@@ -381,7 +381,7 @@ Aşağıdaki 24 madde belediye panelinin kapsamıdır. Her biri 6.1'deki ilkeye 
 24. Talep kutusu raporu
 25. Keşif rotası ve tanıtım videosu girme (ilçe tanıtımı: Seyahat > Keşfet ve Öğren > Başkanlarla Keşif)
 
-**İlk sürüm önerisi (Eren onayladı):** 1, 2, 3, 4, 6, 8, 12, 14, 15, 17, 19. Talep kutusu (11) ikinci aşamaya: cevap beklentisi doğurur, belediyenin hazır olması gerekir. Geri kalanı sonraki aşamalarda.
+**İlk sürüm önerisi (Eren onayladı):** 1, 2, 3, 4, 6, 8, 12, 14, 15, 17, 18, 19. (18. madde, Eren'in kurum içi onay kararıyla ilk sürüme eklendi, bölüm 6.6.) Talep kutusu (11) ikinci aşamaya: cevap beklentisi doğurur, belediyenin hazır olması gerekir. Geri kalanı sonraki aşamalarda.
 - Onay kuyruğu (14): **Karar (Eren): önce il yöneticisi, sonra admin** (iki aşamalı onay, bölüm 6.5).
 
 ### 6.3 İl yöneticisi paneli (kapsam: kendi ili)
@@ -444,6 +444,14 @@ Not: 9 ve 10 numaralı güvenlik ve KVKK maddeleri mağaza onayı ve yasal uyum 
   - **"Güvenli olanları onayla":** Yalnızca *güvenilir yöneticilerin* ilk aşamada onayladığı işleri onaylar.
 - **Güvenilir yöneticiler listesi:** Admin bu listeye yönetici ekler ve listeden çıkarır. Her kayıt bir yönetici ile bir kapsamdan oluşur. Kapsam şehir, ilçe ve kategoriye göre seçilir. Örnek: "Ahmet Bey, Bursa, yalnızca bildirimler." Bir iş, onu ilk aşamada onaylayan yönetici bu listede o iş için uygun şehir, ilçe ve kategoriyle kayıtlıysa "güvenli" sayılır.
 - **Öneri (standart güvenlik):** Toplu onaydan önce "X iş onaylanacak" özeti gösterilir ve onay istenir. Toplu onaylar da tek tek işlem kaydına yazılır. Yüksek riskli işler (hesap kapatma, ücret/iade, il geneli bildirim) "Güvenli olanları onayla" kapsamına girmez, her seferinde tek tek onaylanır.
+
+### 6.6 Kurum içi personel ve onay akışı (Karar, Eren)
+
+- **Karar (Eren): kurum kendi personeline sınırlar içinde görev verir.** "Yetkiyi yalnızca admin verir" kuralı kurumlara verilen yetki içindir. Admin kurumu (belediye, muhtarlık, kurum, kulüp) açar, bölgesini ve bölümlerini belirler ve bir **kurum yöneticisi** atar. Kurum yöneticisi kendi personelini ekler, çıkarır ve görev verir. Admin'in kuruma vermediği bölge ya da bölümü kimseye veremez.
+- **Personel rolleri (her bölüm için ayrı):** *Hazırlayan* taslak yazar ve onaya gönderir, kendisi yayınlayamaz. *Onaylayan* inceler; onaylarsa yayınlanır, reddederse gerekçe notuyla hazırlayana geri döner. *İzleyen* yalnızca görür. Kurum yöneticisi bir bölümde bazı kişilere **"onaysız yayınlayabilir"** yetkisi verebilir (örn. acil duyuruda fen işleri müdürü). Onaylayan taslakta düzeltme yapabilir, değişiklik kayda geçer (öneri).
+- **Örnek (Eren'in örneği):** Basın müdürü gönderi ve etkinlikte hazırlayan, özel kalem onaylayan. Basın müdürü "Onaya gönder" der, özel kaleme bildirim gider, onaylanınca yayınlanır.
+- **Dış onaylarla ilişkisi:** Kurum içi onaydan sonra, iki aşamalı onay gereken işler (kampanya bildirimi vb.) bölüm 6.5'teki il yöneticisi → admin akışına girer.
+- **Kayıt ve güvenlik (standart):** Kim hazırladı, kim onayladı, ne zaman yayınlandı kayda geçer. Personel ayrılınca yetki tek tuşla kapatılır, süreli görev verilebilir. Aynı yapı muhtarlıkta (muhtar yardımcısı hazırlar, muhtar onaylar) ve diğer kurumlarda geçerlidir.
 
 ## 7. Filtreli bildirim
 
