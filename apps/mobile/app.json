@@ -54,6 +54,14 @@
             ]
           }
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "CityJoy, SOS gönderdiğinizde konumunuzu yalnızca aile listenizdeki kişilere iletmek için kullanır. Arka planda konum izlenmez.",
+          "isAndroidBackgroundLocationEnabled": false,
+          "isIosBackgroundLocationEnabled": false
+        }
       ]
     ],
     "experiments": {

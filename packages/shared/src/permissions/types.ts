@@ -16,6 +16,7 @@ export type Module =
   | 'meslekler'
   | 'acil-numaralar'
   | 'hizmet-kategorileri'
+  | 'sos'
   | 'yetkiler'
   | 'onaylar'
   | 'islem-kayitlari'

@@ -25,7 +25,7 @@ Son güncelleme: 27 Ekim 2026.
 |---|---|
 | `apps/mobile` | Expo SDK 58 + Expo Router (TypeScript). Ekranlar `src/app`, bileşenler `src/components`, tema `src/theme` |
 | `apps/panel` | React 19 + Vite + React Router (hash yönlendirme). Tek panel, menü yetkiye göre süzülür |
-| `packages/shared` | Ortak: 5 dil metinleri (`src/i18n/locales`), konum verisi, acil numaralar (`src/emergency`), hizmet kategorileri (`src/categories`), işletmeler ve sıralama (`src/business`), yetki, veri yapıları, hizmet arayüzleri, Firebase uygulaması (`src/firebase`, `@cityjoy/shared/firebase` olarak alınır) |
+| `packages/shared` | Ortak: 5 dil metinleri (`src/i18n/locales`), konum verisi, acil numaralar (`src/emergency`), hizmet kategorileri (`src/categories`), işletmeler ve sıralama (`src/business`), SOS ve aile (`src/sos`), yetki, veri yapıları, hizmet arayüzleri, Firebase uygulaması (`src/firebase`, `@cityjoy/shared/firebase` olarak alınır) |
 | `firebase/` | `firestore.rules` ve emülatör testleri |
 | `tasarim/` | Eren'in 135 tasarım HTML dosyası. İçerikleri değiştirilmez (`CLAUDE.md`) |
 | `docs/stil-rehberi.md` | Renk, yazı tipi, bileşen kuralları (görsel yön kararı) |
@@ -34,8 +34,8 @@ Son güncelleme: 27 Ekim 2026.
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (37)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (22; Java gerekir)
+npm test                      # ortak paket testleri (42)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (25; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -106,6 +106,17 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    silinir. Çok satırlı metin kutuları büyütüldü; doğrudan açılan ekranlarda "Kaydet" sonrası geri dönüş düzeltildi.
    Emülatörde baştan sona denendi.
 
+13. **SOS - Aileme haber ver** (PROJE.md 5.4). Hesabım > Ailem (SOS): davet kodu (8 karakter, tek kullanımlık, 24 saat) QR,
+   bağlantı (`cityjoy://family?kod=...`, paylaş ile WhatsApp vb.) ya da elle yazılarak; ekleme karşılıklı, herkes istediği an
+   çıkar, en çok 10 kişi. Acil İhtiyaçlar > SOS (en üstte): 112 uyarısı, konum durumu, haber verilecek kişiler, tek SOS düğmesi
+   (Karar, Eren: tür seçimi yok) + geri sayım (iptal edilebilir), deneme gönderimi. Gönderilince canlı görünüm: kalan süre,
+   uygulama açıkken canlı konum (30 sn / 50 m), Güvendeyim / Yardım gerek / Durdur, kişi başına Teslim edildi / Görüldü.
+   Alıcıda her ekranın üstünde kırmızı şerit, ayrıntıda konum + "Haritada aç" + 112. SOS geçmişi. İnternet yoksa 12 sn sonra
+   "112'yi arayın" uyarısı. Kurallar: SOS yalnızca aile bağı olan kişilere (tek tek denetlenir), admin dahil kimse başkasının
+   SOS'unu göremez; alıcı yalnızca kendi teslim/görüldü işaretini koyar. Kayıtlar 30 gün sonra silinir (TTL `deleteAt`).
+   Panel > SOS ayarları: canlı konum süresi, geri sayım (kişisel veri gösterilmez). Hesap silinince aile bağları, davetler ve
+   gönderilen SOS'lar silinir. Emülatörde iki kullanıcıyla baştan sona denendi.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Yetkiyi yalnızca admin verir; il yöneticisi talep açar (6, 6.5).
@@ -116,6 +127,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Kurum kendi personeline sınırlar içinde görev verir (kurum yöneticisi); belediye paneli 18. madde ilk sürümde (6.6).
 - Görsel yön: koyu A, açık C (17).
 - Hizmet listesi sıralaması (5.6): Reklam en çok 2 ve yalnızca doğrulanmış; sonra doğrulanmış, puan, ilçe, güncellik.
+- SOS türü seçimi yok, tek düğme (5.4).
 - Değerlendirme kuralları (5.6, Eren "gerekeni yap" dedi): uygulamadan arama şartı, kişi başına bir, cevap hakkı, şikâyet ve gizleme.
 
 ## Açık işler ve bilinen eksikler
@@ -135,6 +147,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   silmede kullanıcının yorumlarını bulma). Gerçek projede
   kurallarla birlikte yüklenmeli; yüklenmezse hizmet listesi açılmaz. Konsoldan yüklemek zahmetli: `firebase deploy` için
   dağıtım anahtarı ya da Eren'in bilgisayarından tek komut gerekir (Eren'e sade anlatılacak).
+- **SOS bildirimi telefona (push) henüz gitmiyor:** SOS, alıcının uygulaması açıkken anında görünür; uygulama kapalıysa
+  açılınca görünür. Telefona bildirim için geliştirme derlemesi (Expo hesabı, EAS) ve Expo push gerekir; yayından önce şart.
+  Sonra: QR'ı kamerayla okutma (expo-camera), fotoğraf/ses ekleme (Storage, Blaze), "ID ile istek" yöntemi (kod ve bağlantı
+  şimdilik yeterli), ulaşılabilir aile üyesi yoksa uyarı (push ile birlikte).
+- **Firestore TTL politikası** (`sosAlerts.deleteAt`, 30 gün) konsolda açılmalı; indexes dosyasında tanımlı.
 - Değerlendirme: şikâyet sayısı eşiğinde otomatik geçici gizleme ve il yöneticisi kuyruğu, yasaklı kelime süzgeci, yorum
   bildirimi (işletmeye "yeni değerlendirme") sonraki adımlarda. "Arama kaydı" kişisel veridir: aydınlatma metnine eklenecek
   (avukat kontrolü). Aynı telefonla kayıtlı işletmenin "sahiplik talebi" akışı henüz yok (mesaj CityJoy ile iletişime yönlendiriyor).
@@ -151,10 +168,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
-1. Nöbetçi eczane: Claude veri kaynağı ve günlük güncelleme için sade bir öneri hazırlayacak, Eren onaylayacak.
-2. SOS - Aileme haber ver: aile listesi (QR / davet bağlantısı / ID ile istek, karşılıklı onay).
+1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS'un telefona bildirim olarak gitmesi, QR okutma, Google/Apple girişi
+   bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
+2. Nöbetçi eczane: Claude veri kaynağı ve günlük güncelleme için sade bir öneri hazırlayacak, Eren onaylayacak.
 3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu ve fotoğraf vitrini (Firebase Storage; Blaze plan gerekir).
-4. Telefonda deneme sürümü (Expo hesabı, EAS) / paneli internete koyma (Firebase Hosting).
+4. Paneli internete koyma (Firebase Hosting).
 
 ## PROJE.md bölümleri (gerektiğinde ilgili bölümü oku)
 

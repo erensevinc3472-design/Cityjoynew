@@ -8,6 +8,7 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import '@/lib/i18n';
+import { IncomingSosBanner, IncomingSosProvider } from '@/lib/incoming-sos';
 import { SessionProvider, useSession } from '@/lib/session';
 import { SettingsProvider, useSettings } from '@/lib/settings';
 import { useThemeColors } from '@/theme/use-theme';
@@ -37,7 +38,10 @@ function RootNavigator() {
   return (
     <LocaleProvider direction={rtl ? 'rtl' : 'ltr'}>
       <View style={{ flex: 1, direction: rtl ? 'rtl' : 'ltr', backgroundColor: c.background }}>
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }} />
+        <IncomingSosProvider>
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }} />
+          <IncomingSosBanner />
+        </IncomingSosProvider>
       </View>
     </LocaleProvider>
   );

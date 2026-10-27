@@ -17,9 +17,8 @@ import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
-/** Sonraki parçalarda gelecek bölümler (PROJE.md 5.4). Hizmetler hazır, ayrı satırda. */
-const COMING: { key: 'sos' | 'pharmacy'; icon: IconName }[] = [
-  { key: 'sos', icon: 'sensors' },
+/** Sonraki parçalarda gelecek bölümler (PROJE.md 5.4). SOS ve Hizmetler hazır, ayrı satırlarda. */
+const COMING: { key: 'pharmacy'; icon: IconName }[] = [
   { key: 'pharmacy', icon: 'local-pharmacy' },
 ];
 
@@ -73,6 +72,21 @@ export default function UrgentScreen() {
             <AppText variant="caption">{t('urgent.disclaimer')}</AppText>
           </View>
         </View>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${t('urgent.sos')}. ${t('urgent.sosHint')}`}
+          onPress={() => router.push('/sos')}
+          style={({ pressed }) => [styles.row, { backgroundColor: c.dangerSoft, borderColor: c.danger, opacity: pressed ? 0.8 : 1 }]}>
+          <View style={[styles.icon, { backgroundColor: c.danger }]}>
+            <MaterialIcons name="sensors" size={22} color={c.onDanger} />
+          </View>
+          <View style={styles.flex}>
+            <AppText variant="label" style={{ color: c.danger }}>{t('urgent.sos')}</AppText>
+            <AppText variant="caption">{t('urgent.sosHint')}</AppText>
+          </View>
+          <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={24} color={c.danger} />
+        </Pressable>
 
         <AppText variant="subtitle" accessibilityRole="header">{t('urgent.numbersTitle')}</AppText>
         {callError ? <FormMessage kind="error" text={callError} /> : null}

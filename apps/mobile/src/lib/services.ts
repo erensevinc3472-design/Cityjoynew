@@ -2,6 +2,8 @@ import { createEmergencyNumberStore, createServiceCategoryStore } from '@cityjoy
 import {
   createFirebaseAuthService,
   createFirestoreBusinessRepository,
+  createFirestoreFamilyRepository,
+  createFirestoreSosRepository,
   createFirestoreEmergencyNumberRepository,
   createFirestoreOccupationRepository,
   createFirestoreProfileRepository,
@@ -11,7 +13,7 @@ import {
 } from '@cityjoy/shared/firebase';
 import { Platform } from 'react-native';
 
-export { DuplicateBusinessError } from '@cityjoy/shared/firebase';
+export { DuplicateBusinessError, SosSendTimeoutError } from '@cityjoy/shared/firebase';
 
 import { firebaseAuth, firestore } from './firebase';
 import i18n from './i18n';
@@ -23,6 +25,8 @@ export const occupationRepository = createFirestoreOccupationRepository(firestor
 export const emergencyNumbers = createEmergencyNumberStore(createFirestoreEmergencyNumberRepository(firestore), deviceStorage);
 export const businessRepository = createFirestoreBusinessRepository(firestore);
 export const reviewRepository = createFirestoreReviewRepository(firestore);
+export const familyRepository = createFirestoreFamilyRepository(firestore);
+export const sosRepository = createFirestoreSosRepository(firestore);
 export const serviceCategories = createServiceCategoryStore(createFirestoreServiceCategoryRepository(firestore), deviceStorage);
 export const sendServiceSuggestion = (uid: string, text: string, provinceCode?: string) => submitServiceSuggestion(firestore, uid, text, provinceCode);
 

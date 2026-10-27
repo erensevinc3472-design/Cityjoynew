@@ -19,3 +19,9 @@ export {
 } from './service-categories';
 export { createBusinessAdmin, createFirestoreBusinessRepository, DuplicateBusinessError } from './businesses';
 export { createFirestoreReviewRepository, createReviewModeration, type ReviewReport } from './reviews';
+export {
+  createFirestoreFamilyRepository,
+  createFirestoreSosRepository,
+  createSosSettingsAdmin,
+  SosSendTimeoutError,
+} from './sos';

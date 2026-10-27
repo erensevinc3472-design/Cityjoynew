@@ -14,7 +14,8 @@
     "isletme-dogrulama": "İşletmeler",
     "meslekler": "Meslekler",
     "acil-numaralar": "Acil numaralar",
-    "hizmet-kategorileri": "Hizmet kategorileri"
+    "hizmet-kategorileri": "Hizmet kategorileri",
+    "sos": "SOS ayarları"
   },
   "roles": {
     "admin": "Admin",
@@ -338,5 +339,21 @@
     "loading": "Yükleniyor…",
     "empty": "Şikâyet yok.",
     "note": "Hakaret ve iftira şikâyetlerinde değerlendirmeyi gizlemeden önce metni okuyun: deneyim anlatımı serbest, kişiyi suçlama ve kişisel bilgi yasak. Her işlem işlem kaydına yazılır."
+  },
+  "sosSettings": {
+    "title": "SOS ayarları",
+    "intro": "Uygulamadaki \"SOS - Aileme haber ver\" özelliğinin süreleri. Değişiklik uygulamada bir sonraki SOS ekranı açılışında geçerli olur.",
+    "privacy": "Gizlilik: kişilerin SOS kayıtları, aile listeleri ve konumları panelde görünmez; veritabanı kuralları yöneticilerin bunları okumasını da engeller. Kayıtlar 30 gün sonra kendiliğinden silinir.",
+    "liveMinutes": "Canlı konum paylaşım süresi (dakika)",
+    "countdownSeconds": "Gönderim öncesi geri sayım (saniye)",
+    "range": "{{min}}-{{max}} arası",
+    "save": "Kaydet",
+    "saved": "Kaydedildi.",
+    "error": "Kaydedilemedi. Yetkinizi ve bağlantınızı kontrol edin.",
+    "loadError": "Ayarlar yüklenemedi.",
+    "retry": "Tekrar dene",
+    "loading": "Yükleniyor…",
+    "readOnly": "Bu ayarları yalnızca admin değiştirebilir.",
+    "demoReadOnly": "Örnek hesapla yalnızca görüntüleyebilirsiniz."
   }
 }

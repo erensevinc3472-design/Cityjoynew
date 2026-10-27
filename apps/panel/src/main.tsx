@@ -11,6 +11,7 @@ import { LoginPage } from './pages/login-page';
 import { ModerationPage } from './pages/moderation-page';
 import { OccupationsPage } from './pages/occupations-page';
 import { ServiceCategoriesPage } from './pages/service-categories-page';
+import { SosSettingsPage } from './pages/sos-settings-page';
 import { OverviewPage } from './pages/overview-page';
 import './styles.css';
 
@@ -38,6 +39,7 @@ const router = createHashRouter([
       { path: 'hizmet-kategorileri', element: <ServiceCategoriesPage /> },
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
+      { path: 'sos-ayarlari', element: <SosSettingsPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },

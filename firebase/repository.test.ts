@@ -3,9 +3,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { activeEmergencyNumbers, buildCategoryTree, rankBusinesses, createServiceCategoryStore, LEGAL_TEXT_VERSION } from '@cityjoy/shared';
+import { FamilyError, activeEmergencyNumbers, buildCategoryTree, rankBusinesses, createServiceCategoryStore, LEGAL_TEXT_VERSION } from '@cityjoy/shared';
 import {
   createBusinessAdmin,
+  createFirestoreFamilyRepository,
+  createFirestoreSosRepository,
+  createSosSettingsAdmin,
   createFirestoreReviewRepository,
   createReviewModeration,
   DuplicateBusinessError,
@@ -277,5 +280,56 @@ describe('değerlendirmeler', () => {
     await ayse.save(id, 'ayse', { stars: 4, text: 'İkinci kez çağırdım, yine iyiydi.' }, 'Ayşe K.');
     await createFirestoreBusinessRepository(fs('ali')).delete(id);
     expect(await ayse.getMine(id, 'ayse')).toBeNull();
+  });
+});
+
+describe('SOS - Aileme haber ver', () => {
+  it('davet > kabul > SOS > teslim/görüldü > güvendeyim; ayrılma; hesap silme; panel ayarları', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'admins/eren'), { addedAt: 'konsol' });
+    });
+    const fs = (uid: string) => env.authenticatedContext(uid).firestore() as unknown as Firestore;
+    const fam = (uid: string) => createFirestoreFamilyRepository(fs(uid));
+    const sos = (uid: string) => createFirestoreSosRepository(fs(uid));
+
+    const inv = await fam('ali').createInvite('ali', 'Ali Usta');
+    await expect(fam('ali').acceptInvite(inv.code, 'ali', 'Ali Usta')).rejects.toEqual(new FamilyError('self'));
+    await expect(fam('ayse').acceptInvite('ZZZZ-ZZZZ', 'ayse', 'Ayşe')).rejects.toEqual(new FamilyError('invalid'));
+    expect(await fam('ayse').acceptInvite(inv.code.toLowerCase(), 'ayse', 'Ayşe Kaya')).toMatchObject({ uid: 'ali', name: 'Ali Usta' });
+    await expect(fam('veli').acceptInvite(inv.code, 'veli', 'Veli')).rejects.toEqual(new FamilyError('used'));
+    const inv2 = await fam('ali').createInvite('ali', 'Ali Usta');
+    await fam('veli').acceptInvite(inv2.code, 'veli', 'Veli Demir');
+    expect((await fam('ali').listMembers('ali')).map((m) => m.name)).toEqual(['Ayşe Kaya', 'Veli Demir']);
+    expect((await fam('ayse').listMembers('ayse')).map((m) => m.name)).toEqual(['Ali Usta']);
+
+    expect(await sos('ali').config()).toEqual({ liveMinutes: 30, countdownSeconds: 5 });
+    await createSosSettingsAdmin(fs('eren'), 'eren').save({ liveMinutes: 45, countdownSeconds: 4 });
+    expect(await sos('ali').config()).toEqual({ liveMinutes: 45, countdownSeconds: 4 });
+
+    const incoming: string[][] = [];
+    const stop = sos('ayse').watchIncoming('ayse', (l) => incoming.push(l.map((a) => a.fromName)));
+    const id = await sos('ali').send({ fromUid: 'ali', fromName: 'Ali Usta', recipients: ['ayse', 'veli'], test: false, location: { lat: 40.19, lng: 29.06, accuracy: 10 }, liveMinutes: 45 });
+    await expect(sos('ali').send({ fromUid: 'ali', fromName: 'Ali', recipients: ['yabanci'], test: false, liveMinutes: 30 })).rejects.toThrow();
+    await new Promise((r) => setTimeout(r, 800));
+    stop();
+    expect(incoming.at(-1)).toEqual(['Ali Usta']);
+
+    await sos('ayse').markDelivered(id, 'ayse');
+    await sos('ayse').markSeen(id, 'ayse');
+    await sos('ali').updateLocation(id, { lat: 40.2, lng: 29.07 });
+    await sos('ali').setStatus(id, 'guvende');
+    const [sent] = await sos('ali').listSent('ali');
+    expect(sent).toMatchObject({ status: 'guvende', location: { lat: 40.2, lng: 29.07 } });
+    expect(Object.keys(sent.deliveredTo)).toEqual(['ayse']);
+    expect(Object.keys(sent.seenBy)).toEqual(['ayse']);
+
+    // Ayrılma iki taraftan da kaldırır; ayrılan kişiye artık SOS gönderilemez.
+    await fam('veli').remove('veli', 'ali');
+    expect((await fam('ali').listMembers('ali')).map((m) => m.uid)).toEqual(['ayse']);
+    await expect(sos('ali').send({ fromUid: 'ali', fromName: 'Ali', recipients: ['veli'], test: true, liveMinutes: 30 })).rejects.toThrow();
+
+    await fam('ali').deleteAllOf('ali');
+    expect(await fam('ayse').listMembers('ayse')).toEqual([]);
+    expect(await sos('ali').listSent('ali')).toEqual([]);
   });
 });

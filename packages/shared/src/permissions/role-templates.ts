@@ -14,6 +14,8 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
     meslekler: ALL,
     'acil-numaralar': ALL,
     'hizmet-kategorileri': ALL,
+    // Yalnızca ayarlar; kişilerin SOS kayıtları ve konumları panelde görünmez (gizlilik).
+    sos: ALL,
     yetkiler: ALL,
     onaylar: ALL,
     'islem-kayitlari': READ,

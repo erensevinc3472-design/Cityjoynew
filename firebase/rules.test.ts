@@ -267,6 +267,69 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(getDoc(doc(db('veli'), 'reviewReports/b1_ayse_veli')));
   });
 
+  it('aile: davetle karşılıklı bağ; kullanılmış/süresi dolmuş davet olmaz; bağı iki taraf da siler', async () => {
+    const invite = (from: string, over: Record<string, unknown> = {}) => ({
+      fromUid: from, fromName: 'Ali', createdAt: serverTimestamp(), expiresAt: Timestamp.fromMillis(Date.now() + 3600_000), ...over,
+    });
+    await assertFails(setDoc(doc(db('ali'), 'familyInvites/ABCDEFGH'), invite('ali', { expiresAt: Timestamp.fromMillis(Date.now() + 48 * 3600_000) })));
+    await assertFails(setDoc(doc(db('ali'), 'familyInvites/ABCDEFGH'), invite('veli')));
+    await assertSucceeds(setDoc(doc(db('ali'), 'familyInvites/ABCDEFGH'), invite('ali')));
+    const accept = (uid: string, code = 'ABCDEFGH', other = 'ali') => {
+      const f = db(uid);
+      const [a, b] = [uid, other].sort();
+      const batch = writeBatch(f);
+      batch.update(doc(f, `familyInvites/${code}`), { usedBy: uid, usedAt: serverTimestamp() });
+      batch.set(doc(f, `familyLinks/${a}_${b}`), { members: [a, b], names: { [uid]: 'X', [other]: 'Ali' }, inviteCode: code, createdAt: serverTimestamp() });
+      return batch.commit();
+    };
+    // Davetsiz bağ kurulamaz; kendi davetini kabul edemez.
+    await assertFails(setDoc(doc(db('ayse'), 'familyLinks/ali_ayse'), { members: ['ali', 'ayse'], names: {}, inviteCode: 'ZZZZZZZZ', createdAt: serverTimestamp() }));
+    await assertFails(accept('ali', 'ABCDEFGH', 'ali'));
+    await assertSucceeds(accept('ayse'));
+    // Kullanılmış davet ikinci kez kullanılamaz.
+    await assertFails(accept('veli'));
+    // Süresi dolmuş davet.
+    await seed('familyInvites/EXPRDCDE', { fromUid: 'ali', fromName: 'Ali', createdAt: Timestamp.now(), expiresAt: Timestamp.fromMillis(Date.now() - 1000) });
+    await assertFails(accept('veli', 'EXPRDCDE'));
+    // Bağı yalnızca iki taraf görür; ikisi de silebilir.
+    await assertSucceeds(getDoc(doc(db('ayse'), 'familyLinks/ali_ayse')));
+    await assertFails(getDoc(doc(db('veli'), 'familyLinks/ali_ayse')));
+    await assertFails(deleteDoc(doc(db('veli'), 'familyLinks/ali_ayse')));
+    await assertSucceeds(deleteDoc(doc(db('ayse'), 'familyLinks/ali_ayse')));
+  });
+
+  it('SOS: yalnızca aile üyelerine; yabancıya ve 10 kişiden fazlasına gönderilemez; alıcı yalnızca kendi işaretini koyar; admin göremez', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    const family = ['b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9', 'b10', 'b11'];
+    for (const m of family) {
+      const [a, b] = ['ali', m].sort();
+      await seed(`familyLinks/${a}_${b}`, { members: [a, b], names: {}, inviteCode: 'X', createdAt: Timestamp.now() });
+    }
+    const alert = (recipients: string[], over: Record<string, unknown> = {}) => ({
+      fromUid: 'ali', fromName: 'Ali', recipients, test: false, status: 'aktif',
+      location: { lat: 40.19, lng: 29.06, accuracy: 12, at: serverTimestamp() },
+      createdAt: serverTimestamp(), liveUntil: Timestamp.fromMillis(Date.now() + 30 * 60_000),
+      deleteAt: Timestamp.fromMillis(Date.now() + 30 * 86400_000), deliveredTo: {}, seenBy: {}, ...over,
+    });
+    await assertFails(setDoc(doc(db('ali'), 'sosAlerts/s0'), alert(['b1', 'yabanci'])));
+    await assertFails(setDoc(doc(db('ali'), 'sosAlerts/s0'), alert(family)));
+    await assertFails(setDoc(doc(db('ali'), 'sosAlerts/s0'), alert(['b1'], { liveUntil: Timestamp.fromMillis(Date.now() + 5 * 3600_000) })));
+    await assertSucceeds(setDoc(doc(db('ali'), 'sosAlerts/s1'), alert(family.slice(0, 10))));
+    await assertSucceeds(setDoc(doc(db('ali'), 'sosAlerts/s2'), alert(['b1', 'b2'])));
+
+    await assertSucceeds(getDoc(doc(db('b1'), 'sosAlerts/s2')));
+    await assertFails(getDoc(doc(db('b3'), 'sosAlerts/s2')));
+    await assertFails(getDoc(doc(db('eren'), 'sosAlerts/s2')));
+    await assertSucceeds(updateDoc(doc(db('b1'), 'sosAlerts/s2'), { 'deliveredTo.b1': serverTimestamp(), 'seenBy.b1': serverTimestamp() }));
+    await assertFails(updateDoc(doc(db('b1'), 'sosAlerts/s2'), { 'seenBy.b2': serverTimestamp() }));
+    await assertFails(updateDoc(doc(db('b1'), 'sosAlerts/s2'), { status: 'bitti' }));
+    await assertSucceeds(updateDoc(doc(db('ali'), 'sosAlerts/s2'), { status: 'guvende' }));
+    await assertSucceeds(updateDoc(doc(db('ali'), 'sosAlerts/s2'), { location: { lat: 40.2, lng: 29.1, at: serverTimestamp() } }));
+    await assertFails(updateDoc(doc(db('ali'), 'sosAlerts/s2'), { recipients: ['b1', 'b2', 'b3'] }));
+    await assertFails(deleteDoc(doc(db('b1'), 'sosAlerts/s2')));
+    await assertSucceeds(deleteDoc(doc(db('ali'), 'sosAlerts/s2')));
+  });
+
   it('admin listesine istemciden yazılamaz', async () => {
     await assertFails(setDoc(doc(db('ali'), 'admins/ali'), { addedAt: 'x' }));
   });
