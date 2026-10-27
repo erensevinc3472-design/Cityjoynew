@@ -332,3 +332,24 @@ export function createCityGuideStore(repo: CityGuideRepository, cache: KeyValueC
     },
   };
 }
+
+/** Öğeyi Excel satırı biçimine geri çevirir (panelde düzenleme formu ve dışa aktarma için). */
+export function cityItemToRow(item: CityGuideItem, ctx: Pick<ParseContext, 'provinces' | 'districts'>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const col of columnsOf(item.section)) {
+    const v = item.values[col.key];
+    if (v === undefined) continue;
+    out[col.key] =
+      typeof v === 'boolean' ? (v ? 'Evet' : 'Hayır') : Array.isArray(v) ? v.join(col.type === 'steps' ? ' | ' : ', ') : String(v);
+  }
+  if (item.provinceCode !== NATIONAL) out.il = ctx.provinces.find((p) => p.code === item.provinceCode)?.name ?? '';
+  if (item.districtId) out.ilce = ctx.districts.find((d) => d.id === item.districtId)?.name ?? '';
+  if (item.location) {
+    out.enlem = String(item.location.lat);
+    out.boylam = String(item.location.lng);
+  }
+  out.kaynak = item.source;
+  const [y, m, d] = item.sourceDate.split('-');
+  out.kaynak_tarihi = `${d}.${m}.${y}`;
+  return out;
+}

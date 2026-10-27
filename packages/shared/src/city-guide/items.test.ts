@@ -90,3 +90,18 @@ describe('Excel satırlarını okuma', () => {
     expect(m.items.find((i) => i.name === 'Bursa Kent Müzesi')!.verified).toBe(false);
   });
 });
+
+describe('öğeyi satıra çevirme', () => {
+  it('düzenleme için satıra çevrilip yeniden okununca aynı öğe çıkar', async () => {
+    const { cityItemToRow } = await import('../index');
+    const rowValues = {
+      tip: 'katli', ad: 'Kent Otoparkı', isletici: 'Belediye', il: 'Bursa', ilce: 'Nilüfer', kapasite: '400', ilk_saat_tl: '30',
+      odeme_yontemleri: 'Nakit, Kredi Kartı', engelli_ucretsiz: 'Evet', enlem: '40.2', boylam: '28.95',
+      kaynak: 'https://www.bursa.bel.tr/otopark', kaynak_tarihi: '27.10.2026',
+    };
+    const first = parseCitySheet('otoparklar', [header('otoparklar'), row('otoparklar', rowValues)], ctx).items[0]!;
+    const back = cityItemToRow(first, ctx);
+    const again = parseCitySheet('otoparklar', [header('otoparklar'), row('otoparklar', back)], ctx).items[0]!;
+    expect(again).toEqual(first);
+  });
+});

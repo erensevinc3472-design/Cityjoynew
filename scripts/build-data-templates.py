@@ -117,3 +117,6 @@ ws.sheet_properties.tabColor='0B3B47'
 wb.move_sheet('İlçeler', offset=len(wb.sheetnames))
 out=f'{ROOT}/docs/veri-sablonlari/benim-sehrim-sablon.xlsx'
 wb.save(out); print(out, wb.sheetnames)
+# Panelde "Şablonu indir" bağlantısı için aynı dosya.
+import shutil
+shutil.copyfile(out, f'{ROOT}/apps/panel/public/benim-sehrim-sablon.xlsx')

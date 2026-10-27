@@ -6,6 +6,7 @@ import { Shell } from './components/shell';
 import { SessionProvider, useSession } from './lib/session';
 import { AuditLogPage } from './pages/audit-log-page';
 import { BusinessesPage } from './pages/businesses-page';
+import { CityGuidePage } from './pages/city-guide-page';
 import { EmergencyNumbersPage } from './pages/emergency-numbers-page';
 import { GrantsPage } from './pages/grants-page';
 import { LocationsPage } from './pages/locations-page';
@@ -43,6 +44,7 @@ const router = createHashRouter([
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
+      { path: 'sehir-rehberi', element: <CityGuidePage /> },
       { path: 'kurumlar', element: <OrganizationsPage /> },
       { path: 'yetkiler', element: <GrantsPage /> },
       { path: 'islem-kayitlari', element: <AuditLogPage /> },
