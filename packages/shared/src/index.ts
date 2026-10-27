@@ -11,3 +11,6 @@ export * from './models/membership';
 /** Konum verisinin sürümü; veri yeniden üretilince değişir ve önbellek yenilenir. */
 export const LOCATION_DATA_VERSION: string = locationMeta.generatedAt;
 export const LOCATION_DATA_SOURCE: string = locationMeta.source;
+export * from './permissions/types';
+export * from './permissions/can';
+export * from './permissions/role-templates';

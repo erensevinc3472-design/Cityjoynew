@@ -10,13 +10,15 @@ Türkiye geneli şehir yaşamı uygulaması (mobil uygulama + yönetim paneli).
 | Klasör | İçerik |
 |---|---|
 | `apps/mobile` | Mobil uygulama (React Native + Expo, TypeScript) |
-| `packages/shared` | Ortak parçalar: 5 dilin metinleri, il/ilçe/mahalle verisi, veri yapıları |
+| `apps/panel` | Web yönetim paneli (React + Vite); menü yetkiye göre değişir |
+| `packages/shared` | Ortak parçalar: 5 dilin metinleri, il/ilçe/mahalle verisi, yetki yapısı, veri yapıları |
 
 ## Çalıştırma
 
 ```sh
 npm install          # bir kez
 npm run mobile       # geliştirme sunucusu (telefonda Expo Go ile açılır)
+npm run panel        # yönetim paneli (geliştirme modunda örnek hesaplarla giriş)
 npm test             # testler
 npm run typecheck    # tür kontrolü
 ```

@@ -9,6 +9,7 @@
     "mobile": "npm run start --workspace apps/mobile",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "locations:build": "node packages/shared/scripts/build-locations.mjs"
+    "locations:build": "node packages/shared/scripts/build-locations.mjs",
+    "panel": "npm run dev --workspace apps/panel"
   }
 }

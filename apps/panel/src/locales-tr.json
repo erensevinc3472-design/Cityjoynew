@@ -1,0 +1,83 @@
+{
+  "appName": "CityJoy Panel",
+  "nav": {
+    "overview": "Genel bakış",
+    "konumlar": "İl, ilçe ve mahalleler",
+    "yetkiler": "Yetkiler",
+    "islem-kayitlari": "İşlem kayıtları",
+    "bildirimler": "Bildirimler",
+    "gonderiler": "Gönderiler",
+    "etkinlikler": "Etkinlikler",
+    "hizmetler": "Hizmetler",
+    "moderasyon": "Moderasyon",
+    "isletme-dogrulama": "İşletme doğrulama"
+  },
+  "roles": {
+    "admin": "Admin",
+    "il-yoneticisi": "İl yöneticisi",
+    "belediye": "Belediye",
+    "baskan": "Belediye başkanı",
+    "muhtar": "Muhtar",
+    "kurum": "Kurum",
+    "kulup": "Kulüp",
+    "moderator": "Gönüllü moderatör",
+    "yayinci": "Haber yayıncısı"
+  },
+  "actions": {
+    "goruntule": "Görüntüle",
+    "ekle": "Ekle",
+    "duzenle": "Düzenle",
+    "sil": "Sil",
+    "onayla": "Onayla",
+    "bildirim-gonder": "Bildirim gönder"
+  },
+  "login": {
+    "title": "Panele giriş",
+    "notConnected": "Giriş sistemi henüz bağlanmadı. Firebase kurulunca e-posta, şifre ve iki aşamalı doğrulama ile giriş yapılacak.",
+    "demoTitle": "Örnek hesapla dene",
+    "demoNote": "Geliştirme modu. Bu hesaplar gerçek değildir, yetki yapısını denemek içindir.",
+    "logout": "Çıkış yap"
+  },
+  "overview": {
+    "title": "Hoş geldiniz",
+    "scope": "Yetki bölgeniz",
+    "modules": "Yetkili olduğunuz bölümler",
+    "comingSoon": "Henüz yapılmadı",
+    "ready": "Hazır",
+    "colModule": "Bölüm",
+    "colActions": "Yapabilecekleriniz",
+    "colStatus": "Durum"
+  },
+  "scope": {
+    "ulke": "Tüm Türkiye"
+  },
+  "locations": {
+    "title": "İl, ilçe ve mahalleler",
+    "provinces": "İller",
+    "districts": "İlçeler",
+    "neighbourhoods": "Mahalle ve köyler",
+    "search": "Ara",
+    "name": "Ad",
+    "code": "Plaka",
+    "districtCount": "İlçe",
+    "postalCode": "Posta kodu",
+    "kind": "Tür",
+    "kinds": {
+      "mahalle": "Mahalle",
+      "koy": "Köy",
+      "diger": "Diğer"
+    },
+    "source": "Kaynak",
+    "updated": "Veri tarihi",
+    "total": "{{count}} kayıt",
+    "importButton": "Kaynaktan güncelle",
+    "editButton": "Düzenle",
+    "needsDatabase": "Düzenleme ve içe aktarma veritabanı (Firebase) bağlanınca açılacak.",
+    "readOnly": "Bu bölümü yalnızca görüntüleyebilirsiniz.",
+    "loadError": "Mahalle listesi yüklenemedi.",
+    "retry": "Tekrar dene",
+    "loading": "Yükleniyor…",
+    "empty": "Sonuç yok.",
+    "all": "Tümü"
+  }
+}
