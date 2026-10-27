@@ -167,8 +167,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   İl bazlı şikâyet kuyruğu ve il yöneticisinin işletme doğrulaması onay merkeziyle gelecek. Kurum içeriği (gönderi,
   etkinlik, bildirim) bölümleri henüz yok; personel görevleri hazır, bölümler yapılınca çalışır. Yeni admin yalnızca Firebase
   konsolundan (`admins/<uid>`). Belde belediyeleri konum listesinde yok (gerekirse "kurum" olarak açılır). Panel metinleri
-  şimdilik yalnızca Türkçe. **Yapılacak (Eren, konsoldan):** e-posta şablonları (Firebase konsolu > Authentication >
-  Templates) Türkçe ve CityJoy adıyla ayarlanmalı; kurumlara giden "şifrenizi belirleyin" e-postası bunu kullanır.
+  şimdilik yalnızca Türkçe. E-posta şablonları konsolda değiştirilemiyor (Firebase: "Email template updates
+  are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
+  ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
+  (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
