@@ -93,7 +93,8 @@
     "weakPassword": "Choose a stronger password.",
     "requiresRecentLogin": "For your security, please enter your password again.",
     "unknown": "Something went wrong. Please try again.",
-    "notConfigured": "The app isn't connected to the server yet."
+    "notConfigured": "The app isn't connected to the server yet.",
+    "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Please choose another name."
   },
   "reset": {
     "title": "Reset your password",
@@ -235,7 +236,8 @@
       "address": "Address can be at most 200 characters.",
       "hoursNote": "Opening hours can be at most 120 characters.",
       "description": "Description can be at most 500 characters.",
-      "priceList": "Each price row needs both a service and a price (max 30 rows)."
+      "priceList": "Each price row needs both a service and a price (max 30 rows).",
+      "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Contact CityJoy for an institution account."
     },
     "hide": "Unpublish (hide)",
     "show": "Publish again",

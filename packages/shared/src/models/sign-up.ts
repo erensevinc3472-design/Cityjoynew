@@ -1,3 +1,4 @@
+import { isReservedName } from '../organizations/municipalities';
 import { ageGroup, MIN_PASSWORD_LENGTH } from './user';
 
 export interface SignUpInput {
@@ -18,6 +19,7 @@ export const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(
 export function validateSignUp(input: SignUpInput, now = new Date()): SignUpErrors {
   const errors: SignUpErrors = {};
   if (input.fullName.trim().length < 2) errors.fullName = 'errors.required';
+  else if (isReservedName(input.fullName)) errors.fullName = 'errors.reservedName';
   if (!isValidEmail(input.email)) errors.email = input.email.trim() ? 'errors.invalidEmail' : 'errors.required';
   if (input.password.length < MIN_PASSWORD_LENGTH) errors.password = 'errors.passwordTooShort';
   else if (input.password !== input.passwordRepeat) errors.passwordRepeat = 'errors.passwordsDontMatch';

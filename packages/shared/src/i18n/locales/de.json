@@ -93,7 +93,8 @@
     "weakPassword": "Wähle ein stärkeres Passwort.",
     "requiresRecentLogin": "Zu deiner Sicherheit gib bitte dein Passwort erneut ein.",
     "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-    "notConfigured": "Die App ist noch nicht mit dem Server verbunden."
+    "notConfigured": "Die App ist noch nicht mit dem Server verbunden.",
+    "reservedName": "Dieser Name ist offiziellen Einrichtungen vorbehalten (Gemeinde, Gouverneursamt, CityJoy usw.). Bitte wähle einen anderen Namen."
   },
   "reset": {
     "title": "Passwort zurücksetzen",
@@ -235,7 +236,8 @@
       "address": "Die Adresse darf höchstens 200 Zeichen haben.",
       "hoursNote": "Öffnungszeiten dürfen höchstens 120 Zeichen haben.",
       "description": "Die Beschreibung darf höchstens 500 Zeichen haben.",
-      "priceList": "Jede Preiszeile braucht Leistung und Preis (höchstens 30 Zeilen)."
+      "priceList": "Jede Preiszeile braucht Leistung und Preis (höchstens 30 Zeilen).",
+      "reservedName": "Dieser Name ist offiziellen Einrichtungen vorbehalten (Gemeinde, Gouverneursamt, CityJoy usw.). Für ein Behördenkonto wenden Sie sich an CityJoy."
     },
     "hide": "Nicht mehr anzeigen",
     "show": "Wieder veröffentlichen",

@@ -26,12 +26,12 @@ export {
   createSosSettingsAdmin,
   SosSendTimeoutError,
 } from './sos';
+export { createGrantAdmin, listAuditLog, loadOwnGrants, type GrantInput } from './grants';
 export {
-  createGrantAdmin,
-  deleteOwnAccessRequest,
-  getOwnAccessRequest,
-  listAuditLog,
-  loadOwnGrants,
-  submitAccessRequest,
-  type GrantInput,
-} from './grants';
+  createAccountWithSetupLink,
+  createOrganizationAdmin,
+  loadOwnMemberships,
+  memberDocId,
+  resendSetupLink,
+  type OrganizationInput,
+} from './organizations';

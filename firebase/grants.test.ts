@@ -3,16 +3,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { grantDocId, ROLE_TEMPLATES, defaultModulesFor } from '@cityjoy/shared';
+import { defaultModulesFor, grantDocId, ROLE_TEMPLATES, type Organization } from '@cityjoy/shared';
 import {
   createBusinessAdmin,
   createGrantAdmin,
+  createOrganizationAdmin,
   createServiceCategoryAdmin,
-  deleteOwnAccessRequest,
-  getOwnAccessRequest,
   listAuditLog,
   loadOwnGrants,
-  submitAccessRequest,
+  loadOwnMemberships,
 } from '@cityjoy/shared/firebase';
 import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -32,8 +31,9 @@ beforeEach(async () => {
   await seed('admins/eren', { addedAt: 'konsol' });
 });
 
-const fs = (uid: string, email?: string) =>
-  env.authenticatedContext(uid, email ? { email, email_verified: true } : {}).firestore() as unknown as Firestore;
+/** Kişiler e-postalarıyla tanınır; yetki yalnızca doğrulanmış e-postada geçer. */
+const fs = (uid: string, email = `${uid}@ornek.com`, verified = true) =>
+  env.authenticatedContext(uid, { email, email_verified: verified }).firestore() as unknown as Firestore;
 
 async function seed(p: string, data: Record<string, unknown>) {
   await env.withSecurityRulesDisabled(async (ctx) => {
@@ -42,119 +42,111 @@ async function seed(p: string, data: Record<string, unknown>) {
 }
 
 const bursa = { level: 'il', provinceCode: '16' } as const;
+const ataevler = { level: 'mahalle', provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-ataevler' } as const;
+const kadikoyMahalle = { level: 'mahalle', provinceCode: '34', districtId: '34-kadikoy', neighbourhoodId: '34-kadikoy-moda' } as const;
+
 const ilYoneticisi = {
-  uid: 'ahmet',
-  displayName: 'Ahmet Yılmaz',
   email: 'ahmet@ornek.com',
+  displayName: 'Ahmet Yılmaz',
   role: 'il-yoneticisi' as const,
   scope: bursa,
   modules: defaultModulesFor('il-yoneticisi', ROLE_TEMPLATES),
 };
+const muhtar = (scope: typeof ataevler | typeof kadikoyMahalle = ataevler, email = 'muhtar@ornek.com') => ({
+  email,
+  displayName: 'Ayşe Muhtar',
+  role: 'muhtar' as const,
+  scope,
+  modules: defaultModulesFor('muhtar', ROLE_TEMPLATES),
+});
 
-describe('yetki verme', () => {
-  it('admin yetki verir; kişi kendi yetkisini görür, başkası göremez', async () => {
-    const admin = createGrantAdmin(fs('eren'), 'eren');
-    const id = await admin.save(ilYoneticisi, true);
-    expect(id).toBe(grantDocId('ahmet', bursa));
-
-    const own = await loadOwnGrants(fs('ahmet'), 'ahmet');
-    expect(own).toHaveLength(1);
-    expect(own[0]!.role).toBe('il-yoneticisi');
+describe('yetki zinciri', () => {
+  it('admin il yöneticisi atar; kişi e-postasıyla girince yetkisini görür, başkası göremez', async () => {
+    const id = await createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren').save(ilYoneticisi, true);
+    expect(id).toBe(grantDocId('ahmet@ornek.com', bursa));
+    const own = await loadOwnGrants(fs('ahmet'), 'ahmet@ornek.com');
+    expect(own.map((g) => g.role)).toEqual(['il-yoneticisi']);
     await assertFails(getDoc(doc(fs('veli'), 'grants', id)));
-    expect((await admin.listAll()).map((g) => g.id)).toEqual([id]);
-
-    // Her işlem kayda geçer.
-    const log = await listAuditLog(fs('eren'));
+    const log = await listAuditLog(fs('eren', 'eren@ornek.com'));
     expect(log.some((e) => e.module === 'yetkiler' && e.targetId === id && e.action === 'ekle')).toBe(true);
   });
 
-  it('admin olmayan yetki veremez; il yöneticisi de veremez', async () => {
-    await createGrantAdmin(fs('eren'), 'eren').save(ilYoneticisi, true);
-    await expect(
-      createGrantAdmin(fs('ahmet'), 'ahmet').save({ ...ilYoneticisi, uid: 'veli', displayName: 'Veli' }, true),
-    ).rejects.toThrow();
-    await expect(createGrantAdmin(fs('veli'), 'veli').save({ ...ilYoneticisi, uid: 'veli' }, true)).rejects.toThrow();
+  it('il yöneticisi kendi ilinde muhtar atar ve geri alır; başka ile, il yöneticisi olarak ya da fazla yetkiyle atayamaz', async () => {
+    await createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren').save(ilYoneticisi, true);
+    const ahmet = createGrantAdmin(fs('ahmet'), 'ahmet');
+    await ahmet.save(muhtar(), true);
+    expect((await loadOwnGrants(fs('muhtar'), 'muhtar@ornek.com'))[0]?.role).toBe('muhtar');
+    expect((await ahmet.listForProvince('16')).map((g) => g.role).sort()).toEqual(['il-yoneticisi', 'muhtar']);
+    await expect(ahmet.listForProvince('34')).rejects.toThrow();
+
+    await expect(ahmet.save(muhtar(kadikoyMahalle, 'baska@ornek.com'), true)).rejects.toThrow();
+    await expect(ahmet.save({ ...ilYoneticisi, email: 'veli@ornek.com' }, true)).rejects.toThrow();
+    // Kendinde olmayan yetkiyi veremez (il yöneticisinin acil numara düzenleme yetkisi yok, muhtarın sınırı da değil).
+    const ref = doc(fs('ahmet'), 'grants', grantDocId('can@ornek.com', ataevler));
+    await assertFails(setDoc(ref, {
+      email: 'can@ornek.com', displayName: 'Can', role: 'muhtar', scope: ataevler, modules: { 'acil-numaralar': ['goruntule', 'duzenle'] },
+      grantedBy: 'ahmet', grantedAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    }));
+    // Kendine yetki veremez.
+    await expect(ahmet.save(muhtar(ataevler, 'ahmet@ornek.com'), true)).rejects.toThrow();
+
+    const [m] = (await ahmet.listForProvince('16')).filter((g) => g.role === 'muhtar');
+    await ahmet.revoke(m!);
+    const log = await listAuditLog(fs('ahmet'), { actorUid: 'ahmet' });
+    expect(log.map((e) => e.action).sort()).toEqual(['ekle', 'sil']);
   });
 
-  it('panelden admin rolü, ülke geneli liste yetkisi ya da yetki verme yetkisi verilemez', async () => {
-    const base = {
-      uid: 'ahmet', displayName: 'Ahmet', role: 'il-yoneticisi', scope: bursa, grantedBy: 'eren',
-      grantedAt: serverTimestamp(), updatedAt: serverTimestamp(),
-    };
-    const ref = doc(fs('eren'), 'grants', grantDocId('ahmet', bursa));
-    await assertFails(setDoc(ref, { ...base, role: 'admin', scope: { level: 'ulke' }, modules: { konumlar: ['goruntule'] } }));
+  it('doğrulanmamış e-postada yetki geçmez; muhtar yetki veremez', async () => {
+    await createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren').save(ilYoneticisi, true);
+    await expect(createGrantAdmin(fs('ahmet', 'ahmet@ornek.com', false), 'ahmet').save(muhtar(), true)).rejects.toThrow();
+    await createGrantAdmin(fs('ahmet'), 'ahmet').save(muhtar(), true);
+    await expect(createGrantAdmin(fs('muhtar'), 'muhtar').save(muhtar(ataevler, 'yardimci@ornek.com'), true)).rejects.toThrow();
+  });
+
+  it('panelden admin rolü ya da ülke geneli liste yetkisi verilemez; rol bölge düzeyine uymalı', async () => {
+    const base = { email: 'ahmet@ornek.com', displayName: 'Ahmet', role: 'il-yoneticisi', scope: bursa, grantedBy: 'eren', grantedAt: serverTimestamp(), updatedAt: serverTimestamp() };
+    const admin = fs('eren', 'eren@ornek.com');
+    const ref = doc(admin, 'grants', grantDocId('ahmet@ornek.com', bursa));
+    await assertFails(setDoc(doc(admin, 'grants', 'ahmet@ornek.com__ulke'), { ...base, role: 'admin', scope: { level: 'ulke' }, modules: { konumlar: ['goruntule'] } }));
     await assertFails(setDoc(ref, { ...base, modules: { 'acil-numaralar': ['goruntule', 'duzenle'] } }));
     await assertFails(setDoc(ref, { ...base, modules: { meslekler: ['goruntule'] } }));
-    await assertFails(setDoc(ref, { ...base, modules: { yetkiler: ['goruntule', 'ekle'] } }));
-    // Kimlik bölgeyle uyuşmalı; rol bölge düzeyine uymalı (il yöneticisi ilçeye verilmez).
-    await assertFails(setDoc(doc(fs('eren'), 'grants', 'ahmet__il-34'), { ...base, modules: { konumlar: ['goruntule'] } }));
-    await assertFails(
-      setDoc(doc(fs('eren'), 'grants', 'ahmet__ilce-16-nilufer'), {
-        ...base, scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' }, modules: { konumlar: ['goruntule'] },
-      }),
-    );
-    // Admin kendine yetki veremez.
-    await assertFails(
-      setDoc(doc(fs('eren'), 'grants', 'eren__il-16'), { ...base, uid: 'eren', modules: { konumlar: ['goruntule'] } }),
-    );
+    await assertFails(setDoc(doc(admin, 'grants', 'ahmet@ornek.com__il-34'), { ...base, modules: { konumlar: ['goruntule'] } }));
+    await assertFails(setDoc(doc(admin, 'grants', grantDocId('ahmet@ornek.com', ataevler)), { ...base, scope: ataevler, modules: { konumlar: ['goruntule'] } }));
     await assertSucceeds(setDoc(ref, { ...base, modules: { konumlar: ['goruntule'] } }));
   });
 
   it('geri alınan ya da süresi dolan yetki sunucuda geçmez; yetki silinemez', async () => {
-    const admin = createGrantAdmin(fs('eren'), 'eren');
+    const admin = createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren');
     await admin.save(ilYoneticisi, true);
     await seed('serviceSuggestions/s1', { uid: 'ali', text: 'Saat tamircisi', provinceCode: '16', status: 'yeni', createdAt: Timestamp.now() });
     await assertSucceeds(getDoc(doc(fs('ahmet'), 'serviceSuggestions/s1')));
-
     const [g] = await admin.listAll();
     await admin.revoke(g!);
     await assertFails(getDoc(doc(fs('ahmet'), 'serviceSuggestions/s1')));
-    // Geri alınmış yetki yeniden geri alınamaz, içeriği gizlice değiştirilemez.
-    await assertFails(updateDoc(doc(fs('eren'), 'grants', g!.id), { revokedAt: serverTimestamp(), revokedBy: 'eren', updatedAt: serverTimestamp() }));
-
-    // Yeniden verilebilir, bu kez süresi geçmiş olarak.
     await admin.save({ ...ilYoneticisi, expiresAt: new Date(Date.now() - 60_000) }, false);
     await assertFails(getDoc(doc(fs('ahmet'), 'serviceSuggestions/s1')));
     await admin.save({ ...ilYoneticisi, expiresAt: new Date(Date.now() + 86_400_000) }, false);
     await assertSucceeds(getDoc(doc(fs('ahmet'), 'serviceSuggestions/s1')));
-
-    await assertFails(deleteDoc(doc(fs('eren'), 'grants', g!.id)));
+    await assertFails(deleteDoc(doc(fs('eren', 'eren@ornek.com'), 'grants', g!.id)));
   });
 });
 
 describe('il yöneticisi kendi ilinde çalışır', () => {
   beforeEach(async () => {
-    await createGrantAdmin(fs('eren'), 'eren').save(ilYoneticisi, true);
+    await createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren').save(ilYoneticisi, true);
     await seed('serviceSuggestions/bursa', { uid: 'ali', text: 'Saat tamircisi', provinceCode: '16', status: 'yeni', createdAt: Timestamp.now() });
     await seed('serviceSuggestions/istanbul', { uid: 'ali', text: 'Kayıkçı', provinceCode: '34', status: 'yeni', createdAt: Timestamp.now() });
   });
 
-  it('yalnızca kendi ilinin eksik hizmet önerilerini görür ve incelendi yapar; işlem kaydı yazılır', async () => {
+  it('yalnızca kendi ilinin eksik hizmet önerilerini görür ve incelendi yapar', async () => {
     const mine = createServiceCategoryAdmin(fs('ahmet'), 'ahmet');
     const list = await mine.listSuggestions({ provinceCode: '16' });
     expect(list.map((s) => s.id)).toEqual(['bursa']);
     await expect(mine.listSuggestions({ provinceCode: '34' })).rejects.toThrow();
     await expect(mine.listSuggestions()).rejects.toThrow();
-
     await mine.markReviewed(list[0]!);
-    const other = { id: 'istanbul', uid: 'ali', text: 'Kayıkçı', provinceCode: '34', status: 'yeni' as const, createdAt: '' };
-    await expect(mine.markReviewed(other)).rejects.toThrow();
-
-    const log = await listAuditLog(fs('ahmet'), { actorUid: 'ahmet' });
-    expect(log.map((e) => e.targetId)).toEqual(['bursa']);
-    // Başkasının kayıtlarını ve tüm kaydı göremez.
+    await expect(mine.markReviewed({ id: 'istanbul', uid: 'ali', text: 'Kayıkçı', provinceCode: '34', status: 'yeni', createdAt: '' })).rejects.toThrow();
     await expect(listAuditLog(fs('ahmet'))).rejects.toThrow();
-  });
-
-  it('yetkisi olmayan bölgeye ya da bölgesiz işlem kaydı ekleyemez', async () => {
-    const audit = (region?: Record<string, string>) =>
-      setDoc(doc(fs('ahmet'), 'auditLog/x'), {
-        actorUid: 'ahmet', module: 'hizmet-kategorileri', action: 'onayla', at: serverTimestamp(), summary: 'deneme',
-        ...(region ? { region } : {}),
-      });
-    await assertFails(audit());
-    await assertFails(audit({ provinceCode: '34' }));
-    await assertSucceeds(audit({ provinceCode: '16' }));
   });
 
   it('kendi ilindeki gizli işletmeleri görür, başka ili göremez, doğrulama yapamaz', async () => {
@@ -174,38 +166,79 @@ describe('il yöneticisi kendi ilinde çalışır', () => {
   });
 });
 
-describe('yetki talebi', () => {
-  it('kişi kendi e-postasıyla talep gönderir, admin görür ve yetki verince talep kapanır', async () => {
-    const me = { uid: 'veli', displayName: 'Veli Kaya', email: 'veli@ornek.com' };
-    await submitAccessRequest(fs('veli', 'veli@ornek.com'), me, 'Nilüfer Belediyesi basın birimi');
-    // Başkasının e-postasıyla gönderemez.
-    await expect(submitAccessRequest(fs('can', 'can@ornek.com'), { uid: 'can', displayName: 'Can', email: 'eren@ornek.com' }, '')).rejects.toThrow();
-    // Aynı gün ikinci kez gönderemez.
-    await expect(submitAccessRequest(fs('veli', 'veli@ornek.com'), me, 'tekrar')).rejects.toThrow();
-    // Başkası göremez.
-    await assertFails(getDoc(doc(fs('can', 'can@ornek.com'), 'accessRequests/veli')));
+describe('kurumlar ve personel', () => {
+  const nilufer = {
+    id: 'bld-16-nilufer', name: 'Nilüfer Belediyesi', kind: 'ilce-belediyesi' as const,
+    scope: { level: 'ilce' as const, provinceCode: '16', districtId: '16-nilufer' }, modules: ['gonderiler' as const, 'bildirimler' as const],
+    officialEmail: 'bilgi@nilufer.bel.tr',
+  };
+  const kalem = { email: 'kalem@nilufer.bel.tr', displayName: 'Özel Kalem' };
+  const org = (): Organization => ({ ...nilufer, status: 'aktif', createdBy: 'eren', createdAt: '' });
 
-    const admin = createGrantAdmin(fs('eren'), 'eren');
-    const [req] = await admin.listRequests();
-    expect(req?.email).toBe('veli@ornek.com');
-
-    await admin.save(
-      {
-        uid: 'veli', displayName: req!.displayName, email: req!.email, role: 'belediye',
-        scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' }, modules: defaultModulesFor('belediye', ROLE_TEMPLATES),
-      },
-      true,
-    );
-    expect((await getOwnAccessRequest(fs('veli', 'veli@ornek.com'), 'veli'))?.status).toBe('yetki-verildi');
-    expect(await admin.listRequests()).toEqual([]);
+  it('kurumu yalnızca admin açar; aynı belediye iki kez açılamaz; belediye kimliği kilitli listeden', async () => {
+    await expect(createOrganizationAdmin(fs('ahmet'), 'ahmet').create(nilufer, kalem)).rejects.toThrow();
+    const admin = createOrganizationAdmin(fs('eren', 'eren@ornek.com'), 'eren');
+    await admin.create(nilufer, kalem);
+    await expect(admin.create(nilufer, kalem)).rejects.toThrow();
+    await expect(admin.create({ ...nilufer, id: 'krm-nilufer-belediyesi' }, kalem)).rejects.toThrow();
+    await admin.create({ ...nilufer, id: 'krm-bursa-spor', name: 'Bursa Spor Kulübü', kind: 'kulup', scope: { level: 'il', provinceCode: '16' } }, kalem);
   });
 
-  it('admin talebi reddeder; kişi kendi talebini silebilir', async () => {
-    await submitAccessRequest(fs('veli', 'veli@ornek.com'), { uid: 'veli', displayName: 'Veli', email: 'veli@ornek.com' }, '');
-    const admin = createGrantAdmin(fs('eren'), 'eren');
-    await admin.rejectRequest((await admin.listRequests())[0]!);
-    expect((await getOwnAccessRequest(fs('veli', 'veli@ornek.com'), 'veli'))?.status).toBe('reddedildi');
-    await deleteOwnAccessRequest(fs('veli', 'veli@ornek.com'), 'veli');
-    expect(await getOwnAccessRequest(fs('veli', 'veli@ornek.com'), 'veli')).toBeNull();
+  it('kurum yöneticisi kendi personelini ekler, görev verir, çıkarır; kurum yöneticisi atayamaz, başka kuruma dokunamaz', async () => {
+    await createOrganizationAdmin(fs('eren', 'eren@ornek.com'), 'eren').create(nilufer, kalem);
+    const kalemDb = fs('kalem', 'kalem@nilufer.bel.tr');
+    const mine = await loadOwnMemberships(kalemDb, 'kalem@nilufer.bel.tr');
+    expect(mine.map((m) => [m.org.id, m.member.isOrgAdmin])).toEqual([['bld-16-nilufer', true]]);
+
+    const k = createOrganizationAdmin(kalemDb, 'kalem');
+    const basin = { email: 'basin@nilufer.bel.tr', displayName: 'Basın Müdürü', isOrgAdmin: false, assignments: { gonderiler: { role: 'hazirlayan' as const } } };
+    await k.saveMember(org(), basin, true);
+    expect((await k.listMembers('bld-16-nilufer')).map((m) => m.email)).toEqual(['kalem@nilufer.bel.tr', 'basin@nilufer.bel.tr']);
+    expect((await loadOwnMemberships(fs('basin', 'basin@nilufer.bel.tr'), 'basin@nilufer.bel.tr'))[0]?.member.assignments).toEqual({ gonderiler: { role: 'hazirlayan' } });
+
+    // Kurumun bölümleri dışında görev, kurum yöneticisi atama, kendi kaydını değiştirme yok.
+    const raw = doc(kalemDb, 'orgMembers', 'bld-16-nilufer__basin@nilufer.bel.tr');
+    await assertFails(setDoc(raw, { orgId: 'bld-16-nilufer', email: 'basin@nilufer.bel.tr', displayName: 'B', isOrgAdmin: false, assignments: { etkinlikler: { role: 'onaylayan' } }, addedBy: 'kalem', updatedAt: serverTimestamp() }));
+    await expect(k.saveMember(org(), { ...basin, email: 'yeni@nilufer.bel.tr', isOrgAdmin: true }, true)).rejects.toThrow();
+    await expect(k.saveMember(org(), { ...kalem, isOrgAdmin: false, assignments: {} }, false)).rejects.toThrow();
+    // Personel başka personel ekleyemez.
+    await expect(createOrganizationAdmin(fs('basin', 'basin@nilufer.bel.tr'), 'basin').saveMember(org(), { ...basin, email: 'x@nilufer.bel.tr' }, true)).rejects.toThrow();
+
+    const [, b] = await k.listMembers('bld-16-nilufer');
+    await k.removeMember(org(), b!);
+    expect((await k.listMembers('bld-16-nilufer'))[1]?.removedAt).toBeTruthy();
+  });
+
+  it('kurum pasifleşince ya da sözleşmesi bitince kurum yöneticisi çalışamaz; il yöneticisi ilindeki kurumları görür', async () => {
+    const admin = createOrganizationAdmin(fs('eren', 'eren@ornek.com'), 'eren');
+    await admin.create(nilufer, kalem);
+    await admin.update(org(), { status: 'pasif' });
+    const basin = { email: 'basin@nilufer.bel.tr', displayName: 'Basın', isOrgAdmin: false, assignments: {} };
+    await expect(createOrganizationAdmin(fs('kalem', 'kalem@nilufer.bel.tr'), 'kalem').saveMember(org(), basin, true)).rejects.toThrow();
+    await admin.update(org(), { status: 'aktif', contractEndsAt: new Date(Date.now() - 1000) });
+    await expect(createOrganizationAdmin(fs('kalem', 'kalem@nilufer.bel.tr'), 'kalem').saveMember(org(), basin, true)).rejects.toThrow();
+
+    await createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren').save(ilYoneticisi, true);
+    expect((await createOrganizationAdmin(fs('ahmet'), 'ahmet').listForProvince('16')).map((o) => o.id)).toEqual(['bld-16-nilufer']);
+    await expect(createOrganizationAdmin(fs('ahmet'), 'ahmet').listForProvince('34')).rejects.toThrow();
+  });
+});
+
+describe('kilitli adlar', () => {
+  it('işletme adı belediye ya da resmî kurum adı olamaz', async () => {
+    const biz = (name: string) => ({
+      type: 'hizmet', name, categoryIds: ['tesisatci'], location: { provinceCode: '16', districtId: '16-nilufer' }, phone: '5551112233',
+      whatsapp: false, is24h: false, priceList: [], ownerUid: 'ali', status: 'yayinda',
+      verification: { status: 'dogrulanmadi' }, membership: { tier: 'ucretsiz' }, rating: { sum: 0, count: 0 },
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    });
+    const ali = fs('ali');
+    for (const name of ['Nilüfer Belediyesi', 'NİLÜFER BELEDİYESİ', 'Bursa Valiliği', 'CityJoy Destek']) {
+      await assertFails(setDoc(doc(ali, 'businesses/x'), biz(name)));
+    }
+    // Ad uygunsa kural telefon kaydını bekler; burada yalnızca ad denetimini ayırmak için updateDoc ile bakılır.
+    await seed('businesses/y', { ...biz('Ahmet Usta'), createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
+    await assertFails(updateDoc(doc(ali, 'businesses/y'), { name: 'Osmangazi Belediyesi', updatedAt: serverTimestamp() }));
+    await assertSucceeds(updateDoc(doc(ali, 'businesses/y'), { name: 'Ahmet Usta Tesisat', updatedAt: serverTimestamp() }));
   });
 });

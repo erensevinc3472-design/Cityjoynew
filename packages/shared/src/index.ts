@@ -17,6 +17,7 @@ export * from './permissions/role-templates';
 export * from './permissions/grants';
 export * from './organizations/types';
 export * from './organizations/staff';
+export * from './organizations/municipalities';
 export * from './services/types';
 export * from './services/occupations';
 export * from './emergency/numbers';

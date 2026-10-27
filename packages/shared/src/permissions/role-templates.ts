@@ -17,6 +17,7 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
     // Yalnızca ayarlar; kişilerin SOS kayıtları ve konumları panelde görünmez (gizlilik).
     sos: ALL,
     yetkiler: ALL,
+    kurumlar: ALL,
     onaylar: ALL,
     'islem-kayitlari': READ,
     bildirimler: ALL,
@@ -33,8 +34,10 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
     // Kategori ağacı ülke geneli; değişikliği admin yapar. Kendi ilinin eksik hizmet önerilerini görür ve
     // "incelendi" yapar (onayla).
     'hizmet-kategorileri': ['goruntule', 'onayla'],
-    // Yetkiyi yalnızca admin verir; il yöneticisi görür ve talep açar (talep onay merkezine düşer).
-    yetkiler: ['goruntule'],
+    // Kendi ilinde muhtar ve gönüllü moderatör yetkisi verir (PROJE.md 6.7); kurumları görür.
+    yetkiler: ['goruntule', 'ekle', 'duzenle', 'sil'],
+    kurumlar: READ,
+    gonderiler: [...WRITE, 'sil', 'onayla'],
     // İki aşamalı onayın ilk aşaması (PROJE.md 6.5).
     onaylar: ['goruntule', 'onayla'],
     'islem-kayitlari': READ,

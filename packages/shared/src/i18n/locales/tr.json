@@ -93,7 +93,8 @@
     "weakPassword": "Daha güçlü bir şifre seç.",
     "requiresRecentLogin": "Güvenliğin için şifreni tekrar girmen gerekiyor.",
     "unknown": "Bir sorun oluştu. Lütfen tekrar dene.",
-    "notConfigured": "Uygulama henüz sunucuya bağlı değil."
+    "notConfigured": "Uygulama henüz sunucuya bağlı değil.",
+    "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Başka bir ad yazın."
   },
   "reset": {
     "title": "Şifreni sıfırla",
@@ -235,7 +236,8 @@
       "address": "Adres en çok 200 karakter olabilir.",
       "hoursNote": "Çalışma saatleri en çok 120 karakter olabilir.",
       "description": "Tanıtım en çok 500 karakter olabilir.",
-      "priceList": "Fiyat satırlarında hizmet ve fiyat ikisi de dolu olmalı (en çok 30 satır)."
+      "priceList": "Fiyat satırlarında hizmet ve fiyat ikisi de dolu olmalı (en çok 30 satır).",
+      "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Kurum hesabı için CityJoy ile iletişime geçin."
     },
     "hide": "Yayından kaldır (gizle)",
     "show": "Yeniden yayınla",

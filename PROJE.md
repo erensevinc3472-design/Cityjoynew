@@ -336,7 +336,7 @@ Bildirim merkezi, kategorilere göre (duyuru, etkinlik, mesaj, takip, yarışma,
 
 Eren'in kuralı: **herkes yalnızca kendi panelinden, kendine yetkilendirilen kadarını** uygulamaya etki ettirebilir.
 - Yetki iki eksenlidir: **bölge** (il/ilçe/mahalle) ve **modül** (hangi bölüme yazabilir).
-- **Karar (Eren): yetkiyi yalnızca admin verir ve geri alır.** İl yöneticisi yetki veremez. Öneri: il yöneticisi yetki *talebi* açabilir, talep admin'in "Bekleyen onaylar" ekranına düşer (bölüm 6.5).
+- ~~Karar (Eren): yetkiyi yalnızca admin verir ve geri alır. İl yöneticisi yetki veremez.~~ **27 Ekim 2026'da değişti, bkz. 6.7:** admin herkese ve tüm kurumlara verir; il yöneticisi kendi ilindeki muhtarlara (ve gönüllü moderatörlere) verir; kurum kendi personeline verir. Kimse kendinde olmayan yetkiyi veremez.
 - **Karar (Eren): herkes kendi alanında.** Büyükşehir belediyesi il geneli içerik girer, ilçe belediyesi yalnızca kendi ilçesine. İkisi aynı yere içerik girerse her içerikte kimin girdiği yazar. Kimse diğerinin içeriğini düzenleyemez.
 - **Karar (Eren): işletmeler için ayrı panel yok (ilk sürüm).** İşletme sahipleri her şeyi mobil uygulamadaki Profil > İşletmem bölümünden yapar. İhtiyaç olursa sonra eklenir.
 
@@ -463,6 +463,14 @@ Not: 9 ve 10 numaralı güvenlik ve KVKK maddeleri mağaza onayı ve yasal uyum 
 - **Örnek (Eren'in örneği):** Basın müdürü gönderi ve etkinlikte hazırlayan, özel kalem onaylayan. Basın müdürü "Onaya gönder" der, özel kaleme bildirim gider, onaylanınca yayınlanır.
 - **Dış onaylarla ilişkisi:** Kurum içi onaydan sonra, iki aşamalı onay gereken işler (kampanya bildirimi vb.) bölüm 6.5'teki il yöneticisi → admin akışına girer.
 - **Kayıt ve güvenlik (standart):** Kim hazırladı, kim onayladı, ne zaman yayınlandı kayda geçer. Personel ayrılınca yetki tek tuşla kapatılır, süreli görev verilebilir. Aynı yapı muhtarlıkta (muhtar yardımcısı hazırlar, muhtar onaylar) ve diğer kurumlarda geçerlidir.
+
+### 6.7 Hesap açma, kilitli adlar ve yetki zinciri (Karar, Eren, 27 Ekim 2026)
+
+- **Kilitli adlar (Karar, Eren):** Tüm belediye adları (30 büyükşehir, 51 il, ilçe belediyeleri) baştan kilitlidir; hiçbir kullanıcı bu adları (işletme adı, profil adı, ileride kullanıcı adı) alamaz. Ad yalnızca admin'in açtığı resmî kurum hesabına verilir. Standart olarak "belediye, valilik, kaymakamlık, muhtarlık, CityJoy" gibi resmî sözcükler de kullanıcı adlarında kullanılamaz (Claude, güvenlik).
+- **Kurum hesabını CityJoy açar (Karar, Eren):** Anlaşma yapılan kurumun hesabı kurumun resmî e-postasıyla açılır. Şifreyi kurum kendisi belirler: sisteme kayıtlı e-postaya "şifrenizi belirleyin" bağlantısı gider (Eren onayladı; şifre CityJoy'da, mesajda ya da e-postada hiç durmaz). Hesap kurum yöneticisinindir (örn. özel kalem); personel ortak şifre kullanmaz, herkes kendi hesabıyla çalışır, kayıtlarda kişinin adı görünür.
+- **Form yok, yetki yukarıdan verilir (Karar, Eren):** Yetki alacak kişi form doldurmaz, panele başvurmaz. Yetkiyi veren, kişinin e-postasını yazar, rolünü ve bölgesini/bölümünü seçer; kişi o e-postayla (doğrulanmış) uygulamaya ya da panele girince yetkisi açılır. Zincir: **admin** herkese ve tüm kurumlara; **il yöneticisi** kendi ilindeki muhtarlara (ve gönüllü moderatörlere); **kurum yöneticisi** kendi personeline (kurumun bölgesi ve bölümleri içinde). Kimse kendinde olmayan yetkiyi veremez; verenin kendisi ve admin geri alabilir; her işlem kayda geçer.
+- **Panel kimlerde (Eren onayladı):** Admin, kurumlar ve il yöneticileri panel sahibidir. Muhtar ve kurum personeli aynı web panelini kendi hesabıyla, yalnızca aldıkları erişim kadar kullanır (panel telefonda da açılır). Mobil uygulamada "Yönetim" bölümü sonraya bırakıldı.
+- **Onay zinciri (Karar, Eren):** Personelin onay gereken işi kendi yetkilisine (kurum içi onaylayan / il yöneticisi) gider. Admin onayı gereken işleri il yöneticisi ve kurum admin'e sorar (Bekleyen onaylar, 6.5). Aşağıdaki **önemli konularda** il yöneticisi ya da kurum onaylasa bile iş admin'e de gider (Eren onayladı): il geneli ve kampanya bildirimleri, işletme doğrulaması, yeni kurum hesabı açma, hesap kapatma ve yasaklama, ücret ve iade işlemleri, anket yayını.
 
 ## 7. Filtreli bildirim
 

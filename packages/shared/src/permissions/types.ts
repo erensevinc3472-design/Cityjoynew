@@ -25,7 +25,8 @@ export type Module =
   | 'etkinlikler'
   | 'hizmetler'
   | 'moderasyon'
-  | 'isletme-dogrulama';
+  | 'isletme-dogrulama'
+  | 'kurumlar';
 
 export type Action = 'goruntule' | 'ekle' | 'duzenle' | 'sil' | 'onayla' | 'bildirim-gonder';
 
@@ -43,10 +44,14 @@ export interface RegionRef {
   neighbourhoodId?: string;
 }
 
-/** Bir hesaba verilen yetki. Her atama ve geri alma işlem kaydına yazılır. */
+/**
+ * Bir kişiye verilen yetki. Kişi e-postasıyla tanınır (PROJE.md 6.7): yetkiyi veren e-postayı yazar, kişi o
+ * (doğrulanmış) e-postayla girince yetki açılır. Her atama ve geri alma işlem kaydına yazılır.
+ */
 export interface PermissionGrant {
   id: string;
-  uid: string;
+  /** Küçük harfli e-posta. */
+  email: string;
   role: Role;
   scope: RegionScope;
   modules: Partial<Record<Module, Action[]>>;
@@ -56,6 +61,8 @@ export interface PermissionGrant {
   /** Süreli yetkilerde bitiş (ISO tarih). */
   expiresAt?: string;
   revokedAt?: string;
+  /** Kurum personeli görevinden türetilen yetkide kurum kimliği. */
+  orgId?: string;
 }
 
 /** Yönetici işlem kaydı (kim, neyi, ne zaman). Silinemez, yalnızca eklenir. */
