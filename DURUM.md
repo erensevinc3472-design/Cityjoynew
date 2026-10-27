@@ -95,7 +95,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Yasal metinler boş (yalnızca "avukat kontrolünden geçecek" notu).
 - Misafir gezinti, telefon doğrulaması: `PROJE.md` 3.1'de onay bekleyen öneriler.
 - Panelde onay merkezi, yetki atama ve personel ekranları yok (veri yapıları hazır).
-- **Güncel güvenlik kuralları Firebase'e yüklenmedi:** `firebase/firestore.rules` değişti (acil numaralar eklendi). Konsola
+- **Güncel güvenlik kuralları Firebase'e yüklenmedi (Eren bilgisayardan yapacak; her oturum başında ona hatırlat):** `firebase/firestore.rules` değişti (acil numaralar eklendi). Konsola
   yüklenene kadar gerçek projede panelden acil numara kaydedilemez (uygulama gömülü listeyi gösterir).
 - Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, SOS (aile listesi, QR; bildirim için geliştirme derlemesi gerekir), hizmet
   kategorileri, asistan.
