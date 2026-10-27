@@ -1,0 +1,127 @@
+rules_version = '2';
+
+// CityJoy veritabanı güvenlik kuralları.
+// İlke: varsayılan kapalı; her koleksiyon açıkça izin verilen kadarını açar. Yetki kontrolü burada,
+// sunucuda yapılır (ekranda gizlemek yetmez). Yayın: firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Admin listesi yalnızca Firebase konsolundan (ya da sunucudan) yazılır.
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function ageOf(birthYear) {
+      return request.time.year() - birthYear;
+    }
+
+    function validConsent(c) {
+      return c is map
+        && c.keys().hasOnly(['granted', 'at', 'textVersion'])
+        && c.granted is bool && c.at is string && c.textVersion is string;
+    }
+
+    function validLocation(loc) {
+      return loc is map
+        && loc.keys().hasOnly(['provinceCode', 'districtId', 'neighbourhoodId'])
+        && loc.provinceCode is string && loc.provinceCode.matches('^[0-8][0-9]$')
+        && (!('districtId' in loc) || (loc.districtId is string && loc.districtId.matches('^' + loc.provinceCode + '-.+')))
+        && (!('neighbourhoodId' in loc) || ('districtId' in loc && loc.neighbourhoodId is string
+              && loc.neighbourhoodId.matches('^' + loc.districtId + '-.+')));
+    }
+
+    // Kullanıcının özel profili (yaş, cinsiyet, meslek, mahalle). Yalnızca sahibi okur ve yazar.
+    function validProfile(d) {
+      return d.keys().hasOnly([
+          'uid', 'displayName', 'language', 'location', 'locationChangedAt', 'birthYear', 'gender',
+          'occupationId', 'interests', 'phoneVerified', 'emailVerified', 'isPrivate', 'consents',
+          'createdAt', 'updatedAt'])
+        && d.displayName is string && d.displayName.size() >= 2 && d.displayName.size() <= 60
+        && d.language in ['tr', 'en', 'de', 'ar', 'ru']
+        && d.birthYear is int && ageOf(d.birthYear) >= 13 && ageOf(d.birthYear) <= 120
+        && (!('gender' in d) || d.gender in ['kadin', 'erkek', 'belirtmek-istemiyorum'])
+        && (!('occupationId' in d) || (d.occupationId is string && d.occupationId.size() <= 60))
+        && (!('interests' in d) || (d.interests is list && d.interests.size() <= 20))
+        && (!('location' in d) || validLocation(d.location))
+        && d.isPrivate is bool
+        // 13-17 yaş hesapları gizli kalır.
+        && (ageOf(d.birthYear) >= 18 || d.isPrivate == true)
+        && d.consents is map
+        && d.consents.keys().hasOnly(['terms', 'privacyNotice', 'targeting', 'commercialMessages'])
+        && validConsent(d.consents.terms) && d.consents.terms.granted == true
+        && validConsent(d.consents.privacyNotice) && d.consents.privacyNotice.granted == true
+        && (!('targeting' in d.consents) || validConsent(d.consents.targeting))
+        && (!('commercialMessages' in d.consents) || validConsent(d.consents.commercialMessages))
+        // 18 yaş altına kampanya izni verilmez.
+        && (ageOf(d.birthYear) >= 18 || !('commercialMessages' in d.consents) || d.consents.commercialMessages.granted == false)
+        && d.updatedAt == request.time;
+    }
+
+    function neighbourhoodOf(d) {
+      return ('location' in d && 'neighbourhoodId' in d.location) ? d.location.neighbourhoodId : null;
+    }
+
+    // Mahalle ayda bir kez değiştirilebilir (Keşfet kuralı 5); ilk seçim serbesttir.
+    function neighbourhoodChangeAllowed(before, after) {
+      return neighbourhoodOf(before) == neighbourhoodOf(after)
+        ? after.get('locationChangedAt', null) == before.get('locationChangedAt', null)
+        : after.locationChangedAt == request.time
+          && (neighbourhoodOf(before) == null
+              || before.get('locationChangedAt', null) == null
+              || request.time > before.locationChangedAt + duration.value(30, 'd'));
+    }
+
+    match /users/{uid} {
+      allow read: if isSelf(uid);
+      allow create: if isSelf(uid)
+        && validProfile(request.resource.data)
+        && request.resource.data.uid == uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.phoneVerified == false
+        && request.resource.data.emailVerified == false
+        && (neighbourhoodOf(request.resource.data) == null || request.resource.data.locationChangedAt == request.time);
+      allow update: if isSelf(uid)
+        && validProfile(request.resource.data)
+        // Değiştirilemeyen alanlar: kimlik, doğum yılı (yaş kilidi), oluşturma tarihi, doğrulama durumları.
+        && !request.resource.data.diff(resource.data).affectedKeys()
+              .hasAny(['uid', 'birthYear', 'createdAt', 'phoneVerified', 'emailVerified'])
+        && neighbourhoodChangeAllowed(resource.data, request.resource.data);
+      // Hesap silme uygulama içinden yapılır (mağaza zorunluluğu).
+      allow delete: if isSelf(uid);
+    }
+
+    // Meslek listesi: herkes okur (kayıt ekranı), yalnızca admin yönetir.
+    match /occupations/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['names', 'order', 'active', 'updatedAt', 'updatedBy'])
+        && request.resource.data.names is map && request.resource.data.names.tr is string
+        && request.resource.data.order is int && request.resource.data.active is bool
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false; // Silmek yerine pasifleştirilir; seçmiş kullanıcıların kaydı bozulmaz.
+    }
+
+    match /admins/{uid} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+
+    // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez.
+    match /auditLog/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
+  }
+}
