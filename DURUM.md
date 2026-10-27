@@ -34,8 +34,8 @@ Son güncelleme: 27 Ekim 2026.
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (42)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (25; Java gerekir)
+npm test                      # ortak paket testleri (43)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (26; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -116,6 +116,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    SOS'unu göremez; alıcı yalnızca kendi teslim/görüldü işaretini koyar. Kayıtlar 30 gün sonra silinir (TTL `deleteAt`).
    Panel > SOS ayarları: canlı konum süresi, geri sayım (kişisel veri gösterilmez). Hesap silinince aile bağları, davetler ve
    gönderilen SOS'lar silinir. Emülatörde iki kullanıcıyla baştan sona denendi.
+   **Eren'in netleştirmesiyle güncellendi:** SOS = gönderen yardım istiyor ("Yardım gerek" düğmesi kaldırıldı, alıcıda
+   "X yardım istiyor"). Telefon sürümü için kod hazır: SOS'ta arka planda konum (`lib/sos-background.ts`, expo-task-manager;
+   ekran kilitli / uygulama kapalıyken de, yalnızca SOS süresince), aile üyelerine yüksek öncelikli sesli bildirim
+   (`lib/push.ts`, Expo push, alıcının dilinde; `pushTokens` yalnızca sahibi ve ailesi okur), bildirime dokununca SOS
+   ekranı, "Güvendeyim" bildirimi, SOS hazırlığı bölümü (bildirim + "her zaman" konum izni), çıkışta bildirim adresi silinir.
+   Web'de bu kısımlar sessizce atlanır ve ekranda uyarı görünür; **gerçek telefonda henüz denenmedi** (EAS gerekir).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -127,7 +133,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Kurum kendi personeline sınırlar içinde görev verir (kurum yöneticisi); belediye paneli 18. madde ilk sürümde (6.6).
 - Görsel yön: koyu A, açık C (17).
 - Hizmet listesi sıralaması (5.6): Reklam en çok 2 ve yalnızca doğrulanmış; sonra doğrulanmış, puan, ilçe, güncellik.
-- SOS türü seçimi yok, tek düğme (5.4).
+- SOS türü seçimi yok, tek düğme; SOS = gönderen yardım istiyor; konum arka planda da gider; aileye bildirim (5.4).
 - Değerlendirme kuralları (5.6, Eren "gerekeni yap" dedi): uygulamadan arama şartı, kişi başına bir, cevap hakkı, şikâyet ve gizleme.
 
 ## Açık işler ve bilinen eksikler
@@ -147,10 +153,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   silmede kullanıcının yorumlarını bulma). Gerçek projede
   kurallarla birlikte yüklenmeli; yüklenmezse hizmet listesi açılmaz. Konsoldan yüklemek zahmetli: `firebase deploy` için
   dağıtım anahtarı ya da Eren'in bilgisayarından tek komut gerekir (Eren'e sade anlatılacak).
-- **SOS bildirimi telefona (push) henüz gitmiyor:** SOS, alıcının uygulaması açıkken anında görünür; uygulama kapalıysa
-  açılınca görünür. Telefona bildirim için geliştirme derlemesi (Expo hesabı, EAS) ve Expo push gerekir; yayından önce şart.
-  Sonra: QR'ı kamerayla okutma (expo-camera), fotoğraf/ses ekleme (Storage, Blaze), "ID ile istek" yöntemi (kod ve bağlantı
-  şimdilik yeterli), ulaşılabilir aile üyesi yoksa uyarı (push ile birlikte).
+- **SOS bildirimi ve arka plan konumu telefonda denenmedi:** kod hazır, ama Expo push adresi için `app.json` içinde EAS proje
+  kimliği (`extra.eas.projectId`) gerekir; `eas init` ile gelir. Telefonda denenecekler: kilitli ekranda bildirim sesi,
+  uygulama kapalıyken konum güncellemesi, bildirime dokununca SOS ekranı. Expo push güvenliği: bildirim adresleri yalnızca aile
+  üyelerine açık; ileride Expo erişim anahtarıyla sunucudan gönderime geçilebilir (Blaze). Sonra: QR'ı kamerayla okutma
+  (expo-camera), fotoğraf/ses ekleme (Storage, Blaze), "ID ile istek" yöntemi, iOS "kritik uyarı" başvurusu (isteğe bağlı).
 - **Firestore TTL politikası** (`sosAlerts.deleteAt`, 30 gün) konsolda açılmalı; indexes dosyasında tanımlı.
 - Değerlendirme: şikâyet sayısı eşiğinde otomatik geçici gizleme ve il yöneticisi kuyruğu, yasaklı kelime süzgeci, yorum
   bildirimi (işletmeye "yeni değerlendirme") sonraki adımlarda. "Arama kaydı" kişisel veridir: aydınlatma metnine eklenecek
@@ -168,8 +175,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
-1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS'un telefona bildirim olarak gitmesi, QR okutma, Google/Apple girişi
-   bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
+1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
+   Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: Claude veri kaynağı ve günlük güncelleme için sade bir öneri hazırlayacak, Eren onaylayacak.
 3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu ve fotoğraf vitrini (Firebase Storage; Blaze plan gerekir).
 4. Paneli internete koyma (Firebase Hosting).

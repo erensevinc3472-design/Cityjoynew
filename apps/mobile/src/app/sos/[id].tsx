@@ -20,6 +20,8 @@ import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { watchLocation } from '@/lib/location';
+import { sendSosPush } from '@/lib/push';
+import { isBackgroundSharing, stopBackgroundSharing } from '@/lib/sos-background';
 import { goBackOr } from '@/lib/navigation';
 import { familyRepository, sosRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
@@ -29,19 +31,24 @@ import { useThemeColors } from '@/theme/use-theme';
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 /**
- * Bir SOS'un canlı görünümü. Gönderen: kalan süre, canlı konum, Güvendeyim / Yardım gerek / Durdur,
+ * Bir SOS'un canlı görünümü. Gönderen: kalan süre, canlı konum, Güvendeyim / Durdur,
  * kişi başına "Teslim edildi / Görüldü". Alıcı: kimden, durum, konum ve "Haritada aç", 112.
  */
 export default function SosDetailScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, bg, nopush } = useLocalSearchParams<{ id: string; bg?: string; nopush?: string }>();
   const { user } = useSession();
   const [alert, setAlert] = useState<SosAlert | null | undefined>(undefined);
   const [names, setNames] = useState<Record<string, string>>({});
   const [now, setNow] = useState(() => new Date());
   const lastSent = useRef<SosAlert['location']>(undefined);
+  // Arka plan paylaşımı sürüyorsa (telefon) ekran ayrıca konum göndermez.
+  const [backgroundOn, setBackgroundOn] = useState(bg === '1');
+  useEffect(() => {
+    isBackgroundSharing(id).then((on) => on && setBackgroundOn(true)).catch(() => {});
+  }, [id]);
 
   const isSender = !!alert && alert.fromUid === user?.uid;
   const live = !!alert && isLive(alert, now);
@@ -70,7 +77,7 @@ export default function SosDetailScreen() {
 
   // Gönderen: paylaşım sürerken ve ekran açıkken canlı konum (arka planda izleme yok).
   useEffect(() => {
-    if (!isSender || !live || !alert) return;
+    if (!isSender || !live || !alert || backgroundOn) return;
     lastSent.current = alert.location;
     let stop: (() => void) | undefined;
     let cancelled = false;
@@ -86,9 +93,17 @@ export default function SosDetailScreen() {
     };
     // Yalnızca canlılık değişince yeniden başlar.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSender, live, id]);
+  }, [isSender, live, id, backgroundOn]);
 
-  const setStatus = (s: SosStatus) => sosRepository.setStatus(id, s).catch(() => {});
+  const unreachable = (nopush ?? '').split(',').filter(Boolean);
+
+  /** Güvendeyim / Durdur: arka plan paylaşımı kapanır; "Güvendeyim" aileye bildirim olarak da gider. */
+  const finish = async (s: Extract<SosStatus, 'guvende' | 'bitti'>) => {
+    await stopBackgroundSharing();
+    setBackgroundOn(false);
+    await sosRepository.setStatus(id, s).catch(() => {});
+    if (s === 'guvende' && alert) sendSosPush(alert, 'guvende').catch(() => {});
+  };
   const time = (iso: string) => new Date(iso).toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' });
 
   const header = <HeroHeader title={t('sos.title')} onBack={() => goBackOr(router, isSender ? '/sos' : '/home')} />;
@@ -107,7 +122,7 @@ export default function SosDetailScreen() {
     );
   }
 
-  const statusText = { aktif: t('sos.statusActive'), yardim: t('sos.statusHelp'), guvende: t('sos.statusSafe'), bitti: t('sos.statusEnded') }[alert.status];
+  const statusText = { aktif: t('sos.statusActive'), guvende: t('sos.statusSafe'), bitti: t('sos.statusEnded') }[alert.status];
   const statusColor = alert.status === 'guvende' ? c.success : alert.status === 'bitti' ? c.textMuted : c.danger;
 
   return (
@@ -151,15 +166,14 @@ export default function SosDetailScreen() {
 
         {isSender ? (
           <>
+            {live ? <AppButton title={t('sos.safe')} onPress={() => finish('guvende')} /> : null}
             {live ? (
-              <View style={styles.row}>
-                <View style={styles.flex}>
-                  <AppButton title={t('sos.safe')} onPress={() => setStatus('guvende')} />
-                </View>
-                <View style={styles.flex}>
-                  <AppButton variant="secondary" title={t('sos.needHelp')} onPress={() => setStatus('yardim')} />
-                </View>
-              </View>
+              <AppText variant="caption" muted>{backgroundOn ? t('sos.backgroundOn') : t('sos.backgroundOff')}</AppText>
+            ) : null}
+            {unreachable.length ? (
+              <AppText variant="caption" style={{ color: c.danger }}>
+                {t('sos.noPush', { names: unreachable.map((u) => names[u] ?? '-').join(', ') })}
+              </AppText>
             ) : null}
 
             <AppText variant="label" accessibilityRole="header">{t('sos.recipientsTitle')}</AppText>
@@ -176,8 +190,7 @@ export default function SosDetailScreen() {
                 </View>
               );
             })}
-            {live ? <AppButton variant="ghost" title={t('sos.stop')} onPress={() => setStatus('bitti')} /> : null}
-            <AppText variant="caption" muted>{t('sos.appOpenNote')}</AppText>
+            {live ? <AppButton variant="ghost" title={t('sos.stop')} onPress={() => finish('bitti')} /> : null}
           </>
         ) : (
           <AppButton title={t('sos.call112')} onPress={() => Linking.openURL(telUrl('112')).catch(() => {})} />

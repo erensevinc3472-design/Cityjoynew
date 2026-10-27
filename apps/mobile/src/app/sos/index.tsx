@@ -10,17 +10,21 @@ import { AppText } from '@/components/app-text';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
+import { SosReadiness } from '@/components/sos-readiness';
 import { StateMessage } from '@/components/state-message';
 import { currentLocation, type LocationState } from '@/lib/location';
 import { goBackOr } from '@/lib/navigation';
+import { sendSosPush } from '@/lib/push';
+import { startBackgroundSharing } from '@/lib/sos-background';
 import { familyRepository, sosRepository, SosSendTimeoutError } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 /**
- * SOS - Aileme haber ver (PROJE.md 5.4). Tek düğme (Karar, Eren: tür seçimi yok). Dokununca geri sayım
- * başlar (yanlışlıkla basmaya karşı), sonra konum aile listesindeki herkese aynı anda gider.
+ * SOS - Aileme haber ver (PROJE.md 5.4). SOS = "yardıma ihtiyacım var" (Eren). Tek düğme, tür seçimi yok.
+ * Dokununca geri sayım başlar (yanlışlıkla basmaya karşı); sonra aile üyelerinin telefonuna yüksek
+ * öncelikli bildirim gider ve konum, ekran kilitlense de arka planda paylaşılır.
  * Resmi acil çağrı değildir; 112 düğmesi her zaman üstte.
  */
 export default function SosScreen() {
@@ -58,15 +62,22 @@ export default function SosScreen() {
       const fresh = await Promise.race([currentLocation(), new Promise<LocationState>((r) => setTimeout(() => r(loc), 4000))]);
       const location = fresh.status === 'ready' ? fresh.location : loc.status === 'ready' ? loc.location : undefined;
       try {
+        const fromName = profile?.displayName ?? user.displayName ?? '';
+        const recipients = members.map((m) => m.uid);
         const id = await sosRepository.send({
           fromUid: user.uid,
-          fromName: profile?.displayName ?? user.displayName ?? '',
-          recipients: members.map((m) => m.uid),
+          fromName,
+          recipients,
           test,
           location,
           liveMinutes: config.liveMinutes,
         });
-        router.replace({ pathname: '/sos/[id]', params: { id } });
+        const liveUntil = new Date(Date.now() + config.liveMinutes * 60_000).toISOString();
+        // Arka planda konum (ekran kilitlense de) ve aile üyelerinin telefonuna bildirim; ikisi de
+        // gönderimi bekletmez, SOS kaydı zaten gitti.
+        const background = await startBackgroundSharing(id, liveUntil, { title: t('sos.fgTitle'), body: t('sos.fgBody') });
+        const unreachable = await sendSosPush({ id, fromName, test, recipients }, 'yardim').catch(() => recipients);
+        router.replace({ pathname: '/sos/[id]', params: { id, bg: background ? '1' : '0', nopush: unreachable.join(',') } });
       } catch (e) {
         setError(e instanceof SosSendTimeoutError ? t('sos.timeout') : t('sos.sendError'));
       } finally {
@@ -165,9 +176,9 @@ export default function SosScreen() {
               <AppButton variant="ghost" title={t('sos.manageFamily')} onPress={() => router.push('/family')} />
             </View>
 
+            <SosReadiness />
             <AppButton variant="secondary" title={t('sos.test')} disabled={sending || countdown !== null} onPress={() => send(true)} />
             <AppText variant="caption" muted>{t('sos.testHint')}</AppText>
-            <AppText variant="caption" muted>{t('sos.appOpenNote')}</AppText>
           </>
         )}
       </ScrollView>

@@ -330,6 +330,17 @@ describe('occupations, admins, auditLog', () => {
     await assertSucceeds(deleteDoc(doc(db('ali'), 'sosAlerts/s2')));
   });
 
+  it('bildirim adresi: sahibi yazar, yalnızca sahibi ve aile üyeleri okur', async () => {
+    await seed('familyLinks/ali_ayse', { members: ['ali', 'ayse'], names: {}, inviteCode: 'X', createdAt: Timestamp.now() });
+    const tok = { tokens: ['ExponentPushToken[abc]'], language: 'tr', updatedAt: serverTimestamp() };
+    await assertFails(setDoc(doc(db('veli'), 'pushTokens/ali'), tok));
+    await assertFails(setDoc(doc(db('ali'), 'pushTokens/ali'), { ...tok, tokens: ['1', '2', '3', '4', '5', '6'] }));
+    await assertSucceeds(setDoc(doc(db('ali'), 'pushTokens/ali'), tok));
+    await assertSucceeds(getDoc(doc(db('ayse'), 'pushTokens/ali')));
+    await assertFails(getDoc(doc(db('veli'), 'pushTokens/ali')));
+    await assertFails(getDoc(doc(db(), 'pushTokens/ali')));
+  });
+
   it('admin listesine istemciden yazılamaz', async () => {
     await assertFails(setDoc(doc(db('ali'), 'admins/ali'), { addedAt: 'x' }));
   });

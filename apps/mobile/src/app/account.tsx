@@ -11,6 +11,7 @@ import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
+import { unregisterPush } from '@/lib/push';
 import { authService, businessRepository, familyRepository, profileRepository, reviewRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings, type ThemeMode } from '@/lib/settings';
@@ -36,6 +37,8 @@ export default function AccountScreen() {
   const [busy, setBusy] = useState(false);
 
   const signOut = async () => {
+    // Bu telefona artık bu hesabın aile SOS bildirimleri gelmesin.
+    if (user) await unregisterPush(user.uid);
     await authService.signOut();
     await adopt(null);
     restartFlow(router);

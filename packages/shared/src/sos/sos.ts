@@ -1,3 +1,6 @@
+import { translations } from '../i18n/resources';
+import type { LanguageCode } from '../i18n/languages';
+
 /**
  * SOS - Aileme haber ver (PROJE.md 5.4). Kararlar (Eren): SMS yok, aile üyeleri uygulamayı kullanır;
  * ekleme karşılıklıdır (QR / davet bağlantısı / kod); SOS'ta konum listedeki herkese aynı anda gider;
@@ -85,8 +88,11 @@ export class FamilyError extends Error {
   }
 }
 
-/** sending: geri sayım bitti, gönderiliyor; aktif: gönderildi; guvende / yardim: gönderenin durumu; bitti: paylaşım kapandı. */
-export type SosStatus = 'aktif' | 'guvende' | 'yardim' | 'bitti';
+/**
+ * SOS = gönderenin yardıma ihtiyacı var (Eren). aktif: yardım istiyor, konum paylaşılıyor;
+ * guvende: gönderen "Güvendeyim" dedi; bitti: paylaşım durduruldu.
+ */
+export type SosStatus = 'aktif' | 'guvende' | 'bitti';
 
 export interface SosLocation {
   lat: number;
@@ -117,7 +123,7 @@ export interface SosAlert {
 
 /** Canlı konum sürüyor mu? Gönderen "Güvendeyim" ya da "Durdur" dediyse biter. */
 export function isLive(a: Pick<SosAlert, 'status' | 'liveUntil'>, now = new Date()): boolean {
-  return (a.status === 'aktif' || a.status === 'yardim') && new Date(a.liveUntil) > now;
+  return a.status === 'aktif' && new Date(a.liveUntil) > now;
 }
 
 /** Alıcı tarafında üstte gösterilecek mi: canlıysa ya da son 2 saatte gönderildiyse. */
@@ -177,4 +183,63 @@ export interface SosRepository {
   watchIncoming(uid: string, onChange: (list: SosAlert[]) => void, onError?: (e: unknown) => void): () => void;
   listSent(uid: string): Promise<SosAlert[]>;
   delete(id: string): Promise<void>;
+}
+
+/** Android bildirim kanalı ve arka plan konum görevinin adı (uygulama ve yerel yapılandırma aynı adı kullanır). */
+export const SOS_CHANNEL_ID = 'sos';
+export const SOS_BACKGROUND_TASK = 'cityjoy-sos-location';
+
+/** Bir kişinin bildirim adresleri (telefon başına bir) ve bildirimin yazılacağı dil. */
+export interface PushTarget {
+  uid: string;
+  tokens: string[];
+  language: LanguageCode;
+}
+
+/** Expo bildirim servisine gönderilen ileti. */
+export interface PushMessage {
+  to: string;
+  title: string;
+  body: string;
+  data: { sosId: string };
+  sound: 'default';
+  priority: 'high';
+  channelId: string;
+  /** iOS: odak modunda da görünür. */
+  interruptionLevel: 'time-sensitive';
+  /** Saniye: 1 saatten eski SOS bildirimi teslim edilmez. */
+  ttl: number;
+}
+
+const fill = (text: string, name: string) => text.replace('{{name}}', name);
+
+/**
+ * SOS bildirimleri, her alıcının kendi dilinde. "yardim": SOS gönderildi (gönderen yardım istiyor);
+ * "guvende": gönderen güvende olduğunu bildirdi.
+ */
+export function sosPushMessages(targets: readonly PushTarget[], alert: { id: string; fromName: string; test: boolean }, kind: 'yardim' | 'guvende'): PushMessage[] {
+  return targets.flatMap((target) => {
+    const tr = (translations[target.language] ?? translations.tr).sos;
+    const title = kind === 'guvende' ? fill(tr.pushSafeTitle, alert.fromName) : alert.test ? fill(tr.pushTestTitle, alert.fromName) : fill(tr.pushHelpTitle, alert.fromName);
+    const body = kind === 'guvende' ? tr.pushSafeBody : tr.pushHelpBody;
+    return [...new Set(target.tokens)].map((to) => ({
+      to,
+      title,
+      body,
+      data: { sosId: alert.id },
+      sound: 'default' as const,
+      priority: 'high' as const,
+      channelId: SOS_CHANNEL_ID,
+      interruptionLevel: 'time-sensitive' as const,
+      ttl: 3600,
+    }));
+  });
+}
+
+export interface PushTokenRepository {
+  save(uid: string, token: string, language: LanguageCode): Promise<void>;
+  /** Çıkış yapılınca bu telefona artık bildirim gitmez. */
+  remove(uid: string, token: string): Promise<void>;
+  /** Aile üyelerinin bildirim adresleri (okunamayanlar atlanır). */
+  forUsers(uids: readonly string[]): Promise<PushTarget[]>;
 }

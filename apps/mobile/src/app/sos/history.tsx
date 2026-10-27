@@ -26,7 +26,7 @@ export default function SosHistoryScreen() {
   useFocusEffect(load);
 
   const status = (a: SosAlert) =>
-    ({ aktif: t('sos.statusActive'), yardim: t('sos.statusHelp'), guvende: t('sos.statusSafe'), bitti: t('sos.statusEnded') })[a.status];
+    ({ aktif: t('sos.statusActive'), guvende: t('sos.statusSafe'), bitti: t('sos.statusEnded') })[a.status];
 
   return (
     <FormScreen title={t('sos.history')}>

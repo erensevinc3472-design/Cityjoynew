@@ -19,7 +19,9 @@ import { OptionRow } from '@/components/option-row';
 import { QrCode } from '@/components/qr-code';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
+import { registerForPush } from '@/lib/push';
 import { familyRepository } from '@/lib/services';
+import { useSettings } from '@/lib/settings';
 import { useSession } from '@/lib/session';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -33,6 +35,7 @@ export default function FamilyScreen() {
   const c = useThemeColors();
   const { user, profile } = useSession();
   const { kod } = useLocalSearchParams<{ kod?: string }>();
+  const { language } = useSettings();
   const name = profile?.displayName ?? user?.displayName ?? '';
 
   const [members, setMembers] = useState<FamilyMember[] | null>(null);
@@ -132,7 +135,10 @@ export default function FamilyScreen() {
             variant="secondary"
             title={t('family.invite')}
             disabled={busy || (members?.length ?? 0) >= FAMILY_MAX}
-            onPress={() => run(async () => setInvite(await familyRepository.createInvite(user.uid, name)))}
+            onPress={() => run(async () => {
+              setInvite(await familyRepository.createInvite(user.uid, name));
+              registerForPush(user.uid, language ?? 'tr', true).catch(() => {});
+            })}
           />
         </>
       )}
@@ -144,6 +150,8 @@ export default function FamilyScreen() {
         disabled={busy || code.trim().length < 8}
         onPress={() => run(async () => {
           const m = await familyRepository.acceptInvite(code, user.uid, name);
+          // Aile kurulduğu an bildirim izni istenir: aile SOS gönderirse telefon çalsın.
+          registerForPush(user.uid, language ?? 'tr', true).catch(() => {});
           setCode('');
           return t('family.added', { name: m.name });
         })}

@@ -7,6 +7,7 @@ import { FamilyError, activeEmergencyNumbers, buildCategoryTree, rankBusinesses,
 import {
   createBusinessAdmin,
   createFirestoreFamilyRepository,
+  createFirestorePushTokenRepository,
   createFirestoreSosRepository,
   createSosSettingsAdmin,
   createFirestoreReviewRepository,
@@ -328,7 +329,13 @@ describe('SOS - Aileme haber ver', () => {
     expect((await fam('ali').listMembers('ali')).map((m) => m.uid)).toEqual(['ayse']);
     await expect(sos('ali').send({ fromUid: 'ali', fromName: 'Ali', recipients: ['veli'], test: true, liveMinutes: 30 })).rejects.toThrow();
 
+    // Bildirim adresleri: aile üyesi okur, çıkışta silinir.
+    await createFirestorePushTokenRepository(fs('ali')).save('ali', 'ExponentPushToken[ali1]', 'tr');
+    await createFirestorePushTokenRepository(fs('ayse')).save('ayse', 'ExponentPushToken[ayse1]', 'en');
+    expect(await createFirestorePushTokenRepository(fs('ali')).forUsers(['ayse', 'veli'])).toEqual([{ uid: 'ayse', tokens: ['ExponentPushToken[ayse1]'], language: 'en' }]);
+
     await fam('ali').deleteAllOf('ali');
+    expect(await createFirestorePushTokenRepository(fs('ali')).forUsers(['ali'])).toEqual([]);
     expect(await fam('ayse').listMembers('ayse')).toEqual([]);
     expect(await sos('ali').listSent('ali')).toEqual([]);
   });

@@ -1,4 +1,5 @@
 import {
+  arrayRemove,
   collection,
   doc,
   getDoc,
@@ -17,6 +18,7 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 
+import type { LanguageCode } from '../i18n/languages';
 import type { Module } from '../permissions/types';
 import {
   clampSosConfig,
@@ -29,6 +31,8 @@ import {
   type FamilyInvite,
   type FamilyMember,
   type FamilyRepository,
+  type PushTarget,
+  type PushTokenRepository,
   type SosAlert,
   type SosConfig,
   type SosRepository,
@@ -135,6 +139,7 @@ export function createFirestoreFamilyRepository(db: Firestore): FamilyRepository
       ]);
       const batch = writeBatch(db);
       [...l.docs, ...i.docs, ...a.docs].forEach((d) => batch.delete(d.ref));
+      batch.delete(doc(db, 'pushTokens', uid));
       await batch.commit();
     },
   };
@@ -239,6 +244,28 @@ export function createSosSettingsAdmin(db: Firestore, actorUid: string) {
         summary: `SOS ayarları: canlı konum ${clean.liveMinutes} dk, geri sayım ${clean.countdownSeconds} sn`,
       });
       await batch.commit();
+    },
+  };
+}
+
+/** Telefon başına bildirim adresi (Expo push). Yalnızca sahibi ve aile üyeleri okur. */
+export function createFirestorePushTokenRepository(db: Firestore): PushTokenRepository {
+  const ref = (uid: string) => doc(db, 'pushTokens', uid);
+  return {
+    async save(uid, token, language: LanguageCode) {
+      const snap = await getDoc(ref(uid));
+      // En çok 5 telefon: en eski adres düşer.
+      const tokens = [...((snap.get('tokens') as string[] | undefined) ?? []).filter((x) => x !== token), token].slice(-5);
+      await setDoc(ref(uid), { tokens, language, updatedAt: serverTimestamp() });
+    },
+    async remove(uid, token) {
+      await updateDoc(ref(uid), { tokens: arrayRemove(token), updatedAt: serverTimestamp() }).catch(() => {});
+    },
+    async forUsers(uids) {
+      const docs = await Promise.all(uids.map((u) => getDoc(ref(u)).catch(() => null)));
+      return docs.flatMap((d, i): PushTarget[] =>
+        d?.exists() ? [{ uid: uids[i], tokens: (d.get('tokens') as string[]) ?? [], language: (d.get('language') as LanguageCode) ?? 'tr' }] : [],
+      );
     },
   };
 }

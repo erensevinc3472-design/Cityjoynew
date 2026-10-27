@@ -464,7 +464,7 @@ service cloud.firestore {
       // Gönderen: canlı konum ve durum (Güvendeyim / Yardım gerek / bitir).
       allow update: if signedIn() && resource.data.fromUid == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['location', 'status'])
-        && request.resource.data.status in ['aktif', 'guvende', 'yardim', 'bitti']
+        && request.resource.data.status in ['aktif', 'guvende', 'bitti']
         && (!('location' in request.resource.data.diff(resource.data).affectedKeys()) || validSosLocation(request.resource.data.location));
       // Alıcı: yalnızca kendi "teslim edildi" ve "görüldü" işareti.
       allow update: if signedIn() && request.auth.uid in resource.data.recipients
@@ -472,6 +472,18 @@ service cloud.firestore {
         && request.resource.data.deliveredTo.diff(resource.data.deliveredTo).affectedKeys().hasOnly([request.auth.uid])
         && request.resource.data.seenBy.diff(resource.data.seenBy).affectedKeys().hasOnly([request.auth.uid]);
       allow delete: if signedIn() && resource.data.fromUid == request.auth.uid;
+    }
+
+    // Bildirim adresleri (telefon başına, en çok 5): SOS bildirimini aile üyesinin telefonu gönderir.
+    // Yalnızca sahibi ve aile üyeleri okur (yabancı bildirim gönderemesin diye).
+    match /pushTokens/{uid} {
+      allow read: if isSelf(uid) || (signedIn() && isFamily(uid));
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['tokens', 'language', 'updatedAt'])
+        && request.resource.data.tokens is list && request.resource.data.tokens.size() <= 5
+        && request.resource.data.language in ['tr', 'en', 'de', 'ar', 'ru']
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isSelf(uid);
     }
 
     // Uygulama ayarları (SOS süreleri): herkes okur, admin yazar.

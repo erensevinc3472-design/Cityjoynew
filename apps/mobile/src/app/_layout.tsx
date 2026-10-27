@@ -8,7 +8,9 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import '@/lib/i18n';
-import { IncomingSosBanner, IncomingSosProvider } from '@/lib/incoming-sos';
+import { IncomingSosBanner, IncomingSosProvider, PushRegistrar } from '@/lib/incoming-sos';
+// SOS arka plan konum görevi, uygulama kapalıyken de çalışabilmesi için en başta tanımlanır.
+import '@/lib/sos-background';
 import { SessionProvider, useSession } from '@/lib/session';
 import { SettingsProvider, useSettings } from '@/lib/settings';
 import { useThemeColors } from '@/theme/use-theme';
@@ -41,6 +43,7 @@ function RootNavigator() {
         <IncomingSosProvider>
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }} />
           <IncomingSosBanner />
+          <PushRegistrar />
         </IncomingSosProvider>
       </View>
     </LocaleProvider>
