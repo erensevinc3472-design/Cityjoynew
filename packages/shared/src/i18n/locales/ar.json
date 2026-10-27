@@ -1,0 +1,52 @@
+{
+  "common": {
+    "continue": "متابعة",
+    "back": "رجوع",
+    "search": "بحث",
+    "loading": "جارٍ التحميل…",
+    "retry": "إعادة المحاولة",
+    "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "offline": "يبدو أنك غير متصل بالإنترنت.",
+    "noResults": "لم يتم العثور على نتائج.",
+    "change": "تغيير",
+    "selected": "تم الاختيار"
+  },
+  "language": {
+    "title": "اختر لغتك",
+    "subtitle": "يمكنك تغيير اللغة من الإعدادات في أي وقت.",
+    "suggested": "مقترحة حسب لغة جهازك"
+  },
+  "location": {
+    "title": "أين تسكن؟",
+    "subtitle": "اختر لكي نعرض لك محتوى مدينتك ومنطقتك وحيّك.",
+    "province": "الولاية",
+    "district": "المنطقة",
+    "neighbourhood": "الحي",
+    "selectProvince": "اختر الولاية",
+    "selectDistrict": "اختر المنطقة",
+    "selectNeighbourhood": "اختر الحي",
+    "searchProvince": "ابحث عن ولاية",
+    "searchDistrict": "ابحث عن منطقة",
+    "searchNeighbourhood": "ابحث عن حي أو قرية",
+    "fullCapacityWarning": "أدخل معلوماتك بشكل صحيح لاستخدام التطبيق بكامل إمكانياته.",
+    "skip": "تخطَّ الآن",
+    "save": "حفظ",
+    "neighbourhoodLoadError": "تعذّر تنزيل قائمة الأحياء.",
+    "village": "قرية",
+    "source": "المصدر: قائمة الرموز البريدية لـ PTT"
+  },
+  "home": {
+    "slogan": "اكتشافك، متعتك",
+    "yourLocation": "موقعك",
+    "noLocation": "لم يتم اختيار موقع",
+    "changeLocation": "تغيير الموقع",
+    "changeLanguage": "تغيير اللغة",
+    "comingSoon": "سيُضاف هذا القسم في المرحلة القادمة."
+  },
+  "modules": {
+    "myCity": "مدينتي",
+    "travel": "السفر",
+    "social": "الانسجام الاجتماعي",
+    "urgent": "الاحتياجات العاجلة"
+  }
+}

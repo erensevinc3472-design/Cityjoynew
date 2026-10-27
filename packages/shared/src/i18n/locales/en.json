@@ -1,0 +1,52 @@
+{
+  "common": {
+    "continue": "Continue",
+    "back": "Back",
+    "search": "Search",
+    "loading": "Loading…",
+    "retry": "Try again",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "offline": "You seem to be offline.",
+    "noResults": "No results found.",
+    "change": "Change",
+    "selected": "Selected"
+  },
+  "language": {
+    "title": "Choose your language",
+    "subtitle": "You can change the language in settings at any time.",
+    "suggested": "Suggested from your device language"
+  },
+  "location": {
+    "title": "Where do you live?",
+    "subtitle": "Choose so we can show content for your city, district and neighbourhood.",
+    "province": "Province",
+    "district": "District",
+    "neighbourhood": "Neighbourhood",
+    "selectProvince": "Select province",
+    "selectDistrict": "Select district",
+    "selectNeighbourhood": "Select neighbourhood",
+    "searchProvince": "Search province",
+    "searchDistrict": "Search district",
+    "searchNeighbourhood": "Search neighbourhood or village",
+    "fullCapacityWarning": "Enter your details correctly to use the app to its full capacity.",
+    "skip": "Skip for now",
+    "save": "Save",
+    "neighbourhoodLoadError": "The neighbourhood list could not be downloaded.",
+    "village": "Village",
+    "source": "Source: PTT postal code list"
+  },
+  "home": {
+    "slogan": "Your Discovery, Your Joy",
+    "yourLocation": "Your location",
+    "noLocation": "No location selected",
+    "changeLocation": "Change location",
+    "changeLanguage": "Change language",
+    "comingSoon": "This section will be added in the next stage."
+  },
+  "modules": {
+    "myCity": "My City",
+    "travel": "Travel",
+    "social": "Social Harmony",
+    "urgent": "Urgent Needs"
+  }
+}

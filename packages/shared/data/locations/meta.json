@@ -1,0 +1,10 @@
+{
+  "source": "PTT posta kodu listesi (postakodu.ptt.gov.tr)",
+  "via": "turkey-neighbourhoods@4.0.3 (MIT)",
+  "generatedAt": "2026-10-27T07:33:22.050Z",
+  "counts": {
+    "provinces": 81,
+    "districts": 973,
+    "neighbourhoods": 73305
+  }
+}

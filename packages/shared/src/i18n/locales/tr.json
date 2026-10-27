@@ -1,0 +1,52 @@
+{
+  "common": {
+    "continue": "Devam et",
+    "back": "Geri",
+    "search": "Ara",
+    "loading": "Yükleniyor…",
+    "retry": "Tekrar dene",
+    "errorGeneric": "Bir sorun oluştu. Lütfen tekrar deneyin.",
+    "offline": "İnternet bağlantısı yok gibi görünüyor.",
+    "noResults": "Sonuç bulunamadı.",
+    "change": "Değiştir",
+    "selected": "Seçildi"
+  },
+  "language": {
+    "title": "Dilinizi seçin",
+    "subtitle": "Dili istediğiniz zaman ayarlardan değiştirebilirsiniz.",
+    "suggested": "Cihazınızın diline göre önerildi"
+  },
+  "location": {
+    "title": "Nerede yaşıyorsunuz?",
+    "subtitle": "Şehrinize, ilçenize ve mahallenize göre içerik gösterebilmemiz için seçin.",
+    "province": "İl",
+    "district": "İlçe",
+    "neighbourhood": "Mahalle",
+    "selectProvince": "İl seçin",
+    "selectDistrict": "İlçe seçin",
+    "selectNeighbourhood": "Mahalle seçin",
+    "searchProvince": "İl ara",
+    "searchDistrict": "İlçe ara",
+    "searchNeighbourhood": "Mahalle veya köy ara",
+    "fullCapacityWarning": "Uygulamayı tam kapasite kullanmak için bilgileri doğru giriniz.",
+    "skip": "Şimdilik atla",
+    "save": "Kaydet",
+    "neighbourhoodLoadError": "Mahalle listesi indirilemedi.",
+    "village": "Köy",
+    "source": "Kaynak: PTT posta kodu listesi"
+  },
+  "home": {
+    "slogan": "Senin Keşfin, Senin Keyfin",
+    "yourLocation": "Konumunuz",
+    "noLocation": "Konum seçilmedi",
+    "changeLocation": "Konum değiştir",
+    "changeLanguage": "Dili değiştir",
+    "comingSoon": "Bu bölüm sonraki aşamada eklenecek."
+  },
+  "modules": {
+    "myCity": "Benim Şehrim",
+    "travel": "Seyahat",
+    "social": "Sosyal Harmoni",
+    "urgent": "Acil İhtiyaçlar"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "common": {
+    "continue": "Weiter",
+    "back": "Zurück",
+    "search": "Suchen",
+    "loading": "Wird geladen…",
+    "retry": "Erneut versuchen",
+    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "offline": "Du scheinst offline zu sein.",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "change": "Ändern",
+    "selected": "Ausgewählt"
+  },
+  "language": {
+    "title": "Wähle deine Sprache",
+    "subtitle": "Du kannst die Sprache jederzeit in den Einstellungen ändern.",
+    "suggested": "Basierend auf deiner Gerätesprache vorgeschlagen"
+  },
+  "location": {
+    "title": "Wo wohnst du?",
+    "subtitle": "Wähle aus, damit wir Inhalte für deine Stadt, deinen Bezirk und dein Viertel zeigen können.",
+    "province": "Provinz",
+    "district": "Bezirk",
+    "neighbourhood": "Viertel",
+    "selectProvince": "Provinz wählen",
+    "selectDistrict": "Bezirk wählen",
+    "selectNeighbourhood": "Viertel wählen",
+    "searchProvince": "Provinz suchen",
+    "searchDistrict": "Bezirk suchen",
+    "searchNeighbourhood": "Viertel oder Dorf suchen",
+    "fullCapacityWarning": "Gib deine Daten korrekt ein, um die App voll nutzen zu können.",
+    "skip": "Vorerst überspringen",
+    "save": "Speichern",
+    "neighbourhoodLoadError": "Die Liste der Viertel konnte nicht geladen werden.",
+    "village": "Dorf",
+    "source": "Quelle: PTT-Postleitzahlenliste"
+  },
+  "home": {
+    "slogan": "Deine Entdeckung, Deine Freude",
+    "yourLocation": "Dein Standort",
+    "noLocation": "Kein Standort ausgewählt",
+    "changeLocation": "Standort ändern",
+    "changeLanguage": "Sprache ändern",
+    "comingSoon": "Dieser Bereich wird in der nächsten Phase hinzugefügt."
+  },
+  "modules": {
+    "myCity": "Meine Stadt",
+    "travel": "Reisen",
+    "social": "Soziale Harmonie",
+    "urgent": "Dringende Hilfe"
+  }
+}
