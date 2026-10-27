@@ -19,7 +19,7 @@ export default function WelcomeScreen() {
   return (
     <Screen>
       <View style={styles.hero}>
-        <AppText variant="label" style={{ color: c.highlight }}>CityJoy</AppText>
+        <AppText variant="label" style={{ color: c.highlight, letterSpacing: 3 }}>CityJoy</AppText>
         <AppText variant="title">{t('auth.welcomeTitle')}</AppText>
         <AppText muted>{t('auth.welcomeSubtitle')}</AppText>
       </View>

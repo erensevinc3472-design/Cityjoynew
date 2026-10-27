@@ -48,7 +48,11 @@
     "myCity": "Meine Stadt",
     "travel": "Reisen",
     "social": "Soziale Harmonie",
-    "urgent": "Dringende Hilfe"
+    "urgent": "Dringende Hilfe",
+    "myCityHint": "Lokale Entdeckungen",
+    "travelHint": "Routen und Reisen",
+    "socialHint": "Gemeinschaft",
+    "urgentHint": "Schnellzugriff"
   },
   "auth": {
     "welcomeTitle": "Willkommen bei CityJoy",

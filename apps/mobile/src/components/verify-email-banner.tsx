@@ -31,7 +31,7 @@ export function VerifyEmailBanner() {
   };
 
   return (
-    <View style={[styles.box, { backgroundColor: c.accentSoft }]} accessibilityLiveRegion="polite">
+    <View style={[styles.box, { backgroundColor: c.surface, borderColor: c.accentBorder }]} accessibilityLiveRegion="polite">
       <AppText>{t('verify.banner', { email: user.email })}</AppText>
       {note ? <AppText variant="caption" muted>{note}</AppText> : null}
       <View style={styles.row}>
@@ -43,7 +43,7 @@ export function VerifyEmailBanner() {
 }
 
 const styles = StyleSheet.create({
-  box: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.lg },
+  box: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.lg, borderWidth: 1 },
   row: { flexDirection: 'row', gap: spacing.sm },
   flex: { flex: 1 },
 });

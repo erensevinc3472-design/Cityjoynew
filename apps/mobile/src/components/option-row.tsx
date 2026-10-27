@@ -30,7 +30,7 @@ export function OptionRow({ title, subtitle, selected, showChevron, trailing, on
         styles.row,
         {
           backgroundColor: selected ? c.accentSoft : c.surface,
-          borderColor: selected ? c.accent : c.border,
+          borderColor: selected ? c.accentBorder : c.border,
           opacity: pressed ? 0.85 : 1,
         },
       ]}>

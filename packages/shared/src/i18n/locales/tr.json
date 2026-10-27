@@ -48,7 +48,11 @@
     "myCity": "Benim Şehrim",
     "travel": "Seyahat",
     "social": "Sosyal Harmoni",
-    "urgent": "Acil İhtiyaçlar"
+    "urgent": "Acil İhtiyaçlar",
+    "myCityHint": "Yerel keşifler",
+    "travelHint": "Rotalar ve yolculuk",
+    "socialHint": "Topluluk",
+    "urgentHint": "Hızlı erişim"
   },
   "auth": {
     "welcomeTitle": "CityJoy'a hoş geldin",

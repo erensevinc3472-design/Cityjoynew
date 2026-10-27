@@ -1,4 +1,5 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { PlayfairDisplay_500Medium_Italic } from '@expo-google-fonts/playfair-display';
 import { PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans';
 import { useFonts } from 'expo-font';
 import { LocaleProvider, Stack } from 'expo-router';
@@ -25,6 +26,7 @@ function RootNavigator() {
     Inter_600SemiBold,
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
+    PlayfairDisplay_500Medium_Italic,
   });
   // Yazı tipi yüklenemezse sistem yazı tipiyle devam edilir.
   const loaded = ready && session.ready && (fontsLoaded || !!fontError);
@@ -38,7 +40,7 @@ function RootNavigator() {
   return (
     <LocaleProvider direction={rtl ? 'rtl' : 'ltr'}>
       <View style={{ flex: 1, direction: rtl ? 'rtl' : 'ltr', backgroundColor: c.background }}>
-        <StatusBar style="auto" />
+        <StatusBar style="light" />
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }} />
       </View>
     </LocaleProvider>

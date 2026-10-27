@@ -48,7 +48,11 @@
     "myCity": "مدينتي",
     "travel": "السفر",
     "social": "الانسجام الاجتماعي",
-    "urgent": "الاحتياجات العاجلة"
+    "urgent": "الاحتياجات العاجلة",
+    "myCityHint": "اكتشافات محلية",
+    "travelHint": "مسارات ورحلات",
+    "socialHint": "المجتمع",
+    "urgentHint": "وصول سريع"
   },
   "auth": {
     "welcomeTitle": "مرحبًا بك في CityJoy",

@@ -9,7 +9,7 @@ export function SearchField({ value, onChangeText, placeholder }: { value: strin
   const c = useThemeColors();
   const { rtl } = useSettings();
   return (
-    <View style={[styles.box, { backgroundColor: c.surface, borderColor: c.border }]}>
+    <View style={[styles.box, { backgroundColor: c.surfaceStrong, borderColor: c.border }]}>
       <MaterialIcons name="search" size={22} color={c.textMuted} />
       <TextInput
         value={value}
@@ -20,7 +20,7 @@ export function SearchField({ value, onChangeText, placeholder }: { value: strin
         autoCorrect={false}
         autoCapitalize="none"
         clearButtonMode="while-editing"
-        style={[styles.input, { color: c.text, textAlign: rtl ? 'right' : 'left' }]}
+        style={[styles.input, { color: c.textStrong, textAlign: rtl ? 'right' : 'left' }]}
       />
     </View>
   );

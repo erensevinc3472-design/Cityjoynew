@@ -148,8 +148,8 @@ export default function LocationScreen() {
         </View>
       </View>
 
-      <View style={[styles.notice, { backgroundColor: c.accentSoft }]}>
-        <MaterialIcons name="info-outline" size={20} color={c.primary} />
+      <View style={[styles.notice, { backgroundColor: c.surface, borderColor: c.border }]}>
+        <MaterialIcons name="info-outline" size={20} color={c.info} />
         <AppText variant="caption" style={styles.noticeText}>{t('location.fullCapacityWarning')}</AppText>
       </View>
 
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingTop: spacing.sm },
   back: { width: MIN_TOUCH, height: MIN_TOUCH, alignItems: 'center', justifyContent: 'center', marginStart: -spacing.sm },
   headerText: { flex: 1, gap: spacing.xs },
-  notice: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderRadius: radius.md },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   noticeText: { flex: 1 },
   list: { gap: spacing.sm, paddingVertical: spacing.sm },
   source: { textAlign: 'center', paddingVertical: spacing.md },

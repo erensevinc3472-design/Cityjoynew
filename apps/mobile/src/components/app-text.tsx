@@ -16,7 +16,7 @@ export function AppText({ variant = 'body', muted, style, ...rest }: TextProps &
     <Text
       {...WEB_AUTO_DIR}
       accessibilityRole={variant === 'title' ? 'header' : undefined}
-      style={[align, styles[variant], { color: muted ? c.textMuted : c.text }, style]}
+      style={[align, styles[variant], { color: muted ? c.textMuted : variant === 'title' || variant === 'subtitle' ? c.textStrong : c.text }, style]}
       {...rest}
     />
   );

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
 import { useSettings } from '@/lib/settings';
@@ -15,6 +16,7 @@ interface Props extends Omit<TextInputProps, 'style'> {
 export function TextField({ label, error, hint, ...input }: Props) {
   const c = useThemeColors();
   const { rtl } = useSettings();
+  const [focused, setFocused] = useState(false);
   return (
     <View style={styles.wrap}>
       <AppText variant="label">{label}</AppText>
@@ -24,9 +26,22 @@ export function TextField({ label, error, hint, ...input }: Props) {
         placeholderTextColor={c.textMuted}
         style={[
           styles.input,
-          { color: c.text, backgroundColor: c.surface, borderColor: error ? c.danger : c.border, textAlign: rtl ? 'right' : 'left' },
+          {
+            color: c.textStrong,
+            backgroundColor: c.surfaceStrong,
+            borderColor: error ? c.danger : focused ? c.accent : c.border,
+            textAlign: rtl ? 'right' : 'left',
+          },
         ]}
         {...input}
+        onFocus={(e) => {
+          setFocused(true);
+          input.onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          input.onBlur?.(e);
+        }}
       />
       {error ? (
         <AppText variant="caption" style={{ color: c.danger }} accessibilityLiveRegion="polite">{error}</AppText>
@@ -39,5 +54,5 @@ export function TextField({ label, error, hint, ...input }: Props) {
 
 const styles = StyleSheet.create({
   wrap: { gap: spacing.xs },
-  input: { minHeight: MIN_TOUCH, borderWidth: 1, borderRadius: radius.sm, paddingHorizontal: spacing.md, fontFamily: fonts.body, fontSize: 16 },
+  input: { minHeight: MIN_TOUCH, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md, fontFamily: fonts.body, fontSize: 16 },
 });

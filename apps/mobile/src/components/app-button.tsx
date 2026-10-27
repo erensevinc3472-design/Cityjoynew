@@ -15,8 +15,10 @@ interface Props {
 export function AppButton({ title, onPress, variant = 'primary', disabled, loading }: Props) {
   const c = useThemeColors();
   const inactive = disabled || loading;
-  const bg = variant === 'primary' ? c.primary : variant === 'secondary' ? c.accentSoft : 'transparent';
+  // Ana: altın zemin; ikincil: kart zemini + altın kenarlık; metin: yalnızca altın yazı.
+  const bg = variant === 'primary' ? c.primary : variant === 'secondary' ? c.surface : 'transparent';
   const fg = variant === 'primary' ? c.onPrimary : c.primary;
+  const borderColor = variant === 'secondary' ? c.accentBorder : 'transparent';
 
   return (
     <Pressable
@@ -26,7 +28,7 @@ export function AppButton({ title, onPress, variant = 'primary', disabled, loadi
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
-        { backgroundColor: bg, opacity: inactive ? 0.5 : pressed ? 0.85 : 1 },
+        { backgroundColor: bg, borderColor, opacity: inactive ? 0.5 : pressed ? 0.85 : 1 },
       ]}>
       {loading ? (
         <ActivityIndicator color={fg} />
@@ -44,6 +46,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
   },
-  label: { fontFamily: fonts.bodySemi, textAlign: 'center' },
+  label: { fontFamily: fonts.headingSemi, textAlign: 'center', letterSpacing: 0.2 },
 });
