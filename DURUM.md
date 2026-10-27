@@ -25,7 +25,7 @@ Son güncelleme: 27 Ekim 2026.
 |---|---|
 | `apps/mobile` | Expo SDK 58 + Expo Router (TypeScript). Ekranlar `src/app`, bileşenler `src/components`, tema `src/theme` |
 | `apps/panel` | React 19 + Vite + React Router (hash yönlendirme). Tek panel, menü yetkiye göre süzülür |
-| `packages/shared` | Ortak: 5 dil metinleri (`src/i18n/locales`), konum verisi, acil numaralar (`src/emergency`), hizmet kategorileri (`src/categories`), yetki, veri yapıları, hizmet arayüzleri, Firebase uygulaması (`src/firebase`, `@cityjoy/shared/firebase` olarak alınır) |
+| `packages/shared` | Ortak: 5 dil metinleri (`src/i18n/locales`), konum verisi, acil numaralar (`src/emergency`), hizmet kategorileri (`src/categories`), işletmeler ve sıralama (`src/business`), yetki, veri yapıları, hizmet arayüzleri, Firebase uygulaması (`src/firebase`, `@cityjoy/shared/firebase` olarak alınır) |
 | `firebase/` | `firestore.rules` ve emülatör testleri |
 | `tasarim/` | Eren'in 135 tasarım HTML dosyası. İçerikleri değiştirilmez (`CLAUDE.md`) |
 | `docs/stil-rehberi.md` | Renk, yazı tipi, bileşen kuralları (görsel yön kararı) |
@@ -34,8 +34,8 @@ Son güncelleme: 27 Ekim 2026.
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (29)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (18; Java gerekir)
+npm test                      # ortak paket testleri (34)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (20; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -75,7 +75,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    arama ekranı açılır (uygulama kendiliğinden aramaz). SOS, nöbetçi eczane, hizmetler "yakında" olarak görünür.
    Liste telefonda saklanır, gömülü başlangıç listesiyle internetsiz de çalışır. Panel: "Acil numaralar" sayfası
    (ekle/düzenle 5 dil, simge, sıra, pasifleştir, başlangıç listesini yükle; işlem kaydı). Veritabanı: `emergencyNumbers`
-   (herkes okur, yalnızca admin yazar). Tasarımdaki 183/186/187 etiket hatası düzeltildi (PROJE.md 5.4 ve 13. madde 27).
+   (herkes okur, yalnızca admin yazar). Tasarımdaki 183/186/187 etiket hatası düzeltildi (PROJE.md 5.4 ve 13. madde 33).
    Emülatörde panel + uygulama (açık, koyu, Arapça) denendi.
 10. **Acil İhtiyaçlar, 2. parça: hizmetler.** Acil İhtiyaçlar > Hizmetler (`apps/mobile/src/app/services/`): 14 ana kategori,
    88 alt kategori (tasarımdan, 5 dilde), açılır liste, Türkçe karakter duyarsız arama, acil kategorilerde "Acil" etiketi.
@@ -84,6 +84,17 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    `catalogVersions/serviceCategories` sürüm belgesi okunur (tek okuma), liste değiştiyse indirilir. Panel: "Hizmet kategorileri"
    sayfası (üstte eksik hizmet önerileri, "incelendi" işareti; altta ağaç: ana/alt kategori ekle, düzenle, acil işareti,
    pasifleştir, başlangıç listesini yükle; işlem kaydı). Kurallar iki seviyeyi zorunlu kılar. Emülatörde baştan sona denendi.
+
+11. **İşletme ekle, 1. parça** (PROJE.md 5.6-5.7). Hesabım > İşletmem: işletme ekle/düzenle/gizle/sil (`apps/mobile/src/app/business/`).
+   Tür, ad, hizmetler (en çok 5, Hizmetler listesinden), il/ilçe, adres (evden çalışanlarda yok), telefon, WhatsApp, 7/24 veya
+   saat notu, tanıtım, fiyat listesi ("tahmini" notuyla). Eklenen işletme seçtiği hizmetlerde, kendi ilinde kart olarak görünür
+   (Ara / WhatsApp, doğrulama tarihi, puan, ilçe). İşletme sayfası: güven bilgisi, fiyat listesi, son güncelleme, "bilgi
+   platformu" notu. **Sıralama (Karar, Eren):** en çok 2 "Reklam" kartı (yalnızca doğrulanmış), sonra doğrulanmış, yorum
+   sayısıyla ağırlıklı puan, ilçe, güncellik; üyelik kademesi sırayı değiştirmez; kural uygulamada "Sıralama nasıl yapılır?"
+   altında yazılı (`rankBusinesses`). Panel > İşletmeler: il süzgeci, doğrula / incelemeye al / kaldır, yayından kaldır,
+   elle üyelik kademesi ve 30 gün öne çıkarma (ödeme gelene kadar), işlem kaydı. Kurallar: sahibi doğrulama, kademe, puan ve
+   öne çıkmayı değiştiremez; admin işletme bilgisini değiştiremez. Hesap silinince işletmeler de silinir. Firestore bileşik
+   dizinleri `firebase/firestore.indexes.json` içinde. Emülatörde baştan sona denendi (açık, koyu, Arapça).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -94,6 +105,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - İşletmeler için ayrı panel yok, uygulamadaki İşletmem kullanılır (6).
 - Kurum kendi personeline sınırlar içinde görev verir (kurum yöneticisi); belediye paneli 18. madde ilk sürümde (6.6).
 - Görsel yön: koyu A, açık C (17).
+- Hizmet listesi sıralaması (5.6): Reklam en çok 2 ve yalnızca doğrulanmış; sonra doğrulanmış, puan, ilçe, güncellik.
 
 ## Açık işler ve bilinen eksikler
 
@@ -108,6 +120,13 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   taksi durağı. Hizmetlerde işletme listesi İşletmem (5.7) ile gelecek.
 - Hizmet önerileri: şimdilik yalnızca admin görür (il yöneticisi yetki kayıtları gelince kendi ilini görecek). Günlük gönderim
   sınırı ve hesap silinince kullanıcının önerilerinin silinmesi sunucu işleviyle eklenecek (Blaze plan gerektirir).
+- **Dizinler Firebase'e yüklenmedi:** `firebase/firestore.indexes.json` (işletme listesi sorguları için). Gerçek projede
+  kurallarla birlikte yüklenmeli; yüklenmezse hizmet listesi açılmaz. Konsoldan yüklemek zahmetli: `firebase deploy` için
+  dağıtım anahtarı ya da Eren'in bilgisayarından tek komut gerekir (Eren'e sade anlatılacak).
+- İşletme: fotoğraf/video vitrini (kademeye göre kapasite; Firebase Storage Blaze ister), yorum ve puan verme, telefonla
+  sahiplik doğrulaması (SMS, Blaze), belge yükleme ve ücretli doğrulama, aynı işletmenin ikinci kaydını engelleme, kategoriye
+  özel alanlar (konaklama, yeme-içme...), mobil ustalar için hizmet verdiği ilçeler, "bilgileriniz hâlâ doğru mu?" hatırlatması,
+  işletme başına günlük ekleme sınırı. Panelde il yöneticisinin kendi ilini görmesi yetki kayıtlarıyla gelecek.
 - SORULACAK: Nöbetçi eczane veri kaynağı (PROJE.md 5.1) ve günlük çekimin nerede çalışacağı (Firebase Spark planında
   zamanlanmış işlev yok: Blaze planı ya da GitHub Actions gibi ücretsiz bir zamanlayıcı).
 - Panel ve web sürümü internette yayında değil (Firebase Hosting için dağıtım anahtarı gerekir).
@@ -117,11 +136,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
-1. Nöbetçi eczane: Claude veri kaynağı ve günlük güncelleme için sade bir öneri hazırlayacak, Eren onaylayacak.
-2. SOS - Aileme haber ver: önce aile listesi (QR / davet bağlantısı / ID ile istek, karşılıklı onay). Hesap gerektirmez;
-   bildirimin telefona gitmesi geliştirme derlemesiyle (Expo hesabı) denenebilir.
-3. Telefonda deneme sürümü (Expo hesabı, EAS).
-4. Paneli internete koyma (Firebase Hosting).
+1. İşletme ekle, 2. parça: yorum ve puan verme (kurallarıyla: kim yorum yazabilir, şikâyet, işletmenin cevabı) ve
+   aynı işletmenin ikinci kaydını engelleme.
+2. Nöbetçi eczane: Claude veri kaynağı ve günlük güncelleme için sade bir öneri hazırlayacak, Eren onaylayacak.
+3. SOS - Aileme haber ver: aile listesi (QR / davet bağlantısı / ID ile istek, karşılıklı onay).
+4. Telefonda deneme sürümü (Expo hesabı, EAS) / paneli internete koyma (Firebase Hosting).
 
 ## PROJE.md bölümleri (gerektiğinde ilgili bölümü oku)
 

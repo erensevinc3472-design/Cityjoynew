@@ -268,6 +268,7 @@ Doğrulanmış hesap işareti (mavi tik) ve profil sayfaları var (profil-beledi
 - **Doğrulama modeli (Eren):** Eklenen işletme önce "doğrulanmadı" görünür. Doğrulanmak için ücret öder (Eren'in verdiği örnek: yaklaşık 1000 TL, kesin tutar sonra belirlenecek), gerekirse ekiple görüntülü görüşür ve evrak sunar. Evrak listesi hazırlanacak ve araştırılacak. Doğrulanan işletme kendi sayfasına ve yorum bölümüne kavuşur.
 - **Vizyon (Eren):** İşletmeleri şehirlerde yeni bir pazar yerine dönüştürmek.
 - Öneri (Eren onayladı): Doğrulanmamış işletmeler "doğrulanmadı" etiketiyle ve daha aşağıda listelenir. Şikâyet ve puanlama olur. Özellikle çilingir, çekici, ambulans gibi acil kategorilerde dolandırıcılık riskine karşı doğrulama aranır. İlk sürümde işletme vitrini ve iletişim bilgisi yeterlidir, uygulama içi ödeme ve satış sonraya bırakılır (elektronik ticaret mevzuatı yükümlülükleri doğurur).
+- **Karar (Eren, 27 Ekim 2026): hizmet listelerinde sıralama.** En üstte "Reklam" etiketli, sayısı sınırlı (en fazla 2) ücretli öne çıkan kart. Öne çıkma yalnızca belgeleri doğrulanmış işletmelere verilir (Claude, güvenlik standardı: acil kategorilerde dolandırıcılık riski). Altında herkes aynı kuralla sıralanır: önce doğrulanmışlar, sonra yorum sayısını da hesaba katan puan (az yorumla yüksek puan öne geçemez), sonra yakınlık (ilçe) ve bilgi güncelliği. Üyelik kademesi sırayı gizlice yükseltmez; kademe yalnızca vitrin kapasitesini artırır. Kural herkese açık yazılır (bölüm 1.2). Reklam mevzuatı avukatla netleştirilecek.
 
 ### 5.7 İşletme kayıt akışı: Profil > İşletme ekle (Eren onayladı)
 
@@ -564,7 +565,6 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
 24. `seyahat-anasayfa.html` ve `rota.html`: "Paketler" bölümü "Hazır Yolculuk Planları"na dönüşecek. "Seçildi: Metro Turizm / Hilton Bodrum" gibi marka adları kategorilerle değişecek. "Tahmini Toplam" tahmini maliyet aralığı olarak ve kaynak/tarihle gösterilecek. "Seferleri gör / Otelleri gör" düğmeleri resmi sitelere yönlendirme olarak yeniden adlandırılacak.
 25. Benim Şehrim: üstte "ziyaretçi/evim" şeridi ve konum değişikliği sorusunun diyaloğu eklenecek.
 26. Profil sayfası: "İşletme ekle" akışı (bölüm 5.7): işletme türü seçimi, ortak bilgiler, kategoriye özel alanlar, önizleme ve doğrulama adımları tasarlanacak.
-27. `acil-ihtiyaclar.html`: acil numara etiketleri düzeltilecek: 183 Sosyal Destek (su arızası değil), 185 Su Arıza eklenecek, 186 Elektrik, 187 Doğalgaz (tasarımda 186 ve 187 yer değiştirmiş). Uygulamada doğru liste kullanılıyor (bölüm 5.4).
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
 
@@ -626,6 +626,7 @@ Eren'in kararı: bunlar tartışmasız eklenir. Güncel kurallar yayından önce
 30. `profil.html`: yaş, meslek, cinsiyet ve mahalle gibi alanlar herkese açık profil görünümünden kaldırılacak, hesap gizliliği anahtarı ve engelle/sessize al seçenekleri eklenecek.
 31. Alt gezinme ve ana sayfa kısayollarından Reels kaldırılacak. Keşfet gönderi ekranında video yükleme (60 sn) ve yarışma video yükleme (90 sn) eklenecek.
 32. Tüm tasarımlarda marka yazımı "CityJoy" olarak birleştirilecek (şu an CityJOY, CityJoy ve TRAVELJOY karışık görünüyor, TravelJoy Seyahat modülünün alt adı olarak kalacak).
+33. `acil-ihtiyaclar.html`: acil numara etiketleri düzeltilecek: 183 Sosyal Destek (su arızası değil), 185 Su Arıza eklenecek, 186 Elektrik, 187 Doğalgaz (tasarımda 186 ve 187 yer değiştirmiş). Uygulamada doğru liste kullanılıyor (bölüm 5.4).
 
 ## 16. Yönetim şeması için çizim maddeleri (Eren çizecek, Claude'un hazırladığı liste)
 

@@ -11,7 +11,7 @@
     "etkinlikler": "Etkinlikler",
     "hizmetler": "Hizmetler",
     "moderasyon": "Moderasyon",
-    "isletme-dogrulama": "İşletme doğrulama",
+    "isletme-dogrulama": "İşletmeler",
     "meslekler": "Meslekler",
     "acil-numaralar": "Acil numaralar",
     "hizmet-kategorileri": "Hizmet kategorileri"
@@ -242,5 +242,65 @@
       "incelendi": "İncelendi"
     },
     "categoriesTitle": "Kategoriler"
+  },
+  "businesses": {
+    "title": "İşletmeler",
+    "intro": "Kullanıcıların uygulamadaki Profil > İşletmem bölümünden eklediği işletmeler. Seçtikleri hizmetlerin listesinde, kendi illerinde görünürler.",
+    "manualNote": "Ödeme sistemi henüz yok: üyelik kademesi ve öne çıkarma burada elle verilir (30 gün). Kademe yalnızca vitrin kapasitesini değiştirir, sıralamayı değiştirmez. Öne çıkan kart uygulamada \"Reklam\" etiketiyle görünür; bir listede en çok 2 tane ve yalnızca belgeleri doğrulanmış işletmeler.",
+    "readOnly": "Bu sayfada değişikliği şimdilik yalnızca admin yapabilir.",
+    "demoReadOnly": "Örnek hesapla yalnızca görüntüleyebilirsiniz.",
+    "province": "İl",
+    "allProvinces": "Tüm iller",
+    "name": "İşletme",
+    "status": "Durum",
+    "verification": "Doğrulama",
+    "tier": "Üyelik",
+    "featured": "Öne çıkma",
+    "types": {
+      "hizmet": "Hizmet veren",
+      "esnaf": "Esnaf / dükkân",
+      "evden-uretim": "Evden üretim",
+      "yeme-icme": "Yeme-içme",
+      "konaklama": "Konaklama",
+      "yol-ustu": "Yol üstü",
+      "emlak": "Emlak"
+    },
+    "statuses": {
+      "yayinda": "Yayında",
+      "gizli": "Sahibi gizledi",
+      "kaldirildi": "Kaldırıldı"
+    },
+    "remove": "Yayından kaldır",
+    "restore": "Yeniden yayına al",
+    "verifications": {
+      "dogrulanmadi": "Doğrulanmadı",
+      "inceleniyor": "İnceleniyor",
+      "dogrulandi": "Belgeleri doğrulandı"
+    },
+    "setVerification": {
+      "dogrulandi": "Doğrula",
+      "inceleniyor": "İncelemeye al",
+      "dogrulanmadi": "Doğrulamayı kaldır"
+    },
+    "tiers": {
+      "ucretsiz": "Ücretsiz",
+      "standart": "Standart",
+      "pro": "Pro",
+      "premium": "Premium"
+    },
+    "tierFor": "{{name}} üyelik kademesi",
+    "until": "{{date}} tarihine kadar",
+    "ad": "Reklam",
+    "feature30": "30 gün öne çıkar",
+    "unfeature": "Öne çıkarmayı kaldır",
+    "saved": "Kaydedildi.",
+    "error": "Kaydedilemedi. Yetkinizi ve bağlantınızı kontrol edin.",
+    "loadError": "Liste yüklenemedi.",
+    "retry": "Tekrar dene",
+    "loading": "Yükleniyor…",
+    "empty": "Henüz işletme yok.",
+    "count": "{{count}} işletme (en yeni güncellenen 200).",
+    "rankingNote": "Uygulamadaki sıralama: en çok 2 Reklam kartı, sonra doğrulanmış, puan (yorum sayısıyla), ilçe, güncellik.",
+    "featureNeedsVerification": "Yalnızca doğrulanmış işletme öne çıkarılabilir."
   }
 }

@@ -20,4 +20,5 @@ export * from './services/types';
 export * from './services/occupations';
 export * from './emergency/numbers';
 export * from './categories/service-categories';
+export * from './business/business';
 export * from './models/sign-up';

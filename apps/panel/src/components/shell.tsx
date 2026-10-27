@@ -19,7 +19,7 @@ export const MENU: { module: Module; path?: string }[] = [
   { module: 'etkinlikler' },
   { module: 'hizmetler' },
   { module: 'moderasyon' },
-  { module: 'isletme-dogrulama' },
+  { module: 'isletme-dogrulama', path: '/isletmeler' },
 ];
 
 export function Shell() {

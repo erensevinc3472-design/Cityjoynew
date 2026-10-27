@@ -167,6 +167,44 @@ describe('occupations, admins, auditLog', () => {
     await assertSucceeds(updateDoc(doc(db('eren'), 'serviceSuggestions/1'), { status: 'incelendi', reviewedBy: 'eren', reviewedAt: serverTimestamp() }));
   });
 
+  it('işletme: sahibi bilgilerini yazar ama doğrulama, kademe, puan ve öne çıkmayı değiştiremez', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    const content = {
+      type: 'hizmet', name: 'Ali Tesisat', categoryIds: ['tesisatci'], location: { provinceCode: '16', districtId: '16-nilufer' },
+      phone: '05321234567', whatsapp: true, is24h: false, priceList: [],
+    };
+    const fresh = (uid: string, over: Record<string, unknown> = {}) => ({
+      ...content, ownerUid: uid, status: 'yayinda', verification: { status: 'dogrulanmadi' }, membership: { tier: 'ucretsiz' },
+      rating: { avg: 0, count: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...over,
+    });
+    await assertFails(setDoc(doc(db(), 'businesses/b1'), fresh('misafir')));
+    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('veli')));
+    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { verification: { status: 'dogrulandi' } })));
+    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { membership: { tier: 'premium' } })));
+    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { rating: { avg: 5, count: 100 } })));
+    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { type: 'evden-uretim', address: 'Ev adresim' })));
+    await assertSucceeds(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali')));
+
+    await assertSucceeds(getDoc(doc(db(), 'businesses/b1')));
+    await assertSucceeds(updateDoc(doc(db('ali'), 'businesses/b1'), { name: 'Ali Usta Tesisat', updatedAt: serverTimestamp() }));
+    await assertFails(updateDoc(doc(db('ali'), 'businesses/b1'), { featuredUntil: Timestamp.now(), updatedAt: serverTimestamp() }));
+    await assertFails(updateDoc(doc(db('ali'), 'businesses/b1'), { 'verification.status': 'dogrulandi', updatedAt: serverTimestamp() }));
+    await assertFails(updateDoc(doc(db('veli'), 'businesses/b1'), { name: 'Başkası', updatedAt: serverTimestamp() }));
+
+    // Gizlenen işletmeyi yalnızca sahibi ve admin görür.
+    await assertSucceeds(updateDoc(doc(db('ali'), 'businesses/b1'), { status: 'gizli', updatedAt: serverTimestamp() }));
+    await assertFails(getDoc(doc(db('veli'), 'businesses/b1')));
+    await assertSucceeds(getDoc(doc(db('eren'), 'businesses/b1')));
+
+    // Admin doğrular ve kaldırır ama bilgileri değiştiremez; kaldırılanı sahibi açamaz.
+    await assertSucceeds(updateDoc(doc(db('eren'), 'businesses/b1'), { verification: { status: 'dogrulandi', verifiedAt: serverTimestamp() } }));
+    await assertFails(updateDoc(doc(db('eren'), 'businesses/b1'), { name: 'Admin yazdı' }));
+    await assertSucceeds(updateDoc(doc(db('eren'), 'businesses/b1'), { status: 'kaldirildi' }));
+    await assertFails(updateDoc(doc(db('ali'), 'businesses/b1'), { status: 'yayinda', updatedAt: serverTimestamp() }));
+    await assertFails(deleteDoc(doc(db('veli'), 'businesses/b1')));
+    await assertSucceeds(deleteDoc(doc(db('ali'), 'businesses/b1')));
+  });
+
   it('admin listesine istemciden yazılamaz', async () => {
     await assertFails(setDoc(doc(db('ali'), 'admins/ali'), { addedAt: 'x' }));
   });

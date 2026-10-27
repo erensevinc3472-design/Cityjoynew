@@ -80,6 +80,8 @@ a { color: var(--accent); }
 .page-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1rem; }
 .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .crumbs { display: flex; gap: 0.4rem; flex-wrap: wrap; color: var(--muted); margin-top: 0.25rem; }
+.toolbar select { min-height: 44px; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--fg); font: inherit; }
+td select { min-height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--fg); font: inherit; }
 .toolbar input { width: min(360px, 100%); min-height: 44px; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--fg); font: inherit; }
 
 .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }

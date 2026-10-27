@@ -179,6 +179,56 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // İşletmeler (PROJE.md 5.6-5.7). Sahibi bilgilerini yazar; doğrulama, üyelik kademesi, puan ve öne çıkma
+    // yalnızca yönetimce (ve ileride sunucu işlevleriyle) değişir.
+    function validBusinessContent(d) {
+      return d.type in ['hizmet', 'esnaf', 'evden-uretim', 'yeme-icme', 'konaklama', 'yol-ustu', 'emlak']
+        && d.name is string && d.name.size() >= 2 && d.name.size() <= 80
+        && d.categoryIds is list && d.categoryIds.size() >= 1 && d.categoryIds.size() <= 5
+        && validLocation(d.location) && 'districtId' in d.location
+        && (!('address' in d) || (d.address is string && d.address.size() <= 200 && d.type != 'evden-uretim'))
+        && d.phone is string && d.phone.matches('^[0-9]{10,13}$')
+        && d.whatsapp is bool && d.is24h is bool
+        && (!('hoursNote' in d) || (d.hoursNote is string && d.hoursNote.size() <= 120))
+        && (!('description' in d) || (d.description is string && d.description.size() <= 500))
+        && d.priceList is list && d.priceList.size() <= 30;
+    }
+
+    function businessContentKeys() {
+      return ['type', 'name', 'categoryIds', 'location', 'address', 'phone', 'whatsapp', 'is24h', 'hoursNote',
+              'description', 'priceList'];
+    }
+
+    match /businesses/{id} {
+      allow read: if resource.data.status == 'yayinda' || isSelf(resource.data.ownerUid) || isAdmin();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(businessContentKeys().concat(
+             ['ownerUid', 'status', 'verification', 'membership', 'rating', 'createdAt', 'updatedAt']))
+        && validBusinessContent(request.resource.data)
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'yayinda'
+        && request.resource.data.verification == {'status': 'dogrulanmadi'}
+        && request.resource.data.membership == {'tier': 'ucretsiz'}
+        && request.resource.data.rating == {'avg': 0, 'count': 0}
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      // Sahibi: yalnızca kendi bilgileri ve gizle/yayınla. Yönetimin kaldırdığı işletmeyi açamaz.
+      allow update: if isSelf(resource.data.ownerUid)
+        && resource.data.status != 'kaldirildi'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(businessContentKeys().concat(['status', 'updatedAt']))
+        && validBusinessContent(request.resource.data)
+        && request.resource.data.status in ['yayinda', 'gizli']
+        && request.resource.data.updatedAt == request.time;
+      // Yönetim (admin): doğrulama, kaldırma, kademe, öne çıkma. İşletmenin bilgilerini değiştiremez.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'verification', 'membership', 'featuredUntil'])
+        && request.resource.data.status in ['yayinda', 'gizli', 'kaldirildi']
+        && request.resource.data.verification.status in ['dogrulanmadi', 'inceleniyor', 'dogrulandi']
+        && request.resource.data.membership.tier in ['ucretsiz', 'standart', 'pro', 'premium'];
+      // Sahibi silebilir (hesap silmede de kullanılır, KVKK).
+      allow delete: if isSelf(resource.data.ownerUid);
+    }
+
     match /admins/{uid} {
       allow read: if isSelf(uid);
       allow write: if false;

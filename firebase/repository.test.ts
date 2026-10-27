@@ -3,9 +3,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { activeEmergencyNumbers, buildCategoryTree, createServiceCategoryStore, LEGAL_TEXT_VERSION } from '@cityjoy/shared';
+import { activeEmergencyNumbers, buildCategoryTree, rankBusinesses, createServiceCategoryStore, LEGAL_TEXT_VERSION } from '@cityjoy/shared';
 import {
+  createBusinessAdmin,
   createEmergencyNumberAdmin,
+  createFirestoreBusinessRepository,
   createFirestoreServiceCategoryRepository,
   createServiceCategoryAdmin,
   submitServiceSuggestion,
@@ -172,5 +174,50 @@ describe('hizmet kategorileri (admin) ve öneriler', () => {
     expect(log.docs.map((d) => d.data().summary)).toEqual(
       expect.arrayContaining(['Pasifleştirildi: Çilingir', 'Eklendi: Kilim tamiri', 'Hizmet önerisi incelendi']),
     );
+  });
+});
+
+describe('işletmeler', () => {
+  it('sahibi ekler, hizmet listesinde görünür; admin doğrular ve öne çıkarır; hesap silinince işletmeler silinir', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'admins/eren'), { addedAt: 'konsol' });
+    });
+    const aliDb = env.authenticatedContext('ali').firestore() as unknown as Firestore;
+    const veliDb = env.authenticatedContext('veli').firestore() as unknown as Firestore;
+    const guest = createFirestoreBusinessRepository(env.unauthenticatedContext().firestore() as unknown as Firestore);
+    const ali = createFirestoreBusinessRepository(aliDb);
+    const veli = createFirestoreBusinessRepository(veliDb);
+    const input = (name: string, districtId = '16-nilufer') => ({
+      type: 'hizmet' as const, name, categoryIds: ['tesisatci', 'elektrikci'], location: { provinceCode: '16', districtId },
+      phone: '0532 123 45 67', whatsapp: true, is24h: true, description: '  ', priceList: [{ name: 'Keşif', price: 'Ücretsiz' }],
+    });
+    const a = await ali.create('ali', input('Ali Tesisat'));
+    const v = await veli.create('veli', input('Veli Tesisat', '16-osmangazi'));
+    await veli.create('veli', { ...input('İstanbul Tesisat', '34-kadikoy'), location: { provinceCode: '34', districtId: '34-kadikoy' } });
+
+    const list = await guest.listByCategory('16', 'tesisatci');
+    expect(list.map((b) => b.name).sort()).toEqual(['Ali Tesisat', 'Veli Tesisat']);
+    expect(list.find((b) => b.id === a)).toMatchObject({ phone: '05321234567', verification: { status: 'dogrulanmadi' }, membership: { tier: 'ucretsiz' } });
+    expect('description' in list[0]).toBe(false);
+
+    const admin = createBusinessAdmin(env.authenticatedContext('eren').firestore() as unknown as Firestore, 'eren');
+    const veliBiz = (await admin.list({ provinceCode: '16' })).find((b) => b.id === v)!;
+    await admin.setVerification(veliBiz, 'dogrulandi');
+    await admin.setFeatured(veliBiz, new Date(Date.now() + 86400000));
+    await admin.setTier(veliBiz, 'pro', new Date(Date.now() + 30 * 86400000));
+    const ranked = rankBusinesses(await guest.listByCategory('16', 'tesisatci'), { districtId: '16-nilufer' });
+    expect(ranked.featured.map((b) => b.id)).toEqual([v]);
+    expect(ranked.featured[0].verification.status).toBe('dogrulandi');
+    expect(ranked.featured[0].membership.tier).toBe('pro');
+
+    await ali.update(a, { ...input('Ali Usta'), description: 'Tesisat işleri' });
+    await ali.setHidden(a, true);
+    expect((await guest.listByCategory('16', 'tesisatci')).map((b) => b.id)).toEqual([v]);
+    expect((await ali.listMine('ali'))[0]).toMatchObject({ name: 'Ali Usta', status: 'gizli', description: 'Tesisat işleri' });
+
+    await veli.deleteAllOf('veli');
+    expect(await veli.listMine('veli')).toEqual([]);
+    const log = await getDocs(collection(env.authenticatedContext('eren').firestore(), 'auditLog'));
+    expect(log.docs.map((d) => d.data().summary)).toEqual(expect.arrayContaining(['Doğrulandı: Veli Tesisat', 'Üyelik kademesi: pro: Veli Tesisat']));
   });
 });
