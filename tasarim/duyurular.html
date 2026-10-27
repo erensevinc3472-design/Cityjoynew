@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Duyurular</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "gold": "#d4b07b",
+                        "emerald-darkest": "#041F1F",
+                        "emerald-deep": "#061a12",
+                        "emerald-light": "#0E2A28",
+                        "card-surface": "#123C3A",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "card": "10px",
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .gold-gradient {
+                background: linear-gradient(135deg, #d4b07b 0%, #f9e29c 50%, #b8860b 100%);
+            }
+            .glass-card {
+                background: rgba(18, 60, 58, 0.6);
+                backdrop-filter: blur(15px);
+                border: 1px solid rgba(212, 176, 123, 0.15);
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .nav-blur {
+                backdrop-filter: blur(10px);
+                background-color: rgba(4, 31, 31, 0.98);
+                border-top: 1px solid rgba(212, 176, 123, 0.1);
+            }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-emerald-darkest font-display text-slate-100 antialiased overflow-x-hidden pb-32">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-emerald-darkest/95 backdrop-blur-md px-4 pt-4 pb-4 border-b border-gold/10">
+<div class="flex items-center justify-between">
+<a href="sosyal-harmoni.html" class="flex items-center justify-center size-10 rounded-full hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-gold">arrow_back_ios_new</span>
+</a>
+<h1 class="text-lg font-extrabold tracking-[0.2em] text-gold uppercase">Duyurular</h1>
+<div class="flex items-center gap-1.5 bg-gold/10 border border-gold/20 px-3 py-1.5 rounded-full">
+<span class="material-symbols-outlined text-gold text-sm fill-1">location_on</span>
+<span class="text-[10px] font-bold text-gold tracking-widest uppercase">Bursa</span>
+</div>
+</div>
+</header>
+
+<main class="flex-1">
+<div class="px-4 py-4 space-y-6">
+<!-- Filter Tabs -->
+<div class="flex p-1 rounded-xl bg-white/5 border border-white/10 h-12">
+<button class="flex-1 flex items-center justify-center rounded-lg gold-gradient text-emerald-darkest text-sm font-black shadow-lg shadow-gold/20">
+                        BÖLGESEL
+                    </button>
+<button class="flex-1 flex items-center justify-center rounded-lg text-white/50 text-sm font-semibold hover:text-white transition-colors">
+                        GENEL
+                    </button>
+</div>
+
+<!-- Date Selector -->
+<div class="flex items-center gap-3">
+<div class="flex-1 flex gap-2 overflow-x-auto scrollbar-hide py-1">
+<div class="flex flex-col items-center justify-center min-w-[54px] h-16 rounded-xl border border-gold bg-gold/10">
+<span class="text-[10px] font-bold text-gold/70 uppercase">Pzt</span>
+<span class="text-lg font-extrabold text-gold">12</span>
+</div>
+<div class="flex flex-col items-center justify-center min-w-[54px] h-16 rounded-xl border border-white/5 bg-white/5">
+<span class="text-[10px] font-bold text-white/40 uppercase">Sal</span>
+<span class="text-lg font-bold text-white/80">13</span>
+</div>
+<div class="flex flex-col items-center justify-center min-w-[54px] h-16 rounded-xl border border-white/5 bg-white/5">
+<span class="text-[10px] font-bold text-white/40 uppercase">Çar</span>
+<span class="text-lg font-bold text-white/80">14</span>
+</div>
+<div class="flex flex-col items-center justify-center min-w-[54px] h-16 rounded-xl border border-white/5 bg-white/5">
+<span class="text-[10px] font-bold text-white/40 uppercase">Per</span>
+<span class="text-lg font-bold text-white/80">15</span>
+</div>
+</div>
+<button class="size-16 shrink-0 flex items-center justify-center rounded-xl gold-gradient text-emerald-darkest shadow-lg shadow-gold/20">
+<span class="material-symbols-outlined text-2xl font-bold">calendar_month</span>
+</button>
+</div>
+
+<!-- District Filter -->
+<div class="flex gap-2 overflow-x-auto scrollbar-hide">
+<span class="shrink-0 px-4 py-2 rounded-full border border-gold bg-gold/15 text-gold text-[10px] font-black uppercase tracking-widest">Nilüfer</span>
+<span class="shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/60 text-[10px] font-bold uppercase tracking-widest">Osmangazi</span>
+<span class="shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/60 text-[10px] font-bold uppercase tracking-widest">Yıldırım</span>
+<span class="shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/60 text-[10px] font-bold uppercase tracking-widest">Gürsu</span>
+</div>
+</div>
+
+<!-- Announcements List -->
+<div class="px-4 space-y-4 pb-8">
+<!-- Announcement 1 -->
+<div class="glass-card rounded-card p-4 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+<div class="flex justify-between items-start mb-3 relative z-10">
+<div class="flex items-center gap-3">
+<div class="size-11 rounded-lg bg-emerald-deep flex items-center justify-center border border-gold/20">
+<span class="material-symbols-outlined text-gold">engineering</span>
+</div>
+<div>
+<div class="flex items-center gap-1">
+<h3 class="text-sm font-bold text-white">Osmangazi Belediyesi</h3>
+<span class="material-symbols-outlined text-gold text-[16px] fill-1">verified</span>
+</div>
+<p class="text-[10px] text-white/40 uppercase font-black tracking-tight">Resmi Duyuru</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded bg-gold/10 text-gold text-[9px] font-black uppercase tracking-widest border border-gold/20">Çalışma</span>
+</div>
+<h4 class="text-base font-bold text-white mb-3 leading-snug">Dikkaldırım Mahallesi Altyapı İyileştirme Çalışması</h4>
+<div class="flex items-center gap-5 mb-4">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-gold text-lg">schedule</span>
+<span class="text-xs font-medium text-white/70">09:00 - 18:00</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-gold text-lg">location_on</span>
+<span class="text-xs font-medium text-white/70">Dikkaldırım Cad.</span>
+</div>
+</div>
+<button class="w-full py-3 gold-gradient text-emerald-darkest text-[11px] font-black rounded-lg uppercase tracking-[0.15em] hover:brightness-110 active:scale-[0.98] transition-all">
+                        DETAY
+                    </button>
+</div>
+
+<!-- Announcement 2 -->
+<div class="glass-card rounded-card p-4">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="size-11 rounded-lg bg-emerald-deep flex items-center justify-center border border-white/10">
+<span class="material-symbols-outlined text-blue-400">water_drop</span>
+</div>
+<div>
+<div class="flex items-center gap-1">
+<h3 class="text-sm font-bold text-white">Bursa Su (BUSKİ)</h3>
+<span class="material-symbols-outlined text-gold text-[16px] fill-1">verified</span>
+</div>
+<p class="text-[10px] text-white/40 uppercase font-black tracking-tight">Hizmet Kesintisi</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded bg-red-500/10 text-red-500 text-[9px] font-black uppercase tracking-widest border border-red-500/20">Kesinti</span>
+</div>
+<h4 class="text-base font-bold text-white mb-2 leading-snug">Nilüfer Bölgesi Zorunlu Su Kesintisi Duyurusu</h4>
+<p class="text-xs text-white/50 mb-4 line-clamp-2 leading-relaxed">Ana isale hattındaki arıza nedeniyle Nilüfer ilçesi genelinde 4 saatlik su kesintisi öngörülmektedir.</p>
+<div class="flex justify-between items-center pt-2 border-t border-white/5">
+<span class="text-[10px] font-bold text-white/30 uppercase tracking-tighter">Yayın: 10 Dakika Önce</span>
+<button class="text-gold text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                            DETAY <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</button>
+</div>
+</div>
+
+<!-- Announcement 3 -->
+<div class="glass-card rounded-card p-4">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="size-11 rounded-lg bg-emerald-deep flex items-center justify-center border border-white/10">
+<span class="material-symbols-outlined text-orange-400">thunderstorm</span>
+</div>
+<div>
+<div class="flex items-center gap-1">
+<h3 class="text-sm font-bold text-white">Meteoroloji</h3>
+</div>
+<p class="text-[10px] text-white/40 uppercase font-black tracking-tight">Hava Durumu</p>
+</div>
+</div>
+<span class="px-2 py-1 rounded bg-orange-500/10 text-orange-500 text-[9px] font-black uppercase tracking-widest border border-orange-500/20">Uyarı</span>
+</div>
+<h4 class="text-base font-bold text-white mb-3">Kuvvetli Fırtına Beklentisi</h4>
+<div class="flex items-center gap-3 py-3 px-4 rounded-lg bg-white/5 border border-white/5">
+<span class="material-symbols-outlined text-orange-400 text-xl">warning</span>
+<p class="text-[11px] text-white/70 italic leading-tight">Vatandaşların ani sel ve su baskınlarına karşı tedbirli olması rica olunur.</p>
+</div>
+<div class="flex justify-end mt-4">
+<button class="text-gold text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                            DETAY <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 nav-blur px-4 pb-8 pt-4 rounded-t-[32px] shadow-[0_-15px_40px_rgba(0,0,0,0.6)]">
+<div class="flex items-center justify-around max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1.5 text-white/40 hover:text-gold transition-colors" href="anasayfa.html">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[9px] font-bold tracking-widest uppercase">Anasayfa</span>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-white/40 hover:text-gold transition-colors" href="kesfet-bolgesel.html">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[9px] font-bold tracking-widest uppercase">Keşfet</span>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-white/40 hover:text-gold transition-colors" href="sosyal-harmoni.html">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[9px] font-bold tracking-widest uppercase">Sosyal</span>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-white/40 hover:text-gold transition-colors" href="ara.html">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[9px] font-bold tracking-widest uppercase">Ara</span>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-white/40 hover:text-gold transition-colors" href="profil.html">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[9px] font-bold tracking-widest uppercase">Profil</span>
+</a>
+</div>
+</nav>
+</div>
+
+</body></html>

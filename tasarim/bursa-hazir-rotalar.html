@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Bursa - Hazır Rotalar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "darkest": "#081F24",
+                    "main-bg": "#0D3238",
+                    "card-bg": "#17464B",
+                    "card-glow": "#1F5055",
+                    "gold-primary": "#E0B07A",
+                    "gold-nav": "#F0B36F",
+                    "nav-bg": "#0A2A2F",
+                    "nav-passive": "#6E8C8E",
+                    "text-secondary": "#C7D8DA",
+                    "text-desc": "#9FB6B8",
+                    "border-subtle": "#3F6E70",
+                },
+                fontFamily: {
+                    "display": ["Space Grotesk", "sans-serif"]
+                },
+                animation: {
+                    'fade-in': 'fadeIn 0.6s ease-out',
+                    'slide-up': 'slideUp 0.7s ease-out',
+                    'pulse-glow': 'pulseGlow 2s infinite',
+                },
+                keyframes: {
+                    fadeIn: {
+                        '0%': { opacity: '0' },
+                        '100%': { opacity: '1' },
+                    },
+                    slideUp: {
+                        '0%': { opacity: '0', transform: 'translateY(30px)' },
+                        '100%': { opacity: '1', transform: 'translateY(0)' },
+                    },
+                    pulseGlow: {
+                        '0%, 100%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.4)' },
+                        '50%': { boxShadow: '0 0 35px rgba(224, 176, 122, 0.7)' },
+                    },
+                }
+            },
+        },
+    }
+</script>
+<style type="text/tailwindcss">
+    @layer utilities {
+        .glass-dark {
+            background: rgba(8, 31, 36, 0.95);
+            backdrop-filter: blur(20px);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(224, 176, 122, 0.5);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .route-card {
+            background: linear-gradient(135deg, rgba(23, 70, 75, 0.6) 0%, rgba(8, 31, 36, 0.8) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            transition: all 0.3s ease;
+        }
+        .route-card:hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(224, 176, 122, 0.2);
+        }
+        .stop-dot {
+            width: 12px;
+            height: 12px;
+            background: #E0B07A;
+            border-radius: 50%;
+            border: 2px solid #081F24;
+            box-shadow: 0 0 0 2px #E0B07A;
+        }
+        .stop-line {
+            position: absolute;
+            left: 5px;
+            top: 20px;
+            bottom: -10px;
+            width: 2px;
+            background: linear-gradient(to bottom, #E0B07A, transparent);
+        }
+        .modal-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, #0D3238 0%, #081F24 100%);
+            border-radius: 24px 24px 0 0;
+            z-index: 200;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-sheet.active {
+            transform: translateY(0);
+        }
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 31, 36, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 199;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+</style>
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden">
+
+<!-- Modal Overlay -->
+<div id="route-modal-overlay" class="modal-overlay" onclick="closeRouteModal()"></div>
+
+<!-- Route Detail Modal (Bottom Sheet) -->
+<div id="route-modal" class="modal-sheet">
+    <div class="p-4">
+        <!-- Handle Bar -->
+        <div class="flex justify-center mb-4">
+            <div class="w-12 h-1 bg-white/30 rounded-full"></div>
+        </div>
+        
+        <!-- Modal Content (Dynamic) -->
+        <div id="route-modal-content">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-darkest/90 backdrop-blur-md border-b border-border-subtle/30">
+    <div class="flex items-center gap-3">
+        <a class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group" href="bursa.html">
+            <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+        </a>
+        <div class="flex flex-col">
+            <span class="text-[10px] text-gold-primary tracking-wider uppercase">Bursa</span>
+            <h1 class="text-lg font-bold tracking-tight text-white leading-none">Hazır Rotalar</h1>
+        </div>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<section class="relative pt-[60px] pb-6 px-4">
+    <div class="max-w-7xl mx-auto">
+        <div class="animate-slide-up">
+            <h2 class="text-2xl font-bold text-white mb-2 text-glow">Bursa'nın En İyi Hazır Rotaları</h2>
+            <p class="text-sm text-text-secondary">5 özenle hazırlanmış rota seni bekliyor. Kendine uygun olanı seç ve keşfe başla!</p>
+        </div>
+    </div>
+</section>
+
+<!-- Routes List -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24 px-4">
+    <div class="max-w-7xl mx-auto space-y-4">
+        
+        <!-- Route 1: Tarihi Bursa -->
+        <div class="route-card rounded-2xl p-4 cursor-pointer" onclick="openRouteModal('tarihi')">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#E0B07A] to-[#F0B36F] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#081F24] text-2xl">castle</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Tarihi Bursa</h3>
+                        <p class="text-[10px] text-gold-primary">6 Durak • 4.5 Saat</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-gold-primary text-xs fill-1">star</span>
+                    <span class="text-xs font-bold text-white">4.9</span>
+                </div>
+            </div>
+            
+            <!-- Stops Preview -->
+            <div class="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide">
+                <div class="flex items-center gap-2 text-xs text-text-secondary whitespace-nowrap">
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">1</span>
+                    <span>Ulu Camii</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">2</span>
+                    <span>Yeşil Türbe</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">3</span>
+                    <span>Koza Han</span>
+                    <span class="text-text-desc">+3</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between pt-3 border-t border-border-subtle/30">
+                <div class="flex items-center gap-3 text-[10px] text-text-secondary">
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">group</span>
+                        12.4K keşfeden
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">schedule</span>
+                        4.5 saat
+                    </span>
+                </div>
+                <button class="px-4 py-2 bg-gold-primary text-[#081F24] rounded-full text-xs font-bold flex items-center gap-1 hover:bg-gold-nav transition-colors">
+                    <span>Detaylar</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Route 2: Doğa & Manzara -->
+        <div class="route-card rounded-2xl p-4 cursor-pointer" onclick="openRouteModal('doga')">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4A90A4] to-[#2D8A8A] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-2xl">forest</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Doğa & Manzara</h3>
+                        <p class="text-[10px] text-gold-primary">4 Durak • 6 Saat</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-gold-primary text-xs fill-1">star</span>
+                    <span class="text-xs font-bold text-white">4.8</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide">
+                <div class="flex items-center gap-2 text-xs text-text-secondary whitespace-nowrap">
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">1</span>
+                    <span>Uludağ Zirve</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">2</span>
+                    <span>Cumalıkızık</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">3</span>
+                    <span>Gölyazı</span>
+                    <span class="text-text-desc">+1</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between pt-3 border-t border-border-subtle/30">
+                <div class="flex items-center gap-3 text-[10px] text-text-secondary">
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">group</span>
+                        8.2K keşfeden
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">schedule</span>
+                        6 saat
+                    </span>
+                </div>
+                <button class="px-4 py-2 bg-gold-primary text-[#081F24] rounded-full text-xs font-bold flex items-center gap-1 hover:bg-gold-nav transition-colors">
+                    <span>Detaylar</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Route 3: Lezzet Turu -->
+        <div class="route-card rounded-2xl p-4 cursor-pointer" onclick="openRouteModal('lezzet')">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#F0B36F] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#081F24] text-2xl">restaurant</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Lezzet Turu</h3>
+                        <p class="text-[10px] text-gold-primary">5 Durak • 3.5 Saat</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-gold-primary text-xs fill-1">star</span>
+                    <span class="text-xs font-bold text-white">4.9</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide">
+                <div class="flex items-center gap-2 text-xs text-text-secondary whitespace-nowrap">
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">1</span>
+                    <span>İskender Kebap</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">2</span>
+                    <span>İnegöl Köfte</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">3</span>
+                    <span>Kestane Şekeri</span>
+                    <span class="text-text-desc">+2</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between pt-3 border-t border-border-subtle/30">
+                <div class="flex items-center gap-3 text-[10px] text-text-secondary">
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">group</span>
+                        15.6K keşfeden
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">schedule</span>
+                        3.5 saat
+                    </span>
+                </div>
+                <button class="px-4 py-2 bg-gold-primary text-[#081F24] rounded-full text-xs font-bold flex items-center gap-1 hover:bg-gold-nav transition-colors">
+                    <span>Detaylar</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Route 4: Akşam & Işıklar -->
+        <div class="route-card rounded-2xl p-4 cursor-pointer" onclick="openRouteModal('aksam')">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E3A2F] to-[#0D3238] flex items-center justify-center border border-gold-primary/30">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">nightlight</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Akşam & Işıklar</h3>
+                        <p class="text-[10px] text-gold-primary">3 Durak • 2.5 Saat</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-gold-primary text-xs fill-1">star</span>
+                    <span class="text-xs font-bold text-white">4.7</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide">
+                <div class="flex items-center gap-2 text-xs text-text-secondary whitespace-nowrap">
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">1</span>
+                    <span>Tophane Gün Batımı</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">2</span>
+                    <span>Şehir Işıkları</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">3</span>
+                    <span>Teleferik Gece</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between pt-3 border-t border-border-subtle/30">
+                <div class="flex items-center gap-3 text-[10px] text-text-secondary">
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">group</span>
+                        5.3K keşfeden
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">schedule</span>
+                        2.5 saat
+                    </span>
+                </div>
+                <button class="px-4 py-2 bg-gold-primary text-[#081F24] rounded-full text-xs font-bold flex items-center gap-1 hover:bg-gold-nav transition-colors">
+                    <span>Detaylar</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Route 5: Aile & Çocuk -->
+        <div class="route-card rounded-2xl p-4 cursor-pointer" onclick="openRouteModal('aile')">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#E0B07A] to-[#4A90A4] flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-2xl">family_restroom</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Aile & Çocuk</h3>
+                        <p class="text-[10px] text-gold-primary">4 Durak • 5 Saat</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-gold-primary text-xs fill-1">star</span>
+                    <span class="text-xs font-bold text-white">4.6</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide">
+                <div class="flex items-center gap-2 text-xs text-text-secondary whitespace-nowrap">
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">1</span>
+                    <span>Hayvanat Bahçesi</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">2</span>
+                    <span>Timsah Arena</span>
+                    <span class="material-symbols-outlined text-[10px] text-border-subtle">arrow_forward</span>
+                    <span class="w-6 h-6 rounded-full bg-card-bg flex items-center justify-center text-[10px] text-gold-primary">3</span>
+                    <span>Kent Müzesi</span>
+                    <span class="text-text-desc">+1</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between pt-3 border-t border-border-subtle/30">
+                <div class="flex items-center gap-3 text-[10px] text-text-secondary">
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">group</span>
+                        6.8K keşfeden
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[10px]">schedule</span>
+                        5 saat
+                    </span>
+                </div>
+                <button class="px-4 py-2 bg-gold-primary text-[#081F24] rounded-full text-xs font-bold flex items-center gap-1 hover:bg-gold-nav transition-colors">
+                    <span>Detaylar</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- Bottom Navigation - AI BUTONU KALDIRILDI -->
+<nav class="fixed bottom-0 left-0 right-0 flex items-center justify-around px-4 py-2 bg-nav-bg border-t border-border-subtle/50 pb-6 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="anasayfa.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">home</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ana Sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-nav" href="bursa.html">
+        <span class="material-symbols-outlined text-lg fill-1">explore</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="ara.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">search</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="profil.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">person</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Profil</span>
+    </a>
+</nav>
+
+<script>
+// Route Data
+const routesData = {
+    tarihi: {
+        name: "Tarihi Bursa",
+        icon: "castle",
+        color: "from-[#E0B07A] to-[#F0B36F]",
+        rating: 4.9,
+        users: "12.4K",
+        duration: "4.5 saat",
+        stops: 6,
+        description: "Osmanlı'nın ilk başkentinin en önemli tarihi yapılarını keşfedin. 700 yıllık miras, çiniler, camiler ve hanlar sizi bekliyor.",
+        startPoint: "Ulu Camii",
+        transport: "Metro + Yürüyüş",
+        tips: [
+            "Sabah erken başlayın, öğle kalabalığından kaçının",
+            "Her durakta ortalama 30-45 dk ayırın",
+            "Öğle yemeği için Koza Han çevresindeki restoranlar"
+        ],
+        stops: [
+            { name: "Ulu Camii", type: "Tarihi Yapı", duration: "45 dk", rating: 4.9, image: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=400&q=80", desc: "20 kubbeli Osmanlı mimarisinin şaheseri" },
+            { name: "Yeşil Türbe", type: "UNESCO", duration: "30 dk", rating: 4.8, image: "https://images.unsplash.com/photo-1566125882500-87e10f726cdc?w=400&q=80", desc: "Çinileriyle ünlü Sultan Çelebi Mehmet türbesi" },
+            { name: "Koza Han", type: "Tarihi Çarşı", duration: "60 dk", rating: 4.7, image: "https://images.unsplash.com/photo-1559628233-100c798642d4?w=400&q=80", desc: "500 yıllık ipek ticaretinin merkezi" },
+            { name: "Tophane", type: "Manzara", duration: "30 dk", rating: 4.8, image: "https://images.unsplash.com/photo-1594924862961-e6b107626bd1?w=400&q=80", desc: "Osman Gazi ve Orhan Gazi türbeleri, panoramik manzara" },
+            { name: "Muradiye", type: "Külliye", duration: "45 dk", rating: 4.6, image: "https://images.unsplash.com/photo-1544212414-6f9c5b58f5c5?w=400&q=80", desc: "II. Murad'ın yaptırdığı külliye ve bahçe" },
+            { name: "Hanlar Bölgesi", type: "Alışveriş", duration: "60 dk", rating: 4.5, image: "https://images.unsplash.com/photo-1555992336-fb0d29498b13?w=400&q=80", desc: "15. yüzyıldan kalma hanlar, el sanatları" }
+        ]
+    },
+    doga: {
+        name: "Doğa & Manzara",
+        icon: "forest",
+        color: "from-[#4A90A4] to-[#2D8A8A]",
+        rating: 4.8,
+        users: "8.2K",
+        duration: "6 saat",
+        stops: 4,
+        description: "Bursa'nın yeşil doğası ve eşsiz manzaralarını keşfedin. Uludağ'dan Gölyazı'ya doğa harikaları.",
+        startPoint: "Uludağ Teleferik",
+        transport: "Teleferik + Araba",
+        tips: [
+            "Uludağ için erken saatlerde gidin, sis öğleden sonra artar",
+            "Cumalıkızık'ta köy kahvaltısı yapın",
+            "Gölyazı'da gün batımını kaçırmayın"
+        ],
+        stops: [
+            { name: "Uludağ Zirve", type: "Milli Park", duration: "3 saat", rating: 4.8, image: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=400&q=80", desc: "2.543m zirve, teleferik, kayak merkezleri" },
+            { name: "Cumalıkızık", type: "UNESCO", duration: "2 saat", rating: 4.9, image: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=400&q=80", desc: "700 yıllık Osmanlı köyü, taş sokaklar" },
+            { name: "Gölyazı", type: "Göl", duration: "2 saat", rating: 4.7, image: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=400&q=80", desc: "Uluabat Gölü'ndeki yarımada, Ağlayan Çınar" },
+            { name: "Mudanya Sahil", type: "Sahil", duration: "1.5 saat", rating: 4.6, image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80", desc: "Marmara Denizi kıyısı, balık restoranları" }
+        ]
+    },
+    lezzet: {
+        name: "Lezzet Turu",
+        icon: "restaurant",
+        color: "from-[#D4AF37] to-[#F0B36F]",
+        rating: 4.9,
+        users: "15.6K",
+        duration: "3.5 saat",
+        stops: 5,
+        description: "Bursa'nın dünyaca ünlü lezzetlerini tadın. İskender'den kestane şekerine, cantıktan tahinli pideye.",
+        startPoint: "Kayhan Çarşısı",
+        transport: "Yürüyüş + Kısa Taksi",
+        tips: [
+            "Aç gelin! Her durak doyurucu",
+            "İskender için rezervasyon yaptırın",
+            "Kestane şekeri almadan çıkmayın"
+        ],
+        stops: [
+            { name: "İskender Kebap", type: "Gastronomi", duration: "60 dk", rating: 4.9, image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=80", desc: "1867'den beri orijinal İskender kebap" },
+            { name: "İnegöl Köfte", type: "Lezzet", duration: "45 dk", rating: 4.7, image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=80", desc: "Meşhur ızgara köfte, piyaz eşliğinde" },
+            { name: "Kestane Şekeri", type: "Tatlı", duration: "30 dk", rating: 4.8, image: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&q=80", desc: "Bursa'nın simgesi, 600 yıllık tatlı" },
+            { name: "Cantık", type: "Hamur İşi", duration: "30 dk", rating: 4.6, image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80", desc: "Geleneksel Bursa pizzası" },
+            { name: "Tahinli Pide", type: "Tatlı", duration: "30 dk", rating: 4.7, image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&q=80", desc: "Susam ve tahinli geleneksel tatlı" }
+        ]
+    },
+    aksam: {
+        name: "Akşam & Işıklar",
+        icon: "nightlight",
+        color: "from-[#1E3A2F] to-[#0D3238]",
+        rating: 4.7,
+        users: "5.3K",
+        duration: "2.5 saat",
+        stops: 3,
+        description: "Bursa'nın romantik akşam atmosferini yaşayın. Gün batımı, şehir ışıkları ve gece teleferik.",
+        startPoint: "Tophane",
+        transport: "Taksi + Teleferik",
+        tips: [
+            "Gün batımından 1 saat önce Tophane'de olun",
+            "Teleferik için gece biletleri ayrı satılır",
+            "Fotoğraf makinenizi şarj edin"
+        ],
+        stops: [
+            { name: "Tophane Gün Batımı", type: "Manzara", duration: "60 dk", rating: 4.8, image: "https://images.unsplash.com/photo-1594924862961-e6b107626bd1?w=400&q=80", desc: "Panoramik Bursa manzarası, gün batımı" },
+            { name: "Şehir Işıkları", type: "Gezi", duration: "45 dk", rating: 4.6, image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=400&q=80", desc: "Aydınlatılmış tarihi yapılar, yürüyüş" },
+            { name: "Teleferik Gece", type: "Aktivite", duration: "60 dk", rating: 4.7, image: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=400&q=80", desc: "Gece Uludağ'a çıkış, şehir ışıkları manzarası" }
+        ]
+    },
+    aile: {
+        name: "Aile & Çocuk",
+        icon: "family_restroom",
+        color: "from-[#E0B07A] to-[#4A90A4]",
+        rating: 4.6,
+        users: "6.8K",
+        duration: "5 saat",
+        stops: 4,
+        description: "Çocuklarla keyifli bir gün için ideal rota. Hayvanat bahçesi, müze, park ve tarihi köy.",
+        startPoint: "Bursa Hayvanat Bahçesi",
+        transport: "Araba + Yürüyüş",
+        tips: [
+            "Hayvanat bahçesi sabah erken daha az kalabalık",
+            "Çocuklar için su ve atıştırmalık getirin",
+            "Cumalıkızık'ta atlı tur yapılabilir"
+        ],
+        stops: [
+            { name: "Hayvanat Bahçesi", type: "Doğa", duration: "2 saat", rating: 4.5, image: "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?w=400&q=80", desc: "Bursa Zoo, 600+ hayvan türü, piknik alanları" },
+            { name: "Timsah Arena", type: "Spor", duration: "45 dk", rating: 4.4, image: "https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=400&q=80", desc: "Bursaspor stadyumu, müze ve tur" },
+            { name: "Kent Müzesi", type: "Müze", duration: "60 dk", rating: 4.6, image: "https://images.unsplash.com/photo-1566125882500-87e10f726cdc?w=400&q=80", desc: "Bursa'nın tarihi, interaktif sergiler" },
+            { name: "Cumalıkızık", type: "UNESCO", duration: "2 saat", rating: 4.9, image: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=400&q=80", desc: "Tarihi köy, atlı tur, el sanatları atölyeleri" }
+        ]
+    }
+};
+
+function openRouteModal(routeId) {
+    const route = routesData[routeId];
+    if (!route) return;
+    
+    const overlay = document.getElementById('route-modal-overlay');
+    const modal = document.getElementById('route-modal');
+    const content = document.getElementById('route-modal-content');
+    
+    // Build stops list
+    const stopsHtml = route.stops.map((stop, idx) => `
+        <div class="relative pl-8 pb-6 ${idx === route.stops.length - 1 ? '' : ''}">
+            ${idx !== route.stops.length - 1 ? '<div class="stop-line"></div>' : ''}
+            <div class="stop-dot absolute left-0 top-0"></div>
+            <div class="flex gap-3">
+                <div class="w-16 h-16 rounded-lg overflow-hidden shrink-0">
+                    <img src="${stop.image}" class="w-full h-full object-cover" alt="${stop.name}"/>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs font-bold text-gold-primary">${idx + 1}</span>
+                        <h4 class="text-sm font-bold text-white">${stop.name}</h4>
+                    </div>
+                    <p class="text-[10px] text-gold-primary mb-1">${stop.type} • ⭐ ${stop.rating}</p>
+                    <p class="text-xs text-text-secondary line-clamp-2">${stop.desc}</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-[10px] text-text-desc flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[10px]">schedule</span>
+                            ${stop.duration}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    content.innerHTML = `
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${route.color} flex items-center justify-center">
+                    <span class="material-symbols-outlined ${routeId === 'tarihi' || routeId === 'lezzet' ? 'text-[#081F24]' : 'text-white'} text-2xl">${route.icon}</span>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-white">${route.name}</h2>
+                    <p class="text-[10px] text-gold-primary">${route.stops.length} Durak • ${route.duration}</p>
+                </div>
+            </div>
+            <button onclick="closeRouteModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-sm">close</span>
+            </button>
+        </div>
+        
+        <!-- Rating & Users -->
+        <div class="flex items-center gap-4 mb-4 text-[10px] text-text-secondary">
+            <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-gold-primary text-xs fill-1">star</span>
+                <span class="text-white font-bold">${route.rating}</span>
+                <span>(${route.users} keşfeden)</span>
+            </span>
+            <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">schedule</span>
+                ${route.duration}
+            </span>
+        </div>
+        
+        <!-- Description -->
+        <p class="text-xs text-text-secondary mb-4 leading-relaxed">${route.description}</p>
+        
+        <!-- Start Point -->
+        <div class="bg-card-bg/50 rounded-lg p-3 mb-4 border border-border-subtle/30">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-gold-primary text-sm">location_on</span>
+                <span class="text-xs font-bold text-white">Başlangıç: ${route.startPoint}</span>
+            </div>
+            <div class="flex items-center gap-2 text-[10px] text-text-secondary">
+                <span class="material-symbols-outlined text-[10px]">directions_bus</span>
+                <span>Önerilen: ${route.transport}</span>
+            </div>
+        </div>
+        
+        <!-- Stops -->
+        <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-gold-primary text-base">flag</span>
+            Duraklar
+        </h3>
+        <div class="mb-4">
+            ${stopsHtml}
+        </div>
+        
+        <!-- Tips -->
+        <div class="bg-card-bg/50 rounded-lg p-3 mb-6 border border-border-subtle/30">
+            <h4 class="text-xs font-bold text-white mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-gold-primary text-sm">lightbulb</span>
+                Pro İpuçları
+            </h4>
+            <ul class="space-y-1">
+                ${route.tips.map(tip => `
+                    <li class="flex gap-2 text-[10px] text-text-secondary">
+                        <span class="material-symbols-outlined text-gold-primary text-xs shrink-0">check_circle</span>
+                        <span>${tip}</span>
+                    </li>
+                `).join('')}
+            </ul>
+        </div>
+        
+        <!-- Action Button -->
+        <a href="bursa-rota-sinematik.html?route=${routeId}" class="block w-full py-4 bg-gradient-to-r from-[#E0B07A] to-[#F0B36F] rounded-xl text-[#081F24] font-bold text-center flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#E0B07A]/30 transition-all">
+            <span class="material-symbols-outlined text-lg">play_arrow</span>
+            <span>Rotayı Başlat</span>
+        </a>
+    `;
+    
+    overlay.classList.add('active');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRouteModal() {
+    const overlay = document.getElementById('route-modal-overlay');
+    const modal = document.getElementById('route-modal');
+    
+    overlay.classList.remove('active');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+</script>
+
+</body>
+</html>

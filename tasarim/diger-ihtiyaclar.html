@@ -1,0 +1,599 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy - Diğer İhtiyaçlar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#BB9E77",
+                        "primary-light": "#D4B896",
+                        "primary-dark": "#9A8260",
+                        background: "#0F3E46",
+                        surface: "#415B57",
+                        border: "#698383",
+                        accent: "#E8D5B5",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        
+        .glass-card {
+            background: rgba(65, 91, 87, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card:hover {
+            background: rgba(65, 91, 87, 0.6);
+            border-color: rgba(187, 158, 119, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card:active {
+            transform: scale(0.98);
+        }
+        
+        .scenario-card {
+            background: linear-gradient(135deg, rgba(65, 91, 87, 0.6) 0%, rgba(65, 91, 87, 0.3) 100%);
+            border: 1px solid rgba(187, 158, 119, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scenario-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #BB9E77, transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .scenario-card:hover::before {
+            opacity: 1;
+        }
+        
+        .scenario-card.active {
+            background: linear-gradient(135deg, rgba(187, 158, 119, 0.2) 0%, rgba(65, 91, 87, 0.6) 100%);
+            border-color: rgba(187, 158, 119, 0.6);
+            box-shadow: 0 0 30px rgba(187, 158, 119, 0.2);
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.9);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:active {
+            transform: scale(0.9);
+        }
+        
+        .nav-item.active {
+            color: #BB9E77;
+        }
+        
+        .nav-item.active span:first-child {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        .service-item {
+            transition: all 0.2s ease;
+        }
+        
+        .service-item:active {
+            transform: scale(0.98);
+            background: rgba(187, 158, 119, 0.1);
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #BB9E77 0%, #E8D5B5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .bottom-sheet {
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .bottom-sheet.open {
+            transform: translateY(0);
+        }
+        
+        .icon-glow {
+            filter: drop-shadow(0 0 8px rgba(187, 158, 119, 0.4));
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="text-white antialiased pb-24">
+
+    <!-- Header -->
+    <header class="pt-12 px-6 pb-4 sticky top-0 z-40 bg-gradient-to-b from-[#0F3E46] via-[#0F3E46] to-transparent">
+        <div class="flex items-center justify-between mb-6">
+            <a href="acil-ihtiyaclar.html" class="ripple w-11 h-11 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all duration-300">
+                <span class="material-symbols-outlined text-primary text-xl">arrow_back_ios_new</span>
+            </a>
+            <div class="flex flex-col items-center">
+                <span class="text-primary tracking-[0.3em] font-semibold text-xs uppercase">CityJoy</span>
+                <div class="w-8 h-0.5 bg-primary/50 rounded-full mt-1"></div>
+            </div>
+            <div class="w-11"></div>
+        </div>
+        
+        <div class="animate-fade-in">
+            <h1 class="text-3xl font-light mb-2 tracking-tight">Diğer İhtiyaçlar</h1>
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-16 h-1 bg-gradient-to-r from-primary to-transparent rounded-full"></div>
+                <span class="text-xs text-gray-400 font-light">Durumunuza göre hizmet</span>
+            </div>
+        </div>
+
+        <!-- Arama -->
+        <div class="relative mt-4 animate-fade-in" style="animation-delay: 0.1s">
+            <input type="text" placeholder="Ne yaptırmak istiyorsunuz?" 
+                   class="w-full bg-surface/50 border border-border/30 rounded-2xl py-4 pl-12 pr-4 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-primary/50 transition-all">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+            <button class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-xl bg-primary/10 text-primary">
+                <span class="material-symbols-outlined text-lg">tune</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="px-6 space-y-6 mt-2">
+        
+        <!-- Senaryo Kartları -->
+        <section class="animate-fade-in" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-medium">Şu anki durumunuz?</h2>
+                <span class="text-xs text-primary cursor-pointer">Tümünü gör</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Kart 1: Yeni Taşındım -->
+                <div class="scenario-card rounded-2xl p-4 cursor-pointer ripple" onclick="selectScenario('move')">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 icon-glow">
+                        <span class="material-symbols-outlined text-primary text-2xl">moving</span>
+                    </div>
+                    <h3 class="font-medium text-sm mb-1">Yeni Taşındım</h3>
+                    <p class="text-[10px] text-gray-400 leading-relaxed">Montaj, temizlik, düzenleme</p>
+                    <div class="mt-3 flex items-center gap-1">
+                        <span class="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-full">12 hizmet</span>
+                    </div>
+                </div>
+
+                <!-- Kart 2: İşim Çok Yoğun -->
+                <div class="scenario-card rounded-2xl p-4 cursor-pointer ripple" onclick="selectScenario('busy')">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 icon-glow">
+                        <span class="material-symbols-outlined text-primary text-2xl">work_history</span>
+                    </div>
+                    <h3 class="font-medium text-sm mb-1">İşim Çok Yoğun</h3>
+                    <p class="text-[10px] text-gray-400 leading-relaxed">Yemek, ütü, temizlik</p>
+                    <div class="mt-3 flex items-center gap-1">
+                        <span class="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-full">8 hizmet</span>
+                    </div>
+                </div>
+
+                <!-- Kart 3: Tatile Gidiyorum -->
+                <div class="scenario-card rounded-2xl p-4 cursor-pointer ripple" onclick="selectScenario('vacation')">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 icon-glow">
+                        <span class="material-symbols-outlined text-primary text-2xl">beach_access</span>
+                    </div>
+                    <h3 class="font-medium text-sm mb-1">Tatile Gidiyorum</h3>
+                    <p class="text-[10px] text-gray-400 leading-relaxed">Pet bakımı, çiçek sulama</p>
+                    <div class="mt-3 flex items-center gap-1">
+                        <span class="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-full">5 hizmet</span>
+                    </div>
+                </div>
+
+                <!-- Kart 4: Hasta/Yorgunum -->
+                <div class="scenario-card rounded-2xl p-4 cursor-pointer ripple" onclick="selectScenario('sick')">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 icon-glow">
+                        <span class="material-symbols-outlined text-primary text-2xl">healing</span>
+                    </div>
+                    <h3 class="font-medium text-sm mb-1">Hasta/Yorgunum</h3>
+                    <p class="text-[10px] text-gray-400 leading-relaxed">Market, ilaç, yemek</p>
+                    <div class="mt-3 flex items-center gap-1">
+                        <span class="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-full">6 hizmet</span>
+                    </div>
+                </div>
+
+                <!-- Kart 5: Yaşlı Yakınım Var -->
+                <div class="scenario-card rounded-2xl p-4 cursor-pointer ripple" onclick="selectScenario('elderly')">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 icon-glow">
+                        <span class="material-symbols-outlined text-primary text-2xl">elderly</span>
+                    </div>
+                    <h3 class="font-medium text-sm mb-1">Yaşlı Yakınım Var</h3>
+                    <p class="text-[10px] text-gray-400 leading-relaxed">Refakat, teknoloji, sağlık</p>
+                    <div class="mt-3 flex items-center gap-1">
+                        <span class="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-full">9 hizmet</span>
+                    </div>
+                </div>
+
+                <!-- Kart 6: Özel Günüm Var -->
+                <div class="scenario-card rounded-2xl p-4 cursor-pointer ripple" onclick="selectScenario('special')">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-3 icon-glow">
+                        <span class="material-symbols-outlined text-primary text-2xl">celebration</span>
+                    </div>
+                    <h3 class="font-medium text-sm mb-1">Özel Günüm Var</h3>
+                    <p class="text-[10px] text-gray-400 leading-relaxed">Organizasyon, temizlik</p>
+                    <div class="mt-3 flex items-center gap-1">
+                        <span class="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-full">7 hizmet</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popüler Hizmetler (Horizontal Scroll) -->
+        <section class="animate-fade-in" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-medium">Popüler Hizmetler</h2>
+                <span class="text-xs text-gray-400">Son 24 saat</span>
+            </div>
+            
+            <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+                <a href="ev-temizligi.html" class="flex-shrink-0 w-32 glass-card rounded-2xl p-3 text-center cursor-pointer ripple active:scale-95">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                        <span class="material-symbols-outlined text-primary text-lg">cleaning_services</span>
+                    </div>
+                    <span class="text-xs font-medium block">Ev Temizliği</span>
+                    <span class="text-[10px] text-gray-400">₺350/saat</span>
+                </a>
+
+                <a href="yemek-yapma.html" class="flex-shrink-0 w-32 glass-card rounded-2xl p-3 text-center cursor-pointer ripple active:scale-95">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                        <span class="material-symbols-outlined text-primary text-lg">soup_kitchen</span>
+                    </div>
+                    <span class="text-xs font-medium block">Yemek Yapma</span>
+                    <span class="text-[10px] text-gray-400">₺400/gün</span>
+                </a>
+
+                <a href="kopek-gezdirme.html" class="flex-shrink-0 w-32 glass-card rounded-2xl p-3 text-center cursor-pointer ripple active:scale-95">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                        <span class="material-symbols-outlined text-primary text-lg">pets</span>
+                    </div>
+                    <span class="text-xs font-medium block">Köpek Gezdirme</span>
+                    <span class="text-[10px] text-gray-400">₺150/seans</span>
+                </a>
+
+                <a href="mobilya-montaj.html" class="flex-shrink-0 w-32 glass-card rounded-2xl p-3 text-center cursor-pointer ripple active:scale-95">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+                        <span class="material-symbols-outlined text-primary text-lg">chair</span>
+                    </div>
+                    <span class="text-xs font-medium block">Mobilya Montajı</span>
+                    <span class="text-[10px] text-gray-400">₺250/saat</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-fade-in" style="animation-delay: 0.4s">
+            <h2 class="text-lg font-medium mb-4">Son Kullanılanlar</h2>
+            
+            <div class="space-y-2">
+                <a href="ev-temizligi.html" class="glass-card rounded-2xl p-4 flex items-center justify-between cursor-pointer ripple service-item block">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-xl">cleaning_services</span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium block">Ev Temizliği</span>
+                            <span class="text-[10px] text-gray-400">3 gün önce • Ayşe K.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-full">Tekrarla</span>
+                        <span class="material-symbols-outlined text-gray-400 text-lg">chevron_right</span>
+                    </div>
+                </a>
+
+                <a href="market-alisverisi.html" class="glass-card rounded-2xl p-4 flex items-center justify-between cursor-pointer ripple service-item block">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-xl">shopping_cart</span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium block">Market Alışverişi</span>
+                            <span class="text-[10px] text-gray-400">1 hafta önce • Mehmet T.</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-primary bg-primary/10 px-2 py-1 rounded-full">Tekrarla</span>
+                        <span class="material-symbols-outlined text-gray-400 text-lg">chevron_right</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Özel Talep -->
+        <section class="animate-fade-in pb-8" style="animation-delay: 0.5s">
+            <a href="ozel-talep.html" class="w-full py-4 border-2 border-dashed border-border/40 text-gray-400 rounded-2xl flex items-center justify-center gap-2 text-sm active:scale-95 transition-all hover:border-primary/40 hover:text-primary ripple block">
+                <span class="material-symbols-outlined">add_circle</span>
+                <span>Listede olmayan bir talep oluştur</span>
+            </a>
+        </section>
+    </main>
+
+    <!-- Bottom Sheet (Senaryo Detayları) -->
+    <div id="bottomSheet" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeBottomSheet()"></div>
+        <div class="bottom-sheet absolute bottom-0 left-0 right-0 bg-[#0F3E46] rounded-t-3xl max-h-[85vh] overflow-y-auto">
+            <div class="sticky top-0 bg-[#0F3E46] pt-4 pb-2 px-6 z-10">
+                <div class="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-4"></div>
+                <div class="flex items-center justify-between">
+                    <h2 id="sheetTitle" class="text-xl font-medium"></h2>
+                    <button onclick="closeBottomSheet()" class="w-8 h-8 rounded-full bg-surface flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gray-400">close</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="sheetContent" class="px-6 pb-8 space-y-3">
+                <!-- Dinamik içerik buraya gelecek -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-6 z-40">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px] font-medium">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px] font-medium">Keşfet</span>
+            </a>
+            <a href="ara.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px] font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        const scenarios = {
+            move: {
+                title: "Yeni Taşındım",
+                services: [
+                    { icon: "cleaning_services", name: "Detaylı Ev Temizliği", desc: "Taşınma öncesi/sonrası derzlem", price: "₺500", link: "ev-temizligi.html" },
+                    { icon: "chair", name: "Mobilya Montajı", desc: "IKEA, modalife vb. kurulum", price: "₺250/saat", link: "mobilya-montaj.html" },
+                    { icon: "tv", name: "TV/Perde Asma", desc: "Dübel, matkap işlemleri", price: "₺200", link: "tv-montaj.html" },
+                    { icon: "lightbulb", name: "Avize/Lamba Montajı", desc: "Elektrik bağlantısı dahil", price: "₺150", link: "elektrik-montaj.html" },
+                    { icon: "checkroom", name: "Dolap Düzenleme", desc: "Gardrop, mutfak düzeni", price: "₺400", link: "duzenleme.html" },
+                    { icon: "local_shipping", name: "Küçük Nakliye", desc: "Şehir içi eşya taşıma", price: "₺300", link: "nakliye.html" }
+                ]
+            },
+            busy: {
+                title: "İşim Çok Yoğun",
+                services: [
+                    { icon: "soup_kitchen", name: "Günlük Yemek Yapma", desc: "2 öğün sıcak yemek", price: "₺400/gün", link: "yemek-yapma.html" },
+                    { icon: "iron", name: "Ütü Hizmeti", desc: "Haftalık ütü toplama", price: "₺300", link: "utu.html" },
+                    { icon: "cleaning_services", name: "Haftalık Temizlik", desc: "Süpürme, silme, toz alma", price: "₺350/saat", link: "ev-temizligi.html" },
+                    { icon: "shopping_cart", name: "Market Alışverişi", desc: "Liste hazırlama ve getirme", price: "₺100 + fiş", link: "market-alisverisi.html" },
+                    { icon: "local_laundry_service", name: "Kuru Temizleme", desc: "Alım ve bırakma", price: "₺50 + ücret", link: "kuru-temizleme.html" },
+                    { icon: "delete", name: "Çöp Atma", desc: "Düzenli çöp çıkarma", price: "₺50/gün", link: "cop-atma.html" }
+                ]
+            },
+            vacation: {
+                title: "Tatile Gidiyorum",
+                services: [
+                    { icon: "pets", name: "Evcil Hayvan Bakımı", desc: "Besleme, temizlik, oyun", price: "₺200/gün", link: "pet-bakimi.html" },
+                    { icon: "nature", name: "Bitki Sulama", desc: "Çiçek ve bahçe bakımı", price: "₺50/ziyaret", link: "bitki-sulama.html" },
+                    { icon: "mail", name: "Posta/Kargo Toplama", desc: "Kapıdan alım ve saklama", price: "₺30/gün", link: "posta-toplama.html" },
+                    { icon: "curtains", name: "Perde/Açık Unutma", desc: "Ev güvenliği kontrolü", price: "₺40/ziyaret", link: "ev-kontrol.html" },
+                    { icon: "local_car_wash", name: "Araç Kontrolü", desc: "Marş, lastik basıncı", price: "₺100", link: "arac-kontrol.html" }
+                ]
+            },
+            sick: {
+                title: "Hasta/Yorgunum",
+                services: [
+                    { icon: "medication", name: "İlaç Getirme", desc: "Eczane alışverişi", price: "₺50 + fiş", link: "ilac-getirme.html" },
+                    { icon: "restaurant", name: "Hastane Yemeği", desc: "Diyetisyen onaylı", price: "₺150", link: "yemek-getirme.html" },
+                    { icon: "shopping_cart", name: "Market Alışverişi", desc: "Temel gıda ihtiyaçları", price: "₺100 + fiş", link: "market-alisverisi.html" },
+                    { icon: "cleaning_services", name: "Hafif Ev Temizliği", desc: "Temel hijyen", price: "₺250", link: "ev-temizligi.html" },
+                    { icon: "local_hospital", name: "Refakatçi", desc: "Hastane eşlik hizmeti", price: "₺500/gün", link: "refakatei.html" }
+                ]
+            },
+            elderly: {
+                title: "Yaşlı Yakınım Var",
+                services: [
+                    { icon: "phone_android", name: "Telefon Kurulumu", desc: "Uygulama, wifi, güncelleme", price: "₺200", link: "telefon-kurulum.html" },
+                    { icon: "tv", name: "TV/Internet Ayarı", desc: "Kumanda, kanal ayarı", price: "₺150", link: "tv-kurulum.html" },
+                    { icon: "shopping_cart", name: "Haftalık Alışveriş", desc: "Pazar ve market", price: "₺150 + fiş", link: "market-alisverisi.html" },
+                    { icon: "medication", name: "İlaç Takibi", desc: "Düzenli kontrol ve hatırlatma", price: "₺300/hafta", link: "ilac-takibi.html" },
+                    { icon: "directions_walk", name: "Refakat (Yürüyüş)", desc: "Doktor/hastane ziyareti", price: "₺400", link: "refakat.html" },
+                    { icon: "cleaning_services", name: "Ev Düzeni", desc: "Yaşlı dostu düzenleme", price: "₺300", link: "ev-duzeni.html" }
+                ]
+            },
+            special: {
+                title: "Özel Günüm Var",
+                services: [
+                    { icon: "cleaning_services", name: "Öncesi Detaylı Temizlik", desc: "Misafir için hazırlık", price: "₺600", link: "ev-temizligi.html" },
+                    { icon: "celebration", name: "Ev Süsleme", desc: "Doğum günü, yılbaşı", price: "₺400", link: "ev-susleme.html" },
+                    { icon: "cake", name: "Pasta Getirme", desc: "Pastane seçimi ve teslimat", price: "₺100 + ücret", link: "pasta-getirme.html" },
+                    { icon: "local_florist", name: "Çiçek Aranjmanı", desc: "Özel gün çiçeği", price: "₺150 + ücret", link: "cicek-getirme.html" },
+                    { icon: "restaurant", name: "Catering (Küçük)", desc: "10-20 kişilik ikramlık", price: "₺1500", link: "catering.html" },
+                    { icon: "photo_camera", name: "Fotoğrafçılık", desc: "Anı fotoğrafları", price: "₺1000", link: "fotografci.html" }
+                ]
+            }
+        };
+
+        function selectScenario(scenarioKey) {
+            const scenario = scenarios[scenarioKey];
+            const sheet = document.getElementById('bottomSheet');
+            const title = document.getElementById('sheetTitle');
+            const content = document.getElementById('sheetContent');
+            
+            // Aktif kartı işaretle
+            document.querySelectorAll('.scenario-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            title.textContent = scenario.title;
+            content.innerHTML = scenario.services.map((service, index) => `
+                <a href="${service.link}" class="glass-card rounded-2xl p-4 flex items-center justify-between cursor-pointer ripple service-item block" style="animation: slideUp 0.3s ease-out ${index * 0.05}s both">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-primary text-xl">${service.icon}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <span class="text-sm font-medium block truncate">${service.name}</span>
+                            <span class="text-[10px] text-gray-400 block truncate">${service.desc}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-1 flex-shrink-0 ml-2">
+                        <span class="text-sm font-semibold text-primary">${service.price}</span>
+                        <span class="text-[10px] text-gray-400 bg-surface px-2 py-0.5 rounded-full">Talep Et</span>
+                    </div>
+                </a>
+            `).join('');
+            
+            sheet.classList.remove('hidden');
+            setTimeout(() => {
+                sheet.querySelector('.bottom-sheet').classList.add('open');
+            }, 10);
+        }
+
+        function closeBottomSheet() {
+            const sheet = document.getElementById('bottomSheet');
+            sheet.querySelector('.bottom-sheet').classList.remove('open');
+            setTimeout(() => {
+                sheet.classList.add('hidden');
+                document.querySelectorAll('.scenario-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+            }, 300);
+        }
+
+        // Dokunmatik kaydırma için
+        let touchStartY = 0;
+        const bottomSheet = document.querySelector('.bottom-sheet');
+        
+        bottomSheet.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        bottomSheet.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const diff = touchY - touchStartY;
+            if (diff > 0 && bottomSheet.scrollTop === 0) {
+                bottomSheet.style.transform = `translateY(${diff}px)`;
+            }
+        });
+
+        bottomSheet.addEventListener('touchend', (e) => {
+            const touchY = e.changedTouches[0].clientY;
+            const diff = touchY - touchStartY;
+            if (diff > 100) {
+                closeBottomSheet();
+            } else {
+                bottomSheet.style.transform = '';
+            }
+        });
+    </script>
+</body>
+</html>

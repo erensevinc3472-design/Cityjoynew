@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Devlet Okulları ve Eğitim Kurumları - Anadolu Liseleri, Fen Liseleri, Meslek Liseleri, İmam Hatipler ve Halk Eğitim Merkezleri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Eğitim Kurumları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "edu-blue": "#3B82F6",
+                        "edu-purple": "#8B5CF6",
+                        "edu-orange": "#F97316",
+                        "edu-green": "#10B981"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .school-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .school-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .type-btn {
+            transition: all 0.3s ease;
+        }
+        .type-btn.active {
+            background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+            color: white;
+            border-color: transparent;
+        }
+        .type-btn:not(.active):hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
+        }
+        .modal-school {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .search-box {
+            background: rgba(13, 50, 56, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .search-box:focus-within {
+            border-color: rgba(224, 176, 122, 0.6);
+            box-shadow: 0 4px 25px rgba(224, 176, 122, 0.1);
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">EĞİTİM KURUMLARI</h1>
+                <p class="text-xs text-gray-text truncate">Bursa Devlet Okulları ve Eğitim Merkezleri</p>
+            </div>
+            <button onclick="openInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-edu-blue/20 hover:bg-edu-blue/30 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-edu-blue">school</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Eğitim İstatistikleri -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-edu-blue/30 to-edu-blue/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-edu-blue text-xl">cast_for_education</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Bursa Eğitim Ağı</h2>
+                            <p class="text-xs text-gray-text">2024-2025 Eğitim Yılı</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-edu-green/10 border border-edu-green/30">
+                        <div class="w-2 h-2 rounded-full bg-edu-green animate-pulse"></div>
+                        <span class="text-xs text-edu-green font-medium">Aktif</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-edu-purple">1,247</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Devlet Okulu</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-edu-blue">485K</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Öğrenci</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">35K</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Öğretmen</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-edu-orange">17</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">İlçe</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme - Düzeltilmiş Boyut -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Okul Bul</h3>
+                        <p class="text-xs text-gray-text truncate">Okul adı, türü veya ilçe ara</p>
+                    </div>
+                </div>
+
+                <!-- Düzeltilmiş Arama Çubuğu - Daha Büyük -->
+                <div class="search-box rounded-2xl p-4 flex items-center gap-3 mb-5">
+                    <span class="material-symbols-outlined text-gold shrink-0 text-xl">location_on</span>
+                    <input type="text" id="schoolSearch" placeholder="Örn: Bursa Fen Lisesi, Nilüfer Anadolu..." 
+                        class="bg-transparent flex-1 text-base text-off-white placeholder-gray-text focus:outline-none min-w-0 h-12"
+                        onkeyup="searchSchool()"/>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">İlçe Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-4">
+                    <button onclick="filterDistrict('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterDistrict('osmangazi')" id="btn-osmangazi" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Osmangazi</span>
+                    </button>
+                    <button onclick="filterDistrict('nilufer')" id="btn-nilufer" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Nilüfer</span>
+                    </button>
+                    <button onclick="filterDistrict('yildirim')" id="btn-yildirim" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Yıldırım</span>
+                    </button>
+                    <button onclick="filterDistrict('inegol')" id="btn-inegol" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">İnegöl</span>
+                    </button>
+                    <button onclick="filterDistrict('gemlik')" id="btn-gemlik" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Gemlik</span>
+                    </button>
+                </div>
+
+                <!-- Okul Türü Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Okul Türü</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterType('all')" id="type-all" class="type-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterType('anadolu')" id="type-anadolu" class="type-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Anadolu Lisesi</span>
+                    </button>
+                    <button onclick="filterType('fen')" id="type-fen" class="type-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Fen Lisesi</span>
+                    </button>
+                    <button onclick="filterType('meslek')" id="type-meslek" class="type-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Meslek Lisesi</span>
+                    </button>
+                    <button onclick="filterType('imam')" id="type-imam" class="type-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">İmam Hatip</span>
+                    </button>
+                    <button onclick="filterType('hem')" id="type-hem" class="type-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Halk Eğitim</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Sıkça Sorulan Sorular</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Kayıt İşlemleri -->
+                <div class="school-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-edu-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-edu-blue text-sm">app_registration</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Nasıl Kayıt Yaptırılır?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                e-Okul sistemi üzerinden elektronik kayıt yapılır. Nakil istekleri ise e-Devlet üzerinden "e-Okul" hizmeti kullanılarak gerçekleştirilir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="px-2 py-1 rounded text-[10px] bg-edu-blue/20 text-edu-blue border border-edu-blue/30">e-Okul</span>
+                                <span class="px-2 py-1 rounded text-[10px] bg-edu-green/20 text-edu-green border border-edu-green/30">e-Devlet</span>
+                                <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">Ağustos Ayı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LGS Tercihleri -->
+                <div class="school-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-edu-purple/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-edu-purple text-sm">format_list_numbered</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">LGS Tercihleri Nasıl Yapılır?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Liselere Geçiş Sistemi (LGS) tercihleri MEB tarafından belirlenen tarihlerde "e-Okul" sistemi üzerinden yapılır. Bursa'da kontenjanlar ve taban puanlar ilçelere göre değişiklik gösterir.
+                            </p>
+                            <div class="bg-white/5 rounded-lg p-2 text-[10px] text-gray-text">
+                                <strong class="text-gold">İpucu:</strong> Osmangazi ve Nilüfer ilçelerindeki köklü liseler daha yüksek puanlarla öğrenci alır.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ulaşım -->
+                <div class="school-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-edu-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-edu-orange text-sm">directions_bus</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Okul Servisi ve Ulaşım</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Bursa'da okullara ulaşım:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>BursaRay + Otobüs:</strong> Metro ile merkezi noktalara ulaşım</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>Özel Servis:</strong> Okul yönetimleri tarafından organize edilir</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>Toplu Taşıma:</strong> 16-25 yaş öğrenci kartı indirimli</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Halk Eğitim -->
+                <div class="school-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-edu-green/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-edu-green text-sm">groups</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Halk Eğitim Merkezleri</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Her ilçede bulunan Halk Eğitim Merkezleri (HEM) ücretsiz kurslar düzenler:
+                            </p>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-edu-green text-lg">menu_book</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Okuma-Yazma</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-edu-green text-lg">computer</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Bilgisayar</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-edu-green text-lg">palette</span>
+                                    <p class="text-[10px] text-gray-text mt-1">El Sanatları</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-edu-green text-lg">language</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Yabancı Dil</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Osmangazi Okulları -->
+        <section class="animate-slide-up district-section" data-district="osmangazi" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('osmangaziSection', 'osmangaziIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-edu-blue/30 to-edu-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-edu-blue">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Osmangazi İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Merkez ilçede 320+ okul</span>
+                    </div>
+                </div>
+                <span id="osmangaziIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="osmangaziSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('bursaal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Çekirge Mah. Tarihi Bina</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">stars</span>
+                        <span>1873'ten beri eğitim veriyor</span>
+                    </div>
+                </div>
+
+                <!-- Bursa Fen Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('bursafl')" data-type="fen">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">FL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Fen Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Çekirge Mah. Dr. Sadık Ahmet Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-purple">science</span>
+                        <span>Üniversite hazırlık ve proje okulu</span>
+                    </div>
+                </div>
+
+                <!-- Tophane Meslek Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('tophaneml')" data-type="meslek">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">ML</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Tophane Mesleki ve Teknik Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Tophane Mah. Tophane Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-orange">engineering</span>
+                        <span>Endüstriyel otomasyon ve makine</span>
+                    </div>
+                </div>
+
+                <!-- Hüdavendigar Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('hudavendigarl')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hüdavendigar Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Hüdavendigar Mah. Tophane Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">history_edu</span>
+                        <span>Tarihi okul binası</span>
+                    </div>
+                </div>
+
+                <!-- Çelebi Mehmet Anadolu İmam Hatip Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('celebiihl')" data-type="imam">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">İHL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Çelebi Mehmet Anadolu İHL</h4>
+                                <p class="text-[10px] text-gray-text">Altıparmak Mah. Çelebi Mehmet Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-green">mosque</span>
+                        <span>İmam hatip ve mesleki programlar</span>
+                    </div>
+                </div>
+
+                <!-- Hamitler Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('hamitleral')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hamitler Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Hamitler Mah. Eğitim Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">school</span>
+                        <span>Yeni nesil eğitim binası</span>
+                    </div>
+                </div>
+
+                <!-- Osmangazi Halk Eğitim Merkezi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('osmangazihem')" data-type="hem">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">HEM</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Osmangazi Halk Eğitim Merkezi</h4>
+                                <p class="text-[10px] text-gray-text">Altıparmak Mah. Hükümet Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">groups</span>
+                        <span>Ücretsiz kurslar ve mesleki eğitim</span>
+                    </div>
+                </div>
+
+                <!-- Soğanlı Mesleki ve Teknik Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('soganliml')" data-type="meslek">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">ML</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Soğanlı MTAL</h4>
+                                <p class="text-[10px] text-gray-text">Soğanlı Mah. Eğitim Bölgesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-orange">construction</span>
+                        <span>İnşaat ve elektrik-elektronik bölümleri</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nilüfer Okulları -->
+        <section class="animate-slide-up district-section" data-district="nilufer" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('niluferSection', 'niluferIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-edu-green/30 to-edu-green/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-edu-green">park</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Nilüfer İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Modern eğitim bölgesi</span>
+                    </div>
+                </div>
+                <span id="niluferIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="niluferSection" class="expandable-section mt-3 space-y-3">
+                <!-- Nilüfer Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('niluferal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Konak Mah. FSM Bulvarı</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">emoji_events</span>
+                        <span>Yüksek başarı oranı</span>
+                    </div>
+                </div>
+
+                <!-- Özlüce Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('ozluceal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özlüce Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Özlüce Mah. 167. Sokak</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">sports_esports</span>
+                        <span>Spor ve akademik başarı</span>
+                    </div>
+                </div>
+
+                <!-- Beşevler Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('besevleral')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Beşevler Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Beşevler Mah. Eğitim Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">subway</span>
+                        <span>Metro yakınlığı</span>
+                    </div>
+                </div>
+
+                <!-- Görükle Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('goruklel')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Görükle Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Görükle Mah. Üniversite Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">account_balance</span>
+                        <span>Uludağ Üniversitesi yakınlığı</span>
+                    </div>
+                </div>
+
+                <!-- Çalı Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('calial')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Çalı Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Çalı Mah. Çalı Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">agriculture</span>
+                        <span>Tarım bölgesi okulu</span>
+                    </div>
+                </div>
+
+                <!-- Nilüfer Halk Eğitim Merkezi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('niluferhem')" data-type="hem">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">HEM</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer Halk Eğitim Merkezi</h4>
+                                <p class="text-[10px] text-gray-text">Konak Mah. Nilüfer Belediyesi yanı</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">palette</span>
+                        <span>Sanatsal ve mesleki kurslar</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yıldırım Okulları -->
+        <section class="animate-slide-up district-section" data-district="yildirim" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('yildirimSection', 'yildirimIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-edu-orange/30 to-edu-orange/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-edu-orange">mosque</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Yıldırım İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Tarihi ve modern okullar</span>
+                    </div>
+                </div>
+                <span id="yildirimIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="yildirimSection" class="expandable-section mt-3 space-y-3">
+                <!-- Yıldırım Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('yildirimal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yıldırım Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Beyazıt Mah. 1. Beyazıt Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">history</span>
+                        <span>Köklü eğitim geleneği</span>
+                    </div>
+                </div>
+
+                <!-- Davutdede Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('davutdedeal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Davutdede Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Davutdede Mah. Eğitim Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">trending_up</span>
+                        <span>Hızlı gelişen kurum</span>
+                    </div>
+                </div>
+
+                <!-- Beyazıt Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('beyazital')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Beyazıt Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Beyazıt Mah. Okul Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">star</span>
+                        <span>Merkezi konum</span>
+                    </div>
+                </div>
+
+                <!-- Cumalıkızık Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('cumalikizikal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Cumalıkızık Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Cumalıkızık Mah. UNESCO Bölgesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-green">world</span>
+                        <span>UNESCO Dünya Mirası bölgesinde</span>
+                    </div>
+                </div>
+
+                <!-- Değirmenlikızık Çok Programlı Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('degirmenlikizik')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Değirmenlikızık ÇPAL</h4>
+                                <p class="text-[10px] text-gray-text">Değirmenlikızık Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">forest</span>
+                        <span>Köy yaşamı içinde eğitim</span>
+                    </div>
+                </div>
+
+                <!-- Yıldırım Halk Eğitim Merkezi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('yildirimhem')" data-type="hem">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">HEM</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yıldırım Halk Eğitim Merkezi</h4>
+                                <p class="text-[10px] text-gray-text">Beyazıt Mah. Hükümet Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">handshake</span>
+                        <span>Yöresel el sanatları kursları</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diğer İlçeler -->
+        <section class="animate-slide-up district-section" data-district="diger" style="animation-delay: 0.6s">
+            <button onclick="toggleSection('digerSection', 'digerIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-edu-purple/30 to-edu-purple/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-edu-purple">map</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Diğer İlçeler</span>
+                        <span class="text-[10px] text-gray-text block truncate">İnegöl, Gemlik, Mudanya, Kestel</span>
+                    </div>
+                </div>
+                <span id="digerIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="digerSection" class="expandable-section mt-3 space-y-3">
+                <!-- İnegöl Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('inegolal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">İnegöl Merkez, Bursa Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">chair</span>
+                        <span>Mobilya şehri İnegöl'ün köklü okulu</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl Fen Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('inegolfl')" data-type="fen">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">FL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl Fen Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">İnegöl Mah. Yeni Mahalle</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-purple">science</span>
+                        <span>Bölgenin en başarılı fen liselerinden</span>
+                    </div>
+                </div>
+
+                <!-- Gemlik Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('gemlikal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Gemlik Merkez, Atatürk Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">sailing</span>
+                        <span>Deniz kenarında tarihi okul</span>
+                    </div>
+                </div>
+
+                <!-- Mudanya Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('mudanyaal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mudanya Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Mudanya Merkez, Güzelyalı</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">beach_access</span>
+                        <span>Marmara Denizi manzaralı kampüs</span>
+                    </div>
+                </div>
+
+                <!-- Kestel Anadolu Lisesi -->
+                <div class="school-card rounded-xl p-4" onclick="openSchoolDetail('kestelal')" data-type="anadolu">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-edu-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">AL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Kestel Anadolu Lisesi</h4>
+                                <p class="text-[10px] text-gray-text">Kestel Merkez, Ankara Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-edu-blue">agriculture</span>
+                        <span>Tarım ve hayvancılık bölgesi</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="https://e-okul.meb.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-edu-blue text-xl">computer</span>
+                    <span class="text-[10px] text-center">e-Okul</span>
+                </a>
+                <a href="https://mebis.meb.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-edu-purple text-xl">menu_book</span>
+                    <span class="text-[10px] text-center">MEBBİS</span>
+                </a>
+                <a href="https://e-devlet.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-edu-green text-xl">account_balance</span>
+                    <span class="text-[10px] text-center">e-Devlet</span>
+                </a>
+                <a href="https://www.bursa.meb.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-edu-orange text-xl">apartment</span>
+                    <span class="text-[10px] text-center">İl Müdürlüğü</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.8s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-edu-blue">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-edu-blue shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-edu-blue mb-1">Eğitim Yılı Bilgisi</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            2024-2025 eğitim öğretim yılı kayıtları ve nakil işlemleri için e-Okul sistemini kullanınız. 
+                            Adres değişikliği durumunda yeni ikamet adresine en yakın okuldan kayıt yenileme işlemi yapılmaktadır.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Okul Detay Modalı -->
+    <div id="schoolDetailModal" class="fixed inset-0 z-[80] modal-school hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeSchoolDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Okul Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Eğitim Kurumu Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-edu-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-edu-blue text-3xl">school</span>
+                    </div>
+                    <div>
+                        <h2 id="modalSchoolName" class="text-xl font-bold text-white mb-1">Okul Adı</h2>
+                        <p id="modalDistrict" class="text-sm text-gold">İlçe</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Telefon</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">email</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">E-posta / Web</p>
+                            <p id="modalWeb" class="text-sm text-white">bursa.meb.gov.tr</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Eğitim Saatleri</p>
+                            <p class="text-sm text-white">Sabah: 08:00 - 12:30</p>
+                            <p class="text-sm text-white">Öğlen: 13:00 - 17:30</p>
+                            <p class="text-xs text-gray-text mt-1">* Tam gün eğitim uygulayan okullar için tek seans</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Okul Hakkında -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">info</span>
+                    Okul Hakkında
+                </h3>
+                <p id="modalAbout" class="text-xs text-gray-text leading-relaxed mb-4">
+                    <!-- Dinamik içerik -->
+                </p>
+                
+                <div id="modalPrograms" class="grid grid-cols-2 gap-2">
+                    <!-- Dinamik programlar -->
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Başarılar ve Özellikler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">emoji_events</span>
+                    Başarılar ve Özellikler
+                </h3>
+                <div id="modalAchievements" class="space-y-2">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button onclick="callNumber('0224')" class="flex-1 bg-edu-blue/20 hover:bg-edu-blue/30 border border-edu-blue/50 text-edu-blue py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Ara
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bilgi Modalı -->
+    <div id="infoModal" class="fixed inset-0 z-[80] modal-school hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Eğitim Rehberi</h1>
+                        <p class="text-xs text-gray-text truncate">Bursa İl Milli Eğitim</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-edu-blue/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-edu-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-edu-blue text-3xl">menu_book</span>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-edu-blue">e-Okul Sistemi</h2>
+                        <p class="text-sm text-gray-text">Tüm işlemler çevrimiçi</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Öğrenci bilgileri, notlar, devamsızlık, nakil işlemleri ve karne görüntüleme e-Okul üzerinden yapılır.
+                </p>
+                <button onclick="window.open('https://e-okul.meb.gov.tr', '_blank')" class="w-full bg-edu-blue/20 hover:bg-edu-blue/30 border border-edu-blue/50 text-edu-blue py-4 rounded-xl text-lg font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">open_in_new</span>
+                    e-Okul'a Git
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-edu-purple text-2xl mb-2">calendar_month</span>
+                    <p class="text-lg font-bold text-edu-purple">LGS</p>
+                    <p class="text-xs text-gray-text">Liselere Giriş</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-edu-orange text-2xl mb-2">edit_note</span>
+                    <p class="text-lg font-bold text-edu-orange">YKS</p>
+                    <p class="text-xs text-gray-text">Yükseköğretim</p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-xl p-4 border-l-4 border-gold">
+                <p class="text-sm text-gray-text">
+                    <strong class="text-gold">İletişim:</strong><br/>
+                    Bursa İl Milli Eğitim Müdürlüğü<br/>
+                    Adres: Odunluk Mah. Mihraplı Cad. No:4 Osmangazi/BURSA<br/>
+                    Tel: 0224 221 10 00
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Okul Veritabanı
+        const schoolData = {
+            'bursaal': {
+                name: 'Bursa Anadolu Lisesi',
+                district: 'Osmangazi',
+                type: 'Anadolu Lisesi',
+                address: 'Çekirge Mah. Tarihi Okul Binası, Osmangazi/Bursa',
+                phone: '(0224) 221 23 45',
+                web: 'bursaal.meb.k12.tr',
+                about: '1873 yılında kurulan Bursa Anadolu Lisesi, şehrin en köklü ve prestijli eğitim kurumlarından biridir. Tarihi binası ve kaliteli eğitim kadrosuyla her yıl yüzlerce öğrenciyi başarıyla üniversiteye hazırlamaktadır.',
+                programs: ['Sayısal', 'Sözel', 'Yabancı Dil'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 10 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çekirge durağı)' },
+                    { icon: 'local_parking', text: 'Sokak içi park (sınırlı, veli ziyaretleri için)' }
+                ],
+                achievements: [
+                    'Her yıl 50+ öğrenci ilk 1000 içinde',
+                    'TÜBİTAK proje yarışmalarında dereceler',
+                    'Ulusal spor müsabakalarında şampiyonluklar'
+                ],
+                mapQuery: 'Bursa Anadolu Lisesi, Çekirge, Osmangazi, Bursa'
+            },
+            'bursafl': {
+                name: 'Bursa Fen Lisesi',
+                district: 'Osmangazi',
+                type: 'Fen Lisesi',
+                address: 'Çekirge Mah. Dr. Sadık Ahmet Cad. No:12, Osmangazi/Bursa',
+                phone: '(0224) 221 67 89',
+                web: 'bursafl.meb.k12.tr',
+                about: 'Bursa Fen Lisesi, sayısal alanda üstün yetenekli öğrencilerin eğitim gördüğü, laboratuvar olanakları ve proje bazlı eğitimiyle öne çıkan bir kurumdur. Öğrencileri dünya üniversitelerine hazırlamaktadır.',
+                programs: ['Fen Bilimleri', 'Matematik', 'Biyoloji'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 8 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Çekirge otoparkları (ücretli)' }
+                ],
+                achievements: [
+                    'TÜBİKAK 4006 Bilim Fuarı birincilikleri',
+                    'Uluslararası Olimpiyatlarda madalyalar',
+                    'Her yıl 100+ öğrenci tıp ve mühendislik fakültelerinde'
+                ],
+                mapQuery: 'Bursa Fen Lisesi, Çekirge, Osmangazi, Bursa'
+            },
+            'tophaneml': {
+                name: 'Tophane Mesleki ve Teknik Anadolu Lisesi',
+                district: 'Osmangazi',
+                type: 'Meslek Lisesi',
+                address: 'Tophane Mah. Tophane Cad. No:45, Osmangazi/Bursa',
+                phone: '(0224) 220 12 34',
+                web: 'tophanemtal.meb.k12.tr',
+                about: 'Endüstriyel otomasyon, makine ve elektrik-elektronik alanlarında uzmanlaşmış, iş dünyasıyla entegre çalışan bir meslek lisesidir. Öğrenciler staj ve iş imkanlarına sahiptir.',
+                programs: ['Endüstriyel Otomasyon', 'Makine', 'Elektrik-Elektronik', 'Bilişim'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Tophane durağı)' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 5 dk' },
+                    { icon: 'local_parking', text: 'Tophane meydanı otoparkı' }
+                ],
+                achievements: [
+                    'Mesleki yarışmalarda Türkiye birinciliği',
+                    'İş garantili mezunlar',
+                    'Teknopark iş birlikleri'
+                ],
+                mapQuery: 'Tophane Mesleki ve Teknik Anadolu Lisesi, Osmangazi, Bursa'
+            },
+            'hudavendigarl': {
+                name: 'Hüdavendigar Anadolu Lisesi',
+                district: 'Osmangazi',
+                type: 'Anadolu Lisesi',
+                address: 'Hüdavendigar Mah. Tophane Cad. No:23, Osmangazi/Bursa',
+                phone: '(0224) 220 45 67',
+                web: 'hudavendigarl.meb.k12.tr',
+                about: 'Tarihi Hüdavendigar semtinde bulunan, güçlü akademik kadrosu ve sosyal aktiviteleriyle bilinen köklü bir eğitim kurumudur.',
+                programs: ['Sayısal', 'Sözel', 'Eşit Ağırlık'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60 hatları' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağı' },
+                    { icon: 'local_parking', text: 'Semt otoparkı' }
+                ],
+                achievements: [
+                    'Yüksek üniversite yerleştirme oranı',
+                    'Kültürel etkinliklerde başarı'
+                ],
+                mapQuery: 'Hüdavendigar Anadolu Lisesi, Osmangazi, Bursa'
+            },
+            'celebiihl': {
+                name: 'Çelebi Mehmet Anadolu İmam Hatip Lisesi',
+                district: 'Osmangazi',
+                type: 'İmam Hatip Lisesi',
+                address: 'Altıparmak Mah. Çelebi Mehmet Cad. No:56, Osmangazi/Bursa',
+                phone: '(0224) 221 90 12',
+                web: 'celebiihl.meb.k12.tr',
+                about: 'Din eğitimi ve modern bilimlerin bir arada verildiği, etüt ve sosyal aktiviteleriyle öne çıkan bir imam hatip lisesidir.',
+                programs: ['İmam Hatip', 'Kuran-ı Kerim', 'Arapça'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A hatları' },
+                    { icon: 'local_parking', text: 'Altıparmak otoparkları' }
+                ],
+                achievements: [
+                    'Kur\'an-ı Kerim yarışmalarında dereceler',
+                    'Sosyal projelerde ödüller'
+                ],
+                mapQuery: 'Çelebi Mehmet Anadolu İmam Hatip Lisesi, Osmangazi, Bursa'
+            },
+            'hamitleral': {
+                name: 'Hamitler Anadolu Lisesi',
+                district: 'Osmangazi',
+                type: 'Anadolu Lisesi',
+                address: 'Hamitler Mah. Eğitim Cad. No:78, Osmangazi/Bursa',
+                phone: '(0224) 441 23 45',
+                web: 'hamitleral.meb.k12.tr',
+                about: 'Modern kampüsü ve spor tesisleriyle donatılmış, Hamitler bölgesinin önemli eğitim kurumlarından biridir.',
+                programs: ['Sayısal', 'Sözel', 'Spor'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3G, 4, 5A, 6, 7, 8, 9, 10, 17 hatları' },
+                    { icon: 'local_parking', text: 'Okul otoparkı (geniş)' }
+                ],
+                achievements: [
+                    'Spor müsabakalarında il birincilikleri',
+                    'Modern laboratuvar olanakları'
+                ],
+                mapQuery: 'Hamitler Anadolu Lisesi, Osmangazi, Bursa'
+            },
+            'osmangazihem': {
+                name: 'Osmangazi Halk Eğitim Merkezi',
+                district: 'Osmangazi',
+                type: 'Halk Eğitim Merkezi',
+                address: 'Altıparmak Mah. Hükümet Cad. No:34, Osmangazi/Bursa',
+                phone: '(0224) 220 78 90',
+                web: 'osmangazihem.meb.gov.tr',
+                about: '7\'den 70\'e herkese ücretsiz kurs imkanı sunan, mesleki ve sosyal gelişim odaklı eğitim merkezidir.',
+                programs: ['Okuma-Yazma', 'Bilgisayar', 'El Sanatları', 'Yabancı Dil', 'Müzik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Hükümet caddesi otoparkları' }
+                ],
+                achievements: [
+                    'Yılda 5000+ kursiyer',
+                    'Ücretsiz sertifikalı eğitimler',
+                    'Kadın-erkek eşit katılım'
+                ],
+                mapQuery: 'Osmangazi Halk Eğitim Merkezi, Osmangazi, Bursa'
+            },
+            'soganliml': {
+                name: 'Soğanlı Mesleki ve Teknik Anadolu Lisesi',
+                district: 'Osmangazi',
+                type: 'Meslek Lisesi',
+                address: 'Soğanlı Mah. Eğitim Bölgesi, Osmangazi/Bursa',
+                phone: '(0224) 441 56 78',
+                web: 'soganlimtal.meb.k12.tr',
+                about: 'İnşaat ve elektrik-elektronik alanlarında uzmanlaşmış, bölgenin iş gücü ihtiyacını karşılayan önemli bir meslek lisesidir.',
+                programs: ['İnşaat', 'Elektrik-Elektronik', 'Makine'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 38, 94 hatları' },
+                    { icon: 'local_parking', text: 'Okul otoparkı' }
+                ],
+                achievements: [
+                    'Mesleki yeterlilik belgesi verme yetkisi',
+                    'İş dünyasıyla güçlü bağlantılar'
+                ],
+                mapQuery: 'Soğanlı Mesleki ve Teknik Anadolu Lisesi, Osmangazi, Bursa'
+            },
+            // Nilüfer Okulları
+            'niluferal': {
+                name: 'Nilüfer Anadolu Lisesi',
+                district: 'Nilüfer',
+                type: 'Anadolu Lisesi',
+                address: 'Konak Mah. FSM Bulvarı No:123, Nilüfer/Bursa',
+                phone: '(0224) 441 11 22',
+                web: 'niluferal.meb.k12.tr',
+                about: 'Nilüfer ilçesinin merkezinde, modern eğitim anlayışı ve başarılı akademik kadrosuyla öne çıkan bir Anadolu Lisesidir.',
+                programs: ['Sayısal', 'Sözel', 'Eşit Ağırlık'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 5 dk' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'FSM Bulvarı otoparkları' }
+                ],
+                achievements: [
+                    'Yüksek üniversite başarısı',
+                    'Sosyal sorumluluk projeleri'
+                ],
+                mapQuery: 'Nilüfer Anadolu Lisesi, Nilüfer, Bursa'
+            },
+            'ozluceal': {
+                name: 'Özlüce Anadolu Lisesi',
+                district: 'Nilüfer',
+                type: 'Anadolu Lisesi',
+                address: 'Özlüce Mah. 167. Sokak No:5, Nilüfer/Bursa',
+                phone: '(0224) 442 33 44',
+                web: 'ozluceal.meb.k12.tr',
+                about: 'Spor tesisleri ve yeşil alanlarıyla çevrili, Özlüce semtinin gözde eğitim kurumudur.',
+                programs: ['Sayısal', 'Sözel', 'Spor'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Geniş otopark alanı' }
+                ],
+                achievements: [
+                    'Spor branşlarında başarılar',
+                    'Yeşil okul sertifikası'
+                ],
+                mapQuery: 'Özlüce Anadolu Lisesi, Nilüfer, Bursa'
+            },
+            'besevleral': {
+                name: 'Beşevler Anadolu Lisesi',
+                district: 'Nilüfer',
+                type: 'Anadolu Lisesi',
+                address: 'Beşevler Mah. Eğitim Cad. No:67, Nilüfer/Bursa',
+                phone: '(0224) 443 55 66',
+                web: 'besevleral.meb.k12.tr',
+                about: 'Beşevler semtinde, metro yakınlığı avantajıyla ulaşımı kolay, modern bir eğitim kurumudur.',
+                programs: ['Sayısal', 'Sözel'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 3 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' }
+                ],
+                achievements: [
+                    'Merkezi konum avantajı',
+                    'Aktif öğrenci kulüpleri'
+                ],
+                mapQuery: 'Beşevler Anadolu Lisesi, Nilüfer, Bursa'
+            },
+            'goruklel': {
+                name: 'Görükle Lisesi',
+                district: 'Nilüfer',
+                type: 'Anadolu Lisesi',
+                address: 'Görükle Mah. Üniversite Cad. No:89, Nilüfer/Bursa',
+                phone: '(0224) 444 77 88',
+                web: 'goruklel.meb.k12.tr',
+                about: 'Uludağ Üniversitesi kampüsüne komşu, üniversite ortamı içinde eğitim veren, akademik başarısı yüksek bir lisedir.',
+                programs: ['Sayısal', 'Sözel', 'Yabancı Dil'],
+                transport: [
+                    { icon: 'subway', text: 'M2 Hattı - Üniversite durağı' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Üniversite otoparkı (indirimli)' }
+                ],
+                achievements: [
+                    'Üniversite iş birlikleri',
+                    'Laboratuvar olanakları'
+                ],
+                mapQuery: 'Görükle Lisesi, Nilüfer, Bursa'
+            },
+            'calial': {
+                name: 'Çalı Anadolu Lisesi',
+                district: 'Nilüfer',
+                type: 'Anadolu Lisesi',
+                address: 'Çalı Mah. Çalı Cad. No:12, Nilüfer/Bursa',
+                phone: '(0224) 445 99 00',
+                web: 'calial.meb.k12.tr',
+                about: 'Tarımsal alanların içinde, doğal ortamda eğitim veren, Çalı bölgesinin tek Anadolu Lisesidir.',
+                programs: ['Sayısal', 'Sözel'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Okul otoparkı' }
+                ],
+                achievements: [
+                    'Tarım projeleri',
+                    'Doğa sporları aktiviteleri'
+                ],
+                mapQuery: 'Çalı Anadolu Lisesi, Nilüfer, Bursa'
+            },
+            'niluferhem': {
+                name: 'Nilüfer Halk Eğitim Merkezi',
+                district: 'Nilüfer',
+                type: 'Halk Eğitim Merkezi',
+                address: 'Konak Mah. Nilüfer Belediyesi Yanı, Nilüfer/Bursa',
+                phone: '(0224) 441 00 11',
+                web: 'niluferhem.meb.gov.tr',
+                about: 'Nilüfer Belediyesi iş birliğiyle çalışan, sanatsal ve mesleki kurslarıyla zengin bir eğitim merkezidir.',
+                programs: ['Resim', 'Müzik', 'Dans', 'Bilgisayar', 'Dil Kursları'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' }
+                ],
+                achievements: [
+                    'Sanatsal etkinlikler',
+                    'Uluslararası kursiyer değişimi'
+                ],
+                mapQuery: 'Nilüfer Halk Eğitim Merkezi, Nilüfer, Bursa'
+            },
+            // Yıldırım Okulları
+            'yildirimal': {
+                name: 'Yıldırım Anadolu Lisesi',
+                district: 'Yıldırım',
+                type: 'Anadolu Lisesi',
+                address: 'Beyazıt Mah. 1. Beyazıt Cad. No:34, Yıldırım/Bursa',
+                phone: '(0224) 331 22 33',
+                web: 'yildirimal.meb.k12.tr',
+                about: 'Yıldırım ilçesinin merkezinde, köklü eğitim geleneği ve modern eğitim tekniklerini birleştiren bir kurumdur.',
+                programs: ['Sayısal', 'Sözel', 'Eşit Ağırlık'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Beyazıt meydanı otoparkı' }
+                ],
+                achievements: [
+                    'Tarihi eğitim geleneği',
+                    'Yüksek mezun başarısı'
+                ],
+                mapQuery: 'Yıldırım Anadolu Lisesi, Yıldırım, Bursa'
+            },
+            'davutdedeal': {
+                name: 'Davutdede Anadolu Lisesi',
+                district: 'Yıldırım',
+                type: 'Anadolu Lisesi',
+                address: 'Davutdede Mah. Eğitim Cad. No:56, Yıldırım/Bursa',
+                phone: '(0224) 332 44 55',
+                web: 'davutdedeal.meb.k12.tr',
+                about: 'Hızla gelişen Davutdede semtinde, modern binası ve geniş bahçesiyle hizmet veren bir Anadolu Lisesidir.',
+                programs: ['Sayısal', 'Sözel'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 6 hatları' },
+                    { icon: 'local_parking', text: 'Okul otoparkı' }
+                ],
+                achievements: [
+                    'Yeni nesil eğitim anlayışı',
+                    'Teknolojik sınıflar'
+                ],
+                mapQuery: 'Davutdede Anadolu Lisesi, Yıldırım, Bursa'
+            },
+            'beyazital': {
+                name: 'Beyazıt Anadolu Lisesi',
+                district: 'Yıldırım',
+                type: 'Anadolu Lisesi',
+                address: 'Beyazıt Mah. Okul Cad. No:78, Yıldırım/Bursa',
+                phone: '(0224) 333 66 77',
+                web: 'beyazital.meb.k12.tr',
+                about: 'Beyazıt semtinin merkezinde, ulaşımı kolay, sosyal aktiviteleri zengin bir eğitim kurumudur.',
+                programs: ['Sayısal', 'Sözel'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Beyazıt meydanı otoparkı' }
+                ],
+                achievements: [
+                    'Merkezi konum',
+                    'Aktif öğrenci kulüpleri'
+                ],
+                mapQuery: 'Beyazıt Anadolu Lisesi, Yıldırım, Bursa'
+            },
+            'cumalikizikal': {
+                name: 'Cumalıkızık Anadolu Lisesi',
+                district: 'Yıldırım',
+                type: 'Anadolu Lisesi',
+                address: 'Cumalıkızık Mah. UNESCO Bölgesi, Yıldırım/Bursa',
+                phone: '(0224) 334 88 99',
+                web: 'cumalikizikal.meb.k12.tr',
+                about: 'UNESCO Dünya Mirası listesindeki Cumalıkızık köyü içinde, tarihi dokunun içinde modern eğitim veren benzersiz bir okuldur.',
+                programs: ['Sayısal', 'Sözel', 'Turizm'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 10, 17, 25 hatları' },
+                    { icon: 'local_parking', text: 'Köy giriş otoparkı' }
+                ],
+                achievements: [
+                    'UNESCO bölgesinde eğitim',
+                    'Turizm odaklı programlar',
+                    'Tarihi ortamda modern eğitim'
+                ],
+                mapQuery: 'Cumalıkızık Anadolu Lisesi, Yıldırım, Bursa'
+            },
+            'degirmenlikizik': {
+                name: 'Değirmenlikızık Çok Programlı Anadolu Lisesi',
+                district: 'Yıldırım',
+                type: 'Anadolu Lisesi',
+                address: 'Değirmenlikızık Mah. Dalyan Sk. 6/1, Yıldırım/Bursa',
+                phone: '(0224) 335 00 11',
+                web: 'degirmenlikizik.meb.k12.tr',
+                about: 'Osmanlı köyü atmosferi içinde, küçük sınıflarla kişiye özel eğitim imkanı sunan bir okuldur.',
+                programs: ['Sayısal', 'Sözel', 'Mesleki'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 10, 17, 25 hatları' },
+                    { icon: 'local_parking', text: 'Köy meydanı otopark' }
+                ],
+                achievements: [
+                    'Köy yaşamında eğitim',
+                    'Sınıf mevcudu düşük'
+                ],
+                mapQuery: 'Değirmenlikızık ÇPAL, Yıldırım, Bursa'
+            },
+            'yildirimhem': {
+                name: 'Yıldırım Halk Eğitim Merkezi',
+                district: 'Yıldırım',
+                type: 'Halk Eğitim Merkezi',
+                address: 'Beyazıt Mah. Hükümet Cad. No:12, Yıldırım/Bursa',
+                phone: '(0224) 336 22 33',
+                web: 'yildirimhem.meb.gov.tr',
+                about: 'Yöresel el sanatları ve geleneksel Bursa kültürünün aktarıldığı kurslarıyla öne çıkan bir eğitim merkezidir.',
+                programs: ['El Sanatları', 'Ahşap Oyma', 'Çini', 'Okuma-Yazma'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Hükümet caddesi otoparkları' }
+                ],
+                achievements: [
+                    'Geleneksel sanatlar kursları',
+                    'UNESCO el sanatları projesi'
+                ],
+                mapQuery: 'Yıldırım Halk Eğitim Merkezi, Yıldırım, Bursa'
+            },
+            // Diğer İlçeler
+            'inegolal': {
+                name: 'İnegöl Anadolu Lisesi',
+                district: 'İnegöl',
+                type: 'Anadolu Lisesi',
+                address: 'İnegöl Merkez, Bursa Cad. No:45, İnegöl/Bursa',
+                phone: '(0224) 711 23 45',
+                web: 'inegolal.meb.k12.tr',
+                about: 'Mobilya sanayinin merkezi İnegöl\'ün en köklü eğitim kurumlarından biridir. Endüstri meslek liseleriyle iş birlikleri içindedir.',
+                programs: ['Sayısal', 'Sözel', 'Teknik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'İnegöl şehir içi otobüsleri' },
+                    { icon: 'local_parking', text: 'Okul otoparkı' }
+                ],
+                achievements: [
+                    'Mobilya sektörü iş birlikleri',
+                    'Teknik eğitim avantajı'
+                ],
+                mapQuery: 'İnegöl Anadolu Lisesi, İnegöl, Bursa'
+            },
+            'inegolfl': {
+                name: 'İnegöl Fen Lisesi',
+                district: 'İnegöl',
+                type: 'Fen Lisesi',
+                address: 'İnegöl Mah. Yeni Mahalle No:67, İnegöl/Bursa',
+                phone: '(0224) 712 56 78',
+                web: 'inegolfl.meb.k12.tr',
+                about: 'Bölgenin en başarılı fen liselerinden biri olup, laboratuvar olanakları ve proje bazlı eğitimiyle öne çıkar.',
+                programs: ['Fen Bilimleri', 'Matematik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'İnegöl şehir içi otobüsleri' },
+                    { icon: 'local_parking', text: 'Geniş otopark' }
+                ],
+                achievements: [
+                    'Bölge birincilikleri',
+                    'Laboratuvar yatırımları'
+                ],
+                mapQuery: 'İnegöl Fen Lisesi, İnegöl, Bursa'
+            },
+            'gemlikal': {
+                name: 'Gemlik Anadolu Lisesi',
+                district: 'Gemlik',
+                type: 'Anadolu Lisesi',
+                address: 'Gemlik Merkez, Atatürk Cad. No:89, Gemlik/Bursa',
+                phone: '(0224) 513 90 12',
+                web: 'gemlikal.meb.k12.tr',
+                about: 'Marmara Denizi kıyısında, deniz manzaralı tarihi binada eğitim veren köklü bir okuldur.',
+                programs: ['Sayısal', 'Sözel', 'Denizcilik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Gemlik şehir içi otobüsleri' },
+                    { icon: 'directions_boat', text: 'İDO iskelesine yakın' },
+                    { icon: 'local_parking', text: 'Sahil otoparkı' }
+                ],
+                achievements: [
+                    'Denizcilik eğitimi',
+                    'Tarihi okul binası'
+                ],
+                mapQuery: 'Gemlik Anadolu Lisesi, Gemlik, Bursa'
+            },
+            'mudanyaal': {
+                name: 'Mudanya Anadolu Lisesi',
+                district: 'Mudanya',
+                type: 'Anadolu Lisesi',
+                address: 'Mudanya Merkez, Güzelyalı Mah., Mudanya/Bursa',
+                phone: '(0224) 544 33 44',
+                web: 'mudanyaal.meb.k12.tr',
+                about: 'Mudanya\'nın incisi Güzelyalı\'da, deniz manzaralı modern kampüste eğitim vermektedir.',
+                programs: ['Sayısal', 'Sözel', 'Turizm'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Bursa-Mudanya otobüsleri' },
+                    { icon: 'directions_boat', text: 'İDO Mudanya iskelesi' },
+                    { icon: 'local_parking', text: 'Kampüs otoparkı' }
+                ],
+                achievements: [
+                    'Deniz manzaralı kampüs',
+                    'Turizm odaklı eğitim'
+                ],
+                mapQuery: 'Mudanya Anadolu Lisesi, Mudanya, Bursa'
+            },
+            'kestelal': {
+                name: 'Kestel Anadolu Lisesi',
+                district: 'Kestel',
+                type: 'Anadolu Lisesi',
+                address: 'Kestel Merkez, Ankara Cad. No:23, Kestel/Bursa',
+                phone: '(0224) 381 55 66',
+                web: 'kestelal.meb.k12.tr',
+                about: 'Tarım ve hayvancılık bölgesi Kestel\'in merkezinde, tarımsal eğitim programları da sunan bir okuldur.',
+                programs: ['Sayısal', 'Sözel', 'Tarım'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Bursa-Kestel otobüsleri' },
+                    { icon: 'local_parking', text: 'Okul otoparkı' }
+                ],
+                achievements: [
+                    'Tarım eğitimi',
+                    'Bölgesel başarılar'
+                ],
+                mapQuery: 'Kestel Anadolu Lisesi, Kestel, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // District Filter
+        let currentDistrict = 'all';
+        let currentType = 'all';
+
+        function filterDistrict(district) {
+            currentDistrict = district;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + district).classList.add('active');
+
+            applyFilters();
+        }
+
+        // Type Filter
+        function filterType(type) {
+            currentType = type;
+            
+            // Update buttons
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('type-' + type).classList.add('active');
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const sections = document.querySelectorAll('.district-section');
+            const cards = document.querySelectorAll('.school-card');
+
+            // Filter sections by district
+            sections.forEach(section => {
+                if (currentDistrict === 'all' || section.dataset.district === currentDistrict) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Filter cards by type
+            cards.forEach(card => {
+                const cardType = card.dataset.type;
+                const cardDistrict = card.closest('.district-section').dataset.district;
+                
+                const typeMatch = currentType === 'all' || cardType === currentType;
+                const districtMatch = currentDistrict === 'all' || cardDistrict === currentDistrict;
+
+                if (typeMatch && districtMatch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Search School
+        function searchSchool() {
+            const searchTerm = document.getElementById('schoolSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.school-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open School Detail Modal
+        function openSchoolDetail(schoolId) {
+            const school = schoolData[schoolId];
+            if (!school) return;
+
+            document.getElementById('modalSchoolName').textContent = school.name;
+            document.getElementById('modalDistrict').textContent = school.district + ' İlçesi - ' + school.type;
+            document.getElementById('modalAddress').textContent = school.address;
+            document.getElementById('modalPhone').textContent = school.phone;
+            document.getElementById('modalWeb').textContent = school.web;
+            document.getElementById('modalAbout').textContent = school.about;
+
+            // Programları doldur
+            const programsContainer = document.getElementById('modalPrograms');
+            programsContainer.innerHTML = '';
+            school.programs.forEach(program => {
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 rounded-lg p-2 text-center';
+                div.innerHTML = `<p class="text-xs text-gray-text">${program}</p>`;
+                programsContainer.appendChild(div);
+            });
+
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            school.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Başarıları doldur
+            const achievementsContainer = document.getElementById('modalAchievements');
+            achievementsContainer.innerHTML = '';
+            school.achievements.forEach(achievement => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2 text-xs text-gray-text';
+                div.innerHTML = `
+                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                    <span>${achievement}</span>
+                `;
+                achievementsContainer.appendChild(div);
+            });
+
+            // İkon rengini ayarla
+            const iconContainer = document.getElementById('modalIcon');
+            const typeColors = {
+                'Anadolu Lisesi': 'bg-edu-blue/20 text-edu-blue',
+                'Fen Lisesi': 'bg-edu-purple/20 text-edu-purple',
+                'Meslek Lisesi': 'bg-edu-orange/20 text-edu-orange',
+                'İmam Hatip Lisesi': 'bg-edu-green/20 text-edu-green',
+                'Halk Eğitim Merkezi': 'bg-gold/20 text-gold'
+            };
+            iconContainer.className = `w-16 h-16 rounded-2xl flex items-center justify-center ${typeColors[school.type] || 'bg-edu-blue/20 text-edu-blue'}`;
+
+            // Harita butonunu güncelle
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${school.mapQuery}')`);
+
+            document.getElementById('schoolDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close School Detail Modal
+        function closeSchoolDetail() {
+            document.getElementById('schoolDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(prefix) {
+            // Gerçek uygulamada burada tam numara kullanılabilir
+            alert('Arama yapılıyor: ' + prefix + '...');
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Info Modal
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak FAQ açık
+            document.getElementById('faqSection').classList.add('open');
+            document.getElementById('faqIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>

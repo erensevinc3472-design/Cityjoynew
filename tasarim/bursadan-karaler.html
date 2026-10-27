@@ -1,0 +1,762 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bursa'dan Kareler - CityJoy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "darkest": "#081F24",
+                    "main-bg": "#0D3238",
+                    "card-bg": "#17464B",
+                    "card-glow": "#1F5055",
+                    "gold-primary": "#E0B07A",
+                    "gold-nav": "#F0B36F",
+                    "nav-bg": "#0A2A2F",
+                    "nav-passive": "#6E8C8E",
+                    "text-secondary": "#C7D8DA",
+                    "text-desc": "#9FB6B8",
+                    "border-subtle": "#3F6E70",
+                    "accent-blue": "#4A90A4",
+                    "accent-teal": "#2D8A8A",
+                },
+                fontFamily: {
+                    "display": ["Space Grotesk", "sans-serif"]
+                },
+                animation: {
+                    'fade-in': 'fadeIn 0.6s ease-out',
+                    'slide-up': 'slideUp 0.7s ease-out',
+                    'pulse-glow': 'pulseGlow 2s infinite',
+                    'float': 'float 6s ease-in-out infinite',
+                    'shimmer': 'shimmer 2.5s infinite',
+                    'scale-in': 'scaleIn 0.4s ease-out',
+                },
+                keyframes: {
+                    fadeIn: {
+                        '0%': { opacity: '0' },
+                        '100%': { opacity: '1' },
+                    },
+                    slideUp: {
+                        '0%': { opacity: '0', transform: 'translateY(30px)' },
+                        '100%': { opacity: '1', transform: 'translateY(0)' },
+                    },
+                    pulseGlow: {
+                        '0%, 100%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.4)' },
+                        '50%': { boxShadow: '0 0 35px rgba(224, 176, 122, 0.7)' },
+                    },
+                    float: {
+                        '0%, 100%': { transform: 'translateY(0px)' },
+                        '50%': { transform: 'translateY(-10px)' },
+                    },
+                    shimmer: {
+                        '0%': { backgroundPosition: '-200% 0' },
+                        '100%': { backgroundPosition: '200% 0' },
+                    },
+                    scaleIn: {
+                        '0%': { transform: 'scale(0.9)', opacity: '0' },
+                        '100%': { transform: 'scale(1)', opacity: '1' },
+                    }
+                }
+            },
+        },
+    }
+</script>
+<style type="text/tailwindcss">
+    @layer utilities {
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 2px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: rgba(63, 110, 112, 0.2);
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: rgba(224, 176, 122, 0.5);
+            border-radius: 4px;
+        }
+        .glow-gold-active {
+            box-shadow: 0 0 15px rgba(224, 176, 122, 0.5);
+        }
+        .card-inner-glow {
+            box-shadow: inset 0 0 20px rgba(31, 80, 85, 0.6);
+        }
+        .nav-glow-gold {
+            filter: drop-shadow(0 0 8px rgba(240, 179, 111, 0.7));
+        }
+        .glass-panel {
+            background: rgba(13, 50, 56, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(224, 176, 122, 0.5);
+        }
+        .shimmer-bg {
+            background: linear-gradient(90deg, transparent, rgba(224, 176, 122, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+        .hero-gradient {
+            background: linear-gradient(to bottom, transparent 0%, rgba(8, 31, 36, 0.8) 60%, rgba(8, 31, 36, 1) 100%);
+        }
+        .gallery-card {
+            background: rgba(23, 70, 75, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .gallery-card:hover {
+            background: rgba(23, 70, 75, 0.6);
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-8px) scale(1.02);
+        }
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 1rem;
+        }
+        @media (min-width: 640px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+        @media (min-width: 1280px) {
+            .masonry-grid {
+                column-count: 4;
+            }
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1rem;
+        }
+        .video-overlay {
+            background: linear-gradient(to top, rgba(8, 31, 36, 0.9) 0%, transparent 50%);
+        }
+        .play-button {
+            background: rgba(224, 176, 122, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        .category-pill {
+            transition: all 0.3s ease;
+        }
+        .category-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(224, 176, 122, 0.3);
+        }
+        .category-pill.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #F0B36F 100%);
+            color: #081F24;
+            font-weight: 700;
+        }
+        .lightbox {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+        }
+        .stats-glow {
+            box-shadow: 0 0 30px rgba(224, 176, 122, 0.2);
+        }
+    }
+</style>
+<base target="_blank">
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden">
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-darkest/90 backdrop-blur-md border-b border-border-subtle/30">
+    <div class="flex items-center gap-3">
+        <a class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group" href="bursa.html">
+            <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+        </a>
+        <div class="flex flex-col">
+            <span class="text-[10px] text-gold-primary tracking-wider uppercase">Galeri</span>
+            <h1 class="text-lg font-bold tracking-tight text-white leading-none">Bursa'dan Kareler</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-2">
+        <button onclick="toggleView('grid')" class="w-9 h-9 flex items-center justify-center rounded-full bg-card-bg/50 border border-border-subtle/30 hover:border-gold-primary/50 transition-colors view-btn active" data-view="grid">
+            <span class="material-symbols-outlined text-gold-primary text-sm">grid_view</span>
+        </button>
+        <button onclick="toggleView('list')" class="w-9 h-9 flex items-center justify-center rounded-full bg-card-bg/50 border border-border-subtle/30 hover:border-gold-primary/50 transition-colors view-btn" data-view="list">
+            <span class="material-symbols-outlined text-nav-passive text-sm">view_list</span>
+        </button>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<section class="relative h-[45vh] min-h-[350px] w-full overflow-hidden mt-[60px]">
+    <div class="absolute inset-0">
+        <img alt="Bursa'dan Kareler" class="w-full h-full object-cover" src="cityjoy-assets/bursa1.jpg"/>
+        <div class="absolute inset-0 bg-darkest/60"></div>
+        <div class="absolute inset-0 hero-gradient"></div>
+    </div>
+    
+    <div class="absolute inset-0 flex flex-col justify-end pb-8 px-6">
+        <div class="max-w-4xl animate-slide-up">
+            <div class="flex gap-2 mb-3">
+                <span class="px-2 py-1 bg-gold-primary/20 border border-gold-primary/40 rounded text-gold-primary text-[9px] font-bold uppercase">4K Görüntüler</span>
+                <span class="px-2 py-1 bg-card-bg/50 border border-border-subtle/40 rounded text-text-secondary text-[9px] font-bold uppercase">360° Videolar</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold text-white mb-3 text-glow tracking-tight">
+                Bursa'dan Kareler
+            </h1>
+            <p class="text-base text-text-secondary max-w-2xl leading-relaxed">
+                Yeşil Bursa'nın her köşesinden, her anından özel kareler. Tarihi yapılardan doğal güzelliklere, sokak lezzetlerinden geleneksel el sanatlarına kadar Bursa'yı keşfedin.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="sticky top-[60px] z-40 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 py-4">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex justify-between items-center">
+            <div class="flex gap-6 overflow-x-auto pb-1 scrollbar-hide">
+                <div class="flex items-center gap-2 stats-glow px-4 py-2 rounded-full bg-card-bg/30 border border-border-subtle/20">
+                    <span class="material-symbols-outlined text-gold-primary text-lg">photo_library</span>
+                    <div>
+                        <p class="text-lg font-bold text-white leading-none">1,247</p>
+                        <p class="text-[9px] text-text-desc uppercase">Fotoğraf</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 stats-glow px-4 py-2 rounded-full bg-card-bg/30 border border-border-subtle/20">
+                    <span class="material-symbols-outlined text-gold-primary text-lg">videocam</span>
+                    <div>
+                        <p class="text-lg font-bold text-white leading-none">86</p>
+                        <p class="text-[9px] text-text-desc uppercase">Video</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 stats-glow px-4 py-2 rounded-full bg-card-bg/30 border border-border-subtle/20">
+                    <span class="material-symbols-outlined text-gold-primary text-lg">360</span>
+                    <div>
+                        <p class="text-lg font-bold text-white leading-none">12</p>
+                        <p class="text-[9px] text-text-desc uppercase">360° Tur</p>
+                    </div>
+                </div>
+            </div>
+            <button class="hidden md:flex items-center gap-2 px-4 py-2 bg-gold-primary/10 border border-gold-primary/30 rounded-full text-gold-primary text-xs font-bold hover:bg-gold-primary/20 transition-colors">
+                <span class="material-symbols-outlined text-sm">upload</span>
+                Sen de Yükle
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Category Navigation -->
+<section class="bg-darkest border-b border-border-subtle/20 py-4">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" id="category-tabs">
+            <button onclick="filterCategory('all')" class="category-pill active px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-card-bg/50 text-text-secondary border border-border-subtle/30">
+                Tümü
+            </button>
+            <button onclick="filterCategory('tarihi')" class="category-pill px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-card-bg/50 text-text-secondary border border-border-subtle/30">
+                Tarihi Yerler
+            </button>
+            <button onclick="filterCategory('dogal')" class="category-pill px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-card-bg/50 text-text-secondary border border-border-subtle/30">
+                Doğa & Manzara
+            </button>
+            <button onclick="filterCategory('yemek')" class="category-pill px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-card-bg/50 text-text-secondary border border-border-subtle/30">
+                Lezzetler
+            </button>
+            <button onclick="filterCategory('sokak')" class="category-pill px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-card-bg/50 text-text-secondary border border-border-subtle/30">
+                Sokak Hayatı
+            </button>
+            <button onclick="filterCategory('video')" class="category-pill px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-card-bg/50 text-text-secondary border border-border-subtle/30 flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">play_circle</span>
+                Videolar
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Main Gallery Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24 pt-6">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <!-- Featured Section -->
+        <section class="mb-10">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gold-primary">stars</span>
+                        Editörün Seçtikleri
+                    </h2>
+                    <p class="text-sm text-text-desc mt-1">Bu haftanın en çok beğenilen kareleri</p>
+                </div>
+                <a href="#" class="text-xs text-gold-primary font-bold hover:underline">Tümünü Gör</a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Featured Item 1 -->
+                <div class="gallery-card rounded-2xl overflow-hidden group cursor-pointer md:col-span-2 md:row-span-2" onclick="openLightbox(this)">
+                    <div class="relative h-full min-h-[300px] md:min-h-[400px]">
+                        <img src="https://images.unsplash.com/photo-1544212414-6f9c5b58f5c5?w=1200&q=80" alt="Ulu Cami" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-transparent to-transparent opacity-80"></div>
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-gold-primary text-darkest text-[9px] font-bold rounded uppercase">Öne Çıkan</span>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 p-5">
+                            <h3 class="text-lg font-bold text-white mb-1">Ulu Cami'nin İhtişamı</h3>
+                            <p class="text-xs text-text-secondary mb-3">Selçuklu mimarisinin Bursa'daki en görkemli örneği</p>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-1 text-[10px] text-text-desc">
+                                    <span class="material-symbols-outlined text-xs">favorite</span>
+                                    <span>2.4K</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-[10px] text-text-desc">
+                                    <span class="material-symbols-outlined text-xs">visibility</span>
+                                    <span>12.8K</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Item 2 -->
+                <div class="gallery-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox(this)">
+                    <div class="relative h-48">
+                        <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=800&q=80" alt="Uludağ" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 class="text-sm font-bold text-white">Uludağ Zirvesi</h3>
+                            <p class="text-[10px] text-text-desc">Kış turizminin kalbi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Item 3 -->
+                <div class="gallery-card rounded-2xl overflow-hidden group cursor-pointer" onclick="openLightbox(this)">
+                    <div class="relative h-48">
+                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80" alt="İskender" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 class="text-sm font-bold text-white">Meşhur İskender</h3>
+                            <p class="text-[10px] text-text-desc">Kebap kültürünün başkenti</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Section -->
+        <section class="mb-10" id="video-section">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gold-primary">play_circle</span>
+                        Video Koleksiyonu
+                    </h2>
+                    <p class="text-sm text-text-desc mt-1">Bursa'yı hareketli keşfedin</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="w-8 h-8 flex items-center justify-center rounded-full bg-card-bg/50 border border-border-subtle/30 hover:border-gold-primary/50 transition-colors">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">chevron_left</span>
+                    </button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-full bg-card-bg/50 border border-border-subtle/30 hover:border-gold-primary/50 transition-colors">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Video 1 -->
+                <div class="gallery-card rounded-2xl overflow-hidden group cursor-pointer" onclick="playVideo('video1')">
+                    <div class="relative h-56">
+                        <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80" alt="Video Thumbnail" class="w-full h-full object-cover"/>
+                        <div class="absolute inset-0 bg-darkest/40 group-hover:bg-darkest/20 transition-colors"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="play-button w-16 h-16 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-darkest text-3xl">play_arrow</span>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-3 right-3 px-2 py-1 bg-darkest/80 rounded text-[10px] text-white font-bold">
+                            03:45
+                        </div>
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-red-500 text-white text-[9px] font-bold rounded uppercase">4K</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-sm font-bold text-white mb-1">Bursa'nın 24 Saati</h3>
+                        <p class="text-xs text-text-desc line-clamp-2">Şehrin her köşesinden gün boyu çekilmiş özel zaman atlamalı video</p>
+                        <div class="flex items-center gap-3 mt-3">
+                            <img src="https://i.pravatar.cc/150?img=1" class="w-6 h-6 rounded-full" alt="User"/>
+                            <span class="text-[10px] text-text-secondary">@bursasever</span>
+                            <span class="text-[10px] text-text-desc ml-auto">15K görüntüleme</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video 2 -->
+                <div class="gallery-card rounded-2xl overflow-hidden group cursor-pointer" onclick="playVideo('video2')">
+                    <div class="relative h-56">
+                        <img src="https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?w=800&q=80" alt="Video Thumbnail" class="w-full h-full object-cover"/>
+                        <div class="absolute inset-0 bg-darkest/40 group-hover:bg-darkest/20 transition-colors"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="play-button w-16 h-16 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-darkest text-3xl">play_arrow</span>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-3 right-3 px-2 py-1 bg-darkest/80 rounded text-[10px] text-white font-bold">
+                            05:20
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-sm font-bold text-white mb-1">Zeytin Hasadı</h3>
+                        <p class="text-xs text-text-desc line-clamp-2">Gemlik zeytininin topraktan sofraya yolculuğu</p>
+                        <div class="flex items-center gap-3 mt-3">
+                            <img src="https://i.pravatar.cc/150?img=2" class="w-6 h-6 rounded-full" alt="User"/>
+                            <span class="text-[10px] text-text-secondary">@gemlikli</span>
+                            <span class="text-[10px] text-text-desc ml-auto">8.2K görüntüleme</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video 3 -->
+                <div class="gallery-card rounded-2xl overflow-hidden group cursor-pointer" onclick="playVideo('video3')">
+                    <div class="relative h-56">
+                        <img src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=800&q=80" alt="Video Thumbnail" class="w-full h-full object-cover"/>
+                        <div class="absolute inset-0 bg-darkest/40 group-hover:bg-darkest/20 transition-colors"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="play-button w-16 h-16 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-darkest text-3xl">play_arrow</span>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-3 right-3 px-2 py-1 bg-darkest/80 rounded text-[10px] text-white font-bold">
+                            02:15
+                        </div>
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-blue-500 text-white text-[9px] font-bold rounded uppercase">360°</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-sm font-bold text-white mb-1">Koza Han 360°</h3>
+                        <p class="text-xs text-text-desc line-clamp-2">Tarihi hanın içinde sanal tur deneyimi</p>
+                        <div class="flex items-center gap-3 mt-3">
+                            <img src="https://i.pravatar.cc/150?img=3" class="w-6 h-6 rounded-full" alt="User"/>
+                            <span class="text-[10px] text-text-secondary">@tarihci</span>
+                            <span class="text-[10px] text-text-desc ml-auto">22K görüntüleme</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Masonry Gallery -->
+        <section class="mb-10">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gold-primary">photo</span>
+                        Fotoğraf Galerisi
+                    </h2>
+                </div>
+                <div class="flex gap-2">
+                    <select class="bg-card-bg/50 border border-border-subtle/30 rounded-lg text-xs text-text-secondary px-3 py-2 outline-none focus:border-gold-primary/50">
+                        <option>En Yeni</option>
+                        <option>En Çok Beğenilen</option>
+                        <option>En Çok Görüntülenen</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="masonry-grid" id="gallery-grid">
+                <!-- Gallery Items -->
+                <div class="masonry-item gallery-card rounded-xl overflow-hidden group cursor-pointer" data-category="tarihi" onclick="openLightbox(this)">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1544212414-6f9c5b58f5c5?w=600&q=80" alt="Yeşil Türbe" class="w-full"/>
+                        <div class="absolute inset-0 bg-darkest/0 group-hover:bg-darkest/20 transition-colors"></div>
+                        <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button class="w-8 h-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30">
+                                <span class="material-symbols-outlined text-white text-sm">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-xs font-bold text-white">Yeşil Türbe</h4>
+                        <p class="text-[10px] text-text-desc">Çelebi Mehmet'in eşsiz eseri</p>
+                    </div>
+                </div>
+
+                <div class="masonry-item gallery-card rounded-xl overflow-hidden group cursor-pointer" data-category="dogal" onclick="openLightbox(this)">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=600&q=80" alt="Uludağ" class="w-full"/>
+                        <div class="absolute inset-0 bg-darkest/0 group-hover:bg-darkest/20 transition-colors"></div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-xs font-bold text-white">Uludağ'da Gün Batımı</h4>
+                        <p class="text-[10px] text-text-desc">Zirveden eşsiz manzara</p>
+                    </div>
+                </div>
+
+                <div class="masonry-item gallery-card rounded-xl overflow-hidden group cursor-pointer" data-category="yemek" onclick="openLightbox(this)">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80" alt="Kestane Şekeri" class="w-full"/>
+                        <div class="absolute inset-0 bg-darkest/0 group-hover:bg-darkest/20 transition-colors"></div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-xs font-bold text-white">Kestane Şekeri</h4>
+                        <p class="text-[10px] text-text-desc">Geleneksel lezzet</p>
+                    </div>
+                </div>
+
+                <div class="masonry-item gallery-card rounded-xl overflow-hidden group cursor-pointer" data-category="sokak" onclick="openLightbox(this)">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80" alt="Hanlar Bölgesi" class="w-full"/>
+                        <div class="absolute inset-0 bg-darkest/0 group-hover:bg-darkest/20 transition-colors"></div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-xs font-bold text-white">Hanlar Bölgesi</h4>
+                        <p class="text-[10px] text-text-desc">Tarihi çarşıda günübirlik yaşam</p>
+                    </div>
+                </div>
+
+                <div class="masonry-item gallery-card rounded-xl overflow-hidden group cursor-pointer" data-category="tarihi" onclick="openLightbox(this)">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?w=600&q=80" alt="Koza Han" class="w-full"/>
+                        <div class="absolute inset-0 bg-darkest/0 group-hover:bg-darkest/20 transition-colors"></div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-xs font-bold text-white">Koza Han</h4>
+                        <p class="text-[10px] text-text-desc">İpek ticaretinin merkezi</p>
+                    </div>
+                </div>
+
+                <div class="masonry-item gallery-card rounded-xl overflow-hidden group cursor-pointer" data-category="dogal" onclick="openLightbox(this)">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=600&q=80" alt="Gölyazı" class="w-full"/>
+                        <div class="absolute inset-0 bg-darkest/0 group-hover:bg-darkest/20 transition-colors"></div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-xs font-bold text-white">Gölyazı</h4>
+                        <p class="text-[10px] text-text-desc">Uluabat Gölü'nde saklı cennet</p>
+                    </div>
+                </div>
+
+                <div class="masonry-item gallery-card rounded-xl overflow-hidden group cursor-pointer" data-category="yemek" onclick="openLightbox(this)">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=600&q=80" alt="Cantık" class="w-full"/>
+                        <div class="absolute inset-0 bg-darkest/0 group-hover:bg-darkest/20 transition-colors"></div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-xs font-bold text-white">Bursa Cantığı</h4>
+                        <p class="text-[10px] text-text-desc">Yöresel lezzet</p>
+                    </div>
+                </div>
+
+                <div class="masonry-item gallery-card rounded-xl overflow-hidden group cursor-pointer" data-category="sokak" onclick="openLightbox(this)">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1595123550441-d377e017de6a?w=600&q=80" alt="Tahıl Pazarı" class="w-full"/>
+                        <div class="absolute inset-0 bg-darkest/0 group-hover:bg-darkest/20 transition-colors"></div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-xs font-bold text-white">Tahıl Pazarı</h4>
+                        <p class="text-[10px] text-text-desc">Yerel pazar atmosferi</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Load More -->
+        <div class="text-center">
+            <button class="px-8 py-3 bg-card-bg/50 border border-gold-primary/30 rounded-full text-gold-primary text-sm font-bold hover:bg-gold-primary/10 transition-colors flex items-center gap-2 mx-auto">
+                <span class="material-symbols-outlined text-sm">refresh</span>
+                Daha Fazla Yükle
+            </button>
+        </div>
+    </div>
+</main>
+
+<!-- Lightbox Modal -->
+<div id="lightbox" class="fixed inset-0 z-[100] hidden lightbox flex items-center justify-center p-4">
+    <button onclick="closeLightbox()" class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10">
+        <span class="material-symbols-outlined text-white text-2xl">close</span>
+    </button>
+    
+    <button onclick="changeImage(-1)" class="absolute left-4 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10">
+        <span class="material-symbols-outlined text-white text-2xl">chevron_left</span>
+    </button>
+    
+    <button onclick="changeImage(1)" class="absolute right-4 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10">
+        <span class="material-symbols-outlined text-white text-2xl">chevron_right</span>
+    </button>
+
+    <div class="max-w-5xl w-full max-h-[90vh] flex flex-col items-center">
+        <img id="lightbox-img" src="" alt="" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"/>
+        <div class="mt-4 text-center">
+            <h3 id="lightbox-title" class="text-xl font-bold text-white mb-1"></h3>
+            <p id="lightbox-desc" class="text-sm text-text-secondary"></p>
+        </div>
+        <div class="flex gap-4 mt-4">
+            <button class="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white text-sm hover:bg-white/20 transition-colors">
+                <span class="material-symbols-outlined text-sm">favorite</span>
+                <span>Beğen</span>
+            </button>
+            <button class="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white text-sm hover:bg-white/20 transition-colors">
+                <span class="material-symbols-outlined text-sm">share</span>
+                <span>Paylaş</span>
+            </button>
+            <button class="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-white text-sm hover:bg-white/20 transition-colors">
+                <span class="material-symbols-outlined text-sm">download</span>
+                <span>İndir</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Video Player Modal -->
+<div id="video-modal" class="fixed inset-0 z-[100] hidden lightbox flex items-center justify-center p-4">
+    <button onclick="closeVideo()" class="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors z-10">
+        <span class="material-symbols-outlined text-white text-2xl">close</span>
+    </button>
+    <div class="max-w-4xl w-full aspect-video bg-darkest rounded-2xl overflow-hidden flex items-center justify-center border border-border-subtle/30">
+        <div class="text-center">
+            <span class="material-symbols-outlined text-6xl text-gold-primary mb-4">play_circle</span>
+            <p class="text-white font-bold">Video Oynatıcı</p>
+            <p class="text-sm text-text-desc mt-2">Burada video içeriği gösterilecek</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 flex items-center justify-around px-6 py-3 bg-nav-bg border-t border-border-subtle/50 pb-6 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="anasayfa.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">home</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ana Sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-nav nav-glow-gold" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-lg fill-1">explore</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="konaklama-genel.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">hotel</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Konaklama</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="ara.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">search</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="profil.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">person</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Profil</span>
+    </a>
+</nav>
+
+<script>
+// Category Filter
+function filterCategory(category) {
+    // Update active button
+    document.querySelectorAll('.category-pill').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // Filter items
+    const items = document.querySelectorAll('.masonry-item');
+    items.forEach(item => {
+        if (category === 'all' || item.dataset.category === category) {
+            item.style.display = 'block';
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'scale(1)';
+            }, 10);
+        } else {
+            item.style.opacity = '0';
+            item.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                item.style.display = 'none';
+            }, 300);
+        }
+    });
+
+    // Show/hide video section
+    const videoSection = document.getElementById('video-section');
+    if (category === 'video') {
+        videoSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// View Toggle
+function toggleView(view) {
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.querySelector('span').classList.remove('text-gold-primary');
+        btn.querySelector('span').classList.add('text-nav-passive');
+    });
+    event.currentTarget.querySelector('span').classList.remove('text-nav-passive');
+    event.currentTarget.querySelector('span').classList.add('text-gold-primary');
+}
+
+// Lightbox
+let currentImageIndex = 0;
+const galleryImages = [];
+
+function openLightbox(element) {
+    const lightbox = document.getElementById('lightbox');
+    const img = element.querySelector('img');
+    const title = element.querySelector('h3, h4')?.textContent || '';
+    const desc = element.querySelector('p')?.textContent || '';
+    
+    document.getElementById('lightbox-img').src = img.src;
+    document.getElementById('lightbox-title').textContent = title;
+    document.getElementById('lightbox-desc').textContent = desc;
+    
+    lightbox.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function changeImage(direction) {
+    // Basit geçiş animasyonu
+    const img = document.getElementById('lightbox-img');
+    img.style.opacity = '0.5';
+    setTimeout(() => {
+        img.style.opacity = '1';
+    }, 200);
+}
+
+// Video Player
+function playVideo(videoId) {
+    document.getElementById('video-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeVideo() {
+    document.getElementById('video-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+// Keyboard Navigation
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeLightbox();
+        closeVideo();
+    }
+    if (e.key === 'ArrowLeft') changeImage(-1);
+    if (e.key === 'ArrowRight') changeImage(1);
+});
+
+// Close on background click
+document.getElementById('lightbox').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeLightbox();
+});
+document.getElementById('video-modal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeVideo();
+});
+</script>
+
+</body>
+</html>

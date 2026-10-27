@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Satılık Kiralık - Emlak, araç, elektronik ve daha fazlası. Bölgesel ilanlar, ücretsiz ilan verme."/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Satılık & Kiralık</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "metro-blue": "#3B82F6",
+                        "metro-green": "#10B981",
+                        "bus-orange": "#F97316",
+                        "tram-purple": "#8B5CF6",
+                        "premium": "#FFD700"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-gold {
+            animation: pulseGold 2s infinite;
+        }
+        @keyframes pulseGold {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(224, 176, 122, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(224, 176, 122, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 3000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .category-btn {
+            transition: all 0.3s ease;
+        }
+        .category-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+        .category-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .listing-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .listing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(224, 176, 122, 0.15);
+            border-color: rgba(224, 176, 122, 0.3);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .badge-sale { background: linear-gradient(135deg, #FF4444 0%, #CC0000 100%); }
+        .badge-rent { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+        .badge-free { background: linear-gradient(135deg, #10B981 0%, #059669 100%); }
+        .badge-swap { background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); }
+        .district-pill {
+            transition: all 0.2s ease;
+        }
+        .district-pill:hover {
+            background: rgba(224, 176, 122, 0.2);
+            transform: scale(1.05);
+        }
+        .district-pill.active {
+            background: #E0B07A;
+            color: #081F24;
+        }
+        .price-tag {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.2) 0%, rgba(224, 176, 122, 0.05) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+        }
+        .filter-chip {
+            transition: all 0.2s ease;
+        }
+        .filter-chip.active {
+            background: #E0B07A;
+            color: #081F24;
+            border-color: transparent;
+        }
+        .chat-bubble {
+            position: relative;
+            background: rgba(13, 50, 56, 0.9);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 20px;
+            border-width: 8px 8px 0;
+            border-style: solid;
+            border-color: rgba(224, 176, 122, 0.2) transparent transparent transparent;
+        }
+        .image-gallery {
+            scroll-snap-type: x mandatory;
+        }
+        .image-gallery img {
+            scroll-snap-align: start;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="benim-sehrim.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">SATILIK & KİRALIK</h1>
+                <p class="text-xs text-gray-text truncate">Bursa'nın İlan Platformu • Ücretsiz İlan Ver</p>
+            </div>
+            <button onclick="openNotifications()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0 relative">
+                <span class="material-symbols-outlined text-gold">notifications</span>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-live-red rounded-full animate-pulse"></span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Arama ve Filtreler -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <!-- Arama Çubuğu -->
+                <div class="relative mb-4">
+                    <input type="text" id="searchInput" placeholder="Ne arıyorsunuz? (örn: 3+1 daire, iPhone 15...)" 
+                        class="w-full bg-dark-teal/50 border border-gold/30 rounded-xl py-3.5 pl-12 pr-4 text-sm text-off-white placeholder-gray-text focus:outline-none focus:border-gold/60 transition-colors"
+                        onkeyup="filterListings()">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gold">search</span>
+                    <button onclick="toggleAdvancedSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg bg-gold/10 hover:bg-gold/20 transition-colors">
+                        <span class="material-symbols-outlined text-gold text-sm">tune</span>
+                    </button>
+                </div>
+
+                <!-- İlan Türü Seçimi -->
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-4">
+                    <button onclick="setListingType('all')" id="type-all" class="filter-chip active flex items-center gap-2 px-4 py-2 rounded-full shrink-0 font-medium border border-white/10 bg-card-teal text-white text-xs">
+                        <span class="material-symbols-outlined text-[16px]">apps</span>
+                        Tümü
+                    </button>
+                    <button onclick="setListingType('sale')" id="type-sale" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-full shrink-0 font-medium border border-white/10 bg-card-teal text-white text-xs">
+                        <span class="material-symbols-outlined text-[16px]">sell</span>
+                        Satılık
+                    </button>
+                    <button onclick="setListingType('rent')" id="type-rent" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-full shrink-0 font-medium border border-white/10 bg-card-teal text-white text-xs">
+                        <span class="material-symbols-outlined text-[16px]">key</span>
+                        Kiralık
+                    </button>
+                    <button onclick="setListingType('free')" id="type-free" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-full shrink-0 font-medium border border-white/10 bg-card-teal text-white text-xs">
+                        <span class="material-symbols-outlined text-[16px]">redeem</span>
+                        Ücretsiz
+                    </button>
+                    <button onclick="setListingType('swap')" id="type-swap" class="filter-chip flex items-center gap-2 px-4 py-2 rounded-full shrink-0 font-medium border border-white/10 bg-card-teal text-white text-xs">
+                        <span class="material-symbols-outlined text-[16px]">sync_alt</span>
+                        Takas
+                    </button>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+                    <button onclick="setDistrict('all')" class="district-pill active px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 whitespace-nowrap">Tüm Bursa</button>
+                    <button onclick="setDistrict('nilufer')" class="district-pill px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 whitespace-nowrap">Nilüfer</button>
+                    <button onclick="setDistrict('osmangazi')" class="district-pill px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 whitespace-nowrap">Osmangazi</button>
+                    <button onclick="setDistrict('yildirim')" class="district-pill px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 whitespace-nowrap">Yıldırım</button>
+                    <button onclick="setDistrict('mudanya')" class="district-pill px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 whitespace-nowrap">Mudanya</button>
+                    <button onclick="setDistrict('gemlik')" class="district-pill px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 whitespace-nowrap">Gemlik</button>
+                    <button onclick="setDistrict('inegol')" class="district-pill px-3 py-1.5 rounded-full text-xs font-medium bg-white/5 border border-white/10 whitespace-nowrap">İnegöl</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kategoriler -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Kategoriler</h3>
+                <button onclick="toggleSection('categoriesSection', 'categoriesIcon')" class="text-xs text-gray-text flex items-center gap-1">
+                    Tümü
+                    <span id="categoriesIcon" class="material-symbols-outlined text-sm rotate-icon">expand_more</span>
+                </button>
+            </div>
+            
+            <div id="categoriesSection" class="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                <button onclick="setCategory('emlak')" id="cat-emlak" class="category-btn active flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 bg-card-teal">
+                    <div class="w-10 h-10 rounded-xl bg-metro-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-metro-blue">apartment</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Emlak</span>
+                </button>
+                <button onclick="setCategory('arac')" id="cat-arac" class="category-btn flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 bg-card-teal">
+                    <div class="w-10 h-10 rounded-xl bg-bus-orange/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-bus-orange">directions_car</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Araç</span>
+                </button>
+                <button onclick="setCategory('elektronik')" id="cat-elektronik" class="category-btn flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 bg-card-teal">
+                    <div class="w-10 h-10 rounded-xl bg-tram-purple/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-tram-purple">devices</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Elektronik</span>
+                </button>
+                <button onclick="setCategory('moda')" id="cat-moda" class="category-btn flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 bg-card-teal">
+                    <div class="w-10 h-10 rounded-xl bg-live-red/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-live-red">checkroom</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Moda</span>
+                </button>
+                <button onclick="setCategory('mobilya')" id="cat-mobilya" class="category-btn flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 bg-card-teal">
+                    <div class="w-10 h-10 rounded-xl bg-metro-green/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-metro-green">chair</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Mobilya</span>
+                </button>
+                <button onclick="setCategory('spor')" id="cat-spor" class="category-btn flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 bg-card-teal">
+                    <div class="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-yellow-500">sports_basketball</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Spor</span>
+                </button>
+                <button onclick="setCategory('kitap')" id="cat-kitap" class="category-btn flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 bg-card-teal">
+                    <div class="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-pink-500">menu_book</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Kitap</span>
+                </button>
+                <button onclick="setCategory('diger')" id="cat-diger" class="category-btn flex flex-col items-center gap-2 p-3 rounded-xl border border-white/10 bg-card-teal">
+                    <div class="w-10 h-10 rounded-xl bg-gray-500/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gray-400">more_horiz</span>
+                    </div>
+                    <span class="text-[10px] font-medium">Diğer</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Öne Çıkan İlanlar (Premium) -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold text-sm">workspace_premium</span>
+                    Öne Çıkanlar
+                </h3>
+                <span class="text-[10px] text-gray-text">VIP İlanlar</span>
+            </div>
+            
+            <div class="space-y-3" id="featuredListings">
+                <!-- Premium İlan 1 -->
+                <div class="listing-card glass-card rounded-2xl overflow-hidden border border-gold/30 relative" onclick="openListingDetail(1)">
+                    <div class="absolute top-3 left-3 z-10 flex gap-2">
+                        <span class="badge-sale px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-lg">SATILIK</span>
+                        <span class="bg-gold/90 text-deep-teal px-2 py-1 rounded-lg text-[10px] font-bold shadow-lg flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[12px]">workspace_premium</span>
+                            VIP
+                        </span>
+                    </div>
+                    <div class="absolute top-3 right-3 z-10">
+                        <button onclick="event.stopPropagation(); toggleFavorite(1)" class="w-8 h-8 rounded-full bg-black/40 backdrop-blur flex items-center justify-center hover:bg-live-red/80 transition-colors">
+                            <span class="material-symbols-outlined text-white text-sm" id="fav-1">favorite_border</span>
+                        </button>
+                    </div>
+                    <div class="h-48 bg-gradient-to-br from-dark-teal to-medium-teal relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop" alt="Villa" class="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500">
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                            <div class="flex items-center gap-2 text-[10px] text-gray-text">
+                                <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                Nilüfer, Çalı
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-base mb-1 line-clamp-1">Müstakil Tripleks Villa - Havuzlu</h4>
+                        <p class="text-xs text-gray-text mb-3 line-clamp-2">5+2 oda, 350m², özel havuzlu, bahçeli, kapalı otoparklı. Site içi güvenlikli.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="price-tag px-3 py-1.5 rounded-lg">
+                                <span class="text-lg font-bold text-gold">12.500.000 ₺</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-[10px] text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">bed</span> 5
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">square_foot</span> 350m²
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Premium İlan 2 -->
+                <div class="listing-card glass-card rounded-2xl overflow-hidden border border-gold/30 relative" onclick="openListingDetail(2)">
+                    <div class="absolute top-3 left-3 z-10 flex gap-2">
+                        <span class="badge-rent px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-lg">KİRALIK</span>
+                        <span class="bg-gold/90 text-deep-teal px-2 py-1 rounded-lg text-[10px] font-bold shadow-lg flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[12px]">workspace_premium</span>
+                            VIP
+                        </span>
+                    </div>
+                    <div class="absolute top-3 right-3 z-10">
+                        <button onclick="event.stopPropagation(); toggleFavorite(2)" class="w-8 h-8 rounded-full bg-black/40 backdrop-blur flex items-center justify-center hover:bg-live-red/80 transition-colors">
+                            <span class="material-symbols-outlined text-white text-sm" id="fav-2">favorite_border</span>
+                        </button>
+                    </div>
+                    <div class="h-48 bg-gradient-to-br from-dark-teal to-medium-teal relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop" alt="Araba" class="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500">
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                            <div class="flex items-center gap-2 text-[10px] text-gray-text">
+                                <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                Osmangazi, Heykel
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-base mb-1 line-clamp-1">2023 BMW 520i Luxury Line</h4>
+                        <p class="text-xs text-gray-text mb-3 line-clamp-2">15.000 km, hatasız boyasız, yetkili servis bakımlı, aylık kiralık veya satılık.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="price-tag px-3 py-1.5 rounded-lg">
+                                <span class="text-lg font-bold text-gold">45.000 ₺/ay</span>
+                                <span class="text-xs text-gray-text block">veya 2.850.000 ₺</span>
+                            </div>
+                            <div class="flex items-center gap-3 text-[10px] text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">speed</span> 15k km
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">calendar_today</span> 2023
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Son İlanlar -->
+        <section class="animate-slide-up" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Son İlanlar</h3>
+                <div class="flex gap-2">
+                    <button onclick="setSort('newest')" class="text-[10px] text-gold underline">En Yeni</button>
+                    <button onclick="setSort('price-low')" class="text-[10px] text-gray-text">En Ucuz</button>
+                    <button onclick="setSort('price-high')" class="text-[10px] text-gray-text">En Pahalı</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="listingsGrid">
+                <!-- İlan 3 -->
+                <div class="listing-card glass-card rounded-xl overflow-hidden" onclick="openListingDetail(3)">
+                    <div class="relative h-40">
+                        <div class="absolute top-2 left-2 z-10">
+                            <span class="badge-free px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-lg">ÜCRETSİZ</span>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&auto=format&fit=crop" alt="Kitap" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-bold text-sm mb-1 line-clamp-1">Üniversite Ders Kitapları (Hukuk)</h4>
+                        <p class="text-[10px] text-gray-text mb-2">Nilüfer, Üniversite</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-green-400 font-bold text-sm">Ücretsiz</span>
+                            <span class="text-[10px] text-gray-text">2 saat önce</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İlan 4 -->
+                <div class="listing-card glass-card rounded-xl overflow-hidden" onclick="openListingDetail(4)">
+                    <div class="relative h-40">
+                        <div class="absolute top-2 left-2 z-10">
+                            <span class="badge-sale px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-lg">SATILIK</span>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800&auto=format&fit=crop" alt="Telefon" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-bold text-sm mb-1 line-clamp-1">iPhone 15 Pro Max 256GB</h4>
+                        <p class="text-[10px] text-gray-text mb-2">Osmangazi, Şehreküstü</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gold font-bold text-sm">78.000 ₺</span>
+                            <span class="text-[10px] text-gray-text">5 saat önce</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İlan 5 -->
+                <div class="listing-card glass-card rounded-xl overflow-hidden" onclick="openListingDetail(5)">
+                    <div class="relative h-40">
+                        <div class="absolute top-2 left-2 z-10">
+                            <span class="badge-rent px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-lg">KİRALIK</span>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop" alt="Daire" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-bold text-sm mb-1 line-clamp-1">2+1 Eşyalı Daire - Merkezi</h4>
+                        <p class="text-[10px] text-gray-text mb-2">Yıldırım, Davutdede</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gold font-bold text-sm">12.000 ₺/ay</span>
+                            <span class="text-[10px] text-gray-text">1 gün önce</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- İlan 6 -->
+                <div class="listing-card glass-card rounded-xl overflow-hidden" onclick="openListingDetail(6)">
+                    <div class="relative h-40">
+                        <div class="absolute top-2 left-2 z-10">
+                            <span class="badge-swap px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-lg">TAKAS</span>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&auto=format&fit=crop" alt="Laptop" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-bold text-sm mb-1 line-clamp-1">MacBook Pro M3 - Takas Olur</h4>
+                        <p class="text-[10px] text-gray-text mb-2">Nilüfer, Beşevler</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gold font-bold text-sm">65.000 ₺</span>
+                            <span class="text-[10px] text-gray-text">2 gün önce</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="loadMore()" class="w-full mt-4 py-3 border border-gold/30 text-gold rounded-xl text-sm font-medium hover:bg-gold/10 transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+                Daha Fazla Göster
+            </button>
+        </section>
+
+        <!-- İlan Ver CTA -->
+        <section class="animate-slide-up" style="animation-delay: 0.4s">
+            <div class="glass-card rounded-2xl p-6 border-2 border-gold/30 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                <div class="relative z-10 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center pulse-gold">
+                        <span class="material-symbols-outlined text-gold text-3xl">add_circle</span>
+                    </div>
+                    <h3 class="text-lg font-bold gold-gradient-text mb-2">Ücretsiz İlan Ver</h3>
+                    <p class="text-xs text-gray-text mb-4 max-w-xs mx-auto">
+                        30 saniyede ilanınızı oluşturun, Bursa'nın dört bir yanından alıcılarla buluşun.
+                    </p>
+                    <button onclick="openNewListing()" class="w-full bg-gradient-to-r from-gold/30 to-gold/10 hover:from-gold/40 hover:to-gold/20 border border-gold/50 text-gold py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">add</span>
+                        Hemen İlan Ver
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popüler Aramalar -->
+        <section class="animate-slide-up" style="animation-delay: 0.5s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Popüler Aramalar</h3>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="quickSearch('3+1 satılık')" class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-gray-text hover:border-gold/50 hover:text-gold transition-colors">3+1 satılık</button>
+                <button onclick="quickSearch('kiralık araba')" class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-gray-text hover:border-gold/50 hover:text-gold transition-colors">kiralık araba</button>
+                <button onclick="quickSearch('ücretsiz eşya')" class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-gray-text hover:border-gold/50 hover:text-gold transition-colors">ücretsiz eşya</button>
+                <button onclick="quickSearch('iPhone')" class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-gray-text hover:border-gold/50 hover:text-gold transition-colors">iPhone</button>
+                <button onclick="quickSearch('mobilya')" class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-gray-text hover:border-gold/50 hover:text-gold transition-colors">mobilya</button>
+                <button onclick="quickSearch('bisiklet')" class="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-gray-text hover:border-gold/50 hover:text-gold transition-colors">bisiklet</button>
+            </div>
+        </section>
+
+        <!-- Güvenlik İpuçları -->
+        <section class="animate-slide-up" style="animation-delay: 0.6s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-metro-green">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-metro-green shrink-0">security</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-metro-green mb-1">Güvenli Alışveriş</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            İlan sahipleriyle yüz yüze görüşmeden kapora ödemeyin. 
+                            <span class="text-gold">Bursa'nın güvenilir ilan platformu.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <button onclick="openNewListing()" class="flex flex-col items-center gap-1 -mt-6">
+                <div class="bg-gold w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-gold/20 pulse-gold">
+                    <span class="material-symbols-outlined text-deep-teal text-2xl">add</span>
+                </div>
+                <span class="text-[10px] text-gold font-bold">İlan Ver</span>
+            </button>
+            <a href="favoriler.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">favorite</span>
+                <span class="text-[10px]">Favoriler</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- İlan Detay Modal -->
+    <div id="listingModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeListingModal()"></div>
+        <div class="absolute inset-0 overflow-y-auto">
+            <div class="min-h-full md:flex md:items-center md:justify-center p-0 md:p-4">
+                <div class="bg-[#0D3238] w-full md:max-w-2xl md:rounded-3xl min-h-full md:min-h-0 shadow-2xl animate-slide-up relative">
+                    <!-- Modal Header -->
+                    <div class="sticky top-0 z-20 bg-[#0D3238]/95 backdrop-blur border-b border-white/10 p-4 flex items-center justify-between">
+                        <h3 class="text-lg font-bold gold-gradient-text">İlan Detayı</h3>
+                        <div class="flex gap-2">
+                            <button onclick="shareListing()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold/20 transition-colors">
+                                <span class="material-symbols-outlined text-gold">share</span>
+                            </button>
+                            <button onclick="closeListingModal()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-live-red/20 transition-colors">
+                                <span class="material-symbols-outlined text-live-red">close</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal Content -->
+                    <div id="modalContent" class="p-0">
+                        <!-- Dinamik içerik buraya gelecek -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yeni İlan Modal -->
+    <div id="newListingModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeNewListing()"></div>
+        <div class="absolute inset-0 overflow-y-auto">
+            <div class="min-h-full md:flex md:items-center md:justify-center p-0 md:p-4">
+                <div class="bg-[#0D3238] w-full md:max-w-lg md:rounded-3xl min-h-full md:min-h-0 shadow-2xl animate-slide-up">
+                    <div class="p-4 border-b border-white/10 flex items-center justify-between sticky top-0 bg-[#0D3238]/95 backdrop-blur z-10">
+                        <h3 class="text-lg font-bold gold-gradient-text">Yeni İlan Ver</h3>
+                        <button onclick="closeNewListing()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-sm">close</span>
+                        </button>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <!-- Adım 1: Kategori -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-text font-medium">İlan Türü</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setNewListingType('sale')" class="type-select p-3 rounded-xl border border-white/10 bg-card-teal text-sm font-medium hover:border-gold/50 transition-colors flex items-center justify-center gap-2" id="new-type-sale">
+                                    <span class="material-symbols-outlined text-bus-orange">sell</span>
+                                    Satılık
+                                </button>
+                                <button onclick="setNewListingType('rent')" class="type-select p-3 rounded-xl border border-white/10 bg-card-teal text-sm font-medium hover:border-gold/50 transition-colors flex items-center justify-center gap-2" id="new-type-rent">
+                                    <span class="material-symbols-outlined text-metro-blue">key</span>
+                                    Kiralık
+                                </button>
+                                <button onclick="setNewListingType('free')" class="type-select p-3 rounded-xl border border-white/10 bg-card-teal text-sm font-medium hover:border-gold/50 transition-colors flex items-center justify-center gap-2" id="new-type-free">
+                                    <span class="material-symbols-outlined text-metro-green">redeem</span>
+                                    Ücretsiz
+                                </button>
+                                <button onclick="setNewListingType('swap')" class="type-select p-3 rounded-xl border border-white/10 bg-card-teal text-sm font-medium hover:border-gold/50 transition-colors flex items-center justify-center gap-2" id="new-type-swap">
+                                    <span class="material-symbols-outlined text-tram-purple">sync_alt</span>
+                                    Takas
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Adım 2: Kategori Seçimi -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-text font-medium">Kategori</label>
+                            <select class="w-full bg-dark-teal/50 border border-white/10 rounded-xl py-3 px-4 text-sm text-off-white focus:outline-none focus:border-gold/50">
+                                <option value="">Kategori Seçin</option>
+                                <option value="emlak">Emlak</option>
+                                <option value="arac">Araç</option>
+                                <option value="elektronik">Elektronik</option>
+                                <option value="moda">Moda</option>
+                                <option value="mobilya">Mobilya</option>
+                                <option value="spor">Spor</option>
+                                <option value="kitap">Kitap</option>
+                                <option value="diger">Diğer</option>
+                            </select>
+                        </div>
+
+                        <!-- Adım 3: Başlık ve Açıklama -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-text font-medium">İlan Başlığı</label>
+                            <input type="text" placeholder="Örn: 3+1 Satılık Daire" class="w-full bg-dark-teal/50 border border-white/10 rounded-xl py-3 px-4 text-sm text-off-white placeholder-gray-text focus:outline-none focus:border-gold/50">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-text font-medium">Açıklama</label>
+                            <textarea rows="3" placeholder="Ürün hakkında detaylı bilgi..." class="w-full bg-dark-teal/50 border border-white/10 rounded-xl py-3 px-4 text-sm text-off-white placeholder-gray-text focus:outline-none focus:border-gold/50 resize-none"></textarea>
+                        </div>
+
+                        <!-- Adım 4: Fiyat ve Konum -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-2">
+                                <label class="text-xs text-gray-text font-medium">Fiyat (₺)</label>
+                                <input type="number" placeholder="0" class="w-full bg-dark-teal/50 border border-white/10 rounded-xl py-3 px-4 text-sm text-off-white placeholder-gray-text focus:outline-none focus:border-gold/50">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-xs text-gray-text font-medium">İlçe</label>
+                                <select class="w-full bg-dark-teal/50 border border-white/10 rounded-xl py-3 px-4 text-sm text-off-white focus:outline-none focus:border-gold/50">
+                                    <option value="">Seçin</option>
+                                    <option value="nilufer">Nilüfer</option>
+                                    <option value="osmangazi">Osmangazi</option>
+                                    <option value="yildirim">Yıldırım</option>
+                                    <option value="mudanya">Mudanya</option>
+                                    <option value="gemlik">Gemlik</option>
+                                    <option value="inegol">İnegöl</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Adım 5: Fotoğraf -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-text font-medium">Fotoğraflar</label>
+                            <div class="border-2 border-dashed border-gold/30 rounded-xl p-6 text-center hover:border-gold/60 transition-colors cursor-pointer">
+                                <span class="material-symbols-outlined text-gold text-3xl mb-2">add_photo_alternate</span>
+                                <p class="text-xs text-gray-text">Fotoğraf yüklemek için dokunun</p>
+                                <p class="text-[10px] text-gray-text mt-1">En fazla 10 fotoğraf</p>
+                            </div>
+                        </div>
+
+                        <!-- Adım 6: İletişim -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-text font-medium">İletişim Telefonu</label>
+                            <input type="tel" placeholder="05XX XXX XX XX" class="w-full bg-dark-teal/50 border border-white/10 rounded-xl py-3 px-4 text-sm text-off-white placeholder-gray-text focus:outline-none focus:border-gold/50">
+                        </div>
+
+                        <button onclick="submitListing()" class="w-full bg-gradient-to-r from-gold/30 to-gold/10 hover:from-gold/40 hover:to-gold/20 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 mt-6">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            İlanı Yayınla
+                        </button>
+
+                        <p class="text-[10px] text-gray-text text-center">
+                            Yayınlayarak <a href="#" class="text-gold underline">kullanım koşullarını</a> kabul etmiş olursunuz.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // VERİ: İLANLAR
+        // ==========================================
+        const listingsData = {
+            1: {
+                title: "Müstakil Tripleks Villa - Havuzlu",
+                type: "sale",
+                category: "emlak",
+                price: "12.500.000 ₺",
+                location: "Nilüfer, Çalı",
+                description: "5+2 oda, 350m² kullanım alanına sahip tripleks villa. Özel havuz, bahçe, kapalı otopark. Site içi 24 saat güvenlik. Asansörlü. Doğalgaz kombi sistemli. Kapalı garaj 2 araçlık.",
+                specs: { rooms: "5+2", area: "350m²", floor: "Tripleks", age: "3 yaşında" },
+                images: ["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800", "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800"],
+                seller: { name: "Ahmet Y.", phone: "0532 XXX XX XX", verified: true },
+                date: "Bugün",
+                vip: true
+            },
+            2: {
+                title: "2023 BMW 520i Luxury Line",
+                type: "rent",
+                category: "arac",
+                price: "45.000 ₺/ay",
+                location: "Osmangazi, Heykel",
+                description: "15.000 km'de, hatasız boyasız. Yetkili servis bakımlı. Aylık kiralık veya satılık seçenekleri mevcut. Full paket, deri döşeme, panoramik sunroof.",
+                specs: { year: "2023", km: "15.000", fuel: "Benzin", gear: "Otomatik" },
+                images: ["https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800"],
+                seller: { name: "Mehmet K.", phone: "0533 XXX XX XX", verified: true },
+                date: "Bugün",
+                vip: true
+            },
+            3: {
+                title: "Üniversite Ders Kitapları (Hukuk)",
+                type: "free",
+                category: "kitap",
+                price: "Ücretsiz",
+                location: "Nilüfer, Üniversite",
+                description: "Hukuk fakültesi 1. sınıf ders kitapları. İyi durumda, not alınmamış. Ücretsiz sahibinden.",
+                specs: { condition: "İyi", count: "12 kitap", lang: "Türkçe" },
+                images: ["https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800"],
+                seller: { name: "Zeynep A.", phone: "0544 XXX XX XX", verified: false },
+                date: "2 saat önce",
+                vip: false
+            },
+            4: {
+                title: "iPhone 15 Pro Max 256GB",
+                type: "sale",
+                category: "elektronik",
+                price: "78.000 ₺",
+                location: "Osmangazi, Şehreküstü",
+                description: "Garantili, kutulu, tüm aksesuarları mevcut. Natural Titanium renk. 3 ay kullanılmış, kılıf ve ekran koruyucu takılı kullanıldı.",
+                specs: { storage: "256GB", color: "Natural Titanium", battery: "100%", warranty: "Var" },
+                images: ["https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800"],
+                seller: { name: "Can B.", phone: "0555 XXX XX XX", verified: true },
+                date: "5 saat önce",
+                vip: false
+            },
+            5: {
+                title: "2+1 Eşyalı Daire - Merkezi",
+                type: "rent",
+                category: "emlak",
+                price: "12.000 ₺/ay",
+                location: "Yıldırım, Davutdede",
+                description: "Merkezi konumda, eşyalı 2+1 daire. Metro ve otobüs duraklarına yakın. Doğalgazlı, internet altyapısı mevcut.",
+                specs: { rooms: "2+1", area: "85m²", floor: "3. kat", furnished: "Evet" },
+                images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800"],
+                seller: { name: "Ayşe Y.", phone: "0536 XXX XX XX", verified: false },
+                date: "1 gün önce",
+                vip: false
+            },
+            6: {
+                title: "MacBook Pro M3 - Takas Olur",
+                type: "swap",
+                category: "elektronik",
+                price: "65.000 ₺",
+                location: "Nilüfer, Beşevler",
+                description: "MacBook Pro 14' M3 chip, 8GB RAM, 512GB SSD. iPad Pro ile takas düşünülür. Orjinal kutusu ve şarj aleti mevcut.",
+                specs: { processor: "M3", ram: "8GB", storage: "512GB SSD", screen: "14 inch" },
+                images: ["https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800"],
+                seller: { name: "Burak S.", phone: "0542 XXX XX XX", verified: true },
+                date: "2 gün önce",
+                vip: false
+            }
+        };
+
+        // ==========================================
+        // FONKSİYONLAR
+        // ==========================================
+        
+        let currentFilter = { type: 'all', district: 'all', category: 'emlak' };
+
+        // Filtreleme Fonksiyonları
+        function setListingType(type) {
+            currentFilter.type = type;
+            document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('type-' + type).classList.add('active');
+            filterListings();
+        }
+
+        function setDistrict(district) {
+            currentFilter.district = district;
+            document.querySelectorAll('.district-pill').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            filterListings();
+        }
+
+        function setCategory(category) {
+            currentFilter.category = category;
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('cat-' + category).classList.add('active');
+            filterListings();
+        }
+
+        function filterListings() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Burada gerçek filtreleme mantığı olacak
+            // Şimdilik animasyon gösterelim
+            const grid = document.getElementById('listingsGrid');
+            grid.style.opacity = '0.5';
+            setTimeout(() => {
+                grid.style.opacity = '1';
+            }, 300);
+        }
+
+        function quickSearch(term) {
+            document.getElementById('searchInput').value = term;
+            filterListings();
+        }
+
+        // Modal Fonksiyonları
+        function openListingDetail(id) {
+            const listing = listingsData[id];
+            if (!listing) return;
+
+            const modal = document.getElementById('listingModal');
+            const content = document.getElementById('modalContent');
+            
+            const typeBadges = {
+                'sale': '<span class="badge-sale px-3 py-1.5 rounded-lg text-xs font-bold text-white">SATILIK</span>',
+                'rent': '<span class="badge-rent px-3 py-1.5 rounded-lg text-xs font-bold text-white">KİRALIK</span>',
+                'free': '<span class="badge-free px-3 py-1.5 rounded-lg text-xs font-bold text-white">ÜCRETSİZ</span>',
+                'swap': '<span class="badge-swap px-3 py-1.5 rounded-lg text-xs font-bold text-white">TAKAS</span>'
+            };
+
+            const specsHtml = Object.entries(listing.specs).map(([key, value]) => `
+                <div class="bg-white/5 rounded-lg p-3 text-center">
+                    <p class="text-[10px] text-gray-text uppercase mb-1">${key}</p>
+                    <p class="text-sm font-bold text-gold">${value}</p>
+                </div>
+            `).join('');
+
+            content.innerHTML = `
+                <div class="relative h-72 bg-dark-teal">
+                    <img src="${listing.images[0]}" class="w-full h-full object-cover" alt="${listing.title}">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0D3238] to-transparent h-32"></div>
+                </div>
+                
+                <div class="p-4 space-y-4">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1">
+                            ${typeBadges[listing.type]}
+                            <h2 class="text-xl font-bold mt-2 mb-1">${listing.title}</h2>
+                            <div class="flex items-center gap-2 text-sm text-gray-text">
+                                <span class="material-symbols-outlined text-gold text-base">location_on</span>
+                                ${listing.location}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-2xl font-bold text-gold">${listing.price}</p>
+                            <p class="text-xs text-gray-text">${listing.date}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        ${specsHtml}
+                    </div>
+
+                    <div class="chat-bubble rounded-xl p-4">
+                        <h4 class="text-sm font-bold mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gold text-base">description</span>
+                            Açıklama
+                        </h4>
+                        <p class="text-sm text-gray-text leading-relaxed">${listing.description}</p>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gold text-2xl">person</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold flex items-center gap-2">
+                                    ${listing.seller.name}
+                                    ${listing.seller.verified ? '<span class="material-symbols-outlined text-metro-green text-base" title="Onaylı Satıcı">verified</span>' : ''}
+                                </p>
+                                <p class="text-xs text-gray-text">İlan Sahibi</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <a href="tel:${listing.seller.phone}" class="flex items-center justify-center gap-2 bg-gold/20 hover:bg-gold/30 text-gold py-3 rounded-xl font-medium transition-colors">
+                                <span class="material-symbols-outlined text-base">phone</span>
+                                Ara
+                            </a>
+                            <button onclick="openChat(${id})" class="flex items-center justify-center gap-2 bg-metro-green/20 hover:bg-metro-green/30 text-metro-green py-3 rounded-xl font-medium transition-colors">
+                                <span class="material-symbols-outlined text-base">chat</span>
+                                Mesaj
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="toggleFavorite(${id})" class="flex-1 py-3 border border-white/10 rounded-xl text-sm font-medium hover:border-gold/50 transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base" id="modal-fav-${id}">favorite_border</span>
+                            Favorilere Ekle
+                        </button>
+                        <button onclick="reportListing(${id})" class="flex-1 py-3 border border-white/10 rounded-xl text-sm font-medium hover:border-live-red/50 hover:text-live-red transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base">flag</span>
+                            Şikayet Et
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeListingModal() {
+            document.getElementById('listingModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openNewListing() {
+            document.getElementById('newListingModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeNewListing() {
+            document.getElementById('newListingModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function setNewListingType(type) {
+            document.querySelectorAll('.type-select').forEach(btn => {
+                btn.classList.remove('border-gold', 'bg-gold/10');
+                btn.classList.add('border-white/10', 'bg-card-teal');
+            });
+            const selected = document.getElementById('new-type-' + type);
+            selected.classList.remove('border-white/10', 'bg-card-teal');
+            selected.classList.add('border-gold', 'bg-gold/10');
+        }
+
+        function submitListing() {
+            showToast('İlanınız incelendikten sonra yayınlanacaktır!');
+            closeNewListing();
+        }
+
+        // Yardımcı Fonksiyonlar
+        function toggleFavorite(id) {
+            const icon = document.getElementById('fav-' + id) || document.getElementById('modal-fav-' + id);
+            if (icon) {
+                if (icon.textContent === 'favorite_border') {
+                    icon.textContent = 'favorite';
+                    icon.classList.add('text-live-red');
+                    showToast('Favorilere eklendi');
+                } else {
+                    icon.textContent = 'favorite_border';
+                    icon.classList.remove('text-live-red');
+                }
+            }
+        }
+
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            if (section && icon) {
+                section.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-24 left-1/2 -translate-x-1/2 bg-card-teal border border-gold/30 text-white px-6 py-3 rounded-xl text-sm font-medium shadow-2xl z-[200] animate-fade-in flex items-center gap-2';
+            toast.innerHTML = `
+                <span class="material-symbols-outlined text-gold">check_circle</span>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function loadMore() {
+            showToast('Daha fazla ilan yükleniyor...');
+        }
+
+        function shareListing() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Bursa Satılık & Kiralık',
+                    text: 'Bu ilana bak!',
+                    url: window.location.href
+                });
+            } else {
+                showToast('Bağlantı kopyalandı');
+            }
+        }
+
+        function openChat(id) {
+            showToast('Sohbet başlatılıyor...');
+        }
+
+        function reportListing(id) {
+            showToast('Şikayetiniz alındı');
+        }
+
+        function openNotifications() {
+            showToast('Bildirimler yükleniyor...');
+        }
+
+        function toggleAdvancedSearch() {
+            showToast('Gelişmiş filtreler yakında...');
+        }
+
+        function setSort(type) {
+            showToast('Sıralama değiştirildi');
+        }
+
+        // ESC tuşu ile kapatma
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeListingModal();
+                closeNewListing();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan kategori seçimi
+            setNewListingType('sale');
+        });
+    </script>
+
+</body>
+</html>

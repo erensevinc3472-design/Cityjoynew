@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    <title>Bursa Vitrini - Haftanın Seçkisi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; background: #081F24; font-family: 'Plus Jakarta Sans', sans-serif; color: white; }
+
+        .scroll-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .section {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hero Section */
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: all 0.8s ease;
+            filter: blur(8px) brightness(0.6);
+            transform: scale(1.05);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(8,31,36,0.3) 0%, rgba(8,31,36,0.85) 100%);
+        }
+
+        .header { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            z-index: 50; 
+            padding: 16px 24px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn { 
+            width: 44px; 
+            height: 44px; 
+            border-radius: 50%; 
+            background: rgba(255,255,255,0.1); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255,255,255,0.2); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            text-decoration: none;
+            transition: all 0.3s; 
+        }
+
+        .header-content {
+            position: absolute;
+            top: 100px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 40;
+        }
+
+        .header-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #C9A86C;
+            margin-bottom: 8px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #C9A86C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .issue-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(201,168,108,0.2);
+            border: 1px solid rgba(201,168,108,0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #C9A86C;
+            margin-top: 16px;
+        }
+
+        /* Carousel */
+        .carousel-container { 
+            position: absolute; 
+            top: 50%; 
+            left: 0; 
+            right: 0; 
+            transform: translateY(-45%); 
+            height: 420px; 
+            z-index: 10; 
+            perspective: 1500px; 
+        }
+
+        .carousel-track { 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+            transform-style: preserve-3d; 
+        }
+
+        .carousel-card { 
+            position: absolute; 
+            width: 280px; 
+            height: 380px; 
+            left: 50%; 
+            top: 50%; 
+            margin-left: -140px; 
+            margin-top: -190px; 
+            border-radius: 24px; 
+            overflow: hidden; 
+            cursor: pointer; 
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); 
+            transform-style: preserve-3d; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            background: #000;
+            text-decoration: none;
+            display: block;
+        }
+
+        .carousel-card::before { 
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.95) 100%); 
+            z-index: 1; 
+        }
+
+        .card-bg { 
+            position: absolute; 
+            inset: 0; 
+            background-size: cover; 
+            background-position: center; 
+            transition: transform 0.6s ease; 
+        }
+
+        .card-content { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 24px; 
+            z-index: 2; 
+        }
+
+        .card-category {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+            color: #081F24;
+        }
+
+        .card-title { 
+            font-size: 26px; 
+            font-weight: 800; 
+            line-height: 1.15; 
+            margin-bottom: 8px; 
+        }
+
+        .card-subtitle { 
+            font-size: 13px; 
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .card-sponsor {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            opacity: 0.7;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Card Positions */
+        .carousel-card.prev-2 { transform: translateX(-350px) translateZ(-400px) rotateY(45deg) scale(0.7); opacity: 0.3; filter: blur(3px); }
+        .carousel-card.prev-1 { transform: translateX(-180px) translateZ(-200px) rotateY(30deg) scale(0.85); opacity: 0.6; filter: blur(1px); }
+        .carousel-card.active { 
+            transform: translateX(0) translateZ(0) rotateY(0) scale(1); 
+            opacity: 1; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 40px rgba(201,168,108,0.2);
+        }
+        .carousel-card.next-1 { transform: translateX(180px) translateZ(-200px) rotateY(-30deg) scale(0.85); opacity: 0.6; filter: blur(1px); }
+        .carousel-card.next-2 { transform: translateX(350px) translateZ(-400px) rotateY(-45deg) scale(0.7); opacity: 0.3; filter: blur(3px); }
+        .carousel-card.hidden { opacity: 0; pointer-events: none; }
+
+        /* Smoke */
+        .smoke-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 300px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .smoke-layer {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            right: 0;
+            height: 400px;
+            opacity: 0.6;
+            background: radial-gradient(ellipse at center bottom, 
+                rgba(201,168,108,0.3) 0%, 
+                rgba(201,168,108,0.15) 30%, 
+                transparent 100%);
+            filter: blur(40px);
+            animation: smokeRise 8s ease-in-out infinite;
+        }
+
+        @keyframes smokeRise {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-30px) scale(1.1); opacity: 0.8; }
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.7;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        /* Archive */
+        .archive-section {
+            background: linear-gradient(180deg, #0D3238 0%, #081F24 100%);
+        }
+
+        .archive-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .archive-title {
+            text-align: center;
+        }
+        .archive-title h1 { font-size: 24px; font-weight: 800; }
+        .archive-title span { font-size: 12px; color: #C9A86C; letter-spacing: 0.2em; text-transform: uppercase; }
+
+        .archive-grid {
+            position: absolute;
+            top: 100px;
+            left: 0;
+            right: 0;
+            bottom: 40px;
+            overflow-y: auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-content: start;
+        }
+
+        .archive-item {
+            aspect-ratio: 3/4;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+            text-decoration: none;
+        }
+
+        .archive-item-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .archive-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%);
+            z-index: 1;
+        }
+
+        .archive-item-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            z-index: 2;
+        }
+
+        .archive-issue {
+            font-size: 10px;
+            font-weight: 700;
+            color: #C9A86C;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+
+        .archive-item-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .touch-area { 
+            position: absolute; 
+            top: 30%; 
+            bottom: 30%; 
+            width: 20%; 
+            z-index: 15; 
+            cursor: pointer; 
+        }
+        .touch-area.left { left: 0; }
+        .touch-area.right { right: 0; }
+
+        @media (max-width: 380px) {
+            .carousel-card { width: 260px; height: 360px; margin-left: -130px; margin-top: -180px; }
+            .header-title { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-container" id="mainScroll">
+        
+        <!-- BİRİNCİ SAYFA: HAFTANIN SEÇKİSİ -->
+        <section class="section" id="section1">
+            <div class="hero-bg" id="heroBg" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80');"></div>
+            <div class="hero-overlay"></div>
+
+            <header class="header">
+                <a href="benim-sehrim.html" class="back-btn">
+                    <span class="material-icons-round">arrow_back</span>
+                </a>
+                <button class="back-btn" onclick="sharePage()">
+                    <span class="material-icons-round">share</span>
+                </button>
+            </header>
+
+            <div class="header-content">
+                <div class="header-label">Bursa Vitrini</div>
+                <h1 class="header-title">Haftanın Seçkisi</h1>
+                <p class="header-subtitle">Editörden, kalpten, Bursa'dan</p>
+                <div class="issue-badge">Sayı 12 • 15-22 Mart 2026</div>
+            </div>
+
+            <div class="carousel-container">
+                <div class="carousel-track" id="track1"></div>
+            </div>
+
+            <div class="smoke-container">
+                <div class="smoke-layer"></div>
+            </div>
+
+            <div class="scroll-hint">
+                <span class="material-icons-round">keyboard_arrow_down</span>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Arşiv için kaydır</span>
+            </div>
+
+            <div class="touch-area left" onclick="prevCard()"></div>
+            <div class="touch-area right" onclick="nextCard()"></div>
+        </section>
+
+        <!-- İKİNCİ SAYFA: ARŞİV -->
+        <section class="section archive-section">
+            <header class="archive-header">
+                <button class="back-btn" onclick="scrollToTop()">
+                    <span class="material-icons-round">arrow_upward</span>
+                </button>
+                <div class="archive-title">
+                    <span>Geçmiş Sayılar</span>
+                    <h1>Arşiv</h1>
+                </div>
+                <button class="back-btn">
+                    <span class="material-icons-round">search</span>
+                </button>
+            </header>
+
+            <div class="archive-grid" id="archiveGrid"></div>
+        </section>
+
+    </div>
+
+    <script>
+        // DEMO İÇERİKLER - Hafta 12 (Dağder Güncellemesi)
+        const weeklyContent = [
+            { 
+                id: 0, 
+                category: "HOLDİNG",
+                categoryColor: "#1e40af",
+                title: "Bursa'nın Devleri", 
+                subtitle: "Eczacıbaşı'ndan İpekiş'e şehrin ekonomi motorları",
+                sponsor: "Kaleseramik",
+                readTime: "12 dk",
+                views: "5.2B",
+                image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&q=80",
+                link: "vitrin-holding.html"
+            },
+            { 
+                id: 1, 
+                category: "LEZZET",
+                categoryColor: "#dc2626",
+                title: "İskender'in Tahtına Adaylar", 
+                subtitle: "Bursa'nın en iyi 5 iskendercisi",
+                sponsor: "Hacı İskender",
+                readTime: "8 dk",
+                views: "3.8B",
+                image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80",
+                link: "vitrin-iskender.html"
+            },
+            { 
+                id: 2, 
+                category: "KONAKLAMA",
+                categoryColor: "#059669",
+                title: "Tarihi Konaklarda Bir Gece", 
+                subtitle: "Bursa'nın butik otelleri ve pansiyonları",
+                sponsor: "Kitap Evi Otel",
+                readTime: "6 dk",
+                views: "2.1B",
+                image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80",
+                link: "vitrin-konaklama.html"
+            },
+            { 
+                id: 3, 
+                category: "DÜĞÜN",
+                categoryColor: "#db2777",
+                title: "Bursa'da Evlenmek", 
+                subtitle: "En iyi düğün salonları ve organizatörler",
+                sponsor: "Merinos Davet",
+                readTime: "10 dk",
+                views: "4.5B",
+                image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
+                link: "vitrin-dugun.html"
+            },
+            { 
+                id: 4, 
+                category: "STK",
+                categoryColor: "#ea580c", // Turuncu - doğa sporları
+                title: "Dağder: Zirvelerin Efendisi", 
+                subtitle: "40 yıldır Uludağ'ın zirvelerinde",
+                sponsor: "The North Face",
+                readTime: "9 dk",
+                views: "2.8B",
+                image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&q=80",
+                link: "vitrin-dagder.html"
+            }
+        ];
+
+        // ARŞİV VERİLERİ
+        const archiveIssues = [
+            { issue: "Sayı 11", title: "Gastronomi Rehberi", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80", link: "arsiv-11.html" },
+            { issue: "Sayı 10", title: "Sokak Lezzetleri", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80", link: "arsiv-10.html" },
+            { issue: "Sayı 9", title: "Sanayi Emekçileri", image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400&q=80", link: "arsiv-9.html" },
+            { issue: "Sayı 8", title: "Mahalle Bakkalları", image: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400&q=80", link: "arsiv-8.html" },
+            { issue: "Sayı 7", title: "Tribün Kültürü", image: "https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=400&q=80", link: "arsiv-7.html" },
+            { issue: "Sayı 6", title: "Köy Okulları", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80", link: "arsiv-6.html" }
+        ];
+
+        let currentIndex = 0;
+        let isAnimating = false;
+
+        function init() {
+            renderCarousel();
+            renderArchive();
+            updateBackground();
+        }
+
+        function renderCarousel() {
+            const track = document.getElementById('track1');
+            track.innerHTML = '';
+            weeklyContent.forEach((item, index) => {
+                const card = document.createElement('a');
+                card.href = item.link;
+                card.className = `carousel-card ${getCardClass(index)}`;
+                card.innerHTML = `
+                    <div class="card-bg" style="background-image: url('${item.image}')"></div>
+                    <div class="card-content">
+                        <div class="card-category" style="background: ${item.categoryColor}">${item.category}</div>
+                        <h3 class="card-title">${item.title}</h3>
+                        <div class="card-subtitle">${item.subtitle}</div>
+                        <div class="card-sponsor">
+                            <span class="material-icons-round" style="font-size: 14px;">verified</span>
+                            Sponsor: ${item.sponsor}
+                        </div>
+                    </div>
+                `;
+                track.appendChild(card);
+            });
+        }
+
+        function renderArchive() {
+            const grid = document.getElementById('archiveGrid');
+            archiveIssues.forEach(item => {
+                const div = document.createElement('a');
+                div.href = item.link;
+                div.className = 'archive-item';
+                div.innerHTML = `
+                    <div class="archive-item-bg" style="background-image: url('${item.image}')"></div>
+                    <div class="archive-item-content">
+                        <div class="archive-issue">${item.issue}</div>
+                        <div class="archive-item-title">${item.title}</div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function getCardClass(index) {
+            const diff = index - currentIndex;
+            const total = weeklyContent.length;
+            let normalized = diff;
+            if (diff > total / 2) normalized = diff - total;
+            if (diff < -total / 2) normalized = diff + total;
+
+            if (normalized === 0) return 'carousel-card active';
+            if (normalized === -1) return 'carousel-card prev-1';
+            if (normalized === 1) return 'carousel-card next-1';
+            if (normalized <= -2) return 'carousel-card prev-2';
+            if (normalized >= 2) return 'carousel-card next-2';
+            return 'carousel-card hidden';
+        }
+
+        function updateBackground() {
+            const current = weeklyContent[currentIndex];
+            document.getElementById('heroBg').style.backgroundImage = `url('${current.image}')`;
+        }
+
+        function updateCarousel() {
+            document.querySelectorAll('.carousel-card').forEach((card, index) => {
+                card.className = `carousel-card ${getCardClass(index)}`;
+            });
+            updateBackground();
+        }
+
+        function nextCard() {
+            if (isAnimating) return;
+            isAnimating = true;
+            currentIndex = (currentIndex + 1) % weeklyContent.length;
+            updateCarousel();
+            setTimeout(() => isAnimating = false, 600);
+        }
+
+        function prevCard() {
+            if (isAnimating) return;
+            isAnimating = true;
+            currentIndex = (currentIndex - 1 + weeklyContent.length) % weeklyContent.length;
+            updateCarousel();
+            setTimeout(() => isAnimating = false, 600);
+        }
+
+        function scrollToTop() {
+            document.getElementById('mainScroll').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function sharePage() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Bursa Vitrini - Haftanın Seçkisi',
+                    text: 'Bursa\'nın en iyileri, editör seçkisi',
+                    url: window.location.href
+                });
+            } else {
+                alert('Link kopyalandı!');
+            }
+        }
+
+        // Touch controls
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) {
+                const scrollPos = document.getElementById('mainScroll').scrollTop;
+                if (scrollPos < window.innerHeight / 2) {
+                    diff > 0 ? nextCard() : prevCard();
+                }
+            }
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', e => {
+            const scrollPos = document.getElementById('mainScroll').scrollTop;
+            if (scrollPos < window.innerHeight / 2) {
+                if (e.key === 'ArrowRight') nextCard();
+                if (e.key === 'ArrowLeft') prevCard();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

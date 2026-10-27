@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Bursa - Sinematik Rota</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "darkest": "#081F24",
+                    "main-bg": "#0D3238",
+                    "card-bg": "#17464B",
+                    "gold-primary": "#E0B07A",
+                    "text-secondary": "#C7D8DA",
+                    "text-desc": "#9FB6B8",
+                    "border-subtle": "#3F6E70",
+                },
+                animation: {
+                    'pulse-glow': 'pulseGlow 2s infinite',
+                    'float': 'float 6s ease-in-out infinite',
+                    'ray-move': 'rayMove 8s infinite',
+                },
+                keyframes: {
+                    pulseGlow: {
+                        '0%, 100%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.6), 0 0 40px rgba(224, 176, 122, 0.3)' },
+                        '50%': { boxShadow: '0 0 30px rgba(224, 176, 122, 0.8), 0 0 60px rgba(224, 176, 122, 0.5)' },
+                    },
+                    float: {
+                        '0%, 100%': { transform: 'translateY(0px)' },
+                        '50%': { transform: 'translateY(-10px)' },
+                    },
+                    rayMove: {
+                        '0%, 100%': { transform: 'translateX(-50px) rotate(15deg)', opacity: '0.3' },
+                        '50%': { transform: 'translateX(50px) rotate(-15deg)', opacity: '0.6' },
+                    }
+                }
+            },
+        },
+    }
+</script>
+<style>
+    .cinematic-gradient {
+        background: linear-gradient(180deg, 
+            rgba(8,31,36,0.4) 0%, 
+            transparent 20%, 
+            transparent 60%, 
+            rgba(8,31,36,0.9) 80%,
+            rgba(8,31,36,1) 100%
+        );
+    }
+    .light-ray {
+        position: absolute;
+        top: -10%;
+        width: 3px;
+        height: 70%;
+        background: linear-gradient(to bottom, transparent, rgba(224,176,122,0.4), transparent);
+        filter: blur(2px);
+        animation: rayMove 10s infinite ease-in-out;
+    }
+    .route-node {
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .route-node.active {
+        transform: scale(1.3);
+        box-shadow: 0 0 30px rgba(224,176,122,0.8), 0 0 60px rgba(224,176,122,0.4);
+    }
+    .route-node.completed {
+        background: #10B981;
+        border-color: #10B981;
+    }
+    .route-node.locked {
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
+    .route-line {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: drawLine 3s ease-out forwards;
+    }
+    @keyframes drawLine {
+        to { stroke-dashoffset: 0; }
+    }
+    .bottom-sheet {
+        transform: translateY(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bottom-sheet.open {
+        transform: translateY(0);
+    }
+    .info-accordion {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
+    }
+    .info-accordion.open {
+        max-height: 500px;
+    }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+</head>
+<body class="bg-darkest font-['Space_Grotesk'] text-white overflow-hidden">
+
+<!-- Sinematic Map Container -->
+<div class="relative w-full h-screen overflow-hidden">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0D3238] via-[#0A282C] to-[#081F24]"></div>
+    
+    <!-- Light Rays -->
+    <div class="light-ray left-[20%]"></div>
+    <div class="light-ray left-[40%]" style="animation-delay: 2s;"></div>
+    <div class="light-ray left-[60%]" style="animation-delay: 4s;"></div>
+    <div class="light-ray left-[80%]" style="animation-delay: 6s;"></div>
+    
+    <!-- Fog Effect -->
+    <div class="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-darkest/90 to-transparent pointer-events-none"></div>
+    
+    <!-- Cinematic Overlay -->
+    <div class="absolute inset-0 cinematic-gradient pointer-events-none"></div>
+    
+    <!-- Header -->
+    <div class="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-4 bg-gradient-to-b from-darkest/80 to-transparent">
+        <button onclick="goBack()" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+            <span class="material-symbols-outlined text-white">arrow_back</span>
+        </button>
+        <div class="text-center">
+            <h1 id="route-title" class="text-lg font-bold text-white tracking-tight">Tarihin İzinde</h1>
+            <p id="route-progress" class="text-xs text-gold-primary">Durak 1 / 6</p>
+        </div>
+        <button onclick="showRouteList()" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+            <span class="material-symbols-outlined text-white">format_list_bulleted</span>
+        </button>
+    </div>
+    
+    <!-- Route Map Area -->
+    <div class="absolute inset-0 flex items-center justify-center pt-20 pb-32">
+        <svg class="w-full h-full max-w-lg" viewBox="0 0 400 600" id="route-svg">
+            <!-- Route Lines -->
+            <path id="route-path" class="route-line" d="M200,100 Q150,200 200,300 T200,500" 
+                  fill="none" stroke="rgba(224,176,122,0.3)" stroke-width="3"/>
+            
+            <!-- Nodes will be added by JS -->
+            <g id="nodes-container"></g>
+        </svg>
+    </div>
+    
+    <!-- Bottom Progress -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-darkest to-transparent">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-text-secondary">Rota İlerlemesi</span>
+            <span id="progress-percent" class="text-xs text-gold-primary font-bold">0%</span>
+        </div>
+        <div class="h-1 bg-white/10 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-gold-primary to-orange-400 w-0 transition-all duration-1000"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Node Detail Bottom Sheet -->
+<div id="node-sheet-overlay" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm hidden" onclick="closeNodeSheet()"></div>
+<div id="node-sheet" class="bottom-sheet fixed inset-x-0 bottom-0 z-[110] bg-gradient-to-t from-darkest via-main-bg to-main-bg rounded-t-3xl max-h-[85vh] overflow-y-auto">
+    <!-- Handle -->
+    <div class="sticky top-0 bg-main-bg pt-3 pb-2 px-4 z-10">
+        <div class="w-12 h-1 bg-border-subtle/50 rounded-full mx-auto mb-3"></div>
+    </div>
+    
+    <div class="px-4 pb-24 space-y-4" id="node-content">
+        <!-- Content injected by JS -->
+    </div>
+</div>
+
+<!-- Route List Modal -->
+<div id="route-list-modal" class="fixed inset-0 z-[120] bg-darkest/95 backdrop-blur-xl hidden">
+    <div class="flex flex-col h-full">
+        <div class="flex items-center justify-between px-4 py-4 border-b border-border-subtle/30">
+            <h2 class="text-xl font-bold text-white">Rota Durakları</h2>
+            <button onclick="closeRouteList()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-white">close</span>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4" id="route-list-content">
+            <!-- List injected by JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+// Route Data
+const routesData = {
+    tarih: {
+        title: "Tarihin İzinde",
+        nodes: [
+            {
+                id: 1,
+                name: "Ulu Camii",
+                type: "Tarihi Yapı",
+                rating: 4.9,
+                x: 200, y: 100,
+                image: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=400",
+                description: "Osmanlı'nın ilk büyük camisi, 20 kubbeli şaheser.",
+                duration: "45 dk",
+                howToGet: [
+                    {type: "metro", text: "Şehreküstü Metro, 5 dk yürüme"},
+                    {type: "bus", text: "Heykel durağı, 2 dk yürüme"},
+                    {type: "walk", text: "Tarihi Çarşı'dan 3 dk"}
+                ],
+                importantInfo: [
+                    {icon: "payments", title: "Giriş", text: "Tamamen ücretsiz"},
+                    {icon: "schedule", title: "En İyi Zaman", text: "Sabah 9-10 veya akşam 17-19"},
+                    {icon: "info", title: "Önemli", text: "Cuma 11:30-14:00 kalabalık"},
+                    {icon: "lightbulb", title: "Pro İpucu", text: "Minber detaylarını mihrap yakınından görün"},
+                    {icon: "restaurant", title: "Yakınında", text: "İskender (200m), Çınaraltı Çay (150m)"},
+                    {icon: "accessible", title: "Erişim", text: "Tekerlekli sandalye rampası mevcut"}
+                ]
+            },
+            {
+                id: 2,
+                name: "Yeşil Türbe",
+                type: "UNESCO",
+                rating: 4.8,
+                x: 150, y: 200,
+                image: "https://images.unsplash.com/photo-1566125882500-87e10f726cdc?w=400",
+                description: "Çelebi Mehmet için yapılan çini şaheseri.",
+                duration: "30 dk",
+                howToGet: [
+                    {type: "bus", text: "Yeşil durağı, 10 numara"},
+                    {type: "taxi", text: "Merkezden ~15 TL"},
+                    {type: "walk", text: "Ulu Camii'den 15 dk yürüme"}
+                ],
+                importantInfo: [
+                    {icon: "payments", title: "Giriş", text: "Ücretsiz"},
+                    {icon: "schedule", title: "Saatler", text: "09:00-17:00 (Kış 16:30)"},
+                    {icon: "info", title: "Kural", text: "Flaşsız fotoğraf, sessizlik"},
+                    {icon: "lightbulb", title: "İpucu", text: "Bahçede manzara fotoğrafı çekin"},
+                    {icon: "place", title: "Yanında", text: "Yeşil Camii (aynı kompleks)"},
+                    {icon: "photo_camera", title: "Foto", text: "Çiniler için makro lens önerilir"}
+                ]
+            },
+            {
+                id: 3,
+                name: "Koza Han",
+                type: "Tarihi Çarşı",
+                rating: 4.7,
+                x: 250, y: 280,
+                image: "https://images.unsplash.com/photo-1559628233-100c798642d4?w=400",
+                description: "500 yıllık ipek hanı, çınar altı çay keyfi.",
+                duration: "1 saat",
+                howToGet: [
+                    {type: "walk", text: "Ulu Camii'den 2 dk yürüme"},
+                    {type: "metro", text: "Şehreküstü Metro, 8 dk yürüme"}
+                ],
+                importantInfo: [
+                    {icon: "payments", text: "Giriş ücretsiz, alışveriş ücretli"},
+                    {icon: "schedule", text: "08:00-20:00 (Pazar kapalı)"},
+                    {icon: "shopping_bag", text: "İpek şal, kestane şekeri"},
+                    {icon: "restaurant", text: "Çınar altı çay bahçesi (içinde)"},
+                    {icon: "lightbulb", text: "Köşe dükkanlarında pazarlık yapın"},
+                    {icon: "photo_camera", text: "Şadırvan ve çınar için ideal"}
+                ]
+            },
+            {
+                id: 4,
+                name: "Tophane",
+                type: "Manzara",
+                rating: 4.8,
+                x: 180, y: 380,
+                image: "https://images.unsplash.com/photo-1594924862961-e6b107626bd1?w=400",
+                description: "Osman Gazi ve Orhan Gazi türbeleri, panoramik manzara.",
+                duration: "45 dk",
+                howToGet: [
+                    {type: "walk", text: "Tarihi Çarşı'dan 15 dk (yokuş)"},
+                    {type: "taxi", text: "Merkezden ~25 TL"},
+                    {type: "tram", text: "T1 tramvay Tophane durağı"}
+                ],
+                importantInfo: [
+                    {icon: "payments", text: "Tamamen ücretsiz"},
+                    {icon: "schedule", text: "Türbeler: 09:00-18:00"},
+                    {icon: "place", text: "Osman Gazi ve Orhan Gazi türbeleri"},
+                    {icon: "lightbulb", text: "Gün batımı ve gece manzarası muhteşem"},
+                    {icon: "photo_camera", text: "Şehir manzarası için en iyi nokta"},
+                    {icon: "restaurant", text: "Tophane Sosyal Tesisleri (100m)"}
+                ]
+            },
+            {
+                id: 5,
+                name: "Muradiye",
+                type: "Külliye",
+                rating: 4.6,
+                x: 220, y: 450,
+                image: "https://images.unsplash.com/photo-1544212414-6f9c5b58f5c5?w=400",
+                description: "II. Murad'ın yaptırdığı külliye ve bahçe.",
+                duration: "40 dk",
+                howToGet: [
+                    {type: "bus", text: "Muradiye durağı"},
+                    {type: "metro", text: "Şehreküstü'den otobüsle 10 dk"},
+                    {type: "car", text: "Merkezden 10 dk"}
+                ],
+                importantInfo: [
+                    {icon: "payments", text: "Ücretsiz giriş"},
+                    {icon: "schedule", text: "09:00-17:00 (Kış 16:30)"},
+                    {icon: "place", text: "12 şehzade türbesi ve bahçe"},
+                    {icon: "lightbulb", text: "Bahçede dinlenmek için ideal"},
+                    {icon: "history", text: "Cem Sultan Türbesi'ni görün"},
+                    {icon: "restaurant", text: "Muradiye Sosyal Tesisleri (içinde)"}
+                ]
+            },
+            {
+                id: 6,
+                name: "Cumalıkızık",
+                type: "UNESCO Köy",
+                rating: 4.9,
+                x: 200, y: 550,
+                image: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=400",
+                description: "700 yıllık Osmanlı köyü, taş sokaklar.",
+                duration: "2 saat",
+                howToGet: [
+                    {type: "metro", text: "Cumalıkızık İstasyonu + servis"},
+                    {type: "minibus", text: "Şehreküstü'den (20 dk)"},
+                    {type: "car", text: "Merkezden 15 km (20 dk)"}
+                ],
+                importantInfo: [
+                    {icon: "payments", text: "Köy ücretsiz, müze 20 TL"},
+                    {icon: "schedule", text: "Müze: 09:00-17:00 (Pzt kapalı)"},
+                    {icon: "restaurant", text: "Köy kahvaltısı evleri (10+ mekan)"},
+                    {icon: "shopping_bag", text: "Ev yapımı reçel ve turşu"},
+                    {icon: "lightbulb", text: "Sabah 8-9 fotoğraf için ideal"},
+                    {icon: "place", text: "Saitabat Şelalesi (15 km uzakta)"}
+                ]
+            }
+        ]
+    }
+};
+
+let currentRoute = null;
+let currentNodes = [];
+let activeNodeIndex = 0;
+
+// Initialize
+function init() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const routeType = urlParams.get('route') || 'tarih';
+    
+    currentRoute = routesData[routeType] || routesData.tarih;
+    currentNodes = currentRoute.nodes;
+    
+    document.getElementById('route-title').textContent = currentRoute.title;
+    updateProgress();
+    renderNodes();
+    renderRouteList();
+}
+
+function renderNodes() {
+    const container = document.getElementById('nodes-container');
+    container.innerHTML = '';
+    
+    currentNodes.forEach((node, index) => {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'route-node cursor-pointer');
+        g.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+        g.onclick = () => openNodeSheet(index);
+        
+        let nodeClass = '';
+        let fill = '#17464B';
+        let stroke = '#3F6E70';
+        let icon = '';
+        
+        if (index === activeNodeIndex) {
+            nodeClass = 'active';
+            fill = '#E0B07A';
+            stroke = '#E0B07A';
+            icon = '<circle r="8" fill="#081F24"/><circle r="4" fill="#E0B07A"/>';
+        } else if (index < activeNodeIndex) {
+            nodeClass = 'completed';
+            fill = '#10B981';
+            stroke = '#10B981';
+            icon = '<path d="M-4,0 L-1,3 L4,-3" stroke="white" stroke-width="2" fill="none"/>';
+        } else {
+            nodeClass = 'locked';
+            icon = '<text y="4" text-anchor="middle" fill="#9FB6B8" font-size="10">?</text>';
+        }
+        
+        g.innerHTML = `
+            <circle r="20" fill="${fill}" stroke="${stroke}" stroke-width="3" class="${nodeClass}"/>
+            ${icon}
+            <text y="35" text-anchor="middle" fill="white" font-size="11" font-weight="600">${node.name}</text>
+            <text y="48" text-anchor="middle" fill="#9FB6B8" font-size="9">${node.type}</text>
+        `;
+        
+        container.appendChild(g);
+    });
+    
+    // Update route path
+    const path = document.getElementById('route-path');
+    let d = `M${currentNodes[0].x},${currentNodes[0].y}`;
+    for (let i = 1; i < currentNodes.length; i++) {
+        const prev = currentNodes[i-1];
+        const curr = currentNodes[i];
+        const midY = (prev.y + curr.y) / 2;
+        d += ` Q${prev.x},${midY} ${curr.x},${curr.y}`;
+    }
+    path.setAttribute('d', d);
+}
+
+function openNodeSheet(index) {
+    const node = currentNodes[index];
+    const sheet = document.getElementById('node-sheet');
+    const overlay = document.getElementById('node-sheet-overlay');
+    const content = document.getElementById('node-content');
+    
+    // Build how to get section
+    const howToGetHtml = node.howToGet.map(h => `
+        <div class="flex items-center gap-3 p-3 bg-darkest/50 rounded-xl border border-border-subtle/30">
+            <div class="w-10 h-10 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-gold-primary text-lg">${h.type}</span>
+            </div>
+            <span class="text-sm text-text-secondary">${h.text}</span>
+        </div>
+    `).join('');
+    
+    // Build important info accordion
+    const importantInfoHtml = node.importantInfo.map(info => `
+        <div class="flex items-start gap-3 p-3 bg-darkest/30 rounded-lg">
+            <span class="material-symbols-outlined text-gold-primary text-lg shrink-0">${info.icon}</span>
+            <div>
+                <p class="text-xs text-text-desc mb-0.5">${info.title || ''}</p>
+                <p class="text-sm text-white">${info.text}</p>
+            </div>
+        </div>
+    `).join('');
+    
+    content.innerHTML = `
+        <!-- Hero Image -->
+        <div class="relative h-48 rounded-2xl overflow-hidden">
+            <img src="${node.image}" class="w-full h-full object-cover"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent"></div>
+            <div class="absolute bottom-3 left-3 right-3">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="px-2 py-0.5 bg-gold-primary/20 text-gold-primary text-[9px] font-bold rounded uppercase">${node.type}</span>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-gold-primary text-xs fill-1">star</span>
+                        <span class="text-xs text-white font-bold">${node.rating}</span>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-white">${node.name}</h2>
+            </div>
+        </div>
+        
+        <!-- Description -->
+        <p class="text-sm text-text-secondary leading-relaxed">${node.description}</p>
+        
+        <!-- Duration Badge -->
+        <div class="flex items-center gap-2 px-4 py-2 bg-gold-primary/10 rounded-full border border-gold-primary/30 w-fit">
+            <span class="material-symbols-outlined text-gold-primary text-sm">schedule</span>
+            <span class="text-sm text-gold-primary font-semibold">Önerilen süre: ${node.duration}</span>
+        </div>
+        
+        <!-- How to Get There -->
+        <div>
+            <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-gold-primary">directions</span>
+                Nasıl Giderim?
+            </h3>
+            <div class="space-y-2 mb-4">
+                ${howToGetHtml}
+            </div>
+            <div class="flex gap-2">
+                <button onclick="openNavigation(${index})" class="flex-1 flex items-center justify-center gap-2 p-3 bg-gold-primary text-darkest rounded-xl font-semibold text-sm hover:bg-gold-primary/90 transition-colors">
+                    <span class="material-symbols-outlined text-sm">navigation</span>
+                    Yol Tarifi Aç
+                </button>
+                <button onclick="toggleTransportOptions(${index})" class="flex items-center justify-center gap-2 p-3 bg-card-bg border border-border-subtle/30 text-white rounded-xl font-semibold text-sm hover:border-gold-primary/50 transition-colors">
+                    <span class="material-symbols-outlined text-sm">directions_bus</span>
+                    Toplu Taşıma
+                </button>
+            </div>
+        </div>
+        
+        <!-- Important Info Accordion -->
+        <div class="border border-border-subtle/30 rounded-2xl overflow-hidden">
+            <button onclick="toggleImportantInfo()" class="w-full flex items-center justify-between p-4 bg-card-bg/50 hover:bg-card-bg transition-colors">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">lightbulb</span>
+                    <span class="font-semibold text-white">Önemli Bilgiler</span>
+                </div>
+                <span class="material-symbols-outlined text-text-secondary transition-transform" id="info-arrow">expand_more</span>
+            </button>
+            <div id="important-info-content" class="info-accordion">
+                <div class="p-4 space-y-2 bg-darkest/30">
+                    ${importantInfoHtml}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Photo Memory -->
+        <button onclick="addPhotoMemory(${index})" class="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border-subtle/50 rounded-2xl text-text-secondary hover:border-gold-primary/50 hover:text-gold-primary transition-colors">
+            <span class="material-symbols-outlined text-2xl">add_a_photo</span>
+            <span class="font-semibold">Fotoğraf Ekle / Anı Kaydet</span>
+        </button>
+        
+        <!-- Navigation Buttons -->
+        <div class="flex gap-3 pt-2">
+            <button onclick="previousNode()" class="flex-1 flex items-center justify-center gap-2 p-3 bg-card-bg border border-border-subtle/30 rounded-xl text-white font-semibold ${index === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-gold-primary/50'} transition-colors" ${index === 0 ? 'disabled' : ''}>
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+                Önceki
+            </button>
+            <button onclick="nextNode()" class="flex-1 flex items-center justify-center gap-2 p-3 bg-gold-primary text-darkest rounded-xl font-semibold hover:bg-gold-primary/90 transition-colors">
+                Sonraki
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+        </div>
+    `;
+    
+    overlay.classList.remove('hidden');
+    setTimeout(() => sheet.classList.add('open'), 10);
+}
+
+function closeNodeSheet() {
+    const sheet = document.getElementById('node-sheet');
+    const overlay = document.getElementById('node-sheet-overlay');
+    sheet.classList.remove('open');
+    setTimeout(() => overlay.classList.add('hidden'), 400);
+}
+
+function toggleImportantInfo() {
+    const content = document.getElementById('important-info-content');
+    const arrow = document.getElementById('info-arrow');
+    content.classList.toggle('open');
+    arrow.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0)';
+}
+
+function openNavigation(index) {
+    // Open Google Maps with the location
+    window.open('https://www.google.com/maps/dir/?api=1&destination=Bursa+' + encodeURIComponent(currentNodes[index].name), '_blank');
+}
+
+function toggleTransportOptions(index) {
+    alert('Toplu taşıma detayları: ' + currentNodes[index].name);
+}
+
+function addPhotoMemory(index) {
+    alert('Fotoğraf ekleme özelliği - ' + currentNodes[index].name + ' için anı kaydediliyor...');
+}
+
+function previousNode() {
+    if (activeNodeIndex > 0) {
+        activeNodeIndex--;
+        updateProgress();
+        renderNodes();
+        openNodeSheet(activeNodeIndex);
+    }
+}
+
+function nextNode() {
+    if (activeNodeIndex < currentNodes.length - 1) {
+        activeNodeIndex++;
+        updateProgress();
+        renderNodes();
+        openNodeSheet(activeNodeIndex);
+    } else {
+        // Route completed
+        alert('Tebrikler! Rotayı tamamladınız! 🎉');
+    }
+}
+
+function updateProgress() {
+    const percent = Math.round((activeNodeIndex / (currentNodes.length - 1)) * 100);
+    document.getElementById('progress-percent').textContent = percent + '%';
+    document.getElementById('progress-bar').style.width = percent + '%';
+    document.getElementById('route-progress').textContent = `Durak ${activeNodeIndex + 1} / ${currentNodes.length}`;
+}
+
+function showRouteList() {
+    document.getElementById('route-list-modal').classList.remove('hidden');
+}
+
+function closeRouteList() {
+    document.getElementById('route-list-modal').classList.add('hidden');
+}
+
+function renderRouteList() {
+    const container = document.getElementById('route-list-content');
+    container.innerHTML = currentNodes.map((node, index) => `
+        <div class="flex items-center gap-4 p-4 ${index === activeNodeIndex ? 'bg-gold-primary/10 border border-gold-primary/30' : 'bg-card-bg/30 border border-border-subtle/20'} rounded-2xl mb-3 cursor-pointer" onclick="jumpToNode(${index}); closeRouteList();">
+            <div class="w-12 h-12 rounded-full ${index < activeNodeIndex ? 'bg-emerald-500' : index === activeNodeIndex ? 'bg-gold-primary animate-pulse-glow' : 'bg-border-subtle/50'} flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined ${index < activeNodeIndex ? 'text-white' : index === activeNodeIndex ? 'text-darkest' : 'text-text-secondary'}">
+                    ${index < activeNodeIndex ? 'check' : index === activeNodeIndex ? 'navigation' : 'location_on'}
+                </span>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-bold text-white ${index === activeNodeIndex ? 'text-gold-primary' : ''}">${node.name}</h3>
+                <p class="text-xs text-text-desc">${node.type} • ${node.duration}</p>
+            </div>
+            <span class="material-symbols-outlined text-text-secondary">chevron_right</span>
+        </div>
+    `).join('');
+}
+
+function jumpToNode(index) {
+    activeNodeIndex = index;
+    updateProgress();
+    renderNodes();
+    openNodeSheet(index);
+}
+
+function goBack() {
+    window.location.href = 'bursa.html';
+}
+
+// Initialize on load
+window.onload = init;
+</script>
+
+</body>
+</html>

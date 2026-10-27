@@ -1,0 +1,471 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy - Bursa Çilingir</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#BB9E77",
+                        "background": "#0F3E46",
+                        "surface": "#415B57",
+                        "border": "#698383",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 100%);
+            min-height: 100dvh;
+        }
+        
+        .glass-card {
+            background: rgba(65, 91, 87, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.85);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        
+        .status-open {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #4ade80;
+        }
+        
+        .status-closed {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+        
+        .rating-badge {
+            background: linear-gradient(135deg, rgba(187, 158, 119, 0.2) 0%, rgba(187, 158, 119, 0.1) 100%);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+        }
+
+        .review-item {
+            border-bottom: 1px solid rgba(105, 131, 131, 0.3);
+            padding: 8px 0;
+        }
+        
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .district-btn {
+            background: rgba(65, 91, 87, 0.4);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .district-btn:hover {
+            background: rgba(187, 158, 119, 0.2);
+            border-color: rgba(187, 158, 119, 0.5);
+        }
+
+        .district-btn.active {
+            background: rgba(187, 158, 119, 0.3);
+            border-color: #BB9E77;
+            color: #BB9E77;
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="text-white antialiased pb-24">
+    <!-- Header -->
+    <header class="pt-12 px-6 pb-4 sticky top-0 z-40 bg-gradient-to-b from-[#0F3E46] via-[#0F3E46] to-transparent">
+        <div class="flex items-center justify-between mb-4">
+            <a href="acil-ihtiyaclar.html" class="ripple w-10 h-10 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all duration-300">
+                <span class="material-symbols-outlined text-primary text-lg">arrow_back_ios_new</span>
+            </a>
+            <div class="flex flex-col items-center">
+                <span class="text-primary tracking-[0.3em] font-semibold text-xs uppercase">CityJoy</span>
+                <div class="w-6 h-0.5 bg-primary/50 rounded-full mt-1"></div>
+            </div>
+            <div class="w-10"></div>
+        </div>
+        
+        <div class="page-transition">
+            <h1 class="text-2xl font-medium mb-3 tracking-tight">Çilingir</h1>
+            
+            <!-- District Selector -->
+            <div class="relative mb-4">
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="districtContainer">
+                    <button class="district-btn active px-4 py-2 rounded-full text-xs font-medium" data-district="hepsi">Tümü</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="osmangazi">Osmangazi</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="nilufer">Nilüfer</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="yildirim">Yıldırım</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="mudanya">Mudanya</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="gursu">Gürsu</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="kestel">Kestel</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="buyukorhan">Büyükorhan</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="harmancik">Harmancık</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="inegol">İnegöl</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="iznik">İznik</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="karacabey">Karacabey</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="keles">Keles</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="orhaneli">Orhaneli</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="orhangazi">Orhangazi</button>
+                    <button class="district-btn px-4 py-2 rounded-full text-xs font-medium text-gray-300" data-district="yenisehir">Yenişehir</button>
+                </div>
+                <!-- Fade effect on right -->
+                <div class="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-[#0F3E46] to-transparent pointer-events-none"></div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div class="w-12 h-0.5 bg-gradient-to-r from-primary to-transparent rounded-full"></div>
+                <span class="text-xs text-gray-400 font-light">7/24 kapı açma</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-6 space-y-4 mt-2">
+        <!-- Cilingir 1 -->
+        <div class="page-transition stagger-1 glass-card rounded-2xl p-4" data-location="osmangazi">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="text-lg font-medium text-white mb-1">Osmangazi Anahtarcı</h3>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="rating-badge flex items-center text-primary text-xs px-2 py-0.5 rounded-full">
+                            <span class="material-symbols-outlined text-sm mr-1 fill-1">star</span>
+                            4.9
+                        </span>
+                        <span class="text-xs text-gray-400 font-light">120+ Değerlendirme</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-300 text-xs mb-1">
+                        <span class="material-symbols-outlined text-sm text-primary">location_on</span>
+                        <span>Atatürk Cad. No:45, Osmangazi</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-300 text-xs">
+                        <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+                        <span>Kapı Açma: ₺300 | Kasa: ₺500</span>
+                    </div>
+                </div>
+                <span class="status-open text-[10px] px-2 py-0.5 rounded-md font-medium">7/24 AÇIK</span>
+            </div>
+            
+            <!-- Yorumlar -->
+            <div class="mt-3 pt-3 border-t border-border/30">
+                <h4 class="text-xs font-medium text-primary mb-2">Son Yorumlar</h4>
+                <div class="space-y-1 text-xs text-gray-300">
+                    <div class="review-item">
+                        <div class="flex items-center gap-1 mb-1">
+                            <span class="font-medium text-white">Ahmet K.</span>
+                            <span class="text-primary">★★★★★</span>
+                        </div>
+                        <p>15 dakikada geldiler, kapıyı zedelemeden açtılar.</p>
+                    </div>
+                    <div class="review-item">
+                        <div class="flex items-center gap-1 mb-1">
+                            <span class="font-medium text-white">Zeynep M.</span>
+                            <span class="text-primary">★★★★★</span>
+                        </div>
+                        <p>Gece 3'te aradım, hemen geldiler. Çok güvenilir.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-border/30 mt-3">
+                <div class="flex items-center gap-1 text-gray-300">
+                    <span class="material-symbols-outlined text-sm text-primary">near_me</span>
+                    <span class="text-xs">0.8 km uzaklıkta</span>
+                </div>
+                <a href="tel:+905321234570" class="bg-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border border-primary/30 active:scale-95 transition-transform ripple">
+                    <span class="material-symbols-outlined text-sm">call</span>
+                    ARAYIN
+                </a>
+            </div>
+        </div>
+
+        <!-- Cilingir 2 -->
+        <div class="page-transition stagger-2 glass-card rounded-2xl p-4" data-location="nilufer">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="text-lg font-medium text-white mb-1">Nilüfer Güven Çilingir</h3>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="rating-badge flex items-center text-primary text-xs px-2 py-0.5 rounded-full">
+                            <span class="material-symbols-outlined text-sm mr-1 fill-1">star</span>
+                            4.7
+                        </span>
+                        <span class="text-xs text-gray-400 font-light">85 Değerlendirme</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-300 text-xs mb-1">
+                        <span class="material-symbols-outlined text-sm text-primary">location_on</span>
+                        <span>İzmir Yolu Cad. No:12, Nilüfer</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-300 text-xs">
+                        <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+                        <span>Kapı Açma: ₺350 | Oto: ₺400</span>
+                    </div>
+                </div>
+                <span class="status-open text-[10px] px-2 py-0.5 rounded-md font-medium">7/24 AÇIK</span>
+            </div>
+            
+            <!-- Yorumlar -->
+            <div class="mt-3 pt-3 border-t border-border/30">
+                <h4 class="text-xs font-medium text-primary mb-2">Son Yorumlar</h4>
+                <div class="space-y-1 text-xs text-gray-300">
+                    <div class="review-item">
+                        <div class="flex items-center gap-1 mb-1">
+                            <span class="font-medium text-white">Mehmet Y.</span>
+                            <span class="text-primary">★★★★☆</span>
+                        </div>
+                        <p>Araba anahtarımı içerde unuttum, 20 dk'da çözdüler.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-border/30 mt-3">
+                <div class="flex items-center gap-1 text-gray-300">
+                    <span class="material-symbols-outlined text-sm text-primary">near_me</span>
+                    <span class="text-xs">1.2 km uzaklıkta</span>
+                </div>
+                <a href="tel:+905321234571" class="bg-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border border-primary/30 active:scale-95 transition-transform ripple">
+                    <span class="material-symbols-outlined text-sm">call</span>
+                    ARAYIN
+                </a>
+            </div>
+        </div>
+
+        <!-- Cilingir 3 -->
+        <div class="page-transition stagger-3 glass-card rounded-2xl p-4" data-location="yildirim">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="text-lg font-medium text-white mb-1">Yıldırım Hızlı Anahtar</h3>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="rating-badge flex items-center text-primary text-xs px-2 py-0.5 rounded-full">
+                            <span class="material-symbols-outlined text-sm mr-1 fill-1">star</span>
+                            4.5
+                        </span>
+                        <span class="text-xs text-gray-400 font-light">54 Değerlendirme</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-300 text-xs mb-1">
+                        <span class="material-symbols-outlined text-sm text-primary">location_on</span>
+                        <span>Tarihi Çarşı İçi, Yıldırım</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-300 text-xs">
+                        <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+                        <span>Kapı Açma: ₺250 | Anahtar: ₺50</span>
+                    </div>
+                </div>
+                <span class="status-open text-[10px] px-2 py-0.5 rounded-md font-medium">AÇIK</span>
+            </div>
+            
+            <!-- Yorumlar -->
+            <div class="mt-3 pt-3 border-t border-border/30">
+                <h4 class="text-xs font-medium text-primary mb-2">Son Yorumlar</h4>
+                <div class="space-y-1 text-xs text-gray-300">
+                    <div class="review-item">
+                        <div class="flex items-center gap-1 mb-1">
+                            <span class="font-medium text-white">Ayşe D.</span>
+                            <span class="text-primary">★★★★★</span>
+                        </div>
+                        <p>Dükkanı çarşıda, fiyatlar uygun, tavsiye ederim.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-border/30 mt-3">
+                <div class="flex items-center gap-1 text-gray-300">
+                    <span class="material-symbols-outlined text-sm text-primary">near_me</span>
+                    <span class="text-xs">2.5 km uzaklıkta</span>
+                </div>
+                <a href="tel:+905321234572" class="bg-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border border-primary/30 active:scale-95 transition-transform ripple">
+                    <span class="material-symbols-outlined text-sm">call</span>
+                    ARAYIN
+                </a>
+            </div>
+        </div>
+
+        <!-- Cilingir 4 -->
+        <div class="page-transition stagger-4 glass-card rounded-2xl p-4" data-location="mudanya">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="text-lg font-medium text-white mb-1">Mudanya Oto Çilingir</h3>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="rating-badge flex items-center text-primary text-xs px-2 py-0.5 rounded-full">
+                            <span class="material-symbols-outlined text-sm mr-1 fill-1">star</span>
+                            4.8
+                        </span>
+                        <span class="text-xs text-gray-400 font-light">210 Değerlendirme</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-300 text-xs mb-1">
+                        <span class="material-symbols-outlined text-sm text-primary">location_on</span>
+                        <span>Sahil Cad. No:88, Mudanya</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-gray-300 text-xs">
+                        <span class="material-symbols-outlined text-sm text-primary">schedule</span>
+                        <span>Oto Açma: ₺400 | Kasa: ₺600</span>
+                    </div>
+                </div>
+                <span class="status-closed text-[10px] px-2 py-0.5 rounded-md font-medium">KAPALI</span>
+            </div>
+            
+            <!-- Yorumlar -->
+            <div class="mt-3 pt-3 border-t border-border/30">
+                <h4 class="text-xs font-medium text-primary mb-2">Son Yorumlar</h4>
+                <div class="space-y-1 text-xs text-gray-300">
+                    <div class="review-item">
+                        <div class="flex items-center gap-1 mb-1">
+                            <span class="font-medium text-white">Can B.</span>
+                            <span class="text-primary">★★★★★</span>
+                        </div>
+                        <p>Yazlıkta kilitli kaldım, sahil bölgesinde hızlı hizmet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-border/30 mt-3">
+                <div class="flex items-center gap-1 text-gray-300">
+                    <span class="material-symbols-outlined text-sm text-primary">near_me</span>
+                    <span class="text-xs">3.1 km uzaklıkta</span>
+                </div>
+                <a href="tel:+905321234573" class="bg-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border border-primary/30 active:scale-95 transition-transform ripple">
+                    <span class="material-symbols-outlined text-sm">call</span>
+                    ARAYIN
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-6 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px] font-medium">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px] font-medium">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px] font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // District filter functionality
+        const districtBtns = document.querySelectorAll('.district-btn');
+        const cilingirCards = document.querySelectorAll('.glass-card[data-location]');
+
+        districtBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                districtBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.classList.add('text-gray-300');
+                });
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                this.classList.remove('text-gray-300');
+                
+                const selectedDistrict = this.getAttribute('data-district');
+                
+                // Filter cards
+                cilingirCards.forEach(card => {
+                    if (selectedDistrict === 'hepsi' || card.getAttribute('data-location') === selectedDistrict) {
+                        card.style.display = 'block';
+                        // Re-trigger animation
+                        card.style.animation = 'none';
+                        setTimeout(() => {
+                            card.style.animation = '';
+                        }, 10);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

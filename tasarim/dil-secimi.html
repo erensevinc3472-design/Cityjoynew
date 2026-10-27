@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CityJoy - Dil Seçimi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #102022;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            max-width: 430px;
+            margin: 0 auto;
+        }
+
+        /* Header - Sol Üstte Geri Tuşu, Sağ Üstte Logo */
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(16, 32, 34, 0.9), transparent);
+        }
+
+        /* Geri Tuşu - Sol Üst */
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Logo - Sağ Üst */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #0faebd, #0d8a96);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Language Slices */
+        .language-slice {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .language-slice:last-child {
+            border-bottom: none;
+        }
+
+        .language-slice:hover {
+            flex: 1.5;
+        }
+
+        /* Background Images */
+        .bg-image {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 1s ease;
+        }
+
+        .language-slice:hover .bg-image {
+            transform: scale(1.1);
+        }
+
+        .slice-1 .bg-image {
+            background-image: url('https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=800&q=80');
+        }
+
+        .slice-2 .bg-image {
+            background-image: url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80');
+        }
+
+        .slice-3 .bg-image {
+            background-image: url('https://images.unsplash.com/photo-1527838832700-5059252407fa?w=800&q=80');
+        }
+
+        .slice-4 .bg-image {
+            background-image: url('https://images.unsplash.com/photo-1513326738677-b964603b136d?w=800&q=80');
+        }
+
+        .slice-5 .bg-image {
+            background-image: url('https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800&q=80');
+        }
+
+        /* Overlays */
+        .overlay-dark {
+            position: absolute;
+            inset: 0;
+            background: rgba(16, 32, 34, 0.4);
+            mix-blend-mode: multiply;
+            transition: all 0.5s ease;
+        }
+
+        .language-slice:hover .overlay-dark {
+            background: rgba(15, 174, 189, 0.2);
+        }
+
+        .overlay-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(16, 32, 34, 0.9), rgba(16, 32, 34, 0.2), transparent);
+        }
+
+        /* Content */
+        .slice-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 14px 32px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .language-slice:hover .lang-btn {
+            background: #0faebd;
+            border-color: #0faebd;
+            transform: scale(1.05);
+        }
+
+        .lang-btn:active {
+            transform: scale(0.95);
+        }
+
+        .lang-text {
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .lang-arrow {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .language-slice:hover .lang-arrow {
+            color: white;
+        }
+
+        @media (min-width: 431px) {
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #1a1a2e;
+            }
+            
+            .container {
+                height: 90vh;
+                max-height: 844px;
+                border-radius: 40px;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+                overflow: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header - Sol Üstte Geri Tuşu, Sağ Üstte Logo -->
+        <div class="header">
+            <!-- Geri Tuşu - Sol Üst -->
+            <a href="index.html" class="back-btn">←</a>
+
+            <!-- Logo - Sağ Üst -->
+            <div class="logo-section">
+                <div class="logo-icon">✈</div>
+                <div class="logo-text">CityJoy</div>
+            </div>
+        </div>
+
+        <!-- Türkçe -->
+        <div class="language-slice slice-1" onclick="selectLanguage('tr')">
+            <div class="bg-image"></div>
+            <div class="overlay-dark"></div>
+            <div class="overlay-gradient"></div>
+            <div class="slice-content">
+                <div class="lang-btn">
+                    <span class="lang-text">Türkçe</span>
+                    <span class="lang-arrow">→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- English -->
+        <div class="language-slice slice-2" onclick="selectLanguage('en')">
+            <div class="bg-image"></div>
+            <div class="overlay-dark"></div>
+            <div class="overlay-gradient"></div>
+            <div class="slice-content">
+                <div class="lang-btn">
+                    <span class="lang-text">English</span>
+                    <span class="lang-arrow">→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deutsch -->
+        <div class="language-slice slice-3" onclick="selectLanguage('de')">
+            <div class="bg-image"></div>
+            <div class="overlay-dark"></div>
+            <div class="overlay-gradient"></div>
+            <div class="slice-content">
+                <div class="lang-btn">
+                    <span class="lang-text">Deutsch</span>
+                    <span class="lang-arrow">→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Русский -->
+        <div class="language-slice slice-4" onclick="selectLanguage('ru')">
+            <div class="bg-image"></div>
+            <div class="overlay-dark"></div>
+            <div class="overlay-gradient"></div>
+            <div class="slice-content">
+                <div class="lang-btn">
+                    <span class="lang-text">Русский</span>
+                    <span class="lang-arrow">→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- العربية -->
+        <div class="language-slice slice-5" onclick="selectLanguage('ar')">
+            <div class="bg-image"></div>
+            <div class="overlay-dark"></div>
+            <div class="overlay-gradient"></div>
+            <div class="slice-content">
+                <div class="lang-btn">
+                    <span class="lang-text">العربية</span>
+                    <span class="lang-arrow">→</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectLanguage(lang) {
+            localStorage.setItem('selectedLanguage', lang);
+            window.location.href = 'kayit.html';
+        }
+    </script>
+</body>
+</html>

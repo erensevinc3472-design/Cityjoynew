@@ -1,0 +1,874 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    <title>Gurme Lezzetler - Osmangazi Lezzet Rehberi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "success-green": "#10B981"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-live {
+            animation: pulseLive 2s infinite;
+        }
+        @keyframes pulseLive {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(255, 68, 68, 0); }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .category-pill {
+            transition: all 0.3s ease;
+        }
+        .category-pill.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .venue-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .venue-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        .rating-badge {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.2) 0%, rgba(224, 176, 122, 0.1) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+        }
+        .gurme-badge {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .story-ring {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 50%, #081F24 100%);
+            padding: 2px;
+        }
+        .chef-recommend {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.15) 0%, rgba(224, 176, 122, 0.05) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+        }
+    </style>
+<base target="_blank">
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="text-off-white pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="cafe-restaurant.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">Gurme Lezzetler</h1>
+                <p class="text-xs text-gray-text truncate">Osmangazi'nin En Seçkin Mekanları</p>
+            </div>
+            <button onclick="toggleNotifications()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gold/20 hover:bg-gold/30 transition-colors shrink-0 relative">
+                <span class="material-symbols-outlined text-gold">notifications</span>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-live-red rounded-full pulse-live"></span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 space-y-6 mt-4">
+
+        <!-- Categories -->
+        <section class="animate-fade-in">
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                <button onclick="setCategory('editor')" id="cat-editor" class="category-pill active flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl px-4 border border-white/10 bg-white/5 text-sm font-medium">
+                    <span class="text-lg">⭐</span>
+                    <span>Editörün Seçimi</span>
+                </button>
+                <button onclick="setCategory('chef')" id="cat-chef" class="category-pill flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl px-4 border border-white/10 bg-white/5 text-sm font-medium">
+                    <span class="text-lg">👨‍🍳</span>
+                    <span>Şef Tavsiyesi</span>
+                </button>
+                <button onclick="setCategory('top10')" id="cat-top10" class="category-pill flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl px-4 border border-white/10 bg-white/5 text-sm font-medium">
+                    <span class="text-lg">🏆</span>
+                    <span>En İyi 10</span>
+                </button>
+                <button onclick="setCategory('fine')" id="cat-fine" class="category-pill flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl px-4 border border-white/10 bg-white/5 text-sm font-medium">
+                    <span class="text-lg">🍽️</span>
+                    <span>Fine Dining</span>
+                </button>
+                <button onclick="setCategory('steak')" id="cat-steak" class="category-pill flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl px-4 border border-white/10 bg-white/5 text-sm font-medium">
+                    <span class="text-lg">🥩</span>
+                    <span>Et & Steak</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Hero Featured -->
+        <section class="animate-fade-in" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl overflow-hidden border border-gold/30 relative">
+                <div class="aspect-[16/9] w-full bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800')">
+                    <div class="absolute inset-0 bg-gradient-to-t from-deep-teal via-deep-teal/60 to-transparent"></div>
+                    <div class="absolute top-3 left-3 gurme-badge px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">verified</span> Gurme Onaylı
+                    </div>
+                    <div class="absolute top-3 right-3 bg-black/40 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1">
+                        <span class="material-symbols-outlined text-gold text-sm fill-1">star</span>
+                        <span class="text-gold font-bold text-sm">4.9</span>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h2 class="text-xl font-bold text-off-white mb-1">Kebapçı İskender (Mavi Dükkan)</h2>
+                            <p class="text-gold text-sm font-medium">1867'den Beri • Efsane İskender</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-text mb-3 line-clamp-2">Bursa'nın en ikonik lezzeti. Tereyağı, domates sosu ve yoğurdun dansı. Tarihi Mavi Dükkan'da orijinal lezzet.</p>
+                    <div class="flex gap-2 mb-4">
+                        <span class="text-gold border border-gold/30 px-2 py-1 rounded text-[10px] font-semibold uppercase">Tarihi Mekan</span>
+                        <span class="text-gold border border-gold/30 px-2 py-1 rounded text-[10px] font-semibold uppercase">Rezervasyon Önerilir</span>
+                    </div>
+                    <button onclick="openReservation('iskender')" class="w-full bg-gradient-to-r from-gold to-gold-light text-deep-teal py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                        <span class="material-symbols-outlined">event_available</span> Rezervasyon Yap
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Editor's Story -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <button onclick="toggleSection('editorStory', 'editorIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">auto_stories</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold text-gold block truncate">Editörün Notu</span>
+                        <span class="text-[10px] text-gray-text block truncate">Osmangazi'de gurme rehberi</span>
+                    </div>
+                </div>
+                <span id="editorIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="editorStory" class="expandable-section mt-3">
+                <div class="glass-card rounded-2xl p-4 space-y-4">
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-gold">1</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-gold">Tarihi Lezzetler</p>
+                            <p class="text-xs text-gray-text">1867'den beri İskender, 1937'den beri pideli köfte. Osmangazi'nin sokakları tarihin tadını taşıyor.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-gold">2</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-gold">Şeffaf Yönetim</p>
+                            <p class="text-xs text-gray-text">Belediye Başkanı Erkan Aydın döneminde gıda denetimleri artırıldı. Hijyen standartları yükseltildi.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-gold">3</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-gold">Yerel Üretim</p>
+                            <p class="text-xs text-gray-text">Atalık tohumlar, yerel üreticiler, doğal ürünler. Osmangazi'nin lezzetleri sürdürülebilir.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- First Timers -->
+        <section class="animate-slide-up" style="animation-delay: 0.3s">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold">Bursa'ya İlk Kez Gelenler İçin</h3>
+                <button onclick="showAllFirstTimers()" class="text-gold text-xs font-semibold flex items-center gap-1">
+                    Tümü <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+            <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="firstTimersContainer">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- Chef Recommendations -->
+        <section class="animate-slide-up" style="animation-delay: 0.4s">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold">👨‍🍳 Şef Tavsiyeleri</h3>
+                <span class="text-xs text-gray-text">Ustaların özel seçimi</span>
+            </div>
+            <div class="space-y-3" id="chefContainer">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- Fine Dining -->
+        <section class="animate-slide-up" style="animation-delay: 0.5s">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold">🍽️ Fine Dining</h3>
+                <button onclick="showAllFineDining()" class="text-gold text-xs font-semibold flex items-center gap-1">
+                    Tümü <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+            <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="fineDiningContainer">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- Romantic Dinners -->
+        <section class="animate-slide-up" style="animation-delay: 0.6s">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold">Romantik Akşam Yemeği</h3>
+                <button onclick="showAllRomantic()" class="text-gold text-xs font-semibold flex items-center gap-1">
+                    Tümü <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+            <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="romanticContainer">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- Weekend Breakfast -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold">Hafta Sonu Kahvaltısı</h3>
+                <button onclick="showAllBreakfast()" class="text-gold text-xs font-semibold flex items-center gap-1">
+                    Tümü <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+            <div class="space-y-3" id="breakfastContainer">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- Night Eats -->
+        <section class="animate-slide-up" style="animation-delay: 0.8s">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold">Gece Lezzet Durakları</h3>
+                <button onclick="showAllNight()" class="text-gold text-xs font-semibold flex items-center gap-1">
+                    Tümü <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+            <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="nightContainer">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- Lezzet Rotaları -->
+        <section class="animate-slide-up" style="animation-delay: 0.9s">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold">🗺️ Lezzet Rotaları</h3>
+                <span class="text-xs text-gray-text">Planlı turlar</span>
+            </div>
+            <div class="glass-card rounded-2xl p-4 border border-gold/20">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold text-2xl">route</span>
+                    </div>
+                    <div class="min-w-0">
+                        <h4 class="text-sm font-bold text-gold mb-1">Tarihi Osmangazi Turu</h4>
+                        <p class="text-xs text-gray-text">4 mekan • 3 saat • 2.5 km yürüyüş</p>
+                    </div>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="w-6 h-6 rounded-full bg-gold/20 text-gold flex items-center justify-center font-bold text-[10px]">1</span>
+                        <span class="text-off-white">Tarihi Abdal Simit Fırını (Kahvaltı)</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="w-6 h-6 rounded-full bg-gold/20 text-gold flex items-center justify-center font-bold text-[10px]">2</span>
+                        <span class="text-off-white">Kebapçı İdris (Öğle Yemeği)</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="w-6 h-6 rounded-full bg-gold/20 text-gold flex items-center justify-center font-bold text-[10px]">3</span>
+                        <span class="text-off-white">Kafkas Pasta (Tatlı Molası)</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="w-6 h-6 rounded-full bg-gold/20 text-gold flex items-center justify-center font-bold text-[10px]">4</span>
+                        <span class="text-off-white">Arap Şükrü (Akşam Yemeği)</span>
+                    </div>
+                </div>
+                <button onclick="startRoute()" class="w-full bg-gold/20 border border-gold/50 text-gold py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-gold/30 transition-colors">
+                    <span class="material-symbols-outlined">play_arrow</span> Rotayı Başlat
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="index.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <button class="flex flex-col items-center gap-1 text-gold scale-110">
+                <div class="bg-gold/20 p-1.5 rounded-full mb-[-2px]">
+                    <span class="material-symbols-outlined fill-1 text-gold text-lg">restaurant_menu</span>
+                </div>
+                <span class="text-[10px] font-bold">Gurme</span>
+            </button>
+            <a href="ara.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Reservation Modal -->
+    <div id="reservationModal" class="fixed inset-0 z-[80] bg-deep-teal hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <button onclick="closeReservation()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                    <span class="material-symbols-outlined text-gold">arrow_back</span>
+                </button>
+                <h2 class="text-lg font-bold gold-gradient-text">Rezervasyon</h2>
+                <div class="w-10"></div>
+            </div>
+        </div>
+        <div class="px-4 py-6 space-y-6 max-w-lg mx-auto">
+            <div class="glass-card rounded-2xl p-4 text-center">
+                <span class="material-symbols-outlined text-4xl text-gold mb-2">restaurant</span>
+                <h3 id="resVenueName" class="text-lg font-bold mb-1">Mekan Adı</h3>
+                <p class="text-xs text-gray-text">Rezervasyonunuz için bilgileri doldurun</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-gold uppercase tracking-wider block mb-2">Tarih</label>
+                    <input type="date" id="resDate" class="w-full bg-white/5 border border-gold/20 rounded-xl p-3 text-off-white focus:border-gold/50 outline-none"/>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gold uppercase tracking-wider block mb-2">Saat</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="selectTime(this)" class="time-slot bg-white/5 border border-white/10 rounded-lg py-2 text-xs font-medium hover:border-gold/50">12:00</button>
+                        <button onclick="selectTime(this)" class="time-slot bg-white/5 border border-white/10 rounded-lg py-2 text-xs font-medium hover:border-gold/50">13:00</button>
+                        <button onclick="selectTime(this)" class="time-slot bg-white/5 border border-white/10 rounded-lg py-2 text-xs font-medium hover:border-gold/50">18:00</button>
+                        <button onclick="selectTime(this)" class="time-slot bg-white/5 border border-white/10 rounded-lg py-2 text-xs font-medium hover:border-gold/50">19:00</button>
+                        <button onclick="selectTime(this)" class="time-slot bg-white/5 border border-white/10 rounded-lg py-2 text-xs font-medium hover:border-gold/50">20:00</button>
+                        <button onclick="selectTime(this)" class="time-slot bg-white/5 border border-white/10 rounded-lg py-2 text-xs font-medium hover:border-gold/50">21:00</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gold uppercase tracking-wider block mb-2">Kişi Sayısı</label>
+                    <div class="flex items-center gap-4">
+                        <button onclick="changePeople(-1)" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gold font-bold">-</button>
+                        <span id="peopleCount" class="text-xl font-bold text-gold">2</span>
+                        <button onclick="changePeople(1)" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gold font-bold">+</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gold uppercase tracking-wider block mb-2">İletişim</label>
+                    <input type="tel" placeholder="Telefon numaranız" class="w-full bg-white/5 border border-gold/20 rounded-xl p-3 text-off-white placeholder-gray-text focus:border-gold/50 outline-none mb-2"/>
+                    <input type="text" placeholder="Ad Soyad" class="w-full bg-white/5 border border-gold/20 rounded-xl p-3 text-off-white placeholder-gray-text focus:border-gold/50 outline-none"/>
+                </div>
+            </div>
+
+            <button onclick="submitReservation()" class="w-full bg-gradient-to-r from-gold to-gold-light text-deep-teal py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">check</span> Rezervasyon Yap
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Gurme venue data
+        const gurmeData = {
+            firstTimers: [
+                {
+                    id: 1,
+                    name: "Kebapçı İskender",
+                    type: "Tarihi Mekan",
+                    rating: 4.9,
+                    image: "https://images.unsplash.com/photo-1561651823-34a0658ebc9d?w=400",
+                    desc: "Efsanevi İskender Lezzeti"
+                },
+                {
+                    id: 2,
+                    name: "Kebapçı İdris",
+                    type: "Özel Deneyim",
+                    rating: 4.9,
+                    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400",
+                    desc: "1937'den Beri Pideli Köfte"
+                },
+                {
+                    id: 3,
+                    name: "Hayat Lokantası",
+                    type: "Gurme Onaylı",
+                    rating: 4.6,
+                    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400",
+                    desc: "1947'den Beri Süt Helvası"
+                },
+                {
+                    id: 4,
+                    name: "Kafkas Pasta",
+                    type: "Tatlı",
+                    rating: 4.7,
+                    image: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=400",
+                    desc: "Meşhur Kestane Şekeri"
+                }
+            ],
+            chefRecommendations: [
+                {
+                    id: 1,
+                    name: "Uludağ Kebapçısı Cemal&Cemil",
+                    chef: "Cemal Usta",
+                    dish: "İskender Kebap",
+                    rating: 4.8,
+                    image: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=400",
+                    desc: "1964'ten beri. İnegöl eti, özel tereyağı. Tereyağı önce pidenin üzerine gezdirilir, sonra döner eklenir.",
+                    tip: "Tavsiye: Öğle saatlerinde gidin, et taze gelir."
+                },
+                {
+                    id: 2,
+                    name: "Kebapçı Hüseyin Usta",
+                    chef: "Hüseyin Usta",
+                    dish: "Pideli Köfte",
+                    rating: 4.7,
+                    image: "https://images.unsplash.com/photo-1561758033-d8f241cb4939?w=400",
+                    desc: "40 yıllık tecrübe. Tuz Pazarı'nda gizli bir hazine. Yoğurt ve tereyağı eşliğinde.",
+                    tip: "Tavsiye: Yanında ayran içmeyi unutmayın."
+                }
+            ],
+            fineDining: [
+                {
+                    id: 1,
+                    name: "Rumeli Kardeşler",
+                    type: "Osmanlı Mutfağı",
+                    rating: 4.5,
+                    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400",
+                    price: "$$$"
+                },
+                {
+                    id: 2,
+                    name: "Abidin Usta",
+                    type: "Fine Dining",
+                    rating: 4.7,
+                    image: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=400",
+                    price: "$$$"
+                },
+                {
+                    id: 3,
+                    name: "Arap Şükrü",
+                    type: "Meyhane",
+                    rating: 4.4,
+                    image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400",
+                    price: "$$$"
+                }
+            ],
+            romantic: [
+                {
+                    id: 1,
+                    name: "Derebahçe",
+                    type: "Doğa İçinde",
+                    rating: 4.6,
+                    image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=400",
+                    location: "Doburca"
+                },
+                {
+                    id: 2,
+                    name: "Kozahan Çay Bahçesi",
+                    type: "Tarihi",
+                    rating: 4.3,
+                    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400",
+                    location: "Nalbantoğlu"
+                },
+                {
+                    id: 3,
+                    name: "Tarihi İnanç Fırını",
+                    type: "Kahvaltı",
+                    rating: 4.6,
+                    image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400",
+                    location: "Muradiye"
+                }
+            ],
+            breakfast: [
+                {
+                    id: 1,
+                    name: "Derebahçe Restaurant",
+                    rating: 4.6,
+                    image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=400",
+                    desc: "Doğa içinde serpme kahvaltı. 240 TL (sınırsız çay dahil).",
+                    tags: ["Doğa", "Serpme", "Rezervasyon"]
+                },
+                {
+                    id: 2,
+                    name: "Tarihi Abdal Simit",
+                    rating: 4.8,
+                    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400",
+                    desc: "Odun ateşinde simit ve tahinli pide. 700 yıllık lezzet.",
+                    tags: ["Tarihi", "Simit", "Kahvaltı"]
+                }
+            ],
+            night: [
+                {
+                    id: 1,
+                    name: "Çorbacı Dayı",
+                    hours: "24 Saat",
+                    image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400",
+                    type: "Çorba"
+                },
+                {
+                    id: 2,
+                    name: "Gece Döneri",
+                    hours: "04:00'e Kadar",
+                    image: "https://images.unsplash.com/photo-1561651823-34a0658ebc9d?w=400",
+                    type: "Döner"
+                },
+                {
+                    id: 3,
+                    name: "Midye Keyfi",
+                    hours: "Sıcak Servis",
+                    image: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=400",
+                    type: "Midye"
+                },
+                {
+                    id: 4,
+                    name: "Hayat Lokantası",
+                    hours: "22:00'e Kadar",
+                    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400",
+                    type: "Esnaf"
+                }
+            ]
+        };
+
+        function init() {
+            renderFirstTimers();
+            renderChefRecommendations();
+            renderFineDining();
+            renderRomantic();
+            renderBreakfast();
+            renderNight();
+        }
+
+        function renderFirstTimers() {
+            const container = document.getElementById('firstTimersContainer');
+            container.innerHTML = gurmeData.firstTimers.map(venue => `
+                <div onclick="openVenueDetail(${venue.id})" class="min-w-[260px] glass-card rounded-xl overflow-hidden border border-white/5 cursor-pointer venue-card">
+                    <div class="h-32 bg-cover bg-center relative" style="background-image: url('${venue.image}')">
+                        <div class="absolute top-2 right-2 rating-badge px-2 py-1 rounded-lg flex items-center gap-1">
+                            <span class="material-symbols-outlined text-gold text-xs fill-1">star</span>
+                            <span class="text-gold font-bold text-xs">${venue.rating}</span>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <span class="text-[10px] font-bold text-gold uppercase tracking-wider">${venue.type}</span>
+                        <h4 class="font-bold text-off-white text-sm mt-0.5">${venue.name}</h4>
+                        <p class="text-xs text-gray-text mt-0.5">${venue.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderChefRecommendations() {
+            const container = document.getElementById('chefContainer');
+            container.innerHTML = gurmeData.chefRecommendations.map(rec => `
+                <div class="chef-recommend rounded-2xl p-4">
+                    <div class="flex gap-3 mb-3">
+                        <div class="w-20 h-20 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('${rec.image}')"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="material-symbols-outlined text-gold text-sm">verified</span>
+                                <span class="text-[10px] text-gold font-bold uppercase">Şef Tavsiyesi</span>
+                            </div>
+                            <h4 class="font-bold text-off-white text-sm">${rec.name}</h4>
+                            <p class="text-xs text-gray-text">${rec.chef} • ${rec.dish}</p>
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="material-symbols-outlined text-gold text-xs fill-1">star</span>
+                                <span class="text-xs font-bold text-gold">${rec.rating}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-text mb-2">${rec.desc}</p>
+                    <div class="bg-gold/10 border border-gold/30 rounded-lg p-2 flex items-start gap-2">
+                        <span class="material-symbols-outlined text-gold text-xs shrink-0 mt-0.5">lightbulb</span>
+                        <span class="text-xs text-gold">${rec.tip}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderFineDining() {
+            const container = document.getElementById('fineDiningContainer');
+            container.innerHTML = gurmeData.fineDining.map(venue => `
+                <div onclick="openVenueDetail(${venue.id})" class="min-w-[200px] glass-card rounded-xl overflow-hidden border border-white/5 cursor-pointer venue-card">
+                    <div class="h-40 bg-cover bg-center relative" style="background-image: url('${venue.image}')">
+                        <div class="absolute inset-0 bg-gradient-to-t from-deep-teal to-transparent"></div>
+                        <div class="absolute bottom-2 left-2 right-2">
+                            <p class="text-[10px] text-gold font-bold uppercase">${venue.type}</p>
+                            <h4 class="font-bold text-off-white text-sm">${venue.name}</h4>
+                            <div class="flex items-center justify-between mt-1">
+                                <div class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-gold text-xs fill-1">star</span>
+                                    <span class="text-xs text-gold font-bold">${venue.rating}</span>
+                                </div>
+                                <span class="text-xs text-gold">${venue.price}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRomantic() {
+            const container = document.getElementById('romanticContainer');
+            container.innerHTML = gurmeData.romantic.map(venue => `
+                <div onclick="openVenueDetail(${venue.id})" class="min-w-[160px] text-center cursor-pointer">
+                    <div class="story-ring w-20 h-20 mx-auto rounded-full p-0.5 mb-2">
+                        <div class="w-full h-full rounded-full bg-cover bg-center border-2 border-deep-teal" style="background-image: url('${venue.image}')"></div>
+                    </div>
+                    <p class="text-[10px] text-gold font-bold uppercase mb-0.5">${venue.type}</p>
+                    <h5 class="text-sm font-bold text-off-white">${venue.name}</h5>
+                    <p class="text-[10px] text-gray-text">${venue.location}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderBreakfast() {
+            const container = document.getElementById('breakfastContainer');
+            container.innerHTML = gurmeData.breakfast.map(venue => `
+                <div onclick="openVenueDetail(${venue.id})" class="glass-card rounded-xl p-3 flex gap-3 cursor-pointer venue-card border border-white/5">
+                    <div class="w-20 h-20 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('${venue.image}')"></div>
+                    <div class="flex flex-col justify-center flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-off-white text-sm">${venue.name}</h4>
+                            <div class="rating-badge px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-gold text-xs fill-1">star</span>
+                                <span class="text-xs font-bold text-gold">${venue.rating}</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-text mt-0.5 line-clamp-2">${venue.desc}</p>
+                        <div class="flex gap-2 mt-2">
+                            ${venue.tags.map(tag => `
+                                <span class="text-[9px] bg-gold/20 text-gold px-2 py-0.5 rounded font-bold uppercase">${tag}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderNight() {
+            const container = document.getElementById('nightContainer');
+            container.innerHTML = gurmeData.night.map(venue => `
+                <div onclick="openVenueDetail(${venue.id})" class="min-w-[120px] text-center cursor-pointer">
+                    <div class="w-16 h-16 mx-auto rounded-full border-2 border-gold/30 p-0.5 mb-2 relative">
+                        <div class="w-full h-full rounded-full bg-cover bg-center" style="background-image: url('${venue.image}')"></div>
+                        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-gold rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-deep-teal text-xs">dark_mode</span>
+                        </div>
+                    </div>
+                    <h5 class="text-xs font-bold text-off-white">${venue.name}</h5>
+                    <p class="text-[10px] text-gold">${venue.hours}</p>
+                    <p class="text-[10px] text-gray-text">${venue.type}</p>
+                </div>
+            `).join('');
+        }
+
+        function setCategory(cat) {
+            document.querySelectorAll('.category-pill').forEach(el => el.classList.remove('active'));
+            document.getElementById(`cat-${cat}`).classList.add('active');
+            
+            // Scroll to relevant section
+            const sectionMap = {
+                'editor': 0,
+                'chef': 2,
+                'top10': 0,
+                'fine': 3,
+                'steak': 2
+            };
+            
+            // Visual feedback only - in real app would filter content
+        }
+
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        function openReservation(venue) {
+            document.getElementById('reservationModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            const venueNames = {
+                'iskender': 'Kebapçı İskender (Mavi Dükkan)',
+                'default': 'Seçilen Mekan'
+            };
+            
+            document.getElementById('resVenueName').textContent = venueNames[venue] || venueNames.default;
+            
+            // Set min date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('resDate').min = today;
+            document.getElementById('resDate').value = today;
+        }
+
+        function closeReservation() {
+            document.getElementById('reservationModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function selectTime(btn) {
+            document.querySelectorAll('.time-slot').forEach(el => {
+                el.classList.remove('bg-gold', 'text-deep-teal', 'border-gold');
+                el.classList.add('bg-white/5', 'border-white/10');
+            });
+            btn.classList.remove('bg-white/5', 'border-white/10');
+            btn.classList.add('bg-gold', 'text-deep-teal', 'border-gold');
+        }
+
+        function changePeople(delta) {
+            const countEl = document.getElementById('peopleCount');
+            let count = parseInt(countEl.textContent) + delta;
+            if (count < 1) count = 1;
+            if (count > 20) count = 20;
+            countEl.textContent = count;
+        }
+
+        function submitReservation() {
+            const date = document.getElementById('resDate').value;
+            const people = document.getElementById('peopleCount').textContent;
+            
+            if (!date) {
+                alert('Lütfen tarih seçin');
+                return;
+            }
+            
+            alert(`Rezervasyon talebiniz alındı! \nTarih: ${date}\nKişi: ${people}\n\nMekan en kısa sürede size dönüş yapacaktır.`);
+            closeReservation();
+        }
+
+        function openVenueDetail(id) {
+            // In real app, would open detail modal or navigate to detail page
+            console.log('Opening venue detail:', id);
+        }
+
+        function showAllFirstTimers() {
+            alert('Tüm "İlk Kez Gelenler" mekanları listesi burada gösterilecek.');
+        }
+
+        function showAllFineDining() {
+            alert('Tüm Fine Dining mekanları listesi burada gösterilecek.');
+        }
+
+        function showAllRomantic() {
+            alert('Tüm romantik mekanlar listesi burada gösterilecek.');
+        }
+
+        function showAllBreakfast() {
+            alert('Tüm kahvaltı mekanları listesi burada gösterilecek.');
+        }
+
+        function showAllNight() {
+            alert('Tüm gece mekanları listesi burada gösterilecek.');
+        }
+
+        function startRoute() {
+            if (confirm('Tarihi Osmangazi Lezzet Rotası başlatılsın mı?\n\n1. Tarihi Abdal Simit Fırını\n2. Kebapçı İdris\n3. Kafkas Pasta\n4. Arap Şükrü\n\nHarita üzerinde yönlendirme açılacak.')) {
+                window.open('https://www.google.com/maps/dir/Tarihi+Abdal+Simit+Fırını,+Osmangazi,+Bursa/Kebapçı+İdris,+Osmangazi,+Bursa/Kafkas+Pasta,+Osmangazi,+Bursa/Arap+Şükrü,+Osmangazi,+Bursa', '_blank');
+            }
+        }
+
+        function toggleNotifications() {
+            alert('Bildirimler: Yeni mekan eklendi, favori mekanınızda indirim var!');
+        }
+
+        // Initialize
+        init();
+    </script>
+
+</body>
+</html>
+

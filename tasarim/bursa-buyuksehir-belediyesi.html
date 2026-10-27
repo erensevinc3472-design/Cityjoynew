@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Bursa Büyükşehir Belediyesi - Mustafa Bozbey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "petrol-dark": "#062F2F",
+                        "teal-deep": "#0A3F3F",
+                        "emerald-dark": "#0E4A4A",
+                        "night-green": "#021F1F",
+                        "gold": "#D4A373",
+                        "bronze": "#C8925A",
+                        "gold-light": "#E6B980",
+                        "off-white": "#F1F1F1",
+                        "gray-light": "#BFC7C7",
+                        "turquoise-gray": "#8FA5A5",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, #062F2F 0%, #0A3F3F 50%, #0E4A4A 100%);
+            min-height: 100dvh;
+        }
+        .glass-card {
+            background: rgba(10, 63, 63, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 163, 115, 0.2);
+        }
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background-color: rgba(6, 47, 47, 0.95);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #E6B980 0%, #D4A373 50%, #C8925A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .service-card:hover {
+            border-color: rgba(212, 163, 115, 0.4);
+            transform: translateY(-2px);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+    <header class="pt-12 px-6 pb-4">
+        <div class="flex items-center gap-4 mb-6">
+            <a href="belediye-hizmetleri.html" class="w-10 h-10 flex items-center justify-center rounded-full glass-card">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div>
+                <h1 class="text-lg font-bold gold-gradient-text">Büyükşehir Belediyesi</h1>
+                <p class="text-xs text-turquoise-gray">Başkan: Mustafa Bozbey</p>
+            </div>
+        </div>
+        
+        <!-- Başkan Profili -->
+        <div class="glass-card rounded-3xl p-6 mb-6">
+            <div class="flex items-center gap-4">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-gold/30 to-bronze/20 flex items-center justify-center border-2 border-gold/50">
+                    <span class="material-symbols-outlined text-gold text-4xl">person</span>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">Mustafa Bozbey</h2>
+                    <p class="text-sm text-gold">Bursa Büyükşehir Belediye Başkanı</p>
+                    <p class="text-xs text-turquoise-gray mt-1">2024 - Devam Ediyor</p>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <a href="tel:02241531111" class="flex-1 bg-gold/20 border border-gold/30 rounded-xl py-2 flex items-center justify-center gap-2 text-sm">
+                    <span class="material-symbols-outlined text-gold text-sm">phone</span>
+                    Ara
+                </a>
+                <a href="https://www.bursa.bel.tr" target="_blank" class="flex-1 bg-gold/20 border border-gold/30 rounded-xl py-2 flex items-center justify-center gap-2 text-sm">
+                    <span class="material-symbols-outlined text-gold text-sm">language</span>
+                    Web
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="px-6 space-y-6">
+        <!-- Hizmetler Grid -->
+        <div>
+            <h3 class="text-xs font-bold tracking-[0.3em] text-turquoise-gray uppercase mb-4">HİZMETLER</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="buyuksehir-ulasim.html" class="service-card glass-card rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">directions_bus</span>
+                    <h4 class="font-medium text-sm">Ulaşım</h4>
+                    <p class="text-xs text-gray-light mt-1">Burulaş, otobüs, metro</p>
+                </a>
+                <a href="buyuksehir-su.html" class="service-card glass-card rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">water_drop</span>
+                    <h4 class="font-medium text-sm">Su & Kanalizasyon</h4>
+                    <p class="text-xs text-gray-light mt-1">BUSKİ, fatura, arıza</p>
+                </a>
+                <a href="buyuksehir-cevre.html" class="service-card glass-card rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">forest</span>
+                    <h4 class="font-medium text-sm">Çevre</h4>
+                    <p class="text-xs text-gray-light mt-1">Atık, yeşil alan</p>
+                </a>
+                <a href="buyuksehir-itfaiye.html" class="service-card glass-card rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">fire_truck</span>
+                    <h4 class="font-medium text-sm">İtfaiye</h4>
+                    <p class="text-xs text-gray-light mt-1">Acil, yangın</p>
+                </a>
+                <a href="buyuksehir-afet.html" class="service-card glass-card rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">warning</span>
+                    <h4 class="font-medium text-sm">Afet Koordinasyon</h4>
+                    <p class="text-xs text-gray-light mt-1">Acil durum, yardım</p>
+                </a>
+                <a href="buyuksehir-kultur.html" class="service-card glass-card rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">theater_comedy</span>
+                    <h4 class="font-medium text-sm">Kültür & Sanat</h4>
+                    <p class="text-xs text-gray-light mt-1">Etkinlik, müze</p>
+                </a>
+                <a href="buyuksehir-turizm.html" class="service-card glass-card rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">tour</span>
+                    <h4 class="font-medium text-sm">Turizm</h4>
+                    <p class="text-xs text-gray-light mt-1">Rehber, bilgi</p>
+                </a>
+                <a href="buyuksehir-altyapi.html" class="service-card glass-card rounded-2xl p-4 transition-all">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">construction</span>
+                    <h4 class="font-medium text-sm">Altyapı</h4>
+                    <p class="text-xs text-gray-light mt-1">Yol, köprü</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Hızlı İşlemler -->
+        <div>
+            <h3 class="text-xs font-bold tracking-[0.3em] text-turquoise-gray uppercase mb-4">HIZLI İŞLEMLER</h3>
+            <div class="space-y-3">
+                <a href="buyuksehir-burulas.html" class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-gold">directions_transit</span>
+                        <span>Burulaş Kart İşlemleri</span>
+                    </div>
+                    <span class="material-symbols-outlined text-gold/50">arrow_forward</span>
+                </a>
+                <a href="buyuksehir-biski.html" class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-gold">water</span>
+                        <span>BUSKİ Fatura Ödeme</span>
+                    </div>
+                    <span class="material-symbols-outlined text-gold/50">arrow_forward</span>
+                </a>
+                <a href="buyuksehir-sikayet.html" class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-gold">report_problem</span>
+                        <span>Şikayet Bildir</span>
+                    </div>
+                    <span class="material-symbols-outlined text-gold/50">arrow_forward</span>
+                </a>
+                <a href="buyuksehir-talep.html" class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-gold">lightbulb</span>
+                        <span>Talep Oluştur</span>
+                    </div>
+                    <span class="material-symbols-outlined text-gold/50">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Acil Numaralar -->
+        <div class="glass-card rounded-2xl p-5 border border-red-500/30">
+            <h3 class="text-sm font-bold text-red-400 mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">emergency</span>
+                Acil Durum Numaraları
+            </h3>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="tel:153" class="bg-red-500/20 border border-red-500/30 rounded-xl p-3 text-center">
+                    <p class="text-xs text-red-300">Büyükşehir</p>
+                    <p class="text-lg font-bold text-red-400">153</p>
+                </a>
+                <a href="tel:110" class="bg-red-500/20 border border-red-500/30 rounded-xl p-3 text-center">
+                    <p class="text-xs text-red-300">İtfaiye</p>
+                    <p class="text-lg font-bold text-red-400">110</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- İletişim -->
+        <div class="glass-card rounded-2xl p-5">
+            <h3 class="text-sm font-bold text-gold mb-4">İletişim</h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-gold">location_on</span>
+                    <span class="text-gray-light">Zafer Mah. Ankara Yolu Caddesi No:1 Osmangazi/BURSA</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-gold">phone</span>
+                    <span class="text-gray-light">0224 153 11 11</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-gold">email</span>
+                    <span class="text-gray-light">info@bursa.bel.tr</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur border-t border-gold/10 pt-3 pb-8 px-4">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="benim-sehrim.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+</body>
+</html>
+

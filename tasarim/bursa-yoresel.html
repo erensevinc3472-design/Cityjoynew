@@ -1,0 +1,732 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Yöresel Bursa - Kültür & Miras</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.7s ease-out',
+                        'slide-right': 'slideRight 0.5s ease-out',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'shimmer': 'shimmer 2.5s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideRight: {
+                            '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.4)' },
+                            '50%': { boxShadow: '0 0 35px rgba(224, 176, 122, 0.7)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .sidebar-scroll::-webkit-scrollbar {
+                width: 2px;
+            }
+            .sidebar-scroll::-webkit-scrollbar-track {
+                background: rgba(63, 110, 112, 0.2);
+            }
+            .sidebar-scroll::-webkit-scrollbar-thumb {
+                background: rgba(224, 176, 122, 0.5);
+                border-radius: 4px;
+            }
+            .glow-gold-active {
+                box-shadow: 0 0 15px rgba(224, 176, 122, 0.5);
+            }
+            .card-inner-glow {
+                box-shadow: inset 0 0 20px rgba(31, 80, 85, 0.6);
+            }
+            .nav-glow-gold {
+                filter: drop-shadow(0 0 8px rgba(240, 179, 111, 0.7));
+            }
+            .glass-panel {
+                background: rgba(13, 50, 56, 0.85);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+            }
+            .text-glow {
+                text-shadow: 0 0 20px rgba(224, 176, 122, 0.5);
+            }
+            .shimmer-bg {
+                background: linear-gradient(90deg, transparent, rgba(224, 176, 122, 0.1), transparent);
+                background-size: 200% 100%;
+                animation: shimmer 3s infinite;
+            }
+            .hero-gradient {
+                background: linear-gradient(to bottom, transparent 0%, rgba(8, 31, 36, 0.8) 60%, rgba(8, 31, 36, 1) 100%);
+            }
+            .culture-card {
+                background: rgba(23, 70, 75, 0.4);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+                transition: all 0.3s ease;
+            }
+            .culture-card:hover {
+                background: rgba(23, 70, 75, 0.6);
+                border-color: rgba(224, 176, 122, 0.4);
+                transform: translateY(-5px);
+            }
+            .product-card {
+                background: linear-gradient(135deg, rgba(23, 70, 75, 0.6) 0%, rgba(8, 31, 36, 0.8) 100%);
+                border: 1px solid rgba(224, 176, 122, 0.3);
+                transition: all 0.4s ease;
+            }
+            .product-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(224, 176, 122, 0.15);
+                border-color: rgba(224, 176, 122, 0.5);
+            }
+            .unesco-badge {
+                background: linear-gradient(135deg, #E0B07A 0%, #F0B36F 100%);
+                color: #081F24;
+                font-size: 9px;
+                font-weight: bold;
+                padding: 2px 8px;
+                border-radius: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+            .coğrafi-badge {
+                background: rgba(224, 176, 122, 0.15);
+                border: 1px solid rgba(224, 176, 122, 0.4);
+                color: #E0B07A;
+                font-size: 9px;
+                font-weight: bold;
+                padding: 2px 8px;
+                border-radius: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden">
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-darkest/90 backdrop-blur-md border-b border-border-subtle/30">
+    <div class="flex items-center gap-3">
+        <a class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group" href="bursa.html">
+            <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+        </a>
+        <div class="flex flex-col">
+            <span class="text-[10px] text-gold-primary tracking-wider uppercase">Bursa</span>
+            <h1 class="text-lg font-bold tracking-tight text-white leading-none">Yöresel Miras</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-3">
+        <button class="flex items-center gap-1.5 px-3 py-1.5 bg-card-bg/50 rounded-full border border-border-subtle/30 hover:border-gold-primary/50 transition-colors">
+            <span class="material-symbols-outlined text-gold-primary text-sm">share</span>
+        </button>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<section class="relative h-[50vh] min-h-[400px] w-full overflow-hidden mt-[60px]">
+    <div class="absolute inset-0">
+        <img alt="Bursa Kültür" class="w-full h-full object-cover" src="cityjoy-assets/bursa1.jpg"/>1920&q=80"/>
+        <div class="absolute inset-0 bg-darkest/50"></div>
+        <div class="absolute inset-0 hero-gradient"></div>
+    </div>
+    
+    <div class="absolute inset-0 flex flex-col justify-end pb-8 px-6">
+        <div class="max-w-4xl animate-slide-up">
+            <div class="flex gap-2 mb-3">
+                <span class="px-2 py-1 bg-gold-primary/20 border border-gold-primary/40 rounded text-gold-primary text-[9px] font-bold uppercase">UNESCO Mirası</span>
+                <span class="px-2 py-1 bg-card-bg/50 border border-border-subtle/40 rounded text-text-secondary text-[9px] font-bold uppercase">29 Coğrafi İşaret</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 text-glow tracking-tight">
+                Yöresel Bursa
+            </h1>
+            <p class="text-base text-text-secondary max-w-2xl leading-relaxed">
+                2400 yıllık Kılıç Kalkan'dan UNESCO korumasındaki Karagöz'e, ipek dokumacılığından 29 coğrafi işaretli lezzete kadar Bursa'nın eşsiz kültürel mirası.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Category Navigation -->
+<section class="sticky top-[60px] z-40 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 py-3">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide" id="category-tabs">
+            <a href="#kilic-kalkan" class="tab-btn tab-active px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap">Kılıç Kalkan</a>
+            <a href="#karagoz" class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap">Karagöz</a>
+            <a href="#el-sanatlari" class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap">El Sanatları</a>
+            <a href="#lezzetler" class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap">Lezzetler</a>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24 pt-6">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <!-- Kılıç Kalkan Section -->
+        <section id="kilic-kalkan" class="mb-12 scroll-mt-24">
+            <div class="flex items-end justify-between mb-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="unesco-badge">UNESCO</span>
+                        <span class="text-[10px] text-text-desc uppercase tracking-wider">Somut Olmayan Kültürel Miras</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white">Kılıç Kalkan Oyunu</h2>
+                    <p class="text-text-desc text-sm mt-1">Dünyanın tek müziksiz halk oyunu</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=800&q=80" alt="Kılıç Kalkan" class="w-full h-64 object-cover rounded-xl mb-4"/>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 bg-gold-primary/10 text-gold-primary text-[10px] rounded-full">2400 Yıllık</span>
+                            <span class="px-2 py-1 bg-gold-primary/10 text-gold-primary text-[10px] rounded-full">Müziksiz</span>
+                            <span class="px-2 py-1 bg-gold-primary/10 text-gold-primary text-[10px] rounded-full">Savaş Oyunu</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <p class="text-sm text-text-secondary leading-relaxed">
+                            Bursa Kılıç Kalkan Oyunu, M.Ö. 400 yıllarına dayanan tarihiyle dünyanın en eski halk oyunlarından biridir. 
+                            Xenophon'un "Onbinlerin Dönüşü" eserinde Bithinialıların kılıç ve kalkanla oynadığı oyunlardan bahsedilir.
+                        </p>
+                        <p class="text-sm text-text-secondary leading-relaxed">
+                            Osman Gazi ve Orhan Gazi'nin Bursa'yı kuşattıkları dönemde, askerlerin kılıç kalkan gösterileriyle 
+                            kutlamalar yapmasıyla bugünkü şeklini almıştır. 1973'te kurulan dernek sayesinde uluslararası 
+                            alanda tanınmış ve dünya şampiyonlukları kazanılmıştır.
+                        </p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                                <p class="text-[10px] text-text-desc uppercase">Kostüm</p>
+                                <p class="text-xs text-white font-bold">Keçe külah, keyfiye, cepken</p>
+                            </div>
+                            <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                                <p class="text-[10px] text-text-desc uppercase">Figürler</p>
+                                <p class="text-xs text-white font-bold">Selam, kılıç bileme, çarpışma</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="culture-card rounded-xl p-4">
+                    <div class="w-12 h-12 rounded-full bg-gold-primary/10 flex items-center justify-center mb-3">
+                        <span class="material-symbols-outlined text-gold-primary text-xl">sports_martial_arts</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mb-2">Oyunun Yapısı</h3>
+                    <p class="text-xs text-text-desc">Sekiz ana oyun ve ara bağlantılardan oluşur. Saygı, selamlama, kılıç bileme, değiştirme, çarpışma ve barış figürleri temsil edilir.</p>
+                </div>
+                <div class="culture-card rounded-xl p-4">
+                    <div class="w-12 h-12 rounded-full bg-gold-primary/10 flex items-center justify-center mb-3">
+                        <span class="material-symbols-outlined text-gold-primary text-xl">history</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mb-2">Tarihçe</h3>
+                    <p class="text-xs text-text-desc">M.Ö. 400'den günümüze ulaşan oyun, Cumhuriyet döneminde Halk Evleri tarafından canlandırılmış ve uluslararası formata kavuşturulmuştur.</p>
+                </div>
+                <div class="culture-card rounded-xl p-4">
+                    <div class="w-12 h-12 rounded-full bg-gold-primary/10 flex items-center justify-center mb-3">
+                        <span class="material-symbols-outlined text-gold-primary text-xl">public</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mb-2">Uluslararası</h3>
+                    <p class="text-xs text-text-desc">120'den fazla ülkede gösteri yapılmış, hemen katıldığı tüm yarışmalarda şampiyonluklar kazanılmıştır.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Karagöz Section -->
+        <section id="karagoz" class="mb-12 scroll-mt-24">
+            <div class="flex items-end justify-between mb-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="unesco-badge">UNESCO</span>
+                        <span class="text-[10px] text-text-desc uppercase tracking-wider">Somut Olmayan Kültürel Miras</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white">Karagöz ve Hacivat</h2>
+                    <p class="text-text-desc text-sm mt-1">Gölge oyununun başkenti Bursa</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <p class="text-sm text-text-secondary leading-relaxed">
+                            Karagöz ve Hacivat geleneği, 2009 yılında UNESCO İnsanlığın Somut Olmayan Kültürel Mirasının 
+                            Temsili Listesi'ne kaydedilmiştir. Bursa, bu geleneğin doğduğu ve yaşatıldığı şehirdir.
+                        </p>
+                        <p class="text-sm text-text-secondary leading-relaxed">
+                            Rivayete göre Karagöz ve Hacivat, Orhan Gazi döneminde Orhan Camii inşaatında çalışan 
+                            demirci ve duvarcı ustalarıdır. İşleri aksattıkları gerekçesiyle idam edilirler. 
+                            Şeyh Küşteri, halkın üzüntüsünü gidermek için bu karakterleri perde arkasından oynatmaya başlar.
+                        </p>
+                        <div class="p-4 bg-gold-primary/5 border border-gold-primary/20 rounded-xl">
+                            <p class="text-xs text-gold-primary font-bold mb-1">Karagöz Müzesi</p>
+                            <p class="text-[11px] text-text-secondary">2007'de açılan müze, Türkiye'nin ilk ve tek Karagöz Müzesi'dir. 69 kişilik gösteri salonu ve tasvir yapım atölyesi bulunur.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1544212414-6f9c5b58f5c5?w=800&q=80" alt="Karagöz" class="w-full h-64 object-cover rounded-xl mb-4"/>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="p-2 bg-card-bg/30 rounded-lg text-center">
+                                <p class="text-lg font-bold text-gold-primary">35cm</p>
+                                <p class="text-[9px] text-text-desc uppercase">Tasvir Boyu</p>
+                            </div>
+                            <div class="p-2 bg-card-bg/30 rounded-lg text-center">
+                                <p class="text-lg font-bold text-gold-primary">Deve Derisi</p>
+                                <p class="text-[9px] text-text-desc uppercase">Malzeme</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Karagöz Characters -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="culture-card rounded-xl p-4 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gold-primary/10 flex items-center justify-center mx-auto mb-3">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">person</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mb-1">Karagöz</h3>
+                    <p class="text-[10px] text-text-desc">Cesur, mert, eğitimsiz halk adamı</p>
+                </div>
+                <div class="culture-card rounded-xl p-4 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gold-primary/10 flex items-center justify-center mx-auto mb-3">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">person_outline</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mb-1">Hacivat</h3>
+                    <p class="text-[10px] text-text-desc">Eğitimli, kurnaz, pazarlıklı</p>
+                </div>
+                <div class="culture-card rounded-xl p-4 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gold-primary/10 flex items-center justify-center mx-auto mb-3">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">face_4</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mb-1">Zenne</h3>
+                    <p class="text-[10px] text-text-desc">Kadın karakterler</p>
+                </div>
+                <div class="culture-card rounded-xl p-4 text-center">
+                    <div class="w-16 h-16 rounded-full bg-gold-primary/10 flex items-center justify-center mx-auto mb-3">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">group</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mb-1">Diğer Tipler</h3>
+                    <p class="text-[10px] text-text-desc">Çelebi, Tiryaki, Laz, Kürt...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- El Sanatları Section -->
+        <section id="el-sanatlari" class="mb-12 scroll-mt-24">
+            <div class="flex items-end justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white">Geleneksel El Sanatları</h2>
+                    <p class="text-text-desc text-sm mt-1">Bursa'nın 700 yıllık sanat mirası</p>
+                </div>
+            </div>
+
+            <!-- İpekçilik -->
+            <div class="glass-panel rounded-2xl p-6 mb-6">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-14 h-14 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">texture</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-bold text-white">İpekçilik</h3>
+                            <span class="coğrafi-badge">Coğrafi İşaret</span>
+                        </div>
+                        <p class="text-sm text-text-secondary">Bursa İpeği - 15. yüzyıldan beri Avrupa saraylarına ihracat</p>
+                    </div>
+                </div>
+                <p class="text-sm text-text-secondary leading-relaxed mb-4">
+                    15-17. yüzyıllarda Bursa, ipekli dokumacılığın merkezi haline gelmiştir. Bursa atlasları, 
+                    kadifeleri ve ipeklileri Avrupalı aristokrat aileler ve saraylarında kullanılmıştır. 
+                    Kozahan ve İpekhan günümüzde bu kültürü yaşatmaktadır.
+                </p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Atlas</p>
+                        <p class="text-[10px] text-text-desc">Parlak ipek kumaş</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Kadife</p>
+                        <p class="text-[10px] text-text-desc">Havlı ipek dokuma</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Çatma</p>
+                        <p class="text-[10px] text-text-desc">Desenli kadife</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Kemha</p>
+                        <p class="text-[10px] text-text-desc">Altın-gümüş işlemeli</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Arts Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="culture-card rounded-xl p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-gold-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-gold-primary">content_cut</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Bıçakçılık</h3>
+                            <span class="coğrafi-badge">Coğrafi İşaret</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-desc leading-relaxed">
+                        Bursa Bıçağı, şehrin en önemli el sanatlarından biridir. Kılıç Kalkan oyunuyla 
+                        bağlantılı olarak gelişmiş, günümüzde hala aktif üretim yapılmaktadır.
+                    </p>
+                </div>
+
+                <div class="culture-card rounded-xl p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-gold-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-gold-primary">dry_cleaning</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Havluculuk</h3>
+                            <span class="coğrafi-badge">Coğrafi İşaret</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-desc leading-relaxed">
+                        18. yüzyıldan beri el tezgahlarında dokunan Bursa havluları, jakarlı ve işlemeli 
+                        ürünleriyle dünya çapında tanınır. Havlucular Çarşısı bu geleneği yaşatır.
+                    </p>
+                </div>
+
+                <div class="culture-card rounded-xl p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-gold-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-gold-primary">palette</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">İznik Çinisi</h3>
+                            <span class="coğrafi-badge">Coğrafi İşaret</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-desc leading-relaxed">
+                        15. yüzyılda başlayan İznik çini sanatı, Osmanlı mimarisinin vazgeçilmezidir. 
+                        Kubbe, duvar ve süsleme panoları dünya çapında değerlidir.
+                    </p>
+                </div>
+
+                <div class="culture-card rounded-xl p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-gold-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-gold-primary">hiking</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Saraçlık & Semercilik</h3>
+                        </div>
+                    </div>
+                    <p class="text-xs text-text-desc leading-relaxed">
+                        At koşum takımları ve semer yapımı geleneksel sanatlardır. Gürgen ağacı, 
+                        keçi derisi ve saz kullanılarak üretilir.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lezzetler Section -->
+        <section id="lezzetler" class="mb-12 scroll-mt-24">
+            <div class="flex items-end justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white">Coğrafi İşaretli Lezzetler</h2>
+                    <p class="text-text-desc text-sm mt-1">Bursa'nın 29 tescilli ürünü - Marmara Bölgesi'nde ilk sıra</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-2xl font-bold text-gold-primary">29</p>
+                    <p class="text-[10px] text-text-desc uppercase">Coğrafi İşaret</p>
+                </div>
+            </div>
+
+            <!-- Featured Products -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <!-- İskender -->
+                <div class="product-card rounded-xl overflow-hidden group">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="İskender"/>
+                        <div class="absolute top-2 left-2">
+                            <span class="unesco-badge">AB Başvurusu</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-base font-bold text-white mb-1">Bursa Döner Kebabı</h3>
+                        <p class="text-[10px] text-gold-primary mb-2">1867'den beri • Mavi Dükkan</p>
+                        <p class="text-xs text-text-desc line-clamp-2">Dönerin mucidi 1867'den beri hizmet veren meşhur lezzet. İskender kebap olarak dünya çapında tanınır.</p>
+                    </div>
+                </div>
+
+                <!-- Gemlik Zeytini -->
+                <div class="product-card rounded-xl overflow-hidden group">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Gemlik Zeytini"/>
+                        <div class="absolute top-2 left-2">
+                            <span class="unesco-badge">AB Tescilli</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-base font-bold text-white mb-1">Gemlik Zeytini</h3>
+                        <p class="text-[10px] text-gold-primary mb-2">Türkiye'nin 12. AB Tescili</p>
+                        <p class="text-xs text-text-desc line-clamp-2">Bursa'nın ve Türkiye'nin AB coğrafi işaret tescilli ilk ürünü. 2005'te tescil edilmiştir.</p>
+                    </div>
+                </div>
+
+                <!-- İnegöl Köfte -->
+                <div class="product-card rounded-xl overflow-hidden group">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="İnegöl Köfte"/>
+                        <div class="absolute top-2 left-2">
+                            <span class="coğrafi-badge">Mahreç</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-base font-bold text-white mb-1">İnegöl Köfte</h3>
+                        <p class="text-[10px] text-gold-primary mb-2">2006'dan beri tescilli</p>
+                        <p class="text-xs text-text-desc line-clamp-2">Kıyma, soğan ve baharat karışımıyla hazırlanan, ızgarada pişirilen meşhur köfte.</p>
+                    </div>
+                </div>
+
+                <!-- Kestane Şekeri -->
+                <div class="product-card rounded-xl overflow-hidden group">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Kestane Şekeri"/>
+                        <div class="absolute top-2 left-2">
+                            <span class="coğrafi-badge">AB Başvurusu</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-base font-bold text-white mb-1">Bursa Kestane Şekeri</h3>
+                        <p class="text-[10px] text-gold-primary mb-2">2021'de tescil</p>
+                        <p class="text-xs text-text-desc line-clamp-2">Uludağ eteklerinde yetişen kestanelerden yapılan gelenekli şekerleme. 600 yıllık tarih.</p>
+                    </div>
+                </div>
+
+                <!-- Bursa Şeftalisi -->
+                <div class="product-card rounded-xl overflow-hidden group">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1595123550441-d377e017de6a?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Bursa Şeftalisi"/>
+                        <div class="absolute top-2 left-2">
+                            <span class="coğrafi-badge">Menşe</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-base font-bold text-white mb-1">Bursa Şeftalisi</h3>
+                        <p class="text-[10px] text-gold-primary mb-2">2019'dan beri tescilli</p>
+                        <p class="text-xs text-text-desc line-clamp-2">Bursa ovasında yetişen, dünya çapında tanınan şeftali çeşidi. Aroma ve tat bakımından eşsiz.</p>
+                    </div>
+                </div>
+
+                <!-- Siyah İncir -->
+                <div class="product-card rounded-xl overflow-hidden group">
+                    <div class="relative h-40 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1603569283847-aa295f0d016a?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Siyah İncir"/>
+                        <div class="absolute top-2 left-2">
+                            <span class="coğrafi-badge">AB Başvurusu</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-base font-bold text-white mb-1">Bursa Siyah İnciri</h3>
+                        <p class="text-[10px] text-gold-primary mb-2">2018'den beri tescilli</p>
+                        <p class="text-xs text-text-desc line-clamp-2">Bursa'nın dağ eteklerinde yetişen, kuru incir olarak dünya çapında talep gören eşsiz lezzet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Products List -->
+            <div class="glass-panel rounded-2xl p-6">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">list</span>
+                    Tüm Coğrafi İşaretli Ürünler
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Bursa Cantık</p>
+                        <p class="text-[9px] text-text-desc">2021</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Bursa Cevizli Lokum</p>
+                        <p class="text-[9px] text-text-desc">2021</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Bursa Tahinli Pide</p>
+                        <p class="text-[9px] text-text-desc">2021</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Bursa Pideli Köfte</p>
+                        <p class="text-[9px] text-text-desc">2021</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Bursa Süt Helvası</p>
+                        <p class="text-[9px] text-text-desc">2021</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Kemalpaşa Tatlısı</p>
+                        <p class="text-[9px] text-text-desc">2021</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Bursa Üzüm Şırası</p>
+                        <p class="text-[9px] text-text-desc">2021</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Gedelek Turşusu</p>
+                        <p class="text-[9px] text-text-desc">2017</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Karacabey Soğanı</p>
+                        <p class="text-[9px] text-text-desc">2017</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Hasanağa Enginarı</p>
+                        <p class="text-[9px] text-text-desc">2020</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">Gürsu Deveci Armudu</p>
+                        <p class="text-[9px] text-text-desc">2019</p>
+                    </div>
+                    <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                        <p class="text-xs font-bold text-white">İznik Müşküle Üzümü</p>
+                        <p class="text-[9px] text-text-desc">2021</p>
+                    </div>
+                </div>
+                <p class="text-[10px] text-text-desc mt-4 text-center">ve 17 ürün daha...</p>
+            </div>
+        </section>
+
+        <!-- Info Section -->
+        <section class="glass-panel rounded-2xl p-6">
+            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-gold-primary">info</span>
+                Coğrafi İşaret Nedir?
+            </h3>
+            <p class="text-sm text-text-secondary leading-relaxed mb-4">
+                Coğrafi işaret, belirgin bir niteliği, ünü veya diğer özellikleri bakımından kökenin bulunduğu 
+                yöre, alan, bölge veya ülke ile özdeşleşmiş ürünü gösteren işarettir. Tüketiciler için ürünün 
+                kaynağını, karakteristik özelliklerini ve ürünün söz konusu karakteristik özellikleri ile coğrafi 
+                alan arasındaki bağlantıyı gösteren kalite işaretidir.
+            </p>
+            <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1 bg-gold-primary/10 text-gold-primary text-xs rounded-full">Menşe Adı</span>
+                <span class="px-3 py-1 bg-gold-primary/10 text-gold-primary text-xs rounded-full">Mahreç İşareti</span>
+                <span class="px-3 py-1 bg-gold-primary/10 text-gold-primary text-xs rounded-full">AB Tescili</span>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 flex items-center justify-around px-6 py-3 bg-nav-bg border-t border-border-subtle/50 pb-6 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="anasayfa.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">home</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ana Sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-nav nav-glow-gold" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-lg fill-1">explore</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="konaklama-genel.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">hotel</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Konaklama</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="ara.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">search</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="profil.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">person</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Profil</span>
+    </a>
+</nav>
+
+<script>
+// Tab functionality
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = btn.getAttribute('href');
+        if (target) {
+            document.querySelector(target).scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+// Update active tab on scroll
+window.addEventListener('scroll', () => {
+    const sections = ['kilic-kalkan', 'karagoz', 'el-sanatlari', 'lezzetler'];
+    const scrollPosition = window.scrollY + 200;
+    
+    sections.forEach(section => {
+        const element = document.getElementById(section);
+        if (element) {
+            const offsetTop = element.offsetTop;
+            const offsetHeight = element.offsetHeight;
+            
+            if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('tab-passive');
+                });
+                
+                const activeBtn = document.querySelector(`a[href="#${section}"]`);
+                if (activeBtn) {
+                    activeBtn.classList.remove('tab-passive');
+                    activeBtn.classList.add('tab-active');
+                }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>

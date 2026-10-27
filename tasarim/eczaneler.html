@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Eczaneler - Nöbetçi eczaneler, tüm ilçelerdeki eczane adres, telefon, çalışma saatleri ve konum bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Eczaneler</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "pharmacy-green": "#10B981",
+                        "pharmacy-blue": "#3B82F6",
+                        "night-purple": "#8B5CF6",
+                        "duty-orange": "#F97316"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-duty {
+            animation: pulseDuty 2s infinite;
+        }
+        @keyframes pulseDuty {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(249, 115, 22, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .pharmacy-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .pharmacy-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .pharmacy-card.duty {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .service-tag {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .duty-tag {
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+        .modal-pharmacy {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .status-open {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .status-duty {
+            background: rgba(249, 115, 22, 0.2);
+            color: #F97316;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+        .status-closed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">ECZANELER</h1>
+                <p class="text-xs text-gray-text truncate">Bursa İli Eczane Rehberi</p>
+            </div>
+            <button onclick="openDutyModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-duty-orange/20 hover:bg-duty-orange/30 transition-colors shrink-0 pulse-duty">
+                <span class="material-symbols-outlined text-duty-orange">medical_services</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Nöbetçi Eczane Bilgisi -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pharmacy-green/30 to-pharmacy-green/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-pharmacy-green text-xl">local_pharmacy</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Eczaneler</h2>
+                            <p class="text-xs text-gray-text">Reçete ve Sağlık Ürünleri</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-duty-orange/10 border border-duty-orange/30">
+                        <div class="w-2 h-2 rounded-full bg-duty-orange animate-pulse"></div>
+                        <span class="text-xs text-duty-orange font-medium">Nöbetçi Var</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-pharmacy-green">09:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Açılış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-pharmacy-blue">19:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Kapanış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">184</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Alo Sağlık</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-night-purple">08:30</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Nöbet Bitiş</p>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-duty-orange/10 border border-duty-orange/30 rounded-xl flex items-center gap-3">
+                    <span class="material-symbols-outlined text-duty-orange">schedule</span>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs text-gray-text">Nöbetçi Eczane Saatleri</p>
+                        <p class="text-sm font-bold text-white">19:00 - 08:30 (Ertesi Gün)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Eczane Bul</h3>
+                        <p class="text-xs text-gray-text truncate">İlçe veya eczane adı ara</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="pharmacySearch" placeholder="Örn: Nilüfer, Osmangazi, Çekirge..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchPharmacy()"/>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">İlçe Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterDistrict('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterDistrict('osmangazi')" id="btn-osmangazi" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Osmangazi</span>
+                    </button>
+                    <button onclick="filterDistrict('nilufer')" id="btn-nilufer" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Nilüfer</span>
+                    </button>
+                    <button onclick="filterDistrict('yildirim')" id="btn-yildirim" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Yıldırım</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Sıkça Sorulan Sorular</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Çalışma Saatleri -->
+                <div class="pharmacy-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-pharmacy-green/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-pharmacy-green text-sm">schedule</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Eczane Çalışma Saatleri Nedir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Bursa'da eczaneler hafta içi 09:00 - 19:00 saatleri arasında hizmet verir. 
+                                Cumartesi günleri 09:00 - 19:00 arası açıktır. Pazar günleri kapalıdır.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-pharmacy-green">Pzt-Cmt: 09:00-19:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-live-red">Pazar: Kapalı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nöbetçi Eczane -->
+                <div class="pharmacy-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-duty-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-duty-orange text-sm">medical_services</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Nöbetçi Eczane Nasıl Bulunur?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                19:00'dan ertesi gün 08:30'a kadar nöbetçi eczaneler hizmet verir. 
+                                3 farklı yöntemle bulabilirsiniz:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text mb-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>184</strong> Alo Sağlık hattını arayarak</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>e-Nabız</strong> uygulamasından</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Eczacı Odası websitesinden</span>
+                                </li>
+                            </ul>
+                            <div class="bg-white/5 rounded-lg p-2 text-[10px] text-gray-text">
+                                <strong class="text-gold">Not:</strong> Nöbetçi eczaneler ek ücret talep edemez.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reçete -->
+                <div class="pharmacy-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-pharmacy-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-pharmacy-blue text-sm">description</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Reçetesiz İlaç Alabilir miyim?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Bazı ilaçlar reçetesiz satılabilir (vitamin, mineral, ağrı kesici vb.). 
+                                Ancak antibiyotik ve kontrollü ilaçlar için mutlaka doktor reçetesi gerekir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-pharmacy-blue">Reçetesiz: Vitamin, Aspirin</span>
+                                <span class="duty-tag px-2 py-1 rounded text-[10px] text-duty-orange">Reçeteli: Antibiyotik</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SGK Anlaşması -->
+                <div class="pharmacy-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-gold text-sm">health_and_safety</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">SGK Anlaşmalı Eczaneler</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Bursa'daki tüm eczaneler SGK anlaşmalıdır. Reçeteli ilaçlarda 
+                                katılım payı ödersiniz (genellikle %20). Emekliler ve 
+                                engelliler için farklı ödeme koşulları uygulanır.
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text">
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Medula sistemi üzerinden anlık doğrulama</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>e-Reçete ile kolay provizyon</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Osmangazi Eczane Listesi -->
+        <section class="animate-slide-up district-section" data-district="osmangazi" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('osmangaziSection', 'osmangaziIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pharmacy-blue/30 to-pharmacy-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-pharmacy-blue">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Osmangazi İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Merkez Bölge Eczaneleri</span>
+                    </div>
+                </div>
+                <span id="osmangaziIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="osmangaziSection" class="expandable-section mt-3 space-y-3">
+                <!-- Merkez Bursa Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('merkezbursa')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Merkez Bursa Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi Merkez</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 253 13 19</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">schedule</span>
+                        <span>09:30 - 17:30</span>
+                    </div>
+                </div>
+
+                <!-- Torunlar Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('torunlar')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Torunlar Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Hüdavendigar Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 239 30 00</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Bent Cad. No:3 (Mihraplı Cami Karşısı)</span>
+                    </div>
+                </div>
+
+                <!-- Beyaz Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('beyaz')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Beyaz Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Zafer Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 504 39 60</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Namık Kemal Cad. No:58/B</span>
+                    </div>
+                </div>
+
+                <!-- Anadolu Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('anadolu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Anadolu Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Emek Fatih Sultan Mehmet Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 241 20 86</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Selin Sok. No:14 (Emek ASM Karşısı)</span>
+                    </div>
+                </div>
+
+                <!-- Bağlarbaşı Can Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('baglarbasican')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bağlarbaşı Can Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Bağlarbaşı Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 247 32 94</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Hürriyet Cad. No:164/4</span>
+                    </div>
+                </div>
+
+                <!-- Kardelen Cem Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('kardelencem')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Kardelen Cem Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Küplüpınar Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 253 41 73</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>6. Dicle Sok. No:8/A (Küplüpınar ASM Karşısı)</span>
+                    </div>
+                </div>
+
+                <!-- Akkuş Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('akkus')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Akkuş Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">İntizam Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 504 16 08</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>3. Tabak Sok. No:55/A</span>
+                    </div>
+                </div>
+
+                <!-- Lina Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('lina')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Lina Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Doğanevler Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0507 006 61 16</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>2. Dadaş Sok. No:11 (700.Yıl ASM Karşısı)</span>
+                    </div>
+                </div>
+
+                <!-- Esin Serhat Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('esinserhat')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">9</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Esin Serhat Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Demirtaş Cumhuriyet Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0552 394 94 06</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Çevreyolu Cad. 1229.Sok. No:17</span>
+                    </div>
+                </div>
+
+                <!-- Korupark Eczanesi -->
+                <div class="pharmacy-card duty rounded-xl p-4" onclick="openPharmacyDetail('korupark')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-duty-orange flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">medical_services</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Korupark Eczanesi</h4>
+                                <p class="text-[10px] text-duty-orange">Nöbetçi Eczane</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-duty-orange">schedule</span>
+                        <span>19:00 - 08:30 (Nöbetçi)</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Korupark AVM Yanı</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nilüfer Eczane Listesi -->
+        <section class="animate-slide-up district-section" data-district="nilufer" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('niluferSection', 'niluferIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pharmacy-green/30 to-pharmacy-green/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-pharmacy-green">park</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Nilüfer İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Modern Bölge Eczaneleri</span>
+                    </div>
+                </div>
+                <span id="niluferIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="niluferSection" class="expandable-section mt-3 space-y-3">
+                <!-- Akide Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('akide')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Akide Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Konak Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 451 19 88</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Yıldırım Cad. No:118</span>
+                    </div>
+                </div>
+
+                <!-- Büşra Sırakaya Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('busrasirakaya')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Büşra Sırakaya Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Konak Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 408 38 28</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>İzmir Yolu Cad. No:81B/B (Nilüfer Metro)</span>
+                    </div>
+                </div>
+
+                <!-- Akkon Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('akkon')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Akkon Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Üçevler Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 451 43 21</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>72. Sok. Kale Plaza No:4/C</span>
+                    </div>
+                </div>
+
+                <!-- Kansu Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('kansu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Kansu Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Beşevler Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 451 84 41</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Yıldırım Cad. No:202/A (Nev Anadolu Hastanesi Arkası)</span>
+                    </div>
+                </div>
+
+                <!-- Eylül Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('eylul')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Eylül Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Minareli Çavuş Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 241 82 52</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Mevlana Cad. No:36/A (Alara İlköğretim Okulu Altı)</span>
+                    </div>
+                </div>
+
+                <!-- Nilüfer Yaşam Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('niluferyasam')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer Yaşam Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Cumhuriyet Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 452 81 62</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Gazi Cad. Mavi Sok. No:6/D (Kapalı Pazar Karşısı)</span>
+                    </div>
+                </div>
+
+                <!-- Yüzüncüyıl Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('yuzuncuyil')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yüzüncüyıl Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">100.Yıl Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 413 12 22</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Prof.Dr.Erdal İnönü Cad. No:25/G7</span>
+                    </div>
+                </div>
+
+                <!-- Çamlık Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('camlikeczane')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Çamlık Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">30 Ağustos Zafer Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 503 94 44</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>109.(520)Sok. No:1A/B (Kayapa ASM Karşısı)</span>
+                    </div>
+                </div>
+
+                <!-- Doruk Eczanesi -->
+                <div class="pharmacy-card duty rounded-xl p-4" onclick="openPharmacyDetail('doruk')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-duty-orange flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">medical_services</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Doruk Eczanesi</h4>
+                                <p class="text-[10px] text-duty-orange">Çalı - İcap Nöbetçi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0535 209 54 15</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Çalı Mah. Bursa Cad. No:38/B</span>
+                    </div>
+                </div>
+
+                <!-- Medine Eczanesi -->
+                <div class="pharmacy-card duty rounded-xl p-4" onclick="openPharmacyDetail('medine')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-duty-orange flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">medical_services</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Medine Eczanesi</h4>
+                                <p class="text-[10px] text-duty-orange">Kültür Mah. - Nöbetçi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 443 50 09</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Bilginler Cad. No:101/A (İbrahim Yazıcı Stadyumu Karşısı)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yıldırım Eczane Listesi -->
+        <section class="animate-slide-up district-section" data-district="yildirim" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('yildirimSection', 'yildirimIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-night-purple/30 to-night-purple/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-night-purple">mosque</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Yıldırım İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Tarihi Bölge Eczaneleri</span>
+                    </div>
+                </div>
+                <span id="yildirimIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="yildirimSection" class="expandable-section mt-3 space-y-3">
+                <!-- Feyzan Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('feyzan')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Feyzan Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Musababa Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 326 16 61</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>8. Fatih Sok. No:3 (Işıklar Askeri Lisesi Arkası)</span>
+                    </div>
+                </div>
+
+                <!-- Soybilgin Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('soybilgin')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Soybilgin Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">75.Yıl Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 342 63 00</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Ercan Cad. No:8/C (Ali Yazıcı Cami Karşısı)</span>
+                    </div>
+                </div>
+
+                <!-- Cemre Eczanesi -->
+                <div class="pharmacy-card rounded-xl p-4" onclick="openPharmacyDetail('cemre')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-pharmacy-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Cemre Eczanesi</h4>
+                                <p class="text-[10px] text-gray-text">Yunus Emre Mah.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-pharmacy-green">call</span>
+                        <span>0224 363 04 03</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Kazım Karabekir Cad. No:98 (Çiçek Parkı Karşısı)</span>
+                    </div>
+                </div>
+
+                <!-- Tokoğlu Sağlık Eczanesi -->
+                <div class="pharmacy-card duty rounded-xl p-4" onclick="openPharmacyDetail('tokoglu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-duty-orange flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">medical_services</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Tokoğlu Sağlık Eczanesi</h4>
+                                <p class="text-[10px] text-duty-orange">Nöbetçi Eczane</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-duty-orange">schedule</span>
+                        <span>19:00 - 08:30 (Nöbetçi)</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Yıldırım Bölgesi</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.6s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="saglik-ocaklari.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-pharmacy-green text-xl">local_hospital</span>
+                    <span class="text-[10px] text-center">ASM'ler</span>
+                </a>
+                <a href="hastaneler.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-live-red text-xl">emergency</span>
+                    <span class="text-[10px] text-center">Hastaneler</span>
+                </a>
+                <a href="acil-saglik.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-duty-orange text-xl">call</span>
+                    <span class="text-[10px] text-center">112 Acil</span>
+                </a>
+                <a href="saglik-bakanligi.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-pharmacy-blue text-xl">account_balance</span>
+                    <span class="text-[10px] text-center">e-Nabız</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-pharmacy-green">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-pharmacy-green shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-pharmacy-green mb-1">Eczane Hakkında</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            Eczanelerde reçetesiz ilaç alımı sınırlıdır. Antibiyotik ve kontrollü ilaçlar için 
+                            mutlaka doktor reçetesi gerekir. Nöbetçi eczaneler 19:00-08:30 saatleri arasında 
+                            hizmet verir ve ek ücret talep edemez.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Eczane Detay Modalı -->
+    <div id="pharmacyDetailModal" class="fixed inset-0 z-[80] modal-pharmacy hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closePharmacyDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Eczane Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Eczane Bilgileri ve Konum</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-pharmacy-green/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-pharmacy-green text-3xl">local_pharmacy</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h2 id="modalPharmacyName" class="text-xl font-bold text-white mb-1 truncate">Eczane Adı</h2>
+                        <p id="modalDistrict" class="text-sm text-gold">İlçe</p>
+                        <div id="modalStatus" class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium status-open">
+                            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                            <span>Açık</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            p class="text-sm text-white">Pzt-Cmt: 09:00 - 19:00</p>
+                            <p class="text-xs text-gray-text mt-1">Pazar: Kapalı (Nöbetçi eczanelere bakınız)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Telefon</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">medical_services</span>
+                    Verilen Hizmetler
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-pharmacy-green text-xl mb-1">medication</span>
+                        <p class="text-xs text-gray-text">Reçeteli İlaç</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-pharmacy-green text-xl mb-1">vaccines</span>
+                        <p class="text-xs text-gray-text">Aşılama</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-pharmacy-green text-xl mb-1">science</span>
+                        <p class="text-xs text-gray-text">Tahlil</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-pharmacy-green text-xl mb-1">healing</span>
+                        <p class="text-xs text-gray-text">Medikal Ürün</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-pharmacy-green text-xl mb-1">baby_changing_station</span>
+                        <p class="text-xs text-gray-text">Bebek Ürün</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-pharmacy-green text-xl mb-1">spa</span>
+                        <p class="text-xs text-gray-text">Cilt Bakım</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım ve Otopark
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">directions_bus</span>
+                        <p class="text-sm text-white">Toplu taşıma ile ulaşım bilgisi</p>
+                    </div>
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">local_parking</span>
+                        <p class="text-sm text-white">Otopark bilgisi</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button id="modalCallBtn" onclick="callNumber('')" class="flex-1 bg-pharmacy-green/20 hover:bg-pharmacy-green/30 border border-pharmacy-green/50 text-pharmacy-green py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Ara
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nöbetçi Eczane Modalı -->
+    <div id="dutyModal" class="fixed inset-0 z-[80] modal-pharmacy hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeDutyModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Nöbetçi Eczaneler</h1>
+                        <p class="text-xs text-gray-text truncate">15 Mart 2026 Cumartesi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-duty-orange/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-duty-orange/20 flex items-center justify-center pulse-duty">
+                        <span class="material-symbols-outlined text-duty-orange text-3xl">medical_services</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-duty-orange">Nöbetçi Eczane</h2>
+                        <p class="text-sm text-gray-text">19:00 - 08:30 Arası Hizmet</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Bugün nöbetçi olan eczaneler listesi. Nöbetçi eczaneler normal mesai saatleri dışında 
+                    (19:00-08:30) hizmet verir ve ek ücret talep edemez.
+                </p>
+            </div>
+
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Bugün Nöbetçi</h3>
+                
+                <div class="pharmacy-card duty rounded-xl p-4" onclick="openPharmacyDetail('korupark')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm">Korupark Eczanesi</h4>
+                            <p class="text-[10px] text-gray-text">Osmangazi - Korupark AVM Yanı</p>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="status-duty px-2 py-0.5 rounded text-[10px]">Nöbetçi</span>
+                                <span class="text-[10px] text-gray-text">19:00 - 08:30</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                </div>
+
+                <div class="pharmacy-card duty rounded-xl p-4" onclick="openPharmacyDetail('doruk')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm">Doruk Eczanesi</h4>
+                            <p class="text-[10px] text-gray-text">Nilüfer - Çalı Mah.</p>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="status-duty px-2 py-0.5 rounded text-[10px]">İcap Nöbetçi</span>
+                                <span class="text-[10px] text-gray-text">19:00 - 08:30</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                </div>
+
+                <div class="pharmacy-card duty rounded-xl p-4" onclick="openPharmacyDetail('medine')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm">Medine Eczanesi</h4>
+                            <p class="text-[10px] text-gray-text">Nilüfer - Kültür Mah.</p>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="status-duty px-2 py-0.5 rounded text-[10px]">Nöbetçi</span>
+                                <span class="text-[10px] text-gray-text">19:00 - 08:30</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                </div>
+
+                <div class="pharmacy-card duty rounded-xl p-4" onclick="openPharmacyDetail('tokoglu')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-sm">Tokoğlu Sağlık Eczanesi</h4>
+                            <p class="text-[10px] text-gray-text">Yıldırım Bölgesi</p>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="status-duty px-2 py-0.5 rounded text-[10px]">Nöbetçi</span>
+                                <span class="text-[10px] text-gray-text">19:00 - 08:30</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-xl p-4 border-l-4 border-pharmacy-blue">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-pharmacy-blue shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-pharmacy-blue mb-1">Nasıl Gidilir?</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            184 Alo Sağlık hattını arayarak size en yakın nöbetçi eczaneyi öğrenebilirsiniz. 
+                            Ayrıca e-Nabız uygulamasından da nöbetçi eczane listesine ulaşabilirsiniz.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Eczane Veritabanı
+        const pharmacyData = {
+            'merkezbursa': {
+                name: 'Merkez Bursa Eczanesi',
+                district: 'Osmangazi',
+                address: 'Osmangazi Merkez, Bursa',
+                phone: '0224 253 13 19',
+                hours: '09:30 - 17:30',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Osmangazi merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'Merkez otopark (ücretli)' }
+                ],
+                mapQuery: 'Merkez Bursa Eczanesi, Osmangazi, Bursa'
+            },
+            'torunlar': {
+                name: 'Torunlar Eczanesi',
+                district: 'Osmangazi',
+                address: 'Hüdavendigar Mah. Bent Cad. No:3 (Mihraplı Cami Karşısı), Osmangazi',
+                phone: '0224 239 30 00',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Hüdavendigar durağı)' },
+                    { icon: 'local_parking', text: 'Mihraplı Cami otoparkı (ücretsiz)' },
+                    { icon: 'mosque', text: 'Mihraplı Cami karşısında' }
+                ],
+                mapQuery: 'Torunlar Eczanesi, Bent Cadde, Osmangazi, Bursa'
+            },
+            'beyaz': {
+                name: 'Beyaz Eczanesi',
+                district: 'Osmangazi',
+                address: 'Zafer Mah. Namık Kemal Cad. No:58/B, Osmangazi',
+                phone: '0224 504 39 60',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4, 5A hatları' },
+                    { icon: 'local_parking', text: 'Cadde üzeri park (sınırlı)' }
+                ],
+                mapQuery: 'Beyaz Eczanesi, Namık Kemal Caddesi, Osmangazi, Bursa'
+            },
+            'anadolu': {
+                name: 'Anadolu Eczanesi',
+                district: 'Osmangazi',
+                address: 'Emek Fatih Sultan Mehmet Mah. Selin Sok. No:14 (Emek ASM Karşısı), Osmangazi',
+                phone: '0224 241 20 86',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Emek İstasyonu (300m yürüme)' },
+                    { icon: 'local_parking', text: 'Emek Metro otoparkı (ücretli)' },
+                    { icon: 'local_hospital', text: 'Emek ASM karşısında' }
+                ],
+                mapQuery: 'Anadolu Eczanesi, Emek, Osmangazi, Bursa'
+            },
+            'baglarbasican': {
+                name: 'Bağlarbaşı Can Eczanesi',
+                district: 'Osmangazi',
+                address: 'Bağlarbaşı Mah. Hürriyet Cad. No:164/4, Osmangazi',
+                phone: '0224 247 32 94',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Hürriyet Caddesi üzeri park' }
+                ],
+                mapQuery: 'Bağlarbaşı Can Eczanesi, Hürriyet Caddesi, Osmangazi, Bursa'
+            },
+            'kardelencem': {
+                name: 'Kardelen Cem Eczanesi',
+                district: 'Osmangazi',
+                address: 'Küplüpınar Mah. 6. Dicle Sok. No:8/A (Küplüpınar ASM Karşısı), Osmangazi',
+                phone: '0224 253 41 73',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 38, 94 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı (ücretsiz)' },
+                    { icon: 'local_hospital', text: 'Küplüpınar ASM karşısında' }
+                ],
+                mapQuery: 'Kardelen Cem Eczanesi, Küplüpınar, Osmangazi, Bursa'
+            },
+            'akkus': {
+                name: 'Akkuş Eczanesi',
+                district: 'Osmangazi',
+                address: 'İntizam Mah. 3. Tabak Sok. No:55/A, Osmangazi',
+                phone: '0224 504 16 08',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 6, 7 hatları' },
+                    { icon: 'local_parking', text: 'Sokak içi park' }
+                ],
+                mapQuery: 'Akkuş Eczanesi, İntizam, Osmangazi, Bursa'
+            },
+            'lina': {
+                name: 'Lina Eczanesi',
+                district: 'Osmangazi',
+                address: 'Doğanevler Mah. 2. Dadaş Sok. No:11 (700.Yıl ASM Karşısı), Osmangazi',
+                phone: '0507 006 61 16',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 2, 38 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı mevcut' },
+                    { icon: 'local_hospital', text: '700.Yıl ASM karşısında' }
+                ],
+                mapQuery: 'Lina Eczanesi, Doğanevler, Osmangazi, Bursa'
+            },
+            'esinserhat': {
+                name: 'Esin Serhat Eczanesi',
+                district: 'Osmangazi',
+                address: 'Demirtaş Cumhuriyet Mah. Çevreyolu Cad. 1229.Sok. No:17, Osmangazi',
+                phone: '0552 394 94 06',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' },
+                    { icon: 'local_parking', text: 'Cadde üzeri park' }
+                ],
+                mapQuery: 'Esin Serhat Eczanesi, Demirtaş, Osmangazi, Bursa'
+            },
+            'korupark': {
+                name: 'Korupark Eczanesi',
+                district: 'Osmangazi',
+                address: 'Korupark AVM Yanı, Osmangazi',
+                phone: '0224 211 50 50',
+                hours: '19:00 - 08:30 (Nöbetçi)',
+                status: 'duty',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Geçit İstasyonu (yürüme mesafesi)' },
+                    { icon: 'local_parking', text: 'Korupark AVM otoparkı (ücretli)' },
+                    { icon: 'shopping_bag', text: 'Korupark AVM yanında' }
+                ],
+                mapQuery: 'Korupark Eczanesi, Osmangazi, Bursa'
+            },
+            'akide': {
+                name: 'Akide Eczanesi',
+                district: 'Nilüfer',
+                address: 'Konak Mah. Yıldırım Cad. No:118, Nilüfer',
+                phone: '0224 451 19 88',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı + 5 dk yürüme' },
+                    { icon: 'local_parking', text: 'Yıldırım Caddesi üzeri park' }
+                ],
+                mapQuery: 'Akide Eczanesi, Konak, Nilüfer, Bursa'
+            },
+            'busrasirakaya': {
+                name: 'Büşra Sırakaya Eczanesi',
+                district: 'Nilüfer',
+                address: 'Konak Mah. İzmir Yolu Cad. No:81B/B (Nilüfer Metro), Nilüfer',
+                phone: '0224 408 38 28',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı (yanında)' },
+                    { icon: 'local_parking', text: 'Metro otoparkı (ücretli)' }
+                ],
+                mapQuery: 'Büşra Sırakaya Eczanesi, Konak, Nilüfer, Bursa'
+            },
+            'akkon': {
+                name: 'Akkon Eczanesi',
+                district: 'Nilüfer',
+                address: 'Üçevler Mah. 72. Sok. Kale Plaza No:4/C, Nilüfer',
+                phone: '0224 451 43 21',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Kale Plaza otoparkı (ücretli)' }
+                ],
+                mapQuery: 'Akkon Eczanesi, Üçevler, Nilüfer, Bursa'
+            },
+            'kansu': {
+                name: 'Kansu Eczanesi',
+                district: 'Nilüfer',
+                address: 'Beşevler Mah. Yıldırım Cad. No:202/A (Nev Anadolu Hastanesi Arkası), Nilüfer',
+                phone: '0224 451 84 41',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 5 dk yürüme' },
+                    { icon: 'local_parking', text: 'Cadde üzeri park' },
+                    { icon: 'local_hospital', text: 'Nev Anadolu Hastanesi arkası' }
+                ],
+                mapQuery: 'Kansu Eczanesi, Beşevler, Nilüfer, Bursa'
+            },
+            'eylul': {
+                name: 'Eylül Eczanesi',
+                district: 'Nilüfer',
+                address: 'Minareli Çavuş Mah. Mevlana Cad. No:36/A (Alara İlköğretim Okulu Altı), Nilüfer',
+                phone: '0224 241 82 52',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A hatları' },
+                    { icon: 'local_parking', text: 'Okul yanı park alanı' }
+                ],
+                mapQuery: 'Eylül Eczanesi, Minareli Çavuş, Nilüfer, Bursa'
+            },
+            'niluferyasam': {
+                name: 'Nilüfer Yaşam Eczanesi',
+                district: 'Nilüfer',
+                address: 'Cumhuriyet Mah. Gazi Cad. Mavi Sok. No:6/D (Kapalı Pazar Karşısı), Nilüfer',
+                phone: '0224 452 81 62',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Kapalı pazar otoparkı (cumartesi hariç)' }
+                ],
+                mapQuery: 'Nilüfer Yaşam Eczanesi, Cumhuriyet, Nilüfer, Bursa'
+            },
+            'yuzuncuyil': {
+                name: 'Yüzüncüyıl Eczanesi',
+                district: 'Nilüfer',
+                address: '100.Yıl Mah. Prof.Dr.Erdal İnönü Cad. No:25/G7, Nilüfer',
+                phone: '0224 413 12 22',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Cadde üzeri park' }
+                ],
+                mapQuery: 'Yüzüncüyıl Eczanesi, 100.Yıl, Nilüfer, Bursa'
+            },
+            'camlikeczane': {
+                name: 'Çamlık Eczanesi',
+                district: 'Nilüfer',
+                address: '30 Ağustos Zafer Mah. 109.(520)Sok. No:1A/B (Kayapa ASM Karşısı), Nilüfer',
+                phone: '0224 503 94 44',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'ASM yanı otopark' },
+                    { icon: 'local_hospital', text: 'Kayapa ASM karşısında' }
+                ],
+                mapQuery: 'Çamlık Eczanesi, 30 Ağustos Zafer, Nilüfer, Bursa'
+            },
+            'doruk': {
+                name: 'Doruk Eczanesi',
+                district: 'Nilüfer',
+                address: 'Çalı Mah. Bursa Cad. No:38/B, Nilüfer',
+                phone: '0535 209 54 15',
+                hours: '19:00 - 08:30 (İcap Nöbetçi)',
+                status: 'duty',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çalı durağı)' },
+                    { icon: 'local_parking', text: 'Çalı merkez otoparkı (ücretsiz)' }
+                ],
+                mapQuery: 'Doruk Eczanesi, Çalı, Nilüfer, Bursa'
+            },
+            'medine': {
+                name: 'Medine Eczanesi',
+                district: 'Nilüfer',
+                address: 'Kültür Mah. Bilginler Cad. No:101/A (İbrahim Yazıcı Stadyumu Karşısı), Nilüfer',
+                phone: '0224 443 50 09',
+                hours: '19:00 - 08:30 (Nöbetçi)',
+                status: 'duty',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4, 38 hatları' },
+                    { icon: 'local_parking', text: 'Stadyum otoparkı (maç günleri hariç)' }
+                ],
+                mapQuery: 'Medine Eczanesi, Kültür, Nilüfer, Bursa'
+            },
+            'feyzan': {
+                name: 'Feyzan Eczanesi',
+                district: 'Yıldırım',
+                address: 'Musababa Mah. 8. Fatih Sok. No:3 (Işıklar Askeri Lisesi Arkası), Yıldırım',
+                phone: '0224 326 16 61',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 9 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı' }
+                ],
+                mapQuery: 'Feyzan Eczanesi, Musababa, Yıldırım, Bursa'
+            },
+            'soybilgin': {
+                name: 'Soybilgin Eczanesi',
+                district: 'Yıldırım',
+                address: '75.Yıl Mah. Ercan Cad. No:8/C (Ali Yazıcı Cami Karşısı), Yıldırım',
+                phone: '0224 342 63 00',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Cami yanı otopark (ücretsiz)' }
+                ],
+                mapQuery: 'Soybilgin Eczanesi, 75.Yıl, Yıldırım, Bursa'
+            },
+            'cemre': {
+                name: 'Cemre Eczanesi',
+                district: 'Yıldırım',
+                address: 'Yunus Emre Mah. Kazım Karabekir Cad. No:98 (Çiçek Parkı Karşısı), Yıldırım',
+                phone: '0224 363 04 03',
+                hours: '09:00 - 19:00',
+                status: 'open',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A, 9 hatları' },
+                    { icon: 'local_parking', text: 'Çiçek Parkı otoparkı' }
+                ],
+                mapQuery: 'Cemre Eczanesi, Yunus Emre, Yıldırım, Bursa'
+            },
+            'tokoglu': {
+                name: 'Tokoğlu Sağlık Eczanesi',
+                district: 'Yıldırım',
+                address: 'Yıldırım Bölgesi',
+                phone: '0224 XXX XX XX',
+                hours: '19:00 - 08:30 (Nöbetçi)',
+                status: 'duty',
+                transport: [
+                    { icon: 'directions_bus', text: 'Yıldırım bölgesi otobüs hatları' },
+                    { icon: 'local_parking', text: 'Bölge otoparkları' }
+                ],
+                mapQuery: 'Tokoğlu Sağlık Eczanesi, Yıldırım, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // District Filter
+        let currentDistrict = 'all';
+        function filterDistrict(district) {
+            currentDistrict = district;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + district).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.district-section');
+            sections.forEach(section => {
+                if (district === 'all' || section.dataset.district === district) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Pharmacy
+        function searchPharmacy() {
+            const searchTerm = document.getElementById('pharmacySearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.pharmacy-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open Pharmacy Detail Modal
+        function openPharmacyDetail(pharmacyId) {
+            const pharmacy = pharmacyData[pharmacyId];
+            if (!pharmacy) return;
+
+            document.getElementById('modalPharmacyName').textContent = pharmacy.name;
+            document.getElementById('modalDistrict').textContent = pharmacy.district + ' İlçesi';
+            document.getElementById('modalAddress').textContent = pharmacy.address;
+            document.getElementById('modalPhone').textContent = pharmacy.phone;
+            
+            // Status
+            const statusEl = document.getElementById('modalStatus');
+            if (pharmacy.status === 'duty') {
+                statusEl.className = 'mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium status-duty';
+                statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-current"></span><span>Nöbetçi</span>';
+            } else {
+                statusEl.className = 'mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium status-open';
+                statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-current"></span><span>Açık</span>';
+            }
+
+            // Icon color
+            const iconEl = document.getElementById('modalIcon');
+            if (pharmacy.status === 'duty') {
+                iconEl.className = 'w-16 h-16 rounded-2xl bg-duty-orange/20 flex items-center justify-center';
+                iconEl.innerHTML = '<span class="material-symbols-outlined text-duty-orange text-3xl">medical_services</span>';
+            } else {
+                iconEl.className = 'w-16 h-16 rounded-2xl bg-pharmacy-green/20 flex items-center justify-center';
+                iconEl.innerHTML = '<span class="material-symbols-outlined text-pharmacy-green text-3xl">local_pharmacy</span>';
+            }
+
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            pharmacy.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Butonları güncelle
+            document.getElementById('modalCallBtn').setAttribute('onclick', `callNumber('${pharmacy.phone.replace(/\s/g, '')}')`);
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${pharmacy.mapQuery}')`);
+
+            document.getElementById('pharmacyDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Pharmacy Detail Modal
+        function closePharmacyDetail() {
+            document.getElementById('pharmacyDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Duty Modal
+        function openDutyModal() {
+            document.getElementById('dutyModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDutyModal() {
+            document.getElementById('dutyModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak FAQ açık
+            document.getElementById('faqSection').classList.add('open');
+            document.getElementById('faqIcon').classList.add('open');
+            
+            // Tüm ilçe bölümlerini açık yap
+            document.getElementById('osmangaziSection').classList.add('open');
+            document.getElementById('osmangaziIcon').classList.add('open');
+            document.getElementById('niluferSection').classList.add('open');
+            document.getElementById('niluferIcon').classList.add('open');
+            document.getElementById('yildirimSection').classList.add('open');
+            document.getElementById('yildirimIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>

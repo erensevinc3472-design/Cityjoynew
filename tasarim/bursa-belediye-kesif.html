@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Belediye Başkanlarıyla Keşif - Bursa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.7s ease-out',
+                        'slide-down': 'slideDown 0.4s ease-out',
+                        'slide-right': 'slideRight 0.5s ease-out',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'shimmer': 'shimmer 2.5s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)', maxHeight: '0' },
+                            '100%': { opacity: '1', transform: 'translateY(0)', maxHeight: '1000px' },
+                        },
+                        slideRight: {
+                            '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.4)' },
+                            '50%': { boxShadow: '0 0 35px rgba(224, 176, 122, 0.7)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .sidebar-scroll::-webkit-scrollbar {
+                width: 2px;
+            }
+            .sidebar-scroll::-webkit-scrollbar-track {
+                background: rgba(63, 110, 112, 0.2);
+            }
+            .sidebar-scroll::-webkit-scrollbar-thumb {
+                background: rgba(224, 176, 122, 0.5);
+                border-radius: 4px;
+            }
+            .glow-gold-active {
+                box-shadow: 0 0 15px rgba(224, 176, 122, 0.5);
+            }
+            .card-inner-glow {
+                box-shadow: inset 0 0 20px rgba(31, 80, 85, 0.6);
+            }
+            .nav-glow-gold {
+                filter: drop-shadow(0 0 8px rgba(240, 179, 111, 0.7));
+            }
+            .glass-panel {
+                background: rgba(13, 50, 56, 0.85);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+            }
+            .text-glow {
+                text-shadow: 0 0 20px rgba(224, 176, 122, 0.5);
+            }
+            .shimmer-bg {
+                background: linear-gradient(90deg, transparent, rgba(224, 176, 122, 0.1), transparent);
+                background-size: 200% 100%;
+                animation: shimmer 3s infinite;
+            }
+            .hero-gradient {
+                background: linear-gradient(to bottom, transparent 0%, rgba(8, 31, 36, 0.8) 60%, rgba(8, 31, 36, 1) 100%);
+            }
+            .mayor-card {
+                background: linear-gradient(135deg, rgba(23, 70, 75, 0.8) 0%, rgba(8, 31, 36, 0.9) 100%);
+                border: 1px solid rgba(224, 176, 122, 0.3);
+                transition: all 0.4s ease;
+            }
+            .mayor-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(224, 176, 122, 0.2);
+                border-color: rgba(224, 176, 122, 0.6);
+            }
+            .route-card {
+                background: rgba(23, 70, 75, 0.4);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+                transition: all 0.3s ease;
+            }
+            .route-card:hover {
+                background: rgba(23, 70, 75, 0.6);
+                border-color: rgba(224, 176, 122, 0.4);
+            }
+            .video-overlay {
+                background: linear-gradient(to top, rgba(8, 31, 36, 0.95) 0%, rgba(8, 31, 36, 0.3) 50%, transparent 100%);
+            }
+            .mayor-list-item {
+                transition: all 0.3s ease;
+            }
+            .mayor-list-item:hover {
+                background: rgba(224, 176, 122, 0.1);
+            }
+            .mayor-list-item.active {
+                background: rgba(224, 176, 122, 0.2);
+                border-left: 3px solid #E0B07A;
+            }
+            .expandable-content {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease-out, opacity 0.4s ease-out, padding 0.4s ease;
+                opacity: 0;
+            }
+            .expandable-content.open {
+                max-height: 2000px;
+                opacity: 1;
+                padding-top: 1.5rem;
+            }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden">
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-darkest/90 backdrop-blur-md border-b border-border-subtle/30">
+    <div class="flex items-center gap-3">
+        <a class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group" href="bursa.html">
+            <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+        </a>
+        <div class="flex flex-col">
+            <span class="text-[10px] text-gold-primary tracking-wider uppercase">Bursa</span>
+            <h1 class="text-lg font-bold tracking-tight text-white leading-none">Özel Keşif Serisi</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-3">
+        <button class="flex items-center gap-1.5 px-3 py-1.5 bg-card-bg/50 rounded-full border border-border-subtle/30 hover:border-gold-primary/50 transition-colors">
+            <span class="material-symbols-outlined text-gold-primary text-sm">share</span>
+        </button>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<section class="relative h-[40vh] min-h-[300px] w-full overflow-hidden mt-[60px]">
+    <div class="absolute inset-0">
+       <section class="relative h-[40vh] min-h-[300px] w-full overflow-hidden mt-[60px]">
+    <div class="absolute inset-0">
+        <img alt="Bursa Belediye" class="w-full h-full object-cover" src="cityjoy-assets/bursa1.jpg"/>
+        <div class="absolute inset-0 bg-darkest/50"></div>
+        <div class="absolute inset-0 hero-gradient"></div>
+    </div>
+    <!-- ... -->
+</section>
+        <div class="absolute inset-0 bg-darkest/50"></div>
+        <div class="absolute inset-0 hero-gradient"></div>
+    </div>
+    
+    <div class="absolute inset-0 flex flex-col justify-end pb-8 px-6">
+        <div class="max-w-4xl animate-slide-up">
+            <span class="px-3 py-1 bg-gold-primary/20 border border-gold-primary/40 rounded-full text-gold-primary text-[10px] tracking-[0.15em] uppercase font-bold backdrop-blur-sm mb-3 inline-block">
+                Yerel Yönetimler
+            </span>
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 text-glow tracking-tight">
+                Belediye Başkanlarıyla Keşif
+            </h1>
+            <p class="text-base text-text-secondary max-w-2xl leading-relaxed">
+                Bursa'nın 17 ilçesinin belediye başkanları size özel hazırladıkları rotalarla şehrin gizli kalmış güzelliklerini keşfedin.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24 pt-6">
+    <div class="max-w-4xl mx-auto px-6">
+        
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="glass-panel rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-gold-primary">17</p>
+                <p class="text-[10px] text-text-desc uppercase tracking-wider">İlçe</p>
+            </div>
+            <div class="glass-panel rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-gold-primary">17</p>
+                <p class="text-[10px] text-text-desc uppercase tracking-wider">Belediye Başkanı</p>
+            </div>
+            <div class="glass-panel rounded-xl p-4 text-center">
+                <p class="text-2xl font-bold text-gold-primary">50+</p>
+                <p class="text-[10px] text-text-desc uppercase tracking-wider">Keşif Rotası</p>
+            </div>
+        </div>
+
+        <!-- District Filter -->
+        <div class="mb-6">
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="district-tabs">
+                <button class="tab-btn tab-active px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-district="all">Tümü</button>
+                <button class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-district="merkez">Merkez</button>
+                <button class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-district="sahil">Sahil</button>
+                <button class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-district="dag">Dağ</button>
+                <button class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-district="ova">Ova</button>
+            </div>
+        </div>
+
+        <!-- Mayors List -->
+        <div class="space-y-3" id="mayors-list">
+            
+            <!-- Osmangazi - Erkan Aydın -->
+            <div class="mayor-list-item glass-panel rounded-xl overflow-hidden" data-category="merkez" data-mayor="osmangazi">
+                <button class="w-full p-4 flex items-center justify-between text-left" onclick="toggleMayor('osmangazi')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gold-primary/30 to-gold-primary/10 border-2 border-gold-primary/40 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="material-symbols-outlined text-gold-primary text-xl">person</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Erkan Aydın</h3>
+                            <p class="text-xs text-text-secondary">Osmangazi Belediye Başkanı</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gold-primary text-[10px] fill-1">star</span>
+                                <span class="text-[10px] text-gold-primary font-bold">4.9</span>
+                                <span class="text-[9px] text-text-desc">(2.4k)</span>
+                                <span class="px-1.5 py-0.5 bg-gold-primary/20 rounded text-[8px] text-gold-primary ml-2">Merkez</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-text-desc transition-transform duration-300" id="icon-osmangazi">expand_more</span>
+                </button>
+                
+                <div class="expandable-content px-4" id="content-osmangazi">
+                    <div class="mayor-card rounded-2xl overflow-hidden mb-4">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=600&q=80" class="w-full h-full object-cover" alt="Osmangazi"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                            <div class="absolute bottom-3 left-3 right-3">
+                                <h3 class="text-xl font-bold text-white">Osmangazi</h3>
+                                <p class="text-xs text-text-secondary">Tarihin Başkenti</p>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="space-y-2 mb-4">
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">mosque</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Tarih Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Ulu Cami → Tophane → Koza Han</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">3 saat</span>
+                                </div>
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">restaurant</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Lezzet Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">İskender → Cantık → Kestane Şekeri</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">4 saat</span>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openVideoModal('osmangazi')" class="w-full py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-xs font-bold uppercase hover:bg-gold-primary hover:text-darkest transition-all flex items-center justify-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-sm">play_circle</span>
+                                Tanıtım Videosu
+                            </button>
+                            <button onclick="showRouteDetails('osmangazi')" class="w-full py-2 bg-card-bg/50 border border-border-subtle/30 rounded-xl text-text-secondary text-xs font-bold uppercase hover:border-gold-primary/50 hover:text-gold-primary transition-all">
+                                Rota Detayları
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nilüfer - Şadi Özdemir -->
+            <div class="mayor-list-item glass-panel rounded-xl overflow-hidden" data-category="merkez" data-mayor="nilufer">
+                <button class="w-full p-4 flex items-center justify-between text-left" onclick="toggleMayor('nilufer')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gold-primary/30 to-gold-primary/10 border-2 border-gold-primary/40 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="material-symbols-outlined text-gold-primary text-xl">person</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Şadi Özdemir</h3>
+                            <p class="text-xs text-text-secondary">Nilüfer Belediye Başkanı</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gold-primary text-[10px] fill-1">star</span>
+                                <span class="text-[10px] text-gold-primary font-bold">4.8</span>
+                                <span class="text-[9px] text-text-desc">(1.9k)</span>
+                                <span class="px-1.5 py-0.5 bg-gold-primary/20 rounded text-[8px] text-gold-primary ml-2">Merkez</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-text-desc transition-transform duration-300" id="icon-nilufer">expand_more</span>
+                </button>
+                
+                <div class="expandable-content px-4" id="content-nilufer">
+                    <div class="mayor-card rounded-2xl overflow-hidden mb-4">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=600&q=80" class="w-full h-full object-cover" alt="Nilüfer"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                            <div class="absolute bottom-3 left-3 right-3">
+                                <h3 class="text-xl font-bold text-white">Nilüfer</h3>
+                                <p class="text-xs text-text-secondary">Modern Bursa</p>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="space-y-2 mb-4">
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">water</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Göl Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Gölyazı → Uluabat Gölü</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">5 saat</span>
+                                </div>
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">park</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Doğa Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Hasanağa → Fadıllı → Ayvaini</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">6 saat</span>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openVideoModal('nilufer')" class="w-full py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-xs font-bold uppercase hover:bg-gold-primary hover:text-darkest transition-all flex items-center justify-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-sm">play_circle</span>
+                                Tanıtım Videosu
+                            </button>
+                            <button onclick="showRouteDetails('nilufer')" class="w-full py-2 bg-card-bg/50 border border-border-subtle/30 rounded-xl text-text-secondary text-xs font-bold uppercase hover:border-gold-primary/50 hover:text-gold-primary transition-all">
+                                Rota Detayları
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yıldırım - Oktay Yılmaz -->
+            <div class="mayor-list-item glass-panel rounded-xl overflow-hidden" data-category="merkez" data-mayor="yildirim">
+                <button class="w-full p-4 flex items-center justify-between text-left" onclick="toggleMayor('yildirim')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gold-primary/30 to-gold-primary/10 border-2 border-gold-primary/40 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="material-symbols-outlined text-gold-primary text-xl">person</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Oktay Yılmaz</h3>
+                            <p class="text-xs text-text-secondary">Yıldırım Belediye Başkanı</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gold-primary text-[10px] fill-1">star</span>
+                                <span class="text-[10px] text-gold-primary font-bold">4.9</span>
+                                <span class="text-[9px] text-text-desc">(2.1k)</span>
+                                <span class="px-1.5 py-0.5 bg-gold-primary/20 rounded text-[8px] text-gold-primary ml-2">Merkez</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-text-desc transition-transform duration-300" id="icon-yildirim">expand_more</span>
+                </button>
+                
+                <div class="expandable-content px-4" id="content-yildirim">
+                    <div class="mayor-card rounded-2xl overflow-hidden mb-4">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?w=600&q=80" class="w-full h-full object-cover" alt="Yıldırım"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                            <div class="absolute bottom-3 left-3 right-3">
+                                <h3 class="text-xl font-bold text-white">Yıldırım</h3>
+                                <p class="text-xs text-text-secondary">Kültür & Tarih</p>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="space-y-2 mb-4">
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">account_balance</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Külliye Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Yeşil Türbe → Yeşil Camii → Emir Sultan</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">4 saat</span>
+                                </div>
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">home</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">UNESCO Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Cumalıkızık Köyü</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">Yarım gün</span>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openVideoModal('yildirim')" class="w-full py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-xs font-bold uppercase hover:bg-gold-primary hover:text-darkest transition-all flex items-center justify-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-sm">play_circle</span>
+                                Tanıtım Videosu
+                            </button>
+                            <button onclick="showRouteDetails('yildirim')" class="w-full py-2 bg-card-bg/50 border border-border-subtle/30 rounded-xl text-text-secondary text-xs font-bold uppercase hover:border-gold-primary/50 hover:text-gold-primary transition-all">
+                                Rota Detayları
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mudanya - Hayri Türkyılmaz -->
+            <div class="mayor-list-item glass-panel rounded-xl overflow-hidden" data-category="sahil" data-mayor="mudanya">
+                <button class="w-full p-4 flex items-center justify-between text-left" onclick="toggleMayor('mudanya')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400/30 to-blue-400/10 border-2 border-blue-400/40 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="material-symbols-outlined text-blue-300 text-xl">person</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Hayri Türkyılmaz</h3>
+                            <p class="text-xs text-text-secondary">Mudanya Belediye Başkanı</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gold-primary text-[10px] fill-1">star</span>
+                                <span class="text-[10px] text-gold-primary font-bold">4.7</span>
+                                <span class="text-[9px] text-text-desc">(1.5k)</span>
+                                <span class="px-1.5 py-0.5 bg-blue-500/20 rounded text-[8px] text-blue-300 ml-2">Sahil</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-text-desc transition-transform duration-300" id="icon-mudanya">expand_more</span>
+                </button>
+                
+                <div class="expandable-content px-4" id="content-mudanya">
+                    <div class="mayor-card rounded-2xl overflow-hidden mb-4">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80" class="w-full h-full object-cover" alt="Mudanya"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                            <div class="absolute bottom-3 left-3 right-3">
+                                <h3 class="text-xl font-bold text-white">Mudanya</h3>
+                                <p class="text-xs text-text-secondary">Tarihi Liman</p>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="space-y-2 mb-4">
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">sailing</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Sahil Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Mudanya Sahili → Trilye</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">3 saat</span>
+                                </div>
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">museum</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Tarih Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Mütareke Evi → Güzelyalı</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">2 saat</span>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openVideoModal('mudanya')" class="w-full py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-xs font-bold uppercase hover:bg-gold-primary hover:text-darkest transition-all flex items-center justify-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-sm">play_circle</span>
+                                Tanıtım Videosu
+                            </button>
+                            <button onclick="showRouteDetails('mudanya')" class="w-full py-2 bg-card-bg/50 border border-border-subtle/30 rounded-xl text-text-secondary text-xs font-bold uppercase hover:border-gold-primary/50 hover:text-gold-primary transition-all">
+                                Rota Detayları
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gemlik - Mehmet Uğur Sertaslan -->
+            <div class="mayor-list-item glass-panel rounded-xl overflow-hidden" data-category="sahil" data-mayor="gemlik">
+                <button class="w-full p-4 flex items-center justify-between text-left" onclick="toggleMayor('gemlik')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400/30 to-blue-400/10 border-2 border-blue-400/40 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="material-symbols-outlined text-blue-300 text-xl">person</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Mehmet Uğur Sertaslan</h3>
+                            <p class="text-xs text-text-secondary">Gemlik Belediye Başkanı</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gold-primary text-[10px] fill-1">star</span>
+                                <span class="text-[10px] text-gold-primary font-bold">4.8</span>
+                                <span class="text-[9px] text-text-desc">(1.7k)</span>
+                                <span class="px-1.5 py-0.5 bg-blue-500/20 rounded text-[8px] text-blue-300 ml-2">Sahil</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-text-desc transition-transform duration-300" id="icon-gemlik">expand_more</span>
+                </button>
+                
+                <div class="expandable-content px-4" id="content-gemlik">
+                    <div class="mayor-card rounded-2xl overflow-hidden mb-4">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=600&q=80" class="w-full h-full object-cover" alt="Gemlik"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                            <div class="absolute bottom-3 left-3 right-3">
+                                <h3 class="text-xl font-bold text-white">Gemlik</h3>
+                                <p class="text-xs text-text-secondary">Zeytin Başkenti</p>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="space-y-2 mb-4">
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">spa</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Zeytin Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Zeytin bahçeleri → Sırtköy → Kürü</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">5 saat</span>
+                                </div>
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">beach_access</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Kumsal Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Kurşunlu Plajı → Engürücük</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">3 saat</span>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openVideoModal('gemlik')" class="w-full py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-xs font-bold uppercase hover:bg-gold-primary hover:text-darkest transition-all flex items-center justify-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-sm">play_circle</span>
+                                Tanıtım Videosu
+                            </button>
+                            <button onclick="showRouteDetails('gemlik')" class="w-full py-2 bg-card-bg/50 border border-border-subtle/30 rounded-xl text-text-secondary text-xs font-bold uppercase hover:border-gold-primary/50 hover:text-gold-primary transition-all">
+                                Rota Detayları
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- İnegöl - Alper Taban -->
+            <div class="mayor-list-item glass-panel rounded-xl overflow-hidden" data-category="ova" data-mayor="inegol">
+                <button class="w-full p-4 flex items-center justify-between text-left" onclick="toggleMayor('inegol')">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400/30 to-green-400/10 border-2 border-green-400/40 flex items-center justify-center overflow-hidden shrink-0">
+                            <span class="material-symbols-outlined text-green-300 text-xl">person</span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white">Alper Taban</h3>
+                            <p class="text-xs text-text-secondary">İnegöl Belediye Başkanı</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gold-primary text-[10px] fill-1">star</span>
+                                <span class="text-[10px] text-gold-primary font-bold">4.6</span>
+                                <span class="text-[9px] text-text-desc">(1.2k)</span>
+                                <span class="px-1.5 py-0.5 bg-green-500/20 rounded text-[8px] text-green-300 ml-2">Ova</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-text-desc transition-transform duration-300" id="icon-inegol">expand_more</span>
+                </button>
+                
+                <div class="expandable-content px-4" id="content-inegol">
+                    <div class="mayor-card rounded-2xl overflow-hidden mb-4">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=600&q=80" class="w-full h-full object-cover" alt="İnegöl"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                            <div class="absolute bottom-3 left-3 right-3">
+                                <h3 class="text-xl font-bold text-white">İnegöl</h3>
+                                <p class="text-xs text-text-secondary">Mobilya & Köfte</p>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="space-y-2 mb-4">
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">chair</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Mobilya Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">Mobilya Kent → OSB</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">3 saat</span>
+                                </div>
+                                <div class="route-card rounded-lg p-3 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-gold-primary text-sm">restaurant</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-white truncate">Köfte Rotası</p>
+                                        <p class="text-[10px] text-text-desc truncate">İnegöl Köftecileri</p>
+                                    </div>
+                                    <span class="text-[10px] text-gold-primary">2 saat</span>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openVideoModal('inegol')" class="w-full py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-xs font-bold uppercase hover:bg-gold-primary hover:text-darkest transition-all flex items-center justify-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-sm">play_circle</span>
+                                Tanıtım Videosu
+                            </button>
+                            <button onclick="showRouteDetails('inegol')" class="w-full py-2 bg-card-bg/50 border border-border-subtle/30 rounded-xl text-text-secondary text-xs font-bold uppercase hover:border-gold-primary/50 hover:text-gold-primary transition-all">
+                                Rota Detayları
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- More Districts Info -->
+        <div class="mt-8 glass-panel rounded-2xl p-6">
+            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-gold-primary">info</span>
+                Diğer İlçeler
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                    <p class="text-xs font-bold text-white">Büyükorhan</p>
+                    <p class="text-[10px] text-text-desc">Dağ ilçesi</p>
+                </div>
+                <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                    <p class="text-xs font-bold text-white">Harmancık</p>
+                    <p class="text-[10px] text-text-desc">Dağ ilçesi</p>
+                </div>
+                <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                    <p class="text-xs font-bold text-white">Orhaneli</p>
+                    <p class="text-[10px] text-text-desc">Dağ ilçesi</p>
+                </div>
+                <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                    <p class="text-xs font-bold text-white">Keles</p>
+                    <p class="text-[10px] text-text-desc">Dağ ilçesi</p>
+                </div>
+                <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                    <p class="text-xs font-bold text-white">Orhangazi</p>
+                    <p class="text-[10px] text-text-desc">Göl kenarı</p>
+                </div>
+                <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                    <p class="text-xs font-bold text-white">İznik</p>
+                    <p class="text-[10px] text-text-desc">Tarihi ilçe</p>
+                </div>
+                <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                    <p class="text-xs font-bold text-white">Yenişehir</p>
+                    <p class="text-[10px] text-text-desc">Ova ilçesi</p>
+                </div>
+                <div class="p-3 bg-card-bg/30 rounded-lg border border-border-subtle/20">
+                    <p class="text-xs font-bold text-white">Kestel</p>
+                    <p class="text-[10px] text-text-desc">Gelişen ilçe</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Video Modal -->
+<div id="video-modal" class="fixed inset-0 z-[60] bg-darkest/95 backdrop-blur-md hidden">
+    <div class="absolute top-4 right-4 z-20">
+        <button onclick="closeVideoModal()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </div>
+    <div class="w-full h-full flex items-center justify-center p-4">
+        <div class="w-full max-w-3xl aspect-video bg-card-bg rounded-2xl flex items-center justify-center border border-border-subtle/30">
+            <div class="text-center">
+                <div class="w-20 h-20 rounded-full bg-gold-primary/20 flex items-center justify-center mb-4 mx-auto animate-pulse">
+                    <span class="material-symbols-outlined text-4xl text-gold-primary">play_arrow</span>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2" id="video-title">Tanıtım Videosu</h3>
+                <p class="text-sm text-text-secondary mb-4">Belediye başkanının hazırladığı tanıtım videosu</p>
+                <p class="text-xs text-text-desc">Video oynatıcı entegrasyonu için hazır</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Route Details Modal -->
+<div id="route-modal" class="fixed inset-0 z-[60] bg-darkest/95 backdrop-blur-md hidden">
+    <div class="absolute top-4 right-4 z-20">
+        <button onclick="closeRouteModal()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </div>
+    <div class="w-full h-full overflow-y-auto p-4 pt-16">
+        <div class="max-w-2xl mx-auto">
+            <div class="glass-panel rounded-2xl p-6 mb-4">
+                <h3 class="text-xl font-bold text-white mb-2" id="route-title">Rota Detayları</h3>
+                <p class="text-sm text-text-secondary" id="route-desc">Keşif rotası hakkında detaylı bilgiler</p>
+            </div>
+            
+            <div class="space-y-3" id="route-stops">
+                <!-- Stops will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 flex items-center justify-around px-6 py-3 bg-nav-bg border-t border-border-subtle/50 pb-6 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="anasayfa.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">home</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Anasayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">explore</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="ara.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">search</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="profil.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">person</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Profil</span>
+    </a>
+</nav>
+
+<script>
+// Track currently open mayor
+let currentOpenMayor = null;
+
+// Toggle Mayor Card
+function toggleMayor(mayorId) {
+    const content = document.getElementById(`content-${mayorId}`);
+    const icon = document.getElementById(`icon-${mayorId}`);
+    const listItem = document.querySelector(`[data-mayor="${mayorId}"]`);
+    
+    // If clicking already open mayor, close it
+    if (currentOpenMayor === mayorId) {
+        content.classList.remove('open');
+        icon.style.transform = 'rotate(0deg)';
+        listItem.classList.remove('active');
+        currentOpenMayor = null;
+        return;
+    }
+    
+    // Close previously open mayor
+    if (currentOpenMayor) {
+        const prevContent = document.getElementById(`content-${currentOpenMayor}`);
+        const prevIcon = document.getElementById(`icon-${currentOpenMayor}`);
+        const prevListItem = document.querySelector(`[data-mayor="${currentOpenMayor}"]`);
+        
+        if (prevContent) prevContent.classList.remove('open');
+        if (prevIcon) prevIcon.style.transform = 'rotate(0deg)';
+        if (prevListItem) prevListItem.classList.remove('active');
+    }
+    
+    // Open new mayor
+    content.classList.add('open');
+    icon.style.transform = 'rotate(180deg)';
+    listItem.classList.add('active');
+    currentOpenMayor = mayorId;
+    
+    // Smooth scroll to the opened item
+    setTimeout(() => {
+        listItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+}
+
+// District Filter
+const districtTabs = document.querySelectorAll('.tab-btn');
+const mayorListItems = document.querySelectorAll('.mayor-list-item');
+
+districtTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        districtTabs.forEach(t => {
+            t.classList.remove('tab-active');
+            t.classList.add('tab-passive');
+        });
+        tab.classList.remove('tab-passive');
+        tab.classList.add('tab-active');
+        
+        const district = tab.dataset.district;
+        
+        // Close any open mayor when filtering
+        if (currentOpenMayor) {
+            toggleMayor(currentOpenMayor);
+        }
+        
+        mayorListItems.forEach(item => {
+            if (district === 'all' || item.dataset.category === district) {
+                item.style.display = 'block';
+                item.classList.add('animate-fade-in');
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+
+// Video Modal
+function openVideoModal(district) {
+    const modal = document.getElementById('video-modal');
+    const title = document.getElementById('video-title');
+    const names = {
+        'osmangazi': 'Osmangazi - Erkan Aydın',
+        'nilufer': 'Nilüfer - Şadi Özdemir',
+        'yildirim': 'Yıldırım - Oktay Yılmaz',
+        'mudanya': 'Mudanya - Hayri Türkyılmaz',
+        'gemlik': 'Gemlik - Mehmet Uğur Sertaslan',
+        'inegol': 'İnegöl - Alper Taban'
+    };
+    title.textContent = names[district] || 'Tanıtım Videosu';
+    modal.classList.remove('hidden');
+}
+
+function closeVideoModal() {
+    document.getElementById('video-modal').classList.add('hidden');
+}
+
+// Route Details Modal
+const routeData = {
+    'osmangazi': {
+        title: 'Osmangazi Keşif Rotası',
+        desc: 'Tarihin başkenti Osmangazi\'de 700 yıllık mirası keşfedin',
+        stops: [
+            { name: 'Ulu Cami', time: '09:00', desc: '20 kubbeli Osmanlı şaheseri', icon: 'mosque' },
+            { name: 'Koza Han', time: '10:30', desc: 'İpek ticaretinin merkezi', icon: 'store' },
+            { name: 'Tophane', time: '12:00', desc: 'Osman Gazi Türbesi ve panorama', icon: 'account_balance' },
+            { name: 'İskender Kebap', time: '13:30', desc: 'Öğle yemeği molası', icon: 'restaurant' },
+            { name: 'Muradiye Külliyesi', time: '15:00', desc: 'Sultan II. Murad kompleksi', icon: 'park' },
+            { name: 'Hanlar Bölgesi', time: '17:00', desc: 'Alışveriş ve çay keyfi', icon: 'shopping_bag' }
+        ]
+    },
+    'nilufer': {
+        title: 'Nilüfer Keşif Rotası',
+        desc: 'Modern Bursa\'nin doğal ve kültürel güzellikleri',
+        stops: [
+            { name: 'Gölyazı', time: '09:00', desc: 'Uluabat Gölü\'ndeki yarımada köyü', icon: 'water' },
+            { name: 'Ağlayan Çınar', time: '10:30', desc: 'Anıt ağaç', icon: 'nature' },
+            { name: 'Hasanağa Enginarı', time: '12:00', desc: 'Yerel lezzet', icon: 'restaurant' },
+            { name: 'Fadıllı', time: '14:00', desc: 'Doğa yürüyüşü', icon: 'hiking' },
+            { name: 'Ayvaini Mağarası', time: '16:00', desc: 'Doğal mağara', icon: 'terrain' }
+        ]
+    },
+    'yildirim': {
+        title: 'Yıldırım Keşif Rotası',
+        desc: 'UNESCO mirası ve Osmanlı külliyeleri',
+        stops: [
+            { name: 'Yeşil Türbe', time: '09:00', desc: 'Çelebi Mehmet Türbesi', icon: 'account_balance' },
+            { name: 'Yeşil Camii', time: '10:00', desc: 'Çinilerin zirvesi', icon: 'mosque' },
+            { name: 'Emir Sultan Külliyesi', time: '11:30', desc: 'Manzara ve tarih', icon: 'park' },
+            { name: 'Cumalıkızık', time: '13:30', desc: 'UNESCO Dünya Mirası köyü', icon: 'home' },
+            { name: 'Karagöz Müzesi', time: '16:00', desc: 'Gölge oyunu kültürü', icon: 'theater_comedy' }
+        ]
+    },
+    'mudanya': {
+        title: 'Mudanya Keşif Rotası',
+        desc: 'Tarihi liman kenti ve sahil güzellikleri',
+        stops: [
+            { name: 'Mudanya Sahil', time: '09:00', desc: 'Sahil yürüyüşü', icon: 'beach_access' },
+            { name: 'Mütareke Evi', time: '10:30', desc: 'Mudanya Mütarekesi müzesi', icon: 'museum' },
+            { name: 'Trilye', time: '12:00', desc: 'Tarihi balıkçı köyü', icon: 'sailing' },
+            { name: 'Deniz Mahsulleri', time: '13:30', desc: 'Öğle yemeği', icon: 'restaurant' },
+            { name: 'Güzelyalı', time: '15:30', desc: 'Plaj ve dinlenme', icon: 'wb_sunny' }
+        ]
+    },
+    'gemlik': {
+        title: 'Gemlik Keşif Rotası',
+        desc: 'Zeytin başkentinde doğal güzellikler',
+        stops: [
+            { name: 'Zeytin Bahçeleri', time: '09:00', desc: 'Zeytin hasadı ve tadım', icon: 'spa' },
+            { name: 'Kurşunlu Plajı', time: '11:00', desc: 'Deniz ve kumsal', icon: 'beach_access' },
+            { name: 'Sırtköy', time: '13:00', desc: 'Köy kahvaltısı', icon: 'restaurant' },
+            { name: 'Kürü', time: '15:00', desc: 'Tarihi köy gezisi', icon: 'home' },
+            { name: 'Gemlik Körfezi', time: '17:00', desc: 'Gün batımı manzarası', icon: 'photo_camera' }
+        ]
+    },
+    'inegol': {
+        title: 'İnegöl Keşif Rotası',
+        desc: 'Mobilya ve köfte cenneti',
+        stops: [
+            { name: 'Mobilya Kent', time: '09:00', desc: 'Dünyaca ünlü mobilya mağazaları', icon: 'chair' },
+            { name: 'İnegöl Köftecisi', time: '12:00', desc: 'Meşhur İnegöl köftesi', icon: 'restaurant' },
+            { name: 'Oylat Kaplıcaları', time: '14:00', desc: 'Şifa kaplıcaları', icon: 'hot_tub' },
+            { name: 'İnegöl Müzesi', time: '16:30', desc: 'Yöresel tarih', icon: 'museum' }
+        ]
+    }
+};
+
+function showRouteDetails(district) {
+    const modal = document.getElementById('route-modal');
+    const data = routeData[district] || { title: 'Rota Detayları', desc: 'Bilgi yükleniyor...', stops: [] };
+    
+    document.getElementById('route-title').textContent = data.title;
+    document.getElementById('route-desc').textContent = data.desc;
+    
+    const stopsContainer = document.getElementById('route-stops');
+    stopsContainer.innerHTML = '';
+    
+    data.stops.forEach((stop, index) => {
+        const stopEl = document.createElement('div');
+        stopEl.className = 'glass-panel rounded-xl p-4 flex gap-4';
+        stopEl.innerHTML = `
+            <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-gold-primary/20 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">${stop.icon}</span>
+                </div>
+                ${index < data.stops.length - 1 ? '<div class="w-0.5 h-full bg-gold-primary/20 mt-2"></div>' : ''}
+            </div>
+            <div class="flex-1 pb-4">
+                <div class="flex items-center justify-between mb-1">
+                    <h4 class="text-sm font-bold text-white">${stop.name}</h4>
+                    <span class="text-[10px] text-gold-primary font-bold">${stop.time}</span>
+                </div>
+                <p class="text-xs text-text-desc">${stop.desc}</p>
+            </div>
+        `;
+        stopsContainer.appendChild(stopEl);
+    });
+    
+    modal.classList.remove('hidden');
+}
+
+function closeRouteModal() {
+    document.getElementById('route-modal').classList.add('hidden');
+}
+
+// Close modals on background click
+window.onclick = function(event) {
+    const videoModal = document.getElementById('video-modal');
+    const routeModal = document.getElementById('route-modal');
+    if (event.target === videoModal) {
+        closeVideoModal();
+    }
+    if (event.target === routeModal) {
+        closeRouteModal();
+    }
+}
+</script>
+
+</body>
+</html>
