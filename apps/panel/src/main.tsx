@@ -12,6 +12,7 @@ import { LocationsPage } from './pages/locations-page';
 import { LoginPage } from './pages/login-page';
 import { ModerationPage } from './pages/moderation-page';
 import { OccupationsPage } from './pages/occupations-page';
+import { OrganizationsPage } from './pages/organizations-page';
 import { ServiceCategoriesPage } from './pages/service-categories-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { OverviewPage } from './pages/overview-page';
@@ -42,6 +43,7 @@ const router = createHashRouter([
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
+      { path: 'kurumlar', element: <OrganizationsPage /> },
       { path: 'yetkiler', element: <GrantsPage /> },
       { path: 'islem-kayitlari', element: <AuditLogPage /> },
     ],

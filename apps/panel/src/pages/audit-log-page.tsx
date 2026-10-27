@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { AuditLogEntry } from '@cityjoy/shared';
-import { createGrantAdmin, listAuditLog } from '@cityjoy/shared/firebase';
+import { listAuditLog } from '@cityjoy/shared/firebase';
 
 import { firestore } from '../lib/firebase';
 import { useSession } from '../lib/session';
@@ -16,18 +16,12 @@ export function AuditLogPage() {
   const [list, setList] = useState<AuditLogEntry[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [module, setModule] = useState('');
-  const [names, setNames] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     setLoadError(false);
     if (!user || user.isDemo) return setList([]);
     try {
       setList(await listAuditLog(firestore, isAdmin ? {} : { actorUid: user.uid }));
-      // Admin için yapanın adı yetki kayıtlarından okunur (kayda kişisel veri yazılmadığı için).
-      if (isAdmin) {
-        const grants = await createGrantAdmin(firestore, user.uid).listAll().catch(() => []);
-        setNames(Object.fromEntries(grants.map((g) => [g.uid, g.displayName])));
-      }
     } catch {
       setLoadError(true);
     }
@@ -39,7 +33,7 @@ export function AuditLogPage() {
 
   const modules = [...new Set((list ?? []).map((e) => e.module))];
   const visible = (list ?? []).filter((e) => !module || e.module === module);
-  const actor = (uid: string) => (uid === user?.uid ? t('audit.you') : (names[uid] ?? uid));
+  const actor = (uid: string) => (uid === user?.uid ? t('audit.you') : uid);
 
   return (
     <section className="page">

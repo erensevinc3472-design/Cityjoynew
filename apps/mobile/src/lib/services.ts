@@ -11,7 +11,6 @@ import {
   createFirestoreReviewRepository,
   createFirestoreServiceCategoryRepository,
   submitServiceSuggestion,
-  deleteOwnAccessRequest,
 } from '@cityjoy/shared/firebase';
 import { Platform } from 'react-native';
 
@@ -30,8 +29,6 @@ export const reviewRepository = createFirestoreReviewRepository(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);
 export const sosRepository = createFirestoreSosRepository(firestore);
 export const pushTokenRepository = createFirestorePushTokenRepository(firestore);
-/** Panel yetki talebi (aynı hesapla panelden gönderilmiş olabilir); hesap silinirken o da silinir. */
-export const deleteAccessRequest = (uid: string) => deleteOwnAccessRequest(firestore, uid);
 export const serviceCategories = createServiceCategoryStore(createFirestoreServiceCategoryRepository(firestore), deviceStorage);
 export const sendServiceSuggestion = (uid: string, text: string, provinceCode?: string) => submitServiceSuggestion(firestore, uid, text, provinceCode);
 

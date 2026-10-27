@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { AuthError } from '@cityjoy/shared';
 
-import { AccessRequestBox } from '../components/access-request';
+import { NoAccessBox } from '../components/no-access';
 import { ScopeLabel } from '../components/scope-label';
 import { isFirebaseConfigured } from '../lib/firebase';
 import { authService } from '../lib/services';
@@ -53,7 +53,7 @@ export function LoginPage() {
         <h1>{t('login.title')}</h1>
 
         {noAccess ? (
-          <AccessRequestBox />
+          <NoAccessBox />
         ) : isFirebaseConfigured ? (
           <form className="form" onSubmit={submit} noValidate>
             <label htmlFor="login-email">{t('login.email')}</label>

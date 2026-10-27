@@ -124,3 +124,5 @@ tbody tr:last-child td { border-bottom: 0; }
 .plain-list { margin: 0.4rem 0 0; padding-inline-start: 1rem; font-size: 0.85rem; }
 details summary { cursor: pointer; color: var(--accent); }
 td input[type='checkbox'] { width: 20px; height: 20px; }
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; border: 0; padding: 0; margin: 0; }
+.checkbox-group label { display: flex; align-items: center; gap: 0.4rem; font-weight: 400; min-height: 44px; }
