@@ -26,3 +26,19 @@ export {
   createSosSettingsAdmin,
   SosSendTimeoutError,
 } from './sos';
+export { createGrantAdmin, listAuditLog, loadOwnGrants, type GrantInput } from './grants';
+export {
+  createAccountWithSetupLink,
+  createOrganizationAdmin,
+  loadOwnMemberships,
+  memberDocId,
+  resendSetupLink,
+  type OrganizationInput,
+} from './organizations';
+export { CITY_PACK_SIZE, createCityGuideAdmin, createFirestoreCityGuideRepository } from './city-guide';
+export {
+  createApprovalAdmin,
+  createVerificationRequests,
+  type ApprovalActor,
+  type TrustedApproverInput,
+} from './approvals';

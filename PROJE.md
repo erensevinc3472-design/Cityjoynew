@@ -105,8 +105,10 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
 - **Mahalle Meydanı = mahalle bilgi sayfası (Eren onayladı).** Akış değil, mahallenin "künyesi". Sosyal konuşma Keşfet > Mahallem'de kalır. İçerik: muhtar bilgisi (ad, iletişim, çalışma saatleri), mahalle haritası ve temel bilgiler, yakındaki hizmetler (nöbetçi eczane, sağlık merkezi, okul, cami, park, pazar günü, otopark), afet toplanma alanları, sabitlenmiş mahalle duyuruları ve yaklaşan etkinlikler, mahallenin ücretsiz/takas ilanları ve kayıp-buluntu, "Mahallem akışına git" düğmesi.
   - **Yönetim (Eren'in fikri: muhtar; ayrıntılar Eren onayladı):** Sayfanın bilgi ve duyurularını doğrulanmış **muhtar** hesabı yönetir, yalnızca kendi mahallesi için. Muhtar hesabı yoksa ya da aktif değilse ilçe belediyesi paneli sayfayı düzenler. Muhtar hesapları ilçe belediyesi veya il yöneticisi aracılığıyla doğrulanır. Muhtarlık seçimle değişince hesap devri yapılır (eski hesabın yetkisi kapanır). Muhtar mahalle içi duyuru bildirimi gönderebilir (günlük sınır; reklam, kampanya ve siyasi içerik yasak; kötüye kullanımda yetki kısıtlanır). Muhtar yardımcı personel ekleyebilir. Kullanıcılar bilgi hatası bildirebilir.
 - **İş kuralı (Eren):** Veriler çoğunlukla 81 il için sabit ve ortaktır (otoparklar, müzeler, ulaşım, park ve pazar). Kafe ve restoranlar çok sık değişmez. Etkinlikleri yetkili hesaplar girer (belediye paneli, Eren'in ekibi, yetki verilen kurum ve kişiler), kullanıcılar ise aktivite açar. Nöbetçi eczane bir API ile otomatik gelir (söylenişte "APK" geçti, API olarak anlaşıldı).
+- **Yapıldı (27 Ekim 2026): sabit bilgiler şablonla.** Önemli kurumlar, müzeler, otoparklar, parklar, pazarlar, ulaşım, toplanma alanları, muhtarlıklar, belediye hizmetleri ve "Nasıl yapılır?" tek bir şablonla tutulur; veri Excel'den panelden yüklenir (Eren'in önerisi: başka bir yapay zekâyla ya da ekiple doldurulur, kaynak ve tarih zorunlu, bilinmeyen boş bırakılır). Yüklenen bilgi "doğrulanmadı" etiketiyle ve kaynağıyla görünür, doğrulanınca etiket kalkar. Uygulamada bölümler, liste ve ayrıntı hazır. Kafe-restoran (İşletmem), nöbetçi eczane, etkinlik, ilan ve Mahalle Meydanı ayrı gelecek. Seyahat'in sabit bilgileri aynı yöntemle yapılacak.
 - **Karar (Eren):** Belediye hizmetlerinde uygulama hizmeti, gerekli evrakı ve başvuru bağlantısını gösterir, başvuru belediyenin kendi sistemine yönlendirilir. Uygulama içi başvuru ilk sürümde yok (istekli belediyelerle sonra düşünülebilir).
 - SORULACAK: Veri kaynakları neler (özellikle nöbetçi eczane, ulaşım)?
+  - **Nöbetçi eczane önerisi (Claude, 27 Ekim 2026, ONAY BEKLİYOR):** resmi kurumların açık servisi yok; hazır ücretli servis (ilk tercih NosyAPI, yedek CollectAPI, tahmini ayda 6-13 dolar), her sabah 81 il bir kez çekilir, ikinci deneme yalnızca başarısız illeri tamamlar. Zamanlayıcı şimdilik GitHub Actions (ücretsiz), Blaze'e geçilirse Firebase'e taşınır. Ayrıntı: `docs/oneri-nobetci-eczane.md`.
 - **Ziyaretçi Modu (Eren onayladı; eşik değerleri sonra belirlenecek):** Benim Şehrim kullanıcının o an bulunduğu şehre göre değişebilir. Örnek: Bursa'dan Antalya'ya giden kullanıcıya "Konumunuz Antalya görünüyor, Antalya olarak devam etmek ister misiniz?" sorulur.
   - Kayıtlı il/ilçe/mahalle her zaman "Evim" olarak durur. Farklı bir ilde olunduğu algılandığında (konum izni verilmişse) sorulur, sessizce değişmez. Seçenekler: "Antalya'yı göster", "Bursa'da kal", "Bir daha sorma".
   - Seçilirse ekranın üstünde "Antalya (ziyaretçi) · Evim: Bursa" şeridi ve tek dokunuşla eve dönüş bulunur. Ziyaretçi modunda yerleşik kullanıcıya özel bölümler (belediye başvuruları, mahalle duyuruları) geri çekilir, gezilecek yerler, eczane, acil numaralar, ulaşım ve etkinlikler öne çıkar.
@@ -335,7 +337,7 @@ Bildirim merkezi, kategorilere göre (duyuru, etkinlik, mesaj, takip, yarışma,
 
 Eren'in kuralı: **herkes yalnızca kendi panelinden, kendine yetkilendirilen kadarını** uygulamaya etki ettirebilir.
 - Yetki iki eksenlidir: **bölge** (il/ilçe/mahalle) ve **modül** (hangi bölüme yazabilir).
-- **Karar (Eren): yetkiyi yalnızca admin verir ve geri alır.** İl yöneticisi yetki veremez. Öneri: il yöneticisi yetki *talebi* açabilir, talep admin'in "Bekleyen onaylar" ekranına düşer (bölüm 6.5).
+- ~~Karar (Eren): yetkiyi yalnızca admin verir ve geri alır. İl yöneticisi yetki veremez.~~ **27 Ekim 2026'da değişti, bkz. 6.7:** admin herkese ve tüm kurumlara verir; il yöneticisi kendi ilindeki muhtarlara (ve gönüllü moderatörlere) verir; kurum kendi personeline verir. Kimse kendinde olmayan yetkiyi veremez.
 - **Karar (Eren): herkes kendi alanında.** Büyükşehir belediyesi il geneli içerik girer, ilçe belediyesi yalnızca kendi ilçesine. İkisi aynı yere içerik girerse her içerikte kimin girdiği yazar. Kimse diğerinin içeriğini düzenleyemez.
 - **Karar (Eren): işletmeler için ayrı panel yok (ilk sürüm).** İşletme sahipleri her şeyi mobil uygulamadaki Profil > İşletmem bölümünden yapar. İhtiyaç olursa sonra eklenir.
 
@@ -423,6 +425,9 @@ Eren'in onayıyla ilk sürüm seçimi Claude'a bırakıldı. Tam liste ve ilk s�
 |---|---|---|
 | 1 | 81 il, ilçe ve mahalle verisini yönetme ve içe aktarma | Evet |
 | 2 | Rol ve yetki matrisi tanımlama; il yöneticisi atama ve geri alma | Evet |
+
+**Yapıldı (27 Ekim 2026), 2. ve 12. madde:** Panel > Yetkiler (rol × bölge × bölüm × eylem, süreli, geri al / yeniden ver; e-postayla, form yok) ve Panel > Kurumlar (kurum açma, resmî e-postayla hesap ve şifre belirleme bağlantısı, sözleşme bitişi, pasifleştirme, kurum yöneticisinin personel yönetimi), İşlem kayıtları sayfası. Ayrıntı 6.7. Güvenlik (Claude, standart): admin rolü panelden verilmez (yalnızca Firebase konsolu); yetki yalnızca doğrulanmış e-postada geçer; ülke geneli listeler admin'de kalır; kurallar sunucuda aynı sınırları denetler.
+
 | 3 | İl bazında modül/özellik açıp kapatma | Evet |
 | 4 | Çeviri dosyaları ve uygulama metinleri (5 dil) | Evet |
 | 5 | Zorunlu uygulama güncelleme uyarıları | Sonra |
@@ -451,6 +456,7 @@ Not: 9 ve 10 numaralı güvenlik ve KVKK maddeleri mağaza onayı ve yasal uyum 
   - **"Güvenli olanları onayla":** Yalnızca *güvenilir yöneticilerin* ilk aşamada onayladığı işleri onaylar.
 - **Güvenilir yöneticiler listesi:** Admin bu listeye yönetici ekler ve listeden çıkarır. Her kayıt bir yönetici ile bir kapsamdan oluşur. Kapsam şehir, ilçe ve kategoriye göre seçilir. Örnek: "Ahmet Bey, Bursa, yalnızca bildirimler." Bir iş, onu ilk aşamada onaylayan yönetici bu listede o iş için uygun şehir, ilçe ve kategoriyle kayıtlıysa "güvenli" sayılır.
 - **Öneri (standart güvenlik):** Toplu onaydan önce "X iş onaylanacak" özeti gösterilir ve onay istenir. Toplu onaylar da tek tek işlem kaydına yazılır. Yüksek riskli işler (hesap kapatma, ücret/iade, il geneli bildirim) "Güvenli olanları onayla" kapsamına girmez, her seferinde tek tek onaylanır.
+- **Yapıldı (27 Ekim 2026), ilk kullanım işletme doğrulaması:** Panel > Bekleyen onaylar (il / ilçe / kategori / aşama süzgeci, satır satır onay, gerekçeli ret, "Tümünü onayla", "Güvenli olanları onayla", güvenilir yöneticiler listesi). İşletme sahibi uygulamadan doğrulama ister, il yöneticisi onaylar ya da kendisi önerir, admin son kararı verir. Claude'un standart seçimleri: yüksek riskli işler (hesap kapatma, ücret/iade, il geneli bildirim, kurum hesabı açma) iki toplu düğmeye de girmez; il yöneticisi olmayan ildeki işi admin doğrudan onaylayabilir; kimse kendi isteğine ya da kendi işletmesine karar veremez; ret gerekçesi istek sahibine gösterilir. Diğer iş türleri ilgili özelliklerle eklenecek.
 
 ### 6.6 Kurum içi personel ve onay akışı (Karar, Eren)
 
@@ -459,6 +465,15 @@ Not: 9 ve 10 numaralı güvenlik ve KVKK maddeleri mağaza onayı ve yasal uyum 
 - **Örnek (Eren'in örneği):** Basın müdürü gönderi ve etkinlikte hazırlayan, özel kalem onaylayan. Basın müdürü "Onaya gönder" der, özel kaleme bildirim gider, onaylanınca yayınlanır.
 - **Dış onaylarla ilişkisi:** Kurum içi onaydan sonra, iki aşamalı onay gereken işler (kampanya bildirimi vb.) bölüm 6.5'teki il yöneticisi → admin akışına girer.
 - **Kayıt ve güvenlik (standart):** Kim hazırladı, kim onayladı, ne zaman yayınlandı kayda geçer. Personel ayrılınca yetki tek tuşla kapatılır, süreli görev verilebilir. Aynı yapı muhtarlıkta (muhtar yardımcısı hazırlar, muhtar onaylar) ve diğer kurumlarda geçerlidir.
+
+### 6.7 Hesap açma, kilitli adlar ve yetki zinciri (Karar, Eren, 27 Ekim 2026)
+
+- **Kilitli adlar (Karar, Eren):** Tüm belediye adları (30 büyükşehir, 51 il, ilçe belediyeleri) baştan kilitlidir; hiçbir kullanıcı bu adları (işletme adı, profil adı, ileride kullanıcı adı) alamaz. Ad yalnızca admin'in açtığı resmî kurum hesabına verilir. Standart olarak "belediye, valilik, kaymakamlık, muhtarlık, CityJoy" gibi resmî sözcükler de kullanıcı adlarında kullanılamaz (Claude, güvenlik).
+- **Kurum hesabını CityJoy açar (Karar, Eren):** Anlaşma yapılan kurumun hesabı kurumun resmî e-postasıyla açılır. Şifreyi kurum kendisi belirler: sisteme kayıtlı e-postaya "şifrenizi belirleyin" bağlantısı gider (Eren onayladı; şifre CityJoy'da, mesajda ya da e-postada hiç durmaz). Hesap kurum yöneticisinindir (örn. özel kalem); personel ortak şifre kullanmaz, herkes kendi hesabıyla çalışır, kayıtlarda kişinin adı görünür.
+- **Form yok, yetki yukarıdan verilir (Karar, Eren):** Yetki alacak kişi form doldurmaz, panele başvurmaz. Yetkiyi veren, kişinin e-postasını yazar, rolünü ve bölgesini/bölümünü seçer; kişi o e-postayla (doğrulanmış) uygulamaya ya da panele girince yetkisi açılır. Zincir: **admin** herkese ve tüm kurumlara; **il yöneticisi** kendi ilindeki muhtarlara (ve gönüllü moderatörlere); **kurum yöneticisi** kendi personeline (kurumun bölgesi ve bölümleri içinde). Kimse kendinde olmayan yetkiyi veremez; verenin kendisi ve admin geri alabilir; her işlem kayda geçer.
+- **Yapıldı (27 Ekim 2026):** kilitli adlar, kurum açma ve personel, e-postayla yetki zinciri (panel ve kurallar). Onay zinciri onay merkeziyle (6.5) gelecek.
+- **Panel kimlerde (Eren onayladı):** Admin, kurumlar ve il yöneticileri panel sahibidir. Muhtar ve kurum personeli aynı web panelini kendi hesabıyla, yalnızca aldıkları erişim kadar kullanır (panel telefonda da açılır). Mobil uygulamada "Yönetim" bölümü sonraya bırakıldı.
+- **Onay zinciri (Karar, Eren):** Personelin onay gereken işi kendi yetkilisine (kurum içi onaylayan / il yöneticisi) gider. Admin onayı gereken işleri il yöneticisi ve kurum admin'e sorar (Bekleyen onaylar, 6.5). Aşağıdaki **önemli konularda** il yöneticisi ya da kurum onaylasa bile iş admin'e de gider (Eren onayladı): il geneli ve kampanya bildirimleri, işletme doğrulaması, yeni kurum hesabı açma, hesap kapatma ve yasaklama, ücret ve iade işlemleri, anket yayını.
 
 ## 7. Filtreli bildirim
 

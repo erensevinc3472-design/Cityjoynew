@@ -1,13 +1,29 @@
 import type { Module, RegionScope } from '../permissions/types';
 
-/** Panel kullanan kurum: belediye, muhtarlık, kurum, kulüp, yayıncı. Admin açar. */
+export type OrganizationKind =
+  | 'buyuksehir-belediyesi'
+  | 'il-belediyesi'
+  | 'ilce-belediyesi'
+  | 'kurum'
+  | 'kulup'
+  | 'yayinci';
+
+/**
+ * Panel kullanan kurum: belediye, kamu kurumu, kulüp, yayıncı. Yalnızca admin açar (PROJE.md 6.7). Belediyelerin
+ * kimliği kilitli ad listesindeki kimliktir ("bld-16-nilufer"), böylece aynı belediye iki kez açılamaz.
+ */
 export interface Organization {
   id: string;
   name: string;
-  kind: 'buyuksehir-belediyesi' | 'ilce-belediyesi' | 'il-belediyesi' | 'muhtarlik' | 'kurum' | 'kulup' | 'yayinci';
+  kind: OrganizationKind;
   /** Admin'in kuruma verdiği bölge ve bölümler; personel bunların dışına çıkamaz. */
   scope: RegionScope;
   modules: Module[];
+  /** Kurumun resmî e-postası (hesap bununla açılır, şifre belirleme bağlantısı buraya gider). */
+  officialEmail: string;
+  status: 'aktif' | 'pasif';
+  /** Sözleşme bitişi (ISO tarih); geçince kurum paneli kendiliğinden kapanır. */
+  contractEndsAt?: string;
   createdBy: string;
   createdAt: string;
 }
@@ -23,9 +39,10 @@ export interface StaffAssignment {
 
 export interface OrganizationMember {
   orgId: string;
-  uid: string;
+  /** Küçük harfli e-posta; kişi bu (doğrulanmış) e-postayla girince görevi açılır. */
+  email: string;
   displayName: string;
-  /** Kurum yöneticisi personel ekler, çıkarır ve görev verir. */
+  /** Kurum yöneticisi personel ekler, çıkarır ve görev verir. Yalnızca admin atar. */
   isOrgAdmin: boolean;
   assignments: Partial<Record<Module, StaffAssignment>>;
   /** Süreli görevlerde bitiş (ISO tarih). */

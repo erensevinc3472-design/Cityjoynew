@@ -4,7 +4,7 @@ import { can, canSeeModule, ROLE_TEMPLATES, type PermissionGrant } from '../inde
 
 const grant = (over: Partial<PermissionGrant>): PermissionGrant => ({
   id: 'g',
-  uid: 'u',
+  email: 'u@ornek.com',
   role: 'belediye',
   scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' },
   modules: ROLE_TEMPLATES.belediye,

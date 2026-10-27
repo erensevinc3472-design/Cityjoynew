@@ -1,4 +1,5 @@
 import type { MembershipTier } from '../models/membership';
+import { isReservedName } from '../organizations/municipalities';
 
 /** İşletme türü (PROJE.md 5.7 adım 1). Belediye, kurum, kulüp ve muhtar hesapları bu akışta değildir. */
 export const BUSINESS_TYPES = ['hizmet', 'esnaf', 'evden-uretim', 'yeme-icme', 'konaklama', 'yol-ustu', 'emlak'] as const;
@@ -64,6 +65,7 @@ export const BUSINESS_LIMITS = {
 
 export type BusinessError =
   | 'name'
+  | 'reservedName'
   | 'categories'
   | 'location'
   | 'phone'
@@ -77,6 +79,8 @@ export function validateBusiness(b: BusinessInput): BusinessError[] {
   const errors: BusinessError[] = [];
   const len = (s: string | undefined) => (s ?? '').trim().length;
   if (len(b.name) < BUSINESS_LIMITS.name[0] || len(b.name) > BUSINESS_LIMITS.name[1]) errors.push('name');
+  // Belediye ve resmî kurum adları kilitli (PROJE.md 6.7).
+  else if (isReservedName(b.name)) errors.push('reservedName');
   if (b.categoryIds.length < BUSINESS_LIMITS.categories[0] || b.categoryIds.length > BUSINESS_LIMITS.categories[1]) errors.push('categories');
   if (!/^[0-8][0-9]$/.test(b.location.provinceCode) || !b.location.districtId.startsWith(`${b.location.provinceCode}-`)) errors.push('location');
   if (!/^[0-9]{10,13}$/.test(b.phone)) errors.push('phone');

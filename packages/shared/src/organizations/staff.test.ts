@@ -8,12 +8,14 @@ const org: Organization = {
   kind: 'ilce-belediyesi',
   scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' },
   modules: ['gonderiler', 'etkinlikler', 'bildirimler'],
+  officialEmail: 'bilgi@nilufer.bel.tr',
+  status: 'aktif',
   createdBy: 'admin',
   createdAt: '2026-01-01T00:00:00Z',
 };
 const member = (assignments: OrganizationMember['assignments'], over: Partial<OrganizationMember> = {}): OrganizationMember => ({
   orgId: 'nilufer',
-  uid: 'u',
+  email: 'personel@nilufer.bel.tr',
   displayName: 'Personel',
   isOrgAdmin: false,
   assignments,

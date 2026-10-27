@@ -16,7 +16,8 @@
     "firebase": "^13.1.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "react-router": "8.5.0"
+    "react-router": "8.5.0",
+    "read-excel-file": "9.3.12"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

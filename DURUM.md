@@ -4,11 +4,15 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 27 Ekim 2026.
+Son güncelleme: 27 Ekim 2026 (onay merkezi: Bekleyen onaylar, iki aşamalı işletme doğrulaması, güvenilir yöneticiler).
 
 ## Depo ve ortam
 
-- GitHub: `erensevinc3472-design/Cityjoynew` (gizli), dal `main`. Eski `cityjoy` deposu kullanılmıyor.
+- GitHub: `erensevinc3472-design/Cityjoynew` (gizli), ana dal `main`. Eski `cityjoy` deposu kullanılmıyor.
+- **27 Ekim 2026 çalışmaları `main`'de değil:** yetki zinciri, kurumlar, kilitli adlar ve şehir rehberi
+  `claude/serene-dirac-4mwde3` dalında; onay merkezi bunun üstüne `claude/durum-md-continuation-82b1wf` dalında (önceki dalın
+  hepsini içerir). `main`'e birleştirilmediyse yeni oturum `claude/durum-md-continuation-82b1wf` dalından başlamalı ya da
+  önce birleştirme (PR) yapılmalı; aksi halde bu işler görünmez.
 - Firebase projesi: `cityjoynew` (Spark, ücretsiz plan). Firestore bölgesi eur3. Giriş yöntemleri: e-posta/şifre ve Google.
 - Bağlantı bilgileri koda konmaz. `.env.local` dosyaları GitHub'a gitmez ve oturum kapanınca silinir.
   Yeni oturumda yeniden üretmek için ortam değişkeni `FIREBASE_WEB_CONFIG` (konsoldaki `firebaseConfig` bloğu)
@@ -25,17 +29,18 @@ Son güncelleme: 27 Ekim 2026.
 |---|---|
 | `apps/mobile` | Expo SDK 58 + Expo Router (TypeScript). Ekranlar `src/app`, bileşenler `src/components`, tema `src/theme` |
 | `apps/panel` | React 19 + Vite + React Router (hash yönlendirme). Tek panel, menü yetkiye göre süzülür |
-| `packages/shared` | Ortak: 5 dil metinleri (`src/i18n/locales`), konum verisi, acil numaralar (`src/emergency`), hizmet kategorileri (`src/categories`), işletmeler ve sıralama (`src/business`), SOS ve aile (`src/sos`), yetki, veri yapıları, hizmet arayüzleri, Firebase uygulaması (`src/firebase`, `@cityjoy/shared/firebase` olarak alınır) |
+| `packages/shared` | Ortak: şehir rehberi şeması ve Excel denetimi (`data/city-guide-schema.json`, `src/city-guide`), kilitli belediye adları ve kurumlar (`src/organizations`), 5 dil metinleri (`src/i18n/locales`), konum verisi, acil numaralar (`src/emergency`), hizmet kategorileri (`src/categories`), işletmeler ve sıralama (`src/business`), SOS ve aile (`src/sos`), yetki, veri yapıları, hizmet arayüzleri, Firebase uygulaması (`src/firebase`, `@cityjoy/shared/firebase` olarak alınır) |
 | `firebase/` | `firestore.rules` ve emülatör testleri |
 | `tasarim/` | Eren'in 135 tasarım HTML dosyası. İçerikleri değiştirilmez (`CLAUDE.md`) |
 | `docs/stil-rehberi.md` | Renk, yazı tipi, bileşen kuralları (görsel yön kararı) |
+| `docs/oneri-nobetci-eczane.md` | Nöbetçi eczane veri kaynağı ve günlük çekim önerisi (onay bekliyor) |
 
 ## Komutlar
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (43)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (26; Java gerekir)
+npm test                      # ortak paket testleri (62)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (46; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -123,9 +128,60 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    ekranı, "Güvendeyim" bildirimi, SOS hazırlığı bölümü (bildirim + "her zaman" konum izni), çıkışta bildirim adresi silinir.
    Web'de bu kısımlar sessizce atlanır ve ekranda uyarı görünür; **gerçek telefonda henüz denenmedi** (EAS gerekir).
 
+14. **Yetki zinciri, kurumlar ve kilitli adlar** (PROJE.md 6.7, Eren'in kararı). **Kilitli adlar:** 30 büyükşehir, 51 il ve
+   922 ilçe belediyesinin adı listede (`packages/shared/src/organizations/municipalities.ts`); "belediye, valilik,
+   kaymakamlık, muhtarlık, CityJoy" sözcükleri işletme adında ve kayıttaki adda kullanılamaz (uygulama + kurallar, 5 dilde
+   uyarı). **Kurumlar sayfası (admin):** kurum aç (belediye kilitli listeden seçilir, aynısı iki kez açılamaz; kamu kurumu,
+   kulüp, yayıncı serbest adla), resmî e-posta + kurum yöneticisinin adı, bölümler, sözleşme bitişi. Hesap o e-postayla
+   açılır ve "şifrenizi belirleyin" bağlantısı gider (şifreyi kimse görmez; bağlantıyla şifre koyunca e-posta da
+   doğrulanmış olur). Pasifleştir / etkinleştir, bağlantıyı yeniden gönder; sözleşme bitince panel kendiliğinden kapanır.
+   **Kurum yöneticisi:** kendi personelini e-postayla ekler, bölüm başına görev verir (hazırlayan / onaylayan / izleyen,
+   "onaysız yayınlayabilir"), süreli görev, çıkarma; kurum yöneticisi atayamaz (admin atar). **Yetkiler sayfası:** admin
+   il yöneticisi, muhtar, gönüllü moderatör atar; il yöneticisi kendi ilinde muhtar ve moderatör atar, kendinde olmayan
+   yetkiyi veremez. Form yok: kişi e-postasıyla eklenir, o e-postayla (doğrulanmış) girince yetkisi açılır; doğrulanmamış
+   e-postada "doğrulama e-postasını yeniden gönder / doğruladım" ekranı. **İşlem kayıtları** sayfası. İl yöneticisi kendi
+   ilinin kurumlarını, işletmelerini (salt okunur) ve eksik hizmet önerilerini görür. Veritabanı: `grants/{e-posta}__{bölge}`,
+   `organizations/{bld-.. | krm-..}`, `orgMembers/{kurum}__{e-posta}`; hiçbiri silinmez (geçmiş kalır). Kurallar sunucuda
+   aynı sınırları denetler (rol × bölge × bölüm × eylem, kurumun bölümleri, kendine yetki yok, admin rolü panelden yok).
+   Emülatörde tarayıcıyla baştan sona denendi (kurum aç > şifre bağlantısı > kurum yöneticisi personel ekler > il
+   yöneticisi muhtar atar > muhtar ve personel paneli > doğrulanmamış e-posta).
+
+15. **Benim Şehrim sabit bilgileri (şehir rehberi).** Tek kaynak: `packages/shared/data/city-guide-schema.json` (10 bölüm,
+   sütunlar, seçenekler, 5 dilde adlar). Excel şablonu bundan üretilir (`scripts/build-data-templates.py` >
+   `docs/veri-sablonlari/benim-sehrim-sablon.xlsx` ve panelde indirilebilir kopya). **Panel > Şehir rehberi:** il seç, "Excel'den
+   yükle" > önizleme (geçerli / hatalı satır, nedeni ve satır numarası; örnek satırlar atlanır; yetkisi olmayan il reddedilir) >
+   yükle. Aynı yer yeniden yüklenince güncellenir (kimlik bölüm + ilçe + ad), içerik değişirse doğrulama düşer, dosyada olmayan
+   eskiler kalır. Tek tek doğrula / düzenle (Excel ile aynı denetim) / kaldır; işlem kaydı. Admin her ili ve ülke geneli ("tr",
+   Nasıl yapılır) içeriği, il yöneticisi kendi ilini yönetir (yeni yetki bölümü `sehir-rehberi`). **Veritabanı:**
+   `cityGuide/{il}` özet (bölüm başına sürüm, sayı, parça) + `cityGuidePacks/{il}__{bölüm}__{n}` (en çok 400 öğe/parça); herkes
+   okur. **Uygulama:** ana sayfada Benim Şehrim açıldı (`apps/mobile/src/app/city/`): bölümler (kayıt sayısı, boş olanlar
+   "henüz bilgi yok"), liste (arama, ilçe süzgeci, kendi ilçesi önce), ayrıntı (Ara, Haritada aç, web/başvuru, bölüme özgü
+   bilgiler, kaynak ve tarih, doğrulanmamışsa uyarı). Açılışta tek okuma, bölüm yalnızca değişince indirilir, internetsizken
+   telefondaki gösterilir. Emülatörde panel + uygulama (web) baştan sona denendi. **Eren veri dosyası hazırlıyor** (başka yapay
+   zekâyla ya da ekibiyle); gelmezse Claude açık kaynaklardan "doğrulanmadı" olarak hazırlayacak.
+
+16. **Onay merkezi (PROJE.md 6.5, 6.7), ilk kullanım: işletme doğrulaması.** Ortak yapı `packages/shared/src/approvals`
+   (iş türleri, "yüksek risk" işareti, güvenli iş hesabı, süzgeç, toplu onay seçimi). **Akış:** işletme sahibi uygulamada
+   İşletmem > işletmeyi düzenle > Doğrulama > "Doğrulama iste" der (durumu, ret gerekçesini görür, geri çeker, yeniden ister) >
+   il yöneticisi Panel > Bekleyen onaylar'da onaylar (admin'e gider) ya da gerekçeyle reddeder > admin son kararı verir >
+   işletme "Doğrulandı" olur. İl yöneticisi istek gelmemiş bir işletmeyi Panel > İşletmeler'den "Doğrulamaya öner" ile de
+   gönderebilir (kendi işletmesini öneremez). İl yöneticisi olmayan ildeki işi admin doğrudan onaylar. **Bekleyen onaylar
+   sayfası:** aşama (admin onayı / il onayı bekleyen, hepsi, sonuçlananlar), il, ilçe, kategori süzgeci; satır satır onay ve
+   ret (gerekçe 5-300 karakter, istek sahibine gösterilir); "Tümünü onayla" ve "Güvenli olanları onayla" (önce "X iş onaylanacak"
+   sorusu; yüksek riskli işler toplu onaya girmez; her iş ayrı ayrı işlem kaydına). **Güvenilir yöneticiler** (yalnızca admin):
+   e-posta + il (+ isteğe bağlı ilçe) + kategoriler (boş = hepsi), listeden çıkarma. Veritabanı: `approvals/{tür}__{hedef}`
+   (aynı iş için tek bekleyen istek), `trustedApprovers/{e-posta}__{il-.. | ilce-..}`. Kurallar: istek yalnızca işletme
+   sahibinden ve işletmenin gerçek adı/yeriyle; 1. aşamayı yalnızca o ilde onay yetkisi olan, kendi isteği olmayan kişi, kendi
+   adıyla; 2. aşamayı yalnızca admin; işletme silinince istek de silinir. Şimdilik yalnızca işletme doğrulaması açık; diğer
+   türler (kampanya bildirimi, etkinlik yetkisi, kulüp başvurusu...) ilgili özellik yapılınca aynı yapıya eklenir. Emülatörde
+   tarayıcıyla baştan sona denendi (uygulamadan istek > il yöneticisi onayı ve önerisi > admin güvenli toplu onay > uygulamada
+   "doğrulandı").
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
-- Yetkiyi yalnızca admin verir; il yöneticisi talep açar (6, 6.5).
+- Yetki zinciri (6.7, 27 Ekim 2026): admin herkese ve kurumlara; il yöneticisi kendi ilinde muhtar ve moderatöre; kurum
+  kendi personeline. Form yok, e-postayla verilir. Belediye adları kilitli; kurum hesabı resmî e-postayla, şifreyi kurum koyar.
+  Önemli konularda (bildirim, işletme doğrulama, kurum açma, yasaklama, ücret/iade, anket) onay admin'e de gider.
 - Onay gereken işler önce il yöneticisi, sonra admin; admin panelinde "Bekleyen onaylar" ekranı, "Tümünü onayla",
   "Güvenli olanları onayla" ve şehir/ilçe/kategori kapsamlı güvenilir yöneticiler listesi (6.5).
 - Belediyeler kendi alanında; büyükşehir ilçe içeriğini düzenleyemez (6).
@@ -142,32 +198,41 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
 - Yasal metinler boş (yalnızca "avukat kontrolünden geçecek" notu).
 - Misafir gezinti, telefon doğrulaması: `PROJE.md` 3.1'de onay bekleyen öneriler.
-- Panelde onay merkezi, yetki atama ve personel ekranları yok (veri yapıları hazır).
-- **Güncel güvenlik kuralları Firebase'e yüklenmedi (Eren bilgisayardan yapacak; her oturum başında ona hatırlat):** `firebase/firestore.rules` değişti (acil numaralar eklendi). Konsola
-  yüklenene kadar gerçek projede panelden acil numara kaydedilemez (uygulama gömülü listeyi gösterir).
-- Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, SOS (aile listesi, QR; bildirim için geliştirme derlemesi gerekir), asistan,
-  taksi durağı. Hizmetlerde işletme listesi İşletmem (5.7) ile gelecek.
-- Hizmet önerileri: şimdilik yalnızca admin görür (il yöneticisi yetki kayıtları gelince kendi ilini görecek). Günlük gönderim
+- Onay merkezi yalnızca işletme doğrulamasıyla çalışıyor; diğer onaylı işler (kampanya bildirimi, etkinlik yetkisi, kulüp ve
+  yayıncı başvurusu, kurum içi hazırla > onayla akışı) ilgili bölümler yapılınca eklenecek. Onay bekleyen iş için ilgiliye
+  bildirim (e-posta/push) yok. Belge yükleyerek doğrulama Storage (Blaze) ister. İl bazlı şikâyet kuyruğu henüz yok. Kurum içeriği (gönderi,
+  etkinlik, bildirim) bölümleri henüz yok; personel görevleri hazır, bölümler yapılınca çalışır. Yeni admin yalnızca Firebase
+  konsolundan (`admins/<uid>`). Belde belediyeleri konum listesinde yok (gerekirse "kurum" olarak açılır). Panel metinleri
+  şimdilik yalnızca Türkçe. E-posta şablonları konsolda değiştirilemiyor (Firebase: "Email template updates
+  are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
+  ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
+  (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
+- **Kurallar ve dizinler yeniden değişti (şehir rehberi, onay merkezi), yeniden yüklenmeli:** aynı komut, Eren'in bilgisayarından (güncel ZIP indirip).
+- **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
+  `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
+  dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
+- Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, asistan, taksi durağı (SOS ve hizmetler yapıldı).
+- Hizmet önerileri: admin hepsini, il yöneticisi kendi ilininkileri görür ve inceler. Günlük gönderim
   sınırı ve hesap silinince kullanıcının önerilerinin silinmesi sunucu işleviyle eklenecek (Blaze plan gerektirir).
-- **Dizinler Firebase'e yüklenmedi:** `firebase/firestore.indexes.json` (işletme listesi, değerlendirme listesi, hesap
-  silmede kullanıcının yorumlarını bulma). Gerçek projede
-  kurallarla birlikte yüklenmeli; yüklenmezse hizmet listesi açılmaz. Konsoldan yüklemek zahmetli: `firebase deploy` için
-  dağıtım anahtarı ya da Eren'in bilgisayarından tek komut gerekir (Eren'e sade anlatılacak).
 - **SOS bildirimi ve arka plan konumu telefonda denenmedi:** kod hazır, ama Expo push adresi için `app.json` içinde EAS proje
   kimliği (`extra.eas.projectId`) gerekir; `eas init` ile gelir. Telefonda denenecekler: kilitli ekranda bildirim sesi,
   uygulama kapalıyken konum güncellemesi, bildirime dokununca SOS ekranı. Expo push güvenliği: bildirim adresleri yalnızca aile
   üyelerine açık; ileride Expo erişim anahtarıyla sunucudan gönderime geçilebilir (Blaze). Sonra: QR'ı kamerayla okutma
   (expo-camera), fotoğraf/ses ekleme (Storage, Blaze), "ID ile istek" yöntemi, iOS "kritik uyarı" başvurusu (isteğe bağlı).
-- **Firestore TTL politikası** (`sosAlerts.deleteAt`, 30 gün) konsolda açılmalı; indexes dosyasında tanımlı.
+- **SOS kayıtlarının 30 gün sonra kendiliğinden silinmesi (TTL `sosAlerts.deleteAt`) ücretsiz planda yok:** 27 Ekim'de
+  yüklerken Firebase "billing disabled" dedi, ayar indexes dosyasından çıkarıldı. `deleteAt` alanı yazılmaya devam ediyor;
+  Blaze plana geçilince `firestore.indexes.json` > `fieldOverrides` içine TTL geri eklenecek (ya da gönderen kendi eski
+  kayıtlarını uygulamadan silecek). Gizlilik metninde "30 gün" sözü buna göre yazılmalı.
 - Değerlendirme: şikâyet sayısı eşiğinde otomatik geçici gizleme ve il yöneticisi kuyruğu, yasaklı kelime süzgeci, yorum
   bildirimi (işletmeye "yeni değerlendirme") sonraki adımlarda. "Arama kaydı" kişisel veridir: aydınlatma metnine eklenecek
   (avukat kontrolü). Aynı telefonla kayıtlı işletmenin "sahiplik talebi" akışı henüz yok (mesaj CityJoy ile iletişime yönlendiriyor).
 - İşletme: fotoğraf/video vitrini (kademeye göre kapasite; Firebase Storage Blaze ister), yorum ve puan verme, telefonla
   sahiplik doğrulaması (SMS, Blaze), belge yükleme ve ücretli doğrulama, aynı işletmenin ikinci kaydını engelleme, kategoriye
   özel alanlar (konaklama, yeme-içme...), mobil ustalar için hizmet verdiği ilçeler, "bilgileriniz hâlâ doğru mu?" hatırlatması,
-  işletme başına günlük ekleme sınırı. Panelde il yöneticisinin kendi ilini görmesi yetki kayıtlarıyla gelecek.
-- SORULACAK: Nöbetçi eczane veri kaynağı (PROJE.md 5.1) ve günlük çekimin nerede çalışacağı (Firebase Spark planında
-  zamanlanmış işlev yok: Blaze planı ya da GitHub Actions gibi ücretsiz bir zamanlayıcı).
+  işletme başına günlük ekleme sınırı. (İl yöneticisi kendi ilinin işletmelerini panelde görür, doğrulama admin'de.)
+- SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
+  Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
+  başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
 - Panel ve web sürümü internette yayında değil (Firebase Hosting için dağıtım anahtarı gerekir).
 - Ana sayfadaki arama kutusu ve "Bugün" bölümü (duyuru, hava durumu) ilgili özelliklerle gelecek.
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin
@@ -175,9 +240,13 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
+0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
+   (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
+0b. Dalları `main`'e birleştirme (PR) ve kuralları/dizinleri Firebase'e yeniden yükleme (Eren'in bilgisayarından).
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
-2. Nöbetçi eczane: Claude veri kaynağı ve günlük güncelleme için sade bir öneri hazırlayacak, Eren onaylayacak.
+2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"
+   sayfası ve çekim kodu sahte sağlayıcıyla emülatörde yapılır; anahtarlar gelince bağlanır.
 3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu ve fotoğraf vitrini (Firebase Storage; Blaze plan gerekir).
 4. Paneli internete koyma (Firebase Hosting).
 

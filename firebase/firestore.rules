@@ -19,6 +19,34 @@ service cloud.firestore {
       return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
+    // ---- Kişi yetkileri (PROJE.md 6.7): grants/{e-posta}__{bölge}. Kişi doğrulanmış e-postasıyla tanınır;
+    // kimlik tahmin edilebilir olduğu için "bu kişinin Bursa yetkisi var mı?" tek okumayla denetlenir. ----
+    function verified() {
+      return signedIn() && request.auth.token.get('email', null) is string
+        && request.auth.token.get('email_verified', false) == true;
+    }
+    function myEmail() {
+      return request.auth.token.email;
+    }
+    function grantPath(key) {
+      return /databases/$(database)/documents/grants/$(myEmail() + '__' + key);
+    }
+    function grantOk(g, module, action) {
+      return g.get('revokedAt', null) == null
+        && (g.get('expiresAt', null) == null || g.expiresAt > request.time)
+        && g.modules.get(module, []).hasAny([action]);
+    }
+    function grantAllows(key, module, action) {
+      return verified() && exists(grantPath(key)) && grantOk(get(grantPath(key)).data, module, action);
+    }
+    // Admin ya da ülke / il / (verilirse) ilçe kapsamlı geçerli yetki.
+    function regionAllows(module, action, provinceCode, districtId) {
+      return isAdmin()
+        || (verified() && (grantAllows('ulke', module, action)
+            || (provinceCode is string && grantAllows('il-' + provinceCode, module, action))
+            || (districtId is string && grantAllows('ilce-' + districtId, module, action))));
+    }
+
     function ageOf(birthYear) {
       return request.time.year() - birthYear;
     }
@@ -170,8 +198,13 @@ service cloud.firestore {
             || (request.resource.data.provinceCode is string && request.resource.data.provinceCode.matches('^[0-8][0-9]$')))
         && request.resource.data.status == 'yeni'
         && request.resource.data.createdAt == request.time;
-      allow read: if isAdmin();
-      allow update: if isAdmin()
+      // Admin hepsini, il yöneticisi kendi ilininkileri görür ve "incelendi" yapar.
+      allow read: if isAdmin()
+        || (resource.data.get('provinceCode', null) != null
+            && regionAllows('hizmet-kategorileri', 'goruntule', resource.data.provinceCode, null));
+      allow update: if (isAdmin()
+            || (resource.data.get('provinceCode', null) != null
+                && regionAllows('hizmet-kategorileri', 'onayla', resource.data.provinceCode, null)))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedBy', 'reviewedAt'])
         && request.resource.data.status == 'incelendi'
         && request.resource.data.reviewedBy == request.auth.uid
@@ -179,11 +212,17 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Kilitli adlar (PROJE.md 6.7): belediye ve resmî kurum sözcükleri kullanıcı adlarında kullanılamaz.
+    // Ortak paketteki RESERVED_WORDS ile aynı; Türkçe harfler büyük/küçük ve aksanlı/aksansız eşleşir.
+    function reservedName(n) {
+      return n.lower().matches('.*(b[e]l[e]d[iİıİ]y[e]|v[aâ]l[iİıİ]l[iİıİ][kğg]|k[aâ]ym[aâ]k[aâ]ml[iİıİ][kğg]|m[uü]ht[aâ]rl[iİıİ][kğg]|c[iİıİ]ty ?j[oö]y|tr[aâ]v[e]l ?j[oö]y).*');
+    }
+
     // İşletmeler (PROJE.md 5.6-5.7). Sahibi bilgilerini yazar; doğrulama, üyelik kademesi, puan ve öne çıkma
     // yalnızca yönetimce (ve ileride sunucu işlevleriyle) değişir.
     function validBusinessContent(d) {
       return d.type in ['hizmet', 'esnaf', 'evden-uretim', 'yeme-icme', 'konaklama', 'yol-ustu', 'emlak']
-        && d.name is string && d.name.size() >= 2 && d.name.size() <= 80
+        && d.name is string && d.name.size() >= 2 && d.name.size() <= 80 && !reservedName(d.name)
         && d.categoryIds is list && d.categoryIds.size() >= 1 && d.categoryIds.size() <= 5
         && validLocation(d.location) && 'districtId' in d.location
         && (!('address' in d) || (d.address is string && d.address.size() <= 200 && d.type != 'evden-uretim'))
@@ -234,7 +273,9 @@ service cloud.firestore {
 
     match /businesses/{id} {
       // Olmayan belgeyi okumak ("var mı?" sorusu) reddedilmez; içerik yoksa sızacak bilgi de yoktur.
-      allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(resource.data.ownerUid) || isAdmin();
+      // İşletme doğrulama yetkisi olan yönetici kendi ilindeki gizli / kaldırılmış işletmeleri de görür.
+      allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(resource.data.ownerUid)
+        || regionAllows('isletme-dogrulama', 'goruntule', resource.data.location.provinceCode, null);
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(businessContentKeys().concat(
              ['ownerUid', 'status', 'verification', 'membership', 'rating', 'createdAt', 'updatedAt']))
@@ -502,12 +543,384 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez.
-    match /auditLog/{id} {
+    // ---- Yetkiler (PROJE.md 6.7): admin il yöneticisi, muhtar ve moderatör verir; il yöneticisi kendi ilinde muhtar
+    // ve moderatör verir, kendinde olmayan yetkiyi veremez. Admin rolü panelden verilmez (yalnızca konsol, admins).
+    // Rol sınırları ortak paketteki ROLE_CAPS ile aynıdır.
+    function capsFor(role) {
+      return role == 'il-yoneticisi' ? {
+          'konumlar': ['goruntule'], 'acil-numaralar': ['goruntule'], 'hizmet-kategorileri': ['goruntule', 'onayla'],
+          'kurumlar': ['goruntule'], 'yetkiler': ['goruntule', 'ekle', 'duzenle', 'sil'], 'onaylar': ['goruntule', 'onayla'],
+          'islem-kayitlari': ['goruntule'], 'bildirimler': ['goruntule', 'ekle', 'duzenle', 'sil', 'bildirim-gonder'],
+          'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'], 'etkinlikler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'],
+          'hizmetler': ['goruntule', 'ekle', 'duzenle', 'sil'], 'moderasyon': ['goruntule', 'duzenle', 'sil'],
+          'isletme-dogrulama': ['goruntule', 'onayla'], 'sehir-rehberi': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla']}
+        : role == 'muhtar' ? {
+          'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil'],
+          'etkinlikler': ['goruntule', 'ekle', 'duzenle'], 'bildirimler': ['goruntule', 'ekle', 'bildirim-gonder']}
+        : {'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'moderasyon': ['goruntule', 'duzenle']};
+    }
+    function within(m, caps, k) {
+      return !(k in m) || (m[k] is list && m[k].size() >= 1 && m[k].hasOnly(caps.get(k, [])));
+    }
+    // Muhtar ve moderatör yetkisinin bölümleri (kuralların hesap sınırı için yalnızca bunlar denetlenir).
+    function muhtarWithin(m, caps) {
+      return within(m, caps, 'konumlar') && within(m, caps, 'islem-kayitlari') && within(m, caps, 'gonderiler')
+        && within(m, caps, 'etkinlikler') && within(m, caps, 'bildirimler');
+    }
+    function moderatorWithin(m, caps) {
+      return within(m, caps, 'konumlar') && within(m, caps, 'islem-kayitlari') && within(m, caps, 'moderasyon');
+    }
+    // Rolün bölümleri ve eylemleri verilen sınırın içinde mi (rol sınırı ya da verenin kendi yetkisi)?
+    function roleModulesWithin(m, role, caps) {
+      return m is map && m.size() >= 1 && m.keys().hasOnly(capsFor(role).keys())
+        && (role == 'muhtar' ? muhtarWithin(m, caps)
+            : role == 'moderator' ? moderatorWithin(m, caps)
+            : modulesWithin(m, caps));
+    }
+    function modulesWithin(m, caps) {
+      return m is map && m.size() >= 1 && m.keys().hasOnly(caps.keys())
+        && within(m, caps, 'konumlar') && within(m, caps, 'meslekler') && within(m, caps, 'acil-numaralar')
+        && within(m, caps, 'hizmet-kategorileri') && within(m, caps, 'sos') && within(m, caps, 'kurumlar')
+        && within(m, caps, 'yetkiler') && within(m, caps, 'onaylar') && within(m, caps, 'islem-kayitlari')
+        && within(m, caps, 'bildirimler') && within(m, caps, 'gonderiler') && within(m, caps, 'etkinlikler')
+        && within(m, caps, 'hizmetler') && within(m, caps, 'moderasyon') && within(m, caps, 'isletme-dogrulama')
+        && within(m, caps, 'sehir-rehberi');
+    }
+    function validScope(sc) {
+      return sc is map && (
+        (sc.level == 'ulke' && sc.keys().hasOnly(['level']))
+        || (sc.level == 'il' && sc.keys().hasOnly(['level', 'provinceCode'])
+            && sc.provinceCode is string && sc.provinceCode.matches('^[0-8][0-9]$'))
+        || (sc.level == 'ilce' && sc.keys().hasOnly(['level', 'provinceCode', 'districtId'])
+            && sc.provinceCode is string && sc.provinceCode.matches('^[0-8][0-9]$')
+            && sc.districtId is string && sc.districtId.matches('^' + sc.provinceCode + '-[a-z0-9-]+$'))
+        || (sc.level == 'mahalle' && sc.keys().hasOnly(['level', 'provinceCode', 'districtId', 'neighbourhoodId'])
+            && sc.provinceCode is string && sc.provinceCode.matches('^[0-8][0-9]$')
+            && sc.districtId is string && sc.districtId.matches('^' + sc.provinceCode + '-[a-z0-9-]+$')
+            && sc.neighbourhoodId is string && sc.neighbourhoodId.matches('^' + sc.districtId + '-.+$')));
+    }
+    function scopeKeyOf(sc) {
+      return sc.level == 'ulke' ? 'ulke'
+        : sc.level == 'il' ? 'il-' + sc.provinceCode
+        : sc.level == 'ilce' ? 'ilce-' + sc.districtId
+        : 'mahalle-' + sc.neighbourhoodId;
+    }
+    function roleFitsScope(role, level) {
+      return (role == 'il-yoneticisi' && level == 'il')
+        || (role == 'muhtar' && level == 'mahalle')
+        || (role == 'moderator' && level in ['il', 'ilce', 'mahalle']);
+    }
+    function validEmail(e) {
+      return e is string && e.size() <= 120 && e.matches('^[^@ A-Z]+@[^@ A-Z]+[.][^@ A-Z]+$');
+    }
+    function validGrant(id, d) {
+      return d.keys().hasOnly(['email', 'displayName', 'note', 'role', 'scope', 'modules', 'expiresAt',
+             'grantedBy', 'grantedAt', 'updatedAt', 'revokedAt', 'revokedBy'])
+        && validEmail(d.email)
+        // Kimse kendine yetki veremez.
+        && d.email != request.auth.token.get('email', '')
+        && d.displayName is string && d.displayName.size() >= 1 && d.displayName.size() <= 80
+        && (!('note' in d) || (d.note is string && d.note.size() <= 300))
+        && validScope(d.scope)
+        && roleFitsScope(d.role, d.scope.level)
+        && id == d.email + '__' + scopeKeyOf(d.scope)
+        && roleModulesWithin(d.modules, d.role, capsFor(d.role))
+        && (!('expiresAt' in d) || d.expiresAt is timestamp)
+        && d.grantedBy == request.auth.uid
+        && d.updatedAt == request.time;
+    }
+    // Bu ilde il yöneticisiyim ve bu eylemde yetki yönetebilirim.
+    function provinceManager(provinceCode, action) {
+      return grantAllows('il-' + provinceCode, 'yetkiler', action)
+        && get(grantPath('il-' + provinceCode)).data.role == 'il-yoneticisi';
+    }
+    function canGrant(d) {
+      return isAdmin()
+        || (d.role in ['muhtar', 'moderator'] && d.scope.level != 'ulke'
+            && provinceManager(d.scope.provinceCode, 'ekle')
+            // Kimse kendinde olmayan yetkiyi veremez.
+            && (d.role == 'muhtar' ? muhtarWithin(d.modules, get(grantPath('il-' + d.scope.provinceCode)).data.modules)
+                : moderatorWithin(d.modules, get(grantPath('il-' + d.scope.provinceCode)).data.modules)));
+    }
+
+    match /grants/{id} {
+      // Kişi kendi yetkilerini görür (panel menüsü bundan kurulur); il yöneticisi kendi ilindekileri; admin hepsini.
+      allow read: if isAdmin()
+        || (verified() && (resource == null || resource.data.email == myEmail()))
+        || provinceManager(resource.data.scope.provinceCode, 'goruntule');
+      // Verme / değiştirme / yeniden verme: belgenin tamamı yazılır, geri alma bilgisi temizlenir. İl yöneticisi başka
+      // bir il yöneticisinin yetkisinin üstüne yazamaz.
+      // (Ucuz denetimler önce: kuralların hesap sınırı aşılmasın.)
+      allow create, update: if !('revokedAt' in request.resource.data) && !('revokedBy' in request.resource.data)
+        && request.resource.data.grantedAt == request.time
+        && validGrant(id, request.resource.data)
+        && canGrant(request.resource.data)
+        && (resource == null || isAdmin() || resource.data.role in ['muhtar', 'moderator']);
+      // Geri alma: yalnızca geri alma bilgisi eklenir, yetkinin içeriği değişmez.
+      allow update: if resource.data.get('revokedAt', null) == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['revokedAt', 'revokedBy', 'updatedAt'])
+        && request.resource.data.revokedAt == request.time
+        && request.resource.data.revokedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && (isAdmin()
+            || (resource.data.role in ['muhtar', 'moderator'] && resource.data.scope.level != 'ulke'
+                && provinceManager(resource.data.scope.provinceCode, 'sil')));
+      // Silinmez: geçmiş yetkiler denetim için kalır.
+      allow delete: if false;
+    }
+
+    // ---- Kurumlar (PROJE.md 6.6-6.7): yalnızca admin açar. Kurum yöneticisi kendi personeline, kurumun bölgesi ve
+    // bölümleri içinde görev verir; yeni kurum yöneticisini admin atar. Pasif ya da sözleşmesi biten kurumda kimse çalışamaz.
+    function orgPath(orgId) {
+      return /databases/$(database)/documents/organizations/$(orgId);
+    }
+    function memberPath(orgId) {
+      return /databases/$(database)/documents/orgMembers/$(orgId + '__' + myEmail());
+    }
+    function memberActive(m) {
+      return m.get('removedAt', null) == null && (m.get('expiresAt', null) == null || m.expiresAt > request.time);
+    }
+    function orgActive(o) {
+      return o.status == 'aktif' && (o.get('contractEndsAt', null) == null || o.contractEndsAt > request.time);
+    }
+    function isMemberOf(orgId) {
+      return verified() && exists(memberPath(orgId)) && memberActive(get(memberPath(orgId)).data)
+        && exists(orgPath(orgId)) && orgActive(get(orgPath(orgId)).data);
+    }
+    function isOrgAdminOf(orgId) {
+      return isMemberOf(orgId) && get(memberPath(orgId)).data.isOrgAdmin == true;
+    }
+    function validOrg(id, d) {
+      return d.keys().hasOnly(['name', 'kind', 'scope', 'modules', 'officialEmail', 'status', 'contractEndsAt',
+             'createdBy', 'createdAt', 'updatedAt'])
+        && d.name is string && d.name.size() >= 2 && d.name.size() <= 120
+        && d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi', 'kurum', 'kulup', 'yayinci']
+        // Belediyeler kilitli ad listesindeki kimlikle açılır (aynı belediye iki kez açılamaz).
+        && (d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi']) == id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
+        && (id.matches('^bld-.+') || id.matches('^krm-[a-z0-9-]{2,80}$'))
+        && validScope(d.scope)
+        && d.modules is list && d.modules.hasOnly(['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler'])
+        && validEmail(d.officialEmail)
+        && d.status in ['aktif', 'pasif']
+        && (!('contractEndsAt' in d) || d.contractEndsAt is timestamp)
+        && d.updatedAt == request.time;
+    }
+
+    match /organizations/{id} {
+      allow read: if isAdmin() || isMemberOf(id)
+        || grantAllows('il-' + resource.data.scope.provinceCode, 'kurumlar', 'goruntule');
+      allow create: if isAdmin() && validOrg(id, request.resource.data)
+        && request.resource.data.status == 'aktif'
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update: if isAdmin() && validOrg(id, request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'modules', 'contractEndsAt', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    function validAssignment(a, k) {
+      return !(k in a) || (a[k] is map && a[k].keys().hasOnly(['role', 'canPublishDirectly'])
+        && a[k].role in ['hazirlayan', 'onaylayan', 'izleyen']
+        && (!('canPublishDirectly' in a[k]) || a[k].canPublishDirectly is bool));
+    }
+    function validMember(id, d) {
+      return d.keys().hasOnly(['orgId', 'email', 'displayName', 'isOrgAdmin', 'assignments', 'expiresAt', 'addedBy', 'updatedAt'])
+        // Kurum aynı toplu yazımda açılıyor olabilir (kurum + kurum yöneticisi), bu yüzden yazım sonrası durum okunur.
+        && d.orgId is string && existsAfter(orgPath(d.orgId))
+        && validEmail(d.email)
+        && id == d.orgId + '__' + d.email
+        && d.displayName is string && d.displayName.size() >= 1 && d.displayName.size() <= 80
+        && d.isOrgAdmin is bool
+        && d.assignments is map && d.assignments.keys().hasOnly(getAfter(orgPath(d.orgId)).data.modules)
+        && validAssignment(d.assignments, 'gonderiler') && validAssignment(d.assignments, 'etkinlikler')
+        && validAssignment(d.assignments, 'bildirimler') && validAssignment(d.assignments, 'hizmetler')
+        && (!('expiresAt' in d) || d.expiresAt is timestamp)
+        && d.addedBy == request.auth.uid
+        && d.updatedAt == request.time;
+    }
+
+    match /orgMembers/{id} {
+      // Kişi kendi görevlerini, kurum yöneticisi kendi kurumunun personelini, admin hepsini görür.
+      allow read: if isAdmin()
+        || (verified() && (resource == null || resource.data.email == myEmail()))
+        || isOrgAdminOf(resource.data.orgId);
+      // Ekleme / görev değiştirme / yeniden ekleme. Kurum yöneticisi kendi kaydını ve başka bir kurum yöneticisini
+      // değiştiremez, kurum yöneticisi atayamaz.
+      allow create, update: if validMember(id, request.resource.data)
+        && (isAdmin()
+            || (isOrgAdminOf(request.resource.data.orgId)
+                && request.resource.data.isOrgAdmin == false
+                && request.resource.data.email != myEmail()
+                && (resource == null || resource.data.isOrgAdmin == false)));
+      // Çıkarma: yalnızca çıkarma bilgisi eklenir.
+      allow update: if (isAdmin() || (isOrgAdminOf(resource.data.orgId) && resource.data.isOrgAdmin == false))
+        && resource.data.get('removedAt', null) == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['removedAt', 'removedBy', 'updatedAt'])
+        && request.resource.data.removedAt == request.time
+        && request.resource.data.removedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // ---- Benim Şehrim sabit bilgileri (müzeler, otoparklar...): il başına bölüm paketleri. Herkes okur (girişsiz de);
+    // admin ve o ilde şehir rehberi yetkisi olan (il yöneticisi) yazar. Ülke geneli içerik ("tr") yalnızca admin'de.
+    function canEditGuide(p) {
+      return isAdmin() || (p is string && p != 'tr' && regionAllows('sehir-rehberi', 'duzenle', p, null));
+    }
+    function guideSection(s) {
+      return s in ['onemli-kurumlar', 'muzeler', 'otoparklar', 'parklar', 'pazarlar', 'ulasim', 'toplanma-alanlari',
+                   'muhtarliklar', 'belediye-hizmetleri', 'nasil-yapilir'];
+    }
+    match /cityGuide/{p} {
+      allow read: if true;
+      allow create, update: if (p == 'tr' || p.matches('^[0-8][0-9]$')) && canEditGuide(p)
+        && request.resource.data.keys().hasOnly(['sections', 'updatedAt', 'updatedBy'])
+        && request.resource.data.sections is map && request.resource.data.sections.keys().size() <= 10
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /cityGuidePacks/{id} {
+      allow read: if true;
+      allow create, update: if canEditGuide(request.resource.data.provinceCode)
+        && request.resource.data.keys().hasOnly(['provinceCode', 'section', 'part', 'items', 'updatedAt', 'updatedBy'])
+        && guideSection(request.resource.data.section)
+        && request.resource.data.part is int && request.resource.data.part >= 0 && request.resource.data.part < 50
+        && id == request.resource.data.provinceCode + '__' + request.resource.data.section + '__' + string(request.resource.data.part)
+        && request.resource.data.items is list && request.resource.data.items.size() <= 400
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if canEditGuide(resource.data.provinceCode);
+    }
+
+    // ---- Onay merkezi (PROJE.md 6.5, 6.7): onay gereken iş önce il yöneticisinin (1. aşama), sonra admin'in onayından
+    // geçer. approvals/{tür}__{hedef}: aynı iş için tek istek. Şimdilik yalnızca işletme doğrulaması açık.
+    function validApproval(id, d) {
+      return d.keys().hasOnly(['kind', 'module', 'targetId', 'title', 'region', 'status', 'requestedBy', 'requestedAt',
+             'note', 'firstApproval', 'decision', 'updatedAt'])
+        && d.kind == 'isletme-dogrulama' && d.module == 'isletme-dogrulama'
+        && d.targetId is string && id == d.kind + '__' + d.targetId
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 120
+        && validLocation(d.region) && 'districtId' in d.region && !('neighbourhoodId' in d.region)
+        && (!('note' in d) || (d.note is string && d.note.size() <= 300))
+        && d.requestedAt == request.time
+        && d.updatedAt == request.time;
+    }
+    // Hedef işletme var, adı ve yeri istekteki gibi, henüz doğrulanmamış.
+    function businessTargetOk(d) {
+      return exists(businessPath(d.targetId))
+        && get(businessPath(d.targetId)).data.name == d.title
+        && get(businessPath(d.targetId)).data.location.provinceCode == d.region.provinceCode
+        && get(businessPath(d.targetId)).data.location.districtId == d.region.districtId
+        && get(businessPath(d.targetId)).data.verification.status != 'dogrulandi';
+    }
+    function isBusinessOwner(bid) {
+      return signedIn() && exists(businessPath(bid)) && get(businessPath(bid)).data.ownerUid == request.auth.uid;
+    }
+    // İlk aşama onayı: onaylayan kendisi, e-postası (güvenilir yönetici listesiyle eşleşir) ve şimdiki zaman.
+    function myStep(f) {
+      return f is map && f.keys().hasOnly(['uid', 'email', 'name', 'at'])
+        && f.uid == request.auth.uid && f.email == request.auth.token.get('email', '')
+        && f.name is string && f.name.size() >= 1 && f.name.size() <= 80
+        && f.at == request.time;
+    }
+    function myDecision(dec, stage, rejected) {
+      return dec is map && dec.keys().hasOnly(['uid', 'at', 'stage', 'reason'])
+        && dec.uid == request.auth.uid && dec.at == request.time && dec.stage == stage
+        && (rejected ? (dec.reason is string && dec.reason.size() >= 5 && dec.reason.size() <= 300) : !('reason' in dec));
+    }
+
+    match /approvals/{id} {
+      // İsteyen ve işletme sahibi kendi isteğini; onay yetkisi olan il yöneticisi kendi ilindekileri; admin hepsini görür.
+      allow read: if resource == null || isAdmin()
+        || (signedIn() && resource.data.requestedBy == request.auth.uid)
+        || regionAllows('onaylar', 'goruntule', resource.data.region.provinceCode, null)
+        || (resource.data.kind == 'isletme-dogrulama' && isBusinessOwner(resource.data.targetId));
+      // İşletme sahibi doğrulama ister; reddedilen ya da sonradan doğrulaması kaldırılan istek yeniden gönderilir.
+      // (Ucuz denetimler önce: kuralların hesap sınırı aşılmasın.)
+      allow create, update: if request.resource.data.status == 'il-onayi-bekliyor'
+        && request.resource.data.requestedBy == request.auth.uid
+        && !('firstApproval' in request.resource.data) && !('decision' in request.resource.data)
+        && (resource == null || !(resource.data.status in ['il-onayi-bekliyor', 'admin-onayi-bekliyor']))
+        && validApproval(id, request.resource.data)
+        && isBusinessOwner(request.resource.data.targetId)
+        && businessTargetOk(request.resource.data);
+      // İl yöneticisi istek gelmemiş bir işletmeyi kendisi önerir: 1. aşama onaylı olarak admin'e gider. Kendi işletmesini öneremez.
+      allow create, update: if request.resource.data.status == 'admin-onayi-bekliyor'
+        && request.resource.data.requestedBy == request.auth.uid
+        && !('decision' in request.resource.data)
+        && (resource == null || !(resource.data.status in ['il-onayi-bekliyor', 'admin-onayi-bekliyor']))
+        && myStep(request.resource.data.firstApproval)
+        && validApproval(id, request.resource.data)
+        && regionAllows(request.resource.data.module, 'onayla', request.resource.data.region.provinceCode, request.resource.data.region.districtId)
+        && !isBusinessOwner(request.resource.data.targetId)
+        && businessTargetOk(request.resource.data);
+      // 1. aşama: il yöneticisi kendi ilinde onaylar (admin'e gider) ya da gerekçeyle reddeder. Kendi isteğine karar veremez.
+      allow update: if resource.data.status == 'il-onayi-bekliyor'
+        && request.resource.data.status in ['admin-onayi-bekliyor', 'reddedildi']
+        && resource.data.requestedBy != request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && ((request.resource.data.status == 'admin-onayi-bekliyor'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'firstApproval', 'updatedAt'])
+              && myStep(request.resource.data.firstApproval))
+            || (request.resource.data.status == 'reddedildi'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decision', 'updatedAt'])
+              && myDecision(request.resource.data.decision, 1, true)))
+        && regionAllows(resource.data.module, 'onayla', resource.data.region.provinceCode, resource.data.region.districtId);
+      // 2. aşama: admin bekleyen işi onaylar ya da gerekçeyle reddeder (il yöneticisi yoksa 1. aşamayı da atlayabilir).
+      allow update: if resource.data.status in ['il-onayi-bekliyor', 'admin-onayi-bekliyor']
+        && request.resource.data.status in ['onaylandi', 'reddedildi']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decision', 'updatedAt'])
+        && isAdmin()
+        && myDecision(request.resource.data.decision, 2, request.resource.data.status == 'reddedildi')
+        && request.resource.data.updatedAt == request.time;
+      // İsteyen geri çeker; işletme silinince istek de silinir (hesap silmede de). Kararlar işlem kaydında kalır.
+      allow delete: if signedIn() && (resource.data.requestedBy == request.auth.uid
+        || (resource.data.kind == 'isletme-dogrulama' && isBusinessOwner(resource.data.targetId)));
+    }
+
+    // Güvenilir yöneticiler (PROJE.md 6.5): yalnızca admin görür ve yönetir. Silinmez, listeden çıkarılır.
+    match /trustedApprovers/{id} {
       allow read: if isAdmin();
-      allow create: if isAdmin()
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'provinceCode', 'districtId', 'modules',
+             'addedBy', 'addedAt', 'updatedAt'])
+        && validEmail(request.resource.data.email)
+        && request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 80
+        && request.resource.data.provinceCode is string && request.resource.data.provinceCode.matches('^[0-8][0-9]$')
+        && (!('districtId' in request.resource.data) || (request.resource.data.districtId is string
+            && request.resource.data.districtId.matches('^' + request.resource.data.provinceCode + '-[a-z0-9-]+$')))
+        && id == request.resource.data.email + '__' + ('districtId' in request.resource.data
+            ? 'ilce-' + request.resource.data.districtId : 'il-' + request.resource.data.provinceCode)
+        && request.resource.data.modules is list
+        && request.resource.data.modules.hasOnly(['isletme-dogrulama', 'bildirimler', 'etkinlikler', 'kurumlar', 'moderasyon'])
+        && request.resource.data.addedBy == request.auth.uid
+        && request.resource.data.addedAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isAdmin() && resource.data.get('removedAt', null) == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['removedAt', 'removedBy', 'updatedAt'])
+        && request.resource.data.removedAt == request.time
+        && request.resource.data.removedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez. Admin hepsini, her yönetici kendi
+    // kayıtlarını görür. Admin olmayan yönetici yalnızca yetkisi olan bölgede ve bölümde kayıt ekler.
+    match /auditLog/{id} {
+      allow read: if isAdmin() || (signedIn() && resource.data.actorUid == request.auth.uid);
+      allow create: if signedIn()
         && request.resource.data.actorUid == request.auth.uid
-        && request.resource.data.at == request.time;
+        && request.resource.data.at == request.time
+        && (isAdmin()
+            || (request.resource.data.get('region', null) is map
+                && regionAllows(request.resource.data.module, request.resource.data.action,
+                     request.resource.data.region.get('provinceCode', null),
+                     request.resource.data.region.get('districtId', null)))
+            // Kurum yöneticisi kendi kurumunda (personel işlemleri).
+            || (request.resource.data.get('orgId', null) is string && request.resource.data.module == 'kurumlar'
+                && isOrgAdminOf(request.resource.data.orgId)));
       allow update, delete: if false;
     }
   }

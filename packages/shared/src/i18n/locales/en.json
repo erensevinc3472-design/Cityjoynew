@@ -93,7 +93,8 @@
     "weakPassword": "Choose a stronger password.",
     "requiresRecentLogin": "For your security, please enter your password again.",
     "unknown": "Something went wrong. Please try again.",
-    "notConfigured": "The app isn't connected to the server yet."
+    "notConfigured": "The app isn't connected to the server yet.",
+    "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Please choose another name."
   },
   "reset": {
     "title": "Reset your password",
@@ -235,7 +236,8 @@
       "address": "Address can be at most 200 characters.",
       "hoursNote": "Opening hours can be at most 120 characters.",
       "description": "Description can be at most 500 characters.",
-      "priceList": "Each price row needs both a service and a price (max 30 rows)."
+      "priceList": "Each price row needs both a service and a price (max 30 rows).",
+      "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Contact CityJoy for an institution account."
     },
     "hide": "Unpublish (hide)",
     "show": "Publish again",
@@ -264,7 +266,7 @@
     "notFound": "This business was not found or is not published.",
     "listError": "Could not load businesses.",
     "unverifiedWarning": "Be careful with unverified businesses; confirm identity and price in advance.",
-    "myVerifyNote": "Document verification will open soon. Until then your business is listed as \"Not verified\".",
+    "myVerifyNote": "After saving your business you can request verification from its edit screen. Until verified it is listed as \"Not verified\".",
     "servicesLabel": "Services",
     "hoursLabel": "Opening hours",
     "addressLabel": "Address",
@@ -273,7 +275,16 @@
     "removedNote": "This business was removed by CityJoy. Contact CityJoy for details.",
     "priceListTitle": "Price list",
     "removeService": "Remove",
-    "duplicatePhone": "A business with this phone number is already registered. If it's yours, contact CityJoy."
+    "duplicatePhone": "A business with this phone number is already registered. If it's yours, contact CityJoy.",
+    "verifyTitle": "Verification",
+    "verifyIntro": "Verified businesses come first in lists and get the \"Documents verified\" label. Your request goes to your province manager first, then to CityJoy; you may be contacted by phone or video call.",
+    "verifyRequest": "Request verification",
+    "verifyPendingFirst": "Request received, waiting for the province manager's review.",
+    "verifyPendingAdmin": "Approved by the province manager, waiting for CityJoy's final approval.",
+    "verifyRejected": "Your request was declined. Reason: {{reason}}",
+    "verifyAgain": "Request again",
+    "verifyCancel": "Withdraw request",
+    "verifyDone": "Your business is verified."
   },
   "reviews": {
     "title": "Reviews",
@@ -414,5 +425,28 @@
     "backgroundOff": "No background location permission: your location only updates while this screen is open.",
     "fgTitle": "SOS: sharing your location with your family",
     "fgBody": "If you are safe, tap \"I'm safe\" in the app."
+  },
+  "city": {
+    "needLocation": "Choose your province first to see your city's information.",
+    "staleNote": "Could not connect; showing information saved on your phone, which may be out of date.",
+    "loadError": "Could not load the information. Check your connection and try again.",
+    "comingSoon": "No information yet for this province",
+    "count": "{{count}} entries",
+    "otherSections": "Pharmacies on duty, events, cafés and restaurants, listings and Neighbourhood Square are coming next.",
+    "search": "Search by name, type or district",
+    "allDistricts": "All districts",
+    "contentLanguage": "The information in this section is provided in Turkish.",
+    "empty": "No information in this section yet.",
+    "unverified": "Not verified",
+    "unverifiedNote": "This information has not yet been confirmed by an authorised person and may have changed. Call or check the official website before you go.",
+    "notFound": "This entry was not found; it may have been removed.",
+    "call": "Call: {{number}}",
+    "openMap": "Open in maps",
+    "website": "Website",
+    "apply": "Application page",
+    "moreInfo": "More information",
+    "source": "Source: {{source}}, {{date}}",
+    "verifiedOn": "Verified: {{date}}",
+    "firstHour": "First hour {{price}} TRY"
   }
 }

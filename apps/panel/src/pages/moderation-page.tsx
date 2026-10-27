@@ -12,7 +12,8 @@ import { t } from '../lib/t';
  */
 export function ModerationPage() {
   const { user } = useSession();
-  const canEdit = !!user && !user.isDemo && can(user.grants, { module: 'moderasyon', action: 'duzenle' }) && user.grants.some((g) => g.role === 'admin');
+  const isAdmin = !!user?.grants.some((g) => g.role === 'admin');
+  const canEdit = !!user && !user.isDemo && can(user.grants, { module: 'moderasyon', action: 'duzenle' }) && isAdmin;
   const mod = user ? createReviewModeration(firestore, user.uid) : null;
 
   const [list, setList] = useState<ReviewReport[] | null>(null);
@@ -23,12 +24,14 @@ export function ModerationPage() {
   const load = useCallback(async () => {
     setLoadError(false);
     if (user?.isDemo) return setList([]);
+    // Şikâyetler şimdilik yalnızca admin'e açık; il bazlı kuyruk sonraki adımda (kurallar da okutmaz).
+    if (!isAdmin) return setList([]);
     try {
       setList(await createReviewModeration(firestore, 'okuma').listReports());
     } catch {
       setLoadError(true);
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   useEffect(() => {
     load();
@@ -56,7 +59,7 @@ export function ModerationPage() {
           <p className="meta">{t('moderation.intro')}</p>
         </div>
       </header>
-      {user?.isDemo ? <p className="note">{t('moderation.demoReadOnly')}</p> : !canEdit ? <p className="note">{t('moderation.readOnly')}</p> : null}
+      {user?.isDemo ? <p className="note">{t('moderation.demoReadOnly')}</p> : !isAdmin ? <p className="note">{t('moderation.adminOnly')}</p> : !canEdit ? <p className="note">{t('moderation.readOnly')}</p> : null}
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
 
       {loadError ? (

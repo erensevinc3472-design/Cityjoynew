@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,6 +7,7 @@ import {
   BUSINESS_TYPES,
   HOME_BASED_TYPES,
   validateBusiness,
+  type Approval,
   type Business,
   type BusinessError,
   type BusinessInput,
@@ -22,7 +23,7 @@ import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { goBackOr } from '@/lib/navigation';
 import { useServiceCategories } from '@/lib/service-categories';
-import { businessRepository, DuplicateBusinessError } from '@/lib/services';
+import { businessRepository, DuplicateBusinessError, verificationRequests } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useUserLocation } from '@/lib/user-location';
 import { spacing } from '@/theme/tokens';
@@ -189,7 +190,7 @@ export default function EditBusinessScreen() {
       ) : null}
 
       <AppButton title={t('business.save')} onPress={save} loading={busy} disabled={busy || removed} />
-      <AppText variant="caption" muted>{t('business.myVerifyNote')}</AppText>
+      {existing && !removed ? <VerificationSection business={existing} uid={user.uid} /> : <AppText variant="caption" muted>{t('business.myVerifyNote')}</AppText>}
 
       {existing && !removed ? (
         <AppButton
@@ -210,6 +211,72 @@ export default function EditBusinessScreen() {
         )
       ) : null}
     </FormScreen>
+  );
+}
+
+/** Doğrulama isteği: sahibi ister, durumu ve ret gerekçesini görür, geri çeker ya da yeniden ister. */
+function VerificationSection({ business, uid }: { business: Business; uid: string }) {
+  const { t } = useTranslation();
+  const [request, setRequest] = useState<Approval | null | undefined>(undefined);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
+
+  const load = useCallback(() => {
+    setError(false);
+    verificationRequests.get(business.id).then(setRequest).catch(() => setError(true));
+  }, [business.id]);
+  useEffect(load, [load]);
+
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setError(false);
+    try {
+      await fn();
+      load();
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const verified = business.verification.status === 'dogrulandi';
+  const pending = request?.status === 'il-onayi-bekliyor' || request?.status === 'admin-onayi-bekliyor';
+  const status = verified
+    ? t('business.verifyDone')
+    : request?.status === 'il-onayi-bekliyor'
+      ? t('business.verifyPendingFirst')
+      : request?.status === 'admin-onayi-bekliyor'
+        ? t('business.verifyPendingAdmin')
+        : request?.status === 'reddedildi'
+          ? t('business.verifyRejected', { reason: request.decision?.reason ?? '' })
+          : null;
+
+  return (
+    <View style={styles.confirm}>
+      <AppText variant="label" accessibilityRole="header">{t('business.verifyTitle')}</AppText>
+      {verified ? null : <AppText variant="caption" muted>{t('business.verifyIntro')}</AppText>}
+      {error ? (
+        <StateMessage kind="error" onRetry={load} />
+      ) : request === undefined ? (
+        <StateMessage kind="loading" />
+      ) : (
+        <>
+          {status ? <FormMessage kind={request?.status === 'reddedildi' && !verified ? 'error' : 'info'} text={status} /> : null}
+          {verified ? null : pending ? (
+            <AppButton variant="ghost" title={t('business.verifyCancel')} disabled={busy} onPress={() => run(() => verificationRequests.cancel(business.id))} />
+          ) : (
+            <AppButton
+              variant="secondary"
+              title={request ? t('business.verifyAgain') : t('business.verifyRequest')}
+              loading={busy}
+              disabled={busy}
+              onPress={() => run(() => verificationRequests.request(uid, business))}
+            />
+          )}
+        </>
+      )}
+    </View>
   );
 }
 

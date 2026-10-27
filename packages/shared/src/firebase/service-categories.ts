@@ -9,6 +9,7 @@ import {
   query,
   serverTimestamp,
   Timestamp,
+  where,
   writeBatch,
   type Firestore,
 } from 'firebase/firestore';
@@ -63,8 +64,16 @@ export async function submitServiceSuggestion(db: Firestore, uid: string, text: 
  */
 export function createServiceCategoryAdmin(db: Firestore, actorUid: string) {
   const module: Module = 'hizmet-kategorileri';
-  const audit = (batch: ReturnType<typeof writeBatch>, action: Action, targetId: string, summary: string) => {
-    batch.set(doc(collection(db, 'auditLog')), { actorUid, module, action, targetId, at: serverTimestamp(), summary });
+  const audit = (batch: ReturnType<typeof writeBatch>, action: Action, targetId: string, summary: string, provinceCode?: string) => {
+    batch.set(doc(collection(db, 'auditLog')), {
+      actorUid,
+      module,
+      action,
+      targetId,
+      ...(provinceCode ? { region: { provinceCode } } : {}),
+      at: serverTimestamp(),
+      summary,
+    });
   };
   const bumpVersion = (batch: ReturnType<typeof writeBatch>) =>
     batch.set(versionDoc(db), { updatedAt: serverTimestamp(), updatedBy: actorUid });
@@ -111,8 +120,14 @@ export function createServiceCategoryAdmin(db: Firestore, actorUid: string) {
     },
 
     /** Son öneriler, yeniden eskiye. */
-    async listSuggestions(max = 100): Promise<ServiceSuggestion[]> {
-      const snap = await getDocs(query(collection(db, SUGGESTIONS), orderBy('createdAt', 'desc'), limit(max)));
+    /** İl verilirse yalnızca o ilin önerileri (il yöneticisi kendi ilini görür; kurallar bunu şart koşar). */
+    async listSuggestions(opts: { provinceCode?: string; max?: number } = {}): Promise<ServiceSuggestion[]> {
+      const constraints = [orderBy('createdAt', 'desc'), limit(opts.max ?? 100)];
+      const snap = await getDocs(
+        opts.provinceCode
+          ? query(collection(db, SUGGESTIONS), where('provinceCode', '==', opts.provinceCode), ...constraints)
+          : query(collection(db, SUGGESTIONS), ...constraints),
+      );
       return snap.docs.map((d) => {
         const data = d.data();
         return {
@@ -130,7 +145,7 @@ export function createServiceCategoryAdmin(db: Firestore, actorUid: string) {
       const batch = writeBatch(db);
       batch.update(doc(db, SUGGESTIONS, s.id), { status: 'incelendi', reviewedBy: actorUid, reviewedAt: serverTimestamp() });
       // Öneri metni kullanıcı yazısıdır; kayda yalnızca kimlik yazılır (kişisel veri yazılmaz).
-      audit(batch, 'duzenle', s.id, 'Hizmet önerisi incelendi');
+      audit(batch, 'onayla', s.id, 'Hizmet önerisi incelendi', s.provinceCode);
       await batch.commit();
     },
   };

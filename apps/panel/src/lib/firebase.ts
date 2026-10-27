@@ -20,8 +20,16 @@ const app = getApps().length ? getApp() : initializeApp(config);
 export const firebaseAuth = getAuth(app);
 export const firestore = getFirestore(app);
 
+// Kurum hesabı açmak için ayrı uygulama örneği: yeni hesap oluşturulunca admin'in kendi oturumu bozulmaz.
+const accountApp = getApps().find((a) => a.name === 'hesap-acma') ?? initializeApp(config, 'hesap-acma');
+export const accountAuth = getAuth(accountApp);
+// Firebase'in hazır e-posta şablonları Türkçe gitsin (şablonlar konsoldan değiştirilemiyor).
+firebaseAuth.languageCode = 'tr';
+accountAuth.languageCode = 'tr';
+
 // Yerel deneme: VITE_FIREBASE_EMULATOR=1 ile gerçek proje yerine emülatöre bağlanır.
 if (env.VITE_FIREBASE_EMULATOR === '1') {
   connectAuthEmulator(firebaseAuth, 'http://127.0.0.1:9099', { disableWarnings: true });
+  connectAuthEmulator(accountAuth, 'http://127.0.0.1:9099', { disableWarnings: true });
   connectFirestoreEmulator(firestore, '127.0.0.1', 8080);
 }

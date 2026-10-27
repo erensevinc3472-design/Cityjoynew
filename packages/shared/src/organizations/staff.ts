@@ -1,13 +1,18 @@
 import type { Module } from '../permissions/types';
 import type { Organization, OrganizationMember, StaffRole } from './types';
 
-function isActive(member: OrganizationMember, now: Date): boolean {
+export function isMemberActive(member: OrganizationMember, now = new Date()): boolean {
   if (member.removedAt) return false;
   return !member.expiresAt || new Date(member.expiresAt) > now;
 }
 
+/** Kurum çalışıyor mu (pasifleştirilmemiş, sözleşmesi bitmemiş)? */
+export function isOrganizationActive(org: Organization, now = new Date()): boolean {
+  return org.status === 'aktif' && (!org.contractEndsAt || new Date(org.contractEndsAt) > now);
+}
+
 function roleIn(org: Organization, member: OrganizationMember, module: Module, now: Date): StaffRole | undefined {
-  if (!isActive(member, now) || member.orgId !== org.id || !org.modules.includes(module)) return undefined;
+  if (!isMemberActive(member, now) || !isOrganizationActive(org, now) || member.orgId !== org.id || !org.modules.includes(module)) return undefined;
   return member.assignments[module]?.role;
 }
 

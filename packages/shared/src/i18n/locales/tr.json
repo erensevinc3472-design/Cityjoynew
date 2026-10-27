@@ -93,7 +93,8 @@
     "weakPassword": "Daha güçlü bir şifre seç.",
     "requiresRecentLogin": "Güvenliğin için şifreni tekrar girmen gerekiyor.",
     "unknown": "Bir sorun oluştu. Lütfen tekrar dene.",
-    "notConfigured": "Uygulama henüz sunucuya bağlı değil."
+    "notConfigured": "Uygulama henüz sunucuya bağlı değil.",
+    "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Başka bir ad yazın."
   },
   "reset": {
     "title": "Şifreni sıfırla",
@@ -235,7 +236,8 @@
       "address": "Adres en çok 200 karakter olabilir.",
       "hoursNote": "Çalışma saatleri en çok 120 karakter olabilir.",
       "description": "Tanıtım en çok 500 karakter olabilir.",
-      "priceList": "Fiyat satırlarında hizmet ve fiyat ikisi de dolu olmalı (en çok 30 satır)."
+      "priceList": "Fiyat satırlarında hizmet ve fiyat ikisi de dolu olmalı (en çok 30 satır).",
+      "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Kurum hesabı için CityJoy ile iletişime geçin."
     },
     "hide": "Yayından kaldır (gizle)",
     "show": "Yeniden yayınla",
@@ -264,7 +266,7 @@
     "notFound": "Bu işletme bulunamadı ya da yayında değil.",
     "listError": "İşletmeler yüklenemedi.",
     "unverifiedWarning": "Doğrulanmamış işletmelerle çalışırken dikkatli olun; kimliği ve fiyatı önceden teyit edin.",
-    "myVerifyNote": "Belge doğrulaması yakında açılacak. O zamana kadar işletmeniz \"Doğrulanmadı\" etiketiyle listelenir.",
+    "myVerifyNote": "İşletmenizi kaydettikten sonra düzenleme ekranından doğrulama isteyebilirsiniz. Doğrulanana kadar \"Doğrulanmadı\" etiketiyle listelenir.",
     "servicesLabel": "Hizmetler",
     "hoursLabel": "Çalışma saatleri",
     "addressLabel": "Adres",
@@ -273,7 +275,16 @@
     "removedNote": "Bu işletme yönetim tarafından yayından kaldırıldı. Bilgi için CityJoy ile iletişime geçin.",
     "priceListTitle": "Fiyat listesi",
     "removeService": "Kaldır",
-    "duplicatePhone": "Bu telefon numarasıyla kayıtlı bir işletme zaten var. İşletme sizinse CityJoy ile iletişime geçin."
+    "duplicatePhone": "Bu telefon numarasıyla kayıtlı bir işletme zaten var. İşletme sizinse CityJoy ile iletişime geçin.",
+    "verifyTitle": "Doğrulama",
+    "verifyIntro": "Doğrulanmış işletmeler listede önce gelir ve \"Belgeleri doğrulandı\" etiketi alır. İsteğiniz önce ilinizin yöneticisine, sonra CityJoy'a gider; sizinle telefonla ya da görüntülü görüşmeyle iletişime geçilebilir.",
+    "verifyRequest": "Doğrulama iste",
+    "verifyPendingFirst": "İsteğiniz alındı, il yöneticisinin incelemesini bekliyor.",
+    "verifyPendingAdmin": "İl yöneticisi onayladı, CityJoy'un son onayını bekliyor.",
+    "verifyRejected": "İsteğiniz reddedildi. Gerekçe: {{reason}}",
+    "verifyAgain": "Yeniden iste",
+    "verifyCancel": "İsteği geri çek",
+    "verifyDone": "İşletmeniz doğrulandı."
   },
   "reviews": {
     "title": "Değerlendirmeler",
@@ -414,5 +425,28 @@
     "backgroundOff": "Arka plan konum izni yok: konumunuz yalnızca bu ekran açıkken güncellenir.",
     "fgTitle": "SOS: konumunuz ailenizle paylaşılıyor",
     "fgBody": "Güvendeyseniz uygulamada \"Güvendeyim\"e dokunun."
+  },
+  "city": {
+    "needLocation": "Şehrinin bilgilerini görmek için önce ilini seç.",
+    "staleNote": "İnternete bağlanılamadı; telefonda saklı bilgiler gösteriliyor, güncel olmayabilir.",
+    "loadError": "Bilgiler yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.",
+    "comingSoon": "Bu ilde henüz bilgi yok",
+    "count": "{{count}} kayıt",
+    "otherSections": "Nöbetçi eczane, etkinlikler, kafe ve restoranlar, ilanlar ve Mahalle Meydanı sonraki adımlarda eklenecek.",
+    "search": "Ad, tür ya da ilçe ara",
+    "allDistricts": "Tüm ilçeler",
+    "contentLanguage": "Bu bölümdeki bilgiler Türkçe girilmiştir.",
+    "empty": "Bu bölümde henüz bilgi yok.",
+    "unverified": "Doğrulanmadı",
+    "unverifiedNote": "Bu bilgi henüz yetkili bir kişi tarafından teyit edilmedi; değişmiş olabilir. Gitmeden önce arayarak ya da resmî sitesinden kontrol et.",
+    "notFound": "Bu kayıt bulunamadı; kaldırılmış olabilir.",
+    "call": "Ara: {{number}}",
+    "openMap": "Haritada aç",
+    "website": "Web sitesi",
+    "apply": "Başvuru sayfası",
+    "moreInfo": "Ayrıntılı bilgi",
+    "source": "Kaynak: {{source}}, {{date}}",
+    "verifiedOn": "Doğrulandı: {{date}}",
+    "firstHour": "İlk saat {{price}} ₺"
   }
 }

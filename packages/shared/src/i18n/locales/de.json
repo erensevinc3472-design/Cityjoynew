@@ -93,7 +93,8 @@
     "weakPassword": "Wähle ein stärkeres Passwort.",
     "requiresRecentLogin": "Zu deiner Sicherheit gib bitte dein Passwort erneut ein.",
     "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-    "notConfigured": "Die App ist noch nicht mit dem Server verbunden."
+    "notConfigured": "Die App ist noch nicht mit dem Server verbunden.",
+    "reservedName": "Dieser Name ist offiziellen Einrichtungen vorbehalten (Gemeinde, Gouverneursamt, CityJoy usw.). Bitte wähle einen anderen Namen."
   },
   "reset": {
     "title": "Passwort zurücksetzen",
@@ -235,7 +236,8 @@
       "address": "Die Adresse darf höchstens 200 Zeichen haben.",
       "hoursNote": "Öffnungszeiten dürfen höchstens 120 Zeichen haben.",
       "description": "Die Beschreibung darf höchstens 500 Zeichen haben.",
-      "priceList": "Jede Preiszeile braucht Leistung und Preis (höchstens 30 Zeilen)."
+      "priceList": "Jede Preiszeile braucht Leistung und Preis (höchstens 30 Zeilen).",
+      "reservedName": "Dieser Name ist offiziellen Einrichtungen vorbehalten (Gemeinde, Gouverneursamt, CityJoy usw.). Für ein Behördenkonto wenden Sie sich an CityJoy."
     },
     "hide": "Nicht mehr anzeigen",
     "show": "Wieder veröffentlichen",
@@ -264,7 +266,7 @@
     "notFound": "Dieser Betrieb wurde nicht gefunden oder ist nicht veröffentlicht.",
     "listError": "Betriebe konnten nicht geladen werden.",
     "unverifiedWarning": "Seien Sie bei nicht geprüften Betrieben vorsichtig; klären Sie Identität und Preis vorher.",
-    "myVerifyNote": "Die Dokumentenprüfung startet bald. Bis dahin wird Ihr Betrieb als \"Nicht geprüft\" angezeigt.",
+    "myVerifyNote": "Nach dem Speichern können Sie im Bearbeitungsbildschirm eine Prüfung anfordern. Bis dahin wird Ihr Betrieb als \"Nicht geprüft\" angezeigt.",
     "servicesLabel": "Dienste",
     "hoursLabel": "Öffnungszeiten",
     "addressLabel": "Adresse",
@@ -273,7 +275,16 @@
     "removedNote": "Dieser Betrieb wurde von CityJoy entfernt. Wenden Sie sich für Details an CityJoy.",
     "priceListTitle": "Preisliste",
     "removeService": "Entfernen",
-    "duplicatePhone": "Mit dieser Telefonnummer ist bereits ein Betrieb eingetragen. Wenn es Ihrer ist, wenden Sie sich an CityJoy."
+    "duplicatePhone": "Mit dieser Telefonnummer ist bereits ein Betrieb eingetragen. Wenn es Ihrer ist, wenden Sie sich an CityJoy.",
+    "verifyTitle": "Prüfung",
+    "verifyIntro": "Geprüfte Betriebe stehen in Listen weiter oben und erhalten das Label \"Dokumente geprüft\". Ihre Anfrage geht zuerst an die Provinzverwaltung, dann an CityJoy; Sie werden eventuell telefonisch oder per Videoanruf kontaktiert.",
+    "verifyRequest": "Prüfung anfordern",
+    "verifyPendingFirst": "Anfrage erhalten, wartet auf die Prüfung durch die Provinzverwaltung.",
+    "verifyPendingAdmin": "Von der Provinzverwaltung bestätigt, wartet auf die endgültige Freigabe durch CityJoy.",
+    "verifyRejected": "Ihre Anfrage wurde abgelehnt. Grund: {{reason}}",
+    "verifyAgain": "Erneut anfordern",
+    "verifyCancel": "Anfrage zurückziehen",
+    "verifyDone": "Ihr Betrieb ist geprüft."
   },
   "reviews": {
     "title": "Bewertungen",
@@ -414,5 +425,28 @@
     "backgroundOff": "Keine Hintergrund-Standortberechtigung: Ihr Standort wird nur aktualisiert, solange dieser Bildschirm offen ist.",
     "fgTitle": "SOS: Ihr Standort wird mit Ihrer Familie geteilt",
     "fgBody": "Wenn Sie sicher sind, tippen Sie in der App auf \"Ich bin sicher\"."
+  },
+  "city": {
+    "needLocation": "Wähle zuerst deine Provinz, um die Informationen deiner Stadt zu sehen.",
+    "staleNote": "Keine Verbindung; es werden auf dem Telefon gespeicherte Informationen angezeigt, die veraltet sein können.",
+    "loadError": "Die Informationen konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "comingSoon": "Für diese Provinz noch keine Informationen",
+    "count": "{{count}} Einträge",
+    "otherSections": "Notdienstapotheken, Veranstaltungen, Cafés und Restaurants, Anzeigen und der Viertelplatz folgen in den nächsten Schritten.",
+    "search": "Nach Name, Art oder Bezirk suchen",
+    "allDistricts": "Alle Bezirke",
+    "contentLanguage": "Die Informationen in diesem Bereich sind auf Türkisch erfasst.",
+    "empty": "In diesem Bereich gibt es noch keine Informationen.",
+    "unverified": "Nicht bestätigt",
+    "unverifiedNote": "Diese Information wurde noch nicht von einer berechtigten Person bestätigt und kann sich geändert haben. Ruf vorher an oder prüfe die offizielle Webseite.",
+    "notFound": "Dieser Eintrag wurde nicht gefunden; er wurde vielleicht entfernt.",
+    "call": "Anrufen: {{number}}",
+    "openMap": "In Karten öffnen",
+    "website": "Webseite",
+    "apply": "Antragsseite",
+    "moreInfo": "Weitere Informationen",
+    "source": "Quelle: {{source}}, {{date}}",
+    "verifiedOn": "Bestätigt: {{date}}",
+    "firstHour": "Erste Stunde {{price}} TRY"
   }
 }

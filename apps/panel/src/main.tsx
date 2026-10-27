@@ -4,12 +4,17 @@ import { createHashRouter, Navigate, RouterProvider } from 'react-router';
 
 import { Shell } from './components/shell';
 import { SessionProvider, useSession } from './lib/session';
+import { ApprovalsPage } from './pages/approvals-page';
+import { AuditLogPage } from './pages/audit-log-page';
 import { BusinessesPage } from './pages/businesses-page';
+import { CityGuidePage } from './pages/city-guide-page';
 import { EmergencyNumbersPage } from './pages/emergency-numbers-page';
+import { GrantsPage } from './pages/grants-page';
 import { LocationsPage } from './pages/locations-page';
 import { LoginPage } from './pages/login-page';
 import { ModerationPage } from './pages/moderation-page';
 import { OccupationsPage } from './pages/occupations-page';
+import { OrganizationsPage } from './pages/organizations-page';
 import { ServiceCategoriesPage } from './pages/service-categories-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { OverviewPage } from './pages/overview-page';
@@ -40,6 +45,11 @@ const router = createHashRouter([
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
+      { path: 'onaylar', element: <ApprovalsPage /> },
+      { path: 'sehir-rehberi', element: <CityGuidePage /> },
+      { path: 'kurumlar', element: <OrganizationsPage /> },
+      { path: 'yetkiler', element: <GrantsPage /> },
+      { path: 'islem-kayitlari', element: <AuditLogPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },

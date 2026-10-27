@@ -1,0 +1,2321 @@
+{
+ "version": 1,
+ "note": "Benim Şehrim sabit bilgi bölümleri. Excel şablonu (scripts/build-data-templates.py), panel yükleyicisi ve uygulama bu dosyadan beslenir; sütun adı değişirse üçü birlikte değişir.",
+ "sections": [
+  {
+   "id": "onemli-kurumlar",
+   "sheet": "Önemli Kurumlar",
+   "icon": "account-balance",
+   "names": {
+    "tr": "Önemli Kurumlar",
+    "en": "Public Institutions",
+    "de": "Öffentliche Einrichtungen",
+    "ar": "المؤسسات المهمة",
+    "ru": "Важные учреждения"
+   },
+   "description": "Valilik, kaymakamlık, il müdürlükleri, hastane, aile sağlığı merkezi, emniyet, itfaiye, nüfus, noter, PTT, vergi dairesi, SGK, kütüphane, okul.",
+   "columns": [
+    {
+     "key": "kategori",
+     "required": true,
+     "type": "choice",
+     "hint": "Listeden seçin.",
+     "choices": [
+      "valilik",
+      "kaymakamlik",
+      "il-mudurlugu",
+      "hastane-devlet",
+      "hastane-ozel",
+      "aile-sagligi-merkezi",
+      "emniyet",
+      "jandarma",
+      "itfaiye",
+      "nufus-mudurlugu",
+      "goc-idaresi",
+      "noter",
+      "ptt",
+      "vergi-dairesi",
+      "sgk",
+      "adliye",
+      "kutuphane",
+      "okul",
+      "halk-egitim",
+      "diger"
+     ]
+    },
+    {
+     "key": "ad",
+     "required": true,
+     "type": "text",
+     "hint": "Kurumun resmî adı."
+    },
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı, \"İlçeler\" sekmesindeki yazımla (örnek: Bursa)."
+    },
+    {
+     "key": "ilce",
+     "required": true,
+     "type": "text",
+     "hint": "İlçe adı, \"İlçeler\" sekmesindeki yazımla (örnek: Nilüfer). Merkez ilçeli illerde \"Merkez\"."
+    },
+    {
+     "key": "mahalle",
+     "required": false,
+     "type": "text",
+     "hint": "Mahalle adı, biliniyorsa (örnek: Ataevler)."
+    },
+    {
+     "key": "adres",
+     "required": false,
+     "type": "text",
+     "hint": "Açık adres."
+    },
+    {
+     "key": "telefon",
+     "required": false,
+     "type": "phone",
+     "hint": "Yalnızca kurumun resmî numarası, rakamlarla (örnek: 02242251900). Kişisel numara yazılmaz."
+    },
+    {
+     "key": "web",
+     "required": false,
+     "type": "url",
+     "hint": "Resmî web adresi."
+    },
+    {
+     "key": "calisma_hafta_ici",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 08:00-17:00"
+    },
+    {
+     "key": "calisma_hafta_sonu",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: Kapalı"
+    },
+    {
+     "key": "aciklama",
+     "required": false,
+     "type": "text",
+     "hint": "Kısa açıklama (en çok 300 karakter)."
+    },
+    {
+     "key": "enlem",
+     "required": false,
+     "type": "lat",
+     "hint": "Harita konumu, ondalık derece (örnek: 40.1885). Bilinmiyorsa boş bırakın, uydurmayın."
+    },
+    {
+     "key": "boylam",
+     "required": false,
+     "type": "lng",
+     "hint": "Harita konumu, ondalık derece (örnek: 29.0610)."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "hastane-devlet",
+    "Bursa Şehir Hastanesi",
+    "Bursa",
+    "Nilüfer",
+    "Doğanköy",
+    "Doğanköy Mah. ...",
+    "",
+    "https://bursasehir.saglik.gov.tr",
+    "7/24",
+    "7/24",
+    "Acil servis 7/24 açık.",
+    "",
+    "",
+    "https://bursasehir.saglik.gov.tr",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "muzeler",
+   "sheet": "Müzeler",
+   "icon": "museum",
+   "names": {
+    "tr": "Müzeler",
+    "en": "Museums",
+    "de": "Museen",
+    "ar": "المتاحف",
+    "ru": "Музеи"
+   },
+   "description": "Devlet, belediye ve özel müzeler.",
+   "columns": [
+    {
+     "key": "tur",
+     "required": true,
+     "type": "choice",
+     "hint": "Listeden seçin.",
+     "choices": [
+      "tarih",
+      "arkeoloji",
+      "sanat",
+      "sanayi",
+      "kultur",
+      "etnografya",
+      "bilim",
+      "kent",
+      "diger"
+     ]
+    },
+    {
+     "key": "ad",
+     "required": true,
+     "type": "text",
+     "hint": "Müzenin adı."
+    },
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı, \"İlçeler\" sekmesindeki yazımla (örnek: Bursa)."
+    },
+    {
+     "key": "ilce",
+     "required": true,
+     "type": "text",
+     "hint": "İlçe adı, \"İlçeler\" sekmesindeki yazımla (örnek: Nilüfer). Merkez ilçeli illerde \"Merkez\"."
+    },
+    {
+     "key": "mahalle",
+     "required": false,
+     "type": "text",
+     "hint": "Mahalle adı, biliniyorsa (örnek: Ataevler)."
+    },
+    {
+     "key": "adres",
+     "required": false,
+     "type": "text",
+     "hint": "Açık adres."
+    },
+    {
+     "key": "telefon",
+     "required": false,
+     "type": "phone",
+     "hint": "Yalnızca kurumun resmî numarası, rakamlarla (örnek: 02242251900). Kişisel numara yazılmaz."
+    },
+    {
+     "key": "web",
+     "required": false,
+     "type": "url",
+     "hint": "Resmî web adresi."
+    },
+    {
+     "key": "acilis_saatleri",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 09:00-18:00 (yaz), 09:00-17:00 (kış)"
+    },
+    {
+     "key": "kapali_gunler",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: Pazartesi"
+    },
+    {
+     "key": "ucret_durumu",
+     "required": true,
+     "type": "choice",
+     "hint": "Ücretsiz / Ücretli",
+     "choices": [
+      "Ücretsiz",
+      "Ücretli"
+     ]
+    },
+    {
+     "key": "tam_ucret_tl",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı (örnek: 150)"
+    },
+    {
+     "key": "indirimli_ucret_tl",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "muzekart_gecerli",
+     "required": false,
+     "type": "bool",
+     "hint": "Evet / Hayır"
+    },
+    {
+     "key": "aciklama",
+     "required": false,
+     "type": "text",
+     "hint": "Kısa tanıtım (en çok 500 karakter)."
+    },
+    {
+     "key": "enlem",
+     "required": false,
+     "type": "lat",
+     "hint": "Harita konumu, ondalık derece (örnek: 40.1885). Bilinmiyorsa boş bırakın, uydurmayın."
+    },
+    {
+     "key": "boylam",
+     "required": false,
+     "type": "lng",
+     "hint": "Harita konumu, ondalık derece (örnek: 29.0610)."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "kent",
+    "Bursa Kent Müzesi",
+    "Bursa",
+    "Osmangazi",
+    "",
+    "Reyhan Mah. ...",
+    "",
+    "https://www.bursa.bel.tr",
+    "10:00-18:00",
+    "Pazartesi",
+    "Ücretli",
+    "20",
+    "10",
+    "Hayır",
+    "Bursa'nın kent tarihini anlatan müze.",
+    "",
+    "",
+    "https://www.bursa.bel.tr",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "otoparklar",
+   "sheet": "Otoparklar",
+   "icon": "local-parking",
+   "names": {
+    "tr": "Otoparklar",
+    "en": "Car Parks",
+    "de": "Parkplätze",
+    "ar": "مواقف السيارات",
+    "ru": "Парковки"
+   },
+   "description": "Belediye ve özel otoparklar (AVM dahil).",
+   "columns": [
+    {
+     "key": "tip",
+     "required": true,
+     "type": "choice",
+     "hint": "Listeden seçin.",
+     "choices": [
+      "kapali",
+      "acik",
+      "katli",
+      "yeralti",
+      "avm"
+     ]
+    },
+    {
+     "key": "ad",
+     "required": true,
+     "type": "text",
+     "hint": "Otoparkın adı."
+    },
+    {
+     "key": "isletici",
+     "required": false,
+     "type": "choice",
+     "hint": "Belediye / Özel",
+     "choices": [
+      "Belediye",
+      "Özel"
+     ]
+    },
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı, \"İlçeler\" sekmesindeki yazımla (örnek: Bursa)."
+    },
+    {
+     "key": "ilce",
+     "required": true,
+     "type": "text",
+     "hint": "İlçe adı, \"İlçeler\" sekmesindeki yazımla (örnek: Nilüfer). Merkez ilçeli illerde \"Merkez\"."
+    },
+    {
+     "key": "mahalle",
+     "required": false,
+     "type": "text",
+     "hint": "Mahalle adı, biliniyorsa (örnek: Ataevler)."
+    },
+    {
+     "key": "adres",
+     "required": false,
+     "type": "text",
+     "hint": "Açık adres."
+    },
+    {
+     "key": "telefon",
+     "required": false,
+     "type": "phone",
+     "hint": "Yalnızca kurumun resmî numarası, rakamlarla (örnek: 02242251900). Kişisel numara yazılmaz."
+    },
+    {
+     "key": "web",
+     "required": false,
+     "type": "url",
+     "hint": "Resmî web adresi."
+    },
+    {
+     "key": "kapasite",
+     "required": false,
+     "type": "number",
+     "hint": "Araç sayısı (sayı)"
+    },
+    {
+     "key": "ilk_saat_tl",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "ek_saat_tl",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "gunluk_en_fazla_tl",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "aylik_abonelik_tl",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "calisma_hafta_ici",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 07:00-23:00"
+    },
+    {
+     "key": "calisma_hafta_sonu",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 08:00-24:00"
+    },
+    {
+     "key": "odeme_yontemleri",
+     "required": false,
+     "type": "list",
+     "hint": "Virgülle: Nakit, Kredi Kartı, Temassız, Mobil"
+    },
+    {
+     "key": "engelli_ucretsiz",
+     "required": false,
+     "type": "bool",
+     "hint": "Evet / Hayır"
+    },
+    {
+     "key": "ozellikler",
+     "required": false,
+     "type": "list",
+     "hint": "Virgülle: Kapalı, Güvenlik kamerası, Elektrikli araç şarjı ..."
+    },
+    {
+     "key": "enlem",
+     "required": false,
+     "type": "lat",
+     "hint": "Harita konumu, ondalık derece (örnek: 40.1885). Bilinmiyorsa boş bırakın, uydurmayın."
+    },
+    {
+     "key": "boylam",
+     "required": false,
+     "type": "lng",
+     "hint": "Harita konumu, ondalık derece (örnek: 29.0610)."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "katli",
+    "Örnek Katlı Otopark",
+    "Belediye",
+    "Bursa",
+    "Osmangazi",
+    "",
+    "... Cad. No:1",
+    "",
+    "",
+    "400",
+    "30",
+    "15",
+    "150",
+    "1500",
+    "07:00-23:00",
+    "08:00-24:00",
+    "Nakit, Kredi Kartı",
+    "Evet",
+    "Güvenlik kamerası",
+    "",
+    "",
+    "https://...",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "parklar",
+   "sheet": "Parklar",
+   "icon": "park",
+   "names": {
+    "tr": "Parklar",
+    "en": "Parks",
+    "de": "Parks",
+    "ar": "الحدائق",
+    "ru": "Парки"
+   },
+   "description": "Parklar, millet bahçeleri, kent ormanları, mesire alanları.",
+   "columns": [
+    {
+     "key": "tur",
+     "required": true,
+     "type": "choice",
+     "hint": "Listeden seçin.",
+     "choices": [
+      "park",
+      "millet-bahcesi",
+      "kent-ormani",
+      "mesire-alani",
+      "botanik-bahcesi"
+     ]
+    },
+    {
+     "key": "ad",
+     "required": true,
+     "type": "text",
+     "hint": "Parkın adı."
+    },
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı, \"İlçeler\" sekmesindeki yazımla (örnek: Bursa)."
+    },
+    {
+     "key": "ilce",
+     "required": true,
+     "type": "text",
+     "hint": "İlçe adı, \"İlçeler\" sekmesindeki yazımla (örnek: Nilüfer). Merkez ilçeli illerde \"Merkez\"."
+    },
+    {
+     "key": "mahalle",
+     "required": false,
+     "type": "text",
+     "hint": "Mahalle adı, biliniyorsa (örnek: Ataevler)."
+    },
+    {
+     "key": "adres",
+     "required": false,
+     "type": "text",
+     "hint": "Açık adres."
+    },
+    {
+     "key": "acilis_saatleri",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 7/24 ya da 06:00-24:00"
+    },
+    {
+     "key": "olanaklar",
+     "required": false,
+     "type": "list",
+     "hint": "Virgülle: Çocuk oyun alanı, Spor aletleri, Yürüyüş yolu, Tuvalet, Otopark, Köpek alanı, Mescit, Kafe"
+    },
+    {
+     "key": "engelli_erisimi",
+     "required": false,
+     "type": "bool",
+     "hint": "Evet / Hayır"
+    },
+    {
+     "key": "aciklama",
+     "required": false,
+     "type": "text",
+     "hint": "Kısa tanıtım."
+    },
+    {
+     "key": "enlem",
+     "required": false,
+     "type": "lat",
+     "hint": "Harita konumu, ondalık derece (örnek: 40.1885). Bilinmiyorsa boş bırakın, uydurmayın."
+    },
+    {
+     "key": "boylam",
+     "required": false,
+     "type": "lng",
+     "hint": "Harita konumu, ondalık derece (örnek: 29.0610)."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "park",
+    "Örnek Parkı",
+    "Bursa",
+    "Nilüfer",
+    "Ataevler",
+    "",
+    "7/24",
+    "Çocuk oyun alanı, Yürüyüş yolu",
+    "Evet",
+    "",
+    "",
+    "",
+    "https://...",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "pazarlar",
+   "sheet": "Pazarlar",
+   "icon": "storefront",
+   "names": {
+    "tr": "Pazarlar",
+    "en": "Markets",
+    "de": "Märkte",
+    "ar": "الأسواق",
+    "ru": "Рынки"
+   },
+   "description": "Semt pazarları, köylü/organik pazarlar, bit pazarları.",
+   "columns": [
+    {
+     "key": "tur",
+     "required": true,
+     "type": "choice",
+     "hint": "Listeden seçin.",
+     "choices": [
+      "semt-pazari",
+      "koylu-pazari",
+      "organik-pazar",
+      "bit-pazari",
+      "balik-pazari"
+     ]
+    },
+    {
+     "key": "ad",
+     "required": true,
+     "type": "text",
+     "hint": "Pazarın adı."
+    },
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı, \"İlçeler\" sekmesindeki yazımla (örnek: Bursa)."
+    },
+    {
+     "key": "ilce",
+     "required": true,
+     "type": "text",
+     "hint": "İlçe adı, \"İlçeler\" sekmesindeki yazımla (örnek: Nilüfer). Merkez ilçeli illerde \"Merkez\"."
+    },
+    {
+     "key": "mahalle",
+     "required": false,
+     "type": "text",
+     "hint": "Mahalle adı, biliniyorsa (örnek: Ataevler)."
+    },
+    {
+     "key": "adres",
+     "required": false,
+     "type": "text",
+     "hint": "Açık adres."
+    },
+    {
+     "key": "gunler",
+     "required": true,
+     "type": "list",
+     "hint": "Virgülle: Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar"
+    },
+    {
+     "key": "saatler",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 08:00-18:00"
+    },
+    {
+     "key": "kapali_alan",
+     "required": false,
+     "type": "bool",
+     "hint": "Evet (kapalı pazar yeri) / Hayır"
+    },
+    {
+     "key": "urunler",
+     "required": false,
+     "type": "list",
+     "hint": "Virgülle: Sebze-meyve, Giyim, Organik, Köy ürünleri ..."
+    },
+    {
+     "key": "enlem",
+     "required": false,
+     "type": "lat",
+     "hint": "Harita konumu, ondalık derece (örnek: 40.1885). Bilinmiyorsa boş bırakın, uydurmayın."
+    },
+    {
+     "key": "boylam",
+     "required": false,
+     "type": "lng",
+     "hint": "Harita konumu, ondalık derece (örnek: 29.0610)."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "semt-pazari",
+    "Örnek Salı Pazarı",
+    "Bursa",
+    "Osmangazi",
+    "",
+    "",
+    "Salı",
+    "08:00-18:00",
+    "Hayır",
+    "Sebze-meyve, Giyim",
+    "",
+    "",
+    "https://...",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "ulasim",
+   "sheet": "Ulaşım",
+   "icon": "directions-bus",
+   "names": {
+    "tr": "Ulaşım",
+    "en": "Transport",
+    "de": "Verkehr",
+    "ar": "المواصلات",
+    "ru": "Транспорт"
+   },
+   "description": "Raylı sistem, otobüs hatları, teleferik, vapur, dolmuş, paylaşımlı bisiklet, ulaşım kartı.",
+   "columns": [
+    {
+     "key": "tur",
+     "required": true,
+     "type": "choice",
+     "hint": "Listeden seçin.",
+     "choices": [
+      "metro",
+      "tramvay",
+      "banliyo",
+      "otobus-hatti",
+      "teleferik",
+      "vapur",
+      "dolmus",
+      "bisiklet",
+      "ulasim-karti",
+      "havalimani-servisi"
+     ]
+    },
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı."
+    },
+    {
+     "key": "hat_kodu",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: M1, B/43"
+    },
+    {
+     "key": "ad",
+     "required": true,
+     "type": "text",
+     "hint": "Hat ya da hizmet adı (örnek: BursaRay M1)."
+    },
+    {
+     "key": "baslangic",
+     "required": false,
+     "type": "text",
+     "hint": "İlk durak"
+    },
+    {
+     "key": "bitis",
+     "required": false,
+     "type": "text",
+     "hint": "Son durak"
+    },
+    {
+     "key": "durak_sayisi",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "ilk_sefer",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 06:00"
+    },
+    {
+     "key": "son_sefer",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 00:00"
+    },
+    {
+     "key": "sefer_sikligi",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: 5-10 dk"
+    },
+    {
+     "key": "tam_ucret_tl",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "ogrenci_ucret_tl",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "kart_adi",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: BursaKart"
+    },
+    {
+     "key": "isletici",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: BURULAŞ"
+    },
+    {
+     "key": "web",
+     "required": false,
+     "type": "url",
+     "hint": "Resmî web adresi."
+    },
+    {
+     "key": "aciklama",
+     "required": false,
+     "type": "text",
+     "hint": "Kısa bilgi."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "metro",
+    "Bursa",
+    "M1",
+    "BursaRay M1",
+    "Emek",
+    "Arabayatağı",
+    "",
+    "06:00",
+    "00:00",
+    "5-10 dk",
+    "",
+    "",
+    "BursaKart",
+    "BURULAŞ",
+    "https://www.burulas.com.tr",
+    "",
+    "https://www.burulas.com.tr",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "toplanma-alanlari",
+   "sheet": "Toplanma Alanları",
+   "icon": "emergency-share",
+   "names": {
+    "tr": "Toplanma Alanları",
+    "en": "Assembly Areas",
+    "de": "Sammelplätze",
+    "ar": "مناطق التجمع",
+    "ru": "Пункты сбора"
+   },
+   "description": "Afet ve acil durum toplanma alanları (AFAD).",
+   "columns": [
+    {
+     "key": "ad",
+     "required": true,
+     "type": "text",
+     "hint": "Alanın adı."
+    },
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı, \"İlçeler\" sekmesindeki yazımla (örnek: Bursa)."
+    },
+    {
+     "key": "ilce",
+     "required": true,
+     "type": "text",
+     "hint": "İlçe adı, \"İlçeler\" sekmesindeki yazımla (örnek: Nilüfer). Merkez ilçeli illerde \"Merkez\"."
+    },
+    {
+     "key": "mahalle",
+     "required": false,
+     "type": "text",
+     "hint": "Mahalle adı, biliniyorsa (örnek: Ataevler)."
+    },
+    {
+     "key": "adres",
+     "required": false,
+     "type": "text",
+     "hint": "Açık adres."
+    },
+    {
+     "key": "kapasite_kisi",
+     "required": false,
+     "type": "number",
+     "hint": "Sayı"
+    },
+    {
+     "key": "enlem",
+     "required": false,
+     "type": "lat",
+     "hint": "Harita konumu, ondalık derece (örnek: 40.1885). Bilinmiyorsa boş bırakın, uydurmayın."
+    },
+    {
+     "key": "boylam",
+     "required": false,
+     "type": "lng",
+     "hint": "Harita konumu, ondalık derece (örnek: 29.0610)."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "Örnek Okulu Bahçesi",
+    "Bursa",
+    "Nilüfer",
+    "Ataevler",
+    "",
+    "",
+    "",
+    "",
+    "https://www.turkiye.gov.tr/afet-ve-acil-durum-yonetimi-acil-toplanma-alani-sorgulama",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "muhtarliklar",
+   "sheet": "Muhtarlıklar",
+   "icon": "location-city",
+   "names": {
+    "tr": "Muhtarlıklar",
+    "en": "Neighbourhood Offices",
+    "de": "Ortsvorsteherämter",
+    "ar": "مكاتب المختار",
+    "ru": "Офисы мухтаров"
+   },
+   "description": "Mahalle muhtarlıklarının resmî iletişim bilgileri.",
+   "columns": [
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı."
+    },
+    {
+     "key": "ilce",
+     "required": true,
+     "type": "text",
+     "hint": "İlçe adı."
+    },
+    {
+     "key": "mahalle",
+     "required": true,
+     "type": "text",
+     "hint": "Mahalle adı."
+    },
+    {
+     "key": "muhtar_adi",
+     "required": false,
+     "type": "text",
+     "hint": "Muhtarın adı soyadı (kamu görevlisi; yalnızca resmî kaynakta yayımlanmışsa)."
+    },
+    {
+     "key": "telefon",
+     "required": false,
+     "type": "phone",
+     "hint": "Yalnızca muhtarlığın resmî numarası. Kişisel cep numarası yazılmaz."
+    },
+    {
+     "key": "adres",
+     "required": false,
+     "type": "text",
+     "hint": "Muhtarlık adresi."
+    },
+    {
+     "key": "calisma_saatleri",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: Hafta içi 09:00-17:00"
+    },
+    {
+     "key": "enlem",
+     "required": false,
+     "type": "lat",
+     "hint": "Harita konumu, ondalık derece (örnek: 40.1885). Bilinmiyorsa boş bırakın, uydurmayın."
+    },
+    {
+     "key": "boylam",
+     "required": false,
+     "type": "lng",
+     "hint": "Harita konumu, ondalık derece (örnek: 29.0610)."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "Bursa",
+    "Nilüfer",
+    "Ataevler",
+    "",
+    "",
+    "",
+    "Hafta içi 09:00-17:00",
+    "",
+    "",
+    "https://...",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "belediye-hizmetleri",
+   "sheet": "Belediye Hizmetleri",
+   "icon": "apartment",
+   "names": {
+    "tr": "Belediye Hizmetleri",
+    "en": "Municipal Services",
+    "de": "Kommunale Dienste",
+    "ar": "خدمات البلدية",
+    "ru": "Муниципальные услуги"
+   },
+   "description": "Belediyenin verdiği hizmetler, gereken evrak ve başvuru bağlantısı (başvuru belediyenin kendi sitesinde yapılır).",
+   "columns": [
+    {
+     "key": "il",
+     "required": true,
+     "type": "text",
+     "hint": "İl adı."
+    },
+    {
+     "key": "belediye",
+     "required": true,
+     "type": "text",
+     "hint": "Belediyenin tam adı (örnek: Nilüfer Belediyesi, Bursa Büyükşehir Belediyesi)."
+    },
+    {
+     "key": "kategori",
+     "required": true,
+     "type": "choice",
+     "hint": "Listeden seçin.",
+     "choices": [
+      "imar-ruhsat",
+      "vergi-odeme",
+      "su-altyapi",
+      "temizlik",
+      "zabita",
+      "sosyal-yardim",
+      "kultur-sanat",
+      "spor",
+      "egitim-kurs",
+      "cenaze",
+      "veteriner",
+      "diger"
+     ]
+    },
+    {
+     "key": "hizmet_adi",
+     "required": true,
+     "type": "text",
+     "hint": "Örnek: Ruhsat başvurusu"
+    },
+    {
+     "key": "aciklama",
+     "required": false,
+     "type": "text",
+     "hint": "Kısa açıklama."
+    },
+    {
+     "key": "gerekli_evrak",
+     "required": false,
+     "type": "list",
+     "hint": "Virgülle ayırın."
+    },
+    {
+     "key": "ucret",
+     "required": false,
+     "type": "text",
+     "hint": "Örnek: Ücretsiz ya da tutar"
+    },
+    {
+     "key": "basvuru_baglantisi",
+     "required": false,
+     "type": "url",
+     "hint": "Belediyenin başvuru sayfası."
+    },
+    {
+     "key": "telefon",
+     "required": false,
+     "type": "phone",
+     "hint": "Resmî numara (örnek: 153)."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "Bursa",
+    "Nilüfer Belediyesi",
+    "imar-ruhsat",
+    "Yapı ruhsatı başvurusu",
+    "",
+    "Tapu, proje, ...",
+    "",
+    "https://...",
+    "153",
+    "https://...",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  },
+  {
+   "id": "nasil-yapilir",
+   "sheet": "Nasıl Yapılır",
+   "icon": "lightbulb",
+   "names": {
+    "tr": "Nasıl Yapılır?",
+    "en": "How To",
+    "de": "Wie geht das?",
+    "ar": "كيف أفعل؟",
+    "ru": "Как сделать?"
+   },
+   "description": "Şehir hayatı rehberi: resmî işlemler, ulaşım kartı, tasarruf ve pratik bilgiler. İl boş bırakılırsa ülke geneli sayılır.",
+   "columns": [
+    {
+     "key": "il",
+     "required": false,
+     "type": "text",
+     "hint": "Boş = tüm Türkiye."
+    },
+    {
+     "key": "kategori",
+     "required": true,
+     "type": "choice",
+     "hint": "Listeden seçin.",
+     "choices": [
+      "resmi-islem",
+      "ulasim",
+      "tasarruf",
+      "zaman",
+      "pratik",
+      "saglik",
+      "egitim"
+     ]
+    },
+    {
+     "key": "baslik",
+     "required": true,
+     "type": "text",
+     "hint": "Örnek: BursaKart nasıl alınır?"
+    },
+    {
+     "key": "kisa_metin",
+     "required": true,
+     "type": "text",
+     "hint": "En çok 500 karakter."
+    },
+    {
+     "key": "adimlar",
+     "required": false,
+     "type": "steps",
+     "hint": "Adımları \" | \" ile ayırın."
+    },
+    {
+     "key": "gerekli_belgeler",
+     "required": false,
+     "type": "list",
+     "hint": "Virgülle ayırın."
+    },
+    {
+     "key": "ilgili_baglanti",
+     "required": false,
+     "type": "url",
+     "hint": "Resmî bağlantı."
+    },
+    {
+     "key": "kaynak",
+     "required": true,
+     "type": "url",
+     "hint": "Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez."
+    },
+    {
+     "key": "kaynak_tarihi",
+     "required": true,
+     "type": "date",
+     "hint": "Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026)."
+    },
+    {
+     "key": "not",
+     "required": false,
+     "type": "text",
+     "hint": "İsteğe bağlı kısa not (örnek: \"telefon teyit edilmeli\")."
+    }
+   ],
+   "example": [
+    "Bursa",
+    "ulasim",
+    "BursaKart nasıl alınır?",
+    "BursaKart, şehir içi toplu taşımada kullanılan karttır.",
+    "Satış noktasına gidin | Kimlik gösterin | Kartı yükleyin",
+    "Kimlik (indirimli kart için)",
+    "https://...",
+    "https://...",
+    "27.10.2026",
+    "ÖRNEK SATIR: bilgileri kontrol edilmedi, silin"
+   ]
+  }
+ ],
+ "labels": {
+  "kategori": {
+   "tr": "Kategori",
+   "en": "Category",
+   "de": "Kategorie",
+   "ar": "الفئة",
+   "ru": "Категория"
+  },
+  "tur": {
+   "tr": "Tür",
+   "en": "Type",
+   "de": "Art",
+   "ar": "النوع",
+   "ru": "Тип"
+  },
+  "tip": {
+   "tr": "Tür",
+   "en": "Type",
+   "de": "Art",
+   "ar": "النوع",
+   "ru": "Тип"
+  },
+  "ad": {
+   "tr": "Ad",
+   "en": "Name",
+   "de": "Name",
+   "ar": "الاسم",
+   "ru": "Название"
+  },
+  "il": {
+   "tr": "İl",
+   "en": "Province",
+   "de": "Provinz",
+   "ar": "الولاية",
+   "ru": "Провинция"
+  },
+  "ilce": {
+   "tr": "İlçe",
+   "en": "District",
+   "de": "Bezirk",
+   "ar": "القضاء",
+   "ru": "Район"
+  },
+  "mahalle": {
+   "tr": "Mahalle",
+   "en": "Neighbourhood",
+   "de": "Viertel",
+   "ar": "الحي",
+   "ru": "Квартал"
+  },
+  "adres": {
+   "tr": "Adres",
+   "en": "Address",
+   "de": "Adresse",
+   "ar": "العنوان",
+   "ru": "Адрес"
+  },
+  "telefon": {
+   "tr": "Telefon",
+   "en": "Phone",
+   "de": "Telefon",
+   "ar": "الهاتف",
+   "ru": "Телефон"
+  },
+  "web": {
+   "tr": "Web sitesi",
+   "en": "Website",
+   "de": "Webseite",
+   "ar": "الموقع الإلكتروني",
+   "ru": "Сайт"
+  },
+  "calisma_hafta_ici": {
+   "tr": "Hafta içi",
+   "en": "Weekdays",
+   "de": "Werktags",
+   "ar": "أيام الأسبوع",
+   "ru": "Будни"
+  },
+  "calisma_hafta_sonu": {
+   "tr": "Hafta sonu",
+   "en": "Weekend",
+   "de": "Wochenende",
+   "ar": "عطلة نهاية الأسبوع",
+   "ru": "Выходные"
+  },
+  "calisma_saatleri": {
+   "tr": "Çalışma saatleri",
+   "en": "Opening hours",
+   "de": "Öffnungszeiten",
+   "ar": "ساعات العمل",
+   "ru": "Часы работы"
+  },
+  "aciklama": {
+   "tr": "Açıklama",
+   "en": "Description",
+   "de": "Beschreibung",
+   "ar": "الوصف",
+   "ru": "Описание"
+  },
+  "enlem": {
+   "tr": "Enlem",
+   "en": "Latitude",
+   "de": "Breitengrad",
+   "ar": "خط العرض",
+   "ru": "Широта"
+  },
+  "boylam": {
+   "tr": "Boylam",
+   "en": "Longitude",
+   "de": "Längengrad",
+   "ar": "خط الطول",
+   "ru": "Долгота"
+  },
+  "kaynak": {
+   "tr": "Kaynak",
+   "en": "Source",
+   "de": "Quelle",
+   "ar": "المصدر",
+   "ru": "Источник"
+  },
+  "kaynak_tarihi": {
+   "tr": "Kaynak tarihi",
+   "en": "Source date",
+   "de": "Quellendatum",
+   "ar": "تاريخ المصدر",
+   "ru": "Дата источника"
+  },
+  "not": {
+   "tr": "Not",
+   "en": "Note",
+   "de": "Hinweis",
+   "ar": "ملاحظة",
+   "ru": "Примечание"
+  },
+  "acilis_saatleri": {
+   "tr": "Açılış saatleri",
+   "en": "Opening hours",
+   "de": "Öffnungszeiten",
+   "ar": "ساعات العمل",
+   "ru": "Часы работы"
+  },
+  "kapali_gunler": {
+   "tr": "Kapalı günler",
+   "en": "Closed on",
+   "de": "Ruhetage",
+   "ar": "أيام الإغلاق",
+   "ru": "Выходные дни"
+  },
+  "ucret_durumu": {
+   "tr": "Giriş",
+   "en": "Admission",
+   "de": "Eintritt",
+   "ar": "الدخول",
+   "ru": "Вход"
+  },
+  "tam_ucret_tl": {
+   "tr": "Tam bilet",
+   "en": "Full price",
+   "de": "Normalpreis",
+   "ar": "السعر الكامل",
+   "ru": "Полный билет"
+  },
+  "indirimli_ucret_tl": {
+   "tr": "İndirimli",
+   "en": "Reduced",
+   "de": "Ermäßigt",
+   "ar": "مخفض",
+   "ru": "Льготный"
+  },
+  "muzekart_gecerli": {
+   "tr": "Müzekart geçerli",
+   "en": "Museum Pass valid",
+   "de": "Museumskarte gültig",
+   "ar": "بطاقة المتاحف صالحة",
+   "ru": "Музейная карта действует"
+  },
+  "isletici": {
+   "tr": "İşletici",
+   "en": "Operator",
+   "de": "Betreiber",
+   "ar": "المشغل",
+   "ru": "Оператор"
+  },
+  "kapasite": {
+   "tr": "Kapasite (araç)",
+   "en": "Capacity (cars)",
+   "de": "Kapazität (Autos)",
+   "ar": "السعة (سيارات)",
+   "ru": "Вместимость (машин)"
+  },
+  "ilk_saat_tl": {
+   "tr": "İlk saat",
+   "en": "First hour",
+   "de": "Erste Stunde",
+   "ar": "الساعة الأولى",
+   "ru": "Первый час"
+  },
+  "ek_saat_tl": {
+   "tr": "Ek saat",
+   "en": "Extra hour",
+   "de": "Jede weitere Stunde",
+   "ar": "ساعة إضافية",
+   "ru": "Доп. час"
+  },
+  "gunluk_en_fazla_tl": {
+   "tr": "Günlük en fazla",
+   "en": "Daily maximum",
+   "de": "Tagesmaximum",
+   "ar": "الحد اليومي",
+   "ru": "Максимум в день"
+  },
+  "aylik_abonelik_tl": {
+   "tr": "Aylık abonelik",
+   "en": "Monthly pass",
+   "de": "Monatsabo",
+   "ar": "اشتراك شهري",
+   "ru": "Абонемент на месяц"
+  },
+  "odeme_yontemleri": {
+   "tr": "Ödeme yöntemleri",
+   "en": "Payment methods",
+   "de": "Zahlungsarten",
+   "ar": "طرق الدفع",
+   "ru": "Способы оплаты"
+  },
+  "engelli_ucretsiz": {
+   "tr": "Engelli araçlara ücretsiz",
+   "en": "Free for disabled drivers",
+   "de": "Kostenlos für Menschen mit Behinderung",
+   "ar": "مجاني لذوي الإعاقة",
+   "ru": "Бесплатно для инвалидов"
+  },
+  "ozellikler": {
+   "tr": "Özellikler",
+   "en": "Features",
+   "de": "Ausstattung",
+   "ar": "المزايا",
+   "ru": "Особенности"
+  },
+  "olanaklar": {
+   "tr": "Olanaklar",
+   "en": "Facilities",
+   "de": "Einrichtungen",
+   "ar": "المرافق",
+   "ru": "Удобства"
+  },
+  "engelli_erisimi": {
+   "tr": "Engelli erişimi",
+   "en": "Accessible",
+   "de": "Barrierefrei",
+   "ar": "مناسب لذوي الإعاقة",
+   "ru": "Доступная среда"
+  },
+  "gunler": {
+   "tr": "Kurulduğu günler",
+   "en": "Market days",
+   "de": "Markttage",
+   "ar": "أيام السوق",
+   "ru": "Дни работы"
+  },
+  "saatler": {
+   "tr": "Saatler",
+   "en": "Hours",
+   "de": "Uhrzeiten",
+   "ar": "الساعات",
+   "ru": "Часы"
+  },
+  "kapali_alan": {
+   "tr": "Kapalı pazar yeri",
+   "en": "Covered market",
+   "de": "Überdachter Markt",
+   "ar": "سوق مسقوف",
+   "ru": "Крытый рынок"
+  },
+  "urunler": {
+   "tr": "Ürünler",
+   "en": "Products",
+   "de": "Produkte",
+   "ar": "المنتجات",
+   "ru": "Товары"
+  },
+  "hat_kodu": {
+   "tr": "Hat",
+   "en": "Line",
+   "de": "Linie",
+   "ar": "الخط",
+   "ru": "Линия"
+  },
+  "baslangic": {
+   "tr": "Başlangıç",
+   "en": "From",
+   "de": "Von",
+   "ar": "من",
+   "ru": "Откуда"
+  },
+  "bitis": {
+   "tr": "Bitiş",
+   "en": "To",
+   "de": "Bis",
+   "ar": "إلى",
+   "ru": "Куда"
+  },
+  "durak_sayisi": {
+   "tr": "Durak sayısı",
+   "en": "Stops",
+   "de": "Haltestellen",
+   "ar": "عدد المحطات",
+   "ru": "Остановок"
+  },
+  "ilk_sefer": {
+   "tr": "İlk sefer",
+   "en": "First departure",
+   "de": "Erste Abfahrt",
+   "ar": "أول رحلة",
+   "ru": "Первый рейс"
+  },
+  "son_sefer": {
+   "tr": "Son sefer",
+   "en": "Last departure",
+   "de": "Letzte Abfahrt",
+   "ar": "آخر رحلة",
+   "ru": "Последний рейс"
+  },
+  "sefer_sikligi": {
+   "tr": "Sefer sıklığı",
+   "en": "Frequency",
+   "de": "Takt",
+   "ar": "تكرار الرحلات",
+   "ru": "Интервал"
+  },
+  "ogrenci_ucret_tl": {
+   "tr": "Öğrenci",
+   "en": "Student",
+   "de": "Studierende",
+   "ar": "طالب",
+   "ru": "Студенческий"
+  },
+  "kart_adi": {
+   "tr": "Ulaşım kartı",
+   "en": "Travel card",
+   "de": "Fahrkarte",
+   "ar": "بطاقة المواصلات",
+   "ru": "Транспортная карта"
+  },
+  "kapasite_kisi": {
+   "tr": "Kapasite (kişi)",
+   "en": "Capacity (people)",
+   "de": "Kapazität (Personen)",
+   "ar": "السعة (أشخاص)",
+   "ru": "Вместимость (человек)"
+  },
+  "muhtar_adi": {
+   "tr": "Muhtar",
+   "en": "Mukhtar",
+   "de": "Ortsvorsteher",
+   "ar": "المختار",
+   "ru": "Мухтар"
+  },
+  "belediye": {
+   "tr": "Belediye",
+   "en": "Municipality",
+   "de": "Gemeinde",
+   "ar": "البلدية",
+   "ru": "Муниципалитет"
+  },
+  "hizmet_adi": {
+   "tr": "Hizmet",
+   "en": "Service",
+   "de": "Dienst",
+   "ar": "الخدمة",
+   "ru": "Услуга"
+  },
+  "gerekli_evrak": {
+   "tr": "Gerekli evrak",
+   "en": "Required documents",
+   "de": "Erforderliche Unterlagen",
+   "ar": "المستندات المطلوبة",
+   "ru": "Необходимые документы"
+  },
+  "gerekli_belgeler": {
+   "tr": "Gerekli belgeler",
+   "en": "Required documents",
+   "de": "Erforderliche Unterlagen",
+   "ar": "المستندات المطلوبة",
+   "ru": "Необходимые документы"
+  },
+  "ucret": {
+   "tr": "Ücret",
+   "en": "Fee",
+   "de": "Gebühr",
+   "ar": "الرسوم",
+   "ru": "Стоимость"
+  },
+  "basvuru_baglantisi": {
+   "tr": "Başvuru",
+   "en": "Apply online",
+   "de": "Online beantragen",
+   "ar": "التقديم",
+   "ru": "Подать заявку"
+  },
+  "baslik": {
+   "tr": "Başlık",
+   "en": "Title",
+   "de": "Titel",
+   "ar": "العنوان",
+   "ru": "Заголовок"
+  },
+  "kisa_metin": {
+   "tr": "Özet",
+   "en": "Summary",
+   "de": "Kurzfassung",
+   "ar": "ملخص",
+   "ru": "Кратко"
+  },
+  "adimlar": {
+   "tr": "Adımlar",
+   "en": "Steps",
+   "de": "Schritte",
+   "ar": "الخطوات",
+   "ru": "Шаги"
+  },
+  "ilgili_baglanti": {
+   "tr": "İlgili bağlantı",
+   "en": "Related link",
+   "de": "Weiterer Link",
+   "ar": "رابط ذو صلة",
+   "ru": "Ссылка"
+  }
+ },
+ "choices": {
+  "valilik": {
+   "tr": "Valilik",
+   "en": "Governorship",
+   "de": "Gouverneursamt",
+   "ar": "الولاية",
+   "ru": "Губернаторство"
+  },
+  "kaymakamlik": {
+   "tr": "Kaymakamlık",
+   "en": "District Governorship",
+   "de": "Landratsamt",
+   "ar": "القائمقامية",
+   "ru": "Каймакамлык"
+  },
+  "il-mudurlugu": {
+   "tr": "İl müdürlüğü",
+   "en": "Provincial directorate",
+   "de": "Provinzdirektion",
+   "ar": "مديرية الولاية",
+   "ru": "Областное управление"
+  },
+  "hastane-devlet": {
+   "tr": "Devlet hastanesi",
+   "en": "Public hospital",
+   "de": "Staatliches Krankenhaus",
+   "ar": "مستشفى حكومي",
+   "ru": "Государственная больница"
+  },
+  "hastane-ozel": {
+   "tr": "Özel hastane",
+   "en": "Private hospital",
+   "de": "Privatklinik",
+   "ar": "مستشفى خاص",
+   "ru": "Частная больница"
+  },
+  "aile-sagligi-merkezi": {
+   "tr": "Aile sağlığı merkezi",
+   "en": "Family health centre",
+   "de": "Hausarztzentrum",
+   "ar": "مركز صحة الأسرة",
+   "ru": "Семейная поликлиника"
+  },
+  "emniyet": {
+   "tr": "Emniyet",
+   "en": "Police",
+   "de": "Polizei",
+   "ar": "الشرطة",
+   "ru": "Полиция"
+  },
+  "jandarma": {
+   "tr": "Jandarma",
+   "en": "Gendarmerie",
+   "de": "Gendarmerie",
+   "ar": "الدرك",
+   "ru": "Жандармерия"
+  },
+  "itfaiye": {
+   "tr": "İtfaiye",
+   "en": "Fire brigade",
+   "de": "Feuerwehr",
+   "ar": "الإطفاء",
+   "ru": "Пожарная служба"
+  },
+  "nufus-mudurlugu": {
+   "tr": "Nüfus müdürlüğü",
+   "en": "Civil registry",
+   "de": "Standesamt",
+   "ar": "دائرة النفوس",
+   "ru": "ЗАГС / паспортный стол"
+  },
+  "goc-idaresi": {
+   "tr": "Göç idaresi",
+   "en": "Migration office",
+   "de": "Migrationsbehörde",
+   "ar": "إدارة الهجرة",
+   "ru": "Миграционная служба"
+  },
+  "noter": {
+   "tr": "Noter",
+   "en": "Notary",
+   "de": "Notar",
+   "ar": "كاتب العدل",
+   "ru": "Нотариус"
+  },
+  "ptt": {
+   "tr": "PTT",
+   "en": "Post office",
+   "de": "Post",
+   "ar": "البريد",
+   "ru": "Почта"
+  },
+  "vergi-dairesi": {
+   "tr": "Vergi dairesi",
+   "en": "Tax office",
+   "de": "Finanzamt",
+   "ar": "دائرة الضرائب",
+   "ru": "Налоговая"
+  },
+  "sgk": {
+   "tr": "SGK",
+   "en": "Social security",
+   "de": "Sozialversicherung",
+   "ar": "الضمان الاجتماعي",
+   "ru": "Соцстрах"
+  },
+  "adliye": {
+   "tr": "Adliye",
+   "en": "Courthouse",
+   "de": "Gericht",
+   "ar": "قصر العدل",
+   "ru": "Суд"
+  },
+  "kutuphane": {
+   "tr": "Kütüphane",
+   "en": "Library",
+   "de": "Bibliothek",
+   "ar": "مكتبة",
+   "ru": "Библиотека"
+  },
+  "okul": {
+   "tr": "Okul",
+   "en": "School",
+   "de": "Schule",
+   "ar": "مدرسة",
+   "ru": "Школа"
+  },
+  "halk-egitim": {
+   "tr": "Halk eğitim merkezi",
+   "en": "Adult education centre",
+   "de": "Volkshochschule",
+   "ar": "مركز تعليم عام",
+   "ru": "Центр образования взрослых"
+  },
+  "diger": {
+   "tr": "Diğer",
+   "en": "Other",
+   "de": "Sonstiges",
+   "ar": "أخرى",
+   "ru": "Другое"
+  },
+  "tarih": {
+   "tr": "Tarih",
+   "en": "History",
+   "de": "Geschichte",
+   "ar": "تاريخ",
+   "ru": "История"
+  },
+  "arkeoloji": {
+   "tr": "Arkeoloji",
+   "en": "Archaeology",
+   "de": "Archäologie",
+   "ar": "آثار",
+   "ru": "Археология"
+  },
+  "sanat": {
+   "tr": "Sanat",
+   "en": "Art",
+   "de": "Kunst",
+   "ar": "فن",
+   "ru": "Искусство"
+  },
+  "sanayi": {
+   "tr": "Sanayi",
+   "en": "Industry",
+   "de": "Industrie",
+   "ar": "صناعة",
+   "ru": "Промышленность"
+  },
+  "kultur": {
+   "tr": "Kültür",
+   "en": "Culture",
+   "de": "Kultur",
+   "ar": "ثقافة",
+   "ru": "Культура"
+  },
+  "etnografya": {
+   "tr": "Etnografya",
+   "en": "Ethnography",
+   "de": "Ethnografie",
+   "ar": "إثنوغرافيا",
+   "ru": "Этнография"
+  },
+  "bilim": {
+   "tr": "Bilim",
+   "en": "Science",
+   "de": "Wissenschaft",
+   "ar": "علوم",
+   "ru": "Наука"
+  },
+  "kent": {
+   "tr": "Kent",
+   "en": "City",
+   "de": "Stadt",
+   "ar": "المدينة",
+   "ru": "Город"
+  },
+  "Ücretsiz": {
+   "tr": "Ücretsiz",
+   "en": "Free",
+   "de": "Kostenlos",
+   "ar": "مجاني",
+   "ru": "Бесплатно"
+  },
+  "Ücretli": {
+   "tr": "Ücretli",
+   "en": "Paid",
+   "de": "Kostenpflichtig",
+   "ar": "مدفوع",
+   "ru": "Платно"
+  },
+  "Evet": {
+   "tr": "Evet",
+   "en": "Yes",
+   "de": "Ja",
+   "ar": "نعم",
+   "ru": "Да"
+  },
+  "Hayır": {
+   "tr": "Hayır",
+   "en": "No",
+   "de": "Nein",
+   "ar": "لا",
+   "ru": "Нет"
+  },
+  "kapali": {
+   "tr": "Kapalı otopark",
+   "en": "Indoor",
+   "de": "Parkhaus (überdacht)",
+   "ar": "موقف مغلق",
+   "ru": "Крытая"
+  },
+  "acik": {
+   "tr": "Açık otopark",
+   "en": "Open-air",
+   "de": "Freiluftparkplatz",
+   "ar": "موقف مفتوح",
+   "ru": "Открытая"
+  },
+  "katli": {
+   "tr": "Katlı otopark",
+   "en": "Multi-storey",
+   "de": "Parkhaus",
+   "ar": "موقف متعدد الطوابق",
+   "ru": "Многоуровневая"
+  },
+  "yeralti": {
+   "tr": "Yeraltı otoparkı",
+   "en": "Underground",
+   "de": "Tiefgarage",
+   "ar": "موقف تحت الأرض",
+   "ru": "Подземная"
+  },
+  "avm": {
+   "tr": "AVM otoparkı",
+   "en": "Shopping centre",
+   "de": "Einkaufszentrum",
+   "ar": "مركز تسوق",
+   "ru": "Торговый центр"
+  },
+  "Belediye": {
+   "tr": "Belediye",
+   "en": "Municipal",
+   "de": "Kommunal",
+   "ar": "بلدي",
+   "ru": "Муниципальная"
+  },
+  "Özel": {
+   "tr": "Özel",
+   "en": "Private",
+   "de": "Privat",
+   "ar": "خاص",
+   "ru": "Частная"
+  },
+  "park": {
+   "tr": "Park",
+   "en": "Park",
+   "de": "Park",
+   "ar": "حديقة",
+   "ru": "Парк"
+  },
+  "millet-bahcesi": {
+   "tr": "Millet bahçesi",
+   "en": "Nation's garden",
+   "de": "Volksgarten",
+   "ar": "حديقة الأمة",
+   "ru": "Народный сад"
+  },
+  "kent-ormani": {
+   "tr": "Kent ormanı",
+   "en": "Urban forest",
+   "de": "Stadtwald",
+   "ar": "غابة حضرية",
+   "ru": "Городской лес"
+  },
+  "mesire-alani": {
+   "tr": "Mesire alanı",
+   "en": "Picnic area",
+   "de": "Picknickplatz",
+   "ar": "منطقة نزهة",
+   "ru": "Зона пикника"
+  },
+  "botanik-bahcesi": {
+   "tr": "Botanik bahçesi",
+   "en": "Botanical garden",
+   "de": "Botanischer Garten",
+   "ar": "حديقة نباتية",
+   "ru": "Ботанический сад"
+  },
+  "semt-pazari": {
+   "tr": "Semt pazarı",
+   "en": "Neighbourhood market",
+   "de": "Wochenmarkt",
+   "ar": "سوق الحي",
+   "ru": "Районный рынок"
+  },
+  "koylu-pazari": {
+   "tr": "Köylü pazarı",
+   "en": "Farmers' market",
+   "de": "Bauernmarkt",
+   "ar": "سوق المزارعين",
+   "ru": "Фермерский рынок"
+  },
+  "organik-pazar": {
+   "tr": "Organik pazar",
+   "en": "Organic market",
+   "de": "Biomarkt",
+   "ar": "سوق عضوي",
+   "ru": "Органический рынок"
+  },
+  "bit-pazari": {
+   "tr": "Bit pazarı",
+   "en": "Flea market",
+   "de": "Flohmarkt",
+   "ar": "سوق البضائع المستعملة",
+   "ru": "Блошиный рынок"
+  },
+  "balik-pazari": {
+   "tr": "Balık pazarı",
+   "en": "Fish market",
+   "de": "Fischmarkt",
+   "ar": "سوق السمك",
+   "ru": "Рыбный рынок"
+  },
+  "metro": {
+   "tr": "Metro",
+   "en": "Metro",
+   "de": "U-Bahn",
+   "ar": "مترو",
+   "ru": "Метро"
+  },
+  "tramvay": {
+   "tr": "Tramvay",
+   "en": "Tram",
+   "de": "Straßenbahn",
+   "ar": "ترام",
+   "ru": "Трамвай"
+  },
+  "banliyo": {
+   "tr": "Banliyö treni",
+   "en": "Suburban train",
+   "de": "S-Bahn",
+   "ar": "قطار الضواحي",
+   "ru": "Пригородный поезд"
+  },
+  "otobus-hatti": {
+   "tr": "Otobüs hattı",
+   "en": "Bus line",
+   "de": "Buslinie",
+   "ar": "خط حافلات",
+   "ru": "Автобус"
+  },
+  "teleferik": {
+   "tr": "Teleferik",
+   "en": "Cable car",
+   "de": "Seilbahn",
+   "ar": "تلفريك",
+   "ru": "Канатная дорога"
+  },
+  "vapur": {
+   "tr": "Vapur",
+   "en": "Ferry",
+   "de": "Fähre",
+   "ar": "عبارة",
+   "ru": "Паром"
+  },
+  "dolmus": {
+   "tr": "Dolmuş",
+   "en": "Shared minibus",
+   "de": "Sammeltaxi",
+   "ar": "دولموش",
+   "ru": "Маршрутка"
+  },
+  "bisiklet": {
+   "tr": "Paylaşımlı bisiklet",
+   "en": "Bike sharing",
+   "de": "Leihfahrrad",
+   "ar": "دراجات مشتركة",
+   "ru": "Велопрокат"
+  },
+  "ulasim-karti": {
+   "tr": "Ulaşım kartı",
+   "en": "Travel card",
+   "de": "Fahrkarte",
+   "ar": "بطاقة المواصلات",
+   "ru": "Транспортная карта"
+  },
+  "havalimani-servisi": {
+   "tr": "Havalimanı servisi",
+   "en": "Airport shuttle",
+   "de": "Flughafenbus",
+   "ar": "حافلة المطار",
+   "ru": "Трансфер в аэропорт"
+  },
+  "imar-ruhsat": {
+   "tr": "İmar ve ruhsat",
+   "en": "Zoning and permits",
+   "de": "Bau und Genehmigungen",
+   "ar": "التخطيط والتراخيص",
+   "ru": "Строительство и разрешения"
+  },
+  "vergi-odeme": {
+   "tr": "Vergi ve ödeme",
+   "en": "Taxes and payments",
+   "de": "Steuern und Zahlungen",
+   "ar": "الضرائب والمدفوعات",
+   "ru": "Налоги и платежи"
+  },
+  "su-altyapi": {
+   "tr": "Su ve altyapı",
+   "en": "Water and infrastructure",
+   "de": "Wasser und Infrastruktur",
+   "ar": "المياه والبنية التحتية",
+   "ru": "Вода и инфраструктура"
+  },
+  "temizlik": {
+   "tr": "Temizlik",
+   "en": "Cleaning",
+   "de": "Reinigung",
+   "ar": "النظافة",
+   "ru": "Уборка"
+  },
+  "zabita": {
+   "tr": "Zabıta",
+   "en": "Municipal police",
+   "de": "Ordnungsamt",
+   "ar": "الشرطة البلدية",
+   "ru": "Муниципальная полиция"
+  },
+  "sosyal-yardim": {
+   "tr": "Sosyal yardım",
+   "en": "Social assistance",
+   "de": "Sozialhilfe",
+   "ar": "المساعدات الاجتماعية",
+   "ru": "Соцпомощь"
+  },
+  "kultur-sanat": {
+   "tr": "Kültür ve sanat",
+   "en": "Culture and arts",
+   "de": "Kultur und Kunst",
+   "ar": "الثقافة والفنون",
+   "ru": "Культура"
+  },
+  "spor": {
+   "tr": "Spor",
+   "en": "Sports",
+   "de": "Sport",
+   "ar": "الرياضة",
+   "ru": "Спорт"
+  },
+  "egitim-kurs": {
+   "tr": "Eğitim ve kurs",
+   "en": "Courses",
+   "de": "Kurse",
+   "ar": "الدورات",
+   "ru": "Курсы"
+  },
+  "cenaze": {
+   "tr": "Cenaze hizmetleri",
+   "en": "Funeral services",
+   "de": "Bestattung",
+   "ar": "خدمات الجنازة",
+   "ru": "Ритуальные услуги"
+  },
+  "veteriner": {
+   "tr": "Veteriner",
+   "en": "Veterinary",
+   "de": "Tierärztlicher Dienst",
+   "ar": "بيطري",
+   "ru": "Ветеринария"
+  },
+  "resmi-islem": {
+   "tr": "Resmî işlemler",
+   "en": "Official procedures",
+   "de": "Behördengänge",
+   "ar": "المعاملات الرسمية",
+   "ru": "Госуслуги"
+  },
+  "ulasim": {
+   "tr": "Ulaşım",
+   "en": "Transport",
+   "de": "Verkehr",
+   "ar": "المواصلات",
+   "ru": "Транспорт"
+  },
+  "tasarruf": {
+   "tr": "Tasarruf",
+   "en": "Saving money",
+   "de": "Sparen",
+   "ar": "التوفير",
+   "ru": "Экономия"
+  },
+  "zaman": {
+   "tr": "Zaman kazandıran",
+   "en": "Time savers",
+   "de": "Zeit sparen",
+   "ar": "توفير الوقت",
+   "ru": "Экономия времени"
+  },
+  "pratik": {
+   "tr": "Pratik bilgi",
+   "en": "Practical tips",
+   "de": "Praktische Tipps",
+   "ar": "نصائح عملية",
+   "ru": "Полезные советы"
+  },
+  "saglik": {
+   "tr": "Sağlık",
+   "en": "Health",
+   "de": "Gesundheit",
+   "ar": "الصحة",
+   "ru": "Здоровье"
+  },
+  "egitim": {
+   "tr": "Eğitim",
+   "en": "Education",
+   "de": "Bildung",
+   "ar": "التعليم",
+   "ru": "Образование"
+  }
+ }
+}

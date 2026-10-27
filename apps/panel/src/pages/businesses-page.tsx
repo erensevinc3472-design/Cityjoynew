@@ -2,12 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   can,
   DEFAULT_SERVICE_CATEGORIES,
+  isGrantActive,
   isFeatured,
+  type Approval,
   type Business,
   type MembershipTier,
   type VerificationStatus,
 } from '@cityjoy/shared';
-import { createBusinessAdmin } from '@cityjoy/shared/firebase';
+import { createApprovalAdmin, createBusinessAdmin } from '@cityjoy/shared/firebase';
 
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
@@ -25,10 +27,23 @@ export function BusinessesPage() {
   const { user } = useSession();
   const canEdit = !!user && !user.isDemo && can(user.grants, { module: 'isletme-dogrulama', action: 'onayla' }) && user.grants.some((g) => g.role === 'admin');
   const admin = user ? createBusinessAdmin(firestore, user.uid) : null;
-  const provinces = useMemo(() => locationRepository.getProvinces(), []);
+  // İl yöneticisi doğrulamayı kendisi yapmaz, admin'e önerir (PROJE.md 6.5: iki aşamalı onay).
+  const approvals = user && !user.isDemo ? createApprovalAdmin(firestore, { uid: user.uid, email: user.email ?? '', name: user.displayName }) : null;
+  const canPropose = (b: Business) =>
+    !canEdit && !!approvals && b.ownerUid !== user!.uid && b.verification.status !== 'dogrulandi' &&
+    can(user!.grants, { module: 'isletme-dogrulama', action: 'onayla', region: b.location });
+  // Ülke yetkisi yoksa yalnızca yetkili olunan iller (kurallar da başka ili okutmaz).
+  const viewScopes = (user?.grants ?? []).filter((g) => isGrantActive(g, new Date()) && g.modules['isletme-dogrulama']?.includes('goruntule')).map((g) => g.scope);
+  const national = viewScopes.some((s) => s.level === 'ulke');
+  const allowedKey = viewScopes.flatMap((s) => (s.level === 'il' ? [s.provinceCode] : [])).sort().join();
+  const provinces = useMemo(
+    () => locationRepository.getProvinces().filter((p) => national || allowedKey.split(',').includes(p.code)),
+    [national, allowedKey],
+  );
 
-  const [provinceCode, setProvinceCode] = useState('');
+  const [provinceCode, setProvinceCode] = useState(() => (national ? '' : (provinces[0]?.code ?? '')));
   const [list, setList] = useState<Business[] | null>(null);
+  const [pending, setPending] = useState<Map<string, Approval>>(new Map());
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -36,23 +51,27 @@ export function BusinessesPage() {
   const load = useCallback(async () => {
     setLoadError(false);
     if (user?.isDemo) return setList([]);
+    if (!national && !provinceCode) return setList([]);
     try {
       setList(await createBusinessAdmin(firestore, 'okuma').list(provinceCode ? { provinceCode } : {}));
+      // Bekleyen doğrulama istekleri (onay yetkisi yoksa gösterilmez).
+      const open = await createApprovalAdmin(firestore, { uid: '', email: '', name: '' }).listPending(provinceCode || undefined).catch(() => []);
+      setPending(new Map(open.filter((a) => a.kind === 'isletme-dogrulama').map((a) => [a.targetId, a])));
     } catch {
       setLoadError(true);
     }
-  }, [user, provinceCode]);
+  }, [user, provinceCode, national]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const act = async (fn: () => Promise<void>) => {
+  const act = async (fn: () => Promise<void>, okText = t('businesses.saved')) => {
     setBusy(true);
     setMessage(undefined);
     try {
       await fn();
-      setMessage({ kind: 'ok', text: t('businesses.saved') });
+      setMessage({ kind: 'ok', text: okText });
       await load();
     } catch {
       setMessage({ kind: 'error', text: t('businesses.error') });
@@ -79,8 +98,8 @@ export function BusinessesPage() {
 
       <div className="toolbar">
         <label htmlFor="biz-province" className="sr-only">{t('businesses.province')}</label>
-        <select id="biz-province" value={provinceCode} onChange={(e) => setProvinceCode(e.target.value)}>
-          <option value="">{t('businesses.allProvinces')}</option>
+        <select id="biz-province" value={provinceCode} onChange={(e) => setProvinceCode(e.target.value)} disabled={!national && provinces.length < 2}>
+          {national ? <option value="">{t('businesses.allProvinces')}</option> : null}
           {provinces.map((p) => (
             <option key={p.code} value={p.code}>{p.name}</option>
           ))}
@@ -133,6 +152,18 @@ export function BusinessesPage() {
                     <td>
                       <span className={b.verification.status === 'dogrulandi' ? 'pill ok' : 'pill'}>{t(`businesses.verifications.${b.verification.status}`)}</span>
                       {b.verification.verifiedAt ? <div className="meta">{new Date(b.verification.verifiedAt).toLocaleDateString('tr-TR')}</div> : null}
+                      {pending.get(b.id) ? (
+                        <div className="meta">{pending.get(b.id)!.status === 'il-onayi-bekliyor' ? t('businesses.pendingFirst') : t('businesses.pendingAdmin')}</div>
+                      ) : canPropose(b) ? (
+                        <div className="row-actions">
+                          <button
+                            className="link"
+                            disabled={busy}
+                            onClick={() => window.confirm(t('businesses.proposeConfirm', { name: b.name })) && act(() => approvals!.proposeBusiness(b), t('businesses.proposed'))}>
+                            {t('businesses.propose')}
+                          </button>
+                        </div>
+                      ) : null}
                       {canEdit ? (
                         <div className="row-actions">
                           {(['dogrulandi', 'inceleniyor', 'dogrulanmadi'] as VerificationStatus[])
