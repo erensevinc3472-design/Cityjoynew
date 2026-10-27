@@ -142,7 +142,14 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Emülatörde tarayıcıyla baştan sona denendi (kurum aç > şifre bağlantısı > kurum yöneticisi personel ekler > il
    yöneticisi muhtar atar > muhtar ve personel paneli > doğrulanmamış e-posta).
 
-## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
+15. **Benim Şehrim sabit bilgi şablonu (Excel)**: `docs/veri-sablonlari/benim-sehrim-sablon.xlsx` (üreten betik
+   `scripts/build-data-templates.py`). Sekmeler: Önemli Kurumlar, Müzeler, Otoparklar, Parklar, Pazarlar, Ulaşım, Toplanma
+   Alanları, Muhtarlıklar, Belediye Hizmetleri, Nasıl Yapılır, İlçeler (doğru yazım). Her satırda kaynak + tarih zorunlu,
+   bilinmeyen boş bırakılır, açılır listeler, başka yapay zekâya verilecek hazır metin. **Eren dolduracak (başka yapay
+   zekâyla ya da ekibiyle); bulamazsa Claude açık kaynaklardan (OpenStreetMap vb., "doğrulanmadı") hazırlayacak.** Sırada:
+   veritabanı yapısı + panelde "Excel'den yükle" (hatalı satır listesi, kaynak denetimi) + uygulama ekranları; sonra aynısı
+   Seyahat için.
+ (PROJE.md'ye işlendi)
 
 - Yetki zinciri (6.7, 27 Ekim 2026): admin herkese ve kurumlara; il yöneticisi kendi ilinde muhtar ve moderatöre; kurum
   kendi personeline. Form yok, e-postayla verilir. Belediye adları kilitli; kurum hesabı resmî e-postayla, şifreyi kurum koyar.
@@ -204,7 +211,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
-0. Onay merkezi (PROJE.md 6.5, 6.7): "Bekleyen onaylar", personel > kurum/il yöneticisi > admin zinciri, önemli konularda
+0. Benim Şehrim sabit bilgiler: Eren'in Excel'i gelince (ya da açık kaynakla) yükleme + ekranlar. Seyahat şablonu sonra.
+0b. Onay merkezi (PROJE.md 6.5, 6.7): "Bekleyen onaylar", personel > kurum/il yöneticisi > admin zinciri, önemli konularda
    admin'e de gitme, "Tümünü onayla" / "Güvenli olanları onayla", güvenilir yöneticiler listesi. Yetki zinciri bitti; bunun
    üstüne kurulur.
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
