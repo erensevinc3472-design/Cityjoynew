@@ -25,4 +25,6 @@ export * from './categories/service-categories';
 export * from './business/business';
 export * from './business/reviews';
 export * from './sos/sos';
+export * from './city-guide/schema';
+export * from './city-guide/items';
 export * from './models/sign-up';

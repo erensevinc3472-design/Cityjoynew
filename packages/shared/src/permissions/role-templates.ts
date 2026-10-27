@@ -18,6 +18,7 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
     sos: ALL,
     yetkiler: ALL,
     kurumlar: ALL,
+    'sehir-rehberi': ALL,
     onaylar: ALL,
     'islem-kayitlari': READ,
     bildirimler: ALL,
@@ -37,6 +38,7 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
     // Kendi ilinde muhtar ve gönüllü moderatör yetkisi verir (PROJE.md 6.7); kurumları görür.
     yetkiler: ['goruntule', 'ekle', 'duzenle', 'sil'],
     kurumlar: READ,
+    'sehir-rehberi': [...WRITE, 'sil', 'onayla'],
     gonderiler: [...WRITE, 'sil', 'onayla'],
     // İki aşamalı onayın ilk aşaması (PROJE.md 6.5).
     onaylar: ['goruntule', 'onayla'],

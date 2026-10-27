@@ -26,7 +26,8 @@ export type Module =
   | 'hizmetler'
   | 'moderasyon'
   | 'isletme-dogrulama'
-  | 'kurumlar';
+  | 'kurumlar'
+  | 'sehir-rehberi';
 
 export type Action = 'goruntule' | 'ekle' | 'duzenle' | 'sil' | 'onayla' | 'bildirim-gonder';
 

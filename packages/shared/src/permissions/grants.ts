@@ -21,6 +21,7 @@ export const ALL_MODULES: Module[] = [
   'hizmetler',
   'moderasyon',
   'isletme-dogrulama',
+  'sehir-rehberi',
 ];
 
 /** Kişiye (kurum dışı) verilen roller. Belediye, kurum, kulüp ve yayıncı kurum olarak açılır (PROJE.md 6.7). */
@@ -49,6 +50,8 @@ export const ROLE_CAPS: Record<PersonRole, Caps> = {
     hizmetler: ['goruntule', 'ekle', 'duzenle', 'sil'],
     moderasyon: ['goruntule', 'duzenle', 'sil'],
     'isletme-dogrulama': ['goruntule', 'onayla'],
+    // Benim Şehrim sabit bilgileri: Excel'den yükleme, düzenleme, doğrulama (kendi ilinde).
+    'sehir-rehberi': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'],
   },
   muhtar: {
     konumlar: ['goruntule'],

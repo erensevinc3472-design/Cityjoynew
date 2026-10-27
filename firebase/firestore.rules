@@ -553,7 +553,7 @@ service cloud.firestore {
           'islem-kayitlari': ['goruntule'], 'bildirimler': ['goruntule', 'ekle', 'duzenle', 'sil', 'bildirim-gonder'],
           'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'], 'etkinlikler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'],
           'hizmetler': ['goruntule', 'ekle', 'duzenle', 'sil'], 'moderasyon': ['goruntule', 'duzenle', 'sil'],
-          'isletme-dogrulama': ['goruntule', 'onayla']}
+          'isletme-dogrulama': ['goruntule', 'onayla'], 'sehir-rehberi': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla']}
         : role == 'muhtar' ? {
           'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil'],
           'etkinlikler': ['goruntule', 'ekle', 'duzenle'], 'bildirimler': ['goruntule', 'ekle', 'bildirim-gonder']}
@@ -583,7 +583,8 @@ service cloud.firestore {
         && within(m, caps, 'hizmet-kategorileri') && within(m, caps, 'sos') && within(m, caps, 'kurumlar')
         && within(m, caps, 'yetkiler') && within(m, caps, 'onaylar') && within(m, caps, 'islem-kayitlari')
         && within(m, caps, 'bildirimler') && within(m, caps, 'gonderiler') && within(m, caps, 'etkinlikler')
-        && within(m, caps, 'hizmetler') && within(m, caps, 'moderasyon') && within(m, caps, 'isletme-dogrulama');
+        && within(m, caps, 'hizmetler') && within(m, caps, 'moderasyon') && within(m, caps, 'isletme-dogrulama')
+        && within(m, caps, 'sehir-rehberi');
     }
     function validScope(sc) {
       return sc is map && (
@@ -759,6 +760,37 @@ service cloud.firestore {
         && request.resource.data.removedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
+    }
+
+    // ---- Benim Şehrim sabit bilgileri (müzeler, otoparklar...): il başına bölüm paketleri. Herkes okur (girişsiz de);
+    // admin ve o ilde şehir rehberi yetkisi olan (il yöneticisi) yazar. Ülke geneli içerik ("tr") yalnızca admin'de.
+    function canEditGuide(p) {
+      return isAdmin() || (p is string && p != 'tr' && regionAllows('sehir-rehberi', 'duzenle', p, null));
+    }
+    function guideSection(s) {
+      return s in ['onemli-kurumlar', 'muzeler', 'otoparklar', 'parklar', 'pazarlar', 'ulasim', 'toplanma-alanlari',
+                   'muhtarliklar', 'belediye-hizmetleri', 'nasil-yapilir'];
+    }
+    match /cityGuide/{p} {
+      allow read: if true;
+      allow create, update: if (p == 'tr' || p.matches('^[0-8][0-9]$')) && canEditGuide(p)
+        && request.resource.data.keys().hasOnly(['sections', 'updatedAt', 'updatedBy'])
+        && request.resource.data.sections is map && request.resource.data.sections.keys().size() <= 10
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /cityGuidePacks/{id} {
+      allow read: if true;
+      allow create, update: if canEditGuide(request.resource.data.provinceCode)
+        && request.resource.data.keys().hasOnly(['provinceCode', 'section', 'part', 'items', 'updatedAt', 'updatedBy'])
+        && guideSection(request.resource.data.section)
+        && request.resource.data.part is int && request.resource.data.part >= 0 && request.resource.data.part < 50
+        && id == request.resource.data.provinceCode + '__' + request.resource.data.section + '__' + string(request.resource.data.part)
+        && request.resource.data.items is list && request.resource.data.items.size() <= 400
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if canEditGuide(resource.data.provinceCode);
     }
 
     // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez. Admin hepsini, her yönetici kendi

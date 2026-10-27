@@ -22,78 +22,14 @@ thin=Side(style='thin',color='D9D9D9'); BOX=Border(left=thin,right=thin,top=thin
 wb=Workbook()
 ws=wb.active; ws.title='Okuyun'
 
-COMMON_TAIL=[('kaynak',True,'Bilginin alındığı sayfanın tam adresi (https://...). Resmî site öncelikli. Kaynağı olmayan satır kabul edilmez.'),
-             ('kaynak_tarihi',True,'Kaynağa bakılan gün: GG.AA.YYYY (örnek 27.10.2026).'),
-             ('not',False,'İsteğe bağlı kısa not (örnek: "telefon teyit edilmeli").')]
-LOC=[('il',True,'İl adı, "İlçeler" sekmesindeki yazımla (örnek: Bursa).'),
-     ('ilce',True,'İlçe adı, "İlçeler" sekmesindeki yazımla (örnek: Nilüfer). Merkez ilçeli illerde "Merkez".'),
-     ('mahalle',False,'Mahalle adı, biliniyorsa (örnek: Ataevler).'),
-     ('adres',False,'Açık adres.')]
-GEO=[('enlem',False,'Harita konumu, ondalık derece (örnek: 40.1885). Bilinmiyorsa boş bırakın, uydurmayın.'),
-     ('boylam',False,'Harita konumu, ondalık derece (örnek: 29.0610).')]
-CONTACT=[('telefon',False,'Yalnızca kurumun resmî numarası, rakamlarla (örnek: 02242251900). Kişisel numara yazılmaz.'),
-         ('web',False,'Resmî web adresi.')]
-
-SHEETS=[
- ('Önemli Kurumlar','Valilik, kaymakamlık, il müdürlükleri, hastane, aile sağlığı merkezi, emniyet, itfaiye, nüfus, noter, PTT, vergi dairesi, SGK, kütüphane, okul.',
-  [('kategori',True,'Listeden seçin.'),('ad',True,'Kurumun resmî adı.')]+LOC+CONTACT+
-  [('calisma_hafta_ici',False,'Örnek: 08:00-17:00'),('calisma_hafta_sonu',False,'Örnek: Kapalı'),('aciklama',False,'Kısa açıklama (en çok 300 karakter).')]+GEO+COMMON_TAIL,
-  {'kategori':['valilik','kaymakamlik','il-mudurlugu','hastane-devlet','hastane-ozel','aile-sagligi-merkezi','emniyet','jandarma','itfaiye','nufus-mudurlugu','goc-idaresi','noter','ptt','vergi-dairesi','sgk','adliye','kutuphane','okul','halk-egitim','diger']},
-  ['hastane-devlet','Bursa Şehir Hastanesi','Bursa','Nilüfer','Doğanköy','Doğanköy Mah. ...','','https://bursasehir.saglik.gov.tr','7/24','7/24','Acil servis 7/24 açık.','','','https://bursasehir.saglik.gov.tr','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Müzeler','Devlet, belediye ve özel müzeler.',
-  [('tur',True,'Listeden seçin.'),('ad',True,'Müzenin adı.')]+LOC+CONTACT+
-  [('acilis_saatleri',False,'Örnek: 09:00-18:00 (yaz), 09:00-17:00 (kış)'),('kapali_gunler',False,'Örnek: Pazartesi'),
-   ('ucret_durumu',True,'Ücretsiz / Ücretli'),('tam_ucret_tl',False,'Sayı (örnek: 150)'),('indirimli_ucret_tl',False,'Sayı'),
-   ('muzekart_gecerli',False,'Evet / Hayır'),('aciklama',False,'Kısa tanıtım (en çok 500 karakter).')]+GEO+COMMON_TAIL,
-  {'tur':['tarih','arkeoloji','sanat','sanayi','kultur','etnografya','bilim','kent','diger'],'ucret_durumu':['Ücretsiz','Ücretli'],'muzekart_gecerli':['Evet','Hayır']},
-  ['kent','Bursa Kent Müzesi','Bursa','Osmangazi','','Reyhan Mah. ...','','https://www.bursa.bel.tr','10:00-18:00','Pazartesi','Ücretli','20','10','Hayır','Bursa\'nın kent tarihini anlatan müze.','','','https://www.bursa.bel.tr','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Otoparklar','Belediye ve özel otoparklar (AVM dahil).',
-  [('tip',True,'Listeden seçin.'),('ad',True,'Otoparkın adı.'),('isletici',False,'Belediye / Özel')]+LOC+CONTACT+
-  [('kapasite',False,'Araç sayısı (sayı)'),('ilk_saat_tl',False,'Sayı'),('ek_saat_tl',False,'Sayı'),('gunluk_en_fazla_tl',False,'Sayı'),('aylik_abonelik_tl',False,'Sayı'),
-   ('calisma_hafta_ici',False,'Örnek: 07:00-23:00'),('calisma_hafta_sonu',False,'Örnek: 08:00-24:00'),
-   ('odeme_yontemleri',False,'Virgülle: Nakit, Kredi Kartı, Temassız, Mobil'),('engelli_ucretsiz',False,'Evet / Hayır'),('ozellikler',False,'Virgülle: Kapalı, Güvenlik kamerası, Elektrikli araç şarjı ...')]+GEO+COMMON_TAIL,
-  {'tip':['kapali','acik','katli','yeralti','avm'],'isletici':['Belediye','Özel'],'engelli_ucretsiz':['Evet','Hayır']},
-  ['katli','Örnek Katlı Otopark','Belediye','Bursa','Osmangazi','','... Cad. No:1','','','400','30','15','150','1500','07:00-23:00','08:00-24:00','Nakit, Kredi Kartı','Evet','Güvenlik kamerası','','','https://...','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Parklar','Parklar, millet bahçeleri, kent ormanları, mesire alanları.',
-  [('tur',True,'Listeden seçin.'),('ad',True,'Parkın adı.')]+LOC+
-  [('acilis_saatleri',False,'Örnek: 7/24 ya da 06:00-24:00'),('olanaklar',False,'Virgülle: Çocuk oyun alanı, Spor aletleri, Yürüyüş yolu, Tuvalet, Otopark, Köpek alanı, Mescit, Kafe'),
-   ('engelli_erisimi',False,'Evet / Hayır'),('aciklama',False,'Kısa tanıtım.')]+GEO+COMMON_TAIL,
-  {'tur':['park','millet-bahcesi','kent-ormani','mesire-alani','botanik-bahcesi'],'engelli_erisimi':['Evet','Hayır']},
-  ['park','Örnek Parkı','Bursa','Nilüfer','Ataevler','','7/24','Çocuk oyun alanı, Yürüyüş yolu','Evet','','','','https://...','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Pazarlar','Semt pazarları, köylü/organik pazarlar, bit pazarları.',
-  [('tur',True,'Listeden seçin.'),('ad',True,'Pazarın adı.')]+LOC+
-  [('gunler',True,'Virgülle: Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar'),('saatler',False,'Örnek: 08:00-18:00'),
-   ('kapali_alan',False,'Evet (kapalı pazar yeri) / Hayır'),('urunler',False,'Virgülle: Sebze-meyve, Giyim, Organik, Köy ürünleri ...')]+GEO+COMMON_TAIL,
-  {'tur':['semt-pazari','koylu-pazari','organik-pazar','bit-pazari','balik-pazari'],'kapali_alan':['Evet','Hayır']},
-  ['semt-pazari','Örnek Salı Pazarı','Bursa','Osmangazi','','','Salı','08:00-18:00','Hayır','Sebze-meyve, Giyim','','','https://...','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Ulaşım','Raylı sistem, otobüs hatları, teleferik, vapur, dolmuş, paylaşımlı bisiklet, ulaşım kartı.',
-  [('tur',True,'Listeden seçin.'),('il',True,'İl adı.'),('hat_kodu',False,'Örnek: M1, B/43'),('ad',True,'Hat ya da hizmet adı (örnek: BursaRay M1).'),
-   ('baslangic',False,'İlk durak'),('bitis',False,'Son durak'),('durak_sayisi',False,'Sayı'),('ilk_sefer',False,'Örnek: 06:00'),('son_sefer',False,'Örnek: 00:00'),
-   ('sefer_sikligi',False,'Örnek: 5-10 dk'),('tam_ucret_tl',False,'Sayı'),('ogrenci_ucret_tl',False,'Sayı'),('kart_adi',False,'Örnek: BursaKart'),
-   ('isletici',False,'Örnek: BURULAŞ'),('web',False,'Resmî web adresi.'),('aciklama',False,'Kısa bilgi.')]+COMMON_TAIL,
-  {'tur':['metro','tramvay','banliyo','otobus-hatti','teleferik','vapur','dolmus','bisiklet','ulasim-karti','havalimani-servisi']},
-  ['metro','Bursa','M1','BursaRay M1','Emek','Arabayatağı','','06:00','00:00','5-10 dk','','','BursaKart','BURULAŞ','https://www.burulas.com.tr','','https://www.burulas.com.tr','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Toplanma Alanları','Afet ve acil durum toplanma alanları (AFAD).',
-  [('ad',True,'Alanın adı.')]+LOC+[('kapasite_kisi',False,'Sayı')]+GEO+COMMON_TAIL,
-  {},
-  ['Örnek Okulu Bahçesi','Bursa','Nilüfer','Ataevler','','','','','https://www.turkiye.gov.tr/afet-ve-acil-durum-yonetimi-acil-toplanma-alani-sorgulama','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Muhtarlıklar','Mahalle muhtarlıklarının resmî iletişim bilgileri.',
-  [('il',True,'İl adı.'),('ilce',True,'İlçe adı.'),('mahalle',True,'Mahalle adı.'),('muhtar_adi',False,'Muhtarın adı soyadı (kamu görevlisi; yalnızca resmî kaynakta yayımlanmışsa).'),
-   ('telefon',False,'Yalnızca muhtarlığın resmî numarası. Kişisel cep numarası yazılmaz.'),('adres',False,'Muhtarlık adresi.'),('calisma_saatleri',False,'Örnek: Hafta içi 09:00-17:00')]+GEO+COMMON_TAIL,
-  {},
-  ['Bursa','Nilüfer','Ataevler','','','','Hafta içi 09:00-17:00','','','https://...','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Belediye Hizmetleri','Belediyenin verdiği hizmetler, gereken evrak ve başvuru bağlantısı (başvuru belediyenin kendi sitesinde yapılır).',
-  [('il',True,'İl adı.'),('belediye',True,'Belediyenin tam adı (örnek: Nilüfer Belediyesi, Bursa Büyükşehir Belediyesi).'),('kategori',True,'Listeden seçin.'),
-   ('hizmet_adi',True,'Örnek: Ruhsat başvurusu'),('aciklama',False,'Kısa açıklama.'),('gerekli_evrak',False,'Virgülle ayırın.'),('ucret',False,'Örnek: Ücretsiz ya da tutar'),
-   ('basvuru_baglantisi',False,'Belediyenin başvuru sayfası.'),('telefon',False,'Resmî numara (örnek: 153).')]+COMMON_TAIL,
-  {'kategori':['imar-ruhsat','vergi-odeme','su-altyapi','temizlik','zabita','sosyal-yardim','kultur-sanat','spor','egitim-kurs','cenaze','veteriner','diger']},
-  ['Bursa','Nilüfer Belediyesi','imar-ruhsat','Yapı ruhsatı başvurusu','','Tapu, proje, ...','','https://...','153','https://...','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
- ('Nasıl Yapılır','Şehir hayatı rehberi: resmî işlemler, ulaşım kartı, tasarruf ve pratik bilgiler. İl boş bırakılırsa ülke geneli sayılır.',
-  [('il',False,'Boş = tüm Türkiye.'),('kategori',True,'Listeden seçin.'),('baslik',True,'Örnek: BursaKart nasıl alınır?'),('kisa_metin',True,'En çok 500 karakter.'),
-   ('adimlar',False,'Adımları " | " ile ayırın.'),('gerekli_belgeler',False,'Virgülle ayırın.'),('ilgili_baglanti',False,'Resmî bağlantı.')]+COMMON_TAIL,
-  {'kategori':['resmi-islem','ulasim','tasarruf','zaman','pratik','saglik','egitim']},
-  ['Bursa','ulasim','BursaKart nasıl alınır?','BursaKart, şehir içi toplu taşımada kullanılan karttır.','Satış noktasına gidin | Kimlik gösterin | Kartı yükleyin','Kimlik (indirimli kart için)','https://...','https://...','27.10.2026','ÖRNEK SATIR: bilgileri kontrol edilmedi, silin']),
-]
+# Bölümler, sütunlar ve seçenekler tek kaynaktan gelir: packages/shared/data/city-guide-schema.json
+# (panel yükleyicisi ve uygulama da aynı dosyayı kullanır).
+schema=json.load(open(f'{ROOT}/packages/shared/data/city-guide-schema.json',encoding='utf-8'))
+SHEETS=[]
+for sec in schema['sections']:
+    cols=[(c['key'],c['required'],c['hint']) for c in sec['columns']]
+    choices={c['key']:(c['choices'] if c['type']=='choice' else ['Evet','Hayır']) for c in sec['columns'] if c['type'] in ('choice','bool')}
+    SHEETS.append((sec['sheet'],sec['description'],cols,choices,sec['example']))
 
 # İlçeler sekmesi (doğrulama listeleri için)
 wl=wb.create_sheet('İlçeler')
