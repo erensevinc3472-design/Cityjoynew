@@ -3,9 +3,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { activeEmergencyNumbers, LEGAL_TEXT_VERSION } from '@cityjoy/shared';
+import { activeEmergencyNumbers, buildCategoryTree, createServiceCategoryStore, LEGAL_TEXT_VERSION } from '@cityjoy/shared';
 import {
   createEmergencyNumberAdmin,
+  createFirestoreServiceCategoryRepository,
+  createServiceCategoryAdmin,
+  submitServiceSuggestion,
   createFirestoreEmergencyNumberRepository,
   createFirestoreOccupationRepository,
   createFirestoreProfileRepository,
@@ -129,6 +132,45 @@ describe('acil numara yönetimi (admin)', () => {
     const log = await getDocs(collection(adminDb, 'auditLog'));
     expect(log.docs.map((d) => d.data().summary)).toEqual(
       expect.arrayContaining(['Eklendi: 177 Orman yangını', 'Pasifleştirildi: 155 Polis', expect.stringMatching(/^Başlangıç acil numara listesi/)]),
+    );
+  });
+});
+
+describe('hizmet kategorileri (admin) ve öneriler', () => {
+  it('admin yükler ve değiştirir; uygulama yalnızca sürüm değişince indirir; öneriler panelde incelenir', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'admins/eren'), { addedAt: 'konsol' });
+    });
+    const adminDb = env.authenticatedContext('eren').firestore() as unknown as Firestore;
+    const guestDb = env.unauthenticatedContext().firestore() as unknown as Firestore;
+    const mem = new Map<string, string>();
+    const cache = { get: async (k: string) => mem.get(k) ?? null, set: async (k: string, v: string) => void mem.set(k, v) };
+    const store = createServiceCategoryStore(createFirestoreServiceCategoryRepository(guestDb), cache);
+    expect(await store.refresh()).toEqual([]);
+
+    const admin = createServiceCategoryAdmin(adminDb, 'eren');
+    expect(await admin.seedDefaults(new Set())).toBe(102);
+    const cilingir = (await admin.listAll()).find((c) => c.id === 'cilingir')!;
+    expect(cilingir).toMatchObject({ parentId: 'ev-tesisat', urgent: true });
+    await admin.setActive(cilingir, false);
+    await admin.save({ id: 'kilim-tamiri', parentId: 'ev-tesisat', names: { tr: 'Kilim tamiri' }, icon: 'build', order: 20, active: true }, true);
+
+    const tree = buildCategoryTree(await store.refresh());
+    const ev = tree.find((n) => n.category.id === 'ev-tesisat')!;
+    expect(ev.children.map((c) => c.id)).not.toContain('cilingir');
+    expect(ev.children.at(-1)!.id).toBe('kilim-tamiri');
+
+    const userDb = env.authenticatedContext('ali').firestore() as unknown as Firestore;
+    await submitServiceSuggestion(userDb, 'ali', '  Saat tamiri  ', '16');
+    await expect(createServiceCategoryAdmin(userDb, 'ali').listSuggestions()).rejects.toThrow();
+    const [suggestion] = await admin.listSuggestions();
+    expect(suggestion).toMatchObject({ uid: 'ali', text: 'Saat tamiri', provinceCode: '16', status: 'yeni' });
+    await admin.markReviewed(suggestion);
+    expect((await admin.listSuggestions())[0].status).toBe('incelendi');
+
+    const log = await getDocs(collection(adminDb, 'auditLog'));
+    expect(log.docs.map((d) => d.data().summary)).toEqual(
+      expect.arrayContaining(['Pasifleştirildi: Çilingir', 'Eklendi: Kilim tamiri', 'Hizmet önerisi incelendi']),
     );
   });
 });

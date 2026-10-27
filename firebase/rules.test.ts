@@ -136,6 +136,37 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(deleteDoc(doc(db('eren'), 'emergencyNumbers/112')));
   });
 
+  it('hizmet kategorileri: herkes okur, yalnızca admin iki seviyeli ağaç yazar', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    const c = (uid: string, parentId: string | null, over: Record<string, unknown> = {}) => ({
+      parentId, names: { tr: 'Kategori' }, icon: 'build', order: 1, active: true, updatedBy: uid, updatedAt: serverTimestamp(), ...over,
+    });
+    await assertSucceeds(getDoc(doc(db(), 'serviceCategories/ev')));
+    await assertFails(setDoc(doc(db('ali'), 'serviceCategories/ev'), c('ali', null)));
+    await assertSucceeds(setDoc(doc(db('eren'), 'serviceCategories/ev'), c('eren', null)));
+    await assertSucceeds(setDoc(doc(db('eren'), 'serviceCategories/cilingir'), c('eren', 'ev', { urgent: true })));
+    // Üstü olmayan ya da üçüncü seviye kategori kurulamaz.
+    await assertFails(setDoc(doc(db('eren'), 'serviceCategories/x'), c('eren', 'yok')));
+    await assertFails(setDoc(doc(db('eren'), 'serviceCategories/y'), c('eren', 'cilingir')));
+    await assertFails(deleteDoc(doc(db('eren'), 'serviceCategories/ev')));
+    await assertSucceeds(getDoc(doc(db(), 'catalogVersions/serviceCategories')));
+    await assertFails(setDoc(doc(db('ali'), 'catalogVersions/serviceCategories'), { updatedAt: serverTimestamp(), updatedBy: 'ali' }));
+  });
+
+  it('hizmet önerisi: giriş yapan kendi adına gönderir, yalnızca admin okur ve incelendi yapar', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    const s = (uid: string, over: Record<string, unknown> = {}) => ({ uid, text: 'Kilim tamiri', provinceCode: '16', status: 'yeni', createdAt: serverTimestamp(), ...over });
+    await assertFails(setDoc(doc(db(), 'serviceSuggestions/0'), s('misafir')));
+    await assertFails(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('veli')));
+    await assertFails(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('ali', { text: 'x' })));
+    await assertFails(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('ali', { status: 'incelendi' })));
+    await assertSucceeds(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('ali')));
+    await assertFails(getDoc(doc(db('ali'), 'serviceSuggestions/1')));
+    await assertSucceeds(getDoc(doc(db('eren'), 'serviceSuggestions/1')));
+    await assertFails(updateDoc(doc(db('eren'), 'serviceSuggestions/1'), { text: 'değişti' }));
+    await assertSucceeds(updateDoc(doc(db('eren'), 'serviceSuggestions/1'), { status: 'incelendi', reviewedBy: 'eren', reviewedAt: serverTimestamp() }));
+  });
+
   it('admin listesine istemciden yazılamaz', async () => {
     await assertFails(setDoc(doc(db('ali'), 'admins/ali'), { addedAt: 'x' }));
   });

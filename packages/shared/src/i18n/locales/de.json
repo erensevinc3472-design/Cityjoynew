@@ -160,5 +160,27 @@
     "pharmacyHint": "Täglich aktualisierte Liste",
     "services": "Dienstleistungen",
     "servicesHint": "Schlüsseldienst, Installateur, Abschleppdienst und mehr"
+  },
+  "services": {
+    "title": "Dienstleistungen",
+    "search": "Dienste suchen (Schlüsseldienst, Installateur…)",
+    "noMatch": "Keine Dienste passen zu dieser Suche.",
+    "urgentBadge": "Dringend",
+    "suggestCta": "Fehlt ein Dienst? Melden",
+    "emptyTitle": "Noch keine eingetragenen Betriebe",
+    "emptyBody": "Für diesen Dienst sind noch keine Betriebe eingetragen. Sie erscheinen hier, sobald Betriebe sich über „Mein Betrieb“ in ihrem Profil eintragen.",
+    "urgentNote": "Bei Lebensgefahr nicht warten: 112 anrufen.",
+    "emergencyNumbers": "Notrufnummern",
+    "suggestTitle": "Fehlenden Dienst melden",
+    "suggestIntro": "Schreiben Sie, welchen Dienst Sie nicht gefunden haben. Das CityJoy-Team prüft jeden Vorschlag.",
+    "suggestLabel": "Welcher Dienst fehlt?",
+    "suggestHint": "3-300 Zeichen. Bitte keine persönlichen Daten wie Telefonnummer oder Adresse.",
+    "suggestSend": "Senden",
+    "suggestThanks": "Danke, Ihr Vorschlag wurde gesendet.",
+    "suggestTooShort": "Bitte mindestens 3 Zeichen eingeben.",
+    "suggestSignIn": "Melden Sie sich an, um einen Vorschlag zu senden.",
+    "suggestError": "Senden fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "cachedNote": "Die aktuelle Liste konnte nicht geladen werden; die gespeicherte Liste wird angezeigt.",
+    "subcategories": "{{count}} Dienste"
   }
 }

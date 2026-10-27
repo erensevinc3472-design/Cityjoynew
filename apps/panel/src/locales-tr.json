@@ -13,7 +13,8 @@
     "moderasyon": "Moderasyon",
     "isletme-dogrulama": "İşletme doğrulama",
     "meslekler": "Meslekler",
-    "acil-numaralar": "Acil numaralar"
+    "acil-numaralar": "Acil numaralar",
+    "hizmet-kategorileri": "Hizmet kategorileri"
   },
   "roles": {
     "admin": "Admin",
@@ -188,5 +189,58 @@
       "ar": "Arapça",
       "ru": "Rusça"
     }
+  },
+  "services": {
+    "title": "Hizmet kategorileri",
+    "intro": "Uygulamadaki Acil İhtiyaçlar > Hizmetler ekranında görünen iki seviyeli liste (ana kategori > alt kategori). Liste tüm Türkiye için ortaktır. İşletmeler eklendikçe alt kategorilerine göre burada listelenecek.",
+    "usingDefaults": "Veritabanında henüz kategori yok; uygulama gömülü başlangıç listesini gösteriyor.",
+    "seed": "Başlangıç listesini yükle",
+    "seeded": "{{count}} kategori yüklendi.",
+    "addMain": "Yeni ana kategori",
+    "addChild": "Alt kategori ekle",
+    "mainCategory": "Ana kategori",
+    "childOf": "Alt kategori ({{name}})",
+    "parent": "Ana kategorisi",
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "deactivate": "Pasifleştir",
+    "activate": "Etkinleştir",
+    "active": "Etkin",
+    "inactive": "Pasif",
+    "order": "Sıra",
+    "status": "Durum",
+    "name": "Ad",
+    "icon": "Simge (uygulamadaki simge adı)",
+    "names": "Ad (Türkçe zorunlu)",
+    "urgent": "Acil",
+    "urgentLabel": "Acil kategori",
+    "urgentHint": "Çilingir, çekici gibi acil işler. Dolandırıcılık riskine karşı bu kategorilerde işletme doğrulaması aranacak.",
+    "nameRequired": "Türkçe ad zorunlu.",
+    "duplicate": "Bu adla bir kategori zaten var.",
+    "saved": "Kaydedildi.",
+    "error": "Kaydedilemedi. Yetkinizi ve bağlantınızı kontrol edin.",
+    "loadError": "Liste yüklenemedi.",
+    "retry": "Tekrar dene",
+    "loading": "Yükleniyor…",
+    "demoReadOnly": "Örnek hesapla yalnızca görüntüleyebilirsiniz.",
+    "readOnly": "Bu listeyi yalnızca admin değiştirebilir.",
+    "missingTranslations": "{{count}} dilde çeviri eksik (Türkçe gösterilir)",
+    "allTranslations": "Beş dilde hazır",
+    "count": "{{main}} ana, {{sub}} alt kategori.",
+    "noDelete": "Kategoriler silinmez, pasifleştirilir. Pasif ana kategorinin alt kategorileri de uygulamada gizlenir. Her değişiklik işlem kaydına yazılır.",
+    "suggestionsTitle": "Eksik hizmet önerileri",
+    "suggestionsIntro": "Kullanıcıların uygulamadaki \"Eksik hizmet mi var? Bildir\" düğmesiyle gönderdiği öneriler (son 100).",
+    "suggestionsEmpty": "Henüz öneri yok.",
+    "suggestionsUnavailable": "Önerileri şimdilik yalnızca admin görebilir.",
+    "date": "Tarih",
+    "province": "İl",
+    "suggestion": "Öneri",
+    "markReviewed": "İncelendi olarak işaretle",
+    "suggestionStatus": {
+      "yeni": "Yeni",
+      "incelendi": "İncelendi"
+    },
+    "categoriesTitle": "Kategoriler"
   }
 }

@@ -160,5 +160,27 @@
     "pharmacyHint": "Her gün güncellenen liste",
     "services": "Hizmetler",
     "servicesHint": "Çilingir, tesisat, çekici ve daha fazlası"
+  },
+  "services": {
+    "title": "Hizmetler",
+    "search": "Hizmet ara (çilingir, tesisat…)",
+    "noMatch": "Bu aramayla eşleşen hizmet yok.",
+    "urgentBadge": "Acil",
+    "suggestCta": "Eksik hizmet mi var? Bildir",
+    "emptyTitle": "Henüz kayıtlı işletme yok",
+    "emptyBody": "Bu hizmette henüz kayıtlı işletme yok. İşletmeler profillerindeki İşletmem bölümünden eklendikçe burada görünecek.",
+    "urgentNote": "Hayati tehlike varsa beklemeyin, 112'yi arayın.",
+    "emergencyNumbers": "Acil numaralar",
+    "suggestTitle": "Eksik hizmet bildir",
+    "suggestIntro": "Listede bulamadığınız hizmeti yazın. Öneriniz CityJoy ekibi tarafından incelenir.",
+    "suggestLabel": "Hangi hizmet eksik?",
+    "suggestHint": "3-300 karakter. Telefon, adres gibi kişisel bilgi yazmayın.",
+    "suggestSend": "Gönder",
+    "suggestThanks": "Teşekkürler, öneriniz iletildi.",
+    "suggestTooShort": "En az 3 karakter yazın.",
+    "suggestSignIn": "Öneri göndermek için giriş yapın.",
+    "suggestError": "Gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "cachedNote": "Güncel liste alınamadı; telefonda saklı liste gösteriliyor.",
+    "subcategories": "{{count}} hizmet"
   }
 }

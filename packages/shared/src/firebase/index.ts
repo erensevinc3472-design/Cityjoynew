@@ -12,3 +12,8 @@ export interface FirebaseWebConfig {
 }
 export { createOccupationAdmin, isAdminAccount, occupationIdFromName } from './admin';
 export { createEmergencyNumberAdmin, createFirestoreEmergencyNumberRepository } from './emergency';
+export {
+  createFirestoreServiceCategoryRepository,
+  createServiceCategoryAdmin,
+  submitServiceSuggestion,
+} from './service-categories';

@@ -17,11 +17,10 @@ import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
-/** Sonraki parçalarda gelecek bölümler (PROJE.md 5.4). */
-const COMING: { key: 'sos' | 'pharmacy' | 'services'; icon: IconName }[] = [
+/** Sonraki parçalarda gelecek bölümler (PROJE.md 5.4). Hizmetler hazır, ayrı satırda. */
+const COMING: { key: 'sos' | 'pharmacy'; icon: IconName }[] = [
   { key: 'sos', icon: 'sensors' },
   { key: 'pharmacy', icon: 'local-pharmacy' },
-  { key: 'services', icon: 'handyman' },
 ];
 
 /**
@@ -33,7 +32,7 @@ export default function UrgentScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { language } = useSettings();
+  const { language, rtl } = useSettings();
   const lang: LanguageCode = language ?? 'tr';
   const [numbers, setNumbers] = useState<EmergencyNumber[]>([]);
   const [stale, setStale] = useState(false);
@@ -134,6 +133,21 @@ export default function UrgentScreen() {
           })}
         </View>
         {stale ? <AppText variant="caption" muted>{t('urgent.cachedNote')}</AppText> : null}
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${t('urgent.services')}. ${t('urgent.servicesHint')}`}
+          onPress={() => router.push('/services')}
+          style={({ pressed }) => [styles.row, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.8 : 1 }]}>
+          <View style={[styles.icon, { backgroundColor: c.accentSoft }]}>
+            <MaterialIcons name="handyman" size={22} color={c.icon} />
+          </View>
+          <View style={styles.flex}>
+            <AppText variant="label">{t('urgent.services')}</AppText>
+            <AppText variant="caption" muted>{t('urgent.servicesHint')}</AppText>
+          </View>
+          <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={24} color={c.textSoft} />
+        </Pressable>
 
         <AppText variant="subtitle" accessibilityRole="header">{t('urgent.comingTitle')}</AppText>
         {COMING.map((m) => (

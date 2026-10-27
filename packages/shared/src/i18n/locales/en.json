@@ -160,5 +160,27 @@
     "pharmacyHint": "List updated every day",
     "services": "Services",
     "servicesHint": "Locksmith, plumbing, towing and more"
+  },
+  "services": {
+    "title": "Services",
+    "search": "Search services (locksmith, plumber…)",
+    "noMatch": "No services match this search.",
+    "urgentBadge": "Urgent",
+    "suggestCta": "Missing a service? Tell us",
+    "emptyTitle": "No registered businesses yet",
+    "emptyBody": "There are no registered businesses for this service yet. They will appear here as businesses add themselves from the My Business section of their profile.",
+    "urgentNote": "If a life is in danger, don't wait: call 112.",
+    "emergencyNumbers": "Emergency numbers",
+    "suggestTitle": "Suggest a missing service",
+    "suggestIntro": "Write the service you couldn't find. The CityJoy team reviews every suggestion.",
+    "suggestLabel": "Which service is missing?",
+    "suggestHint": "3-300 characters. Do not include personal details such as phone numbers or addresses.",
+    "suggestSend": "Send",
+    "suggestThanks": "Thank you, your suggestion has been sent.",
+    "suggestTooShort": "Please write at least 3 characters.",
+    "suggestSignIn": "Sign in to send a suggestion.",
+    "suggestError": "Could not send. Check your connection and try again.",
+    "cachedNote": "Could not get the latest list; showing the list saved on this phone.",
+    "subcategories": "{{count}} services"
   }
 }

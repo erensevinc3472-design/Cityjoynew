@@ -10,6 +10,7 @@ export const MENU: { module: Module; path?: string }[] = [
   { module: 'konumlar', path: '/konumlar' },
   { module: 'meslekler', path: '/meslekler' },
   { module: 'acil-numaralar', path: '/acil-numaralar' },
+  { module: 'hizmet-kategorileri', path: '/hizmet-kategorileri' },
   { module: 'onaylar' },
   { module: 'yetkiler' },
   { module: 'islem-kayitlari' },
