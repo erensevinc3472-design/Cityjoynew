@@ -58,7 +58,7 @@ describe('yetki kayıtları', () => {
       scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' }, modules: ['gonderiler', 'bildirimler'],
       officialEmail: 'bilgi@nilufer.bel.tr', status: 'aktif', createdBy: 'admin', createdAt: '',
     };
-    const basin = membershipToGrant(org, { orgId: org.id, email: 'basin@nilufer.bel.tr', displayName: 'Basın', isOrgAdmin: false, assignments: { gonderiler: { role: 'hazirlayan' } } });
+    const basin = membershipToGrant(org, { orgId: org.id, email: 'basin@nilufer.bel.tr', displayName: 'Basın', isOrgAdmin: false, assignments: { gonderiler: ['goruntule', 'ekle', 'duzenle'] } });
     const region = { provinceCode: '16', districtId: '16-nilufer' };
     const grants: PermissionGrant[] = [basin];
     expect(basin.role).toBe('belediye');

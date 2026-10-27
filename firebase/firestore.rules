@@ -550,13 +550,14 @@ service cloud.firestore {
       return role == 'il-yoneticisi' ? {
           'konumlar': ['goruntule'], 'acil-numaralar': ['goruntule'], 'hizmet-kategorileri': ['goruntule', 'onayla'],
           'kurumlar': ['goruntule'], 'yetkiler': ['goruntule', 'ekle', 'duzenle', 'sil'], 'onaylar': ['goruntule', 'onayla'],
-          'islem-kayitlari': ['goruntule'], 'bildirimler': ['goruntule', 'ekle', 'duzenle', 'sil', 'bildirim-gonder'],
-          'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'], 'etkinlikler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'],
+          'islem-kayitlari': ['goruntule'], 'bildirimler': ['goruntule', 'ekle', 'duzenle', 'sil', 'yayinla', 'bildirim-gonder'],
+          'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla'],
+          'etkinlikler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla'],
           'hizmetler': ['goruntule', 'ekle', 'duzenle', 'sil'], 'moderasyon': ['goruntule', 'duzenle', 'sil'],
           'isletme-dogrulama': ['goruntule', 'onayla'], 'sehir-rehberi': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla']}
         : role == 'muhtar' ? {
-          'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil'],
-          'etkinlikler': ['goruntule', 'ekle', 'duzenle'], 'bildirimler': ['goruntule', 'ekle', 'bildirim-gonder']}
+          'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil', 'yayinla'],
+          'etkinlikler': ['goruntule', 'ekle', 'duzenle', 'yayinla'], 'bildirimler': ['goruntule', 'ekle', 'yayinla', 'bildirim-gonder']}
         : {'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'moderasyon': ['goruntule', 'duzenle']};
     }
     function within(m, caps, k) {
@@ -718,10 +719,12 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Görev: bölüm başına işaretlenen eylemler (Karar, Eren, 27 Ekim 2026). "Bildirim gönder" yalnızca bildirimlerde.
     function validAssignment(a, k) {
-      return !(k in a) || (a[k] is map && a[k].keys().hasOnly(['role', 'canPublishDirectly'])
-        && a[k].role in ['hazirlayan', 'onaylayan', 'izleyen']
-        && (!('canPublishDirectly' in a[k]) || a[k].canPublishDirectly is bool));
+      return !(k in a) || (a[k] is list && a[k].size() >= 1
+        && a[k].hasOnly(k == 'bildirimler'
+            ? ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla', 'bildirim-gonder']
+            : ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla']));
     }
     function validMember(id, d) {
       return d.keys().hasOnly(['orgId', 'email', 'displayName', 'isOrgAdmin', 'assignments', 'expiresAt', 'addedBy', 'updatedAt'])

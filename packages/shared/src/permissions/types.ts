@@ -29,7 +29,8 @@ export type Module =
   | 'kurumlar'
   | 'sehir-rehberi';
 
-export type Action = 'goruntule' | 'ekle' | 'duzenle' | 'sil' | 'onayla' | 'bildirim-gonder';
+/** yayinla: hazırladığını onay beklemeden yayınlar ("onaysız yayınla", PROJE.md 6.6). */
+export type Action = 'goruntule' | 'ekle' | 'duzenle' | 'sil' | 'onayla' | 'yayinla' | 'bildirim-gonder';
 
 /** Bir yetkinin geçerli olduğu bölge. Üst bölge alttakileri kapsar (il > ilçe > mahalle). */
 export type RegionScope =

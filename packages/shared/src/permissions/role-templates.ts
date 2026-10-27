@@ -1,6 +1,6 @@
 import type { Action, Module, Role } from './types';
 
-const ALL: Action[] = ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'bildirim-gonder'];
+const ALL: Action[] = ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla', 'bildirim-gonder'];
 const READ: Action[] = ['goruntule'];
 const WRITE: Action[] = ['goruntule', 'ekle', 'duzenle'];
 
@@ -39,12 +39,13 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
     yetkiler: ['goruntule', 'ekle', 'duzenle', 'sil'],
     kurumlar: READ,
     'sehir-rehberi': [...WRITE, 'sil', 'onayla'],
-    gonderiler: [...WRITE, 'sil', 'onayla'],
+    // Kendi gönderi ve etkinliğini onaysız yayınlar; il geneli bildirim admin onayına gider (PROJE.md 6.7).
+    gonderiler: [...WRITE, 'sil', 'onayla', 'yayinla'],
     // İki aşamalı onayın ilk aşaması (PROJE.md 6.5).
     onaylar: ['goruntule', 'onayla'],
     'islem-kayitlari': READ,
     bildirimler: ['goruntule', 'ekle', 'bildirim-gonder'],
-    etkinlikler: [...WRITE, 'onayla'],
+    etkinlikler: [...WRITE, 'onayla', 'yayinla'],
     hizmetler: WRITE,
     moderasyon: ['goruntule', 'duzenle', 'sil'],
     'isletme-dogrulama': ['goruntule', 'onayla'],

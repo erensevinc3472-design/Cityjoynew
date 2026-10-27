@@ -1,4 +1,4 @@
-import type { Module, RegionScope } from '../permissions/types';
+import type { Action, Module, RegionScope } from '../permissions/types';
 
 export type OrganizationKind =
   | 'buyuksehir-belediyesi'
@@ -28,14 +28,11 @@ export interface Organization {
   createdAt: string;
 }
 
-/** Kurum içi görev (PROJE.md 6.6). Bölüm başına ayrı verilir. */
-export type StaffRole = 'hazirlayan' | 'onaylayan' | 'izleyen';
-
-export interface StaffAssignment {
-  role: StaffRole;
-  /** Onay beklemeden yayınlayabilir (örn. acil duyuru). */
-  canPublishDirectly?: boolean;
-}
+/**
+ * Kurum içi görev (PROJE.md 6.6): bölüm başına işaretlenen eylemler. Örnekler: hazırlayan = görüntüle + ekle +
+ * düzenle; onaylayan = bunlara ek onayla; "onaysız yayınla" (yayinla) işaretli kişi hazırladığını onay beklemeden yayınlar.
+ */
+export type StaffAssignment = Action[];
 
 export interface OrganizationMember {
   orgId: string;

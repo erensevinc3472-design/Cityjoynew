@@ -36,6 +36,7 @@
     "duzenle": "Düzenle",
     "sil": "Sil",
     "onayla": "Onayla",
+    "yayinla": "Onaysız yayınla",
     "bildirim-gonder": "Bildirim gönder"
   },
   "login": {
@@ -432,7 +433,7 @@
     "expires": "Bitiş tarihi (isteğe bağlı)",
     "expiresHint": "Boş bırakılırsa süresizdir. Tarih gelince yetki kendiliğinden durur.",
     "scopeFixed": "Rol ve bölge değiştirilemez. Başka bir bölge için bu yetkiyi geri alıp yeni yetki verin.",
-    "modulesHint": "Rol seçilince önerilen yetkiler işaretlenir, değiştirebilirsiniz. \"Görüntüle\" kaldırılırsa o bölümün tüm yetkileri kalkar. Çizgi (-) olan eylemler bu bölümde yalnızca admin'e açıktır.",
+    "modulesHint": "Rol seçilince önerilen yetkiler işaretlenir, değiştirebilirsiniz. \"Görüntüle\" kaldırılırsa o bölümün tüm yetkileri kalkar. Çizgi (-) olan eylemler bu bölümde yalnızca admin'e açıktır. \"Onaysız yayınla\" işaretli değilse kişinin hazırladığı içerik (örn. muhtar duyurusu) önce il yöneticisinin onayına gider.",
     "note": "Not (isteğe bağlı)",
     "notePlaceholder": "Örnek: Bursa il temsilcisi, sözleşme 2027 sonuna kadar",
     "grant": "Yetkiyi ver",
@@ -450,7 +451,7 @@
     "provinceNote": "Yalnızca kendi ilinizde ve kendi yetkiniz kadar yetki verebilirsiniz. İl yöneticisi atamasını CityJoy yapar.",
     "emailRequired": "Geçerli bir e-posta yazın.",
     "cannotOverwrite": "Bu kişinin bu bölgede il yöneticisi yetkisi var; yalnızca CityJoy değiştirebilir.",
-    "modulesHintProvince": "Yalnızca sizde olan yetkiler işaretlenebilir. \"Görüntüle\" kaldırılırsa o bölümün tüm yetkileri kalkar."
+    "modulesHintProvince": "Yalnızca sizde olan yetkiler işaretlenebilir. \"Görüntüle\" kaldırılırsa o bölümün tüm yetkileri kalkar. \"Onaysız yayınla\" işaretli değilse kişinin hazırladığı içerik (örn. muhtar duyurusu) önce il yöneticisinin onayına gider."
   },
   "audit": {
     "title": "İşlem kayıtları",
@@ -556,21 +557,13 @@
     "editMember": "Görevi düzenle",
     "staffIntro": "Personel kendi hesabıyla çalışır; ortak şifre kullanılmaz. Kişiyi e-postasıyla ekleyin; başvuru gerekmez, o e-postayla (doğrulanmış) panele girince görevi açılır.",
     "staffHidden": "Personel listesini kurum yöneticisi ve CityJoy görür.",
-    "memberHint": "Her bölüm için görev seçin. Hazırlayan taslak yazar ve onaya gönderir; onaylayan yayınlar ya da gerekçeyle geri gönderir; izleyen yalnızca görür.",
+    "memberHint": "Her bölümde kişiye vermek istediklerinizi işaretleyin. Örnekler: yalnızca görmesi için \"Görüntüle\"; taslak hazırlayıp onaya göndermesi için \"Ekle\" ve \"Düzenle\"; başkalarının hazırladığını onaylaması için \"Onayla\"; hazırladığını onay beklemeden yayınlaması için \"Onaysız yayınla\".",
     "email": "E-posta",
     "memberName": "Ad soyad",
     "memberExpires": "Görev bitişi (isteğe bağlı)",
     "makeOrgAdmin": "Kurum yöneticisi (personel ekleyip çıkarabilir)",
     "module": "Bölüm",
-    "duty": "Görev",
-    "noDuty": "Görev yok",
-    "publishDirectly": "Onaysız yayınlayabilir",
-    "staffRoles": {
-      "izleyen": "İzleyen",
-      "hazirlayan": "Hazırlayan",
-      "onaylayan": "Onaylayan"
-    },
-    "dutyHint": "\"Onaysız yayınlayabilir\" yalnızca hazırlayana verilir (örnek: acil duyuruda fen işleri müdürü).",
+    "dutyHint": "\"Onaysız yayınla\" işaretli değilse kişinin hazırladığı içerik, o bölümde \"Onayla\" yetkisi olan birinin onayına gider. Örnek: acil duyuruda fen işleri müdürüne \"Onaysız yayınla\" verilebilir.",
     "memberNameRequired": "Kişinin adını yazın.",
     "notSelf": "Kendi görevinizi değiştiremezsiniz.",
     "expiryPast": "Bitiş tarihi bugünden sonra olmalı.",

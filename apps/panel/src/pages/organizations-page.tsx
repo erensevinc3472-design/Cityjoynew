@@ -11,8 +11,9 @@ import {
   type OrganizationKind,
   type OrganizationMember,
   type RegionScope,
+  staffActionsFor,
+  type Action,
   type StaffAssignment,
-  type StaffRole,
 } from '@cityjoy/shared';
 import { createAccountWithSetupLink, createOrganizationAdmin, occupationIdFromName, resendSetupLink } from '@cityjoy/shared/firebase';
 
@@ -23,7 +24,6 @@ import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
-const STAFF_ROLES: StaffRole[] = ['izleyen', 'hazirlayan', 'onaylayan'];
 const KINDS: ('belediye' | Exclude<OrganizationKind, 'buyuksehir-belediyesi' | 'il-belediyesi' | 'ilce-belediyesi'>)[] = ['belediye', 'kurum', 'kulup', 'yayinci'];
 
 const dateOnly = (iso?: string) => (iso ? iso.slice(0, 10) : '');
@@ -538,7 +538,7 @@ function OrgDetail({
                   {members.map((m) => {
                     const active = isMemberActive(m, now);
                     const duties = (Object.entries(m.assignments) as [Module, StaffAssignment][]).map(
-                      ([mod, a]) => `${t(`nav.${mod}`)}: ${t(`orgs.staffRoles.${a.role}`)}${a.canPublishDirectly ? ` (${t('orgs.publishDirectly')})` : ''}`,
+                      ([mod, a]) => `${t(`nav.${mod}`)}: ${a.map((x) => t(`actions.${x}`)).join(', ')}`,
                     );
                     return (
                       <tr key={m.email}>
@@ -596,12 +596,19 @@ function MemberForm({
   onSubmit: (d: MemberDraft) => void;
 }) {
   const set = (patch: Partial<MemberDraft>) => setDraft({ ...draft, ...patch });
-  const setRole = (m: Module, role: StaffRole | '') => {
+  // Görüntüleme kapanınca bölümdeki bütün eylemler kapanır; başka eylem işaretlenince görüntüleme de açılır.
+  const toggle = (m: Module, a: Action, on: boolean) => {
+    const current = new Set(draft.assignments[m] ?? []);
+    if (on) current.add(a).add('goruntule');
+    else current.delete(a);
+    if (a === 'goruntule' && !on) current.clear();
     const next = { ...draft.assignments };
-    if (!role) delete next[m];
-    else next[m] = { role, ...(role === 'hazirlayan' && next[m]?.canPublishDirectly ? { canPublishDirectly: true } : {}) };
+    const list = staffActionsFor(m).filter((x) => current.has(x));
+    if (list.length) next[m] = list;
+    else delete next[m];
     set({ assignments: next });
   };
+  const columns = staffActionsFor('bildirimler');
 
   return (
     <form
@@ -639,36 +646,32 @@ function MemberForm({
           <thead>
             <tr>
               <th scope="col">{t('orgs.module')}</th>
-              <th scope="col">{t('orgs.duty')}</th>
-              <th scope="col">{t('orgs.publishDirectly')}</th>
+              {columns.map((a) => (
+                <th key={a} scope="col">{t(`actions.${a}`)}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {org.modules.map((m) => {
-              const a = draft.assignments[m];
+              const allowed = staffActionsFor(m);
+              const chosen = draft.assignments[m] ?? [];
               return (
                 <tr key={m}>
                   <th scope="row">{t(`nav.${m}`)}</th>
-                  <td>
-                    <select aria-label={`${t(`nav.${m}`)}: ${t('orgs.duty')}`} value={a?.role ?? ''} onChange={(e) => setRole(m, e.target.value as StaffRole | '')}>
-                      <option value="">{t('orgs.noDuty')}</option>
-                      {STAFF_ROLES.map((r) => (
-                        <option key={r} value={r}>{t(`orgs.staffRoles.${r}`)}</option>
-                      ))}
-                    </select>
-                  </td>
-                  <td>
-                    {a?.role === 'hazirlayan' ? (
-                      <input
-                        type="checkbox"
-                        aria-label={`${t(`nav.${m}`)}: ${t('orgs.publishDirectly')}`}
-                        checked={!!a.canPublishDirectly}
-                        onChange={(e) => set({ assignments: { ...draft.assignments, [m]: { role: 'hazirlayan', ...(e.target.checked ? { canPublishDirectly: true } : {}) } } })}
-                      />
-                    ) : (
-                      <span className="meta" aria-hidden>-</span>
-                    )}
-                  </td>
+                  {columns.map((a) => (
+                    <td key={a}>
+                      {allowed.includes(a) ? (
+                        <input
+                          type="checkbox"
+                          aria-label={`${t(`nav.${m}`)}: ${t(`actions.${a}`)}`}
+                          checked={chosen.includes(a)}
+                          onChange={(e) => toggle(m, a, e.target.checked)}
+                        />
+                      ) : (
+                        <span className="meta" aria-hidden>-</span>
+                      )}
+                    </td>
+                  ))}
                 </tr>
               );
             })}

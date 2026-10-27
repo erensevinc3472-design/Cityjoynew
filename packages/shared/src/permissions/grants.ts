@@ -1,9 +1,9 @@
-import type { Organization, OrganizationMember, StaffRole } from '../organizations/types';
+import type { Organization, OrganizationMember } from '../organizations/types';
 import type { Action, Module, PermissionGrant, RegionScope, Role } from './types';
 
 type Caps = Partial<Record<Module, Action[]>>;
 
-export const ALL_ACTIONS: Action[] = ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'bildirim-gonder'];
+export const ALL_ACTIONS: Action[] = ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla', 'bildirim-gonder'];
 
 export const ALL_MODULES: Module[] = [
   'konumlar',
@@ -44,21 +44,22 @@ export const ROLE_CAPS: Record<PersonRole, Caps> = {
     yetkiler: ['goruntule', 'ekle', 'duzenle', 'sil'],
     onaylar: ['goruntule', 'onayla'],
     'islem-kayitlari': ['goruntule'],
-    bildirimler: ['goruntule', 'ekle', 'duzenle', 'sil', 'bildirim-gonder'],
-    gonderiler: ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'],
-    etkinlikler: ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'],
+    bildirimler: ['goruntule', 'ekle', 'duzenle', 'sil', 'yayinla', 'bildirim-gonder'],
+    gonderiler: ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla'],
+    etkinlikler: ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla'],
     hizmetler: ['goruntule', 'ekle', 'duzenle', 'sil'],
     moderasyon: ['goruntule', 'duzenle', 'sil'],
     'isletme-dogrulama': ['goruntule', 'onayla'],
     // Benim Şehrim sabit bilgileri: Excel'den yükleme, düzenleme, doğrulama (kendi ilinde).
     'sehir-rehberi': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'],
   },
+  // "yayinla" işaretlenmezse muhtarın içeriği il yöneticisinin onayına gider (PROJE.md 6.7).
   muhtar: {
     konumlar: ['goruntule'],
     'islem-kayitlari': ['goruntule'],
-    gonderiler: ['goruntule', 'ekle', 'duzenle', 'sil'],
-    etkinlikler: ['goruntule', 'ekle', 'duzenle'],
-    bildirimler: ['goruntule', 'ekle', 'bildirim-gonder'],
+    gonderiler: ['goruntule', 'ekle', 'duzenle', 'sil', 'yayinla'],
+    etkinlikler: ['goruntule', 'ekle', 'duzenle', 'yayinla'],
+    bildirimler: ['goruntule', 'ekle', 'yayinla', 'bildirim-gonder'],
   },
   moderator: {
     konumlar: ['goruntule'],
@@ -153,12 +154,15 @@ export interface GrantRecord extends PermissionGrant {
 /** Kuruma verilebilecek bölümler (kurumun içerik bölümleri). */
 export const ORG_MODULES: Module[] = ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler'];
 
-/** Personel görevinin eylemleri (PROJE.md 6.6). "Onaysız yayınlayabilir" ayrı işarettir. */
-export const STAFF_ACTIONS: Record<StaffRole, Action[]> = {
-  izleyen: ['goruntule'],
-  hazirlayan: ['goruntule', 'ekle', 'duzenle'],
-  onaylayan: ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'bildirim-gonder'],
-};
+/**
+ * Kurum yöneticisinin personele işaretleyebileceği eylemler (Karar, Eren, 27 Ekim 2026: görev hazır kalıptan değil,
+ * kutucuklarla seçilir). "Bildirim gönder" yalnızca bildirimler bölümünde anlamlıdır.
+ */
+export const STAFF_ACTIONS: Action[] = ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla', 'bildirim-gonder'];
+
+export function staffActionsFor(module: Module): Action[] {
+  return STAFF_ACTIONS.filter((a) => module === 'bildirimler' || a !== 'bildirim-gonder');
+}
 
 export function orgRole(kind: Organization['kind']): Role {
   if (kind === 'kulup' || kind === 'yayinci' || kind === 'kurum') return kind;
@@ -173,7 +177,7 @@ export function membershipToGrant(org: Organization, member: OrganizationMember)
   const modules: Caps = { konumlar: ['goruntule'], 'islem-kayitlari': ['goruntule'] };
   for (const m of org.modules) {
     const a = member.assignments[m];
-    if (a) modules[m] = STAFF_ACTIONS[a.role].filter((x) => m === 'bildirimler' || x !== 'bildirim-gonder');
+    if (a?.length) modules[m] = a.filter((x) => staffActionsFor(m).includes(x));
     else if (member.isOrgAdmin) modules[m] = ['goruntule'];
   }
   if (member.isOrgAdmin) modules.kurumlar = ['goruntule', 'ekle', 'duzenle', 'sil'];

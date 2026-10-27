@@ -4,15 +4,13 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 27 Ekim 2026 (onay merkezi: Bekleyen onaylar, iki aşamalı işletme doğrulaması, güvenilir yöneticiler).
+Son güncelleme: 27 Ekim 2026 (yetkiler kutucuklarla seçiliyor, "Onaysız yayınla" yetkisi eklendi).
 
 ## Depo ve ortam
 
 - GitHub: `erensevinc3472-design/Cityjoynew` (gizli), ana dal `main`. Eski `cityjoy` deposu kullanılmıyor.
-- **27 Ekim 2026 çalışmaları `main`'de değil:** yetki zinciri, kurumlar, kilitli adlar ve şehir rehberi
-  `claude/serene-dirac-4mwde3` dalında; onay merkezi bunun üstüne `claude/durum-md-continuation-82b1wf` dalında (önceki dalın
-  hepsini içerir). `main`'e birleştirilmediyse yeni oturum `claude/durum-md-continuation-82b1wf` dalından başlamalı ya da
-  önce birleştirme (PR) yapılmalı; aksi halde bu işler görünmez.
+- Yetki zinciri, şehir rehberi ve onay merkezi 27 Ekim 2026'da `main`'e birleştirildi (PR #3). Sonraki işler
+  `claude/durum-md-continuation-82b1wf` dalında; `main`'e birleştirilmediyse yeni oturum o daldan başlamalı.
 - Firebase projesi: `cityjoynew` (Spark, ücretsiz plan). Firestore bölgesi eur3. Giriş yöntemleri: e-posta/şifre ve Google.
 - Bağlantı bilgileri koda konmaz. `.env.local` dosyaları GitHub'a gitmez ve oturum kapanınca silinir.
   Yeni oturumda yeniden üretmek için ortam değişkeni `FIREBASE_WEB_CONFIG` (konsoldaki `firebaseConfig` bloğu)
@@ -39,8 +37,8 @@ Son güncelleme: 27 Ekim 2026 (onay merkezi: Bekleyen onaylar, iki aşamalı iş
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (62)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (46; Java gerekir)
+npm test                      # ortak paket testleri (63)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (47; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -135,8 +133,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    kulüp, yayıncı serbest adla), resmî e-posta + kurum yöneticisinin adı, bölümler, sözleşme bitişi. Hesap o e-postayla
    açılır ve "şifrenizi belirleyin" bağlantısı gider (şifreyi kimse görmez; bağlantıyla şifre koyunca e-posta da
    doğrulanmış olur). Pasifleştir / etkinleştir, bağlantıyı yeniden gönder; sözleşme bitince panel kendiliğinden kapanır.
-   **Kurum yöneticisi:** kendi personelini e-postayla ekler, bölüm başına görev verir (hazırlayan / onaylayan / izleyen,
-   "onaysız yayınlayabilir"), süreli görev, çıkarma; kurum yöneticisi atayamaz (admin atar). **Yetkiler sayfası:** admin
+   **Kurum yöneticisi:** kendi personelini e-postayla ekler, bölüm başına görev verir (kutucuklarla, madde 17), süreli görev, çıkarma; kurum yöneticisi atayamaz (admin atar). **Yetkiler sayfası:** admin
    il yöneticisi, muhtar, gönüllü moderatör atar; il yöneticisi kendi ilinde muhtar ve moderatör atar, kendinde olmayan
    yetkiyi veremez. Form yok: kişi e-postasıyla eklenir, o e-postayla (doğrulanmış) girince yetkisi açılır; doğrulanmamış
    e-postada "doğrulama e-postasını yeniden gönder / doğruladım" ekranı. **İşlem kayıtları** sayfası. İl yöneticisi kendi
@@ -177,8 +174,19 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    tarayıcıyla baştan sona denendi (uygulamadan istek > il yöneticisi onayı ve önerisi > admin güvenli toplu onay > uygulamada
    "doğrulandı").
 
+17. **Yetkiler kutucuklarla, "Onaysız yayınla" yetkisi** (Karar, Eren, 27 Ekim 2026). Yeni eylem `yayinla`: işaretli kişi
+   hazırladığını onay beklemeden yayınlar; işaretli değilse içerik onaya gider. **Kurum personeli:** açılır listedeki hazır görev
+   (hazırlayan / onaylayan / izleyen) kaldırıldı; kurum yöneticisi her bölümde Görüntüle, Ekle, Düzenle, Sil, Onayla, Onaysız
+   yayınla, Bildirim gönder (yalnızca bildirimlerde) kutucuklarını işaretler. Eski biçimde kayıtlı görevler okunurken yeni
+   biçime çevrilir (`normalizeAssignment`), kurallar yalnızca yeni biçimi yazdırır. **İl yöneticisi > muhtar:** Yetkiler
+   sayfasındaki tabloya "Onaysız yayınla" sütunu geldi (gönderi, etkinlik, bildirim). Kimse kendinde olmayanı veremez:
+   il yöneticisinin varsayılan yetkisinde gönderi ve etkinlikte "onaysız yayınla" var, bildirimde yok (il geneli bildirim
+   admin onayına gider); admin isterse il yöneticisinin yetkisinde işaretler. Emülatörde tarayıcıyla denendi.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
+- Yetkiler kutucuklarla (6.6, 27 Ekim 2026): kurum yöneticisi ve il yöneticisi kişiye verdiği her eylemi işaretler,
+  "Onaysız yayınla" ayrı kutucuk; işaretli değilse içerik onaya gider.
 - Yetki zinciri (6.7, 27 Ekim 2026): admin herkese ve kurumlara; il yöneticisi kendi ilinde muhtar ve moderatöre; kurum
   kendi personeline. Form yok, e-postayla verilir. Belediye adları kilitli; kurum hesabı resmî e-postayla, şifreyi kurum koyar.
   Önemli konularda (bildirim, işletme doğrulama, kurum açma, yasaklama, ücret/iade, anket) onay admin'e de gider.
@@ -242,7 +250,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0b. Dalları `main`'e birleştirme (PR) ve kuralları/dizinleri Firebase'e yeniden yükleme (Eren'in bilgisayarından).
+0b. Kurum içerikleri (Eren onayladı, sıradaki iş): duyuru, resmî gönderi, acil duyuru. Personel hazırlar, "Onayla" yetkisi
+   olan onaylar, "Onaysız yayınla" yetkisi olan doğrudan yayınlar; acil duyuru onaysız gider; uygulamada kendi il / ilçe /
+   mahallesinde görünür. Muhtarın içeriği "onaysız yayınla" yoksa il yöneticisinin onayına gider.
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"

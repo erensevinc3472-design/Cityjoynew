@@ -71,6 +71,16 @@ describe('yetki zinciri', () => {
     expect(log.some((e) => e.module === 'yetkiler' && e.targetId === id && e.action === 'ekle')).toBe(true);
   });
 
+  it('il yöneticisi muhtara "onaysız yayınla" verebilir; kendinde olmayanı (il geneli bildirimi onaysız) veremez', async () => {
+    await createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren').save(ilYoneticisi, true);
+    const ahmet = createGrantAdmin(fs('ahmet'), 'ahmet');
+    await ahmet.save({ ...muhtar(), modules: { gonderiler: ['goruntule', 'ekle', 'yayinla'] } }, true);
+    expect((await loadOwnGrants(fs('muhtar'), 'muhtar@ornek.com'))[0]?.modules.gonderiler).toEqual(['goruntule', 'ekle', 'yayinla']);
+    await expect(ahmet.save({ ...muhtar(), modules: { bildirimler: ['goruntule', 'ekle', 'yayinla'] } }, false)).rejects.toThrow();
+    // Admin verebilir.
+    await createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren').save({ ...muhtar(), modules: { bildirimler: ['goruntule', 'ekle', 'yayinla'] } }, false);
+  });
+
   it('il yöneticisi kendi ilinde muhtar atar ve geri alır; başka ile, il yöneticisi olarak ya da fazla yetkiyle atayamaz', async () => {
     await createGrantAdmin(fs('eren', 'eren@ornek.com'), 'eren').save(ilYoneticisi, true);
     const ahmet = createGrantAdmin(fs('ahmet'), 'ahmet');
@@ -191,14 +201,17 @@ describe('kurumlar ve personel', () => {
     expect(mine.map((m) => [m.org.id, m.member.isOrgAdmin])).toEqual([['bld-16-nilufer', true]]);
 
     const k = createOrganizationAdmin(kalemDb, 'kalem');
-    const basin = { email: 'basin@nilufer.bel.tr', displayName: 'Basın Müdürü', isOrgAdmin: false, assignments: { gonderiler: { role: 'hazirlayan' as const } } };
+    const basin = { email: 'basin@nilufer.bel.tr', displayName: 'Basın Müdürü', isOrgAdmin: false, assignments: { gonderiler: ['goruntule' as const, 'ekle' as const, 'duzenle' as const, 'yayinla' as const] } };
     await k.saveMember(org(), basin, true);
     expect((await k.listMembers('bld-16-nilufer')).map((m) => m.email)).toEqual(['kalem@nilufer.bel.tr', 'basin@nilufer.bel.tr']);
-    expect((await loadOwnMemberships(fs('basin', 'basin@nilufer.bel.tr'), 'basin@nilufer.bel.tr'))[0]?.member.assignments).toEqual({ gonderiler: { role: 'hazirlayan' } });
+    expect((await loadOwnMemberships(fs('basin', 'basin@nilufer.bel.tr'), 'basin@nilufer.bel.tr'))[0]?.member.assignments).toEqual({ gonderiler: ['goruntule', 'ekle', 'duzenle', 'yayinla'] });
 
     // Kurumun bölümleri dışında görev, kurum yöneticisi atama, kendi kaydını değiştirme yok.
     const raw = doc(kalemDb, 'orgMembers', 'bld-16-nilufer__basin@nilufer.bel.tr');
-    await assertFails(setDoc(raw, { orgId: 'bld-16-nilufer', email: 'basin@nilufer.bel.tr', displayName: 'B', isOrgAdmin: false, assignments: { etkinlikler: { role: 'onaylayan' } }, addedBy: 'kalem', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(raw, { orgId: 'bld-16-nilufer', email: 'basin@nilufer.bel.tr', displayName: 'B', isOrgAdmin: false, assignments: { etkinlikler: ['goruntule', 'onayla'] }, addedBy: 'kalem', updatedAt: serverTimestamp() }));
+    // Eski kalıp biçimi ve bölüme uymayan eylem yazılamaz.
+    await assertFails(setDoc(raw, { orgId: 'bld-16-nilufer', email: 'basin@nilufer.bel.tr', displayName: 'B', isOrgAdmin: false, assignments: { gonderiler: { role: 'onaylayan' } }, addedBy: 'kalem', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(raw, { orgId: 'bld-16-nilufer', email: 'basin@nilufer.bel.tr', displayName: 'B', isOrgAdmin: false, assignments: { gonderiler: ['goruntule', 'bildirim-gonder'] }, addedBy: 'kalem', updatedAt: serverTimestamp() }));
     await expect(k.saveMember(org(), { ...basin, email: 'yeni@nilufer.bel.tr', isOrgAdmin: true }, true)).rejects.toThrow();
     await expect(k.saveMember(org(), { ...kalem, isOrgAdmin: false, assignments: {} }, false)).rejects.toThrow();
     // Personel başka personel ekleyemez.
