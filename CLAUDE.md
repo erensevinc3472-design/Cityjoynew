@@ -1,9 +1,12 @@
 # CityJoy: Claude Code çalışma notları
 
-Bu dosya proje klasörünün kökünde durur. Claude Code her oturumda önce bunu, sonra `PROJE.md` dosyasını okur.
+Bu dosya proje klasörünün kökünde durur. Claude Code her oturumda önce bunu, sonra `DURUM.md` dosyasını okur.
 
 ## İlk adım
-- `PROJE.md` dosyasını baştan sona oku. Projenin tüm kararları, önerileri ve açık soruları orada.
+- `DURUM.md` dosyasını oku: neyin yapıldığı, kararlar, açık işler ve sıradaki adım orada kısaca yazılı.
+- `PROJE.md` uzun bir belge (kredi tasarrufu için): baştan sona okuma. Üzerinde çalışılan konunun bölümünü oku
+  (bölüm listesi `DURUM.md` sonunda). Projenin tüm kararları, önerileri ve açık soruları orada.
+- Bir iş bitince `DURUM.md`'yi güncelle, yeni kararları `PROJE.md`'nin ilgili bölümüne işle.
 - "Karar (Eren)" ve "Eren onayladı" işaretli yerler kesindir.
 - "SORULACAK" işaretli yerlerde kendin karar verme, Eren'e sor.
 - Onayı beklenen öneriler kesin sayılmaz.
