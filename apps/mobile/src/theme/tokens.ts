@@ -1,70 +1,77 @@
 /**
- * Görsel kimlik: Eren'in tasarımlarından çıkarılan değerler (docs/stil-rehberi.md).
- * Koyu petrol yeşili zemin, yarı saydam kartlar, ana vurgu altın, ikinci vurgu turkuaz.
+ * Görsel kimlik (docs/stil-rehberi.md). Karar (Eren): koyu modda A "Gece ve Altın",
+ * açık modda C "Karma" (koyu üst bant, aydınlık içerik).
  */
-export const palette = {
-  deep: '#081F24',
-  base: '#0B2B2D',
-  card: '#17464B',
-  cardDark: '#0D3238',
-  edge: '#3F6E70',
-  text: '#C7D8DA',
-  textStrong: '#EEF4F4',
-  textSecondary: '#9FB6B8',
-  textMuted: '#6E8C8E',
-  gold: '#E0B07A',
-  goldDeep: '#D9A066',
-  cyan: '#25C6CF',
-  green: '#10B981',
-  red: '#EF4444',
-} as const;
-
 export const colors = {
   dark: {
-    background: palette.deep,
-    surface: 'rgba(23, 70, 75, 0.75)',
-    surfaceStrong: palette.cardDark,
-    text: palette.text,
-    textStrong: palette.textStrong,
-    textMuted: palette.textSecondary,
-    border: 'rgba(63, 110, 112, 0.4)',
-    primary: palette.gold,
-    onPrimary: palette.deep,
-    accent: palette.gold,
-    accentSoft: 'rgba(224, 176, 122, 0.15)',
-    accentBorder: 'rgba(224, 176, 122, 0.4)',
-    highlight: palette.gold,
-    info: palette.cyan,
-    success: palette.green,
+    background: '#0B2328',
+    surface: '#123238',
+    surfaceStrong: '#163C43',
+    border: 'rgba(255, 255, 255, 0.07)',
+    text: '#EAF1F1',
+    textStrong: '#EAF1F1',
+    textMuted: '#A3B9BB',
+    textSoft: '#7F9799',
+    primary: '#E2B277',
+    onPrimary: '#1A1408',
+    accent: '#E2B277',
+    accentSoft: 'rgba(226, 178, 119, 0.12)',
+    accentBorder: 'rgba(226, 178, 119, 0.4)',
+    icon: '#E2B277',
+    hero: '#0B2328',
+    heroText: '#EAF1F1',
+    heroMuted: '#A3B9BB',
+    heroAccent: '#E2B277',
+    heroChip: 'rgba(255, 255, 255, 0.06)',
+    highlight: '#E2B277',
+    info: '#5FD3DA',
+    success: '#4FD1A5',
+    successSoft: 'rgba(79, 209, 165, 0.12)',
     danger: '#F87171',
+    dangerSoft: 'rgba(248, 113, 113, 0.12)',
+    notice: 'rgba(226, 178, 119, 0.10)',
+    noticeBorder: 'rgba(226, 178, 119, 0.35)',
+    shadow: 'transparent',
   },
-  /**
-   * Açık tema tasarımlarda yok. Eren karar verene kadar kullanılmıyor (docs/stil-rehberi.md, açık soru).
-   */
   light: {
-    background: '#F4F7F7',
+    background: '#F4F5F1',
     surface: '#FFFFFF',
-    surfaceStrong: '#E8EFEF',
-    text: '#132126',
-    textStrong: '#081F24',
-    textMuted: '#4F6468',
-    border: '#D5E0E1',
-    primary: '#0B3C49',
+    surfaceStrong: '#FFFFFF',
+    border: '#E3E8E6',
+    text: '#14262B',
+    textStrong: '#14262B',
+    textMuted: '#56696D',
+    textSoft: '#7A8B8E',
+    primary: '#0E4F57',
     onPrimary: '#FFFFFF',
-    accent: '#A9742F',
-    accentSoft: 'rgba(224, 176, 122, 0.2)',
-    accentBorder: 'rgba(169, 116, 47, 0.5)',
-    highlight: '#A9742F',
-    info: '#0E8C93',
-    success: '#0F7B57',
+    accent: '#0E4F57',
+    accentSoft: '#E3EEEC',
+    accentBorder: 'rgba(14, 79, 87, 0.35)',
+    icon: '#0E4F57',
+    hero: '#0B2E33',
+    heroText: '#F1F5F4',
+    heroMuted: '#A9C0C1',
+    heroAccent: '#E2B277',
+    heroChip: 'rgba(255, 255, 255, 0.08)',
+    highlight: '#B9802F',
+    info: '#0E7C86',
+    success: '#16855F',
+    successSoft: '#E2F3EB',
     danger: '#C0392B',
+    dangerSoft: '#FBE9E7',
+    notice: '#FFF6E8',
+    noticeBorder: '#F0D2A2',
+    shadow: 'rgba(20, 38, 43, 0.08)',
   },
 } as const;
 
+export type ColorScheme = keyof typeof colors;
 export type ThemeColors = { [K in keyof typeof colors.dark]: string };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 } as const;
-export const radius = { sm: 12, md: 16, lg: 20, xl: 24, pill: 999 } as const;
+/** Ekran kenar boşluğu. */
+export const GUTTER = 20;
+export const radius = { sm: 12, md: 14, lg: 18, xl: 24, pill: 999 } as const;
 
 export const fonts = {
   heading: 'PlusJakartaSans_700Bold',
@@ -72,8 +79,6 @@ export const fonts = {
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodySemi: 'Inter_600SemiBold',
-  /** Slogan vurgusu ("Senin Keyfin"). */
-  accentSerif: 'PlayfairDisplay_500Medium_Italic',
 } as const;
 
 /** Dokunma alanı en az 44 nokta (erişilebilirlik). */

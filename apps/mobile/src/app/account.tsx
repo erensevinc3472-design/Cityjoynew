@@ -13,17 +13,23 @@ import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
 import { authService, profileRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
-import { useSettings } from '@/lib/settings';
+import { useSettings, type ThemeMode } from '@/lib/settings';
 import { restartFlow } from '@/lib/navigation';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+
+const APPEARANCE: { mode: ThemeMode; key: string }[] = [
+  { mode: 'system', key: 'account.appearanceSystem' },
+  { mode: 'light', key: 'account.appearanceLight' },
+  { mode: 'dark', key: 'account.appearanceDark' },
+];
 
 export default function AccountScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { user, profile, adopt } = useSession();
-  const { language } = useSettings();
+  const { language, themeMode, setThemeMode } = useSettings();
   const [confirming, setConfirming] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string>();
@@ -58,6 +64,13 @@ export default function AccountScreen() {
 
       <OptionRow title={t('home.changeLanguage')} subtitle={LANGUAGES.find((l) => l.code === language)?.nativeName} showChevron onPress={() => router.push('/language')} />
       <OptionRow title={t('home.changeLocation')} showChevron onPress={() => router.push('/location?edit=1')} />
+
+      <AppText variant="label">{t('account.appearance')}</AppText>
+      <View style={{ gap: spacing.sm }} accessibilityRole="radiogroup" accessibilityLabel={t('account.appearance')}>
+        {APPEARANCE.map((a) => (
+          <OptionRow key={a.mode} title={t(a.key)} selected={themeMode === a.mode} onPress={() => setThemeMode(a.mode)} />
+        ))}
+      </View>
 
       <AppText variant="label">{t('account.legal')}</AppText>
       <OptionRow title={t('account.terms')} showChevron onPress={() => router.push('/legal/terms')} />

@@ -8,8 +8,12 @@ import { deviceStorage } from './storage';
 
 const STORAGE_KEY = 'settings:v1';
 
+/** Görünüm: telefonun ayarına uy ya da açık/koyu sabitle. */
+export type ThemeMode = 'system' | 'light' | 'dark';
+
 interface StoredSettings {
   language: LanguageCode | null;
+  themeMode: ThemeMode;
   location: UserLocation | null;
   /** Kullanıcı konum adımını tamamladı ya da atladı. */
   locationStepDone: boolean;
@@ -21,11 +25,12 @@ interface SettingsContextValue extends StoredSettings {
   rtl: boolean;
   setLanguage(code: LanguageCode): Promise<void>;
   setLocation(location: UserLocation | null): Promise<void>;
+  setThemeMode(mode: ThemeMode): Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
-const EMPTY: StoredSettings = { language: null, location: null, locationStepDone: false };
+const EMPTY: StoredSettings = { language: null, themeMode: 'system', location: null, locationStepDone: false };
 
 function applyDirection(code: LanguageCode) {
   const rtl = isRtl(code);
@@ -85,6 +90,8 @@ export function SettingsProvider({ children }: PropsWithChildren) {
     [persist, settings],
   );
 
+  const setThemeMode = useCallback((themeMode: ThemeMode) => persist({ ...settings, themeMode }), [persist, settings]);
+
   const activeLanguage = settings.language ?? suggestedLanguage;
   const value: SettingsContextValue = {
     ...settings,
@@ -93,6 +100,7 @@ export function SettingsProvider({ children }: PropsWithChildren) {
     rtl: isRtl(activeLanguage),
     setLanguage,
     setLocation,
+    setThemeMode,
   };
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

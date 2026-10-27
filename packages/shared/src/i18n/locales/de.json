@@ -42,17 +42,20 @@
     "changeLocation": "Standort ändern",
     "changeLanguage": "Sprache ändern",
     "comingSoon": "Dieser Bereich wird in der nächsten Phase hinzugefügt.",
-    "account": "Mein Konto"
+    "account": "Mein Konto",
+    "greetingMorning": "Guten Morgen, {{name}}",
+    "greetingDay": "Guten Tag, {{name}}",
+    "greetingEvening": "Guten Abend, {{name}}"
   },
   "modules": {
     "myCity": "Meine Stadt",
     "travel": "Reisen",
     "social": "Soziale Harmonie",
     "urgent": "Dringende Hilfe",
-    "myCityHint": "Lokale Entdeckungen",
+    "myCityHint": "Dienste, Behörden, Verkehr",
     "travelHint": "Routen und Reisen",
-    "socialHint": "Gemeinschaft",
-    "urgentHint": "Schnellzugriff"
+    "socialHint": "Events und Angebote",
+    "urgentHint": "SOS, Apotheken, Nummern"
   },
   "auth": {
     "welcomeTitle": "Willkommen bei CityJoy",
@@ -132,7 +135,11 @@
     "legal": "Rechtliches",
     "terms": "Nutzungsbedingungen",
     "privacy": "Datenschutzhinweise",
-    "neighbourhoodLocked": "Das Viertel kann einmal im Monat geändert werden. Nächste Änderung: {{date}}."
+    "neighbourhoodLocked": "Das Viertel kann einmal im Monat geändert werden. Nächste Änderung: {{date}}.",
+    "appearance": "Darstellung",
+    "appearanceSystem": "Wie am Telefon",
+    "appearanceLight": "Hell",
+    "appearanceDark": "Dunkel"
   },
   "legal": {
     "draftNotice": "Dieser Text wird vorbereitet und vor dem Start von einem Anwalt geprüft."

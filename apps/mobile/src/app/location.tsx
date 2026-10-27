@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { filterByName, nextNeighbourhoodChange, type Neighbourhood, type UserLocation } from '@cityjoy/shared';
 
@@ -11,6 +11,7 @@ import { OptionRow } from '@/components/option-row';
 import { Screen } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
 import { FormMessage } from '@/components/form-message';
+import { HeroHeader } from '@/components/hero-header';
 import { StateMessage } from '@/components/state-message';
 import { locationRepository as repo } from '@/lib/locations';
 import { profileRepository } from '@/lib/services';
@@ -30,7 +31,7 @@ export default function LocationScreen() {
   // Ana sayfa ya da hesap ekranından açıldıysa iş bitince geri dönülür; ilk kurulumda açılış akışı sürer.
   const editing = useLocalSearchParams<{ edit?: string }>().edit === '1';
   const c = useThemeColors();
-  const { setLocation, rtl } = useSettings();
+  const { setLocation } = useSettings();
   const { location } = useUserLocation();
   const { user, profile, refreshProfile } = useSession();
   const [saveError, setSaveError] = useState<string>();
@@ -135,21 +136,16 @@ export default function LocationScreen() {
   const canGoBack = step !== 'province' || (editing && router.canGoBack());
 
   return (
-    <Screen>
-      <View style={styles.header}>
-        {canGoBack ? (
-          <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={goBack} style={styles.back} hitSlop={8}>
-            <MaterialIcons name={rtl ? 'arrow-forward' : 'arrow-back'} size={24} color={c.text} />
-          </Pressable>
-        ) : null}
-        <View style={styles.headerText}>
-          <AppText variant="title">{step === 'province' ? t('location.title') : t(`location.${titleKey[step]}`)}</AppText>
-          {crumbs.length ? <AppText muted>{crumbs.join(' › ')}</AppText> : <AppText muted>{t('location.subtitle')}</AppText>}
-        </View>
-      </View>
-
-      <View style={[styles.notice, { backgroundColor: c.surface, borderColor: c.border }]}>
-        <MaterialIcons name="info-outline" size={20} color={c.info} />
+    <Screen
+      header={
+        <HeroHeader
+          title={step === 'province' ? t('location.title') : t(`location.${titleKey[step]}`)}
+          subtitle={crumbs.length ? crumbs.join(' › ') : t('location.subtitle')}
+          onBack={canGoBack ? goBack : undefined}
+        />
+      }>
+      <View style={[styles.notice, { backgroundColor: c.accentSoft }]}>
+        <MaterialIcons name="info-outline" size={20} color={c.primary} />
         <AppText variant="caption" style={styles.noticeText}>{t('location.fullCapacityWarning')}</AppText>
       </View>
 
@@ -201,10 +197,7 @@ export default function LocationScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingTop: spacing.sm },
-  back: { width: MIN_TOUCH, height: MIN_TOUCH, alignItems: 'center', justifyContent: 'center', marginStart: -spacing.sm },
-  headerText: { flex: 1, gap: spacing.xs },
-  notice: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderRadius: radius.md },
   noticeText: { flex: 1 },
   list: { gap: spacing.sm, paddingVertical: spacing.sm },
   source: { textAlign: 'center', paddingVertical: spacing.md },

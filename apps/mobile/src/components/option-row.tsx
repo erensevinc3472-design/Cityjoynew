@@ -31,6 +31,7 @@ export function OptionRow({ title, subtitle, selected, showChevron, trailing, on
         {
           backgroundColor: selected ? c.accentSoft : c.surface,
           borderColor: selected ? c.accentBorder : c.border,
+          shadowColor: c.shadow,
           opacity: pressed ? 0.85 : 1,
         },
       ]}>
@@ -39,9 +40,9 @@ export function OptionRow({ title, subtitle, selected, showChevron, trailing, on
         {subtitle ? <AppText variant="caption" muted>{subtitle}</AppText> : null}
       </View>
       {trailing}
-      {selected ? <MaterialIcons name="check-circle" size={22} color={c.accent} /> : null}
+      {selected ? <MaterialIcons name="check-circle" size={22} color={c.primary} /> : null}
       {showChevron && !selected ? (
-        <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={24} color={c.textMuted} />
+        <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={24} color={c.textSoft} />
       ) : null}
     </Pressable>
   );
@@ -57,6 +58,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: radius.md,
     borderWidth: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
   },
   texts: { flex: 1, gap: 2 },
 });

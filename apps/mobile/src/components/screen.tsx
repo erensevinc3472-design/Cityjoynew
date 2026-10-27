@@ -1,21 +1,42 @@
-import type { PropsWithChildren } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import type { PropsWithChildren, ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { spacing } from '@/theme/tokens';
-import { useThemeColors } from '@/theme/use-theme';
+import { GUTTER, spacing } from '@/theme/tokens';
+import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
-/** Güvenli alan, arka plan ve geniş ekranlarda (tablet, web) ortalanmış içerik. */
-export function Screen({ children }: PropsWithChildren) {
+interface Props {
+  /** Üst bant içeriği (HeroHeader). Açık modda koyu petrol yeşili, koyu modda zeminle aynı. */
+  header?: ReactNode;
+}
+
+/** Güvenli alan, zemin, üst bant ve geniş ekranlarda (tablet, web) ortalanmış içerik. */
+export function Screen({ header, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
+  const scheme = useResolvedScheme();
+  const insets = useSafeAreaInsets();
+  // Üst bant her iki modda da koyu: durum çubuğu yazısı açık renk.
+  const statusStyle = header || scheme === 'dark' ? 'light' : 'dark';
+
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: c.background }]} edges={['top', 'bottom', 'left', 'right']}>
-      <View style={styles.inner}>{children}</View>
-    </SafeAreaView>
+    <View style={[styles.root, { backgroundColor: c.background }]}>
+      <StatusBar style={statusStyle} />
+      {header ? (
+        <View style={[styles.band, { backgroundColor: c.hero, paddingTop: insets.top + spacing.sm }]}>
+          <View style={styles.inner}>{header}</View>
+        </View>
+      ) : (
+        <View style={{ height: insets.top }} />
+      )}
+      <View style={[styles.inner, styles.body, { paddingBottom: insets.bottom }]}>{children}</View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, alignItems: 'center' },
-  inner: { flex: 1, width: '100%', maxWidth: 640, paddingHorizontal: spacing.md, paddingTop: spacing.md, gap: spacing.md },
+  root: { flex: 1 },
+  band: { alignItems: 'center', paddingBottom: spacing.lg },
+  inner: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER },
+  body: { flex: 1, paddingTop: spacing.md, gap: spacing.md },
 });

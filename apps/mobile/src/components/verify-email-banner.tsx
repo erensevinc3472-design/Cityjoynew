@@ -31,7 +31,7 @@ export function VerifyEmailBanner() {
   };
 
   return (
-    <View style={[styles.box, { backgroundColor: c.surface, borderColor: c.accentBorder }]} accessibilityLiveRegion="polite">
+    <View style={[styles.box, { backgroundColor: c.notice, borderColor: c.noticeBorder }]} accessibilityLiveRegion="polite">
       <AppText>{t('verify.banner', { email: user.email })}</AppText>
       {note ? <AppText variant="caption" muted>{note}</AppText> : null}
       <View style={styles.row}>

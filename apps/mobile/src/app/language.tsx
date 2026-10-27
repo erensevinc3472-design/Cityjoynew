@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { LANGUAGES, type LanguageCode } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
-import { AppText } from '@/components/app-text';
+import { HeroHeader } from '@/components/hero-header';
 import { OptionRow } from '@/components/option-row';
 import { Screen } from '@/components/screen';
 import { profileRepository } from '@/lib/services';
@@ -54,11 +54,7 @@ export default function LanguageScreen() {
   };
 
   return (
-    <Screen>
-      <View style={styles.header}>
-        <AppText variant="title">{t('language.title')}</AppText>
-        <AppText muted>{t('language.subtitle')}</AppText>
-      </View>
+    <Screen header={<HeroHeader title={t('language.title')} subtitle={t('language.subtitle')} onBack={router.canGoBack() ? () => router.back() : undefined} />}>
       <FlatList
         data={LANGUAGES}
         keyExtractor={(l) => l.code}
@@ -80,7 +76,6 @@ export default function LanguageScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: spacing.xs, paddingTop: spacing.lg },
   list: { gap: spacing.sm, paddingVertical: spacing.sm },
   footer: { paddingBottom: spacing.md },
 });

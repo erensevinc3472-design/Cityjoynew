@@ -42,17 +42,20 @@
     "changeLocation": "Konum değiştir",
     "changeLanguage": "Dili değiştir",
     "comingSoon": "Bu bölüm sonraki aşamada eklenecek.",
-    "account": "Hesabım"
+    "account": "Hesabım",
+    "greetingMorning": "Günaydın, {{name}}",
+    "greetingDay": "İyi günler, {{name}}",
+    "greetingEvening": "İyi akşamlar, {{name}}"
   },
   "modules": {
     "myCity": "Benim Şehrim",
     "travel": "Seyahat",
     "social": "Sosyal Harmoni",
     "urgent": "Acil İhtiyaçlar",
-    "myCityHint": "Yerel keşifler",
+    "myCityHint": "Hizmetler, kurumlar, ulaşım",
     "travelHint": "Rotalar ve yolculuk",
-    "socialHint": "Topluluk",
-    "urgentHint": "Hızlı erişim"
+    "socialHint": "Etkinlik ve fırsatlar",
+    "urgentHint": "SOS, eczane, numaralar"
   },
   "auth": {
     "welcomeTitle": "CityJoy'a hoş geldin",
@@ -132,7 +135,11 @@
     "legal": "Yasal metinler",
     "terms": "Kullanım şartları",
     "privacy": "Aydınlatma metni",
-    "neighbourhoodLocked": "Mahalle ayda bir kez değiştirilebilir. Bir sonraki değişiklik: {{date}}."
+    "neighbourhoodLocked": "Mahalle ayda bir kez değiştirilebilir. Bir sonraki değişiklik: {{date}}.",
+    "appearance": "Görünüm",
+    "appearanceSystem": "Telefonun ayarına göre",
+    "appearanceLight": "Açık",
+    "appearanceDark": "Koyu"
   },
   "legal": {
     "draftNotice": "Bu metin hazırlanıyor. Yayından önce avukat tarafından kontrol edilecek."

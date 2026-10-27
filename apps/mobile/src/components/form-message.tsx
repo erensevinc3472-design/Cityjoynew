@@ -8,12 +8,12 @@ import { AppText } from './app-text';
 /** Formun üstünde ya da altında gösterilen hata / bilgi kutusu. */
 export function FormMessage({ kind, text }: { kind: 'error' | 'info'; text: string }) {
   const c = useThemeColors();
-  const color = kind === 'error' ? c.danger : c.info;
+  const color = kind === 'error' ? c.danger : c.primary;
   return (
     <View
       accessibilityRole={kind === 'error' ? 'alert' : undefined}
       accessibilityLiveRegion="polite"
-      style={[styles.box, { backgroundColor: c.surface, borderColor: color }]}>
+      style={[styles.box, { backgroundColor: kind === 'error' ? c.dangerSoft : c.accentSoft, borderColor: kind === 'error' ? c.danger : c.accentBorder }]}>
       <MaterialIcons name={kind === 'error' ? 'error-outline' : 'info-outline'} size={20} color={color} />
       <AppText variant="caption" style={[styles.text, { color: kind === 'error' ? c.danger : c.text }]}>{text}</AppText>
     </View>

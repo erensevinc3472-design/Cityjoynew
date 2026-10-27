@@ -42,17 +42,20 @@
     "changeLocation": "Change location",
     "changeLanguage": "Change language",
     "comingSoon": "This section will be added in the next stage.",
-    "account": "My account"
+    "account": "My account",
+    "greetingMorning": "Good morning, {{name}}",
+    "greetingDay": "Good afternoon, {{name}}",
+    "greetingEvening": "Good evening, {{name}}"
   },
   "modules": {
     "myCity": "My City",
     "travel": "Travel",
     "social": "Social Harmony",
     "urgent": "Urgent Needs",
-    "myCityHint": "Local discoveries",
+    "myCityHint": "Services, institutions, transport",
     "travelHint": "Routes and trips",
-    "socialHint": "Community",
-    "urgentHint": "Quick access"
+    "socialHint": "Events and deals",
+    "urgentHint": "SOS, pharmacies, numbers"
   },
   "auth": {
     "welcomeTitle": "Welcome to CityJoy",
@@ -132,7 +135,11 @@
     "legal": "Legal",
     "terms": "Terms of use",
     "privacy": "Privacy notice",
-    "neighbourhoodLocked": "Your neighbourhood can be changed once a month. Next change: {{date}}."
+    "neighbourhoodLocked": "Your neighbourhood can be changed once a month. Next change: {{date}}.",
+    "appearance": "Appearance",
+    "appearanceSystem": "Match phone setting",
+    "appearanceLight": "Light",
+    "appearanceDark": "Dark"
   },
   "legal": {
     "draftNotice": "This text is being prepared and will be reviewed by a lawyer before launch."

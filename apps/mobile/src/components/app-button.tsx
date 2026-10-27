@@ -18,7 +18,7 @@ export function AppButton({ title, onPress, variant = 'primary', disabled, loadi
   // Ana: altın zemin; ikincil: kart zemini + altın kenarlık; metin: yalnızca altın yazı.
   const bg = variant === 'primary' ? c.primary : variant === 'secondary' ? c.surface : 'transparent';
   const fg = variant === 'primary' ? c.onPrimary : c.primary;
-  const borderColor = variant === 'secondary' ? c.accentBorder : 'transparent';
+  const borderColor = variant === 'secondary' ? c.border : 'transparent';
 
   return (
     <Pressable

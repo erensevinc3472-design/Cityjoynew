@@ -29,7 +29,7 @@ export function TextField({ label, error, hint, ...input }: Props) {
           {
             color: c.textStrong,
             backgroundColor: c.surfaceStrong,
-            borderColor: error ? c.danger : focused ? c.accent : c.border,
+            borderColor: error ? c.danger : focused ? c.primary : c.border,
             textAlign: rtl ? 'right' : 'left',
           },
         ]}

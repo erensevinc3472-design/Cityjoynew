@@ -42,17 +42,20 @@
     "changeLocation": "تغيير الموقع",
     "changeLanguage": "تغيير اللغة",
     "comingSoon": "سيُضاف هذا القسم في المرحلة القادمة.",
-    "account": "حسابي"
+    "account": "حسابي",
+    "greetingMorning": "صباح الخير، {{name}}",
+    "greetingDay": "نهارك سعيد، {{name}}",
+    "greetingEvening": "مساء الخير، {{name}}"
   },
   "modules": {
     "myCity": "مدينتي",
     "travel": "السفر",
     "social": "الانسجام الاجتماعي",
     "urgent": "الاحتياجات العاجلة",
-    "myCityHint": "اكتشافات محلية",
+    "myCityHint": "الخدمات والمؤسسات والمواصلات",
     "travelHint": "مسارات ورحلات",
-    "socialHint": "المجتمع",
-    "urgentHint": "وصول سريع"
+    "socialHint": "فعاليات وعروض",
+    "urgentHint": "الطوارئ والصيدليات والأرقام"
   },
   "auth": {
     "welcomeTitle": "مرحبًا بك في CityJoy",
@@ -132,7 +135,11 @@
     "legal": "النصوص القانونية",
     "terms": "شروط الاستخدام",
     "privacy": "إشعار الخصوصية",
-    "neighbourhoodLocked": "يمكن تغيير الحي مرة واحدة في الشهر. التغيير التالي: {{date}}."
+    "neighbourhoodLocked": "يمكن تغيير الحي مرة واحدة في الشهر. التغيير التالي: {{date}}.",
+    "appearance": "المظهر",
+    "appearanceSystem": "حسب إعداد الهاتف",
+    "appearanceLight": "فاتح",
+    "appearanceDark": "داكن"
   },
   "legal": {
     "draftNotice": "هذا النص قيد الإعداد وسيراجعه محامٍ قبل الإطلاق."

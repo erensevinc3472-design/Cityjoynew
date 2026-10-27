@@ -1,12 +1,13 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useState, type ComponentProps } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { HeroHeader, LocationChip } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { VerifyEmailBanner } from '@/components/verify-email-banner';
 import { locationRepository as repo } from '@/lib/locations';
@@ -16,21 +17,30 @@ import { useUserLocation } from '@/lib/user-location';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
-const MODULES = [
+type IconName = ComponentProps<typeof MaterialIcons>['name'];
+
+const MODULES: { key: string; icon: IconName; urgent?: boolean }[] = [
   { key: 'myCity', icon: 'location-city' },
   { key: 'travel', icon: 'explore' },
   { key: 'social', icon: 'groups' },
-  { key: 'urgent', icon: 'emergency' },
-] as const;
+  { key: 'urgent', icon: 'emergency', urgent: true },
+];
 
-/** Ana sayfa (tasarım: anasayfa.html). Modüller sonraki aşamalarda bağlanacak. */
+function greetingKey(now = new Date()) {
+  const h = now.getHours();
+  if (h >= 5 && h < 12) return 'home.greetingMorning';
+  if (h >= 12 && h < 18) return 'home.greetingDay';
+  return 'home.greetingEvening';
+}
+
+/** Ana sayfa. Modüller sonraki aşamalarda bağlanacak. */
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { language, rtl } = useSettings();
+  const { language } = useSettings();
   const { location } = useUserLocation();
-  const { user } = useSession();
+  const { user, profile } = useSession();
   const [neighbourhoodName, setNeighbourhoodName] = useState<string>();
 
   useEffect(() => {
@@ -48,54 +58,46 @@ export default function HomeScreen() {
     : [];
   const locationText = parts.filter(Boolean).join(', ') || t('home.noLocation');
   const languageName = LANGUAGES.find((l) => l.code === language)?.nativeName;
-  // "Senin Keşfin, Senin Keyfin": ikinci yarı altın italik (tasarımdaki gibi).
+  const firstName = (profile?.displayName ?? user?.displayName ?? '').trim().split(/\s+/)[0];
+  // "Senin Keşfin, Senin Keyfin": ikinci yarı altın.
   const [sloganLead, sloganAccent] = t('home.slogan').split(/[,،]\s*/);
 
+  const header = (
+    <HeroHeader
+      title="CityJoy"
+      right={user ? { icon: 'person-outline', label: t('home.account'), onPress: () => router.push('/account') } : undefined}>
+      <View style={styles.heroText}>
+        {firstName ? <AppText style={{ color: c.heroMuted }}>{t(greetingKey(), { name: firstName })}</AppText> : null}
+        <AppText accessibilityRole="header" style={[styles.slogan, { color: c.heroText }]}>
+          {sloganLead}
+          {sloganAccent ? ', ' : ''}
+          {sloganAccent ? <AppText style={[styles.slogan, { color: c.heroAccent }]}>{sloganAccent}</AppText> : null}
+        </AppText>
+      </View>
+      <LocationChip label={locationText} onPress={() => router.push('/location?edit=1')} />
+    </HeroHeader>
+  );
+
   return (
-    <Screen>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.topBar}>
-          <AppText variant="label" style={[styles.brand, { color: c.textStrong }]}>CityJoy</AppText>
-          {user ? (
-            <Pressable accessibilityRole="button" accessibilityLabel={t('home.account')} onPress={() => router.push('/account')} style={[styles.round, { borderColor: c.border, backgroundColor: c.surface }]}>
-              <MaterialIcons name="person-outline" size={22} color={c.textStrong} />
-            </Pressable>
-          ) : null}
-        </View>
-
-        <View style={styles.hero} accessible accessibilityRole="header" accessibilityLabel={t('home.slogan')}>
-          <AppText style={[styles.sloganLead, { color: c.textStrong }]}>{sloganLead}{sloganAccent ? ',' : ''}</AppText>
-          {sloganAccent ? <AppText style={[styles.sloganAccent, { color: c.accent }]}>{sloganAccent}</AppText> : null}
-        </View>
-
-        <Pressable accessibilityRole="button" accessibilityLabel={`${t('home.yourLocation')}: ${locationText}. ${t('home.changeLocation')}`} onPress={() => router.push('/location?edit=1')} style={styles.locationRow}>
-          <MaterialIcons name="place" size={18} color={c.accent} />
-          <AppText variant="label" style={styles.locationText}>{locationText}</AppText>
-          <MaterialIcons name="edit" size={16} color={c.textMuted} />
-        </Pressable>
-
+    <Screen header={header}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <VerifyEmailBanner />
-
-        <View style={styles.modules}>
+        <View style={styles.grid}>
           {MODULES.map((m) => (
             <View
               key={m.key}
               accessible
               accessibilityLabel={`${t(`modules.${m.key}`)}. ${t('home.comingSoon')}`}
-              style={[styles.module, { backgroundColor: c.surface, borderColor: c.border }]}>
-              <View style={[styles.icon, { borderColor: c.accentBorder, backgroundColor: c.accentSoft }]}>
-                <MaterialIcons name={m.icon} size={22} color={c.accent} />
+              style={[styles.module, { backgroundColor: c.surface, borderColor: c.border, shadowColor: c.shadow }]}>
+              <View style={[styles.icon, { backgroundColor: m.urgent ? c.dangerSoft : c.accentSoft }]}>
+                <MaterialIcons name={m.icon} size={22} color={m.urgent ? c.danger : c.icon} />
               </View>
-              <View style={styles.flex}>
-                <AppText variant="label" style={{ color: c.textStrong }}>{t(`modules.${m.key}`)}</AppText>
-                <AppText variant="caption" muted style={styles.hint}>{t(`modules.${m.key}Hint`)}</AppText>
-              </View>
-              <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={22} color={c.textMuted} />
+              <AppText style={[styles.moduleTitle, { color: c.textStrong }]}>{t(`modules.${m.key}`)}</AppText>
+              <AppText variant="caption" muted>{t(`modules.${m.key}Hint`)}</AppText>
             </View>
           ))}
         </View>
         <AppText variant="caption" muted style={styles.center}>{t('home.comingSoon')}</AppText>
-
         <AppButton variant="ghost" title={`${t('home.changeLanguage')} · ${languageName}`} onPress={() => router.push('/language')} />
       </ScrollView>
     </Screen>
@@ -103,19 +105,23 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.lg, paddingBottom: spacing.xl },
-  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48 },
-  brand: { letterSpacing: 3, fontFamily: fonts.heading },
-  round: { width: 44, height: 44, borderRadius: radius.pill, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  hero: { alignItems: 'center', paddingTop: spacing.md },
-  sloganLead: { fontFamily: fonts.heading, fontSize: 30, lineHeight: 38, textAlign: 'center' },
-  sloganAccent: { fontFamily: fonts.accentSerif, fontSize: 32, lineHeight: 40, textAlign: 'center' },
-  locationRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, minHeight: 44 },
-  locationText: { flexShrink: 1, textAlign: 'center' },
-  modules: { gap: spacing.sm },
-  module: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.lg, borderWidth: 1 },
-  icon: { width: 44, height: 44, borderRadius: radius.pill, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  hint: { textTransform: 'uppercase', letterSpacing: 1, fontSize: 11 },
-  flex: { flex: 1 },
+  content: { gap: spacing.md, paddingBottom: spacing.xl },
+  heroText: { gap: 2 },
+  slogan: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 33 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  module: {
+    flexGrow: 1,
+    flexBasis: '45%',
+    minHeight: 132,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: spacing.md,
+    gap: spacing.xs,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+  },
+  icon: { width: 42, height: 42, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
+  moduleTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 22 },
   center: { textAlign: 'center' },
 });

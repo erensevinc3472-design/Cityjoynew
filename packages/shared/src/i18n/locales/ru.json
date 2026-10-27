@@ -42,17 +42,20 @@
     "changeLocation": "Изменить местоположение",
     "changeLanguage": "Изменить язык",
     "comingSoon": "Этот раздел будет добавлен на следующем этапе.",
-    "account": "Мой аккаунт"
+    "account": "Мой аккаунт",
+    "greetingMorning": "Доброе утро, {{name}}",
+    "greetingDay": "Добрый день, {{name}}",
+    "greetingEvening": "Добрый вечер, {{name}}"
   },
   "modules": {
     "myCity": "Мой город",
     "travel": "Путешествия",
     "social": "Социальная гармония",
     "urgent": "Срочные нужды",
-    "myCityHint": "Местные открытия",
+    "myCityHint": "Услуги, учреждения, транспорт",
     "travelHint": "Маршруты и поездки",
-    "socialHint": "Сообщество",
-    "urgentHint": "Быстрый доступ"
+    "socialHint": "События и предложения",
+    "urgentHint": "SOS, аптеки, номера"
   },
   "auth": {
     "welcomeTitle": "Добро пожаловать в CityJoy",
@@ -132,7 +135,11 @@
     "legal": "Правовые документы",
     "terms": "Условия использования",
     "privacy": "Уведомление о конфиденциальности",
-    "neighbourhoodLocked": "Квартал можно менять раз в месяц. Следующее изменение: {{date}}."
+    "neighbourhoodLocked": "Квартал можно менять раз в месяц. Следующее изменение: {{date}}.",
+    "appearance": "Оформление",
+    "appearanceSystem": "Как на телефоне",
+    "appearanceLight": "Светлое",
+    "appearanceDark": "Тёмное"
   },
   "legal": {
     "draftNotice": "Этот текст готовится и перед запуском будет проверен юристом."
