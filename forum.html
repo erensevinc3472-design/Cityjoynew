@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Forum - Bursa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                "darkest": "#081F24",
+                "main-bg": "#0D3238",
+                "card-bg": "#17464B",
+                "card-glow": "#1F5055",
+                "gold-primary": "#E0B07A",
+                "gold-nav": "#F0B36F",
+                "nav-bg": "#0A2A2F",
+                "nav-passive": "#6E8C8E",
+                "text-secondary": "#C7D8DA",
+                "text-desc": "#9FB6B8",
+                "border-subtle": "#3F6E70",
+                "accent-blue": "#4A90A4",
+                "accent-teal": "#2D8A8A",
+                "accent-purple": "#8B5CF6",
+                "accent-pink": "#EC4899",
+                "accent-green": "#10B981",
+                "warning": "#f97316",
+                "success": "#22c55e",
+                "info": "#3b82f6",
+            },
+            fontFamily: {
+                "display": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            animation: {
+                "fade-in": "fadeIn 0.4s ease-out",
+                "slide-up": "slideUp 0.5s ease-out",
+                "pulse-glow": "pulseGlow 3s infinite",
+                "shimmer": "shimmer 2.5s infinite",
+                "bounce-slow": "bounceSlow 2s infinite",
+                "float": "float 3s ease-in-out infinite",
+                "pulse-dot": "pulseDot 2s infinite",
+            },
+            keyframes: {
+                fadeIn: {
+                    "0%": { opacity: "0" },
+                    "100%": { opacity: "1" },
+                },
+                slideUp: {
+                    "0%": { opacity: "0", transform: "translateY(20px)" },
+                    "100%": { opacity: "1", transform: "translateY(0)" },
+                },
+                pulseGlow: {
+                    "0%, 100%": { boxShadow: "0 0 10px rgba(224, 176, 122, 0.3)" },
+                    "50%": { boxShadow: "0 0 20px rgba(224, 176, 122, 0.6)" },
+                },
+                shimmer: {
+                    "0%": { backgroundPosition: "-200% 0" },
+                    "100%": { backgroundPosition: "200% 0" },
+                },
+                bounceSlow: {
+                    "0%, 100%": { transform: "translateY(0)" },
+                    "50%": { transform: "translateY(-5px)" },
+                },
+                float: {
+                    "0%, 100%": { transform: "translateY(0)" },
+                    "50%": { transform: "translateY(-10px)" },
+                },
+                pulseDot: {
+                    "0%, 100%": { transform: "scale(1)", opacity: "1" },
+                    "50%": { transform: "scale(1.2)", opacity: "0.8" },
+                },
+            }
+        },
+    },
+};
+</script>
+<style type="text/tailwindcss">
+    @layer utilities {
+        .glass-panel {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+        }
+        .glass-panel-hover:hover {
+            background: rgba(23, 70, 75, 0.8);
+            border-color: rgba(224, 176, 122, 0.3);
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(224, 176, 122, 0.3);
+        }
+        .forum-card {
+            background: linear-gradient(135deg, rgba(23, 70, 75, 0.4) 0%, rgba(8, 31, 36, 0.6) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .forum-card:active {
+            transform: scale(0.98);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.9) 0%, rgba(224, 176, 122, 0.7) 100%);
+            color: #081F24;
+            box-shadow: 0 2px 10px rgba(224, 176, 122, 0.3);
+        }
+        .tab-passive {
+            background: rgba(23, 70, 75, 0.3);
+            color: #9FB6B8;
+            border: 1px solid rgba(63, 110, 112, 0.2);
+        }
+        .category-pill {
+            background: rgba(224, 176, 122, 0.1);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            color: #E0B07A;
+        }
+        .category-pill.active {
+            background: rgba(224, 176, 122, 0.9);
+            color: #081F24;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .vote-btn {
+            transition: all 0.2s ease;
+        }
+        .vote-btn.active {
+            color: #E0B07A;
+            background: rgba(224, 176, 122, 0.15);
+        }
+        .vote-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .hot-topic {
+            position: relative;
+        }
+        .hot-topic::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: linear-gradient(to bottom, #E0B07A, transparent);
+            border-radius: 0 2px 2px 0;
+        }
+        .rank-badge {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.2) 0%, rgba(224, 176, 122, 0.05) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+        }
+        .trending-tag {
+            animation: tagPulse 2s infinite;
+        }
+        @keyframes tagPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(224, 176, 122, 0.4); }
+            50% { box-shadow: 0 0 0 4px rgba(224, 176, 122, 0); }
+        }
+        .mention {
+            color: #E0B07A;
+            background: rgba(224, 176, 122, 0.1);
+            padding: 0 4px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .hashtag {
+            color: #4A90A4;
+        }
+        .streak-flame {
+            animation: flame 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6));
+        }
+        @keyframes flame {
+            0%, 100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+            50% { transform: scale(1.1) rotate(2deg); opacity: 0.9; }
+        }
+        .coin-spin {
+            animation: coinSpin 2s linear infinite;
+        }
+        @keyframes coinSpin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        .xp-bar {
+            background: linear-gradient(90deg, #E0B07A 0%, #F0B36F 100%);
+            box-shadow: 0 0 10px rgba(224, 176, 122, 0.5);
+        }
+    }
+</style>
+<base target="_blank">
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden max-w-md mx-auto min-h-screen relative shadow-2xl">
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 max-w-md mx-auto flex items-center justify-between px-4 py-3 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/20">
+    <div class="flex items-center gap-3">
+        <button onclick="goBack()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+            <span class="material-symbols-outlined text-base text-white">arrow_back</span>
+        </button>
+        <div class="flex flex-col">
+            <span class="text-[9px] text-gold-primary tracking-wider uppercase">Bursa</span>
+            <h1 class="text-base font-bold tracking-tight text-white leading-none">Forum</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-gold-primary/10 border border-gold-primary/30">
+            <span class="material-symbols-outlined text-gold-primary text-sm coin-spin">monetization_on</span>
+            <span class="text-xs font-bold text-gold-primary" id="user-coins">2,450</span>
+        </div>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all relative">
+            <span class="material-symbols-outlined text-gold-primary text-base">notifications</span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-pink rounded-full animate-pulse"></span>
+        </button>
+    </div>
+</header>
+
+<!-- User Stats & Quick Actions -->
+<section class="relative mt-[52px] bg-gradient-to-b from-main-bg to-darkest pb-4">
+    <div class="px-4 pt-4">
+        <!-- User Level Card -->
+        <div class="glass-panel rounded-2xl p-4 mb-4">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-gold-primary/30 to-gold-primary/10 flex items-center justify-center border-2 border-gold-primary/30">
+                        <span class="text-2xl">👑</span>
+                        <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-success flex items-center justify-center text-[8px] font-bold border-2 border-darkest">15</div>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-sm font-bold text-white">Forum Lideri</h3>
+                        <span class="text-[10px] text-gold-primary">Seviye 15</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <div class="xp-bar h-full rounded-full" style="width: 65%"></div>
+                        </div>
+                        <span class="text-[9px] text-text-desc">650/1000</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-[10px]">
+                        <span class="flex items-center gap-1 text-text-secondary">
+                            <span class="material-symbols-outlined text-warning text-sm streak-flame">local_fire_department</span>7 Gün
+                        </span>
+                        <span class="text-text-desc">•</span>
+                        <span class="text-text-secondary">42 Konu</span>
+                        <span class="text-text-desc">•</span>
+                        <span class="text-text-secondary">156 Yorum</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Challenge -->
+        <div class="glass-panel rounded-2xl p-4 mb-4 border-l-4 border-gold-primary">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gold-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary">target</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-white">Günlük Görev</h4>
+                        <p class="text-[10px] text-text-desc">3 yorum yap (1/3)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-gold-primary">+30</span>
+                    <span class="material-symbols-outlined text-gold-primary text-sm">stars</span>
+                </div>
+            </div>
+            <div class="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full bg-gold-primary rounded-full transition-all" style="width: 33%"></div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-4 gap-2 mb-4">
+            <button onclick="showNewTopicModal()" class="col-span-2 py-3 bg-gold-primary text-darkest rounded-xl font-bold text-xs uppercase tracking-wider active:scale-95 transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-sm">add_circle</span>Yeni Konu
+            </button>
+            <button class="py-3 glass-panel rounded-xl text-text-secondary text-xs font-bold active:scale-95 transition-all flex flex-col items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-lg">search</span>
+                <span class="text-[9px]">Ara</span>
+            </button>
+            <button class="py-3 glass-panel rounded-xl text-text-secondary text-xs font-bold active:scale-95 transition-all flex flex-col items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-lg">bookmark</span>
+                <span class="text-[9px]">Kaydedilen</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24">
+    <div class="px-4 pt-2">
+        
+        <!-- Filter Tabs -->
+        <div class="flex justify-center mb-4">
+            <div class="glass-panel rounded-full p-1 flex gap-1">
+                <button id="btn-trending" onclick="switchTab('trending')" class="tab-active px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">trending_up</span>Trend
+                </button>
+                <button id="btn-latest" onclick="switchTab('latest')" class="tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">schedule</span>Yeni
+                </button>
+                <button id="btn-following" onclick="switchTab('following')" class="tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">person_add</span>Takip
+                </button>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="mb-4">
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                <button onclick="filterCategory('all')" class="category-pill active px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="all">Tümü</button>
+                <button onclick="filterCategory('general')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="general">Genel</button>
+                <button onclick="filterCategory('suggestions')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="suggestions">Öneriler</button>
+                <button onclick="filterCategory('events')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="events">Etkinlikler</button>
+                <button onclick="filterCategory('help')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="help">Yardım</button>
+            </div>
+        </div>
+
+        <!-- Hot Topics -->
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">local_fire_department</span>Gündemdeki Konular
+                </h3>
+                <button class="text-[10px] text-gold-primary">Tümü →</button>
+            </div>
+            <div class="space-y-2">
+                <div class="hot-topic forum-card rounded-xl p-3 pl-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-accent-purple/20 flex items-center justify-center shrink-0">
+                            <span class="text-sm">🔥</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-white truncate">Uludağ'da kayak sezonu açıldı!</h4>
+                            <p class="text-[10px] text-text-desc mt-0.5 line-clamp-1">Bu sene kar kalitesi harika, gitmeyi planlayanlar...</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <span class="text-[9px] text-text-desc flex items-center gap-0.5">
+                                    <span class="material-symbols-outlined text-[10px]">person</span>Ahmet Y.
+                                </span>
+                                <span class="text-[9px] text-text-desc">•</span>
+                                <span class="text-[9px] text-text-desc">2 saat önce</span>
+                                <span class="text-[9px] text-gold-primary ml-auto">+24</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hot-topic forum-card rounded-xl p-3 pl-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-accent-teal/20 flex items-center justify-center shrink-0">
+                            <span class="text-sm">🚇</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-white truncate">Metro saatleri uzatılmalı</h4>
+                            <p class="text-[10px] text-text-desc mt-0.5 line-clamp-1">Gece çalışanlar için son sefer saati çok erken...</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <span class="text-[9px] text-text-desc flex items-center gap-0.5">
+                                    <span class="material-symbols-outlined text-[10px]">person</span>Selin K.
+                                </span>
+                                <span class="text-[9px] text-text-desc">•</span>
+                                <span class="text-[9px] text-text-desc">4 saat önce</span>
+                                <span class="text-[9px] text-gold-primary ml-auto">+18</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forum Topics -->
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-white">Son Konular</h3>
+                <span class="text-[10px] text-text-desc" id="topic-count">24 konu</span>
+            </div>
+            <div id="topics-container" class="space-y-3">
+                <!-- Topics injected by JS -->
+            </div>
+        </div>
+
+        <!-- Load More -->
+        <div class="text-center pt-2">
+            <button class="px-6 py-2.5 glass-panel rounded-full text-text-desc text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all">Daha Fazla</button>
+        </div>
+    </div>
+</main>
+
+<!-- Topic Detail Modal -->
+<div id="topic-modal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-darkest/98 backdrop-blur-lg modal-backdrop opacity-0 transition-opacity duration-300" onclick="closeTopicModal()"></div>
+    <div class="absolute inset-0 overflow-y-auto modal-content translate-y-full transition-transform duration-400" style="transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);">
+        <button onclick="closeTopicModal()" class="fixed top-3 right-3 z-50 w-8 h-8 rounded-full bg-black/40 backdrop-blur flex items-center justify-center active:scale-95">
+            <span class="material-symbols-outlined text-white text-lg">close</span>
+        </button>
+        <div id="topic-content" class="min-h-screen pb-20">
+            <!-- Topic content injected by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- New Topic Modal -->
+<div id="new-topic-modal" class="fixed inset-0 z-[70] hidden items-end">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeNewTopicModal()"></div>
+    <div class="relative bg-darkest rounded-t-3xl w-full max-h-[90vh] overflow-hidden transform translate-y-full transition-transform duration-300" id="new-topic-content">
+        <div class="w-12 h-1 bg-white/20 rounded-full mx-auto mt-3 mb-4"></div>
+        <div class="px-4 pb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-white">Yeni Konu Aç</h3>
+                <button onclick="closeNewTopicModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-text-desc mb-1 block">Başlık</label>
+                    <input type="text" id="topic-title" placeholder="Konu başlığı yaz..." class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-primary/50">
+                </div>
+                <div>
+                    <label class="text-xs text-text-desc mb-1 block">Kategori</label>
+                    <div class="flex gap-2 flex-wrap">
+                        <button class="category-pill active px-3 py-1.5 rounded-full text-[10px] font-bold" data-cat="general">Genel</button>
+                        <button class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold" data-cat="suggestions">Öneri</button>
+                        <button class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold" data-cat="events">Etkinlik</button>
+                        <button class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold" data-cat="help">Yardım</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-text-desc mb-1 block">İçerik</label>
+                    <textarea id="topic-body" rows="6" placeholder="Düşüncelerini paylaş..." class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-primary/50 resize-none"></textarea>
+                </div>
+                <div class="flex items-center gap-2 p-3 rounded-xl bg-white/5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">info</span>
+                    <p class="text-[10px] text-text-desc">Kaliteli içerik +50 XP kazandırır. Spam veya uygunsuz içerik ceza aldırır.</p>
+                </div>
+                <button onclick="submitTopic()" class="w-full py-3 bg-gold-primary text-darkest rounded-xl font-bold text-sm uppercase active:scale-95 transition-all">Yayınla</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex items-center justify-around px-6 py-2 bg-nav-bg/95 backdrop-blur-md border-t border-border-subtle/30 pb-5 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="anasayfa.html">
+        <span class="material-symbols-outlined text-xl">home</span>
+        <span class="text-[8px] font-medium">Ana sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-primary nav-glow-gold" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-xl">explore</span>
+        <span class="text-[8px] font-medium">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="ara.html">
+        <span class="material-symbols-outlined text-xl">search</span>
+        <span class="text-[8px] font-medium">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary relative" href="forum.html">
+        <span class="material-symbols-outlined text-xl">forum</span>
+        <span class="absolute -top-1 -right-1 w-4 h-4 bg-accent-pink rounded-full text-[8px] font-bold flex items-center justify-center text-white">5</span>
+        <span class="text-[8px] font-medium">Forum</span>
+    </a>
+</nav>
+
+<script>
+const topicsData = [
+    {
+        id: 1,
+        title: "Bursa'ya yeni gelenlere tavsiyeler",
+        author: {name: "Mehmet A.", avatar: "https://i.pravatar.cc/150?img=3", level: 12},
+        category: "general",
+        content: "Merhaba arkadaşlar, Bursa'ya 2 ay önce taşındım. Sizden yerel tavsiyeler almak istiyorum. Özellikle keşfedilmemiş mekanlar...",
+        likes: 45,
+        comments: 23,
+        views: 342,
+        time: "3 saat önce",
+        tags: ["#yenigelen", "#tavsiye"],
+        isHot: true
+    },
+    {
+        id: 2,
+        title: "İnegöl köftesi için en iyi adres?",
+        author: {name: "Ayşe K.", avatar: "https://i.pravatar.cc/150?img=5", level: 8},
+        category: "general",
+        content: "Arkadaşlarımla İnegöl'e gidiyoruz. Özgün lezzet arıyoruz, turistik yerler değil...",
+        likes: 32,
+        comments: 18,
+        views: 256,
+        time: "5 saat önce",
+        tags: ["#yemek", "#inegol"]
+    },
+    {
+        id: 3,
+        title: "Toplu taşımada yeni dönem önerileri",
+        author: {name: "Burak T.", avatar: "https://i.pravatar.cc/150?img=8", level: 15, badge: "Ulaşım Uzmanı"},
+        category: "suggestions",
+        content: "Belediyeye iletilmek üzere bir rapor hazırlıyorum. Sizin önerileriniz neler?",
+        likes: 67,
+        comments: 41,
+        views: 892,
+        time: "1 gün önce",
+        tags: ["#ulasim", "#oneri", "#belediye"],
+        isHot: true
+    },
+    {
+        id: 4,
+        title: "Cumartesi piknik için yer önerisi",
+        author: {name: "Zeynep M.", avatar: "https://i.pravatar.cc/150?img=9", level: 6},
+        category: "events",
+        content: "Ailecek piknik yapabileceğimiz, çocukların rahat oynayabileceği yerler...",
+        likes: 28,
+        comments: 15,
+        views: 198,
+        time: "1 gün önce",
+        tags: ["#piknik", "#aile"]
+    },
+    {
+        id: 5,
+        title: "Kütüphane çalışma saatleri hakkında",
+        author: {name: "Can D.", avatar: "https://i.pravatar.cc/150?img=12", level: 9},
+        category: "help",
+        content: "Merkez kütüphanenin hafta sonu açık olup olmadığını bilen var mı?",
+        likes: 12,
+        comments: 8,
+        views: 145,
+        time: "2 gün önce",
+        tags: ["#kutuphane", "#yardim"]
+    }
+];
+
+let currentTab = "trending";
+let currentCategory = "all";
+
+function init() {
+    renderTopics();
+}
+
+function renderTopics() {
+    const container = document.getElementById("topics-container");
+    let filtered = topicsData;
+    
+    if (currentCategory !== "all") {
+        filtered = filtered.filter(t => t.category === currentCategory);
+    }
+    
+    container.innerHTML = filtered.map(topic => createTopicCard(topic)).join("");
+    document.getElementById("topic-count").textContent = filtered.length + " konu";
+}
+
+function createTopicCard(topic) {
+    const categoryColors = {
+        general: "bg-accent-blue/20 text-accent-blue",
+        suggestions: "bg-success/20 text-success",
+        events: "bg-accent-purple/20 text-accent-purple",
+        help: "bg-warning/20 text-warning"
+    };
+    
+    const categoryNames = {
+        general: "Genel",
+        suggestions: "Öneri",
+        events: "Etkinlik",
+        help: "Yardım"
+    };
+    
+    return `
+        <div class="forum-card rounded-xl p-4" onclick="openTopic(${topic.id})">
+            <div class="flex items-start gap-3">
+                <img src="${topic.author.avatar}" class="w-10 h-10 rounded-full border-2 border-white/10" alt="${topic.author.name}"/>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="px-2 py-0.5 rounded text-[9px] font-bold ${categoryColors[topic.category]}">${categoryNames[topic.category]}</span>
+                        ${topic.isHot ? `<span class="text-[9px] text-warning flex items-center gap-0.5"><span class="material-symbols-outlined text-[10px]">local_fire_department</span>Popüler</span>` : ""}
+                        <span class="text-[9px] text-text-desc ml-auto">${topic.time}</span>
+                    </div>
+                    <h4 class="text-sm font-bold text-white leading-tight mb-1">${topic.title}</h4>
+                    <p class="text-[11px] text-text-desc line-clamp-2 mb-2">${topic.content}</p>
+                    <div class="flex items-center gap-3">
+                        <button class="vote-btn flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 text-[10px] text-text-desc" onclick="event.stopPropagation(); toggleVote(this)">
+                            <span class="material-symbols-outlined text-sm">thumb_up</span>
+                            <span>${topic.likes}</span>
+                        </button>
+                        <span class="flex items-center gap-1 text-[10px] text-text-desc">
+                            <span class="material-symbols-outlined text-sm">chat_bubble</span>${topic.comments}
+                        </span>
+                        <span class="flex items-center gap-1 text-[10px] text-text-desc">
+                            <span class="material-symbols-outlined text-sm">visibility</span>${topic.views}
+                        </span>
+                        <div class="ml-auto flex gap-1">
+                            ${topic.tags.map(tag => `<span class="text-[9px] text-accent-blue">${tag}</span>`).join(" ")}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function openTopic(topicId) {
+    const topic = topicsData.find(t => t.id === topicId);
+    const modal = document.getElementById("topic-modal");
+    const content = document.getElementById("topic-content");
+    
+    content.innerHTML = `
+        <div class="p-4 pt-16">
+            <div class="flex items-center gap-3 mb-4">
+                <img src="${topic.author.avatar}" class="w-12 h-12 rounded-full border-2 border-gold-primary/30"/>
+                <div>
+                    <h2 class="text-lg font-bold text-white">${topic.title}</h2>
+                    <div class="flex items-center gap-2 text-[10px] text-text-desc">
+                        <span class="text-gold-primary">${topic.author.name}</span>
+                        <span>•</span>
+                        <span>Seviye ${topic.author.level}</span>
+                        <span>•</span>
+                        <span>${topic.time}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-panel rounded-xl p-4 mb-4">
+                <p class="text-sm text-text-secondary leading-relaxed">${topic.content}</p>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    ${topic.tags.map(tag => `<span class="px-2 py-1 rounded-lg bg-white/5 text-[10px] text-accent-blue">${tag}</span>`).join(" ")}
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <button class="flex-1 py-2 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-sm font-bold flex items-center justify-center gap-2" onclick="toggleVote(this)">
+                    <span class="material-symbols-outlined">thumb_up</span>Beğen (${topic.likes})
+                </button>
+                <button class="flex-1 py-2 glass-panel rounded-xl text-text-secondary text-sm font-bold flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">share</span>Paylaş
+                </button>
+            </div>
+            
+            <div class="space-y-3">
+                <h3 class="text-sm font-bold text-white mb-2">Yorumlar (${topic.comments})</h3>
+                
+                <div class="glass-panel rounded-xl p-3">
+                    <div class="flex gap-3">
+                        <img src="https://i.pravatar.cc/150?img=15" class="w-8 h-8 rounded-full"/>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-bold text-white">Ali V.</span>
+                                <span class="text-[9px] text-text-desc">2 saat önce</span>
+                            </div>
+                            <p class="text-xs text-text-secondary">Kesinlikle katılıyorum, özellikle metro hattının uzatılması çok önemli.</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <button class="text-[10px] text-text-desc flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">thumb_up</span>12
+                                </button>
+                                <button class="text-[10px] text-text-desc flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">reply</span>Yanıtla
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-panel rounded-xl p-3">
+                    <div class="flex gap-3">
+                        <img src="https://i.pravatar.cc/150?img=20" class="w-8 h-8 rounded-full"/>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-bold text-white">Selin K.</span>
+                                <span class="px-1.5 py-0.5 rounded bg-gold-primary/20 text-[8px] text-gold-primary">Yardımsever</span>
+                                <span class="text-[9px] text-text-desc">4 saat önce</span>
+                            </div>
+                            <p class="text-xs text-text-secondary">@Ahmet Y. haklısın, ben de aynı düşüncedeyim.</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <button class="text-[10px] text-text-desc flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">thumb_up</span>8
+                                </button>
+                                <button class="text-[10px] text-text-desc flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs">reply</span>Yanıtla
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fixed bottom-0 left-0 right-0 p-4 bg-darkest/95 backdrop-blur border-t border-white/10">
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Yorum yaz..." class="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-primary/50"/>
+                    <button class="w-12 h-12 bg-gold-primary rounded-xl flex items-center justify-center text-darkest">
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+    setTimeout(() => {
+        modal.querySelector(".modal-backdrop").classList.remove("opacity-0");
+        modal.querySelector(".modal-content").classList.remove("translate-y-full");
+    }, 10);
+}
+
+function closeTopicModal() {
+    const modal = document.getElementById("topic-modal");
+    modal.querySelector(".modal-backdrop").classList.add("opacity-0");
+    modal.querySelector(".modal-content").classList.add("translate-y-full");
+    setTimeout(() => {
+        modal.classList.add("hidden");
+        document.body.style.overflow = "";
+    }, 400);
+}
+
+function toggleVote(btn) {
+    btn.classList.toggle("active");
+    const countSpan = btn.querySelector("span:last-child");
+    let count = parseInt(countSpan.textContent);
+    
+    if (btn.classList.contains("active")) {
+        count++;
+        btn.querySelector(".material-symbols-outlined").textContent = "thumb_up_alt";
+    } else {
+        count--;
+        btn.querySelector(".material-symbols-outlined").textContent = "thumb_up";
+    }
+    countSpan.textContent = count;
+}
+
+function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById("btn-trending").className = tab === "trending" ? "tab-active px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5" : "tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5";
+    document.getElementById("btn-latest").className = tab === "latest" ? "tab-active px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5" : "tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5";
+    document.getElementById("btn-following").className = tab === "following" ? "tab-active px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5" : "tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5";
+    renderTopics();
+}
+
+function filterCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll(".category-pill").forEach(pill => {
+        pill.classList.toggle("active", pill.dataset.category === category);
+    });
+    renderTopics();
+}
+
+function showNewTopicModal() {
+    const modal = document.getElementById("new-topic-modal");
+    const content = document.getElementById("new-topic-content");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    setTimeout(() => content.classList.remove("translate-y-full"), 10);
+}
+
+function closeNewTopicModal() {
+    const content = document.getElementById("new-topic-content");
+    content.classList.add("translate-y-full");
+    setTimeout(() => {
+        document.getElementById("new-topic-modal").classList.add("hidden");
+        document.getElementById("new-topic-modal").classList.remove("flex");
+    }, 300);
+}
+
+function submitTopic() {
+    const title = document.getElementById("topic-title").value;
+    const body = document.getElementById("topic-body").value;
+    
+    if (!title || !body) {
+        alert("Lütfen başlık ve içerik girin");
+        return;
+    }
+    
+    const newTopic = {
+        id: topicsData.length + 1,
+        title: title,
+        author: {name: "Sen", avatar: "https://i.pravatar.cc/150?img=60", level: 15},
+        category: "general",
+        content: body,
+        likes: 0,
+        comments: 0,
+        views: 1,
+        time: "şimdi",
+        tags: ["#yenikonu"]
+    };
+    
+    topicsData.unshift(newTopic);
+    renderTopics();
+    closeNewTopicModal();
+    
+    // Show success toast
+    const toast = document.createElement("div");
+    toast.className = "fixed top-20 left-1/2 -translate-x-1/2 bg-success text-white px-4 py-2 rounded-full text-sm font-bold z-50 animate-bounce flex items-center gap-2";
+    toast.innerHTML = "<span class='material-symbols-outlined text-sm'>check_circle</span>+50 XP Kazandın!";
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function goBack() {
+    if (window.history.length > 1) window.history.back();
+    else window.location.href = "bursa.html";
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+
+</body>
+</html>

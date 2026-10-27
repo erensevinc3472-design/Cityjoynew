@@ -1,0 +1,573 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy Bursa - Sigorta</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#BB9E77",
+                        "background": "#0F3E46",
+                        "surface": "#415B57",
+                        "border": "#698383",
+                        "star": "#F4D03F",
+                        "open": "#27AE60",
+                        "closed": "#E74C3C"
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 100%);
+            min-height: 100dvh;
+            font-size: 14px;
+        }
+        
+        .glass-card {
+            background: rgba(65, 91, 87, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 131, 131, 0.2);
+        }
+        
+        .agent-card {
+            background: linear-gradient(135deg, rgba(65, 91, 87, 0.5) 0%, rgba(65, 91, 87, 0.3) 100%);
+            border: 1px solid rgba(105, 131, 131, 0.25);
+        }
+        
+        .corporate-card {
+            background: rgba(15, 62, 70, 0.6);
+            border: 1px solid rgba(105, 131, 131, 0.2);
+        }
+        
+        .call-button {
+            background: rgba(187, 158, 119, 0.15);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+        }
+        
+        .whatsapp-button {
+            background: rgba(37, 211, 102, 0.15);
+            border: 1px solid rgba(37, 211, 102, 0.3);
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.9);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .category-chip {
+            background: rgba(65, 91, 87, 0.5);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            white-space: nowrap;
+        }
+        
+        .category-chip.active {
+            background: rgba(187, 158, 119, 0.2);
+            border-color: rgba(187, 158, 119, 0.5);
+            color: #BB9E77;
+        }
+        
+        .open-badge {
+            background: rgba(39, 174, 96, 0.15);
+            color: #27AE60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .closed-badge {
+            background: rgba(231, 76, 60, 0.15);
+            color: #E74C3C;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .all24-badge {
+            background: rgba(187, 158, 119, 0.2);
+            color: #BB9E77;
+            border: 1px solid rgba(187, 158, 119, 0.4);
+        }
+        
+        .guide-item {
+            background: rgba(65, 91, 87, 0.3);
+            border: 1px solid rgba(105, 131, 131, 0.2);
+        }
+        
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.95);
+        }
+        
+        /* Mobil optimizasyon */
+        .compact-text { font-size: 13px; }
+        .small-text { font-size: 11px; }
+        .tiny-text { font-size: 10px; }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="text-white antialiased pb-24">
+
+    <!-- Header - Küçültülmüş -->
+    <header class="sticky-header pt-8 px-4 pb-2">
+        <div class="flex items-center justify-between mb-2">
+            <a href="acil-ihtiyaclar.html" class="w-8 h-8 flex items-center justify-center rounded-full glass-card active:scale-95">
+                <span class="material-symbols-outlined text-primary text-base">arrow_back_ios_new</span>
+            </a>
+            <div class="flex flex-col items-center">
+                <span class="text-primary tracking-[0.2em] font-semibold text-[10px] uppercase">CityJoy</span>
+                <span class="text-[9px] text-gray-400">Bursa</span>
+            </div>
+            <div class="w-8"></div> <!-- Sağ boşluk dengeleme -->
+        </div>
+        
+        <h1 class="text-xl font-medium mb-0.5">Sigorta Acenteleri</h1>
+        <p class="text-xs text-gray-400">Bursa'da güvenilir acenteler</p>
+    </header>
+
+    <!-- Search & Filter -->
+    <section class="px-4 mt-3">
+        <div class="relative mb-3">
+            <input type="text" placeholder="Acente ara..." 
+                   class="w-full bg-surface/50 border border-border/30 rounded-lg px-3 py-2 pl-9 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-primary/50">
+            <span class="material-symbols-outlined absolute left-2.5 top-2 text-gray-400 text-base">search</span>
+        </div>
+        
+        <!-- Category Chips -->
+        <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            <button class="category-chip active px-2.5 py-1 rounded-full tiny-text font-medium">Tümü</button>
+            <button class="category-chip px-2.5 py-1 rounded-full tiny-text font-medium text-gray-300">Konut</button>
+            <button class="category-chip px-2.5 py-1 rounded-full tiny-text font-medium text-gray-300">Araç</button>
+            <button class="category-chip px-2.5 py-1 rounded-full tiny-text font-medium text-gray-300">Sağlık</button>
+            <button class="category-chip px-2.5 py-1 rounded-full tiny-text font-medium text-gray-300">7/24</button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="px-4 space-y-6 mt-4">
+
+        <!-- ⭐ EN ÇOK PUAN ALANLAR (3 tane) -->
+        <section>
+            <div class="flex items-center gap-1.5 mb-2">
+                <span class="material-symbols-outlined text-star text-xs">star</span>
+                <span class="tiny-text text-star/80 bg-star/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">En Çok Puan Alan</span>
+                <div class="flex-1 h-px bg-star/10"></div>
+            </div>
+            
+            <div class="space-y-2">
+                <!-- 1 -->
+                <div class="agent-card rounded-lg p-3">
+                    <div class="flex gap-2.5">
+                        <div class="w-12 h-12 rounded-md bg-gray-600 flex-shrink-0 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop" alt="Ahmet" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-1">
+                                <div>
+                                    <h3 class="compact-text font-semibold text-gray-100 truncate">Ahmet Yılmaz</h3>
+                                    <p class="tiny-text text-primary">Allianz</p>
+                                </div>
+                                <div class="flex items-center gap-0.5 bg-star/10 px-1 py-0.5 rounded">
+                                    <span class="material-symbols-outlined text-star text-[10px] fill-1">star</span>
+                                    <span class="tiny-text font-semibold text-star">4.9</span>
+                                </div>
+                            </div>
+                            <p class="tiny-text text-gray-400 mt-0.5">127 değerlendirme</p>
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="material-symbols-outlined text-gray-500 text-[10px]">location_on</span>
+                                <span class="tiny-text text-gray-300">Nilüfer</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="closed-badge px-1.5 py-0.5 rounded tiny-text">🕐 08:30-18:00</span>
+                                <div class="flex gap-1">
+                                    <a href="tel:+905301234567" class="call-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                                    </a>
+                                    <a href="https://wa.me/905301234567" class="whatsapp-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-green-400 text-xs">chat</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 -->
+                <div class="agent-card rounded-lg p-3">
+                    <div class="flex gap-2.5">
+                        <div class="w-12 h-12 rounded-md bg-gray-600 flex-shrink-0 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop" alt="Zeynep" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-1">
+                                <div>
+                                    <h3 class="compact-text font-semibold text-gray-100 truncate">Zeynep Aktaş</h3>
+                                    <p class="tiny-text text-primary">Anadolu</p>
+                                </div>
+                                <div class="flex items-center gap-0.5 bg-star/10 px-1 py-0.5 rounded">
+                                    <span class="material-symbols-outlined text-star text-[10px] fill-1">star</span>
+                                    <span class="tiny-text font-semibold text-star">4.8</span>
+                                </div>
+                            </div>
+                            <p class="tiny-text text-gray-400 mt-0.5">203 değerlendirme</p>
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="material-symbols-outlined text-gray-500 text-[10px]">location_on</span>
+                                <span class="tiny-text text-gray-300">Osmangazi</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="all24-badge px-1.5 py-0.5 rounded tiny-text">🟢 7/24</span>
+                                <div class="flex gap-1">
+                                    <a href="tel:+905321234567" class="call-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                                    </a>
+                                    <a href="https://wa.me/905321234567" class="whatsapp-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-green-400 text-xs">chat</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 -->
+                <div class="agent-card rounded-lg p-3">
+                    <div class="flex gap-2.5">
+                        <div class="w-12 h-12 rounded-md bg-gray-600 flex-shrink-0 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" alt="Burak" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-1">
+                                <div>
+                                    <h3 class="compact-text font-semibold text-gray-100 truncate">Burak Şahin</h3>
+                                    <p class="tiny-text text-primary">Axa</p>
+                                </div>
+                                <div class="flex items-center gap-0.5 bg-star/10 px-1 py-0.5 rounded">
+                                    <span class="material-symbols-outlined text-star text-[10px] fill-1">star</span>
+                                    <span class="tiny-text font-semibold text-star">4.7</span>
+                                </div>
+                            </div>
+                            <p class="tiny-text text-gray-400 mt-0.5">312 değerlendirme</p>
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="material-symbols-outlined text-gray-500 text-[10px]">location_on</span>
+                                <span class="tiny-text text-gray-300">Nilüfer</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="open-badge px-1.5 py-0.5 rounded tiny-text">🟢 Açık</span>
+                                <div class="flex gap-1">
+                                    <a href="tel:+905371234567" class="call-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                                    </a>
+                                    <a href="https://wa.me/905371234567" class="whatsapp-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-green-400 text-xs">chat</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tümünü Gör -->
+            <a href="#" class="flex items-center justify-center gap-1 mt-2 py-1.5 tiny-text text-primary">
+                <span>Tümünü Gör</span>
+                <span class="material-symbols-outlined text-xs">arrow_forward</span>
+            </a>
+        </section>
+
+        <!-- 📍 SİZE EN YAKIN -->
+        <section>
+            <div class="flex items-center gap-1.5 mb-2">
+                <span class="material-symbols-outlined text-primary text-xs">near_me</span>
+                <span class="tiny-text text-primary/80 bg-primary/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Size En Yakın</span>
+                <div class="flex-1 h-px bg-primary/10"></div>
+            </div>
+            
+            <div class="space-y-2">
+                <!-- Liste -->
+                <div class="agent-card rounded-lg p-3">
+                    <div class="flex gap-2.5">
+                        <div class="w-12 h-12 rounded-md bg-gray-600 flex-shrink-0 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" alt="Mehmet" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1 mb-0.5">
+                                <span class="tiny-text text-primary font-medium">0.8 km</span>
+                            </div>
+                            <h3 class="compact-text font-semibold text-gray-100 truncate">Mehmet Kaya</h3>
+                            <p class="tiny-text text-gray-400">Axa Sigorta</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gray-500 text-[10px]">location_on</span>
+                                <span class="tiny-text text-gray-300">Yıldırım</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="closed-badge px-1.5 py-0.5 rounded tiny-text">🕐 09:00-19:00</span>
+                                <div class="flex gap-1">
+                                    <a href="tel:+905331234567" class="call-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                                    </a>
+                                    <a href="https://wa.me/905331234567" class="whatsapp-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-green-400 text-xs">chat</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card rounded-lg p-3">
+                    <div class="flex gap-2.5">
+                        <div class="w-12 h-12 rounded-md bg-gray-600 flex-shrink-0 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop" alt="Selin" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1 mb-0.5">
+                                <span class="tiny-text text-primary font-medium">1.2 km</span>
+                            </div>
+                            <h3 class="compact-text font-semibold text-gray-100 truncate">Selin Yıldız</h3>
+                            <p class="tiny-text text-gray-400">Groupama</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gray-500 text-[10px]">location_on</span>
+                                <span class="tiny-text text-gray-300">Nilüfer</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="all24-badge px-1.5 py-0.5 rounded tiny-text">🟢 7/24</span>
+                                <div class="flex gap-1">
+                                    <a href="tel:+905341234567" class="call-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                                    </a>
+                                    <a href="https://wa.me/905341234567" class="whatsapp-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-green-400 text-xs">chat</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card rounded-lg p-3">
+                    <div class="flex gap-2.5">
+                        <div class="w-12 h-12 rounded-md bg-gray-600 flex-shrink-0 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop" alt="Can" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1 mb-0.5">
+                                <span class="tiny-text text-primary font-medium">1.5 km</span>
+                            </div>
+                            <h3 class="compact-text font-semibold text-gray-100 truncate">Can Özdemir</h3>
+                            <p class="tiny-text text-gray-400">Mapfre</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gray-500 text-[10px]">location_on</span>
+                                <span class="tiny-text text-gray-300">Osmangazi</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="open-badge px-1.5 py-0.5 rounded tiny-text">🟢 Açık</span>
+                                <div class="flex gap-1">
+                                    <a href="tel:+905351234567" class="call-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                                    </a>
+                                    <a href="https://wa.me/905351234567" class="whatsapp-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-green-400 text-xs">chat</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card rounded-lg p-3">
+                    <div class="flex gap-2.5">
+                        <div class="w-12 h-12 rounded-md bg-gray-600 flex-shrink-0 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop" alt="Elif" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1 mb-0.5">
+                                <span class="tiny-text text-primary font-medium">2.1 km</span>
+                            </div>
+                            <h3 class="compact-text font-semibold text-gray-100 truncate">Elif Demir</h3>
+                            <p class="tiny-text text-gray-400">Türk Nippon</p>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="material-symbols-outlined text-gray-500 text-[10px]">location_on</span>
+                                <span class="tiny-text text-gray-300">Yıldırım</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="closed-badge px-1.5 py-0.5 rounded tiny-text">🕐 08:00-17:00</span>
+                                <div class="flex gap-1">
+                                    <a href="tel:+905361234567" class="call-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                                    </a>
+                                    <a href="https://wa.me/905361234567" class="whatsapp-button w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-green-400 text-xs">chat</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="w-full mt-3 py-2 bg-surface/50 border border-border/30 rounded-lg small-text text-gray-300">
+                Tüm Acenteleri Gör
+            </button>
+        </section>
+
+        <!-- 🏢 KURUMSAL -->
+        <section>
+            <div class="flex items-center gap-1.5 mb-2">
+                <span class="tiny-text text-gray-400 bg-gray-700/30 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Kurumsal</span>
+                <div class="flex-1 h-px bg-gray-700/30"></div>
+            </div>
+            
+            <div class="space-y-2">
+                <div class="corporate-card rounded-lg p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-md bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <span class="small-text font-bold text-primary">A</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="compact-text font-semibold text-gray-100">Allianz</h3>
+                        <p class="tiny-text text-gray-400">444 0 999</p>
+                    </div>
+                    <a href="tel:4440999" class="call-button w-7 h-7 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+
+                <div class="corporate-card rounded-lg p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-md bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <span class="small-text font-bold text-primary">AS</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="compact-text font-semibold text-gray-100">Anadolu</h3>
+                        <p class="tiny-text text-gray-400">444 2 333</p>
+                    </div>
+                    <a href="tel:4442333" class="call-button w-7 h-7 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+
+                <div class="corporate-card rounded-lg p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-md bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <span class="small-text font-bold text-primary">AXA</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="compact-text font-semibold text-gray-100">Axa</h3>
+                        <p class="tiny-text text-gray-400">444 5 400</p>
+                    </div>
+                    <a href="tel:4445400" class="call-button w-7 h-7 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 💡 SİGORTA REHBERİ - Genişletilmiş -->
+        <section class="mt-6">
+            <div class="flex items-center gap-1.5 mb-3">
+                <span class="material-symbols-outlined text-primary text-xs">menu_book</span>
+                <span class="tiny-text text-primary/80 bg-primary/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">Sigorta Rehberi</span>
+                <div class="flex-1 h-px bg-primary/10"></div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <a href="#" class="guide-item flex flex-col items-center p-3 rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-xl mb-1">home</span>
+                    <span class="tiny-text text-gray-200">Konut</span>
+                    <span class="tiny-text text-gray-500">Sigortası</span>
+                </a>
+                
+                <a href="#" class="guide-item flex flex-col items-center p-3 rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-xl mb-1">directions_car</span>
+                    <span class="tiny-text text-gray-200">Trafik</span>
+                    <span class="tiny-text text-gray-500">Zorunlu</span>
+                </a>
+                
+                <a href="#" class="guide-item flex flex-col items-center p-3 rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-xl mb-1">health_and_safety</span>
+                    <span class="tiny-text text-gray-200">Sağlık</span>
+                    <span class="tiny-text text-gray-500">Özel</span>
+                </a>
+                
+                <a href="#" class="guide-item flex flex-col items-center p-3 rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-xl mb-1">business</span>
+                    <span class="tiny-text text-gray-200">İş Yeri</span>
+                    <span class="tiny-text text-gray-500">Paketleri</span>
+                </a>
+                
+                <a href="#" class="guide-item flex flex-col items-center p-3 rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-xl mb-1">shield</span>
+                    <span class="tiny-text text-gray-200">DASK</span>
+                    <span class="tiny-text text-gray-500">Deprem</span>
+                </a>
+                
+                <a href="#" class="guide-item flex flex-col items-center p-3 rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-xl mb-1">airplanemode_active</span>
+                    <span class="tiny-text text-gray-200">Seyahat</span>
+                    <span class="tiny-text text-gray-500">Yurtdışı</span>
+                </a>
+                
+                <a href="#" class="guide-item flex flex-col items-center p-3 rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-xl mb-1"></span>
+                    <span class="tiny-text text-gray-200">Hayat</span>
+                    <span class="tiny-text text-gray-500">Bireysel</span>
+                </a>
+                
+                <a href="#" class="guide-item flex flex-col items-center p-3 rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-xl mb-1">pets</span>
+                    <span class="tiny-text text-gray-200">Evcil</span>
+                    <span class="tiny-text text-gray-500">Hayvan</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Bilgi -->
+        <div class="mt-4 mb-2 p-2.5 bg-primary/5 rounded-lg border border-primary/20">
+            <div class="flex gap-2 items-start">
+                <span class="material-symbols-outlined text-primary text-sm mt-0.5">info</span>
+                <p class="tiny-text text-gray-400 leading-relaxed">
+                    Acenteler bağımsız çalışır. Karşılaştırma yaparak en uygun teklifi seçin.
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-2 pb-5 px-6 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-lg">home</span>
+                <span class="text-[9px] font-medium">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-0.5 text-primary transition-colors">
+                <span class="material-symbols-outlined text-lg fill-1">travel_explore</span>
+                <span class="text-[9px] font-medium">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-lg">manage_search</span>
+                <span class="text-[9px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-lg">person</span>
+                <span class="text-[9px] font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+</body>
+</html>
+

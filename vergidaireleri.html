@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Vergi Daireleri - Tüm ilçelerdeki vergi daireleri adres, telefon, çalışma saatleri ve ulaşım bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Vergi Daireleri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "tax-blue": "#3B82F6",
+                        "tax-navy": "#1E40AF",
+                        "tax-cyan": "#06B6D4",
+                        "success-green": "#10B981",
+                        "warning-orange": "#F97316"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-tax {
+            animation: pulseTax 2s infinite;
+        }
+        @keyframes pulseTax {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .tax-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tax-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .service-tag {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .modal-tax {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .search-box {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">VERGİ DAİRELERİ</h1>
+                <p class="text-xs text-gray-text truncate">Bursa Defterdarlık Başkanlığı</p>
+            </div>
+            <button onclick="openInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-tax-blue/20 hover:bg-tax-blue/30 transition-colors shrink-0 pulse-tax">
+                <span class="material-symbols-outlined text-tax-blue">info</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Vergi Bilgi -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-tax-blue/30 to-tax-blue/10 flex items-center justify-center shrink-0 pulse-tax">
+                            <span class="material-symbols-outlined text-tax-blue text-xl">account_balance</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Vergi Daireleri</h2>
+                            <p class="text-xs text-gray-text">Gelir İdaresi Başkanlığı</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-tax-blue/10 border border-tax-blue/30">
+                        <div class="w-2 h-2 rounded-full bg-tax-blue animate-pulse"></div>
+                        <span class="text-xs text-tax-blue font-medium">Aktif</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-tax-cyan">08:30</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Açılış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-tax-blue">17:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Kapanış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">444 0 189</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Alo Vergi</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-warning-orange">20+</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Vergi Dairesi</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Vergi Dairesi Bul</h3>
+                        <p class="text-xs text-gray-text truncate">İlçe veya vergi dairesi adı ara</p>
+                    </div>
+                </div>
+
+                <div class="search-box rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="taxSearch" placeholder="Örn: Osmangazi, Nilüfer, İnegöl..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchTax()"/>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">İlçe Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterDistrict('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterDistrict('merkez')" id="btn-merkez" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Merkez</span>
+                    </button>
+                    <button onclick="filterDistrict('osmangazi')" id="btn-osmangazi" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Osmangazi</span>
+                    </button>
+                    <button onclick="filterDistrict('nilufer')" id="btn-nilufer" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Nilüfer</span>
+                    </button>
+                    <button onclick="filterDistrict('yildirim')" id="btn-yildirim" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Yıldırım</span>
+                    </button>
+                    <button onclick="filterDistrict('ilceler')" id="btn-ilceler" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Diğer İlçeler</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Sıkça Sorulan Sorular</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Çalışma Saatleri -->
+                <div class="tax-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-tax-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-tax-blue text-sm">schedule</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Çalışma Saatleri Nedir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Hafta içi 08:30 - 17:00 arası hizmet verilir. Öğle arası 12:00 - 13:00 arasıdır. 
+                                Cuma günleri 08:30 - 17:00 arası hizmet verilmektedir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-tax-blue">Pzt-Cuma: 08:30-17:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-success-green">Öğle: 12:00-13:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-live-red">Hafta Sonu: Kapalı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Randevu Alma -->
+                <div class="tax-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-tax-cyan/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-tax-cyan text-sm">event_available</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Nasıl Randevu Alırım?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Vergi daireleri için randevu alabilirsiniz:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text mb-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>Alo Vergi 444 0 189</strong> hattını arayarak</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>ivd.gib.gov.tr</strong> üzerinden online randevu</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>e-Devlet</strong> üzerinden randevu alma</span>
+                                </li>
+                            </ul>
+                            <div class="bg-white/5 rounded-lg p-2 text-[10px] text-gray-text">
+                                <strong class="text-gold">Not:</strong> Bazı işlemler için randevu zorunludur. Vergi borcu yapılandırma, vergi incelemesi gibi işlemler için önceden randevu alınız.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Online İşlemler -->
+                <div class="tax-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-success-green/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-success-green text-sm">computer</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Hangi İşlemleri Online Yapabilirim?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Birçok vergi işlemini online olarak gerçekleştirebilirsiniz:
+                            </p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-tax-blue text-lg">receipt</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Borç Sorgulama</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-tax-blue text-lg">payments</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Ödeme</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-tax-blue text-lg">description</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Beyanname</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-tax-blue text-lg">badge</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Vergi Kimlik No</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gerekli Evraklar -->
+                <div class="tax-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-warning-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-warning-orange text-sm">folder_open</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Vergi Kimlik No İçin Gerekli Evraklar</h4>
+                            <ul class="space-y-1 text-xs text-gray-text">
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Nüfus cüzdanı veya kimlik kartı</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>İkametgah belgesi</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Faaliyet belgesi (iş yeri için)</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Noter onaylı imza sirküleri</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Merkez Vergi Daireleri -->
+        <section class="animate-slide-up district-section" data-district="merkez" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('merkezSection', 'merkezIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-tax-blue/30 to-tax-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-tax-blue">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Merkez Vergi Daireleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">11 Vergi Dairesi Müdürlüğü</span>
+                    </div>
+                </div>
+                <span id="merkezIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="merkezSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa İhtisas -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('bursaihtisas')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İhtisas Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Atatürk Cad. No:142, Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 75 50</span>
+                    </div>
+                </div>
+
+                <!-- Osmangazi -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('osmangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-cyan flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Osmangazi Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Fevzi Çakmak Mah. Fomara Ek Hizmet Binası</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 75 60</span>
+                    </div>
+                </div>
+
+                <!-- Yıldırım -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('yildirim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-navy flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yıldırım Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Kazım Karabekir Mah. Muhsin Yazıcıoğlu Blv. No:7</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 75 70</span>
+                    </div>
+                </div>
+
+                <!-- Çekirge -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('cekirge')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Çekirge Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Çekirge Mah. Vergi Dairesi Blv.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 75 80</span>
+                    </div>
+                </div>
+
+                <!-- Setbaşı -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('setbasi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-cyan flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Setbaşı Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Fomara Ek Hizmet Binası, Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 75 90</span>
+                    </div>
+                </div>
+
+                <!-- Uludağ -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('uludag')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-navy flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Uludağ Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Merkez - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 76 00</span>
+                    </div>
+                </div>
+
+                <!-- Yeşil -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('yesil')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yeşil Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Merkez - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 76 10</span>
+                    </div>
+                </div>
+
+                <!-- Nilüfer -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('nilufer')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-cyan flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 441 01 18</span>
+                    </div>
+                </div>
+
+                <!-- Ertuğrulgazi -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('ertugrulgazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-navy flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">9</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Ertuğrulgazi Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Merkez - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 76 20</span>
+                    </div>
+                </div>
+
+                <!-- Gökdere -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('gokdere')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">10</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gökdere Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Merkez - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 76 30</span>
+                    </div>
+                </div>
+
+                <!-- Veraset ve Harçlar -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('veraset')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-warning-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">11</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Veraset ve Harçlar Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Merkez - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 76 40</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diğer İlçeler Vergi Daireleri -->
+        <section class="animate-slide-up district-section" data-district="ilceler" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('ilcelerSection', 'ilcelerIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-success-green/30 to-success-green/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-success-green">location_on</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Diğer İlçe Vergi Daireleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">9 İlçe Vergi Dairesi</span>
+                    </div>
+                </div>
+                <span id="ilcelerIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="ilcelerSection" class="expandable-section mt-3 space-y-3">
+                <!-- Gemlik -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('gemlik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Hamidiye Mah. İstiklal Cad. No:40, Gemlik</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 513 01 16</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('inegol')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-cyan flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">İnegöl - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 711 50 00</span>
+                    </div>
+                </div>
+
+                <!-- Karacabey -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('karacabey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-navy flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Karacabey Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Karacabey - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 661 50 00</span>
+                    </div>
+                </div>
+
+                <!-- Mustafakemalpaşa -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('mustafakemalpasa')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mustafakemalpaşa Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Mustafakemalpaşa - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 611 50 00</span>
+                    </div>
+                </div>
+
+                <!-- Mudanya -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('mudanya')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-cyan flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mudanya Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Mudanya - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 544 50 00</span>
+                    </div>
+                </div>
+
+                <!-- Orhangazi -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('orhangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-navy flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhangazi Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Orhangazi - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 570 50 00</span>
+                    </div>
+                </div>
+
+                <!-- İznik -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('iznik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İznik Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">İznik - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 757 50 00</span>
+                    </div>
+                </div>
+
+                <!-- Yenişehir -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('yenisehir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-cyan flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yenişehir Vergi Dairesi</h4>
+                                <p class="text-[10px] text-gray-text">Yenişehir - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 773 50 00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mal Müdürlükleri -->
+        <section class="animate-slide-up district-section" data-district="mal" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('malSection', 'malIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-warning-orange/30 to-warning-orange/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-warning-orange">account_balance_wallet</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Mal Müdürlükleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">4 İlçe Mal Müdürlüğü</span>
+                    </div>
+                </div>
+                <span id="malIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="malSection" class="expandable-section mt-3 space-y-3">
+                <!-- Keles -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('keles')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-warning-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Keles Mal Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Keles - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 541 50 00</span>
+                    </div>
+                </div>
+
+                <!-- Orhaneli -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('orhaneli')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhaneli Mal Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Orhaneli - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 651 50 00</span>
+                    </div>
+                </div>
+
+                <!-- Harmancık -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('harmancik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-cyan flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Harmancık Mal Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Harmancık - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 681 50 00</span>
+                    </div>
+                </div>
+
+                <!-- Büyükorhan -->
+                <div class="tax-card rounded-xl p-4" onclick="openTaxDetail('buyukorhan')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-tax-navy flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Büyükorhan Mal Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Büyükorhan - Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 631 50 00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.6s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="https://ivd.gib.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-tax-blue text-xl">computer</span>
+                    <span class="text-[10px] text-center">İnternet Vergi</span>
+                </a>
+                <a href="https://www.gib.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-tax-cyan text-xl">account_balance</span>
+                    <span class="text-[10px] text-center">GİB</span>
+                </a>
+                <a href="#" onclick="callNumber('4440189')" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-success-green text-xl">call</span>
+                    <span class="text-[10px] text-center">Alo Vergi</span>
+                </a>
+                <a href="#" onclick="callNumber('184')" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-warning-orange text-xl">support_agent</span>
+                    <span class="text-[10px] text-center">Danışma</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-warning-orange">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-warning-orange shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-warning-orange mb-1">Önemli Bilgi</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            Vergi daireleri randevu sistemi ile çalışmaktadır. İşlemleriniz için önceden randevu almanız önerilir. 
+                            <strong>e-Devlet</strong> üzerinden birçok vergi işlemini online olarak gerçekleştirebilirsiniz.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Vergi Dairesi Detay Modalı -->
+    <div id="taxDetailModal" class="fixed inset-0 z-[80] modal-tax hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeTaxDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Vergi Dairesi Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Vergi Dairesi Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-tax-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-tax-blue text-3xl">account_balance</span>
+                    </div>
+                    <div>
+                        <h2 id="modalTaxName" class="text-xl font-bold text-white mb-1">Vergi Dairesi Adı</h2>
+                        <p id="modalType" class="text-sm text-gold">Tür</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p class="text-sm text-white">Hafta İçi: 08:30 - 17:00</p>
+                            <p class="text-xs text-gray-text">Öğle Arası: 12:00 - 13:00</p>
+                            <p class="text-xs text-live-red mt-1">Hafta Sonu: Kapalı</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">İletişim</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                            <p class="text-xs text-gray-text">Faks: 0224 221 75 99</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">email</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">E-Posta</p>
+                            <p id="modalEmail" class="text-sm text-white">bursa.vdb@gelirler.gov.tr</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    Verilen Hizmetler
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-tax-blue text-lg mb-1">person_add</span>
+                        <p class="text-[10px] text-gray-text">Vergi Kimlik No</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-tax-blue text-lg mb-1">description</span>
+                        <p class="text-[10px] text-gray-text">Beyanname</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-tax-blue text-lg mb-1">payments</span>
+                        <p class="text-[10px] text-gray-text">Tahsilat</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-tax-blue text-lg mb-1">request_quote</span>
+                        <p class="text-[10px] text-gray-text">Borç Sorgulama</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-tax-blue text-lg mb-1">verified</span>
+                        <p class="text-[10px] text-gray-text">Yapılandırma</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-tax-blue text-lg mb-1">gavel</span>
+                        <p class="text-[10px] text-gray-text">İtiraz</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım Bilgileri
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button onclick="callNumber('4440189')" class="flex-1 bg-tax-blue/20 hover:bg-tax-blue/30 border border-tax-blue/50 text-tax-blue py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Alo Vergi
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bilgi Modalı -->
+    <div id="infoModal" class="fixed inset-0 z-[80] modal-tax hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Yararlı Bilgiler</h1>
+                        <p class="text-xs text-gray-text truncate">Vergi İşlemleri Hakkında</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-tax-blue/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-tax-blue/20 flex items-center justify-center pulse-tax">
+                        <span class="material-symbols-outlined text-tax-blue text-3xl">support_agent</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-tax-blue">444 0 189</h2>
+                        <p class="text-sm text-gray-text">Alo Vergi Danışma Hattı</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Vergi işlemleriniz hakkında bilgi almak, borç sorgulama ve randevu işlemleri için 7/24 hizmet veren çağrı merkezimizi arayabilirsiniz.
+                </p>
+                <button onclick="callNumber('4440189')" class="w-full bg-tax-blue/20 hover:bg-tax-blue/30 border border-tax-blue/50 text-tax-blue py-4 rounded-xl text-lg font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    444 0 189'u Ara
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-tax-cyan text-2xl mb-2">computer</span>
+                    <p class="text-lg font-bold text-tax-cyan">ivd.gib.gov.tr</p>
+                    <p class="text-xs text-gray-text">İnternet Vergi Dairesi</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">calendar_today</span>
+                    <p class="text-lg font-bold text-gold">e-Devlet</p>
+                    <p class="text-xs text-gray-text">Randevu Sistemi</p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4">Sık Kullanılan İşlemler</h3>
+                <ul class="space-y-3 text-sm text-gray-text">
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-tax-blue">check_circle</span>
+                        <span>Vergi borcu sorgulama ve ödeme</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-tax-blue">check_circle</span>
+                        <span>Beyanname verme ve düzeltme</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-tax-blue">check_circle</span>
+                        <span>Vergi kimlik numarası alma</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-tax-blue">check_circle</span>
+                        <span>Adres değişikliği bildirimi</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-tax-blue">check_circle</span>
+                        <span>İpotek ve terhin işlemleri</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Vergi Dairesi Veritabanı
+        const taxData = {
+            'bursaihtisas': {
+                name: 'Bursa İhtisas Vergi Dairesi',
+                type: 'İhtisas Vergi Dairesi',
+                address: 'Atatürk Cad. No:142, Osmangazi/BURSA',
+                phone: '0224 221 75 50',
+                email: 'bursa.ihtisas.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'local_parking', text: 'Belediye otoparkı (ücretli, 100m)' }
+                ],
+                mapQuery: 'Bursa İhtisas Vergi Dairesi, Atatürk Caddesi, Osmangazi, Bursa'
+            },
+            'osmangazi': {
+                name: 'Osmangazi Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Fevzi Çakmak Mah. Fomara Ek Hizmet Binası, Osmangazi/BURSA',
+                phone: '0224 221 75 60',
+                email: 'osmangazi.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Fomara otoparkı (ücretli)' }
+                ],
+                mapQuery: 'Osmangazi Vergi Dairesi, Fevzi Çakmak Mahallesi, Bursa'
+            },
+            'yildirim': {
+                name: 'Yıldırım Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Kazım Karabekir Mah. Muhsin Yazıcıoğlu Bulvarı No:7, Yıldırım/BURSA',
+                phone: '0224 221 75 70',
+                email: 'yildirim.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Yıldırım belediye otoparkı (ücretsiz)' }
+                ],
+                mapQuery: 'Yıldırım Vergi Dairesi, Muhsin Yazıcıoğlu Bulvarı, Bursa'
+            },
+            'cekirge': {
+                name: 'Çekirge Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Çekirge Mah. Vergi Dairesi Bulvarı, Osmangazi/BURSA',
+                phone: '0224 221 75 80',
+                email: 'cekirge.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çekirge durağı)' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 10 dk yürüme' }
+                ],
+                mapQuery: 'Çekirge Vergi Dairesi, Çekirge, Osmangazi, Bursa'
+            },
+            'setbasi': {
+                name: 'Setbaşı Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Fomara Ek Hizmet Binası, Osmangazi/BURSA',
+                phone: '0224 221 75 90',
+                email: 'setbasi.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4, 38 hatları' },
+                    { icon: 'local_parking', text: 'Setbaşı otoparkı (ücretli)' }
+                ],
+                mapQuery: 'Setbaşı Vergi Dairesi, Osmangazi, Bursa'
+            },
+            'uludag': {
+                name: 'Uludağ Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Merkez - Osmangazi/BURSA',
+                phone: '0224 221 76 00',
+                email: 'uludag.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağı' }
+                ],
+                mapQuery: 'Uludağ Vergi Dairesi, Osmangazi, Bursa'
+            },
+            'yesil': {
+                name: 'Yeşil Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Merkez - Osmangazi/BURSA',
+                phone: '0224 221 76 10',
+                email: 'yesil.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağı' }
+                ],
+                mapQuery: 'Yeşil Vergi Dairesi, Osmangazi, Bursa'
+            },
+            'nilufer': {
+                name: 'Nilüfer Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Nilüfer/BURSA',
+                phone: '0224 441 01 18',
+                email: 'nilufer.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' }
+                ],
+                mapQuery: 'Nilüfer Vergi Dairesi, Nilüfer, Bursa'
+            },
+            'ertugrulgazi': {
+                name: 'Ertuğrulgazi Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Merkez - Osmangazi/BURSA',
+                phone: '0224 221 76 20',
+                email: 'ertugrulgazi.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' }
+                ],
+                mapQuery: 'Ertuğrulgazi Vergi Dairesi, Osmangazi, Bursa'
+            },
+            'gokdere': {
+                name: 'Gökdere Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Merkez - Osmangazi/BURSA',
+                phone: '0224 221 76 30',
+                email: 'gokdere.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' }
+                ],
+                mapQuery: 'Gökdere Vergi Dairesi, Osmangazi, Bursa'
+            },
+            'veraset': {
+                name: 'Bursa Veraset ve Harçlar Vergi Dairesi',
+                type: 'İhtisas Vergi Dairesi',
+                address: 'Merkez - Osmangazi/BURSA',
+                phone: '0224 221 76 40',
+                email: 'veraset.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağı' }
+                ],
+                mapQuery: 'Bursa Veraset ve Harçlar Vergi Dairesi, Osmangazi, Bursa'
+            },
+            'gemlik': {
+                name: 'Gemlik Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Hamidiye Mah. İstiklal Cad. No:40, Gemlik/BURSA',
+                phone: '0224 513 01 16',
+                email: 'gemlik.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Gemlik merkez otobüsleri' },
+                    { icon: 'local_parking', text: 'Gemlik merkez otoparkı' }
+                ],
+                mapQuery: 'Gemlik Vergi Dairesi, İstiklal Caddesi, Gemlik, Bursa'
+            },
+            'inegol': {
+                name: 'İnegöl Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Mahmudiye Mah. Dörtçelik Cad. No:2, İnegöl/BURSA',
+                phone: '0224 711 50 00',
+                email: 'inegol.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'İnegöl merkez otobüsleri' },
+                    { icon: 'local_parking', text: 'İnegöl belediye otoparkı' }
+                ],
+                mapQuery: 'İnegöl Vergi Dairesi, İnegöl, Bursa'
+            },
+            'karacabey': {
+                name: 'Karacabey Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Karacabey/BURSA',
+                phone: '0224 661 50 00',
+                email: 'karacabey.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Karacabey merkez otobüsleri' }
+                ],
+                mapQuery: 'Karacabey Vergi Dairesi, Karacabey, Bursa'
+            },
+            'mustafakemalpasa': {
+                name: 'Mustafakemalpaşa Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Mustafakemalpaşa/BURSA',
+                phone: '0224 611 50 00',
+                email: 'mustafakemalpasa.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Mustafakemalpaşa merkez otobüsleri' }
+                ],
+                mapQuery: 'Mustafakemalpaşa Vergi Dairesi, Mustafakemalpaşa, Bursa'
+            },
+            'mudanya': {
+                name: 'Mudanya Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Mudanya/BURSA',
+                phone: '0224 544 50 00',
+                email: 'mudanya.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Mudanya merkez otobüsleri' },
+                    { icon: 'directions_boat', text: 'İDO Mudanya İskelesi yakınında' }
+                ],
+                mapQuery: 'Mudanya Vergi Dairesi, Mudanya, Bursa'
+            },
+            'orhangazi': {
+                name: 'Orhangazi Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Orhangazi/BURSA',
+                phone: '0224 570 50 00',
+                email: 'orhangazi.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Orhangazi merkez otobüsleri' }
+                ],
+                mapQuery: 'Orhangazi Vergi Dairesi, Orhangazi, Bursa'
+            },
+            'iznik': {
+                name: 'İznik Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'İznik/BURSA',
+                phone: '0224 757 50 00',
+                email: 'iznik.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'İznik merkez otobüsleri' }
+                ],
+                mapQuery: 'İznik Vergi Dairesi, İznik, Bursa'
+            },
+            'yenisehir': {
+                name: 'Yenişehir Vergi Dairesi',
+                type: 'Vergi Dairesi Müdürlüğü',
+                address: 'Yenişehir/BURSA',
+                phone: '0224 773 50 00',
+                email: 'yenisehir.vdb@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Yenişehir merkez otobüsleri' }
+                ],
+                mapQuery: 'Yenişehir Vergi Dairesi, Yenişehir, Bursa'
+            },
+            'keles': {
+                name: 'Keles Mal Müdürlüğü',
+                type: 'Mal Müdürlüğü',
+                address: 'Keles/BURSA',
+                phone: '0224 541 50 00',
+                email: 'keles.mm@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Keles merkez otobüsleri' }
+                ],
+                mapQuery: 'Keles Mal Müdürlüğü, Keles, Bursa'
+            },
+            'orhaneli': {
+                name: 'Orhaneli Mal Müdürlüğü',
+                type: 'Mal Müdürlüğü',
+                address: 'Orhaneli/BURSA',
+                phone: '0224 651 50 00',
+                email: 'orhaneli.mm@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Orhaneli merkez otobüsleri' }
+                ],
+                mapQuery: 'Orhaneli Mal Müdürlüğü, Orhaneli, Bursa'
+            },
+            'harmancik': {
+                name: 'Harmancık Mal Müdürlüğü',
+                type: 'Mal Müdürlüğü',
+                address: 'Harmancık/BURSA',
+                phone: '0224 681 50 00',
+                email: 'harmancik.mm@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Harmancık merkez otobüsleri' }
+                ],
+                mapQuery: 'Harmancık Mal Müdürlüğü, Harmancık, Bursa'
+            },
+            'buyukorhan': {
+                name: 'Büyükorhan Mal Müdürlüğü',
+                type: 'Mal Müdürlüğü',
+                address: 'Büyükorhan/BURSA',
+                phone: '0224 631 50 00',
+                email: 'buyukorhan.mm@gelirler.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Büyükorhan merkez otobüsleri' }
+                ],
+                mapQuery: 'Büyükorhan Mal Müdürlüğü, Büyükorhan, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // District Filter
+        let currentDistrict = 'all';
+        function filterDistrict(district) {
+            currentDistrict = district;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + district).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.district-section');
+            sections.forEach(section => {
+                if (district === 'all' || section.dataset.district === district) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Tax Office
+        function searchTax() {
+            const searchTerm = document.getElementById('taxSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.tax-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open Tax Detail Modal
+        function openTaxDetail(taxId) {
+            const tax = taxData[taxId];
+            if (!tax) return;
+
+            document.getElementById('modalTaxName').textContent = tax.name;
+            document.getElementById('modalType').textContent = tax.type;
+            document.getElementById('modalAddress').textContent = tax.address;
+            document.getElementById('modalPhone').textContent = tax.phone;
+            document.getElementById('modalEmail').textContent = tax.email;
+            
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            tax.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Harita butonunu güncelle
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${tax.mapQuery}')`);
+
+            document.getElementById('taxDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Tax Detail Modal
+        function closeTaxDetail() {
+            document.getElementById('taxDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Info Modal
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak FAQ açık
+            document.getElementById('faqSection').classList.add('open');
+            document.getElementById('faqIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>

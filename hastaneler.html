@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Hastaneleri - Devlet, özel ve üniversite hastaneleri adres, telefon, çalışma saatleri ve ulaşım bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Hastaneleri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "health-green": "#10B981",
+                        "health-blue": "#3B82F6",
+                        "ambulance-orange": "#F97316",
+                        "hospital-purple": "#8B5CF6"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-hospital {
+            animation: pulseHospital 2s infinite;
+        }
+        @keyframes pulseHospital {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .hospital-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .hospital-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .hospital-card.private {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        .hospital-card.university {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .type-badge {
+            transition: all 0.3s ease;
+        }
+        .type-badge.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .modal-hospital {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .emergency-card {
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.15) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+        }
+    </style>
+
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">HASTANELER</h1>
+                <p class="text-xs text-gray-text truncate">Bursa Devlet, Özel ve Üniversite Hastaneleri</p>
+            </div>
+            <button onclick="openEmergencyModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-live-red/20 hover:bg-live-red/30 transition-colors shrink-0 pulse-hospital">
+                <span class="material-symbols-outlined text-live-red">emergency</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Acil Bilgi -->
+        <section class="animate-fade-in">
+            <div class="emergency-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-live-red/30 to-live-red/10 flex items-center justify-center shrink-0 pulse-hospital">
+                            <span class="material-symbols-outlined text-live-red text-xl">local_hospital</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Acil Servisler</h2>
+                            <p class="text-xs text-gray-text">7/24 Hizmet Veren Hastaneler</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-live-red/10 border border-live-red/30">
+                        <div class="w-2 h-2 rounded-full bg-live-red animate-pulse"></div>
+                        <span class="text-xs text-live-red font-medium">Açık</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-health-blue">112</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Ambulans</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-health-green">184</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Sağlık Danışma</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">182</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Randevu</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-ambulance-orange">444</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">MHRS</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Hastane Bul</h3>
+                        <p class="text-xs text-gray-text truncate">Hastane adı veya bölge ara</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="hospitalSearch" placeholder="Örn: Şehir Hastanesi, Acıbadem..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchHospital()"/>
+                </div>
+
+                <!-- Tür Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hastane Türü</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterType('all')" id="btn-type-all" class="type-badge active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="material-symbols-outlined text-sm">apps</span>
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterType('state')" id="btn-type-state" class="type-badge flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="material-symbols-outlined text-sm text-health-blue">account_balance</span>
+                        <span class="text-sm">Devlet</span>
+                    </button>
+                    <button onclick="filterType('private')" id="btn-type-private" class="type-badge flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="material-symbols-outlined text-sm text-hospital-purple">business</span>
+                        <span class="text-sm">Özel</span>
+                    </button>
+                    <button onclick="filterType('university')" id="btn-type-university" class="type-badge flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="material-symbols-outlined text-sm text-health-green">school</span>
+                        <span class="text-sm">Üniversite</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+                <!-- Acil Durumlar Bilgisi -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <button onclick="toggleSection('emergencyGuide', 'emergencyIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-live-red/30 to-live-red/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-live-red">emergency</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Acil Durum Rehberi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Hayati Tehlike ve Acil Durumlar</span>
+                    </div>
+                </div>
+                <span id="emergencyIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="emergencyGuide" class="expandable-section mt-3 space-y-3">
+                <div class="hospital-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-live-red/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-live-red text-sm">priority_high</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Hayati Tehlike Durumları</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Kalp krizi, felç, şiddetli kanama, zehirlenme, şok durumlarında <strong>112</strong>'yi arayın. 
+                                Ambulans gelene kadar hastayı hareket ettirmeyin.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">Kalp Krizi</span>
+                                <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">Felç</span>
+                                <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">Kanama</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hospital-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-ambulance-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-ambulance-orange text-sm">warning</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Acil Durumlar (Ambulans Gerektirmeyen)</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Kırık, çıkık, yanık, yüksek ateş, şiddetli karın ağrısı için en yakın hastane aciline gidin.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="px-2 py-1 rounded text-[10px] bg-ambulance-orange/20 text-ambulance-orange border border-ambulance-orange/30">Kırık/Çıkık</span>
+                                <span class="px-2 py-1 rounded text-[10px] bg-ambulance-orange/20 text-ambulance-orange border border-ambulance-orange/30">Yanık</span>
+                                <span class="px-2 py-1 rounded text-[10px] bg-ambulance-orange/20 text-ambulance-orange border border-ambulance-orange/30">Yüksek Ateş</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hospital-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-health-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-health-blue text-sm">info</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Acil Servis Öncelik Sırası (Triage)</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Hastalar kırmızı (hayati tehlike), sarı (acil), yeşil (az acil) kategorilerine göre sıralanır. 
+                                Sıranız uzun görünse de kritik hastalara öncelik verilir.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Şehir Hastanesi - Özel Bölüm -->
+        <section class="animate-slide-up hospital-section" data-type="state" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('sehirHastanesiSection', 'sehirIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-health-blue/30 to-health-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-health-blue">local_hospital</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Bursa Şehir Hastanesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Türkiye'nin En Büyük Şehir Hastanelerinden</span>
+                    </div>
+                </div>
+                <span id="sehirIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="sehirHastanesiSection" class="expandable-section mt-3">
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('bursa-sehir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">apartment</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Şehir Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Millet Mah. 1200. Sok. Yıldırım</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Devlet</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">1.355 Yatak</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Devlet Hastaneleri -->
+        <section class="animate-slide-up hospital-section" data-type="state" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('devletSection', 'devletIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-health-blue/30 to-health-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-health-blue">account_balance</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Devlet Hastaneleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">Kamu Hastaneleri ve Eğitim Araştırma</span>
+                    </div>
+                </div>
+                <span id="devletIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="devletSection" class="expandable-section mt-3 space-y-3">
+                <!-- SBÜ Bursa Yüksek İhtisas -->
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('yuksek-ihtisas')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">SBÜ Bursa Yüksek İhtisas EAH</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Millet Mah. Mimar Sinan Cad. No:95</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Eğitim Araştırma</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <!-- Çekirge Devlet -->
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('cekirge-devlet')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Çekirge Devlet Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Çekirge Mah. Dr. Rüştü Burlu Cad. No:1</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Genel Hastane</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <!-- Ali Osman Sönmez Onkoloji -->
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('onkoloji')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Ali Osman Sönmez Onkoloji Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Alaaddin Mah. Ortapazar Cad. Menekşe Sk. No:2</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Onkoloji</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Kanser Tedavisi</span>
+                    </div>
+                </div>
+
+                <!-- Dörtçelik Çocuk -->
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('dortcelik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Dörtçelik Çocuk Hastalıkları Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Çekirge Mah. Dr. Rüştü Burlu Cad. No:3</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Çocuk Hastanesi</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <!-- Ağız Diş -->
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('agiz-dis')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Ağız ve Diş Sağlığı EAH</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Ankara Yolu Cad. No:1 Adnan Menderes</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Diş Hastanesi</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">Eğitim Araştırma</span>
+                    </div>
+                </div>
+
+                <!-- İlker Çelikcan FTR -->
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('ftr')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İlker Çelikcan Fizik Tedavi ve Rehabilitasyon</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Çekirge Mah. Sıcaksu Mevkii</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">FTR Hastanesi</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-green/20 text-health-green border border-health-green/30">Kaplıca Tedavisi</span>
+                    </div>
+                </div>
+
+                <!-- Dr. Ayten Bozkaya -->
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('spastik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Dr. Ayten Bozkaya Spastik Çocuklar Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Pınarbaşı Mah. Pınarbaşı Cad. No:72</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Rehabilitasyon</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Spastik Çocuklar</span>
+                    </div>
+                </div>
+
+                <!-- İlçe Hastaneleri -->
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('gemlik-devlet')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik Devlet Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Gemlik / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Dr. Ziya Kaya Mah. Hürriyet Cad. No:45</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">İlçe Hastanesi</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('inegol-devlet')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">9</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl Devlet Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">İnegöl / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Süleymaniye Mah. İstiklal Cad. No:189</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">İlçe Hastanesi</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('mudanya-devlet')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">10</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mudanya Devlet Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Mudanya / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Güzelyalı Mah. Hastane Cad. No:1</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">İlçe Hastanesi</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <div class="hospital-card rounded-xl p-4" onclick="openHospitalDetail('gursu-devlet')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">11</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gürsu Cüneyt Yıldız Devlet Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Gürsu / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Kurtuluş Mah. Hastane Cad. No:1</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">İlçe Hastanesi</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Özel Hastaneler -->
+        <section class="animate-slide-up hospital-section" data-type="private" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('ozelSection', 'ozelIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-hospital-purple/30 to-hospital-purple/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-hospital-purple">business</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Özel Hastaneler</span>
+                        <span class="text-[10px] text-gray-text block truncate">Özel Tıp Merkezleri ve Hastaneler</span>
+                    </div>
+                </div>
+                <span id="ozelIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="ozelSection" class="expandable-section mt-3 space-y-3">
+                <!-- Acıbadem -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('acibadem')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Acıbadem Bursa Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Barış Mah. FSM Bulvarı Sümer Sk. No:1</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">JCI Akredite</span>
+                    </div>
+                </div>
+
+                <!-- Medical Park -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('medicalpark')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel VM Medical Park Bursa Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Kırcaali Mah. Fevzi Çakmak Cad. No:76</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">444 44 84</span>
+                    </div>
+                </div>
+
+                <!-- Medicana -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('medicana')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Medicana Bursa Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Odunluk Mah. İzmir Yolu Cad. No:41</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">(0224) 970 01 01</span>
+                    </div>
+                </div>
+
+                <!-- Doruk Çekirge -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('doruk-cekirge')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Doruk Bursa Hastanesi (Çekirge)</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Hüdavendigar Mah. Zübeydehanım Cad. No:5</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">1971'den Beri</span>
+                    </div>
+                </div>
+
+                <!-- Doruk Nilüfer -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('doruk-nilufer')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Doruk Nilüfer Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Lefkoşe Cad. No:22 Nilüfer</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <!-- Doruk Yıldırım -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('doruk-yildirim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Doruk Yıldırım Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Duaçınarı Mah. Ankara Cad. No:235</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <!-- Nev Anadolu -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('nev-anadolu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Nev Anadolu Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Beşevler Mah. İzmir Yolu No:105</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">(0224) 451 56 00</span>
+                    </div>
+                </div>
+
+                <!-- Nev Esentepe -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('nev-esentepe')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Nev Esentepe Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Esentepe Mh. Mudanya Yolu Cd. No:169</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <!-- Medicabil Nilüfer -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('medicabil-nilufer')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">9</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Medicabil Nilüfer Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Mudanya Yolu. Fethiye Mh. Küre Sk. No:1</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <!-- Medicabil Yıldırım -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('medicabil-yildirim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">10</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Medicabil Yıldırım Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Ortabağlar Mah. Ankara Yolu Cad. No:326</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">444 81 12</span>
+                    </div>
+                </div>
+
+                <!-- Çekirge Kalp -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('cekirge-kalp')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">11</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Çekirge Kalp ve Aritmi Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Kükürtlü Mah. Zübeydehanım Cad. Konca Sk. No:2</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">Kalp Cerrahisi</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">(0224) 275 75 00</span>
+                    </div>
+                </div>
+
+                <!-- Aritmi Osmangazi -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('aritmi-osmangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">12</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Aritmi Osmangazi Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Ulu Mah. Ulubatlı Hasan Cad. No:48-62</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">Kalp-Damar</span>
+                    </div>
+                </div>
+
+                <!-- Dünya Göz -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('dunyagoz')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">13</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Dünya Göz Bursa Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Kükürtlü Mah. Emir Abdülkadir Cad. No:58</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Göz Hastanesi</span>
+                    </div>
+                </div>
+
+                <!-- Retina Göz -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('retina')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">14</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Retina Göz Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Esentepe Mah. Sanayi Cad. No:171</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-blue/20 text-health-blue border border-health-blue/30">Göz Hastanesi</span>
+                    </div>
+                </div>
+
+                <!-- Hayat Hastanesi -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('hayat')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">15</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Hayat Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Elmasbahçeler Mah. Ankara Yolu Cad. No:44</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">444 23 64</span>
+                    </div>
+                </div>
+
+                <!-- Romatem -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('romatem')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">16</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Romatem Bursa FTR Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Kükürtlü Mah. Mudanya Yolu Cad. No:65</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-green/20 text-health-green border border-health-green/30">Fizik Tedavi</span>
+                    </div>
+                </div>
+
+                <!-- Pembe Mavi -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('pembemavi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">17</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Pembe Mavi Tüp Bebek ve Kadın Hastalıkları</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Barış Mah. FSM Bulvarı No:7</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-green/20 text-health-green border border-health-green/30">Tüp Bebek</span>
+                    </div>
+                </div>
+
+                <!-- Mavişehir -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('mavisehir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">18</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel Mavişehir Tıp Merkezi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Mavişehir Mah. Mavişehir Cad. No:1</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl Özel -->
+                <div class="hospital-card private rounded-xl p-4" onclick="openHospitalDetail('inegol-ozel')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-hospital-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">19</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özel İnegöl Borsa Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">İnegöl / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Osmaniye Mah. Cumhuriyet Cad. No:146</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-hospital-purple/20 text-hospital-purple border border-hospital-purple/30">Özel</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Üniversite Hastaneleri -->
+        <section class="animate-slide-up hospital-section" data-type="university" style="animation-delay: 0.6s">
+            <button onclick="toggleSection('universiteSection', 'universiteIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-health-green/30 to-health-green/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-health-green">school</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Üniversite Hastaneleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">Eğitim ve Araştırma Hastaneleri</span>
+                    </div>
+                </div>
+                <span id="universiteIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="universiteSection" class="expandable-section mt-3 space-y-3">
+                <!-- Uludağ Üniversitesi -->
+                <div class="hospital-card university rounded-xl p-4" onclick="openHospitalDetail('uludag')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-green flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">school</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Uludağ Üniversitesi Tıp Fakültesi Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Görükle Kampüsü, Nilüfer</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-green/20 text-health-green border border-health-green/30">Üniversite</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-gold/20 text-gold border border-gold/30">(0224) 295 40 00</span>
+                    </div>
+                </div>
+
+                <!-- Bursa Teknik Üniversitesi -->
+                <div class="hospital-card university rounded-xl p-4" onclick="openHospitalDetail('btu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-green flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">school</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Teknik Üniversitesi Sağlık Uygulama ve Araştırma Merkezi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım / Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Millet Mah. 1200. Sok. Yıldırım</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="px-2 py-1 rounded text-[10px] bg-health-green/20 text-health-green border border-health-green/30">Üniversite</span>
+                        <span class="px-2 py-1 rounded text-[10px] bg-live-red/20 text-live-red border border-live-red/30">7/24 Acil</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="saglik-ocaklari.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-health-green text-xl">local_hospital</span>
+                    <span class="text-[10px] text-center">ASM'ler</span>
+                </a>
+                <a href="eczaneler.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-health-green text-xl">local_pharmacy</span>
+                    <span class="text-[10px] text-center">Eczaneler</span>
+                </a>
+                <a href="acil-saglik.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-ambulance-orange text-xl">emergency</span>
+                    <span class="text-[10px] text-center">112 Acil</span>
+                </a>
+                <a href="saglik-bakanligi.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-health-blue text-xl">account_balance</span>
+                    <span class="text-[10px] text-center">e-Nabız</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.8s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-ambulance-orange">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-ambulance-orange shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-ambulance-orange mb-1">Randevu ve Acil Durumlar</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            Poliklinik randevuları için <strong>182</strong> veya <strong>MHRS</strong> uygulamasını kullanabilirsiniz. 
+                            Acil durumlarda en yakın hastane acil servisine başvurun. 
+                            Özel hastaneler için önceden anlaşmalı kurum bilgisini kontrol edin.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+        <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-2 pb-4 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">home</span>
+                <span class="text-[9px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">explore</span>
+                <span class="text-[9px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+    <span class="material-symbols-outlined text-xl">search</span>
+    <span class="text-[9px]">Ara</span>
+</a>
+            <a href="profil.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">person</span>
+                <span class="text-[9px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hastane Detay Modalı -->
+    <div id="hospitalDetailModal" class="fixed inset-0 z-[80] modal-hospital hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeHospitalDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Hastane Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Hastane Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-health-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-health-blue text-3xl">local_hospital</span>
+                    </div>
+                    <div>
+                        <h2 id="modalHospitalName" class="text-xl font-bold text-white mb-1">Hastane Adı</h2>
+                        <p id="modalType" class="text-sm text-gold">Tür</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Telefon</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p class="text-sm text-white">Poliklinik: 08:00 - 17:00</p>
+                            <p class="text-xs text-gray-text">Acil Servis: 7/24 Açık</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">web</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Web Sitesi</p>
+                            <p id="modalWeb" class="text-sm text-white">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Özellikler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">verified</span>
+                    Hastane Özellikleri
+                </h3>
+
+                <div id="modalFeatures" class="grid grid-cols-2 gap-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım ve Otopark
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Bölümler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">medical_services</span>
+                    Ana Bölümler
+                </h3>
+
+                <div id="modalDepartments" class="flex flex-wrap gap-2">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button id="modalCallBtn" onclick="callNumber('')" class="flex-1 bg-health-green/20 hover:bg-health-green/30 border border-health-green/50 text-health-green py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Ara
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acil Durum Modalı -->
+    <div id="emergencyModal" class="fixed inset-0 z-[80] modal-hospital hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeEmergencyModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Acil Durumlar</h1>
+                        <p class="text-xs text-gray-text truncate">112 Acil Çağrı Merkezi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-live-red/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-live-red/20 flex items-center justify-center pulse-hospital">
+                        <span class="material-symbols-outlined text-live-red text-3xl">emergency</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-live-red">112</h2>
+                        <p class="text-sm text-gray-text">Ambulans ve Acil Çağrı</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Hayati tehlike, kaza, ani rahatsızlık durumlarında ücretsiz arayın.
+                </p>
+                <button onclick="callNumber('112')" class="w-full bg-live-red/20 hover:bg-live-red/30 border border-live-red/50 text-live-red py-4 rounded-xl text-lg font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    112'yi Ara
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-health-blue text-2xl mb-2">support_agent</span>
+                    <p class="text-lg font-bold text-health-blue">184</p>
+                    <p class="text-xs text-gray-text">Sağlık Danışma</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">event_available</span>
+                    <p class="text-lg font-bold text-gold">182</p>
+                    <p class="text-xs text-gray-text">MHRS Randevu</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-ambulance-orange text-2xl mb-2">local_police</span>
+                    <p class="text-lg font-bold text-ambulance-orange">155</p>
+                    <p class="text-xs text-gray-text">Polis İmdat</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-health-green text-2xl mb-2">fire_truck</span>
+                    <p class="text-lg font-bold text-health-green">110</p>
+                    <p class="text-xs text-gray-text">İtfaiye</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hastane Veritabanı
+        const hospitalData = {
+            'bursa-sehir': {
+                name: 'Bursa Şehir Hastanesi',
+                type: 'Devlet Hastanesi',
+                typeColor: 'health-blue',
+                address: 'Millet Mah. 1200. Sok. No:1 Yıldırım/Bursa',
+                phone: '(0224) 211 10 00',
+                web: 'www.bursasehir.saglik.gov.tr',
+                features: [
+                    { icon: 'bed', text: '1.355 Yatak' },
+                    { icon: 'local_hospital', text: '6 Ayrı Hastane' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'helicopter', text: 'Hava Ambulansı' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: '7/24 Açık Otopark (Ücretli)' },
+                    { icon: 'subway', text: 'M1 Hattı - Şehir Hastanesi durağı' },
+                    { icon: 'local_taxi', text: 'Hastane taksi durağı mevcut' }
+                ],
+                departments: ['Genel Cerrahi', 'Kardiyoloji', 'Nöroloji', 'Onkoloji', 'Ortopedi', 'Pediatri', 'Kadın Doğum', 'Göz', 'Kulak Burun Boğaz', 'Üroloji', 'Dahiliye', 'Psikiyatri'],
+                mapQuery: 'Bursa Şehir Hastanesi, Yıldırım'
+            },
+            'yuksek-ihtisas': {
+                name: 'SBÜ Bursa Yüksek İhtisas EAH',
+                type: 'Eğitim Araştırma Hastanesi',
+                typeColor: 'health-blue',
+                address: 'Millet Mah. Mimar Sinan Cad. No:95 Yıldırım/Bursa',
+                phone: '(0224) 295 30 00',
+                web: 'www.bursayuksekihtisas.saglik.gov.tr',
+                features: [
+                    { icon: 'school', text: 'Eğitim Hastanesi' },
+                    { icon: 'science', text: 'Organ Nakli Merkezi' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'biotech', text: 'Yoğun Bakım' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Sınırlı otopark (alternatif: Şehir Hastanesi otoparkı)' },
+                    { icon: 'subway', text: 'M1 Hattı - Millet durağı (yakınında)' }
+                ],
+                departments: ['Organ Nakli', 'Gastroenteroloji', 'Kardiyovasküler Cerrahi', 'Nöroşirurji', 'Plastik Cerrahi', 'Kalp Damar Cerrahisi'],
+                mapQuery: 'Bursa Yüksek İhtisas Eğitim ve Araştırma Hastanesi'
+            },
+            'cekirge-devlet': {
+                name: 'Çekirge Devlet Hastanesi',
+                type: 'Devlet Hastanesi',
+                typeColor: 'health-blue',
+                address: 'Çekirge Mah. Dr. Rüştü Burlu Cad. No:1 Osmangazi/Bursa',
+                phone: '(0224) 295 50 00',
+                web: 'www.cekirgedh.saglik.gov.tr',
+                features: [
+                    { icon: 'local_hospital', text: 'Genel Hastane' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'pregnant_woman', text: 'Doğumhane' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çekirge durağı)' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 10 dk yürüme' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı (sınırlı)' }
+                ],
+                departments: ['Genel Cerrahi', 'Kadın Doğum', 'Çocuk Sağlığı', 'İç Hastalıkları', 'Ortopedi', 'Kulak Burun Boğaz'],
+                mapQuery: 'Çekirge Devlet Hastanesi, Osmangazi'
+            },
+            'onkoloji': {
+                name: 'Ali Osman Sönmez Onkoloji Hastanesi',
+                type: 'Onkoloji Hastanesi',
+                typeColor: 'health-blue',
+                address: 'Alaaddin Mah. Ortapazar Cad. Menekşe Sk. No:2 Osmangazi/Bursa',
+                phone: '(0224) 295 60 00',
+                web: 'www.bursaonkoloji.saglik.gov.tr',
+                features: [
+                    { icon: 'healing', text: 'Kanser Tedavisi' },
+                    { icon: 'vaccines', text: 'Kemoterapi' },
+                    { icon: 'radio_button_checked', text: 'Radyoterapi' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Alaaddin durağı)' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Medikal Onkoloji', 'Radyasyon Onkolojisi', 'Cerrahi Onkoloji', 'Palyatif Bakım'],
+                mapQuery: 'Ali Osman Sönmez Onkoloji Hastanesi, Bursa'
+            },
+            'dortcelik': {
+                name: 'Dörtçelik Çocuk Hastalıkları Hastanesi',
+                type: 'Çocuk Hastanesi',
+                typeColor: 'health-blue',
+                address: 'Çekirge Mah. Dr. Rüştü Burlu Cad. No:3 Osmangazi/Bursa',
+                phone: '(0224) 295 70 00',
+                web: 'www.dortcelik.saglik.gov.tr',
+                features: [
+                    { icon: 'child_care', text: 'Çocuk Hastanesi' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'vaccines', text: 'Aşı Merkezi' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çekirge durağı)' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Çocuk Cerrahisi', 'Çocuk Kardiyolojisi', 'Çocuk Nörolojisi', 'Yenidoğan', 'Çocuk Onkolojisi', 'Çocuk Alerjisi'],
+                mapQuery: 'Dörtçelik Çocuk Hastanesi, Bursa'
+            },
+            'agiz-dis': {
+                name: 'Bursa Ağız ve Diş Sağlığı EAH',
+                type: 'Diş Hastanesi',
+                typeColor: 'health-blue',
+                address: 'Ankara Yolu Cad. No:1 Adnan Menderes Osmangazi/Bursa',
+                phone: '(0224) 295 80 00',
+                web: 'www.bursadis.saglik.gov.tr',
+                features: [
+                    { icon: 'dentistry', text: 'Diş Hastanesi' },
+                    { icon: 'school', text: 'Eğitim Araştırma' },
+                    { icon: 'medical_services', text: 'Cerrahi İmplant' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 38, 94 hatları' },
+                    { icon: 'subway', text: 'M1 Hattı - Emek durağı (yakınında)' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Ağız Diş ve Çene Cerrahisi', 'Ortodonti', 'Periodontoloji', 'Endodonti', 'Protez', 'Restoratif Diş Tedavisi'],
+                mapQuery: 'Bursa Ağız ve Diş Sağlığı Hastanesi'
+            },
+            'ftr': {
+                name: 'İlker Çelikcan Fizik Tedavi ve Rehabilitasyon Hastanesi',
+                type: 'FTR Hastanesi',
+                typeColor: 'health-blue',
+                address: 'Çekirge Mah. Sıcaksu Mevkii Osmangazi/Bursa',
+                phone: '(0224) 295 90 00',
+                web: 'www.bursaftr.saglik.gov.tr',
+                features: [
+                    { icon: 'spa', text: 'Kaplıca Tedavisi' },
+                    { icon: 'accessibility', text: 'Fizik Tedavi' },
+                    { icon: 'pool', text: 'Hidroterapi' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çekirge durağı)' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Fiziksel Tıp ve Rehabilitasyon', 'Romatoloji', 'Kaplıca Tedavisi', 'Hidroterapi', 'Robotik Rehabilitasyon'],
+                mapQuery: 'İlker Çelikcan FTR Hastanesi, Bursa'
+            },
+            'spastik': {
+                name: 'Dr. Ayten Bozkaya Spastik Çocuklar Hastanesi',
+                type: 'Rehabilitasyon Hastanesi',
+                typeColor: 'health-blue',
+                address: 'Pınarbaşı Mah. Pınarbaşı Cad. No:72 Osmangazi/Bursa',
+                phone: '(0224) 296 00 00',
+                web: 'www.spastik.saglik.gov.tr',
+                features: [
+                    { icon: 'accessible', text: 'Spastik Çocuklar' },
+                    { icon: 'accessibility', text: 'Rehabilitasyon' },
+                    { icon: 'school', text: 'Özel Eğitim' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Çocuk Nörolojisi', 'Fizik Tedavi', 'Özel Eğitim', 'Psikoloji', 'Dil ve Konuşma Terapisi'],
+                mapQuery: 'Dr. Ayten Bozkaya Spastik Çocuklar Hastanesi'
+            },
+            'gemlik-devlet': {
+                name: 'Gemlik Devlet Hastanesi',
+                type: 'İlçe Devlet Hastanesi',
+                typeColor: 'ambulance-orange',
+                address: 'Dr. Ziya Kaya Mah. Hürriyet Cad. No:45 Gemlik/Bursa',
+                phone: '(0224) 513 10 00',
+                web: 'www.gemlikdh.saglik.gov.tr',
+                features: [
+                    { icon: 'local_hospital', text: 'İlçe Hastanesi' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'helicopter', text: 'Hava Ambulansı Pisti' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Gemlik merkez otobüsleri' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Acil', 'Poliklinik', 'Doğumhane', 'Ameliyathane'],
+                mapQuery: 'Gemlik Devlet Hastanesi'
+            },
+            'inegol-devlet': {
+                name: 'İnegöl Devlet Hastanesi',
+                type: 'İlçe Devlet Hastanesi',
+                typeColor: 'ambulance-orange',
+                address: 'Süleymaniye Mah. İstiklal Cad. No:189 İnegöl/Bursa',
+                phone: '(0224) 715 10 00',
+                web: 'www.inegoldh.saglik.gov.tr',
+                features: [
+                    { icon: 'local_hospital', text: 'İlçe Hastanesi' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'bed', text: '200+ Yatak' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'İnegöl merkez otobüsleri' },
+                    { icon: 'local_parking', text: 'Geniş otopark' }
+                ],
+                departments: ['Acil', 'Poliklinik', 'Yoğun Bakım', 'Ameliyathane'],
+                mapQuery: 'İnegöl Devlet Hastanesi'
+            },
+            'mudanya-devlet': {
+                name: 'Mudanya Devlet Hastanesi',
+                type: 'İlçe Devlet Hastanesi',
+                typeColor: 'ambulance-orange',
+                address: 'Güzelyalı Mah. Hastane Cad. No:1 Mudanya/Bursa',
+                phone: '(0224) 544 10 00',
+                web: 'www.mudanyadh.saglik.gov.tr',
+                features: [
+                    { icon: 'local_hospital', text: 'İlçe Hastanesi' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'water', text: 'Deniz Manzaralı' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Mudanya otobüsleri' },
+                    { icon: 'directions_boat', text: 'İDO Mudanya İskelesi\'ne yakın' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Acil', 'Poliklinik', 'Doğumhane'],
+                mapQuery: 'Mudanya Devlet Hastanesi'
+            },
+            'gursu-devlet': {
+                name: 'Gürsu Cüneyt Yıldız Devlet Hastanesi',
+                type: 'İlçe Devlet Hastanesi',
+                typeColor: 'ambulance-orange',
+                address: 'Kurtuluş Mah. Hastane Cad. No:1 Gürsu/Bursa',
+                phone: '(0224) 371 10 00',
+                web: 'www.gursudh.saglik.gov.tr',
+                features: [
+                    { icon: 'local_hospital', text: 'İlçe Hastanesi' },
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Gürsu otobüsleri' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Acil', 'Poliklinik', 'Doğumhane'],
+                mapQuery: 'Gürsu Devlet Hastanesi'
+            },
+            // Özel Hastaneler
+            'acibadem': {
+                name: 'Özel Acıbadem Bursa Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Barış Mah. FSM Bulvarı Sümer Sk. No:1 Nilüfer/Bursa',
+                phone: '(0224) 413 40 00',
+                web: 'www.acibadem.com.tr',
+                features: [
+                    { icon: 'verified', text: 'JCI Akredite' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'helicopter', text: 'Hava Ambulansı' },
+                    { icon: 'biotech', text: 'Organ Nakli' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 5 dk' },
+                    { icon: 'local_parking', text: 'Ücretsiz Vale Otopark' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Onkoloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji', 'Dahiliye', 'Psikiyatri', 'Plastik Cerrahi', 'Beyin Cerrahisi'],
+                mapQuery: 'Acıbadem Bursa Hastanesi'
+            },
+            'medicalpark': {
+                name: 'Özel VM Medical Park Bursa Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Kırcaali Mah. Fevzi Çakmak Cad. No:76 Osmangazi/Bursa',
+                phone: '444 44 84',
+                web: 'www.medicalpark.com.tr',
+                features: [
+                    { icon: 'verified', text: 'JCI Akredite' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'science', text: 'Tüp Bebek Merkezi' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4, 38 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji', 'Dahiliye', 'Tüp Bebek'],
+                mapQuery: 'Medical Park Bursa Hastanesi'
+            },
+            'medicana': {
+                name: 'Özel Medicana Bursa Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Odunluk Mah. İzmir Yolu Cad. No:41 Nilüfer/Bursa',
+                phone: '(0224) 970 01 01',
+                web: 'www.medicana.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'science', text: 'Tüp Bebek' },
+                    { icon: 'healing', text: 'Onkoloji' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji', 'Onkoloji', 'Tüp Bebek'],
+                mapQuery: 'Medicana Bursa Hastanesi'
+            },
+            'doruk-cekirge': {
+                name: 'Özel Doruk Bursa Hastanesi (Çekirge)',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Hüdavendigar Mah. Zübeydehanım Cad. No:5 Osmangazi/Bursa',
+                phone: '(0224) 224 00 00',
+                web: 'www.dorukhastanesi.com.tr',
+                features: [
+                    { icon: 'history', text: '1971\'den Beri' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'science', text: 'Tüp Bebek' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çekirge durağı)' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji', 'Tüp Bebek'],
+                mapQuery: 'Doruk Hastanesi Çekirge'
+            },
+            'doruk-nilufer': {
+                name: 'Özel Doruk Nilüfer Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Lefkoşe Cad. No:22 Nilüfer/Bursa',
+                phone: '(0224) 411 00 00',
+                web: 'www.dorukhastanesi.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'science', text: 'Tüp Bebek' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji'],
+                mapQuery: 'Doruk Nilüfer Hastanesi'
+            },
+            'doruk-yildirim': {
+                name: 'Özel Doruk Yıldırım Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Duaçınarı Mah. Ankara Cad. No:235 Yıldırım/Bursa',
+                phone: '(0224) 413 00 00',
+                web: 'www.dorukhastanesi.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'science', text: 'Tüp Bebek' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji'],
+                mapQuery: 'Doruk Yıldırım Hastanesi'
+            },
+            'nev-anadolu': {
+                name: 'Özel Nev Anadolu Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Beşevler Mah. İzmir Yolu No:105 Nilüfer/Bursa',
+                phone: '(0224) 451 56 00',
+                web: 'www.nevanadolu.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'science', text: 'Tüp Bebek' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı (yakınında)' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji', 'Tüp Bebek'],
+                mapQuery: 'Nev Anadolu Hastanesi'
+            },
+            'nev-esentepe': {
+                name: 'Özel Nev Esentepe Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Esentepe Mh. Mudanya Yolu Cd. No:169 Nilüfer/Bursa',
+                phone: '(0224) 451 57 00',
+                web: 'www.nevesentepe.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'science', text: 'Tüp Bebek' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji'],
+                mapQuery: 'Nev Esentepe Hastanesi'
+            },
+            'medicabil-nilufer': {
+                name: 'Özel Medicabil Nilüfer Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Mudanya Yolu. Fethiye Mh. Küre Sk. No:1 Nilüfer/Bursa',
+                phone: '(0224) 451 58 00',
+                web: 'www.medicabil.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji'],
+                mapQuery: 'Medicabil Nilüfer Hastanesi'
+            },
+            'medicabil-yildirim': {
+                name: 'Özel Medicabil Yıldırım Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Ortabağlar Mah. Ankara Yolu Cad. No:326 Yıldırım/Bursa',
+                phone: '444 81 12',
+                web: 'www.medicabil.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji'],
+                mapQuery: 'Medicabil Yıldırım Hastanesi'
+            },
+            'cekirge-kalp': {
+                name: 'Özel Çekirge Kalp ve Aritmi Hastanesi',
+                type: 'Özel Kalp Hastanesi',
+                typeColor: 'hospital-purple',
+                address: 'Kükürtlü Mah. Zübeydehanım Cad. Konca Sk. No:2 Osmangazi/Bursa',
+                phone: '(0224) 275 75 00',
+                web: 'www.cekirgekalp.com.tr',
+                features: [
+                    { icon: 'favorite', text: 'Kalp Cerrahisi' },
+                    { icon: 'monitor_heart', text: 'Aritmi Merkezi' },
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Kalp Damar Cerrahisi', 'Elektrofizyoloji', 'Anjiyografi'],
+                mapQuery: 'Çekirge Kalp Hastanesi'
+            },
+            'aritmi-osmangazi': {
+                name: 'Özel Aritmi Osmangazi Hastanesi',
+                type: 'Özel Kalp Hastanesi',
+                typeColor: 'hospital-purple',
+                address: 'Ulu Mah. Ulubatlı Hasan Cad. No:48-62 Osmangazi/Bursa',
+                phone: '(0224) 275 76 00',
+                web: 'www.aritmiosmangazi.com.tr',
+                features: [
+                    { icon: 'favorite', text: 'Kalp-Damar' },
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4, 38 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Kalp Damar Cerrahisi', 'Damar Cerrahisi'],
+                mapQuery: 'Aritmi Osmangazi Hastanesi'
+            },
+            'dunyagoz': {
+                name: 'Özel Dünya Göz Bursa Hastanesi',
+                type: 'Özel Göz Hastanesi',
+                typeColor: 'hospital-purple',
+                address: 'Kükürtlü Mah. Emir Abdülkadir Cad. No:58 Osmangazi/Bursa',
+                phone: '(0224) 275 77 00',
+                web: 'www.dunyagoz.com.tr',
+                features: [
+                    { icon: 'visibility', text: 'Göz Hastanesi' },
+                    { icon: 'medical_services', text: 'Lazer Cerrahi' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kornea', 'Retina', 'Glokom', 'Katarakt', 'Lazer', 'Oküloplastik'],
+                mapQuery: 'Dünya Göz Bursa Hastanesi'
+            },
+            'retina': {
+                name: 'Özel Retina Göz Hastanesi',
+                type: 'Özel Göz Hastanesi',
+                typeColor: 'hospital-purple',
+                address: 'Esentepe Mah. Sanayi Cad. No:171 Nilüfer/Bursa',
+                phone: '(0224) 275 78 00',
+                web: 'www.retina.com.tr',
+                features: [
+                    { icon: 'visibility', text: 'Göz Hastanesi' },
+                    { icon: 'medical_services', text: 'Retina Cerrahisi' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Retina', 'Vitreoretinal Cerrahi', 'Katarakt', 'Glokom'],
+                mapQuery: 'Retina Göz Hastanesi Bursa'
+            },
+            'hayat': {
+                name: 'Özel Hayat Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Elmasbahçeler Mah. Ankara Yolu Cad. No:44 Osmangazi/Bursa',
+                phone: '444 23 64',
+                web: 'www.hayathastanesi.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji'],
+                mapQuery: 'Hayat Hastanesi Bursa'
+            },
+            'romatem': {
+                name: 'Özel Romatem Bursa FTR Hastanesi',
+                type: 'Özel FTR Hastanesi',
+                typeColor: 'hospital-purple',
+                address: 'Kükürtlü Mah. Mudanya Yolu Cad. No:65 Osmangazi/Bursa',
+                phone: '(0224) 275 79 00',
+                web: 'www.romatem.com.tr',
+                features: [
+                    { icon: 'accessibility', text: 'Fizik Tedavi' },
+                    { icon: 'sports', text: 'Sporcu Sağlığı' },
+                    { icon: 'pool', text: 'Hidroterapi' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Fizik Tedavi', 'Rehabilitasyon', 'Ağrı Tedavisi', 'Sporcu Sağlığı', 'Nörorehabilitasyon'],
+                mapQuery: 'Romatem Bursa'
+            },
+            'pembemavi': {
+                name: 'Özel Pembe Mavi Tüp Bebek ve Kadın Hastalıkları',
+                type: 'Özel Tüp Bebek Merkezi',
+                typeColor: 'hospital-purple',
+                address: 'Barış Mah. FSM Bulvarı No:7 Nilüfer/Bursa',
+                phone: '(0224) 275 80 00',
+                web: 'www.pembemavi.com.tr',
+                features: [
+                    { icon: 'child_care', text: 'Tüp Bebek' },
+                    { icon: 'pregnant_woman', text: 'Kadın Hastalıkları' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Tüp Bebek', 'Kadın Hastalıkları', 'Doğum', 'Jinekoloji'],
+                mapQuery: 'Pembe Mavi Tüp Bebek Merkezi Bursa'
+            },
+            'mavisehir': {
+                name: 'Özel Mavişehir Tıp Merkezi',
+                type: 'Özel Tıp Merkezi',
+                typeColor: 'hospital-purple',
+                address: 'Mavişehir Mah. Mavişehir Cad. No:1 Nilüfer/Bursa',
+                phone: '(0224) 275 81 00',
+                web: 'www.mavisehirtipmerkezi.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Acil', 'Poliklinik', 'Laboratuvar', 'Radyoloji'],
+                mapQuery: 'Mavişehir Tıp Merkezi Bursa'
+            },
+            'inegol-ozel': {
+                name: 'Özel İnegöl Borsa Hastanesi',
+                type: 'Özel Hastane',
+                typeColor: 'hospital-purple',
+                address: 'Osmaniye Mah. Cumhuriyet Cad. No:146 İnegöl/Bursa',
+                phone: '(0224) 715 20 00',
+                web: 'www.inegolborsa.com.tr',
+                features: [
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'İnegöl merkez otobüsleri' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı' }
+                ],
+                departments: ['Kardiyoloji', 'Nöroloji', 'Ortopedi', 'Kadın Doğum', 'Göz', 'KBB', 'Üroloji'],
+                mapQuery: 'İnegöl Borsa Hastanesi'
+            },
+            // Üniversite Hastaneleri
+            'uludag': {
+                name: 'Uludağ Üniversitesi Tıp Fakültesi Hastanesi',
+                type: 'Üniversite Hastanesi',
+                typeColor: 'health-green',
+                address: 'Görükle Kampüsü, Nilüfer/Bursa',
+                phone: '(0224) 295 40 00',
+                web: 'www.uludag.edu.tr',
+                features: [
+                    { icon: 'school', text: 'Eğitim Hastanesi' },
+                    { icon: 'science', text: 'Araştırma Merkezi' },
+                    { icon: 'emergency', text: '7/24 Acil' },
+                    { icon: 'biotech', text: 'Organ Nakli' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları (Görükle hattı)' },
+                    { icon: 'subway', text: 'M2 Hattı - Üniversite durağı' },
+                    { icon: 'local_parking', text: 'Kampüs içi otopark' }
+                ],
+                departments: ['Tüm Tıp Branşları', 'Organ Nakli', 'Onkoloji', 'Nöroşirurji', 'Kardiyovasküler Cerrahi', 'Çocuk Cerrahisi'],
+                mapQuery: 'Uludağ Üniversitesi Tıp Fakültesi Hastanesi'
+            },
+            'btu': {
+                name: 'Bursa Teknik Üniversitesi Sağlık Uygulama ve Araştırma Merkezi',
+                type: 'Üniversite Hastanesi',
+                typeColor: 'health-green',
+                address: 'Millet Mah. 1200. Sok. Yıldırım/Bursa',
+                phone: '(0224) 211 20 00',
+                web: 'www.btu.edu.tr',
+                features: [
+                    { icon: 'school', text: 'Eğitim Hastanesi' },
+                    { icon: 'emergency', text: '7/24 Acil' }
+                ],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'subway', text: 'M1 Hattı - Şehir Hastanesi durağı' },
+                    { icon: 'local_parking', text: 'Otopark mevcut' }
+                ],
+                departments: ['Genel Cerrahi', 'İç Hastalıkları', 'Kadın Doğum', 'Çocuk Sağlığı', 'Ortopedi'],
+                mapQuery: 'Bursa Teknik Üniversitesi Sağlık Merkezi'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // Type Filter
+        let currentType = 'all';
+        function filterType(type) {
+            currentType = type;
+            
+            // Update buttons
+            document.querySelectorAll('.type-badge').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-type-' + type).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.hospital-section');
+            sections.forEach(section => {
+                if (type === 'all' || section.dataset.type === type) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Hospital
+        function searchHospital() {
+            const searchTerm = document.getElementById('hospitalSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.hospital-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open Hospital Detail Modal
+        function openHospitalDetail(hospitalId) {
+            const hospital = hospitalData[hospitalId];
+            if (!hospital) return;
+
+            document.getElementById('modalHospitalName').textContent = hospital.name;
+            document.getElementById('modalType').textContent = hospital.type;
+            document.getElementById('modalType').className = 'text-sm text-' + hospital.typeColor;
+            document.getElementById('modalAddress').textContent = hospital.address;
+            document.getElementById('modalPhone').textContent = hospital.phone;
+            document.getElementById('modalWeb').textContent = hospital.web;
+            
+            // Icon rengini ayarla
+            const iconEl = document.getElementById('modalIcon');
+            iconEl.className = 'w-16 h-16 rounded-2xl bg-' + hospital.typeColor + '/20 flex items-center justify-center';
+            iconEl.querySelector('span').className = 'material-symbols-outlined text-' + hospital.typeColor + ' text-3xl';
+
+            // Özellikleri doldur
+            const featuresContainer = document.getElementById('modalFeatures');
+            featuresContainer.innerHTML = '';
+            hospital.features.forEach(feature => {
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 rounded-xl p-3 text-center';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold text-xl mb-1">${feature.icon}</span>
+                    <p class="text-xs text-gray-text">${feature.text}</p>
+                `;
+                featuresContainer.appendChild(div);
+            });
+
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            hospital.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Bölümleri doldur
+            const departmentsContainer = document.getElementById('modalDepartments');
+            departmentsContainer.innerHTML = '';
+            hospital.departments.forEach(dept => {
+                const span = document.createElement('span');
+                span.className = 'px-3 py-1.5 rounded-full text-xs bg-white/10 text-gray-text border border-white/10';
+                span.textContent = dept;
+                departmentsContainer.appendChild(span);
+            });
+
+            // Butonları güncelle
+            document.getElementById('modalCallBtn').setAttribute('onclick', `callNumber('${hospital.phone.replace(/\D/g, '')}')`);
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${hospital.mapQuery}')`);
+
+            document.getElementById('hospitalDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Hospital Detail Modal
+        function closeHospitalDetail() {
+            document.getElementById('hospitalDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Emergency Modal
+        function openEmergencyModal() {
+            document.getElementById('emergencyModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak tüm bölümler kapalı
+        });
+    </script>
+
+</body>
+</html>

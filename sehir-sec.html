@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>CityJoy - Şehrin Seç</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+    <style>
+        :root {
+            --gold: #C9A86C;
+            --bg-deep: #081F24;
+            --bg-dark: #0D3238;
+            --bg-med: #133D43;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            margin: 0; padding: 0; height: 100%; overflow: hidden;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-deep); color: white;
+        }
+        body { background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%); min-height: 100dvh; }
+
+        /* Scrollable orta alan */
+        .main-scroll {
+            height: 100dvh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .main-scroll::-webkit-scrollbar { display: none; }
+
+        /* Glass panel */
+        .glass {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(201, 168, 108, 0.15);
+            border-radius: 20px;
+        }
+
+        /* GPS butonu */
+        .btn-gps {
+            background: linear-gradient(135deg, #C9A86C, #f4d03f);
+            border: none; border-radius: 16px;
+            color: #081F24; font-weight: 700;
+            font-size: 15px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 16px 24px; width: 100%;
+            transition: all 0.3s; box-shadow: 0 4px 20px rgba(201,168,108,0.35);
+        }
+        .btn-gps:active { transform: scale(0.97); }
+        .btn-gps:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Arama kutusu */
+        .search-box {
+            background: rgba(13, 50, 56, 0.8);
+            border: 1px solid rgba(201,168,108,0.2);
+            border-radius: 14px;
+            color: white; font-size: 15px; font-weight: 500;
+            padding: 14px 16px 14px 44px;
+            width: 100%; outline: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .search-box::placeholder { color: rgba(255,255,255,0.35); }
+        .search-box:focus { border-color: rgba(201,168,108,0.5); }
+
+        /* İl listesi */
+        .il-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: background 0.2s; border-radius: 12px;
+            margin-bottom: 2px;
+        }
+        .il-item:hover, .il-item:active { background: rgba(201,168,108,0.1); }
+        .il-item .plaka {
+            min-width: 32px; height: 32px; border-radius: 8px;
+            background: rgba(201,168,108,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; color: var(--gold);
+        }
+
+        /* İlçe listesi */
+        .ilce-panel { display: none; }
+        .ilce-panel.aktif { display: block; }
+        .ilce-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 13px 16px; cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px; margin-bottom: 2px;
+            transition: background 0.2s;
+        }
+        .ilce-item:hover, .ilce-item:active { background: rgba(201,168,108,0.1); }
+
+        /* Yükleniyor spinner */
+        .spinner {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 3px solid rgba(8,31,36,0.3);
+            border-top-color: #081F24;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: rgba(13,50,56,0.95); backdrop-filter: blur(16px);
+            border: 1px solid rgba(201,168,108,0.3);
+            color: white; border-radius: 12px;
+            padding: 12px 20px; font-size: 14px; font-weight: 500;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            white-space: nowrap; z-index: 9999;
+        }
+        .toast.show { opacity: 1; }
+
+        /* Geri butonu */
+        .btn-back {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: rgba(13,50,56,0.7); border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-back:active { transform: scale(0.93); }
+    </style>
+</head>
+<body>
+
+<div class="main-scroll" id="mainScroll">
+    <div style="padding: 24px 20px 40px; max-width: 480px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom: 28px;">
+            <div class="btn-back" id="btnGeri" onclick="geriDon()">
+                <span class="material-icons-round" style="font-size:20px; color:rgba(255,255,255,0.7);">arrow_back</span>
+            </div>
+            <div>
+                <h1 style="margin:0; font-size:22px; font-weight:800; letter-spacing:-0.5px;">Şehrini Seç</h1>
+                <p style="margin:0; font-size:13px; color:rgba(255,255,255,0.45); margin-top:2px;">
+                    CityJoy sana özel içerik sunsun
+                </p>
+            </div>
+        </div>
+
+        <!-- GPS Butonu -->
+        <button class="btn-gps" id="btnGPS" onclick="gpsDene()">
+            <span class="material-icons-round" style="font-size:20px;">my_location</span>
+            <span id="gpsLabel">Konumumu Otomatik Bul</span>
+            <div class="spinner" id="gpsSpinner"></div>
+        </button>
+
+        <!-- Ayraç -->
+        <div style="display:flex; align-items:center; gap:12px; margin: 20px 0;">
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+            <span style="font-size:12px; color:rgba(255,255,255,0.3); font-weight:600;">VEYA KENDIN SEÇ</span>
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+        </div>
+
+        <!-- Arama -->
+        <div style="position:relative; margin-bottom:16px;">
+            <span class="material-icons-round" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.3); font-size:20px;">search</span>
+            <input class="search-box" id="aramaInput" placeholder="İl ara... (örn. Bursa, İzmir)" oninput="ilAra(this.value)"/>
+        </div>
+
+        <!-- İl Listesi -->
+        <div class="glass" id="ilListesiPanel" style="padding: 8px;">
+            <div id="ilListesi"></div>
+        </div>
+
+        <!-- İlçe Seçimi (başta gizli) -->
+        <div class="ilce-panel glass" id="ilcePanel" style="margin-top:16px; padding:8px;">
+            <div style="padding:12px 8px 8px; display:flex; align-items:center; gap:8px;">
+                <button onclick="ilceKapat()" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;padding:0;display:flex;align-items:center;">
+                    <span class="material-icons-round" style="font-size:18px;">chevron_left</span>
+                </button>
+                <span id="ilceBashik" style="font-size:15px; font-weight:700; color:var(--gold);"></span>
+                <span style="font-size:12px; color:rgba(255,255,255,0.35); margin-left:auto;">İlçe seç</span>
+            </div>
+            <div id="ilceListesi"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+    import { KonumManager } from '/js/konum.js';
+    window._KM = KonumManager;
+</script>
+
+<script>
+    let sehirlerData = null;
+    let seciliIl = null;
+
+    // ─── Sehirler.json yükle ──────────────────────────────────────
+    async function yukle() {
+        try {
+            const res = await fetch('/data/sehirler.json');
+            sehirlerData = await res.json();
+            renderIlListesi(sehirlerData.iller);
+        } catch (e) {
+            toast('❌ Şehir listesi yüklenemedi.');
+        }
+    }
+
+    // ─── İl listesini render et ───────────────────────────────────
+    function renderIlListesi(iller) {
+        const el = document.getElementById('ilListesi');
+        if (!iller.length) {
+            el.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.3); font-size:14px;">Sonuç bulunamadı</div>';
+            return;
+        }
+        el.innerHTML = iller.map(il => `
+            <div class="il-item" onclick="ilSec(${il.plaka})">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="plaka">${il.plaka}</div>
+                    <span style="font-size:15px; font-weight:600;">${il.il}</span>
+                </div>
+                <span class="material-icons-round" style="font-size:18px; color:rgba(255,255,255,0.3);">chevron_right</span>
+            </div>
+        `).join('');
+    }
+
+    // ─── İl arama ─────────────────────────────────────────────────
+    function ilAra(q) {
+        if (!sehirlerData) return;
+        ilceKapat();
+        const norm = s => s.toLocaleLowerCase('tr').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c');
+        const qN = norm(q.trim());
+        const sonuc = qN ? sehirlerData.iller.filter(i => norm(i.il).includes(qN)) : sehirlerData.iller;
+        renderIlListesi(sonuc);
+    }
+    window.ilAra = ilAra;
+
+    // ─── İl seç → ilçeleri göster ────────────────────────────────
+    function ilSec(plaka) {
+        if (!sehirlerData) return;
+        seciliIl = sehirlerData.iller.find(i => i.plaka === plaka);
+        if (!seciliIl) return;
+
+        document.getElementById('ilceBashik').textContent = seciliIl.il;
+        const el = document.getElementById('ilceListesi');
+        el.innerHTML = seciliIl.ilceler.map(ilce => `
+            <div class="ilce-item" onclick="konumSec('${seciliIl.il}', '${ilce}')">
+                <span class="material-icons-round" style="font-size:16px; color:rgba(201,168,108,0.6);">location_on</span>
+                <span style="font-size:14px; font-weight:500;">${ilce}</span>
+            </div>
+        `).join('');
+
+        document.getElementById('ilcePanel').classList.add('aktif');
+        // Scroll to ilçe panel
+        setTimeout(() => {
+            document.getElementById('ilcePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
+    window.ilSec = ilSec;
+
+    // ─── İlçe panelini kapat ──────────────────────────────────────
+    function ilceKapat() {
+        document.getElementById('ilcePanel').classList.remove('aktif');
+        seciliIl = null;
+    }
+    window.ilceKapat = ilceKapat;
+
+    // ─── Konum seç ve kaydet ──────────────────────────────────────
+    function konumSec(il, ilce) {
+        if (window._KM) {
+            window._KM.kaydet(il, ilce);
+        } else {
+            // Fallback: direkt localStorage
+            localStorage.setItem('cj_konum', JSON.stringify({ il, ilce, lat: null, lon: null, zaman: Date.now() }));
+            localStorage.setItem('preferredLocation', JSON.stringify({ city: il, district: ilce }));
+        }
+        toast(`✅ ${ilce}, ${il} seçildi!`);
+        setTimeout(() => yonlendir(), 1000);
+    }
+    window.konumSec = konumSec;
+
+    // ─── GPS dene ────────────────────────────────────────────────
+    async function gpsDene() {
+        const btn = document.getElementById('btnGPS');
+        const label = document.getElementById('gpsLabel');
+        const spinner = document.getElementById('gpsSpinner');
+
+        btn.disabled = true;
+        label.textContent = 'Konum alınıyor...';
+        spinner.style.display = 'block';
+
+        try {
+            const km = window._KM;
+            if (!km) throw new Error('KonumManager yüklenemedi');
+            const konum = await km.konumAl(true);
+            if (konum && konum.il) {
+                toast(`📍 ${konum.ilce ? konum.ilce + ', ' : ''}${konum.il} tespit edildi!`);
+                setTimeout(() => yonlendir(), 1000);
+            } else {
+                toast('📍 Konum tespit edilemedi, lütfen elle seç.');
+            }
+        } catch (e) {
+            toast('⚠️ GPS izni reddedildi veya hata oluştu.');
+        } finally {
+            btn.disabled = false;
+            label.textContent = 'Konumumu Otomatik Bul';
+            spinner.style.display = 'none';
+        }
+    }
+    window.gpsDene = gpsDene;
+
+    // ─── Yönlendir ────────────────────────────────────────────────
+    function yonlendir() {
+        const redirect = sessionStorage.getItem('cj_redirect_after_konum');
+        sessionStorage.removeItem('cj_redirect_after_konum');
+        location.href = redirect || '/anasayfa.html';
+    }
+
+    // ─── Geri dön ─────────────────────────────────────────────────
+    function geriDon() {
+        history.length > 1 ? history.back() : (location.href = '/anasayfa.html');
+    }
+    window.geriDon = geriDon;
+
+    // ─── Toast ────────────────────────────────────────────────────
+    let toastTimer;
+    function toast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    // ─── Başlat ───────────────────────────────────────────────────
+    yukle();
+</script>
+</body>
+</html>

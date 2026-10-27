@@ -1,0 +1,1522 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>Hamitler Mahallesi - Osmangazi</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                        "accent-green": "#10b981",
+                        "accent-red": "#ef4444",
+                        "accent-purple": "#8b5cf6",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.7s ease-out',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'slide-in-right': 'slideInRight 0.4s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideInRight: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.4)' },
+                            '50%': { boxShadow: '0 0 35px rgba(224, 176, 122, 0.7)' },
+                        },
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glow-gold-active {
+                box-shadow: 0 0 15px rgba(224, 176, 122, 0.5);
+            }
+            .card-inner-glow {
+                box-shadow: inset 0 0 20px rgba(31, 80, 85, 0.6);
+            }
+            .nav-glow-gold {
+                filter: drop-shadow(0 0 8px rgba(240, 179, 111, 0.7));
+            }
+            .glass-panel {
+                background: rgba(13, 50, 56, 0.85);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+            }
+            .compact-card {
+                background: linear-gradient(135deg, rgba(23, 70, 75, 0.6) 0%, rgba(8, 31, 36, 0.8) 100%);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+                transition: all 0.3s ease;
+            }
+            .compact-card:hover {
+                border-color: rgba(224, 176, 122, 0.5);
+                transform: translateY(-2px);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .tab-active {
+                background: linear-gradient(135deg, #E0B07A 0%, #F0B36F 100%);
+                color: #081F24;
+                box-shadow: 0 4px 15px rgba(224, 176, 122, 0.4);
+            }
+            .tab-passive {
+                background: rgba(23, 70, 75, 0.6);
+                color: #9FB6B8;
+                border: 1px solid rgba(63, 110, 112, 0.4);
+            }
+            .tab-passive:hover {
+                border-color: rgba(224, 176, 122, 0.5);
+                color: #E0B07A;
+            }
+            .ai-badge {
+                background: linear-gradient(135deg, #1E3A2F 0%, #0D3238 100%);
+                border: 2px solid rgba(224, 176, 122, 0.6);
+                box-shadow: 0 0 20px rgba(224, 176, 122, 0.3);
+            }
+            .ai-badge:hover {
+                box-shadow: 0 0 30px rgba(224, 176, 122, 0.5);
+                transform: translateY(-2px);
+            }
+            .chat-modal {
+                position: fixed;
+                inset: 0;
+                z-index: 100;
+                background: rgba(8, 31, 36, 0.95);
+                backdrop-filter: blur(10px);
+                display: none;
+                flex-direction: column;
+            }
+            .chat-modal.active {
+                display: flex;
+            }
+            .slide-modal {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                max-width: 480px;
+                z-index: 90;
+                background: linear-gradient(180deg, #0D3238 0%, #081F24 100%);
+                border-left: 1px solid rgba(224, 176, 122, 0.3);
+                transform: translateX(100%);
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow-y: auto;
+            }
+            .slide-modal.active {
+                transform: translateX(0);
+            }
+            .modal-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.6);
+                z-index: 85;
+                display: none;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            .modal-overlay.active {
+                display: block;
+                opacity: 1;
+            }
+            .message-bubble {
+                max-width: 80%;
+                padding: 12px 16px;
+                border-radius: 16px;
+                margin-bottom: 12px;
+                font-size: 14px;
+                line-height: 1.5;
+            }
+            .message-user {
+                background: linear-gradient(135deg, #E0B07A 0%, #F0B36F 100%);
+                color: #081F24;
+                margin-left: auto;
+                border-bottom-right-radius: 4px;
+            }
+            .message-ai {
+                background: rgba(23, 70, 75, 0.8);
+                border: 1px solid rgba(224, 176, 122, 0.3);
+                color: white;
+                margin-right: auto;
+                border-bottom-left-radius: 4px;
+            }
+            .gallery-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .gallery-item {
+                aspect-ratio: 1;
+                border-radius: 12px;
+                overflow: hidden;
+                cursor: pointer;
+                border: 2px solid transparent;
+                transition: all 0.3s ease;
+            }
+            .gallery-item:hover {
+                border-color: #E0B07A;
+                transform: scale(1.02);
+            }
+            .gallery-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .timeline-item {
+                position: relative;
+                padding-left: 24px;
+                padding-bottom: 24px;
+                border-left: 2px solid rgba(224, 176, 122, 0.3);
+            }
+            .timeline-item::before {
+                content: '';
+                position: absolute;
+                left: -5px;
+                top: 0;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #E0B07A;
+                box-shadow: 0 0 10px rgba(224, 176, 122, 0.5);
+            }
+            .timeline-item:last-child {
+                border-left: 2px solid transparent;
+            }
+            .institution-card {
+                background: rgba(23, 70, 75, 0.4);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+                border-radius: 12px;
+                padding: 16px;
+                transition: all 0.3s ease;
+            }
+            .institution-card:hover {
+                border-color: rgba(224, 176, 122, 0.5);
+                background: rgba(23, 70, 75, 0.6);
+            }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden">
+
+<!-- Modal Overlay -->
+<div id="modal-overlay" class="modal-overlay" onclick="closeAllModals()"></div>
+
+<!-- AI Chat Modal -->
+<div id="ai-chat-modal" class="chat-modal">
+    <div class="flex items-center justify-between px-4 py-3 bg-nav-bg border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full ai-badge flex items-center justify-center">
+                <span class="material-symbols-outlined text-gold-primary text-lg">smart_toy</span>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-white">Hamitler AI</h3>
+                <p class="text-[10px] text-gold-primary">Mahalle Asistanı</p>
+            </div>
+        </div>
+        <button onclick="closeAIChat()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <span class="material-symbols-outlined text-white text-sm">close</span>
+        </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto p-4" id="chat-messages">
+        <div class="message-bubble message-ai">
+            <p class="mb-2">👋 Merhaba! Ben Hamitler Mahallesi dijital asistanınızım.</p>
+            <p>Size şunlar hakkında yardımcı olabilirim:</p>
+            <ul class="mt-2 space-y-1 text-xs text-text-secondary">
+                <li>• Mahalle duyuruları ve etkinlikler</li>
+                <li>• Belediye hizmetleri ve başvurular</li>
+                <li>• Acil durum iletişim bilgileri</li>
+                <li>• Yerel esnaf ve işletmeler</li>
+            </ul>
+            <p class="mt-3 text-gold-primary text-xs">Nasıl yardımcı olabilirim?</p>
+        </div>
+    </div>
+    
+    <div class="border-t border-border-subtle/30 p-3 bg-nav-bg">
+        <div class="flex gap-2">
+            <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." 
+                   class="flex-1 bg-darkest border border-border-subtle/30 rounded-full px-4 py-2 text-sm text-white placeholder-text-desc focus:outline-none focus:border-gold-primary/50"
+                   onkeypress="if(event.key==='Enter')sendMessage()">
+            <button onclick="sendMessage()" class="w-10 h-10 rounded-full bg-gold-primary flex items-center justify-center text-darkest hover:bg-gold-nav transition-colors">
+                <span class="material-symbols-outlined text-sm">send</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Tarihçe Modal -->
+<div id="tarihce-modal" class="slide-modal">
+    <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gold-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-gold-primary text-lg">history</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white">Hamitler Tarihçesi</h3>
+                <p class="text-[10px] text-gold-primary">Geçmişten günümüze</p>
+            </div>
+        </div>
+        <button onclick="closeModal('tarihce-modal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </div>
+    
+    <div class="p-4 space-y-6">
+        <!-- Başlangıç -->
+        <div class="glass-panel rounded-xl p-4">
+            <h4 class="text-sm font-bold text-gold-primary mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">info</span>
+                İsim Kökeni
+            </h4>
+            <p class="text-sm text-text-secondary leading-relaxed">
+                Hamitler Mahallesi, adını 19. yüzyılda bölgede yaşayan <span class="text-gold-primary">Hamit Bey</span>'den alır. 
+                O dönemde küçük bir köy olan yerleşim, 1960'lardan itibaren hızla büyümeye başlamıştır.
+            </p>
+        </div>
+
+        <!-- Timeline -->
+        <div class="space-y-0 pl-2">
+            <div class="timeline-item">
+                <h5 class="text-sm font-bold text-white mb-1">1890'lar</h5>
+                <p class="text-xs text-text-desc">Hamit Bey'in çiftliği etrafında ilk yerleşim başlar</p>
+            </div>
+            <div class="timeline-item">
+                <h5 class="text-sm font-bold text-white mb-1">1950'ler</h5>
+                <p class="text-xs text-text-desc">Bursa'nın büyümesiyle birlikte nüfus artışı başlar</p>
+            </div>
+            <div class="timeline-item">
+                <h5 class="text-sm font-bold text-white mb-1">1970'ler</h5>
+                <p class="text-xs text-text-desc">İlk okul (Hamitler İlkokulu) ve cami inşası</p>
+            </div>
+            <div class="timeline-item">
+                <h5 class="text-sm font-bold text-white mb-1">1990'lar</h5>
+                <p class="text-xs text-text-desc">Modern apartmanlaşma dönemi, altyapı iyileştirmeleri</p>
+            </div>
+            <div class="timeline-item">
+                <h5 class="text-sm font-bold text-white mb-1">2010'lar - Günümüz</h5>
+                <p class="text-xs text-text-desc">Osmangazi Belediyesi dönüşüm projeleri, park ve sosyal tesisler</p>
+            </div>
+        </div>
+
+        <!-- Eski Yeni -->
+        <div class="glass-panel rounded-xl p-4">
+            <h4 class="text-sm font-bold text-gold-primary mb-3">Eski Hamitler</h4>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-lg overflow-hidden aspect-[4/3] bg-card-bg/50">
+                    <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&h=300&fit=crop" alt="Eski Hamitler" class="w-full h-full object-cover opacity-80">
+                    <p class="text-[10px] text-center text-text-desc mt-1">1960'lar</p>
+                </div>
+                <div class="rounded-lg overflow-hidden aspect-[4/3] bg-card-bg/50">
+                    <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=300&fit=crop" alt="Yeni Hamitler" class="w-full h-full object-cover">
+                    <p class="text-[10px] text-center text-text-desc mt-1">Günümüz</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fun Fact -->
+        <div class="bg-gold-primary/10 border border-gold-primary/30 rounded-xl p-4">
+            <p class="text-xs text-text-secondary italic">
+                💡 <span class="text-gold-primary font-bold">Biliyor muydunuz?</span> 
+                Hamitler'deki ilk apartman 1974'te yapılmış ve hâlâ ayaktadır. 
+                Bina, "Hamitler Apartmanı" olarak bilinir.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Eğitim & Sağlık Modal -->
+<div id="egitim-modal" class="slide-modal">
+    <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-accent-teal text-lg">school</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white">Eğitim & Sağlık</h3>
+                <p class="text-[10px] text-accent-teal">Altyapı bilgileri</p>
+            </div>
+        </div>
+        <button onclick="closeModal('egitim-modal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </div>
+    
+    <div class="p-4 space-y-6">
+        <!-- Eğitim -->
+        <div>
+            <h4 class="text-sm font-bold text-gold-primary mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">school</span>
+                Okullar
+            </h4>
+            <div class="space-y-3">
+                <div class="institution-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Hamitler İlkokulu</h5>
+                        <span class="text-[10px] bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full">Açık</span>
+                    </div>
+                    <p class="text-xs text-text-desc mb-2">Huzur Cd. No:45</p>
+                    <div class="flex gap-2 text-[10px] text-text-secondary">
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">schedule</span> 08:00-17:00</span>
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">phone</span> 0224 224 XX XX</span>
+                    </div>
+                </div>
+
+                <div class="institution-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Hamitler Ortaokulu</h5>
+                        <span class="text-[10px] bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full">Açık</span>
+                    </div>
+                    <p class="text-xs text-text-desc mb-2">Güneş Sk. No:12</p>
+                    <div class="flex gap-2 text-[10px] text-text-secondary">
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">schedule</span> 08:00-17:00</span>
+                    </div>
+                </div>
+
+                <div class="institution-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Özel Hamitler Anaokulu</h5>
+                        <span class="text-[10px] bg-gold-primary/20 text-gold-primary px-2 py-0.5 rounded-full">Özel</span>
+                    </div>
+                    <p class="text-xs text-text-desc mb-2">Bahçe Cd. No:8</p>
+                    <div class="flex gap-2 text-[10px] text-text-secondary">
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">payments</span> ₺3.500/ay</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağlık -->
+        <div>
+            <h4 class="text-sm font-bold text-gold-primary mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">local_hospital</span>
+                Sağlık Kuruluşları
+            </h4>
+            <div class="space-y-3">
+                <div class="institution-card border-accent-red/30">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Hamitler Sağlık Ocağı</h5>
+                        <span class="text-[10px] bg-accent-red/20 text-accent-red px-2 py-0.5 rounded-full">Acil</span>
+                    </div>
+                    <p class="text-xs text-text-desc mb-2">Ana Cadde No:23</p>
+                    <div class="flex gap-2 text-[10px] text-text-secondary">
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">schedule</span> 24 Saat</span>
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">phone</span> 0224 224 12 34</span>
+                    </div>
+                </div>
+
+                <div class="institution-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Hamitler Eczanesi</h5>
+                        <span class="text-[10px] bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full">Nobetçi</span>
+                    </div>
+                    <p class="text-xs text-text-desc mb-2">Çarşı içi No:5</p>
+                    <div class="flex gap-2 text-[10px] text-text-secondary">
+                        <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">schedule</span> 08:30-22:00</span>
+                    </div>
+                </div>
+
+                <div class="institution-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Özel Hamitler Tıp Merkezi</h5>
+                        <span class="text-[10px] bg-accent-blue/20 text-accent-blue px-2 py-0.5 rounded-full">Özel</span>
+                    </div>
+                    <p class="text-xs text-text-desc mb-2">Modern Sk. No:15</p>
+                    <p class="text-[10px] text-text-secondary">Dahiliye, Çocuk, Ortopedi</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ulaşım Bilgisi -->
+        <div class="glass-panel rounded-xl p-4">
+            <h4 class="text-sm font-bold text-gold-primary mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">directions_bus</span>
+                Ulaşım
+            </h4>
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between items-center py-2 border-b border-border-subtle/20">
+                    <span class="text-text-secondary">Şehir Merkezi</span>
+                    <span class="text-white font-medium">25 dk (38T)</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-border-subtle/20">
+                    <span class="text-text-secondary">En Yakın Metro</span>
+                    <span class="text-white font-medium">Çiftehavuzlar (12 dk yürüyüş)</span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-text-secondary">Otogar</span>
+                    <span class="text-white font-medium">15 dk (47 numara)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sosyal Yaşam Modal -->
+<div id="sosyal-modal" class="slide-modal">
+    <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-accent-purple text-lg">diversity_3</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white">Sosyal Yaşam</h3>
+                <p class="text-[10px] text-accent-purple">Dernekler & Etkinlikler</p>
+            </div>
+        </div>
+        <button onclick="closeModal('sosyal-modal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </div>
+    
+    <div class="p-4 space-y-6">
+        <!-- Dernekler -->
+        <div>
+            <h4 class="text-sm font-bold text-gold-primary mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">groups</span>
+                Mahalle Dernekleri
+            </h4>
+            <div class="space-y-3">
+                <div class="institution-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Hamitler Spor Kulübü</h5>
+                        <button class="text-[10px] bg-gold-primary/20 text-gold-primary px-2 py-1 rounded-full hover:bg-gold-primary/30 transition-colors">
+                            Katıl
+                        </button>
+                    </div>
+                    <p class="text-xs text-text-desc mb-2">Futbol, basketbol ve voleybol takımları</p>
+                    <div class="flex gap-2">
+                        <span class="text-[10px] bg-card-bg/50 px-2 py-1 rounded text-text-secondary">240 Üye</span>
+                        <span class="text-[10px] bg-card-bg/50 px-2 py-1 rounded text-text-secondary">Hafta sonu antrenman</span>
+                    </div>
+                </div>
+
+                <div class="institution-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Hamitler Kültür ve Yardımlaşma Derneği</h5>
+                        <button class="text-[10px] bg-gold-primary/20 text-gold-primary px-2 py-1 rounded-full hover:bg-gold-primary/30 transition-colors">
+                            Bilgi Al
+                        </button>
+                    </div>
+                    <p class="text-xs text-text-desc mb-2">Ramazan etkinlikleri, yardım kampanyaları</p>
+                </div>
+
+                <div class="institution-card">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-sm font-bold text-white">Kadınlar Kahvesi</h5>
+                        <span class="text-[10px] bg-accent-green/20 text-accent-green px-2 py-0.5 rounded-full">Aktif</span>
+                    </div>
+                    <p class="text-xs text-text-desc">Her Perşembe 14:00'te mahalle konağında buluşma</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Geleneksel Etkinlikler -->
+        <div>
+            <h4 class="text-sm font-bold text-gold-primary mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">celebration</span>
+                Geleneksel Etkinlikler
+            </h4>
+            <div class="space-y-3">
+                <div class="bg-card-bg/30 rounded-xl p-3 border-l-4 border-gold-primary">
+                    <div class="flex justify-between items-start mb-1">
+                        <h5 class="text-sm font-bold text-white">Ramazan Pilav Günü</h5>
+                        <span class="text-[10px] text-gold-primary">Her yıl</span>
+                    </div>
+                    <p class="text-xs text-text-desc">Ramazan ayında mahalle parkında iftar öncesi pilav ikramı</p>
+                </div>
+
+                <div class="bg-card-bg/30 rounded-xl p-3 border-l-4 border-accent-teal">
+                    <div class="flex justify-between items-start mb-1">
+                        <h5 class="text-sm font-bold text-white">Mahalle Turnuvası</h5>
+                        <span class="text-[10px] text-accent-teal">Yaz ayları</span>
+                    </div>
+                    <p class="text-xs text-text-desc">Futbol ve voleybol turnuvası, final maçı parkta oynanır</p>
+                </div>
+
+                <div class="bg-card-bg/30 rounded-xl p-3 border-l-4 border-accent-purple">
+                    <div class="flex justify-between items-start mb-1">
+                        <h5 class="text-sm font-bold text-white">Komşuluk Günü</h5>
+                        <span class="text-[10px] text-accent-purple">Her ay sonu</span>
+                    </div>
+                    <p class="text-xs text-text-desc">Kapı komşusu buluşmaları, tanışma etkinlikleri</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- WhatsApp Grupları -->
+        <div class="glass-panel rounded-xl p-4">
+            <h4 class="text-sm font-bold text-gold-primary mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">chat</span>
+                Komşu Grupları
+            </h4>
+            <div class="space-y-2">
+                <button class="w-full flex items-center justify-between p-3 rounded-lg bg-card-bg/50 hover:bg-card-bg/70 transition-colors border border-border-subtle/20 hover:border-gold-primary/30">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-accent-green">chat</span>
+                        <div class="text-left">
+                            <p class="text-sm font-bold text-white">Hamitli Komşular</p>
+                            <p class="text-[10px] text-text-desc">340 üye • Genel sohbet</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-gold-primary">arrow_forward</span>
+                </button>
+
+                <button class="w-full flex items-center justify-between p-3 rounded-lg bg-card-bg/50 hover:bg-card-bg/70 transition-colors border border-border-subtle/20 hover:border-gold-primary/30">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-accent-blue">pets</span>
+                        <div class="text-left">
+                            <p class="text-sm font-bold text-white">Patili Komşular</p>
+                            <p class="text-[10px] text-text-desc">Sokak hayvanları yardım grubu</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-gold-primary">arrow_forward</span>
+                </button>
+
+                <button class="w-full flex items-center justify-between p-3 rounded-lg bg-card-bg/50 hover:bg-card-bg/70 transition-colors border border-border-subtle/20 hover:border-gold-primary/30">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-accent-purple">shopping_basket</span>
+                        <div class="text-left">
+                            <p class="text-sm font-bold text-white">Komşu Alışveriş</p>
+                            <p class="text-[10px] text-text-desc">Takas ve satış grubu</p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-gold-primary">arrow_forward</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Boş Zaman -->
+        <div>
+            <h4 class="text-sm font-bold text-gold-primary mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">sports</span>
+                Boş Zaman Aktiviteleri
+            </h4>
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-card-bg/30 rounded-lg p-3 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-2xl mb-1">sports_soccer</span>
+                    <p class="text-xs font-bold text-white">Sabah Sporu</p>
+                    <p class="text-[10px] text-text-desc">06:30 Park</p>
+                </div>
+                <div class="bg-card-bg/30 rounded-lg p-3 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-2xl mb-1">chess</span>
+                    <p class="text-xs font-bold text-white">Satranç</p>
+                    <p class="text-[10px] text-text-desc">Cumartesi 14:00</p>
+                </div>
+                <div class="bg-card-bg/30 rounded-lg p-3 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-2xl mb-1">directions_walk</span>
+                    <p class="text-xs font-bold text-white">Yürüyüş Grubu</p>
+                    <p class="text-[10px] text-text-desc">Her gün 19:00</p>
+                </div>
+                <div class="bg-card-bg/30 rounded-lg p-3 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-2xl mb-1">book</span>
+                    <p class="text-xs font-bold text-white">Kitap Kulübü</p>
+                    <p class="text-[10px] text-text-desc">Pazar 15:00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mahalle Albümü Modal -->
+<div id="album-modal" class="slide-modal">
+    <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gold-primary/10 flex items-center justify-center">
+                <span class="material-symbols-outlined text-gold-primary text-lg">photo_library</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white">Mahalle Albümü</h3>
+                <p class="text-[10px] text-gold-primary">Komşularımızdan kareler</p>
+            </div>
+        </div>
+        <button onclick="closeModal('album-modal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </div>
+    
+    <div class="p-4">
+        <!-- Fotoğraf Yükleme -->
+        <div class="mb-4 p-4 border-2 border-dashed border-border-subtle/30 rounded-xl text-center hover:border-gold-primary/50 transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-gold-primary text-3xl mb-2">add_photo_alternate</span>
+            <p class="text-sm text-text-secondary">Fotoğraf paylaş</p>
+            <p class="text-[10px] text-text-desc">Mahalleden bir kare ekle</p>
+        </div>
+
+        <div class="gallery-grid" id="gallery-grid">
+            <!-- Photos loaded by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Etkinlikler Modal -->
+<div id="etkinlik-modal" class="slide-modal">
+    <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-accent-green/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-accent-green text-lg">event</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white">Etkinlikler</h3>
+                <p class="text-[10px] text-accent-green">Yaklaşan etkinlikler</p>
+            </div>
+        </div>
+        <button onclick="closeModal('etkinlik-modal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </div>
+    
+    <div class="p-4 space-y-4">
+        <!-- Yaklaşan Etkinlikler -->
+        <div class="space-y-3">
+            <div class="bg-gradient-to-r from-gold-primary/20 to-transparent border-l-4 border-gold-primary rounded-r-xl p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <span class="text-[10px] bg-gold-primary text-darkest px-2 py-0.5 rounded-full font-bold">BU HAFTA</span>
+                        <h4 class="text-base font-bold text-white mt-2">Piknik Etkinliği</h4>
+                    </div>
+                    <span class="material-symbols-outlined text-gold-primary text-2xl">celebration</span>
+                </div>
+                <p class="text-xs text-text-secondary mb-3">Cumartesi günü mahalle parkında çocuklar için piknik. Yiyecekleri getirmeyi unutmayın!</p>
+                <div class="flex gap-3 text-[10px] text-text-desc">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">schedule</span> 14:00</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">location_on</span> Hamitler Parkı</span>
+                </div>
+                <button class="mt-3 w-full py-2 bg-gold-primary text-darkest rounded-lg text-xs font-bold hover:bg-gold-nav transition-colors">
+                    Katılacağım
+                </button>
+            </div>
+
+            <div class="bg-card-bg/50 border-l-4 border-accent-teal rounded-r-xl p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <span class="text-[10px] bg-accent-teal/20 text-accent-teal px-2 py-0.5 rounded-full font-bold">15 MART</span>
+                        <h4 class="text-base font-bold text-white mt-2">Mahalle Temizliği</h4>
+                    </div>
+                    <span class="material-symbols-outlined text-accent-teal text-2xl">cleaning_services</span>
+                </div>
+                <p class="text-xs text-text-secondary mb-3">Gönüllü temizlik ekibi oluşturuyoruz. Eldiven ve çöp poşeti belediyeden sağlanacak.</p>
+                <div class="flex gap-3 text-[10px] text-text-desc">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">schedule</span> 09:00</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">location_on</span> Muhtarlık önü</span>
+                </div>
+            </div>
+
+            <div class="bg-card-bg/50 border-l-4 border-accent-purple rounded-r-xl p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <span class="text-[10px] bg-accent-purple/20 text-accent-purple px-2 py-0.5 rounded-full font-bold">22 MART</span>
+                        <h4 class="text-base font-bold text-white mt-2">Kadınlar Günü Buluşması</h4>
+                    </div>
+                    <span class="material-symbols-outlined text-accent-purple text-2xl">female</span>
+                </div>
+                <p class="text-xs text-text-secondary mb-3">8 Mart Dünya Kadınlar Günü kutlaması. Kahve ve pasta ikramı olacak.</p>
+                <div class="flex gap-3 text-[10px] text-text-desc">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">schedule</span> 14:00</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">location_on</span> Mahalle Konağı</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Takvim -->
+        <div class="glass-panel rounded-xl p-4">
+            <h4 class="text-sm font-bold text-gold-primary mb-3">Mart 2026</h4>
+            <div class="grid grid-cols-7 gap-1 text-center text-xs mb-2">
+                <span class="text-text-desc">Pt</span>
+                <span class="text-text-desc">Sa</span>
+                <span class="text-text-desc">Ça</span>
+                <span class="text-text-desc">Pe</span>
+                <span class="text-text-desc">Cu</span>
+                <span class="text-text-desc">Ct</span>
+                <span class="text-text-desc">Pz</span>
+            </div>
+            <div class="grid grid-cols-7 gap-1 text-center text-xs">
+                <span class="p-2 text-text-desc">24</span>
+                <span class="p-2 text-text-desc">25</span>
+                <span class="p-2 text-text-desc">26</span>
+                <span class="p-2 text-text-desc">27</span>
+                <span class="p-2 text-text-desc">28</span>
+                <span class="p-2 rounded-lg bg-gold-primary text-darkest font-bold">1</span>
+                <span class="p-2 text-white">2</span>
+                <span class="p-2 text-white">3</span>
+                <span class="p-2 text-white">4</span>
+                <span class="p-2 text-white">5</span>
+                <span class="p-2 text-white">6</span>
+                <span class="p-2 text-white">7</span>
+                <span class="p-2 text-white">8</span>
+                <span class="p-2 rounded-lg bg-accent-teal/30 text-accent-teal border border-accent-teal/50">15</span>
+                <span class="p-2 text-white">16</span>
+                <span class="p-2 text-white">17</span>
+                <span class="p-2 text-white">18</span>
+                <span class="p-2 text-white">19</span>
+                <span class="p-2 text-white">20</span>
+                <span class="p-2 text-white">21</span>
+                <span class="p-2 rounded-lg bg-accent-purple/30 text-accent-purple border border-accent-purple/50">22</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Duyuru Paylaş Modal -->
+<div id="duyuru-modal" class="slide-modal">
+    <div class="sticky top-0 z-10 flex items-center justify-between px-4 py-4 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-accent-blue/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-accent-blue text-lg">campaign</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-white">Duyuru Paylaş</h3>
+                <p class="text-[10px] text-accent-blue">Mahalle hakkında bilgi ver</p>
+            </div>
+        </div>
+        <button onclick="closeModal('duyuru-modal')" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </div>
+    
+    <div class="p-4 space-y-4">
+        <!-- Kategori Seçimi -->
+        <div>
+            <label class="text-xs text-text-desc mb-2 block">Kategori</label>
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+                <button class="category-btn px-4 py-2 rounded-full text-xs font-bold bg-gold-primary text-darkest" data-cat="general">Genel</button>
+                <button class="category-btn px-4 py-2 rounded-full text-xs font-bold bg-card-bg/50 text-text-secondary border border-border-subtle/30" data-cat="help">Yardım</button>
+                <button class="category-btn px-4 py-2 rounded-full text-xs font-bold bg-card-bg/50 text-text-secondary border border-border-subtle/30" data-cat="event">Etkinlik</button>
+                <button class="category-btn px-4 py-2 rounded-full text-xs font-bold bg-card-bg/50 text-text-secondary border border-border-subtle/30" data-cat="sale">Satış</button>
+            </div>
+        </div>
+
+        <!-- Metin Alanı -->
+        <div>
+            <label class="text-xs text-text-desc mb-2 block">Mesajınız</label>
+            <textarea class="w-full h-32 bg-card-bg/50 border border-border-subtle/30 rounded-xl p-3 text-sm text-white placeholder-text-desc focus:outline-none focus:border-gold-primary/50 resize-none" placeholder="Mahalle hakkında bir şeyler paylaşın..."></textarea>
+        </div>
+
+        <!-- Fotoğraf Ekleme -->
+        <div class="grid grid-cols-4 gap-2">
+            <button class="aspect-square rounded-xl border-2 border-dashed border-border-subtle/30 flex flex-col items-center justify-center gap-1 hover:border-gold-primary/50 transition-colors">
+                <span class="material-symbols-outlined text-gold-primary">add_a_photo</span>
+                <span class="text-[10px] text-text-desc">Foto</span>
+            </button>
+            <button class="aspect-square rounded-xl border-2 border-dashed border-border-subtle/30 flex flex-col items-center justify-center gap-1 hover:border-gold-primary/50 transition-colors">
+                <span class="material-symbols-outlined text-gold-primary">videocam</span>
+                <span class="text-[10px] text-text-desc">Video</span>
+            </button>
+        </div>
+
+        <!-- Paylaş Butonu -->
+        <button class="w-full py-3 bg-gold-primary text-darkest rounded-xl font-bold text-sm hover:bg-gold-nav transition-colors flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-base">send</span>
+            Paylaş
+        </button>
+    </div>
+</div>
+
+<!-- Simplified Header -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-darkest/90 backdrop-blur-md border-b border-border-subtle/30">
+    <div class="flex items-center gap-3">
+        <a class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group" href="benim-sehrim.html"target="_self">
+            <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+        </a>
+        <div class="flex flex-col">
+            <span class="text-[10px] text-gold-primary tracking-wider uppercase">Osmangazi Belediyesi</span>
+            <h1 class="text-lg font-bold tracking-tight text-white leading-none">Hamitler Mahallesi</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-3">
+        <button class="flex items-center gap-1.5 px-3 py-1.5 bg-card-bg/50 rounded-full border border-border-subtle/30 hover:border-gold-primary/50 transition-colors">
+            <span class="material-symbols-outlined text-gold-primary text-sm">notifications</span>
+        </button>
+    </div>
+</header>
+
+<!-- Hero Stats Bar -->
+<div class="mt-[60px] bg-darkest border-b border-border-subtle/30 py-3">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex gap-2 overflow-x-auto scrollbar-hide">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card-bg/30 border border-border-subtle/20 shrink-0">
+                <span class="material-symbols-outlined text-gold-primary text-xs">diversity_3</span>
+                <span class="text-xs font-bold text-white">15.420 Nüfus</span>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card-bg/30 border border-border-subtle/20 shrink-0">
+                <span class="material-symbols-outlined text-gold-primary text-xs">location_city</span>
+                <span class="text-xs font-bold text-white">Osmangazi</span>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card-bg/30 border border-border-subtle/20 shrink-0">
+                <span class="material-symbols-outlined text-gold-primary text-xs">account_balance</span>
+                <span class="text-xs font-bold text-white">Muhtarlık</span>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card-bg/30 border border-border-subtle/20 shrink-0">
+                <span class="material-symbols-outlined text-gold-primary text-xs">verified</span>
+                <span class="text-xs font-bold text-white">12 Proje</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 6 Kart Grid -->
+<section class="relative z-10 bg-darkest py-4 border-b border-border-subtle/20">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            
+            <!-- 1. Duyuru Paylaş -->
+            <div class="compact-card rounded-xl p-4 cursor-pointer" onclick="openModal('duyuru-modal')">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-full bg-accent-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-accent-blue">campaign</span>
+                    </div>
+                    <span class="text-[10px] text-gold-primary font-bold uppercase">Yeni</span>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-1">Duyuru Paylaş</h3>
+                <p class="text-[10px] text-text-desc">Mahalle hakkında bilgi ver</p>
+            </div>
+
+            <!-- 2. Mahalle Albümü -->
+            <div class="compact-card rounded-xl p-4 cursor-pointer" onclick="openModal('album-modal')">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gold-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary">photo_camera</span>
+                    </div>
+                    <span class="text-[10px] text-gold-primary font-bold uppercase">24 Yeni</span>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-1">Mahalle Albümü</h3>
+                <p class="text-[10px] text-text-desc">Komşularımızdan kareler</p>
+            </div>
+
+            <!-- 3. Etkinlikler -->
+            <div class="compact-card rounded-xl p-4 cursor-pointer" onclick="openModal('etkinlik-modal')">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-full bg-accent-green/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-accent-green">event</span>
+                    </div>
+                    <span class="text-[10px] text-accent-green font-bold uppercase">3 Yeni</span>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-1">Etkinlikler</h3>
+                <p class="text-[10px] text-text-desc">Yaklaşan etkinlikler</p>
+            </div>
+
+            <!-- 4. Tarihçe (YENİ) -->
+            <div class="compact-card rounded-xl p-4 cursor-pointer" onclick="openModal('tarihce-modal')">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-full bg-accent-purple/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-accent-purple">history</span>
+                    </div>
+                    <span class="text-[10px] text-accent-purple font-bold uppercase">Bilgi</span>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-1">Tarihçe</h3>
+                <p class="text-[10px] text-text-desc">Hamitler'in hikayesi</p>
+            </div>
+
+            <!-- 5. Eğitim & Sağlık (YENİ) -->
+            <div class="compact-card rounded-xl p-4 cursor-pointer" onclick="openModal('egitim-modal')">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-full bg-accent-teal/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-accent-teal">school</span>
+                    </div>
+                    <span class="text-[10px] text-accent-teal font-bold uppercase">Rehber</span>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-1">Eğitim & Sağlık</h3>
+                <p class="text-[10px] text-text-desc">Okul, hastane, ulaşım</p>
+            </div>
+
+            <!-- 6. Sosyal Yaşam (YENİ) -->
+            <div class="compact-card rounded-xl p-4 cursor-pointer" onclick="openModal('sosyal-modal')">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-full bg-accent-red/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-accent-red">diversity_3</span>
+                    </div>
+                    <span class="text-[10px] text-accent-red font-bold uppercase">Aktif</span>
+                </div>
+                <h3 class="text-sm font-bold text-white mb-1">Sosyal Yaşam</h3>
+                <p class="text-[10px] text-text-desc">Dernekler, gruplar</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Category Tabs -->
+<div class="sticky top-[60px] z-40 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 py-3">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex gap-2 overflow-x-auto scrollbar-hide" id="category-tabs">
+            <button class="tab-btn tab-active px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-category="all">Tümü</button>
+            <button class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-category="announcement">Duyurular</button>
+            <button class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-category="official">Resmi</button>
+            <button class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-category="event">Etkinlik</button>
+            <button class="tab-btn tab-passive px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-category="help">Yardım</button>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-32 pt-4">
+    <div class="max-w-7xl mx-auto px-4">
+        
+        <!-- Section Title -->
+        <div class="flex items-end justify-between mb-4 animate-fade-in">
+            <div>
+                <h2 class="text-lg font-bold text-white">Mahalle Akışı</h2>
+                <p class="text-xs text-text-desc">Son paylaşımlar ve duyurular</p>
+            </div>
+        </div>
+
+        <!-- Feed Grid -->
+        <div class="grid grid-cols-1 gap-3" id="feed-grid">
+            <!-- Posts loaded by JS -->
+        </div>
+
+        <!-- Info Section -->
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- İletişim Bilgileri -->
+            <div class="glass-panel rounded-xl p-4 animate-fade-in">
+                <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary text-base">contact_phone</span>
+                    İletişim
+                </h3>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between items-center py-1.5 border-b border-border-subtle/20">
+                        <span class="text-text-desc">Muhtarlık</span>
+                        <span class="text-white font-medium">0224 224 12 34</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-border-subtle/20">
+                        <span class="text-text-desc">Belediye</span>
+                        <span class="text-white font-medium">444 80 01</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5 border-b border-border-subtle/20">
+                        <span class="text-text-desc">Zabıta</span>
+                        <span class="text-white font-medium">153</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1.5">
+                        <span class="text-text-desc">Acil Durum</span>
+                        <span class="text-accent-red font-medium">112</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hızlı Linkler -->
+            <div class="glass-panel rounded-xl p-4 animate-fade-in" style="animation-delay: 0.1s;">
+                <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary text-base">apps</span>
+                    Hızlı Linkler
+                </h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="#" target="_self" class="flex items-center gap-2 p-2 rounded-lg bg-card-bg/30 border border-border-subtle/20 hover:border-gold-primary/30 transition-colors">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">receipt_long</span>
+                        <span class="text-xs text-white">E-Belediye</span>
+                    </a>
+                    <a href="#" target="_self" class="flex items-center gap-2 p-2 rounded-lg bg-card-bg/30 border border-border-subtle/20 hover:border-gold-primary/30 transition-colors">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">park</span>
+                        <span class="text-xs text-white">Park Talep</span>
+                    </a>
+                    <a href="#" target="_self" class="flex items-center gap-2 p-2 rounded-lg bg-card-bg/30 border border-border-subtle/20 hover:border-gold-primary/30 transition-colors">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">local_shipping</span>
+                        <span class="text-xs text-white">Moloz Kaldırma</span>
+                    </a>
+                    <a href="#" target="_self" class="flex items-center gap-2 p-2 rounded-lg bg-card-bg/30 border border-border-subtle/20 hover:border-gold-primary/30 transition-colors">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">water_drop</span>
+                        <span class="text-xs text-white">Su Arıza</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yerel Esnaf -->
+        <div class="mt-4 glass-panel rounded-xl p-4 animate-fade-in mb-4">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary text-base">storefront</span>
+                    Yerel Esnaf
+                </h3>
+                <button class="text-gold-primary text-xs font-bold uppercase">Tümü</button>
+            </div>
+            <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+                <div class="flex-shrink-0 w-32 bg-card-bg/50 rounded-lg p-3 border border-border-subtle/30">
+                    <div class="w-10 h-10 rounded-full bg-accent-green/20 flex items-center justify-center mb-2">
+                        <span class="material-symbols-outlined text-accent-green text-lg">bakery_dining</span>
+                    </div>
+                    <h4 class="text-xs font-bold text-white mb-0.5">Hamitler Fırın</h4>
+                    <p class="text-[10px] text-text-desc">06:00-22:00</p>
+                    <span class="inline-flex items-center gap-1 mt-1 text-[9px] text-accent-green">
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
+                        Açık
+                    </span>
+                </div>
+                <div class="flex-shrink-0 w-32 bg-card-bg/50 rounded-lg p-3 border border-border-subtle/30">
+                    <div class="w-10 h-10 rounded-full bg-accent-green/20 flex items-center justify-center mb-2">
+                        <span class="material-symbols-outlined text-accent-green text-lg">local_florist</span>
+                    </div>
+                    <h4 class="text-xs font-bold text-white mb-0.5">Aile Manav</h4>
+                    <p class="text-[10px] text-text-desc">07:00-20:00</p>
+                    <span class="inline-flex items-center gap-1 mt-1 text-[9px] text-gold-primary">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold-primary"></span>
+                        Kalabalık
+                    </span>
+                </div>
+                <div class="flex-shrink-0 w-32 bg-card-bg/50 rounded-lg p-3 border border-border-subtle/30">
+                    <div class="w-10 h-10 rounded-full bg-accent-red/20 flex items-center justify-center mb-2">
+                        <span class="material-symbols-outlined text-accent-red text-lg">account_balance</span>
+                    </div>
+                    <h4 class="text-xs font-bold text-white mb-0.5">Muhtarlık</h4>
+                    <p class="text-[10px] text-text-desc">08:00-17:00</p>
+                    <span class="inline-flex items-center gap-1 mt-1 text-[9px] text-accent-red">
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent-red"></span>
+                        Kapalı
+                    </span>
+                </div>
+                <div class="flex-shrink-0 w-32 bg-card-bg/50 rounded-lg p-3 border border-border-subtle/30">
+                    <div class="w-10 h-10 rounded-full bg-accent-green/20 flex items-center justify-center mb-2">
+                        <span class="material-symbols-outlined text-accent-green text-lg">sports_soccer</span>
+                    </div>
+                    <h4 class="text-xs font-bold text-white mb-0.5">Spor Tesisi</h4>
+                    <p class="text-[10px] text-text-desc">08:00-23:00</p>
+                    <span class="inline-flex items-center gap-1 mt-1 text-[9px] text-accent-green">
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
+                        Açık
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 flex items-center justify-around px-4 py-2 bg-nav-bg border-t border-border-subtle/50 pb-6 z-50">
+    
+    <!-- Ana Sayfa -->
+    <a class="flex flex-col items-center gap-0.5 text-gold-nav nav-glow-gold" href="anasayfa.html"target="_self">
+        <span class="material-symbols-outlined text-lg fill-1">home</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ana Sayfa</span>
+    </a>
+
+    <!-- Keşfet -->
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="kesfet-genel.html"target="_self">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">explore</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Keşfet</span>
+    </a>
+
+    <!-- AI Badge (Center) -->
+    <div class="flex flex-col items-center -mt-6 relative">
+        <div class="absolute inset-[-4px] border-2 border-gold-primary/40 rounded-full animate-pulse"></div>
+        <button onclick="openAIChat()" class="ai-badge w-14 h-14 rounded-full flex items-center justify-center relative overflow-hidden transition-all hover:scale-105">
+            <span class="material-symbols-outlined text-2xl text-gold-primary">auto_awesome</span>
+        </button>
+        <span class="absolute -bottom-4 text-[8px] font-bold text-gold-primary uppercase tracking-wider">AI</span>
+    </div>
+
+    <!-- Ara -->
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="ara.html"target="_self">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">search</span>
+        <span class="text-[8px
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ara</span>
+    </a>
+
+    <!-- Profil -->
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="profil.html"target="_self">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">person</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Profil</span>
+    </a>
+
+</nav>
+
+<script>
+// Feed Data
+const feedData = [
+    {
+        id: 1,
+        author: "Erkan Aydın",
+        avatar: "EA",
+        avatarColor: "bg-gold-primary text-darkest",
+        type: "official",
+        typeLabel: "Resmi Ziyaret",
+        typeColor: "bg-gold-primary/20 text-gold-primary",
+        time: "Bugün, 14:30",
+        content: "Değerli Hamitli komşularımızla bir araya gelerek mahallemizin sorunlarını ve taleplerini dinledik. Park yapımı, yol genişletme ve aydınlatma çalışmaları hakkında bilgi verdik. Hamitler'in güzelleşmesi için durmadan çalışmaya devam ediyoruz.",
+        likes: 428,
+        comments: 67,
+        official: true,
+        image: "https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?w=800&h=500&fit=crop",
+        verified: true,
+        title: "Belediye Başkanı Mahalle Ziyareti"
+    },
+    {
+        id: 2,
+        author: "Osmangazi Belediyesi",
+        avatar: "OB",
+        avatarColor: "bg-accent-blue",
+        type: "announcement",
+        typeLabel: "Duyuru",
+        typeColor: "bg-accent-blue/15 text-accent-blue",
+        time: "2 saat önce",
+        content: "Değerli Hamitler sakinleri, yarın (05 Mart) saat 10:00-14:00 arasında ana su hattı bakım çalışması nedeniyle su kesintisi yaşanacaktır. Önceden hazırlıklı olmanızı rica ederiz.",
+        likes: 156,
+        comments: 42,
+        official: true
+    },
+    {
+        id: 3,
+        author: "Ayşe Teyze",
+        avatar: "AT",
+        avatarColor: "bg-accent-green text-white",
+        type: "help",
+        typeLabel: "Yardım",
+        typeColor: "bg-accent-green/15 text-accent-green",
+        time: "6 saat önce",
+        content: "Komşular, eczaneden ilaç almaya gidecek birini arıyorum. Reçeteli ilaçlarım hazır, sadece götürüp getirmesi gerekiyor. Yardımcı olabilecek var mı?",
+        likes: 45,
+        comments: 12,
+        official: false
+    },
+    {
+        id: 4,
+        author: "Fatma Kaya",
+        avatar: "FK",
+        avatarColor: "bg-purple-500 text-white",
+        type: "event",
+        typeLabel: "Etkinlik",
+        typeColor: "bg-gold-primary/15 text-gold-primary",
+        time: "Dün, 18:30",
+        content: "Cumartesi günü mahalle parkında çocuklar için piknik organize ediyoruz. Katılmak isteyenler yorum yazsın, yiyecek listesi oluşturalım. Saat 14:00'te başlıyoruz!",
+        likes: 89,
+        comments: 23,
+        official: false,
+        image: "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=600&h=400&fit=crop"
+    },
+    {
+        id: 5,
+        author: "Hamitler Muhtarlığı",
+        avatar: "HM",
+        avatarColor: "bg-accent-teal",
+        type: "announcement",
+        typeLabel: "Duyuru",
+        typeColor: "bg-accent-blue/15 text-accent-blue",
+        time: "Dün, 10:00",
+        content: "Haftalık semt pazarı bu hafta Cumartesi günü saat 07:00'de Hamitler Parkı yanında kurulacaktır. Tüm komşularımız davetlidir.",
+        likes: 234,
+        comments: 15,
+        official: true
+    }
+];
+
+// Gallery Data
+const galleryPhotos = [
+    { src: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=400&fit=crop", caption: "Hamitler Parkı - Gün batımı" },
+    { src: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=400&h=400&fit=crop", caption: "Mahalle camii" },
+    { src: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=400&fit=crop", caption: "Yeni yapılan sokak" },
+    { src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop", caption: "Çocuk parkı" },
+    { src: "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?w=400&h=400&fit=crop", caption: "Pazar günü" },
+    { src: "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=400&h=400&fit=crop", caption: "Evlerimiz" },
+    { src: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&h=400&fit=crop", caption: "Eski Hamitler" },
+    { src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=400&fit=crop", caption: "Modern Hamitler" }
+];
+
+let currentCategory = 'all';
+
+function renderFeed() {
+    const container = document.getElementById('feed-grid');
+    container.innerHTML = '';
+    
+    const filtered = currentCategory === 'all' 
+        ? feedData 
+        : feedData.filter(item => item.type === currentCategory);
+    
+    filtered.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'group relative rounded-xl overflow-hidden border border-border-subtle bg-card-bg card-inner-glow transition-all duration-300 hover:border-gold-primary/50 animate-fade-in';
+        card.style.animationDelay = `${index * 0.1}s`;
+        
+        const titleSection = item.title ? `
+            <div class="px-4 pt-4 pb-2 border-b border-border-subtle/20 bg-gradient-to-r from-gold-primary/10 to-transparent">
+                <h4 class="text-sm font-bold text-gold-primary flex items-center gap-2">
+                    <span class="material-symbols-outlined text-base">verified</span>
+                    ${item.title}
+                </h4>
+            </div>
+        ` : '';
+        
+        card.innerHTML = `
+            ${titleSection}
+            <div class="p-4">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full ${item.avatarColor} flex items-center justify-center font-bold text-sm">
+                            ${item.avatar}
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-1">
+                                ${item.author}
+                                ${item.official ? '<span class="material-symbols-outlined text-accent-blue text-xs fill-1">verified</span>' : ''}
+                            </h3>
+                            <p class="text-[10px] text-text-desc">${item.time}</p>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase ${item.typeColor}">
+                        ${item.typeLabel}
+                    </span>
+                </div>
+                
+                <p class="text-sm text-text-secondary leading-relaxed mb-3">${item.content}</p>
+                
+                ${item.image ? `
+                    <div class="relative h-48 rounded-lg overflow-hidden mb-3 cursor-pointer" onclick="openLightbox('${item.image}', '${item.caption || ''}')">
+                        <img src="${item.image}" alt="Post" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
+                            <span class="text-xs text-white flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">zoom_in</span>
+                                Büyüt
+                            </span>
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="flex items-center justify-between pt-3 border-t border-border-subtle/30">
+                    <div class="flex gap-4">
+                        <button class="flex items-center gap-1.5 text-text-desc hover:text-gold-primary transition-colors" onclick="likePost(this)">
+                            <span class="material-symbols-outlined text-base">thumb_up</span>
+                            <span class="text-xs font-medium">${item.likes}</span>
+                        </button>
+                        <button class="flex items-center gap-1.5 text-text-desc hover:text-gold-primary transition-colors">
+                            <span class="material-symbols-outlined text-base">chat_bubble</span>
+                            <span class="text-xs font-medium">${item.comments}</span>
+                        </button>
+                    </div>
+                    <button class="flex items-center gap-1.5 text-text-desc hover:text-gold-primary transition-colors">
+                        <span class="material-symbols-outlined text-base">share</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+function likePost(btn) {
+    const icon = btn.querySelector('.material-symbols-outlined');
+    const count = btn.querySelector('span:last-child');
+    
+    if (!btn.classList.contains('liked')) {
+        icon.classList.add('fill-1');
+        btn.classList.add('liked', 'text-gold-primary');
+        count.textContent = parseInt(count.textContent) + 1;
+    } else {
+        icon.classList.remove('fill-1');
+        btn.classList.remove('liked', 'text-gold-primary');
+        count.textContent = parseInt(count.textContent) - 1;
+    }
+}
+
+// Tab functionality
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('tab-active');
+            b.classList.add('tab-passive');
+        });
+        
+        e.target.classList.remove('tab-passive');
+        e.target.classList.add('tab-active');
+        
+        currentCategory = e.target.dataset.category;
+        renderFeed();
+    });
+});
+
+// Modal Functions
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+    document.getElementById('modal-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Load gallery if album modal
+    if (modalId === 'album-modal') {
+        renderGallery();
+    }
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+    document.getElementById('modal-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function closeAllModals() {
+    document.querySelectorAll('.slide-modal').forEach(modal => {
+        modal.classList.remove('active');
+    });
+    document.getElementById('modal-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// AI Chat Functions
+function openAIChat() {
+    document.getElementById('ai-chat-modal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAIChat() {
+    document.getElementById('ai-chat-modal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    addMessage(message, 'user');
+    input.value = '';
+    
+    setTimeout(() => {
+        const response = generateAIResponse(message);
+        addMessage(response, 'ai');
+    }, 1000);
+}
+
+function addMessage(text, sender) {
+    const container = document.getElementById('chat-messages');
+    const bubble = document.createElement('div');
+    bubble.className = `message-bubble message-${sender}`;
+    bubble.innerHTML = `<p>${text}</p>`;
+    container.appendChild(bubble);
+    container.scrollTop = container.scrollHeight;
+}
+
+function generateAIResponse(message) {
+    const lowerMsg = message.toLowerCase();
+    
+    if (lowerMsg.includes('erkan') || lowerMsg.includes('başkan') || lowerMsg.includes('ziyaret')) {
+        return '🏛️ Erkan Aydın, bugün saat 14:30\'da Hamitler Mahallesi\'ni ziyaret etti. Park yapımı, yol genişletme ve aydınlatma çalışmaları hakkında bilgi verdi. Detaylar akışta paylaşıldı.';
+    }
+    else if (lowerMsg.includes('tarihçe') || lowerMsg.includes('tarih')) {
+        return '📜 Hamitler Mahallesi, adını 19. yüzyılda bölgede yaşayan Hamit Bey\'den alır. Detaylı bilgi için "Tarihçe" kartına tıklayabilirsiniz.';
+    }
+    else if (lowerMsg.includes('okul') || lowerMsg.includes('eğitim') || lowerMsg.includes('sağlık')) {
+        return '🏫 Hamitler\'de 2 devlet okulu, 1 anaokulu, sağlık ocağı ve eczane bulunmaktadır. Detaylı liste için "Eğitim & Sağlık" kartına göz atın.';
+    }
+    else if (lowerMsg.includes('dernek') || lowerMsg.includes('sosyal') || lowerMsg.includes('etkinlik')) {
+        return '🎉 Hamitler Spor Kulübü, Kültür ve Yardımlaşma Derneği ve Kadınlar Kahvesi aktif olarak faaliyet gösteriyor. "Sosyal Yaşam" bölümünden katılabilirsiniz.';
+    }
+    else if (lowerMsg.includes('su') || lowerMsg.includes('kesinti')) {
+        return '💧 Yarın 10:00-14:00 arasında su kesintisi planlanmaktadır. Lütfen önceden hazırlıklı olun.';
+    }
+    else if (lowerMsg.includes('fotoğraf') || lowerMsg.includes('albüm') || lowerMsg.includes('galeri')) {
+        return '📸 Mahalle Albümü\'nde 24 fotoğraf var! Komşularımızın paylaştığı kareleri görmek için "Mahalle Albümü" kartına tıklayın.';
+    }
+    else if (lowerMsg.includes('merhaba') || lowerMsg.includes('selam')) {
+        return '👋 Merhaba! Hamitler Mahallesi dijital asistanınızım. Size nasıl yardımcı olabilirim?';
+    }
+    else {
+        return '💡 Bu konuda size yardımcı olmak için:<br>• "Tarihçe nedir?"<br>• "Okullar nerede?"<br>• "Etkinlik var mı?"<br>• "Fotoğraf albümü"';
+    }
+}
+
+// Gallery Functions
+function renderGallery() {
+    const grid = document.getElementById('gallery-grid');
+    if (grid.children.length > 0) return; // Already rendered
+    
+    galleryPhotos.forEach((photo, index) => {
+        const item = document.createElement('div');
+        item.className = 'gallery-item animate-fade-in';
+        item.style.animationDelay = `${index * 0.05}s`;
+        item.innerHTML = `<img src="${photo.src}" alt="${photo.caption}" onclick="openLightbox('${photo.src}', '${photo.caption}')">`;
+        grid.appendChild(item);
+    });
+}
+
+function openLightbox(src, caption) {
+    // Create lightbox dynamically if not exists
+    let lightbox = document.getElementById('lightbox');
+    if (!lightbox) {
+        lightbox = document.createElement('div');
+        lightbox.id = 'lightbox';
+        lightbox.className = 'fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 hidden';
+        lightbox.innerHTML = `
+            <button onclick="closeLightbox()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <img id="lightbox-img" src="" alt="Full size" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl">
+            <p id="lightbox-caption" class="absolute bottom-8 left-0 right-0 text-center text-sm text-white/80 px-4"></p>
+        `;
+        document.body.appendChild(lightbox);
+    }
+    
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox-caption').textContent = caption || '';
+    lightbox.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox) {
+        lightbox.classList.add('hidden');
+        if (!document.querySelector('.slide-modal.active')) {
+            document.body.style.overflow = '';
+        }
+    }
+}
+
+// Category selection in share modal
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.category-btn').forEach(b => {
+            b.classList.remove('bg-gold-primary', 'text-darkest');
+            b.classList.add('bg-card-bg/50', 'text-text-secondary');
+        });
+        e.target.classList.remove('bg-card-bg/50', 'text-text-secondary');
+        e.target.classList.add('bg-gold-primary', 'text-darkest');
+    });
+});
+
+// Initialize
+renderFeed();
+
+// Close modals on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAllModals();
+        closeAIChat();
+        closeLightbox();
+    }
+});
+</script>
+
+</body>
+</html>
+

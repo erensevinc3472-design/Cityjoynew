@@ -1,0 +1,741 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy - SOS Yardımı</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#BB9E77",
+                        "background": "#0F3E46",
+                        "surface": "#415B57",
+                        "border": "#698383",
+                        "emergency": "#EF4444",
+                        "warning": "#F59E0B",
+                        "success": "#10B981",
+                        "info": "#3B82F6",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                    },
+                    keyframes: {
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 100%);
+            min-height: 100dvh;
+        }
+        
+        .glass-card {
+            background: rgba(65, 91, 87, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .sos-glow { box-shadow: 0 0 60px 20px rgba(239, 68, 68, 0.4); }
+        .warning-glow { box-shadow: 0 0 60px 20px rgba(245, 158, 11, 0.4); }
+        .info-glow { box-shadow: 0 0 60px 20px rgba(59, 130, 246, 0.4); }
+        .success-glow { box-shadow: 0 0 60px 20px rgba(16, 185, 129, 0.4); }
+        
+        .pulse-ring {
+            position: absolute;
+            border-radius: 50%;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.85);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .countdown-circle {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        
+        .mode-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        .live-indicator {
+            animation: live-pulse 2s infinite;
+        }
+        
+        @keyframes live-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .hidden { display: none !important; }
+        
+        .sos-ready {
+            animation: breathe 2s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="text-white antialiased pb-24" id="app-body">
+    <!-- Header -->
+    <header class="pt-12 px-6 pb-4">
+        <div class="flex items-center justify-between mb-6">
+            <a href="acil-ihtiyaclar.html" class="ripple w-11 h-11 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all duration-300">
+                <span class="material-symbols-outlined text-primary text-xl">arrow_back_ios_new</span>
+            </a>
+            <h1 class="text-lg font-semibold">SOS Yardımı</h1>
+            <button onclick="toggleHistory()" class="ripple w-11 h-11 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all duration-300">
+                <span class="material-symbols-outlined text-primary text-xl">history</span>
+            </button>
+        </div>
+        
+        <!-- Mode Selector -->
+        <div class="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+            <button onclick="setMode('emergency')" id="btn-emergency" class="mode-btn active flex items-center gap-2 px-4 py-2 rounded-full bg-emergency/20 border-2 border-emergency text-emergency text-sm font-semibold whitespace-nowrap">
+                <span class="material-symbols-outlined text-sm">emergency</span>
+                Acil
+            </button>
+            <button onclick="setMode('warning')" id="btn-warning" class="mode-btn flex items-center gap-2 px-4 py-2 rounded-full bg-warning/20 border-2 border-transparent text-white/70 text-sm font-semibold whitespace-nowrap">
+                <span class="material-symbols-outlined text-sm">warning</span>
+                Yardım
+            </button>
+            <button onclick="setMode('info')" id="btn-info" class="mode-btn flex items-center gap-2 px-4 py-2 rounded-full bg-info/20 border-2 border-transparent text-white/70 text-sm font-semibold whitespace-nowrap">
+                <span class="material-symbols-outlined text-sm">home</span>
+                Eve Dön
+            </button>
+            <button onclick="setMode('success')" id="btn-success" class="mode-btn flex items-center gap-2 px-4 py-2 rounded-full bg-success/20 border-2 border-transparent text-white/70 text-sm font-semibold whitespace-nowrap">
+                <span class="material-symbols-outlined text-sm">medication</span>
+                İlaç
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col items-center justify-center px-6 pb-20" id="main-content">
+        
+        <!-- SOS HAZIR - Buton Gönderim Ekranı -->
+        <div id="ready-screen" class="w-full flex flex-col items-center">
+            <!-- SOS Butonu -->
+            <div class="relative flex flex-col items-center justify-center mb-8">
+                <!-- Pulse Rings -->
+                <div class="absolute w-64 h-64 rounded-full border-2 border-emergency/30 scale-110 pulse-ring" id="pulse-ring-1"></div>
+                <div class="absolute w-64 h-64 rounded-full border-4 border-emergency/10 scale-125 pulse-ring" style="animation-delay: 0.5s" id="pulse-ring-2"></div>
+                
+                <!-- SOS Button - TIKLANABİLİR -->
+                <button onclick="activateSOS()" class="sos-ready relative w-56 h-56 rounded-full focus:outline-none transform active:scale-95 transition-all duration-200" id="sos-main-btn">
+                    <div class="absolute inset-0 rounded-full sos-glow flex flex-col items-center justify-center text-white z-10 transition-all duration-500" id="sos-button" style="background: #EF4444;">
+                        <span class="material-symbols-outlined text-6xl mb-2">touch_app</span>
+                        <span class="text-4xl font-black tracking-tighter">SOS</span>
+                        <span class="text-sm font-semibold uppercase tracking-widest mt-1 opacity-80">Göndermek İçin Bas</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Info Text -->
+            <div class="text-center mb-6 max-w-[280px]">
+                <h2 class="text-xl font-bold text-primary mb-2" id="alert-title">Acil Durum Bildirimi</h2>
+                <p class="text-white/80 text-sm leading-relaxed" id="alert-desc">
+                    SOS butonuna basarak ailenize ve acil durum ekiplerine konumunuzu gönderebilirsiniz.
+                </p>
+            </div>
+
+            <!-- Location Status -->
+            <div class="glass-card rounded-xl p-4 mb-6 w-full max-w-sm flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emergency/20 flex items-center justify-center" id="location-icon">
+                    <span class="material-symbols-outlined text-emergency">location_on</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold">Konum Hazır</p>
+                    <p class="text-xs text-white/60" id="location-text">GPS hassasiyeti yüksek</p>
+                </div>
+                <div class="w-2 h-2 rounded-full bg-emergency live-indicator" id="location-dot"></div>
+            </div>
+
+            <!-- Family Members - KALICI -->
+            <div class="w-full max-w-sm mb-8" id="family-section">
+                <h3 class="text-center text-xs font-bold uppercase tracking-[0.2em] text-primary/70 mb-4">Bildirim Gidecek Kişiler</h3>
+                <div class="glass-card border-emergency/30 rounded-2xl p-6" id="family-card">
+                    <div class="flex justify-center gap-6" id="family-list">
+                        <!-- Dynamic family members -->
+                    </div>
+                    <button onclick="openFamilyManager()" class="mt-4 w-full py-2 text-xs text-primary underline opacity-70 hover:opacity-100">
+                        Aile Üyelerini Yönet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GÖNDERİLDİ - Canlı İzleme Ekranı -->
+        <div id="tracking-screen" class="hidden w-full flex flex-col items-center">
+            
+            <!-- Başarı Bildirimi -->
+            <div class="glass-card rounded-2xl p-6 mb-6 w-full max-w-sm border-success/50">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-success text-2xl">check_circle</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-success">SOS Gönderildi!</h3>
+                        <p class="text-xs text-white/70">Aileniz bilgilendirildi</p>
+                    </div>
+                </div>
+                
+                <!-- Canlı Konum -->
+                <div class="bg-black/20 rounded-xl p-4 mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs text-white/60">Canlı Konum</span>
+                        <span class="text-xs text-success live-indicator flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-success"></span>
+                            Yayında
+                        </span>
+                    </div>
+                    <p class="text-lg font-mono font-bold text-primary" id="live-coords">41.0082° N, 28.9784° E</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-xs text-white/50">30 dakika boyunca paylaşılıyor</p>
+                        <span class="text-xs font-mono text-success" id="time-remaining">30:00</span>
+                    </div>
+                </div>
+
+                <!-- Hızlı Aksiyonlar -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="imSafe()" class="py-3 rounded-xl bg-success/20 border border-success text-success font-semibold text-sm ripple flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-sm">shield</span>
+                        Güvendeyim
+                    </button>
+                    <button onclick="needMoreHelp()" class="py-3 rounded-xl bg-emergency/20 border border-emergency text-emergency font-semibold text-sm ripple flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-sm">sos</span>
+                        Yardım Gerek
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ek Bilgi Paylaşımı -->
+            <button onclick="shareMoreInfo()" class="w-full max-w-sm py-4 rounded-xl glass-card text-white font-semibold mb-6 flex items-center justify-center gap-2 hover:bg-white/5 transition-colors">
+                <span class="material-symbols-outlined">photo_camera</span>
+                Fotoğraf veya Ses Ekle
+            </button>
+
+            <!-- AİLE BÖLÜMÜ - KONUM PAYLAŞIMINDA DA GÖRÜNÜR -->
+            <div class="w-full max-w-sm mb-6">
+                <h3 class="text-center text-xs font-bold uppercase tracking-[0.2em] text-primary/70 mb-4">Bildirim Giden Kişiler</h3>
+                <div class="glass-card border-success/30 rounded-2xl p-6">
+                    <div class="flex justify-center gap-6" id="family-list-tracking">
+                        <!-- Aynı aile üyeleri buraya da kopyalanacak -->
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/10">
+                        <p class="text-xs text-center text-white/60 mb-2">Son Güncelleme: <span id="last-update">Şimdi</span></p>
+                        <div class="flex items-center justify-center gap-4 text-xs">
+                            <span class="flex items-center gap-1 text-success">
+                                <span class="material-symbols-outlined text-sm">done_all</span>
+                                Teslim Edildi
+                            </span>
+                            <span class="flex items-center gap-1 text-primary">
+                                <span class="material-symbols-outlined text-sm">visibility</span>
+                                Görüldü
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- İptal Butonu -->
+            <button onclick="cancelTracking()" class="w-full max-w-xs py-3 rounded-xl bg-black/20 border border-white/20 text-white/70 font-semibold hover:bg-black/30 transition-colors text-sm">
+                Konum Paylaşımını Durdur
+            </button>
+        </div>
+    </main>
+
+    <!-- Family Manager Modal -->
+    <div id="family-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-4">
+        <div class="glass-card rounded-2xl w-full max-w-md p-6 max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-primary">Aile Üyeleri</h3>
+                <button onclick="closeFamilyManager()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <div id="family-manager-list" class="space-y-3 mb-6">
+                <!-- Dynamic list -->
+            </div>
+            
+            <button onclick="addFamilyMember()" class="w-full py-3 rounded-xl border-2 border-dashed border-primary/50 text-primary font-semibold flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">add</span>
+                Yeni Üye Ekle
+            </button>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-4">
+        <div class="glass-card rounded-2xl w-full max-w-md p-6 max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-primary">SOS Geçmişi</h3>
+                <button onclick="toggleHistory()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <div id="history-list" class="space-y-3">
+                <!-- Dynamic history -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-6 z-40">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px] font-medium">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px] font-medium">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px] font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Configuration
+        const MODES = {
+            emergency: { color: '#EF4444', title: 'Acil Durum', desc: 'SOS butonuna basarak ailenize ve acil durum ekiplerine konumunuzu gönderebilirsiniz.', icon: 'emergency', glow: 'sos-glow' },
+            warning: { color: '#F59E0B', title: 'Yardım Gerekiyor', desc: 'SOS butonuna basarak aile üyelerinize konumunuzu gönderebilirsiniz.', icon: 'warning', glow: 'warning-glow' },
+            info: { color: '#3B82F6', title: 'Eve Dönüş', desc: 'SOS butonuna basarak eşinize konumunuzu gönderebilirsiniz.', icon: 'home', glow: 'info-glow' },
+            success: { color: '#10B981', title: 'İlaç Hatırlatma', desc: 'SOS butonuna basarak bakıcınıza konumunuzu gönderebilirsiniz.', icon: 'medication', glow: 'success-glow' }
+        };
+
+        // State
+        let currentMode = 'emergency';
+        let isTracking = false;
+        let familyMembers = [
+            { id: 1, name: 'Eşim', relation: 'eş', phone: '+90 555 123 4567', priority: 1, notify: true, photo: null, status: 'pending' },
+            { id: 2, name: 'Annem', relation: 'anne', phone: '+90 555 987 6543', priority: 2, notify: true, photo: null, status: 'pending' },
+            { id: 3, name: 'Babam', relation: 'baba', phone: '+90 555 456 7890', priority: 3, notify: true, photo: null, status: 'pending' }
+        ];
+        let sosHistory = JSON.parse(localStorage.getItem('sosHistory') || '[]');
+        let watchId = null;
+        let trackingInterval = null;
+        let timeRemaining = 30 * 60; // 30 dakika (saniye)
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFamily();
+            getLocation();
+        });
+
+        // Mode Management
+        function setMode(mode) {
+            currentMode = mode;
+            const config = MODES[mode];
+            
+            // Update UI
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-emergency', 'border-warning', 'border-info', 'border-success');
+                btn.classList.add('border-transparent', 'text-white/70');
+            });
+            
+            const activeBtn = document.getElementById(`btn-${mode}`);
+            activeBtn.classList.add('active', `border-${mode === 'emergency' ? 'emergency' : mode === 'warning' ? 'warning' : mode === 'info' ? 'info' : 'success'}`);
+            activeBtn.classList.remove('border-transparent', 'text-white/70');
+            
+            // Update content
+            document.getElementById('alert-title').textContent = config.title;
+            document.getElementById('alert-desc').textContent = config.desc;
+            
+            // Update colors
+            const sosBtn = document.getElementById('sos-button');
+            sosBtn.className = `absolute inset-0 rounded-full flex flex-col items-center justify-center text-white z-10 transition-all duration-500 ${config.glow}`;
+            sosBtn.style.backgroundColor = config.color;
+            
+            document.getElementById('pulse-ring-1').style.borderColor = config.color + '4D';
+            document.getElementById('pulse-ring-2').style.borderColor = config.color + '1A';
+            document.getElementById('family-card').style.borderColor = config.color + '4D';
+            document.getElementById('location-icon').style.backgroundColor = config.color + '33';
+            document.getElementById('location-dot').style.backgroundColor = config.color;
+            
+            // Update body class
+            document.body.className = `text-white antialiased pb-24`;
+        }
+
+        // SOS Activation - BUTONA BASINCA ÇALIŞIR
+        function activateSOS() {
+            if (isTracking) return;
+            
+            // Butona basma hissi
+            if (navigator.vibrate) navigator.vibrate(50);
+            
+            // Ekran değiştir
+            document.getElementById('ready-screen').classList.add('hidden');
+            document.getElementById('tracking-screen').classList.remove('hidden');
+            
+            // Aile listesini tracking ekranına da kopyala
+            renderFamilyTracking();
+            
+            // SOS gönder
+            sendSOS();
+        }
+
+        // Location Services
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(4);
+                        const lng = position.coords.longitude.toFixed(4);
+                        document.getElementById('location-text').textContent = `${lat}° N, ${lng}° E`;
+                        document.getElementById('live-coords').textContent = `${lat}° N, ${lng}° E`;
+                    },
+                    (error) => {
+                        document.getElementById('location-text').textContent = 'Konum alınıyor...';
+                    },
+                    { enableHighAccuracy: true }
+                );
+            }
+        }
+
+        // SOS Sending
+        function sendSOS() {
+            isTracking = true;
+            
+            // Save to history
+            const record = {
+                id: Date.now(),
+                mode: currentMode,
+                timestamp: new Date().toISOString(),
+                location: document.getElementById('location-text').textContent,
+                status: 'active',
+                duration: 30
+            };
+            sosHistory.unshift(record);
+            localStorage.setItem('sosHistory', JSON.stringify(sosHistory));
+            
+            // Start live tracking
+            startLiveTracking();
+            
+            // Start countdown timer
+            startTrackingTimer();
+            
+            // Simulate notifications
+            simulateNotifications();
+            
+            // Audio confirmation
+            if (navigator.vibrate) navigator.vibrate([100, 100, 300]);
+        }
+
+        function startLiveTracking() {
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition((position) => {
+                    const lat = position.coords.latitude.toFixed(4);
+                    const lng = position.coords.longitude.toFixed(4);
+                    document.getElementById('live-coords').textContent = `${lat}° N, ${lng}° E`;
+                    document.getElementById('last-update').textContent = new Date().toLocaleTimeString('tr-TR');
+                }, null, { enableHighAccuracy: true });
+            }
+        }
+
+        function startTrackingTimer() {
+            timeRemaining = 30 * 60; // 30 dakika
+            
+            trackingInterval = setInterval(() => {
+                timeRemaining--;
+                
+                // Update display
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                document.getElementById('time-remaining').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Auto stop after 30 minutes
+                if (timeRemaining <= 0) {
+                    stopTracking();
+                    alert('30 dakikalık konum paylaşımı sona erdi.');
+                }
+            }, 1000);
+        }
+
+        function simulateNotifications() {
+            // Simulate sending to family members with delay
+            familyMembers.forEach((member, index) => {
+                if (member.notify) {
+                    setTimeout(() => {
+                        member.status = 'delivered';
+                        renderFamilyTracking();
+                    }, (index + 1) * 1500);
+                    
+                    // Mark as seen after additional delay
+                    setTimeout(() => {
+                        member.status = 'seen';
+                        renderFamilyTracking();
+                    }, (index + 1) * 4000);
+                }
+            });
+        }
+
+        // Safety Controls
+        function imSafe() {
+            stopTracking();
+            
+            // Update history
+            if (sosHistory.length > 0) {
+                sosHistory[0].status = 'resolved';
+                sosHistory[0].resolvedAt = new Date().toISOString();
+                localStorage.setItem('sosHistory', JSON.stringify(sosHistory));
+            }
+            
+            alert('Güvende olduğunuz bildirildi. Canlı konum paylaşımı durduruldu.');
+            resetToReady();
+        }
+
+        function needMoreHelp() {
+            if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+            alert('Ek yardım talebi gönderildi! En yakın ekipler yönlendiriliyor.');
+        }
+
+        function shareMoreInfo() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*,video/*,audio/*';
+            input.capture = 'environment';
+            input.onchange = (e) => {
+                if (e.target.files.length > 0) {
+                    alert('Ek bilgi gönderildi: ' + e.target.files[0].name);
+                }
+            };
+            input.click();
+        }
+
+        function cancelTracking() {
+            if (confirm('Konum paylaşımını durdurmak istediğinize emin misiniz?')) {
+                stopTracking();
+                resetToReady();
+            }
+        }
+
+        function stopTracking() {
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+            if (trackingInterval) clearInterval(trackingInterval);
+            isTracking = false;
+        }
+
+        function resetToReady() {
+            document.getElementById('tracking-screen').classList.add('hidden');
+            document.getElementById('ready-screen').classList.remove('hidden');
+            
+            // Reset family statuses
+            familyMembers.forEach(m => m.status = 'pending');
+            renderFamily();
+        }
+
+        // Family Management
+        function renderFamily() {
+            const container = document.getElementById('family-list');
+            container.innerHTML = familyMembers.filter(m => m.notify).map(member => `
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-16 h-16 rounded-full border-2 border-primary p-0.5 bg-surface relative">
+                        <div class="w-full h-full rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+                            ${member.photo ? 
+                                `<img src="${member.photo}" class="w-full h-full object-cover">` : 
+                                `<span class="material-symbols-outlined text-primary text-2xl">person</span>`
+                            }
+                        </div>
+                        ${member.priority === 1 ? '<div class="absolute -top-1 -right-1 w-5 h-5 bg-emergency rounded-full flex items-center justify-center text-[10px] font-bold">1</div>' : ''}
+                    </div>
+                    <span class="text-xs font-medium text-white/90">${member.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderFamilyTracking() {
+            const container = document.getElementById('family-list-tracking');
+            container.innerHTML = familyMembers.filter(m => m.notify).map(member => {
+                let statusIcon = 'schedule';
+                let statusColor = 'text-white/50';
+                let statusText = 'Bekliyor';
+                
+                if (member.status === 'delivered') {
+                    statusIcon = 'done_all';
+                    statusColor = 'text-success';
+                    statusText = 'Teslim Edildi';
+                } else if (member.status === 'seen') {
+                    statusIcon = 'visibility';
+                    statusColor = 'text-primary';
+                    statusText = 'Görüldü';
+                }
+                
+                return `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-16 h-16 rounded-full border-2 border-primary p-0.5 bg-surface relative">
+                            <div class="w-full h-full rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+                                ${member.photo ? 
+                                    `<img src="${member.photo}" class="w-full h-full object-cover">` : 
+                                    `<span class="material-symbols-outlined text-primary text-2xl">person</span>`
+                                }
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-surface border-2 border-surface flex items-center justify-center ${statusColor}">
+                                <span class="material-symbols-outlined text-[14px]">${statusIcon}</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-medium text-white/90">${member.name}</span>
+                        <span class="text-[10px] ${statusColor}">${statusText}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openFamilyManager() {
+            const container = document.getElementById('family-manager-list');
+            container.innerHTML = familyMembers.map(member => `
+                <div class="glass-card rounded-xl p-4 flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary">person</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-sm">${member.name}</p>
+                        <p class="text-xs text-white/60">${member.phone}</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" ${member.notify ? 'checked' : ''} onchange="toggleNotify(${member.id})">
+                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+            `).join('');
+            
+            document.getElementById('family-modal').classList.remove('hidden');
+        }
+
+        function closeFamilyManager() {
+            document.getElementById('family-modal').classList.add('hidden');
+            renderFamily();
+            if (isTracking) renderFamilyTracking();
+        }
+
+        function toggleNotify(id) {
+            const member = familyMembers.find(m => m.id === id);
+            if (member) member.notify = !member.notify;
+        }
+
+        function addFamilyMember() {
+            const name = prompt('İsim:');
+            if (name) {
+                const phone = prompt('Telefon:');
+                familyMembers.push({
+                    id: Date.now(),
+                    name,
+                    phone: phone || '',
+                    priority: familyMembers.length + 1,
+                    notify: true,
+                    photo: null,
+                    status: 'pending'
+                });
+                renderFamily();
+                openFamilyManager();
+            }
+        }
+
+        // History
+        function toggleHistory() {
+            const modal = document.getElementById('history-modal');
+            const container = document.getElementById('history-list');
+            
+            if (modal.classList.contains('hidden')) {
+                container.innerHTML = sosHistory.length === 0 ? 
+                    '<p class="text-center text-white/50 py-8">Henüz kayıt yok</p>' :
+                    sosHistory.map(record => {
+                        const date = new Date(record.timestamp);
+                        const modeConfig = MODES[record.mode];
+                        return `
+                            <div class="glass-card rounded-xl p-4 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: ${modeConfig.color}33">
+                                    <span class="material-symbols-outlined" style="color: ${modeConfig.color}">${modeConfig.icon}</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm">${modeConfig.title}</p>
+                                    <p class="text-xs text-white/60">${date.toLocaleDateString('tr-TR')} ${date.toLocaleTimeString('tr-TR')}</p>
+                                </div>
+                                <span class="text-xs px-2 py-1 rounded-full ${record.status === 'resolved' ? 'bg-success/20 text-success' : 'bg-emergency/20 text-emergency'}">
+                                    ${record.status === 'resolved' ? 'Çözüldü' : 'Aktif'}
+                                </span>
+                            </div>
+                        `;
+                    }).join('');
+                
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

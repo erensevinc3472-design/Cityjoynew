@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa İtfaiye İstasyonları - Tüm ilçelerdeki itfaiye istasyonları adres, telefon ve ulaşım bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa İtfaiye İstasyonları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "fire-orange": "#F97316",
+                        "fire-red": "#DC2626",
+                        "emergency-red": "#EF4444"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-fire {
+            animation: pulseFire 2s infinite;
+        }
+        @keyframes pulseFire {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(249, 115, 22, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .fire-card {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .fire-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .service-tag {
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+        .modal-fire {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .emergency-btn {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">İTFAİYE İSTASYONLARI</h1>
+                <p class="text-xs text-gray-text truncate">Bursa Büyükşehir Belediyesi İtfaiye Dairesi</p>
+            </div>
+            <button onclick="openEmergencyModal()" class="w-10 h-10 flex items-center justify-center rounded-full emergency-btn transition-colors shrink-0 pulse-fire">
+                <span class="material-symbols-outlined text-emergency-red">emergency</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Acil Bilgi -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-fire-orange/30 to-fire-orange/10 flex items-center justify-center shrink-0 pulse-fire">
+                            <span class="material-symbols-outlined text-fire-orange text-xl">local_fire_department</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Bursa İtfaiyesi</h2>
+                            <p class="text-xs text-gray-text">7/24 Yangın Müdahale ve Kurtarma</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emergency-red/10 border border-emergency-red/30">
+                        <div class="w-2 h-2 rounded-full bg-emergency-red animate-pulse"></div>
+                        <span class="text-xs text-emergency-red font-medium">7/24 Aktif</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-emergency-red">110</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Yangın İhbar</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-fire-orange">577</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Personel</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">24+</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">İstasyon</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-fire-red">7/24</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Hizmet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme - Kesfet/Profil ile aynı boyut -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">İstasyon Bul</h3>
+                        <p class="text-xs text-gray-text truncate">İlçe veya istasyon adı ara</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="fireSearch" placeholder="Örn: Osmangazi, Gençosman, Nilüfer..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchFire()"/>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">İlçe Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterDistrict('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterDistrict('osmangazi')" id="btn-osmangazi" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Osmangazi</span>
+                    </button>
+                    <button onclick="filterDistrict('nilufer')" id="btn-nilufer" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Nilüfer</span>
+                    </button>
+                    <button onclick="filterDistrict('yildirim')" id="btn-yildirim" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Yıldırım</span>
+                    </button>
+                    <button onclick="filterDistrict('diger')" id="btn-diger" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Diğer İlçeler</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Yangın Güvenliği</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Yangın İhbar -->
+                <div class="fire-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emergency-red/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-emergency-red text-sm">phone</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Yangın İhbar Hattı: 110</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Yangın, kaza, mahsur kalma ve benzeri acil durumlarda <strong>110</strong> numarasını ücretsiz arayabilirsiniz. 
+                                İhbarlar anında ilgili istasyona yönlendirilir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-fire-orange">7/24 Ücretsiz</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-fire-orange">Tüm Operatörler</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hizmetler -->
+                <div class="fire-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-fire-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-fire-orange text-sm">local_fire_department</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Hangi Hizmetler Verilir?</h4>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-fire-orange text-lg">local_fire_department</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Yangın Söndürme</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-fire-orange text-lg">healing</span>
+                                    <p class="text-[10px] text-gray-text mt-1">İlk Yardım</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-fire-orange text-lg">search</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Arama Kurtarma</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-fire-orange text-lg">flood</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Su Baskını</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-fire-orange text-lg">construction</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Teknik Kurtarma</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-fire-orange text-lg">pets</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Hayvan Kurtarma</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Baca Temizliği -->
+                <div class="fire-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-gold text-sm">cleaning_services</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Baca Temizliği ve Denetim</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Bursa Büyükşehir Belediyesi baca temizliği hizmeti vermektedir. 
+                                Yangın önlem şube müdürlüğünden randevu alabilirsiniz.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-gold">0224 716 34 31</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-gold">Ücretli Hizmet</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eğitimler -->
+                <div class="fire-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-fire-red/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-fire-red text-sm">school</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Yangın Eğitimleri</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Fabrika, okul ve kurumlar için yangın eğitimleri düzenlenmektedir. 
+                                Gönüllü itfaiyecilik başvuruları da kabul edilmektedir.
+                            </p>
+                            <div class="bg-white/5 rounded-lg p-2 text-[10px] text-gray-text">
+                                <strong class="text-gold">Tel:</strong> 0224 716 34 64 (Eğitim Şube)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Osmangazi İtfaiye İstasyonları -->
+        <section class="animate-slide-up district-section" data-district="osmangazi" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('osmangaziSection', 'osmangaziIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-fire-orange/30 to-fire-orange/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-fire-orange">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Osmangazi İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">8 İtfaiye İstasyonu</span>
+                    </div>
+                </div>
+                <span id="osmangaziIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="osmangaziSection" class="expandable-section mt-3 space-y-3">
+                <!-- Gençosman İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('gencosman')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gençosman İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Küplüpınar Mah. Dr. Sadık Ahmet Cad. No:182-188</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">phone</span>
+                        <span>110 (Merkez)</span>
+                    </div>
+                </div>
+
+                <!-- Küçükbalıklı İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('kucukbalikli')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Küçükbalıklı İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Küçükbalıklı Mah. 11 Eylül Blv. No:193</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">school</span>
+                        <span>Eğitim Merkezi ve Arama Kurtarma</span>
+                    </div>
+                </div>
+
+                <!-- Demirtaş İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('demirtas')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Demirtaş İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Dumlupınar Mah. Demirtaş San. Bölg. 1. Sardunya Sok. No:4</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">factory</span>
+                        <span>Sanayi Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- Zafer İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('zafer')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Zafer İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Şehreküstü Mah. Ahmet Hamdi Tanpınar Cad. No:10/1</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">location_on</span>
+                        <span>Şehir Merkezi - Heykel Yakını</span>
+                    </div>
+                </div>
+
+                <!-- Uludağ İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('uludag')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Uludağ İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">1. Oteller Bölgesi, Uludağ</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">ac_unit</span>
+                        <span>Kış Sezonu Özel İstasyon</span>
+                    </div>
+                </div>
+
+                <!-- Yangın Önlem Şube -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('yanginonlem')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yangın Önlem Şube Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Santral Garaj, Atatürk Kongre Kültür Merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">description</span>
+                        <span>Ruhsat ve Denetim Birimi</span>
+                    </div>
+                </div>
+
+                <!-- Müdahale Şube -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('mudahale')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Müdahale Şube Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Üçevler Mah. 3. Sok. No:21 (Küçüksanayi)</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-red">support_agent</span>
+                        <span>0224 716 34 05 / 110</span>
+                    </div>
+                </div>
+
+                <!-- Daire Başkanlığı -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('dairebaskanligi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İtfaiye Dairesi Başkanlığı</h4>
+                                <p class="text-[10px] text-gray-text">Gaziakdemir Mah. Stadyum Cad. 42/2E</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">account_balance</span>
+                        <span>İdari Merkez - 0224 716 34 02</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nilüfer İtfaiye İstasyonları -->
+        <section class="animate-slide-up district-section" data-district="nilufer" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('niluferSection', 'niluferIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emergency-red/30 to-emergency-red/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-emergency-red">park</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Nilüfer İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">3 İtfaiye İstasyonu</span>
+                    </div>
+                </div>
+                <span id="niluferIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="niluferSection" class="expandable-section mt-3 space-y-3">
+                <!-- İhsaniye İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('ihsaniye')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İhsaniye İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Esentepe Mah. Bilinen Sok. No:7</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">location_on</span>
+                        <span>Nilüfer Merkez Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- Hasanağa OSB İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('hasanaga')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hasanağa OSB İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Hasanağa OSB. Mah. 3. Cad. No:2/2</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">factory</span>
+                        <span>Organize Sanayi Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- Küçüksanayi İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('kucuksanayi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Küçüksanayi İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Üçevler Mah. 3. Sok. No:21</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-red">business</span>
+                        <span>Küçük Sanayi Sitesi İçinde</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yıldırım İtfaiye İstasyonları -->
+        <section class="animate-slide-up district-section" data-district="yildirim" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('yildirimSection', 'yildirimIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-fire-red/30 to-fire-red/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-fire-red">mosque</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Yıldırım İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">2 İtfaiye İstasyonu</span>
+                    </div>
+                </div>
+                <span id="yildirimIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="yildirimSection" class="expandable-section mt-3 space-y-3">
+                <!-- Işıklar İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('isiklar')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Işıklar İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Piremir Mah. Işıklar Cad. No: 88</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-emergency-red">location_on</span>
+                        <span>Yıldırım Merkez</span>
+                    </div>
+                </div>
+
+                <!-- Mimarsinan İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('mimarsinan')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mimarsinan İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Mimarsinan Mah. Kervan Cad. No:4</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">location_on</span>
+                        <span>Mimarsinan Bölgesi</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diğer İlçeler İtfaiye İstasyonları -->
+        <section class="animate-slide-up district-section" data-district="diger" style="animation-delay: 0.6s">
+            <button onclick="toggleSection('digerSection', 'digerIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">map</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Diğer İlçeler</span>
+                        <span class="text-[10px] text-gray-text block truncate">11 İtfaiye İstasyonu</span>
+                    </div>
+                </div>
+                <span id="digerIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="digerSection" class="expandable-section mt-3 space-y-3">
+                <!-- Gemlik İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('gemlik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">G</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Hamidiye Mah. Cumhuriyet Cad.No:48 - Gemlik</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">directions_boat</span>
+                        <span>Liman Bölgesi Yakını</span>
+                    </div>
+                </div>
+
+                <!-- Gürsu İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('gursu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">G</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gürsu İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Yenidoğan OSB Mah. Atatürk Cad. No:214 - Gürsu</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-emergency-red">factory</span>
+                        <span>OSB Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl İtfaiye -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('inegol')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">İ</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Süleymaniye Mah. İstiklal Cad. No:209 - İnegöl</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">location_city</span>
+                        <span>İnegöl Merkez</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl Alanyurt -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('alanyurt')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">A</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl Alanyurt İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Yunus Emre Mah. Avcı Sok. No:2 - İnegöl</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-red">home</span>
+                        <span>Alanyurt Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl Sanayi -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('inegolsanayi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">S</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl Sanayi İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Mahmudiye Mah. Hizmet Sok. No:8 - İnegöl</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">factory</span>
+                        <span>Sanayi Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- Hamzabey OSB -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('hamzabey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">H</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hamzabey OSB İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Hamzabey OSB Mah. 2. Cad. No:4 - İnegöl</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">factory</span>
+                        <span>Hamzabey OSB</span>
+                    </div>
+                </div>
+
+                <!-- Mudanya -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('mudanya')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">M</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mudanya İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Güzelyalı Siteler Mah. Aşiyan Sok. No:6 - Mudanya</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-emergency-red">beach_access</span>
+                        <span>Sahil Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- Karacabey -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('karacabey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">K</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Karacabey İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Canbalı Mah. Bursa Cad. No:253 - Karacabey</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">agriculture</span>
+                        <span>Tarım Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- Orhangazi -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('orhangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">O</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhangazi İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Hürriyet Mah. Göl yolu Cad. No: 4 - Orhangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-red">water</span>
+                        <span>İznik Gölü Yakını</span>
+                    </div>
+                </div>
+
+                <!-- Yenişehir -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('yenisahir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">Y</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yenişehir İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Çayır Mah. Çevre Yolu Cad. No:16 - Yenişehir</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">flight</span>
+                        <span>Havalimanı Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- Orhaneli -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('orhaneli')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">O</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhaneli İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">İsmet Paşa Mah. Zafer Sok. No: 90 - Orhaneli</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">forest</span>
+                        <span>Dağ Yöresi Merkez İstasyon</span>
+                    </div>
+                </div>
+
+                <!-- Kestel -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('kestel')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">K</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Kestel İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Ahmet Vefik Paşa Mah. Atatürk Cad. No:25 - Kestel</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-emergency-red">location_city</span>
+                        <span>Kestel Merkez</span>
+                    </div>
+                </div>
+
+                <!-- İznik -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('iznik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">İ</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İznik İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Yeşil Cami Mah. Hicaziye Gökbulut Sok. No:1 - İznik</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">history</span>
+                        <span>Tarihi İlçe Merkezi</span>
+                    </div>
+                </div>
+
+                <!-- Keles -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('keles')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">K</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Keles İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Cuma Mah. Keskinpınar Sok. No:11 - Keles</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-red">landscape</span>
+                        <span>Dağ İlçesi</span>
+                    </div>
+                </div>
+
+                <!-- Büyükorhan -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('buyukorhan')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">B</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Büyükorhan İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Hoca Hasan Mah. Belediye Meydanı No:1 - Büyükorhan</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">terrain</span>
+                        <span>Dağ İlçesi</span>
+                    </div>
+                </div>
+
+                <!-- Harmancık -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('harmancik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-fire-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">H</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Harmancık İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Merkez Mah. Panayır Cad. No:21/A - Harmancık</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-fire-orange">mountain_flag</span>
+                        <span>Dağ İlçesi</span>
+                    </div>
+                </div>
+
+                <!-- Küçükkumla -->
+                <div class="fire-card rounded-xl p-4" onclick="openFireDetail('kucukkumla')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">K</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Küçükkumla İtfaiye İstasyonu</h4>
+                                <p class="text-[10px] text-gray-text">Küçükkumla Mah. 3. Cağlayan Cad. No:13 - Kumla/Gemlik</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-emergency-red">beach_access</span>
+                        <span>Sahil Bölgesi</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="saglik-ocaklari.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-emergency-red text-xl">local_hospital</span>
+                    <span class="text-[10px] text-center">ASM'ler</span>
+                </a>
+                <a href="hastaneler.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-fire-orange text-xl">emergency</span>
+                    <span class="text-[10px] text-center">Hastaneler</span>
+                </a>
+                <a href="polis.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-fire-red text-xl">local_police</span>
+                    <span class="text-[10px] text-center">Polis</span>
+                </a>
+                <a href="afad.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-gold text-xl">warning</span>
+                    <span class="text-[10px] text-center">AFAD</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.8s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-emergency-red">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-emergency-red shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-emergency-red mb-1">Acil Durumda</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            Yangın, kaza veya mahsur kalma durumlarında <strong>110</strong> numarasını arayın. 
+                            İtfaiye ekipleri 7/24 görev başındadır. Orman yangınlarında <strong>177</strong> Orman Yangın İhbar hattını arayın.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation - Kesfet/Profil ile Aynı -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- İtfaiye Detay Modalı -->
+    <div id="fireDetailModal" class="fixed inset-0 z-[80] modal-fire hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeFireDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">İstasyon Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">İtfaiye İstasyonu Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-fire-orange/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-fire-orange text-3xl">local_fire_department</span>
+                    </div>
+                    <div>
+                        <h2 id="modalFireName" class="text-xl font-bold text-white mb-1">İstasyon Adı</h2>
+                        <p id="modalDistrict" class="text-sm text-gold">İlçe</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">İletişim</p>
+                            <p class="text-sm text-white">Yangın İhbar: <strong class="text-emergency-red">110</strong></p>
+                            <p class="text-xs text-gray-text mt-1">Merkez: 0224 716 34 00</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p class="text-sm text-white">7/24 Kesintisiz Hizmet</p>
+                            <p class="text-xs text-gray-text mt-1">Tüm istasyonlar gece-gündüz görev başındadır.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">local_fire_department</span>
+                    Verilen Hizmetler
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-fire-orange text-xl mb-1">local_fire_department</span>
+                        <p class="text-xs text-gray-text">Yangın Söndürme</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-fire-orange text-xl mb-1">healing</span>
+                        <p class="text-xs text-gray-text">İlk Yardım</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-fire-orange text-xl mb-1">search</span>
+                        <p class="text-xs text-gray-text">Arama Kurtarma</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-fire-orange text-xl mb-1">flood</span>
+                        <p class="text-xs text-gray-text">Su Baskını</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-fire-orange text-xl mb-1">construction</span>
+                        <p class="text-xs text-gray-text">Teknik Kurtarma</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-fire-orange text-xl mb-1">pets</span>
+                        <p class="text-xs text-gray-text">Hayvan Kurtarma</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım ve Konum
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Notlar -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined">info</span>
+                    Önemli Bilgiler
+                </h3>
+                <ul class="space-y-2 text-xs text-gray-text">
+                    <li class="flex items-start gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-fire-orange mt-1.5 shrink-0"></span>
+                        <span>Yangın ihbarları <strong class="text-white">110</strong> numarası üzerinden alınır.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-fire-orange mt-1.5 shrink-0"></span>
+                        <span>Yanlış ihbarlar cezai işlem gerektirir.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-fire-orange mt-1.5 shrink-0"></span>
+                        <span>İtfaiye araçlarına yol verilmesi zorunludur.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button onclick="callNumber('110')" class="flex-1 bg-emergency-red/20 hover:bg-emergency-red/30 border border-emergency-red/50 text-emergency-red py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    110'u Ara
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acil Durum Modalı -->
+    <div id="emergencyModal" class="fixed inset-0 z-[80] modal-fire hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeEmergencyModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Acil Durumlar</h1>
+                        <p class="text-xs text-gray-text truncate">Yangın ve Kurtarma İhbar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-emergency-red/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-emergency-red/20 flex items-center justify-center pulse-fire">
+                        <span class="material-symbols-outlined text-emergency-red text-3xl">local_fire_department</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-emergency-red">110</h2>
+                        <p class="text-sm text-gray-text">Yangın İhbar Hattı</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Yangın, kaza, mahsur kalma ve benzeri acil durumlarda ücretsiz arayın. 
+                    Tüm operatörlerden 7/24 ulaşılabilir.
+                </p>
+                <button onclick="callNumber('110')" class="w-full bg-emergency-red/20 hover:bg-emergency-red/30 border border-emergency-red/50 text-emergency-red py-4 rounded-xl text-lg font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    110'u Ara
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-fire-orange text-2xl mb-2">forest</span>
+                    <p class="text-lg font-bold text-fire-orange">177</p>
+                    <p class="text-xs text-gray-text">Orman Yangını</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">phone</span>
+                    <p class="text-lg font-bold text-gold">0224 716 34 00</p>
+                    <p class="text-xs text-gray-text">İtfaiye Merkez</p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-3">Yangın Anında Yapılacaklar</h3>
+                <ul class="space-y-3 text-xs text-gray-text">
+                    <li class="flex items-start gap-2">
+                        <span class="w-6 h-6 rounded-full bg-emergency-red/20 flex items-center justify-center shrink-0 text-emergency-red font-bold">1</span>
+                        <span>Panik yapmayın ve 110'u arayın.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="w-6 h-6 rounded-full bg-emergency-red/20 flex items-center justify-center shrink-0 text-emergency-red font-bold">2</span>
+                        <span>Adresi net ve anlaşılır şekilde bildirin.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="w-6 h-6 rounded-full bg-emergency-red/20 flex items-center justify-center shrink-0 text-emergency-red font-bold">3</span>
+                        <span>Güvenli bir noktaya çekilin.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="w-6 h-6 rounded-full bg-emergency-red/20 flex items-center justify-center shrink-0 text-emergency-red font-bold">4</span>
+                        <span>İtfaiye ekiplerine yol gösterin.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // İtfaiye Veritabanı
+        const fireData = {
+            'gencosman': {
+                name: 'Gençosman İtfaiye İstasyonu',
+                district: 'Osmangazi',
+                address: 'Küplüpınar Mah. Dr. Sadık Ahmet Cad. No:182-188, Osmangazi, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3G, 38, 60, 94 hatları (Gençosman durağı)' },
+                    { icon: 'local_parking', text: 'İstasyon önü otopark (itfaiye araçlarına ayrılmış)' },
+                    { icon: 'location_on', text: 'Osmangazi merkeze 3 km mesafe' }
+                ],
+                features: ['Ana istasyon', '7/24 görev', 'Çok amaçlı kurtarma aracı']
+            },
+            'kucukbalikli': {
+                name: 'Küçükbalıklı İtfaiye İstasyonu',
+                district: 'Osmangazi',
+                address: 'Küçükbalıklı Mah. 11 Eylül Blv. No:193, Osmangazi, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3, 4 hatları' },
+                    { icon: 'school', text: 'Eğitim merkezi ve arama kurtarma birimi' },
+                    { icon: 'local_parking', text: 'Eğitim tesisleri otoparkı' }
+                ],
+                features: ['Eğitim merkezi', 'Arama kurtarma', 'Personel eğitimi']
+            },
+            'demirtas': {
+                name: 'Demirtaş İtfaiye İstasyonu',
+                district: 'Osmangazi',
+                address: 'Dumlupınar Mah. Demirtaş San. Bölg. 1. Sardunya Sok. No:4, Osmangazi, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları (Demirtaş durağı)' },
+                    { icon: 'factory', text: 'Demirtaş Organize Sanayi Bölgesi içinde' },
+                    { icon: 'local_parking', text: 'Sanayi otoparkları (ücretli)' }
+                ],
+                features: ['Sanayi yangınları', 'Kimyasal müdahale', 'Endüstriyel güvenlik']
+            },
+            'zafer': {
+                name: 'Zafer İtfaiye İstasyonu',
+                district: 'Osmangazi',
+                address: 'Şehreküstü Mah. Ahmet Hamdi Tanpınar Cad. No:10/1, Osmangazi, Bursa',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 200m' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'location_on', text: 'Şehir merkezi - Heykel yakını' }
+                ],
+                features: ['Merkez istasyon', 'Hızlı müdahale', 'Tarihi bölge koruma']
+            },
+            'uludag': {
+                name: 'Uludağ İtfaiye İstasyonu',
+                district: 'Osmangazi',
+                address: '1. Oteller Bölgesi, Uludağ, Bursa',
+                transport: [
+                    { icon: 'ac_unit', text: 'Uludağ 1. Oteller Bölgesi' },
+                    { icon: 'directions_car', text: 'Teleferik veya karayolu ile ulaşım' },
+                    { icon: 'warning', text: 'Kış sezonu özel istasyon' }
+                ],
+                features: ['Yüksek irtifa', 'Kayak merkezi', 'Kış şartlarına özel']
+            },
+            'yanginonlem': {
+                name: 'Yangın Önlem Şube Müdürlüğü',
+                district: 'Osmangazi',
+                address: 'Santral Garaj, Atatürk Kongre Kültür Merkezi, Osmangazi, Bursa',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Santral durağı' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3, 4, 38 hatları' },
+                    { icon: 'description', text: 'Ruhsat ve denetim işlemleri' }
+                ],
+                features: ['Ruhsat işlemleri', 'Denetim', 'Baca temizliği']
+            },
+            'mudahale': {
+                name: 'Müdahale Şube Müdürlüğü',
+                district: 'Osmangazi',
+                address: 'Üçevler Mah. 3. Sok. No:21 (Küçüksanayi), Osmangazi, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A hatları' },
+                    { icon: 'business', text: 'Küçük Sanayi Sitesi içinde' },
+                    { icon: 'phone', text: '0224 716 34 05 / 110' }
+                ],
+                features: ['Operasyon merkezi', 'Koordinasyon', 'Müdahale planlama']
+            },
+            'dairebaskanligi': {
+                name: 'İtfaiye Dairesi Başkanlığı',
+                district: 'Osmangazi',
+                address: 'Gaziakdemir Mah. Stadyum Cad. 42/2E, Osmangazi, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Stadyum durağı)' },
+                    { icon: 'account_balance', text: 'Bursa Büyükşehir Belediyesi kompleksi' },
+                    { icon: 'phone', text: '0224 716 34 02' }
+                ],
+                features: ['İdari merkez', 'Koordinasyon', 'Planlama']
+            },
+            'ihsaniye': {
+                name: 'İhsaniye İtfaiye İstasyonu',
+                district: 'Nilüfer',
+                address: 'Esentepe Mah. Bilinen Sok. No:7, Nilüfer, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına yakın' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı' }
+                ],
+                features: ['Nilüfer merkez', '7/24 görev', 'Hızlı müdahale']
+            },
+            'hasanaga': {
+                name: 'Hasanağa OSB İtfaiye İstasyonu',
+                district: 'Nilüfer',
+                address: 'Hasanağa OSB. Mah. 3. Cad. No:2/2, Nilüfer, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'factory', text: 'Hasanağa Organize Sanayi Bölgesi' },
+                    { icon: 'local_parking', text: 'OSB otoparkları' }
+                ],
+                features: ['OSB yangınları', 'Endüstriyel güvenlik', 'Kimyasal müdahale']
+            },
+            'kucuksanayi': {
+                name: 'Küçüksanayi İtfaiye İstasyonu',
+                district: 'Nilüfer',
+                address: 'Üçevler Mah. 3. Sok. No:21, Nilüfer, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A hatları' },
+                    { icon: 'business', text: 'Küçük Sanayi Sitesi içinde' },
+                    { icon: 'local_parking', text: 'Sanayi otoparkı' }
+                ],
+                features: ['Sanayi yangınları', 'Teknik kurtarma', '7/24 görev']
+            },
+            'isiklar': {
+                name: 'Işıklar İtfaiye İstasyonu',
+                district: 'Yıldırım',
+                address: 'Piremir Mah. Işıklar Cad. No: 88, Yıldırım, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı' },
+                    { icon: 'location_on', text: 'Yıldırım merkez bölge' }
+                ],
+                features: ['Yıldırım merkez', '7/24 görev', 'Hızlı müdahale']
+            },
+            'mimarsinan': {
+                name: 'Mimarsinan İtfaiye İstasyonu',
+                district: 'Yıldırım',
+                address: 'Mimarsinan Mah. Kervan Cad. No:4, Yıldırım, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 9 hatları' },
+                    { icon: 'local_parking', text: 'Cadde üzeri park (sınırlı)' },
+                    { icon: 'location_on', text: 'Mimarsinan bölgesi' }
+                ],
+                features: ['Bölge istasyonu', 'Yoğun nüfus', 'Hızlı erişim']
+            },
+            'gemlik': {
+                name: 'Gemlik İtfaiye İstasyonu',
+                district: 'Gemlik',
+                address: 'Hamidiye Mah. Cumhuriyet Cad.No:48, Gemlik, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 200 (Bursa-Gemlik)' },
+                    { icon: 'directions_boat', text: 'Liman bölgesine yakın' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['İlçe merkez', 'Liman güvenliği', 'Endüstriyel bölge']
+            },
+            'gursu': {
+                name: 'Gürsu İtfaiye İstasyonu',
+                district: 'Gürsu',
+                address: 'Yenidoğan OSB Mah. Atatürk Cad. No:214, Gürsu, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 200 (Bursa-Gürsu)' },
+                    { icon: 'factory', text: 'Gürsu OSB yakını' },
+                    { icon: 'local_parking', text: 'Cadde üzeri park' }
+                ],
+                features: ['OSB koruma', 'İlçe merkez', 'Sanayi güvenliği']
+            },
+            'inegol': {
+                name: 'İnegöl İtfaiye İstasyonu',
+                district: 'İnegöl',
+                address: 'Süleymaniye Mah. İstiklal Cad. No:209, İnegöl, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 300 (Bursa-İnegöl)' },
+                    { icon: 'location_city', text: 'İnegöl merkez' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['İlçe merkez', 'Mobilya sanayi', 'Büyük kapasite']
+            },
+            'alanyurt': {
+                name: 'İnegöl Alanyurt İtfaiye İstasyonu',
+                district: 'İnegöl',
+                address: 'Yunus Emre Mah. Avcı Sok. No:2, İnegöl, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 300 (Bursa-İnegöl)' },
+                    { icon: 'home', text: 'Alanyurt bölgesi' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı' }
+                ],
+                features: ['Bölge istasyonu', 'Hızlı müdahale', 'Yerleşim bölgesi']
+            },
+            'inegolsanayi': {
+                name: 'İnegöl Sanayi İtfaiye İstasyonu',
+                district: 'İnegöl',
+                address: 'Mahmudiye Mah. Hizmet Sok. No:8, İnegöl, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 300 (Bursa-İnegöl)' },
+                    { icon: 'factory', text: 'İnegöl Sanayi Bölgesi' },
+                    { icon: 'local_parking', text: 'Sanayi otoparkı' }
+                ],
+                features: ['Sanayi yangınları', 'Mobilya fabrikaları', 'Endüstriyel güvenlik']
+            },
+            'hamzabey': {
+                name: 'Hamzabey OSB İtfaiye İstasyonu',
+                district: 'İnegöl',
+                address: 'Hamzabey OSB Mah. 2. Cad. No:4, İnegöl, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 300 (Bursa-İnegöl)' },
+                    { icon: 'factory', text: 'Hamzabey Organize Sanayi Bölgesi' },
+                    { icon: 'local_parking', text: 'OSB otoparkı' }
+                ],
+                features: ['OSB yangınları', 'Büyük ölçekli müdahale', 'Endüstriyel güvenlik']
+            },
+            'mudanya': {
+                name: 'Mudanya İtfaiye İstasyonu',
+                district: 'Mudanya',
+                address: 'Güzelyalı Siteler Mah. Aşiyan Sok. No:6, Mudanya, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 200 (Bursa-Mudanya)' },
+                    { icon: 'beach_access', text: 'Sahil bölgesi' },
+                    { icon: 'local_parking', text: 'Siteler otoparkı' }
+                ],
+                features: ['Sahil güvenliği', 'Yaz sezonu yoğunluğu', 'Turistik bölge']
+            },
+            'karacabey': {
+                name: 'Karacabey İtfaiye İstasyonu',
+                district: 'Karacabey',
+                address: 'Canbalı Mah. Bursa Cad. No:253, Karacabey, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 400 (Bursa-Karacabey)' },
+                    { icon: 'agriculture', text: 'Tarım bölgesi merkezi' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['Tarım alanları', 'Hayvancılık', 'Geniş bölge']
+            },
+            'orhangazi': {
+                name: 'Orhangazi İtfaiye İstasyonu',
+                district: 'Orhangazi',
+                address: 'Hürriyet Mah. Göl yolu Cad. No: 4, Orhangazi, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 500 (Bursa-Orhangazi)' },
+                    { icon: 'water', text: 'İznik Gölü yakını' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['Göl kenarı', 'Turistik bölge', 'Tarım alanları']
+            },
+            'yenisahir': {
+                name: 'Yenişehir İtfaiye İstasyonu',
+                district: 'Yenişehir',
+                address: 'Çayır Mah. Çevre Yolu Cad. No:16, Yenişehir, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 600 (Bursa-Yenişehir)' },
+                    { icon: 'flight', text: 'Yenişehir Havalimanı yakını' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['Havalimanı güvenliği', 'Tarım bölgesi', 'Stratejik konum']
+            },
+            'orhaneli': {
+                name: 'Orhaneli İtfaiye İstasyonu',
+                district: 'Orhaneli',
+                address: 'İsmet Paşa Mah. Zafer Sok. No: 90, Orhaneli, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 700 (Bursa-Orhaneli)' },
+                    { icon: 'forest', text: 'Dağ yöresi merkez istasyon' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['Orman yangınları', 'Dağ kurtarma', 'Geniş alan']
+            },
+            'kestel': {
+                name: 'Kestel İtfaiye İstasyonu',
+                district: 'Kestel',
+                address: 'Ahmet Vefik Paşa Mah. Atatürk Cad. No:25, Kestel, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 100 (Bursa-Kestel)' },
+                    { icon: 'location_city', text: 'Kestel merkez' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['İlçe merkez', 'Sanayi bölgesi', 'Hızlı erişim']
+            },
+            'iznik': {
+                name: 'İznik İtfaiye İstasyonu',
+                district: 'İznik',
+                address: 'Yeşil Cami Mah. Hicaziye Gökbulut Sok. No:1, İznik, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 800 (Bursa-İznik)' },
+                    { icon: 'history', text: 'Tarihi ilçe merkezi' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['Tarihi yapılar', 'Göl kenarı', 'Turistik bölge']
+            },
+            'keles': {
+                name: 'Keles İtfaiye İstasyonu',
+                district: 'Keles',
+                address: 'Cuma Mah. Keskinpınar Sok. No:11, Keles, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 900 (Bursa-Keles)' },
+                    { icon: 'landscape', text: 'Dağ ilçesi' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['Dağ kurtarma', 'Orman yangınları', 'Zorlu arazi']
+            },
+            'buyukorhan': {
+                name: 'Büyükorhan İtfaiye İstasyonu',
+                district: 'Büyükorhan',
+                address: 'Hoca Hasan Mah. Belediye Meydanı No:1, Büyükorhan, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 950 (Bursa-Büyükorhan)' },
+                    { icon: 'terrain', text: 'Dağ ilçesi' },
+                    { icon: 'local_parking', text: 'Belediye otoparkı' }
+                ],
+                features: ['Dağ kurtarma', 'Orman yangınları', 'Uzun mesafe']
+            },
+            'harmancik': {
+                name: 'Harmancık İtfaiye İstasyonu',
+                district: 'Harmancık',
+                address: 'Merkez Mah. Panayır Cad. No:21/A, Harmancık, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 980 (Bursa-Harmancık)' },
+                    { icon: 'mountain_flag', text: 'Dağ ilçesi' },
+                    { icon: 'local_parking', text: 'Merkez otopark' }
+                ],
+                features: ['Dağ kurtarma', 'Orman yangınları', 'Maden bölgesi']
+            },
+            'kucukkumla': {
+                name: 'Küçükkumla İtfaiye İstasyonu',
+                district: 'Gemlik',
+                address: 'Küçükkumla Mah. 3. Cağlayan Cad. No:13, Kumla/Gemlik, Bursa',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 200 (Bursa-Gemlik)' },
+                    { icon: 'beach_access', text: 'Sahil bölgesi' },
+                    { icon: 'local_parking', text: 'Sahil otoparkı' }
+                ],
+                features: ['Sahil güvenliği', 'Yaz sezonu', 'Turistik bölge']
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // District Filter
+        let currentDistrict = 'all';
+        function filterDistrict(district) {
+            currentDistrict = district;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + district).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.district-section');
+            sections.forEach(section => {
+                if (district === 'all' || section.dataset.district === district) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Fire
+        function searchFire() {
+            const searchTerm = document.getElementById('fireSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.fire-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open Fire Detail Modal
+        function openFireDetail(fireId) {
+            const fire = fireData[fireId];
+            if (!fire) return;
+
+            document.getElementById('modalFireName').textContent = fire.name;
+            document.getElementById('modalDistrict').textContent = fire.district + ' İlçesi';
+            document.getElementById('modalAddress').textContent = fire.address;
+            
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            fire.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Harita butonunu güncelle
+            const mapQuery = fire.name + ', ' + fire.district + ', Bursa';
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${mapQuery}')`);
+
+            document.getElementById('fireDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Fire Detail Modal
+        function closeFireDetail() {
+            document.getElementById('fireDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Emergency Modal
+        function openEmergencyModal() {
+            document.getElementById('emergencyModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak FAQ açık
+            document.getElementById('faqSection').classList.add('open');
+            document.getElementById('faqIcon').classList.add('open');
+            
+            // Tüm ilçeleri göster
+            filterDistrict('all');
+        });
+    </script>
+
+</body>
+</html>

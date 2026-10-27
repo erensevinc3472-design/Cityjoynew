@@ -1,0 +1,2508 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy - Acil İhtiyaçlar | Bursa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#BB9E77",
+                        "primary-light": "#D4B896",
+                        "emergency": "#EF4444",
+                        "health": "#10B981",
+                        "vehicle": "#F59E0B",
+                        "home": "#3B82F6",
+                        "service": "#8B5CF6",
+                        "pet": "#EC4899",
+                    },
+                    animation: {
+                        'pulse-sos': 'pulse-sos 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'typing': 'typing 1.5s infinite',
+                    },
+                    keyframes: {
+                        'pulse-sos': {
+                            '0%, 100%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.7)' },
+                            '50%': { boxShadow: '0 0 0 20px rgba(239, 68, 68, 0)' },
+                        },
+                        'glow': {
+                            '0%': { boxShadow: '0 0 5px #BB9E77, 0 0 10px #BB9E77' },
+                            '100%': { boxShadow: '0 0 20px #BB9E77, 0 0 30px #BB9E77' },
+                        },
+                        'typing': {
+                            '0%, 100%': { opacity: 0.3 },
+                            '50%': { opacity: 1 },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 50%, #061A1D 100%);
+            min-height: 100dvh;
+        }
+        
+        .glass-card {
+            background: rgba(65, 91, 87, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .glass-card:hover {
+            background: rgba(65, 91, 87, 0.8);
+            border-color: rgba(187, 158, 119, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .category-card {
+            background: rgba(20, 50, 55, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(105, 131, 131, 0.2);
+        }
+        
+        .sos-mega {
+            background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+            box-shadow: 0 10px 40px rgba(220, 38, 38, 0.4);
+            animation: pulse-sos 2s infinite;
+        }
+        
+        .sos-mega:active {
+            transform: scale(0.98);
+        }
+        
+        .emergency-chip {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.05) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        
+        .health-chip {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        
+        .vehicle-chip {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.05) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        
+        .home-chip {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        
+        .service-chip {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+        }
+        
+        .pet-chip {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(236, 72, 153, 0.05) 100%);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.9);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .horizontal-scroll {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .horizontal-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .service-item {
+            transition: all 0.3s ease;
+        }
+        
+        .service-item:active {
+            transform: scale(0.95);
+        }
+        
+        .category-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nearby-card {
+            background: linear-gradient(135deg, rgba(187, 158, 119, 0.15) 0%, rgba(187, 158, 119, 0.05) 100%);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+        }
+        
+        .search-box {
+            background: rgba(65, 91, 87, 0.8);
+            border: 1px solid rgba(105, 131, 131, 0.4);
+        }
+        
+        .search-box:focus-within {
+            border-color: #BB9E77;
+            box-shadow: 0 0 0 3px rgba(187, 158, 119, 0.2);
+        }
+        
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .expandable-section.expanded {
+            max-height: 2000px;
+        }
+        
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 100%);
+            width: 100%;
+            max-width: 430px;
+            max-height: 85vh;
+            border-radius: 24px 24px 0 0;
+            border: 1px solid rgba(187, 158, 119, 0.3);
+            border-bottom: none;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(105, 131, 131, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(65, 91, 87, 0.4);
+        }
+        
+        .modal-body {
+            overflow-y: auto;
+            flex: 1;
+            padding: 16px;
+        }
+        
+        .provider-card {
+            background: rgba(65, 91, 87, 0.6);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .provider-card:hover {
+            background: rgba(65, 91, 87, 0.8);
+            border-color: rgba(187, 158, 119, 0.5);
+            transform: translateX(4px);
+        }
+        
+        .provider-card:active {
+            transform: scale(0.98);
+        }
+        
+        .status-open {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        
+        .status-closed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        
+        .rating-badge {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        
+        .distance-badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3B82F6;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        /* AI Chat Styles */
+        .ai-chat-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 200;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .ai-chat-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .ai-chat-container {
+            background: linear-gradient(180deg, #0F3E46 0%, #061A1D 100%);
+            width: 100%;
+            max-width: 430px;
+            height: 85vh;
+            max-height: 700px;
+            border-radius: 24px 24px 0 0;
+            border: 1px solid rgba(187, 158, 119, 0.4);
+            border-bottom: none;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ai-chat-overlay.active .ai-chat-container {
+            transform: translateY(0);
+        }
+        
+        .ai-message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            animation: messageSlide 0.3s ease;
+        }
+        
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .ai-message.user {
+            background: linear-gradient(135deg, #BB9E77 0%, #D4B896 100%);
+            color: #0F3E46;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .ai-message.bot {
+            background: rgba(65, 91, 87, 0.8);
+            border: 1px solid rgba(105, 131, 131, 0.4);
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 16px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #BB9E77;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        .suggestion-chip {
+            background: rgba(187, 158, 119, 0.15);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+            color: #BB9E77;
+            transition: all 0.2s ease;
+        }
+        
+        .suggestion-chip:hover {
+            background: rgba(187, 158, 119, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .suggestion-chip:active {
+            transform: scale(0.95);
+        }
+        
+        .chat-input-container {
+            background: rgba(65, 91, 87, 0.6);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .chat-input {
+            background: rgba(10, 46, 51, 0.8);
+            border: 1px solid rgba(105, 131, 131, 0.4);
+            color: white;
+        }
+        
+        .chat-input:focus {
+            border-color: #BB9E77;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(187, 158, 119, 0.2);
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #BB9E77 0%, #D4B896 100%);
+            color: #0F3E46;
+            transition: all 0.2s ease;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(187, 158, 119, 0.4);
+        }
+        
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="text-white antialiased pb-28">
+
+    <!-- Header -->
+    <header class="pt-12 px-6 pb-4 sticky top-0 z-40 bg-gradient-to-b from-[#0F3E46] via-[#0F3E46] to-transparent">
+        <div class="flex items-center justify-between mb-6">
+            <a href="anasayfa.html" class="w-11 h-11 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-primary text-xl">arrow_back_ios_new</span>
+            </a>
+            <div class="flex flex-col items-center">
+                <span class="text-primary tracking-[0.3em] font-semibold text-xs uppercase">CityJoy</span>
+                <div class="w-8 h-0.5 bg-primary/50 rounded-full mt-1"></div>
+            </div>
+            <!-- AI Asistan Butonu -->
+            <button onclick="openAIChat()" class="w-11 h-11 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all group relative">
+                <span class="material-symbols-outlined text-primary text-xl group-hover:animate-pulse">smart_toy</span>
+                <div class="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#0F3E46] animate-pulse"></div>
+            </button>
+        </div>
+        
+        <div class="page-transition">
+            <h1 class="text-3xl font-light mb-2 tracking-tight">Acil İhtiyaçlar</h1>
+            <div class="flex items-center gap-2">
+                <div class="w-16 h-1 bg-gradient-to-r from-primary to-transparent rounded-full"></div>
+                <span class="text-xs text-gray-400 font-light">Bursa'daki Tüm Hizmetler</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-6 space-y-4 mt-4">
+
+        <!-- MEGA SOS BUTTON -->
+        <div class="page-transition stagger-1">
+            <a href="sos-aile.html" class="sos-mega w-full py-6 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-[0.98] transition-all group">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-white text-3xl animate-pulse">sensors</span>
+                    <span class="text-white font-bold tracking-widest text-lg uppercase">SOS - AİLEME HABER VER</span>
+                </div>
+                <span class="text-red-200 text-xs">Konumunuz anlık olarak gönderilir • 7/24 Aktif</span>
+            </a>
+        </div>
+
+        <!-- Hayati Acil Numaralar (Yatay Kaydırma) -->
+        <div class="page-transition stagger-2">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-medium text-gray-300">Hayati Acil</span>
+                <span class="text-xs text-gray-500">Dokun & Ara</span>
+            </div>
+            <div class="horizontal-scroll flex gap-3 pb-2">
+                <a href="tel:112" class="emergency-chip flex-shrink-0 px-5 py-4 rounded-xl flex flex-col items-center gap-1 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-emergency text-2xl">emergency</span>
+                    <span class="text-emergency font-bold text-lg">112</span>
+                    <span class="text-xs text-gray-400">Ambulans</span>
+                </a>
+                <a href="tel:155" class="emergency-chip flex-shrink-0 px-5 py-4 rounded-xl flex flex-col items-center gap-1 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-emergency text-2xl">local_police</span>
+                    <span class="text-emergency font-bold text-lg">155</span>
+                    <span class="text-xs text-gray-400">Polis</span>
+                </a>
+                <a href="tel:110" class="emergency-chip flex-shrink-0 px-5 py-4 rounded-xl flex flex-col items-center gap-1 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-emergency text-2xl">fire_truck</span>
+                    <span class="text-emergency font-bold text-lg">110</span>
+                    <span class="text-xs text-gray-400">İtfaiye</span>
+                </a>
+                <a href="tel:156" class="emergency-chip flex-shrink-0 px-5 py-4 rounded-xl flex flex-col items-center gap-1 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-emergency text-2xl">security</span>
+                    <span class="text-emergency font-bold text-lg">156</span>
+                    <span class="text-xs text-gray-400">Jandarma</span>
+                </a>
+                <a href="tel:183" class="emergency-chip flex-shrink-0 px-5 py-4 rounded-xl flex flex-col items-center gap-1 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-emergency text-2xl">water_drop</span>
+                    <span class="text-emergency font-bold text-lg">183</span>
+                    <span class="text-xs text-gray-400">Su Arıza</span>
+                </a>
+                <a href="tel:187" class="emergency-chip flex-shrink-0 px-5 py-4 rounded-xl flex flex-col items-center gap-1 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-emergency text-2xl">electric_bolt</span>
+                    <span class="text-emergency font-bold text-lg">187</span>
+                    <span class="text-xs text-gray-400">Elektrik</span>
+                </a>
+                <a href="tel:186" class="emergency-chip flex-shrink-0 px-5 py-4 rounded-xl flex flex-col items-center gap-1 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-emergency text-2xl">local_fire_department</span>
+                    <span class="text-emergency font-bold text-lg">186</span>
+                    <span class="text-xs text-gray-400">Doğalgaz</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Sana En Yakın -->
+        <div class="page-transition stagger-3 nearby-card rounded-2xl p-4">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-primary text-lg">near_me</span>
+                <span class="text-sm font-medium text-primary">Sana En Yakın</span>
+            </div>
+            <div class="space-y-2">
+                <div onclick="openServiceModal('eczane')" class="glass-card rounded-xl p-3 flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full health-chip flex items-center justify-center">
+                            <span class="material-symbols-outlined text-health">local_pharmacy</span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium block">Nöbetçi Eczane</span>
+                            <span class="text-xs text-gray-400">Bursa'daki tüm nöbetçi eczaneler</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-health bg-health/20 px-2 py-1 rounded-full">Açık</span>
+                        <span class="material-symbols-outlined text-primary text-lg">arrow_forward_ios</span>
+                    </div>
+                </div>
+                <div onclick="openServiceModal('taksi')" class="glass-card rounded-xl p-3 flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full vehicle-chip flex items-center justify-center">
+                            <span class="material-symbols-outlined text-vehicle">local_taxi</span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium block">Taksi Durağı</span>
+                            <span class="text-xs text-gray-400">En yakın taksi durakları</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-vehicle bg-vehicle/20 px-2 py-1 rounded-full">7/24</span>
+                        <span class="material-symbols-outlined text-primary text-lg">arrow_forward_ios</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arama -->
+        <div class="page-transition stagger-4 search-box rounded-2xl px-4 py-3 flex items-center gap-3">
+            <span class="material-symbols-outlined text-gray-400">search</span>
+            <input type="text" placeholder="Çilingir, eczane, tamirci ara..." class="bg-transparent border-none outline-none text-sm text-white placeholder-gray-400 flex-1" oninput="searchServices(this.value)">
+            <span class="material-symbols-outlined text-gray-400 text-lg">mic</span>
+        </div>
+
+        <!-- KATEGORİ 1: SAĞLIK -->
+        <div class="page-transition stagger-5 category-card rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full health-chip flex items-center justify-center">
+                        <span class="material-symbols-outlined text-health text-xl">health_and_safety</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-medium block">Sağlık</span>
+                        <span class="text-xs text-gray-400">Tıbbi destek & bakım</span>
+                    </div>
+                </div>
+                <button onclick="toggleSection('health')" class="w-8 h-8 rounded-full glass-card flex items-center justify-center">
+                    <span id="health-icon" class="material-symbols-outlined text-primary text-sm">expand_more</span>
+                </button>
+            </div>
+            
+            <div id="health-content" class="grid grid-cols-2 gap-2 expandable-section">
+                <button onclick="openServiceModal('eczane')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-health text-2xl">local_pharmacy</span>
+                    <span class="text-xs font-medium">Nöbetçi Eczane</span>
+                </button>
+                <button onclick="openServiceModal('veteriner')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-pet text-2xl">pets</span>
+                    <span class="text-xs font-medium">Acil Veteriner</span>
+                </button>
+                <button onclick="openServiceModal('evdebakim')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-health text-2xl">home_health</span>
+                    <span class="text-xs font-medium">Evde Bakım</span>
+                </button>
+                <button onclick="openServiceModal('ambulans')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-emergency text-2xl">emergency</span>
+                    <span class="text-xs font-medium">Özel Ambulans</span>
+                </button>
+                <button onclick="openServiceModal('dishekimi')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-health text-2xl">dentistry</span>
+                    <span class="text-xs font-medium">Acil Diş</span>
+                </button>
+                <button onclick="openServiceModal('psikolog')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-health text-2xl">psychology</span>
+                    <span class="text-xs font-medium">Psikolog</span>
+                </button>
+                <button onclick="openServiceModal('fiziktedavi')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-health text-2xl">sports_kabaddi</span>
+                    <span class="text-xs font-medium">Fizik Tedavi</span>
+                </button>
+                <button onclick="openServiceModal('dializ')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-health text-2xl">water_drop</span>
+                    <span class="text-xs font-medium">Dializ Merkezi</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- KATEGORİ 2: ARAÇ & ULAŞIM -->
+        <div class="page-transition stagger-5 category-card rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full vehicle-chip flex items-center justify-center">
+                        <span class="material-symbols-outlined text-vehicle text-xl">directions_car</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-medium block">Araç & Ulaşım</span>
+                        <span class="text-xs text-gray-400">Yol yardım & ulaşım</span>
+                    </div>
+                </div>
+                <button onclick="toggleSection('vehicle')" class="w-8 h-8 rounded-full glass-card flex items-center justify-center">
+                    <span id="vehicle-icon" class="material-symbols-outlined text-primary text-sm">expand_more</span>
+                </button>
+            </div>
+            
+            <div id="vehicle-content" class="grid grid-cols-2 gap-2 expandable-section">
+                <button onclick="openServiceModal('yolyardim')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-vehicle text-2xl">car_crash</span>
+                    <span class="text-xs font-medium">Yol Yardım</span>
+                </button>
+                <button onclick="openServiceModal('taksi')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-vehicle text-2xl">local_taxi</span>
+                    <span class="text-xs font-medium">Taksi</span>
+                </button>
+                <button onclick="openServiceModal('cekici')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-vehicle text-2xl">tow_truck</span>
+                    <span class="text-xs font-medium">Çekici</span>
+                </button>
+                <button onclick="openServiceModal('lastikci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-vehicle text-2xl">tire_repair</span>
+                    <span class="text-xs font-medium">Lastikçi</span>
+                </button>
+                <button onclick="openServiceModal('akuservis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-vehicle text-2xl">battery_charging_full</span>
+                    <span class="text-xs font-medium">Akü Servis</span>
+                </button>
+                <button onclick="openServiceModal('yakitservis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-vehicle text-2xl">local_gas_station</span>
+                    <span class="text-xs font-medium">Yakıt Servis</span>
+                </button>
+                <button onclick="openServiceModal('otokurtarma')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-vehicle text-2xl">support_agent</span>
+                    <span class="text-xs font-medium">Oto Kurtarma</span>
+                </button>
+                <button onclick="openServiceModal('rentacar')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-vehicle text-2xl">car_rental</span>
+                    <span class="text-xs font-medium">Rent A Car</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- KATEGORİ 3: EV & TESİSAT -->
+        <div class="page-transition stagger-5 category-card rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full home-chip flex items-center justify-center">
+                        <span class="material-symbols-outlined text-home text-xl">home</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-medium block">Ev & Tesisat</span>
+                        <span class="text-xs text-gray-400">Ev içi arıza & tamir</span>
+                    </div>
+                </div>
+                <button onclick="toggleSection('home')" class="w-8 h-8 rounded-full glass-card flex items-center justify-center">
+                    <span id="home-icon" class="material-symbols-outlined text-primary text-sm">expand_more</span>
+                </button>
+            </div>
+            
+            <div id="home-content" class="grid grid-cols-2 gap-2 expandable-section">
+                <button onclick="openServiceModal('cilingir')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-home text-2xl">vpn_key</span>
+                    <span class="text-xs font-medium">Çilingir</span>
+                </button>
+                <button onclick="openServiceModal('tesisat')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-home text-2xl">plumbing</span>
+                    <span class="text-xs font-medium">Tesisat</span>
+                </button>
+                <button onclick="openServiceModal('elektrikci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-home text-2xl">electric_bolt</span>
+                    <span class="text-xs font-medium">Elektrikçi</span>
+                </button>
+                <button onclick="openServiceModal('dogalgaz')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-home text-2xl">local_fire_department</span>
+                    <span class="text-xs font-medium">Doğalgaz</span>
+                </button>
+                <button onclick="openServiceModal('klimaservis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-home text-2xl">ac_unit</span>
+                    <span class="text-xs font-medium">Klima Servis</span>
+                </button>
+                <button onclick="openServiceModal('beyazesya')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-home text-2xl">kitchen</span>
+                    <span class="text-xs font-medium">Beyaz Eşya</span>
+                </button>
+                <button onclick="openServiceModal('camci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-home text-2xl">window</span>
+                    <span class="text-xs font-medium">Camcı</span>
+                </button>
+                <button onclick="openServiceModal('mutfakdolabi')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-home text-2xl">countertops</span>
+                    <span class="text-xs font-medium">Mutfak Dolabı</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- KATEGORİ 4: TAMİRAT & TADİLAT -->
+        <div class="page-transition stagger-5 category-card rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full service-chip flex items-center justify-center">
+                        <span class="material-symbols-outlined text-service text-xl">construction</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-medium block">Tamirat & Tadilat</span>
+                        <span class="text-xs text-gray-400">Usta & onarım hizmetleri</span>
+                    </div>
+                </div>
+                <button onclick="toggleSection('repair')" class="w-8 h-8 rounded-full glass-card flex items-center justify-center">
+                    <span id="repair-icon" class="material-symbols-outlined text-primary text-sm">expand_more</span>
+                </button>
+            </div>
+            
+            <div id="repair-content" class="grid grid-cols-2 gap-2 expandable-section">
+                <button onclick="openServiceModal('genelusta')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-service text-2xl">handyman</span>
+                    <span class="text-xs font-medium">Genel Usta</span>
+                </button>
+                <button onclick="openServiceModal('boyaci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-service text-2xl">format_paint</span>
+                    <span class="text-xs font-medium">Boyacı</span>
+                </button>
+                <button onclick="openServiceModal('badanaci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-service text-2xl">wallpaper</span>
+                    <span class="text-xs font-medium">Badanacı</span>
+                </button>
+                <button onclick="openServiceModal('fayansci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-service text-2xl">grid_on</span>
+                    <span class="text-xs font-medium">Fayansçı</span>
+                </button>
+                <button onclick="openServiceModal('parkeci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-service text-2xl">floor</span>
+                    <span class="text-xs font-medium">Parkeci</span>
+                </button>
+                <button onclick="openServiceModal('alcipan')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-service text-2xl">square_foot</span>
+                    <span class="text-xs font-medium">Alçıpan</span>
+                </button>
+                <button onclick="openServiceModal('demirci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-service text-2xl">hardware</span>
+                    <span class="text-xs font-medium">Demirci</span>
+                </button>
+                <button onclick="openServiceModal('marangoz')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-service text-2xl">carpenter</span>
+                    <span class="text-xs font-medium">Marangoz</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- KATEGORİ 5: GÜVENLİK & SİGORTA -->
+        <div class="page-transition stagger-5 category-card rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full emergency-chip flex items-center justify-center">
+                        <span class="material-symbols-outlined text-emergency text-xl">verified_user</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-medium block">Güvenlik & Sigorta</span>
+                        <span class="text-xs text-gray-400">Koruma & hasar desteği</span>
+                    </div>
+                </div>
+                <button onclick="toggleSection('security')" class="w-8 h-8 rounded-full glass-card flex items-center justify-center">
+                    <span id="security-icon" class="material-symbols-outlined text-primary text-sm">expand_more</span>
+                </button>
+            </div>
+            
+            <div id="security-content" class="grid grid-cols-2 gap-2 expandable-section">
+                <button onclick="openServiceModal('acilsigorta')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-emergency text-2xl">shield</span>
+                    <span class="text-xs font-medium">Acil Sigorta</span>
+                </button>
+                <button onclick="openServiceModal('guvenlik')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-emergency text-2xl">security</span>
+                    <span class="text-xs font-medium">Özel Güvenlik</span>
+                </button>
+                <button onclick="openServiceModal('kameraservis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-emergency text-2xl">videocam</span>
+                    <span class="text-xs font-medium">Kamera Servis</span>
+                </button>
+                <button onclick="openServiceModal('alarmservis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-2 text-center">
+                    <span class="material-symbols-outlined text-emergency text-2xl">notification_important</span>
+                    <span class="text-xs font-medium">Alarm Servis</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 🔥 KATEGORİ 6: DİĞER İHTİYAÇLAR - GENİŞLETİLMİŞ -->
+        <div class="page-transition stagger-5 category-card rounded-2xl p-4 border-2 border-primary/30">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center border border-primary/50">
+                        <span class="material-symbols-outlined text-primary text-xl">apps</span>
+                    </div>
+                    <div>
+                        <span class="text-lg font-medium block text-primary">Tüm Şehir Hizmetleri</span>
+                        <span class="text-xs text-gray-400">Aradığın her şey burada</span>
+                    </div>
+                </div>
+                <button onclick="toggleSection('others')" class="w-8 h-8 rounded-full glass-card flex items-center justify-center">
+                    <span id="others-icon" class="material-symbols-outlined text-primary text-sm">expand_more</span>
+                </button>
+            </div>
+            
+            <div id="others-content" class="expandable-section space-y-4">
+                
+                <!-- Alt Kategori: Temizlik & Bakım -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-service/20 text-service">TEMİZLİK & BAKIM</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('evtemizlik')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-service text-xl">cleaning_services</span>
+                            <span class="text-[10px] font-medium">Ev Temizlik</span>
+                        </button>
+                        <button onclick="openServiceModal('ofistemizlik')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-service text-xl">business</span>
+                            <span class="text-[10px] font-medium">Ofis Temizlik</span>
+                        </button>
+                        <button onclick="openServiceModal('insaattemizlik')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-service text-xl">foundation</span>
+                            <span class="text-[10px] font-medium">İnşaat Sonrası</span>
+                        </button>
+                        <button onclick="openServiceModal('haliyikama')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-service text-xl">dry_cleaning</span>
+                            <span class="text-[10px] font-medium">Halı Yıkama</span>
+                        </button>
+                        <button onclick="openServiceModal('koltukyikama')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-service text-xl">weekend</span>
+                            <span class="text-[10px] font-medium">Koltuk Yıkama</span>
+                        </button>
+                        <button onclick="openServiceModal('camtemizlik')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-service text-xl">cleaning</span>
+                            <span class="text-[10px] font-medium">Cam Temizlik</span>
+                        </button>
+                        <button onclick="openServiceModal('bahcebakim')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">yard</span>
+                            <span class="text-[10px] font-medium">Bahçe Bakım</span>
+                        </button>
+                        <button onclick="openServiceModal('havuzbakim')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-home text-xl">pool</span>
+                            <span class="text-[10px] font-medium">Havuz Bakım</span>
+                        </button>
+                        <button onclick="openServiceModal('boyabadana')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-vehicle text-xl">format_paint</span>
+                            <span class="text-[10px] font-medium">Boya Badana</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alt Kategori: Kişisel Bakım -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-pet/20 text-pet">KİŞİSEL BAKIM</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('kuafor')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">content_cut</span>
+                            <span class="text-[10px] font-medium">Kuaför</span>
+                        </button>
+                        <button onclick="openServiceModal('berber')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">face</span>
+                            <span class="text-[10px] font-medium">Berber</span>
+                        </button>
+                        <button onclick="openServiceModal('manikur')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">spa</span>
+                            <span class="text-[10px] font-medium">Manikür</span>
+                        </button>
+                        <button onclick="openServiceModal('masaj')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">self_improvement</span>
+                            <span class="text-[10px] font-medium">Masaj</span>
+                        </button>
+                        <button onclick="openServiceModal('spa')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">hot_tub</span>
+                            <span class="text-[10px] font-medium">SPA</span>
+                        </button>
+                        <button onclick="openServiceModal('epilasyon')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">beauty_center</span>
+                            <span class="text-[10px] font-medium">Epilasyon</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alt Kategori: Evcil Hayvan -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-pet/20 text-pet">EVCİL HAYVAN</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('pethotel')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">pets</span>
+                            <span class="text-[10px] font-medium">Pet Hotel</span>
+                        </button>
+                        <button onclick="openServiceModal('petpansiyon')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">home</span>
+                            <span class="text-[10px] font-medium">Pet Pansiyon</span>
+                        </button>
+                        <button onclick="openServiceModal('pettaksi')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">local_taxi</span>
+                            <span class="text-[10px] font-medium">Pet Taksi</span>
+                        </button>
+                        <button onclick="openServiceModal('petbakici')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">person</span>
+                            <span class="text-[10px] font-medium">Pet Bakıcı</span>
+                        </button>
+                        <button onclick="openServiceModal('petkuafor')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">content_cut</span>
+                            <span class="text-[10px] font-medium">Pet Kuaför</span>
+                        </button>
+                        <button onclick="openServiceModal('petegitim')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-pet text-xl">school</span>
+                            <span class="text-[10px] font-medium">Pet Eğitim</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alt Kategori: Taşıma & Nakliye -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-vehicle/20 text-vehicle">TAŞIMA & NAKLİYE</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('evdeneve')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-vehicle text-xl">moving</span>
+                            <span class="text-[10px] font-medium">Evden Eve</span>
+                        </button>
+                        <button onclick="openServiceModal('ofistasima')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-vehicle text-xl">corporate_fare</span>
+                            <span class="text-[10px] font-medium">Ofis Taşıma</span>
+                        </button>
+                        <button onclick="openServiceModal('parsiyel')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-vehicle text-xl">inventory_2</span>
+                            <span class="text-[10px] font-medium">Parsiyel</span>
+                        </button>
+                        <button onclick="openServiceModal('kamyonet')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-vehicle text-xl">local_shipping</span>
+                            <span class="text-[10px] font-medium">Kamyonet</span>
+                        </button>
+                        <button onclick="openServiceModal('depolama')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-vehicle text-xl">warehouse</span>
+                            <span class="text-[10px] font-medium">Depolama</span>
+                        </button>
+                        <button onclick="openServiceModal('paketleme')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-vehicle text-xl">inventory</span>
+                            <span class="text-[10px] font-medium">Paketleme</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alt Kategori: Teknik Servisler -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-home/20 text-home">TEKNİK SERVİSLER</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('telefontamiri')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-home text-xl">smartphone</span>
+                            <span class="text-[10px] font-medium">Telefon Tamiri</span>
+                        </button>
+                        <button onclick="openServiceModal('bilgisayarservis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-home text-xl">computer</span>
+                            <span class="text-[10px] font-medium">Bilgisayar</span>
+                        </button>
+                        <button onclick="openServiceModal('tablettamiri')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-home text-xl">tablet_android</span>
+                            <span class="text-[10px] font-medium">Tablet</span>
+                        </button>
+                        <button onclick="openServiceModal('televizyonservis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-home text-xl">tv</span>
+                            <span class="text-[10px] font-medium">Televizyon</span>
+                        </button>
+                        <button onclick="openServiceModal('kameratamiri')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-home text-xl">photo_camera</span>
+                            <span class="text-[10px] font-medium">Kamera</span>
+                        </button>
+                        <button onclick="openServiceModal('oyunkonsolu')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-home text-xl">sports_esports</span>
+                            <span class="text-[10px] font-medium">Oyun Konsolu</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alt Kategori: Eğitim & Özel Ders -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-health/20 text-health">EĞİTİM & DERS</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('matematikozel')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">calculate</span>
+                            <span class="text-[10px] font-medium">Matematik</span>
+                        </button>
+                        <button onclick="openServiceModal('ingilizceozel')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">language</span>
+                            <span class="text-[10px] font-medium">İngilizce</span>
+                        </button>
+                        <button onclick="openServiceModal('muzikdersi')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">music_note</span>
+                            <span class="text-[10px] font-medium">Müzik</span>
+                        </button>
+                        <button onclick="openServiceModal('direksiyon')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">directions_car</span>
+                            <span class="text-[10px] font-medium">Direksiyon</span>
+                        </button>
+                        <button onclick="openServiceModal('yuzmedersi')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">pool</span>
+                            <span class="text-[10px] font-medium">Yüzme</span>
+                        </button>
+                        <button onclick="openServiceModal('spordersi')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">sports</span>
+                            <span class="text-[10px] font-medium">Spor</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alt Kategori: Danışmanlık & Hukuk -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-emergency/20 text-emergency">DANIŞMANLIK</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('avukat')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-emergency text-xl">gavel</span>
+                            <span class="text-[10px] font-medium">Avukat</span>
+                        </button>
+                        <button onclick="openServiceModal('emlakdanisman')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-emergency text-xl">real_estate_agent</span>
+                            <span class="text-[10px] font-medium">Emlak</span>
+                        </button>
+                        <button onclick="openServiceModal('mafdestek')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-emergency text-xl">account_balance</span>
+                            <span class="text-[10px] font-medium">MAF</span>
+                        </button>
+                        <button onclick="openServiceModal('psikolog')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-emergency text-xl">psychology</span>
+                            <span class="text-[10px] font-medium">Psikolog</span>
+                        </button>
+                        <button onclick="openServiceModal('beslenmedanismani')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-emergency text-xl">restaurant</span>
+                            <span class="text-[10px] font-medium">Beslenme</span>
+                        </button>
+                        <button onclick="openServiceModal('kariyerdanismani')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-emergency text-xl">work</span>
+                            <span class="text-[10px] font-medium">Kariyer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alt Kategori: Organizasyon & Etkinlik -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-primary/20 text-primary">ORGANİZASYON</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('dugunorganizasyon')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-primary text-xl">favorite</span>
+                            <span class="text-[10px] font-medium">Düğün</span>
+                        </button>
+                        <button onclick="openServiceModal('dogumgunu')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-primary text-xl">cake</span>
+                            <span class="text-[10px] font-medium">Doğum Günü</span>
+                        </button>
+                        <button onclick="openServiceModal('catering')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-primary text-xl">restaurant_menu</span>
+                            <span class="text-[10px] font-medium">Catering</span>
+                        </button>
+                        <button onclick="openServiceModal('fotografci')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-primary text-xl">photo_camera</span>
+                            <span class="text-[10px] font-medium">Fotoğrafçı</span>
+                        </button>
+                        <button onclick="openServiceModal('djservis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-primary text-xl">music_cast</span>
+                            <span class="text-[10px] font-medium">DJ & Ses</span>
+                        </button>
+                        <button onclick="openServiceModal('dekorasyon')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-primary text-xl">celebration</span>
+                            <span class="text-[10px] font-medium">Dekorasyon</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alt Kategori: Gıda & Market -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="category-badge bg-health/20 text-health">GIDA & MARKET</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="openServiceModal('susiparis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">water_drop</span>
+                            <span class="text-[10px] font-medium">Damacana Su</span>
+                        </button>
+                        <button onclick="openServiceModal('manav')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">nutrition</span>
+                            <span class="text-[10px] font-medium">Manav</span>
+                        </button>
+                        <button onclick="openServiceModal('kasap')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">restaurant</span>
+                            <span class="text-[10px] font-medium">Kasap</span>
+                        </button>
+                        <button onclick="openServiceModal('ekmekfirini')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">bakery_dining</span>
+                            <span class="text-[10px] font-medium">Ekmek Fırını</span>
+                        </button>
+                        <button onclick="openServiceModal('pastane')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">cookie</span>
+                            <span class="text-[10px] font-medium">Pastane</span>
+                        </button>
+                        <button onclick="openServiceModal('kuruyemis')" class="service-item glass-card rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+                            <span class="material-symbols-outlined text-health text-xl">grain</span>
+                            <span class="                            <span class="text-[10px] font-medium">Kuruyemiş</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Alt Bilgi -->
+        <div class="text-center pb-8 pt-4">
+            <p class="text-xs text-gray-500">Toplam <span class="text-primary font-bold">50+</span> hizmet kategorisi</p>
+            <p class="text-xs text-gray-600 mt-1">Eksik hizmet mi var? <a href="#" class="text-primary underline">Bildir</a></p>
+        </div>
+
+    </main>
+
+    <!-- MODAL - Hizmet Sağlayıcıları Listesi -->
+    <div id="serviceModal" class="modal-overlay" onclick="closeServiceModalOnOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="flex items-center gap-3">
+                    <div id="modalIcon" class="w-10 h-10 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-xl">build</span>
+                    </div>
+                    <div>
+                        <h3 id="modalTitle" class="text-lg font-semibold">Hizmet Sağlayıcıları</h3>
+                        <p id="modalSubtitle" class="text-xs text-gray-400">Bursa'daki tüm sağlayıcılar</p>
+                    </div>
+                </div>
+                <button onclick="closeServiceModal()" class="w-8 h-8 rounded-full glass-card flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Provider cards will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chat Modal - Gelişmiş Versiyon -->
+    <div id="aiChatModal" class="ai-chat-overlay" onclick="closeAIChatOnOverlay(event)">
+        <div class="ai-chat-container" onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-primary/20 to-transparent">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center shadow-lg shadow-primary/30">
+                        <span class="material-symbols-outlined text-[#0F3E46] text-2xl">smart_toy</span>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-white">CityJoy Asistan</h3>
+                        <div class="flex items-center gap-1">
+                            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                            <span class="text-xs text-emerald-400">Çevrimiçi</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeAIChat()" class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:bg-white/10 transition-all">
+                    <span class="material-symbols-outlined text-white">close</span>
+                </button>
+            </div>
+
+            <!-- Chat Area -->
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <!-- Welcome Message -->
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-[#0F3E46] text-sm">smart_toy</span>
+                    </div>
+                    <div class="ai-message bot">
+                        <p class="mb-2">Merhaba! 👋 Ben CityJoy Asistan'ınızım.</p>
+                        <p>Bursa'daki acil ihtiyaçlarınızda size yardımcı olabilirim. Size nasıl yardımcı olabilirim?</p>
+                    </div>
+                </div>
+
+                <!-- Quick Suggestions -->
+                <div class="flex flex-wrap gap-2 ml-11">
+                    <button onclick="sendQuickMessage('En yakın nöbetçi eczane nerede?')" class="suggestion-chip px-3 py-2 rounded-full text-xs font-medium">
+                        🏥 Nöbetçi Eczane
+                    </button>
+                    <button onclick="sendQuickMessage('Acil çilingir lazım')" class="suggestion-chip px-3 py-2 rounded-full text-xs font-medium">
+                        🔑 Çilingir
+                    </button>
+                    <button onclick="sendQuickMessage('Taksi çağır')" class="suggestion-chip px-3 py-2 rounded-full text-xs font-medium">
+                        🚕 Taksi
+                    </button>
+                    <button onclick="sendQuickMessage('Elektrik arızası var')" class="suggestion-chip px-3 py-2 rounded-full text-xs font-medium">
+                        ⚡ Elektrikçi
+                    </button>
+                    <button onclick="sendQuickMessage('Su kaçağı var ne yapmalıyım?')" class="suggestion-chip px-3 py-2 rounded-full text-xs font-medium">
+                        💧 Su Tesisat
+                    </button>
+                    <button onclick="sendQuickMessage('Acil veteriner lazım')" class="suggestion-chip px-3 py-2 rounded-full text-xs font-medium">
+                        🐾 Veteriner
+                    </button>
+                </div>
+            </div>
+
+            <!-- Typing Indicator (Hidden by default) -->
+            <div id="typingIndicator" class="hidden px-4 py-2">
+                <div class="flex items-center gap-2 text-gray-400 text-xs">
+                    <span>CityJoy yazıyor</span>
+                    <div class="typing-indicator flex gap-1">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-input-container p-4">
+                <div class="flex items-center gap-2">
+                    <button class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-gray-400 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
+                    <div class="flex-1 relative">
+                        <input 
+                            type="text" 
+                            id="chatInput" 
+                            placeholder="Mesajınızı yazın..." 
+                            class="chat-input w-full rounded-full px-4 py-3 text-sm"
+                            onkeypress="handleChatKeyPress(event)"
+                        >
+                    </div>
+                    <button onclick="sendMessage()" class="send-btn w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
+                        <span class="material-symbols-outlined text-xl">send</span>
+                    </button>
+                </div>
+                <div class="text-center mt-2">
+                    <span class="text-[10px] text-gray-500">AI destekli asistan • Bilgiler Bursa özeldir</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-6 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px] font-medium">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px] font-medium">Keşfet</span>
+            </a>
+            <a href="acil-ihtiyaclar.html" class="nav-item active flex flex-col items-center gap-1 text-primary transition-colors">
+                <span class="material-symbols-outlined text-2xl">emergency</span>
+                <span class="text-[10px] font-medium">Acil</span>
+            </a>
+            <a href="ara.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px] font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // ============================================
+        // HİZMET SAĞLAYICILARI VERİTABANI
+        // ============================================
+        
+        const serviceProviders = {
+            // SAĞLIK
+            eczane: {
+                title: "Nöbetçi Eczaneler",
+                icon: "local_pharmacy",
+                color: "health",
+                providers: [
+                    { name: "Şahin Eczanesi", address: "Hamitler Mah. 75. Sok. No:12, Osmangazi", phone: "0224 441 40 00", status: "open", distance: "240m", rating: "4.8", type: "Nöbetçi" },
+                    { name: "Özgür Eczanesi", address: "Hamitler Mah. 1. Cadde No:45, Osmangazi", phone: "0224 441 41 41", status: "open", distance: "320m", rating: "4.9", type: "Nöbetçi" },
+                    { name: "Anadolu Eczanesi", address: "Çekirge Mah. Cumhuriyet Cad. No:78, Osmangazi", phone: "0224 220 50 50", status: "open", distance: "1.2km", rating: "4.7", type: "Nöbetçi" },
+                    { name: "Nilüfer Eczanesi", address: "Atatürk Bulvarı No:156, Nilüfer", phone: "0224 441 42 42", status: "open", distance: "2.5km", rating: "4.6", type: "Nöbetçi" },
+                    { name: "Yıldırım Eczanesi", address: "Yıldırım Mah. 3. Sok. No:23, Yıldırım", phone: "0224 441 43 43", status: "open", distance: "3.1km", rating: "4.5", type: "Nöbetçi" }
+                ]
+            },
+            veteriner: {
+                title: "Acil Veteriner Klinikleri",
+                icon: "pets",
+                color: "pet",
+                providers: [
+                    { name: "Acil Veteriner Kliniği", address: "Osmangazi/Bursa", phone: "0224 441 42 42", status: "open", distance: "450m", rating: "4.9", type: "7/24 Açık" },
+                    { name: "Vetline Veteriner Kliniği", address: "Nilüfer/Bursa", phone: "0224 441 43 43", status: "open", distance: "1.8km", rating: "4.8", type: "Gece Açık" },
+                    { name: "PetVet 24 Saat", address: "Yıldırım/Bursa", phone: "0224 441 44 44", status: "open", distance: "2.2km", rating: "4.7", type: "7/24 Açık" },
+                    { name: "Bursa Veteriner Acil", address: "Osmangazi/Bursa", phone: "0224 441 45 45", status: "open", distance: "3.5km", rating: "4.6", type: "Gece Açık" }
+                ]
+            },
+            evdebakim: {
+                title: "Evde Bakım Hizmetleri",
+                icon: "home_health",
+                color: "health",
+                providers: [
+                    { name: "Bursa Evde Bakım Merkezi", address: "Osmangazi/Bursa", phone: "0224 441 46 46", status: "open", distance: "800m", rating: "4.9", type: "7/24" },
+                    { name: "Sağlık Atölyesi", address: "Nilüfer/Bursa", phone: "0224 441 47 47", status: "open", distance: "1.5km", rating: "4.8", type: "Randevulu" },
+                    { name: "Özel Hemşirelik", address: "Yıldırım/Bursa", phone: "0224 441 48 48", status: "open", distance: "2.1km", rating: "4.7", type: "7/24" }
+                ]
+            },
+            ambulans: {
+                title: "Özel Ambulans Hizmetleri",
+                icon: "emergency",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Özel Ambulans", address: "Osmangazi/Bursa", phone: "0224 441 49 49", status: "open", distance: "600m", rating: "5.0", type: "7/24" },
+                    { name: "Medikal Ambulans", address: "Nilüfer/Bursa", phone: "0224 441 50 50", status: "open", distance: "1.9km", rating: "4.9", type: "7/24" },
+                    { name: "Acil Ambulans 7/24", address: "Yıldırım/Bursa", phone: "0224 441 51 51", status: "open", distance: "2.8km", rating: "4.8", type: "7/24" }
+                ]
+            },
+            dishekimi: {
+                title: "Acil Diş Hekimleri",
+                icon: "dentistry",
+                color: "health",
+                providers: [
+                    { name: "Bursa Ağız ve Diş Sağlığı Merkezi", address: "Osmangazi/Bursa", phone: "0224 441 52 52", status: "open", distance: "1.1km", rating: "4.9", type: "Acil" },
+                    { name: "Özel Diş Polikliniği", address: "Nilüfer/Bursa", phone: "0224 441 53 53", status: "open", distance: "2.3km", rating: "4.8", type: "Acil" },
+                    { name: "24 Saat Diş Kliniği", address: "Yıldırım/Bursa", phone: "0224 441 54 54", status: "open", distance: "3.2km", rating: "4.7", type: "7/24" }
+                ]
+            },
+            psikolog: {
+                title: "Psikologlar",
+                icon: "psychology",
+                color: "health",
+                providers: [
+                    { name: "Bursa Psikoloji Merkezi", address: "Osmangazi/Bursa", phone: "0224 441 55 55", status: "open", distance: "900m", rating: "4.9", type: "Randevulu" },
+                    { name: "Ruh Sağlığı Kliniği", address: "Nilüfer/Bursa", phone: "0224 441 56 56", status: "open", distance: "1.7km", rating: "4.8", type: "Online" },
+                    { name: "Aile Danışmanlığı", address: "Yıldırım/Bursa", phone: "0224 441 57 57", status: "open", distance: "2.4km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+            fiziktedavi: {
+                title: "Fizik Tedavi Merkezleri",
+                icon: "sports_kabaddi",
+                color: "health",
+                providers: [
+                    { name: "Bursa Fizik Tedavi Merkezi", address: "Osmangazi/Bursa", phone: "0224 441 58 58", status: "open", distance: "750m", rating: "4.9", type: "Tam Gün" },
+                    { name: "Rehabilitasyon Kliniği", address: "Nilüfer/Bursa", phone: "0224 441 59 59", status: "open", distance: "1.6km", rating: "4.8", type: "Randevulu" },
+                    { name: "Fizyo Aktif", address: "Yıldırım/Bursa", phone: "0224 441 60 60", status: "open", distance: "2.5km", rating: "4.7", type: "Tam Gün" }
+                ]
+            },
+            dializ: {
+                title: "Dializ Merkezleri",
+                icon: "water_drop",
+                color: "health",
+                providers: [
+                    { name: "Bursa Dializ Merkezi", address: "Osmangazi/Bursa", phone: "0224 441 61 61", status: "open", distance: "1.3km", rating: "5.0", type: "7/24" },
+                    { name: "Özel Dializ Kliniği", address: "Nilüfer/Bursa", phone: "0224 441 62 62", status: "open", distance: "2.1km", rating: "4.9", type: "Tam Gün" }
+                ]
+            },
+
+            // ARAÇ & ULAŞIM
+            yolyardim: {
+                title: "Yol Yardım Hizmetleri",
+                icon: "car_crash",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Yol Yardım", address: "Osmangazi/Bursa", phone: "0224 441 63 63", status: "open", distance: "500m", rating: "4.9", type: "7/24" },
+                    { name: "Oto Kurtarma 7/24", address: "Nilüfer/Bursa", phone: "0224 441 64 64", status: "open", distance: "1.4km", rating: "4.8", type: "7/24" },
+                    { name: "Acil Yol Yardım", address: "Yıldırım/Bursa", phone: "0224 441 65 65", status: "open", distance: "2.6km", rating: "4.7", type: "7/24" }
+                ]
+            },
+            taksi: {
+                title: "Taksi Durakları",
+                icon: "local_taxi",
+                color: "vehicle",
+                providers: [
+                    { name: "Hamitler Taksi Durağı", address: "Hamitler Mah. 1. Cadde, Osmangazi", phone: "0224 441 66 66", status: "open", distance: "180m", rating: "4.8", type: "3 Araç" },
+                    { name: "Osmangazi Taksi", address: "Osmangazi/Bursa", phone: "0224 441 67 67", status: "open", distance: "450m", rating: "4.7", type: "5 Araç" },
+                    { name: "Nilüfer Taksi Durağı", address: "Nilüfer/Bursa", phone: "0224 441 68 68", status: "open", distance: "1.8km", rating: "4.6", type: "4 Araç" },
+                    { name: "Yıldırım Taksi", address: "Yıldırım/Bursa", phone: "0224 441 69 69", status: "open", distance: "2.3km", rating: "4.5", type: "6 Araç" },
+                    { name: "Merkez Taksi", address: "Osmangazi/Bursa", phone: "0224 441 70 70", status: "open", distance: "3.1km", rating: "4.4", type: "7 Araç" }
+                ]
+            },
+            cekici: {
+                title: "Çekici Hizmetleri",
+                icon: "tow_truck",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Çekici 7/24", address: "Osmangazi/Bursa", phone: "0224 441 71 71", status: "open", distance: "350m", rating: "4.9", type: "7/24" },
+                    { name: "Oto Çekici Servisi", address: "Nilüfer/Bursa", phone: "0224 441 72 72", status: "open", distance: "1.2km", rating: "4.8", type: "7/24" },
+                    { name: "Acil Çekici", address: "Yıldırım/Bursa", phone: "0224 441 73 73", status: "open", distance: "2.4km", rating: "4.7", type: "7/24" }
+                ]
+            },
+            lastikci: {
+                title: "Lastikçiler",
+                icon: "tire_repair",
+                color: "vehicle",
+                providers: [
+                    { name: "7/24 Lastikçi", address: "Osmangazi/Bursa", phone: "0224 441 74 74", status: "open", distance: "420m", rating: "4.8", type: "7/24" },
+                    { name: "Oto Lastik Servisi", address: "Nilüfer/Bursa", phone: "0224 441 75 75", status: "open", distance: "1.5km", rating: "4.7", type: "Açık" },
+                    { name: "Lastik Tamir", address: "Yıldırım/Bursa", phone: "0224 441 76 76", status: "open", distance: "2.7km", rating: "4.6", type: "Açık" }
+                ]
+            },
+            akuservis: {
+                title: "Akü Servisleri",
+                icon: "battery_charging_full",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Akü Servis", address: "Osmangazi/Bursa", phone: "0224 441 77 77", status: "open", distance: "380m", rating: "4.9", type: "7/24" },
+                    { name: "Oto Akü Merkezi", address: "Nilüfer/Bursa", phone: "0224 441 78 78", status: "open", distance: "1.3km", rating: "4.8", type: "Açık" },
+                    { name: "Acil Akü Servisi", address: "Yıldırım/Bursa", phone: "0224 441 79 79", status: "open", distance: "2.5km", rating: "4.7", type: "7/24" }
+                ]
+            },
+            yakitservis: {
+                title: "Yakıt Servisleri",
+                icon: "local_gas_station",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Yakıt Servis", address: "Osmangazi/Bursa", phone: "0224 441 80 80", status: "open", distance: "550m", rating: "4.8", type: "7/24" },
+                    { name: "Oto Yakıt 7/24", address: "Nilüfer/Bursa", phone: "0224 441 81 81", status: "open", distance: "1.6km", rating: "4.7", type: "7/24" }
+                ]
+            },
+            otokurtarma: {
+                title: "Oto Kurtarma",
+                icon: "support_agent",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Oto Kurtarma", address: "Osmangazi/Bursa", phone: "0224 441 82 82", status: "open", distance: "400m", rating: "4.9", type: "7/24" },
+                    { name: "Kurtarma 7/24", address: "Nilüfer/Bursa", phone: "0224 441 83 83", status: "open", distance: "1.4km", rating: "4.8", type: "7/24" }
+                ]
+            },
+            rentacar: {
+                title: "Rent A Car",
+                icon: "car_rental",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Rent A Car", address: "Osmangazi/Bursa", phone: "0224 441 84 84", status: "open", distance: "620m", rating: "4.8", type: "Açık" },
+                    { name: "Oto Kiralama Merkezi", address: "Nilüfer/Bursa", phone: "0224 441 85 85", status: "open", distance: "1.7km", rating: "4.7", type: "Açık" }
+                ]
+            },
+
+            // EV & TESİSAT
+            cilingir: {
+                title: "Çilingirler",
+                icon: "vpn_key",
+                color: "home",
+                providers: [
+                    { name: "Bursa Çilingir 7/24", address: "Osmangazi/Bursa", phone: "0224 441 86 86", status: "open", distance: "280m", rating: "4.9", type: "7/24" },
+                    { name: "Acil Çilingir", address: "Nilüfer/Bursa", phone: "0224 441 87 87", status: "open", distance: "1.1km", rating: "4.8", type: "7/24" },
+                    { name: "Oto Çilingir", address: "Yıldırım/Bursa", phone: "0224 441 88 88", status: "open", distance: "2.2km", rating: "4.7", type: "7/24" },
+                    { name: "Kasa Çilingir", address: "Osmangazi/Bursa", phone: "0224 441 89 89", status: "open", distance: "3.4km", rating: "4.6", type: "7/24" }
+                ]
+            },
+            tesisat: {
+                title: "Tesisatçılar",
+                icon: "plumbing",
+                color: "home",
+                providers: [
+                    { name: "Bursa Tesisat 7/24", address: "Osmangazi/Bursa", phone: "0224 441 90 90", status: "open", distance: "320m", rating: "4.9", type: "7/24" },
+                    { name: "Su Tesisat Ustası", address: "Nilüfer/Bursa", phone: "0224 441 91 91", status: "open", distance: "1.3km", rating: "4.8", type: "Açık" },
+                    { name: "Acil Tesisat", address: "Yıldırım/Bursa", phone: "0224 441 92 92", status: "open", distance: "2.5km", rating: "4.7", type: "7/24" }
+                ]
+            },
+            elektrikci: {
+                title: "Elektrikçiler",
+                icon: "electric_bolt",
+                color: "home",
+                providers: [
+                    { name: "Bursa Elektrikçi 7/24", address: "Osmangazi/Bursa", phone: "0224 441 93 93", status: "open", distance: "290m", rating: "4.9", type: "7/24" },
+                    { name: "Acil Elektrik Ustası", address: "Nilüfer/Bursa", phone: "0224 441 94 94", status: "open", distance: "1.2km", rating: "4.8", type: "7/24" },
+                    { name: "Elektrik Tamiri", address: "Yıldırım/Bursa", phone: "0224 441 95 95", status: "open", distance: "2.3km", rating: "4.7", type: "Açık" },
+                    { name: "Elektrikçi Usta", address: "Osmangazi/Bursa", phone: "0224 441 96 96", status: "open", distance: "3.5km", rating: "4.6", type: "Açık" }
+                ]
+            },
+            dogalgaz: {
+                title: "Doğalgaz Servisleri",
+                icon: "local_fire_department",
+                color: "home",
+                providers: [
+                    { name: "Bursa Doğalgaz 7/24", address: "Osmangazi/Bursa", phone: "0224 441 97 97", status: "open", distance: "410m", rating: "4.9", type: "7/24" },
+                    { name: "Acil Doğalgaz", address: "Nilüfer/Bursa", phone: "0224 441 98 98", status: "open", distance: "1.5km", rating: "4.8", type: "7/24" }
+                ]
+            },
+            klimaservis: {
+                title: "Klima Servisleri",
+                icon: "ac_unit",
+                color: "home",
+                providers: [
+                    { name: "Bursa Klima Servis", address: "Osmangazi/Bursa", phone: "0224 441 99 99", status: "open", distance: "360m", rating: "4.9", type: "Açık" },
+                    { name: "Klima Tamiri", address: "Nilüfer/Bursa", phone: "0224 442 00 00", status: "open", distance: "1.4km", rating: "4.8", type: "Açık" },
+                    { name: "Acil Klima", address: "Yıldırım/Bursa", phone: "0224 442 01 01", status: "open", distance: "2.6km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            beyazesya: {
+                title: "Beyaz Eşya Servisleri",
+                icon: "kitchen",
+                color: "home",
+                providers: [
+                    { name: "Bursa Beyaz Eşya", address: "Osmangazi/Bursa", phone: "0224 442 02 02", status: "open", distance: "430m", rating: "4.9", type: "Açık" },
+                    { name: "Beko Servis", address: "Nilüfer/Bursa", phone: "0224 442 03 03", status: "open", distance: "1.6km", rating: "4.8", type: "Açık" },
+                    { name: "Arçelik Servis", address: "Yıldırım/Bursa", phone: "0224 442 04 04", status: "open", distance: "2.7km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            camci: {
+                title: "Camcılar",
+                icon: "window",
+                color: "home",
+                providers: [
+                    { name: "Bursa Camcı", address: "Osmangazi/Bursa", phone: "0224 442 05 05", status: "open", distance: "520m", rating: "4.8", type: "Açık" },
+                    { name: "Cam Tamiri", address: "Nilüfer/Bursa", phone: "0224 442 06 06", status: "open", distance: "1.7km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            mutfakdolabi: {
+                title: "Mutfak Dolabı Ustaları",
+                icon: "countertops",
+                color: "home",
+                providers: [
+                    { name: "Bursa Mutfak Ustası", address: "Osmangazi/Bursa", phone: "0224 442 07 07", status: "open", distance: "480m", rating: "4.9", type: "Açık" },
+                    { name: "Dolap Tamiri", address: "Nilüfer/Bursa", phone: "0224 442 08 08", status: "open", distance: "1.8km", rating: "4.8", type: "Açık" }
+                ]
+            },
+
+            // TAMİRAT & TADİLAT
+            genelusta: {
+                title: "Genel Ustalar",
+                icon: "handyman",
+                color: "service",
+                providers: [
+                    { name: "Bursa Usta 7/24", address: "Osmangazi/Bursa", phone: "0224 442 09 09", status: "open", distance: "340m", rating: "4.9", type: "7/24" },
+                    { name: "Acil Tamirat", address: "Nilüfer/Bursa", phone: "0224 442 10 10", status: "open", distance: "1.2km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            boyaci: {
+                title: "Boyacılar",
+                icon: "format_paint",
+                color: "service",
+                providers: [
+                    { name: "Bursa Boyacı", address: "Osmangazi/Bursa", phone: "0224 442 11 11", status: "open", distance: "390m", rating: "4.9", type: "Açık" },
+                    { name: "Boya Ustası", address: "Nilüfer/Bursa", phone: "0224 442 12 12", status: "open", distance: "1.5km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            badanaci: {
+                title: "Badanacılar",
+                icon: "wallpaper",
+                color: "service",
+                providers: [
+                    { name: "Bursa Badanacı", address: "Osmangazi/Bursa", phone: "0224 442 13 13", status: "open", distance: "410m", rating: "4.8", type: "Açık" },
+                    { name: "Badana Ustası", address: "Nilüfer/Bursa", phone: "0224 442 14 14", status: "open", distance: "1.6km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            fayansci: {
+                title: "Fayansçılar",
+                icon: "grid_on",
+                color: "service",
+                providers: [
+                    { name: "Bursa Fayansçı", address: "Osmangazi/Bursa", phone: "0224 442 15 15", status: "open", distance: "370m", rating: "4.9", type: "Açık" },
+                    { name: "Seramik Ustası", address: "Nilüfer/Bursa", phone: "0224 442 16 16", status: "open", distance: "1.4km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            parkeci: {
+                title: "Parkeciler",
+                icon: "floor",
+                color: "service",
+                providers: [
+                    { name: "Bursa Parkeci", address: "Osmangazi/Bursa", phone: "0224 442 17 17", status: "open", distance: "420m", rating: "4.9", type: "Açık" },
+                    { name: "Parke Ustası", address: "Nilüfer/Bursa", phone: "0224 442 18 18", status: "open", distance: "1.7km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            alcipan: {
+                title: "Alçıpan Ustaları",
+                icon: "square_foot",
+                color: "service",
+                providers: [
+                    { name: "Bursa Alçıpan", address: "Osmangazi/Bursa", phone: "0224 442 19 19", status: "open", distance: "450m", rating: "4.8", type: "Açık" },
+                    { name: "Alçı Ustası", address: "Nilüfer/Bursa", phone: "0224 442 20 20", status: "open", distance: "1.8km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            demirci: {
+                title: "Demirciler",
+                icon: "hardware",
+                color: "service",
+                providers: [
+                    { name: "Bursa Demirci", address: "Osmangazi/Bursa", phone: "0224 442 21 21", status: "open", distance: "480m", rating: "4.8", type: "Açık" },
+                    { name: "Demir Ustası", address: "Nilüfer/Bursa", phone: "0224 442 22 22", status: "open", distance: "1.9km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            marangoz: {
+                title: "Marangozlar",
+                icon: "carpenter",
+                color: "service",
+                providers: [
+                    { name: "Bursa Marangoz", address: "Osmangazi/Bursa", phone: "0224 442 23 23", status: "open", distance: "460m", rating: "4.9", type: "Açık" },
+                    { name: "Ahşap Ustası", address: "Nilüfer/Bursa", phone: "0224 442 24 24", status: "open", distance: "1.7km", rating: "4.8", type: "Açık" }
+                ]
+            },
+
+            // GÜVENLİK & SİGORTA
+            acilsigorta: {
+                title: "Acil Sigorta",
+                icon: "shield",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Sigorta Acentesi", address: "Osmangazi/Bursa", phone: "0224 442 25 25", status: "open", distance: "580m", rating: "4.8", type: "Açık" },
+                    { name: "Acil Hasar Destek", address: "Nilüfer/Bursa", phone: "0224 442 26 26", status: "open", distance: "1.9km", rating: "4.7", type: "7/24" }
+                ]
+            },
+            guvenlik: {
+                title: "Özel Güvenlik",
+                icon: "security",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Güvenlik 7/24", address: "Osmangazi/Bursa", phone: "0224 442 27 27", status: "open", distance: "520m", rating: "4.9", type: "7/24" },
+                    { name: "Özel Güvenlik Hizmeti", address: "Nilüfer/Bursa", phone: "0224 442 28 28", status: "open", distance: "1.8km", rating: "4.8", type: "7/24" }
+                ]
+            },
+            kameraservis: {
+                title: "Kamera Servisleri",
+                icon: "videocam",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Kamera Servis", address: "Osmangazi/Bursa", phone: "0224 442 29 29", status: "open", distance: "490m", rating: "4.9", type: "Açık" },
+                    { name: "Güvenlik Kamera", address: "Nilüfer/Bursa", phone: "0224 442 30 30", status: "open", distance: "1.7km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            alarmservis: {
+                title: "Alarm Servisleri",
+                icon: "notification_important",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Alarm 7/24", address: "Osmangazi/Bursa", phone: "0224 442 31 31", status: "open", distance: "510m", rating: "4.9", type: "7/24" },
+                    { name: "Alarm Sistemleri", address: "Nilüfer/Bursa", phone: "0224 442 32 32", status: "open", distance: "1.8km", rating: "4.8", type: "Açık" }
+                ]
+            },
+
+            // TEMİZLİK & BAKIM
+            evtemizlik: {
+                title: "Ev Temizlik Hizmetleri",
+                icon: "cleaning_services",
+                color: "service",
+                providers: [
+                    { name: "Bursa Ev Temizlik", address: "Osmangazi/Bursa", phone: "0224 442 33 33", status: "open", distance: "440m", rating: "4.9", type: "Randevulu" },
+                    { name: "Temizlik Şirketi", address: "Nilüfer/Bursa", phone: "0224 442 34 34", status: "open", distance: "1.6km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            ofistemizlik: {
+                title: "Ofis Temizlik",
+                icon: "business",
+                color: "service",
+                providers: [
+                    { name: "Bursa Ofis Temizlik", address: "Osmangazi/Bursa", phone: "0224 442 35 35", status: "open", distance: "470m", rating: "4.8", type: "Randevulu" },
+                    { name: "Kurumsal Temizlik", address: "Nilüfer/Bursa", phone: "0224 442 36 36", status: "open", distance: "1.7km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+            insaattemizlik: {
+                title: "İnşaat Sonrası Temizlik",
+                icon: "foundation",
+                color: "service",
+                providers: [
+                    { name: "Bursa İnşaat Temizlik", address: "Osmangazi/Bursa", phone: "0224 442 37 37", status: "open", distance: "530m", rating: "4.9", type: "Randevulu" },
+                    { name: "Tadilat Temizlik", address: "Nilüfer/Bursa", phone: "0224 442 38 38", status: "open", distance: "1.9km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            haliyikama: {
+                title: "Halı Yıkama",
+                icon: "dry_cleaning",
+                color: "service",
+                providers: [
+                    { name: "Bursa Halı Yıkama", address: "Osmangazi/Bursa", phone: "0224 442 39 39", status: "open", distance: "380m", rating: "4.9", type: "Açık" },
+                    { name: "Halı Temizlik", address: "Nilüfer/Bursa", phone: "0224 442 40 40", status: "open", distance: "1.5km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            koltukyikama: {
+                title: "Koltuk Yıkama",
+                icon: "weekend",
+                color: "service",
+                providers: [
+                    { name: "Bursa Koltuk Yıkama", address: "Osmangazi/Bursa", phone: "0224 442 41 41", status: "open", distance: "420m", rating: "4.8", type: "Randevulu" },
+                    { name: "Koltuk Temizlik", address: "Nilüfer/Bursa", phone: "0224 442 42 42", status: "open", distance: "1.7km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+            camtemizlik: {
+                title: "Cam Temizlik",
+                icon: "cleaning",
+                color: "service",
+                providers: [
+                    { name: "Bursa Cam Temizlik", address: "Osmangazi/Bursa", phone: "0224 442 43 43", status: "open", distance: "450m", rating: "4.8", type: "Randevulu" },
+                    { name: "Dış Cephe Temizlik", address: "Nilüfer/Bursa", phone: "0224 442 44 44", status: "open", distance: "1.8km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+            bahcebakim: {
+                title: "Bahçe Bakım",
+                icon: "yard",
+                color: "health",
+                providers: [
+                    { name: "Bursa Bahçe Bakım", address: "Osmangazi/Bursa", phone: "0224 442 45 45", status: "open", distance: "560m", rating: "4.9", type: "Randevulu" },
+                    { name: "Bahçe Ustası", address: "Nilüfer/Bursa", phone: "0224 442 46 46", status: "open", distance: "2.0km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            havuzbakim: {
+                title: "Havuz Bakım",
+                icon: "pool",
+                color: "home",
+                providers: [
+                    { name: "Bursa Havuz Bakım", address: "Osmangazi/Bursa", phone: "0224 442 47 47", status: "open", distance: "590m", rating: "4.9", type: "Randevulu" },
+                    { name: "Havuz Temizlik", address: "Nilüfer/Bursa", phone: "0224 442 48 48", status: "open", distance: "2.1km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            boyabadana: {
+                title: "Boya Badana",
+                icon: "format_paint",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Boya Badana", address: "Osmangazi/Bursa", phone: "0224 442 49 49", status: "open", distance: "400m", rating: "4.9", type: "Randevulu" },
+                    { name: "Komple Boya", address: "Nilüfer/Bursa", phone: "0224 442 50 50", status: "open", distance: "1.6km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+
+            // KİŞİSEL BAKIM
+            kuafor: {
+                title: "Kuaförler",
+                icon: "content_cut",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Kuaför", address: "Osmangazi/Bursa", phone: "0224 442 51 51", status: "open", distance: "340m", rating: "4.9", type: "Açık" },
+                    { name: "Bayan Kuaför", address: "Nilüfer/Bursa", phone: "0224 442 52 52", status: "open", distance: "1.3km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            berber: {
+                title: "Berberler",
+                icon: "face",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Berber", address: "Osmangazi/Bursa", phone: "0224 442 53 53", status: "open", distance: "280m", rating: "4.9", type: "Açık" },
+                    { name: "Erkek Kuaförü", address: "Nilüfer/Bursa", phone: "0224 442 54 54", status: "open", distance: "1.2km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            manikur: {
+                title: "Manikür & Pedikür",
+                icon: "spa",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Manikür", address: "Osmangazi/Bursa", phone: "0224 442 55 55", status: "open", distance: "370m", rating: "4.8", type: "Randevulu" },
+                    { name: "Nail Art", address: "Nilüfer/Bursa", phone: "0224 442 56 56", status: "open", distance: "1.5km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+            masaj: {
+                title: "Masaj Salonları",
+                icon: "self_improvement",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Masaj", address: "Osmangazi/Bursa", phone: "0224 442 57 57", status: "open", distance: "410m", rating: "4.9", type: "Randevulu" },
+                    { name: "Terapi Merkezi", address: "Nilüfer/Bursa", phone: "0224 442 58 58", status: "open", distance: "1.7km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            spa: {
+                title: "SPA Merkezleri",
+                icon: "hot_tub",
+                color: "pet",
+                providers: [
+                    { name: "Bursa SPA", address: "Osmangazi/Bursa", phone: "0224 442 59 59", status: "open", distance: "440m", rating: "4.9", type: "Randevulu" },
+                    { name: "Wellness Merkezi", address: "Nilüfer/Bursa", phone: "0224 442 60 60", status: "open", distance: "1.8km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            epilasyon: {
+                title: "Epilasyon Merkezleri",
+                icon: "beauty_center",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Epilasyon", address: "Osmangazi/Bursa", phone: "0224 442 61 61", status: "open", distance: "390m", rating: "4.8", type: "Randevulu" },
+                    { name: "Lazer Epilasyon", address: "Nilüfer/Bursa", phone: "0224 442 62 62", status: "open", distance: "1.6km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+
+            // EVCİL HAYVAN
+            pethotel: {
+                title: "Pet Hotel",
+                icon: "pets",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Pet Hotel", address: "Osmangazi/Bursa", phone: "0224 442 63 63", status: "open", distance: "620m", rating: "4.9", type: "7/24" },
+                    { name: "Hayvan Pansiyonu", address: "Nilüfer/Bursa", phone: "0224 442 64 64", status: "open", distance: "2.2km", rating: "4.8", type: "7/24" }
+                ]
+            },
+            petpansiyon: {
+                title: "Pet Pansiyon",
+                icon: "home",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Pet Pansiyon", address: "Osmangazi/Bursa", phone: "0224 442 65 65", status: "open", distance: "650m", rating: "4.9", type: "7/24" },
+                    { name: "Evcil Hayvan Pansiyon", address: "Nilüfer/Bursa", phone: "0224 442 66 66", status: "open", distance: "2.3km", rating: "4.8", type: "7/24" }
+                ]
+            },
+            pettaksi: {
+                title: "Pet Taksi",
+                icon: "local_taxi",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Pet Taksi", address: "Osmangazi/Bursa", phone: "0224 442 67 67", status: "open", distance: "480m", rating: "4.9", type: "7/24" },
+                    { name: "Hayvan Taksi", address: "Nilüfer/Bursa", phone: "0224 442 68 68", status: "open", distance: "1.9km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            petbakici: {
+                title: "Pet Bakıcı",
+                icon: "person",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Pet Bakıcı", address: "Osmangazi/Bursa", phone: "0224 442 69 69", status: "open", distance: "510m", rating: "4.9", type: "7/24" },
+                    { name: "Hayvan Bakıcı", address: "Nilüfer/Bursa", phone: "0224 442 70 70", status: "open", distance: "2.0km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            petkuafor: {
+                title: "Pet Kuaför",
+                icon: "content_cut",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Pet Kuaför", address: "Osmangazi/Bursa", phone: "0224 442 71 71", status: "open", distance: "540m", rating: "4.9", type: "Randevulu" },
+                    { name: "Hayvan Kuaförü", address: "Nilüfer/Bursa", phone: "0224 442 72 72", status: "open", distance: "2.1km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            petegitim: {
+                title: "Pet Eğitim",
+                icon: "school",
+                color: "pet",
+                providers: [
+                    { name: "Bursa Pet Eğitim", address: "Osmangazi/Bursa", phone: "0224 442 73 73", status: "open", distance: "580m", rating: "4.9", type: "Randevulu" },
+                    { name: "Köpek Eğitim", address: "Nilüfer/Bursa", phone: "0224 442 74 74", status: "open", distance: "2.2km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+
+            // TAŞIMA & NAKLİYE
+            evdeneve: {
+                title: "Evden Eve Nakliyat",
+                icon: "moving",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Evden Eve", address: "Osmangazi/Bursa", phone: "0224 442 75 75", status: "open", distance: "460m", rating: "4.9", type: "Randevulu" },
+                    { name: "Nakliyat Firması", address: "Nilüfer/Bursa", phone: "0224 442 76 76", status: "open", distance: "1.8km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            ofistasima: {
+                title: "Ofis Taşıma",
+                icon: "corporate_fare",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Ofis Taşıma", address: "Osmangazi/Bursa", phone: "0224 442 77 77", status: "open", distance: "490m", rating: "4.8", type: "Randevulu" },
+                    { name: "Kurumsal Nakliyat", address: "Nilüfer/Bursa", phone: "0224 442 78 78", status: "open", distance: "1.9km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+            parsiyel: {
+                title: "Parsiyel Taşıma",
+                icon: "inventory_2",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Parsiyel", address: "Osmangazi/Bursa", phone: "0224 442 79 79", status: "open", distance: "520m", rating: "4.8", type: "Randevulu" },
+                    { name: "Parça Eşya Taşıma", address: "Nilüfer/Bursa", phone: "0224 442 80 80", status: "open", distance: "2.0km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+            kamyonet: {
+                title: "Kamyonet Kiralama",
+                icon: "local_shipping",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Kamyonet", address: "Osmangazi/Bursa", phone: "0224 442 81 81", status: "open", distance: "550m", rating: "4.8", type: "Randevulu" },
+                    { name: "Kamyonet Kiralama", address: "Nilüfer/Bursa", phone: "0224 442 82 82", status: "open", distance: "2.1km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+            depolama: {
+                title: "Eşya Depolama",
+                icon: "warehouse",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Depolama", address: "Osmangazi/Bursa", phone: "0224 442 83 83", status: "open", distance: "680m", rating: "4.9", type: "7/24" },
+                    { name: "Eşya Deposu", address: "Nilüfer/Bursa", phone: "0224 442 84 84", status: "open", distance: "2.4km", rating: "4.8", type: "7/24" }
+                ]
+            },
+            paketleme: {
+                title: "Paketleme Hizmeti",
+                icon: "inventory",
+                color: "vehicle",
+                providers: [
+                    { name: "Bursa Paketleme", address: "Osmangazi/Bursa", phone: "0224 442 85 85", status: "open", distance: "480m", rating: "4.8", type: "Randevulu" },
+                    { name: "Ambalaj Hizmeti", address: "Nilüfer/Bursa", phone: "0224 442 86 86", status: "open", distance: "1.9km", rating: "4.7", type: "Randevulu" }
+                ]
+            },
+
+            // TEKNİK SERVİSLER
+            telefontamiri: {
+                title: "Telefon Tamir",
+                icon: "smartphone",
+                color: "home",
+                providers: [
+                    { name: "Bursa Telefon Tamiri", address: "Osmangazi/Bursa", phone: "0224 442 87 87", status: "open", distance: "320m", rating: "4.9", type: "Açık" },
+                    { name: "Cep Telefonu Servis", address: "Nilüfer/Bursa", phone: "0224 442 88 88", status: "open", distance: "1.4km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            bilgisayarservis: {
+                title: "Bilgisayar Servis",
+                icon: "computer",
+                color: "home",
+                providers: [
+                    { name: "Bursa Bilgisayar Servis", address: "Osmangazi/Bursa", phone: "0224 442 89 89", status: "open", distance: "350m", rating: "4.9", type: "Açık" },
+                    { name: "PC Tamiri", address: "Nilüfer/Bursa", phone: "0224 442 90 90", status: "open", distance: "1.5km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            tablettamiri: {
+                title: "Tablet Tamiri",
+                icon: "tablet_android",
+                color: "home",
+                providers: [
+                    { name: "Bursa Tablet Tamiri", address: "Osmangazi/Bursa", phone: "0224 442 91 91", status: "open", distance: "340m", rating: "4.8", type: "Açık" },
+                    { name: "iPad Servis", address: "Nilüfer/Bursa", phone: "0224 442 92 92", status: "open", distance: "1.4km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            televizyonservis: {
+                title: "Televizyon Servis",
+                icon: "tv",
+                color: "home",
+                providers: [
+                    { name: "Bursa TV Servis", address: "Osmangazi/Bursa", phone: "0224 442 93 93", status: "open", distance: "380m", rating: "4.9", type: "Açık" },
+                    { name: "Led TV Tamiri", address: "Nilüfer/Bursa", phone: "0224 442 94 94", status: "open", distance: "1.6km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            kameratamiri: {
+                title: "Kamera Tamiri",
+                icon: "photo_camera",
+                color: "home",
+                providers: [
+                    { name: "Bursa Kamera Tamiri", address: "Osmangazi/Bursa", phone: "0224 442 95 95", status: "open", distance: "410m", rating: "4.8", type: "Açık" },
+                    { name: "Fotoğraf Makinesi Servis", address: "Nilüfer/Bursa", phone: "0224 442 96 96", status: "open", distance: "1.7km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            oyunkonsolu: {
+                title: "Oyun Konsolu Tamiri",
+                icon: "sports_esports",
+                color: "home",
+                providers: [
+                    { name: "Bursa Oyun Konsolu", address: "Osmangazi/Bursa", phone: "0224 442 97 97", status: "open", distance: "360m", rating: "4.9", type: "Açık" },
+                    { name: "PlayStation Servis", address: "Nilüfer/Bursa", phone: "0224 442 98 98", status: "open", distance: "1.5km", rating: "4.8", type: "Açık" }
+                ]
+            },
+
+            // EĞİTİM & DERS
+            matematikozel: {
+                title: "Matematik Özel Ders",
+                icon: "calculate",
+                color: "health",
+                providers: [
+                    { name: "Bursa Matematik Dersi", address: "Osmangazi/Bursa", phone: "0224 442 99 99", status: "open", distance: "440m", rating: "4.9", type: "Online" },
+                    { name: "Matematik Öğretmeni", address: "Nilüfer/Bursa", phone: "0224 443 00 00", status: "open", distance: "1.8km", rating: "4.8", type: "Yüz Yüze" }
+                ]
+            },
+            ingilizceozel: {
+                title: "İngilizce Özel Ders",
+                icon: "language",
+                color: "health",
+                providers: [
+                    { name: "Bursa İngilizce Kursu", address: "Osmangazi/Bursa", phone: "0224 443 01 01", status: "open", distance: "420m", rating: "4.9", type: "Online" },
+                    { name: "İngilizce Öğretmeni", address: "Nilüfer/Bursa", phone: "0224 443 02 02", status: "open", distance: "1.7km", rating: "4.8", type: "Yüz Yüze" }
+                ]
+            },
+            muzikdersi: {
+                title: "Müzik Dersleri",
+                icon: "music_note",
+                color: "health",
+                providers: [
+                    { name: "Bursa Müzik Kursu", address: "Osmangazi/Bursa", phone: "0224 443 03 03", status: "open", distance: "460m", rating: "4.9", type: "Randevulu" },
+                    { name: "Gitar Dersi", address: "Nilüfer/Bursa", phone: "0224 443 04 04", status: "open", distance: "1.9km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            direksiyon: {
+                title: "Direksiyon Dersi",
+                icon: "directions_car",
+                color: "health",
+                providers: [
+                    { name: "Bursa Sürücü Kursu", address: "Osmangazi/Bursa", phone: "0224 443 05 05", status: "open", distance: "510m", rating: "4.9", type: "Randevulu" },
+                    { name: "Özel Direksiyon", address: "Nilüfer/Bursa", phone: "0224 443 06 06", status: "open", distance: "2.0km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            yuzmedersi: {
+                title: "Yüzme Dersi",
+                icon: "pool",
+                color: "health",
+                providers: [
+                    { name: "Bursa Yüzme Kursu", address: "Osmangazi/Bursa", phone: "0224 443 07 07", status: "open", distance: "580m", rating: "4.9", type: "Randevulu" },
+                    { name: "Yüzme Havuzu", address: "Nilüfer/Bursa", phone: "0224 443 08 08", status: "open", distance: "2.2km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            spordersi: {
+                title: "Spor Dersleri",
+                               icon: "sports",
+                color: "health",
+                providers: [
+                    { name: "Bursa Spor Kursu", address: "Osmangazi/Bursa", phone: "0224 443 09 09", status: "open", distance: "540m", rating: "4.9", type: "Randevulu" },
+                    { name: "Fitness Eğitmeni", address: "Nilüfer/Bursa", phone: "0224 443 10 10", status: "open", distance: "2.1km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+
+            // DANIŞMANLIK
+            avukat: {
+                title: "Avukatlar",
+                icon: "gavel",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Hukuk Bürosu", address: "Osmangazi/Bursa", phone: "0224 443 11 11", status: "open", distance: "620m", rating: "4.9", type: "Randevulu" },
+                    { name: "Avukat Mehmet Yılmaz", address: "Nilüfer/Bursa", phone: "0224 443 12 12", status: "open", distance: "2.3km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            emlakdanisman: {
+                title: "Emlak Danışmanları",
+                icon: "real_estate_agent",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Emlak", address: "Osmangazi/Bursa", phone: "0224 443 13 13", status: "open", distance: "480m", rating: "4.8", type: "Açık" },
+                    { name: "Gayrimenkul Danışmanı", address: "Nilüfer/Bursa", phone: "0224 443 14 14", status: "open", distance: "1.9km", rating: "4.7", type: "Açık" }
+                ]
+            },
+            mafdestek: {
+                title: "MAF Destek",
+                icon: "account_balance",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa MAF Merkezi", address: "Osmangazi/Bursa", phone: "0224 443 15 15", status: "open", distance: "590m", rating: "4.9", type: "Randevulu" },
+                    { name: "Mali Destek Hattı", address: "Nilüfer/Bursa", phone: "0224 443 16 16", status: "open", distance: "2.2km", rating: "4.8", type: "7/24" }
+                ]
+            },
+            beslenmedanismani: {
+                title: "Beslenme Danışmanları",
+                icon: "restaurant",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Diyetisyen", address: "Osmangazi/Bursa", phone: "0224 443 17 17", status: "open", distance: "430m", rating: "4.9", type: "Randevulu" },
+                    { name: "Beslenme Uzmanı", address: "Nilüfer/Bursa", phone: "0224 443 18 18", status: "open", distance: "1.7km", rating: "4.8", type: "Online" }
+                ]
+            },
+            kariyerdanismani: {
+                title: "Kariyer Danışmanları",
+                icon: "work",
+                color: "emergency",
+                providers: [
+                    { name: "Bursa Kariyer Merkezi", address: "Osmangazi/Bursa", phone: "0224 443 19 19", status: "open", distance: "560m", rating: "4.8", type: "Randevulu" },
+                    { name: "İş Danışmanı", address: "Nilüfer/Bursa", phone: "0224 443 20 20", status: "open", distance: "2.1km", rating: "4.7", type: "Online" }
+                ]
+            },
+
+            // ORGANİZASYON
+            dugunorganizasyon: {
+                title: "Düğün Organizasyon",
+                icon: "favorite",
+                color: "primary",
+                providers: [
+                    { name: "Bursa Düğün Organizasyon", address: "Osmangazi/Bursa", phone: "0224 443 21 21", status: "open", distance: "640m", rating: "4.9", type: "Randevulu" },
+                    { name: "Etkinlik Planlama", address: "Nilüfer/Bursa", phone: "0224 443 22 22", status: "open", distance: "2.4km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            dogumgunu: {
+                title: "Doğum Günü Organizasyon",
+                icon: "cake",
+                color: "primary",
+                providers: [
+                    { name: "Bursa Doğum Günü", address: "Osmangazi/Bursa", phone: "0224 443 23 23", status: "open", distance: "520m", rating: "4.9", type: "Randevulu" },
+                    { name: "Parti Organizasyon", address: "Nilüfer/Bursa", phone: "0224 443 24 24", status: "open", distance: "2.0km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            catering: {
+                title: "Catering Hizmetleri",
+                icon: "restaurant_menu",
+                color: "primary",
+                providers: [
+                    { name: "Bursa Catering", address: "Osmangazi/Bursa", phone: "0224 443 25 25", status: "open", distance: "580m", rating: "4.9", type: "Randevulu" },
+                    { name: "Yemek Servisi", address: "Nilüfer/Bursa", phone: "0224 443 26 26", status: "open", distance: "2.2km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            fotografci: {
+                title: "Fotoğrafçılar",
+                icon: "photo_camera",
+                color: "primary",
+                providers: [
+                    { name: "Bursa Fotoğrafçı", address: "Osmangazi/Bursa", phone: "0224 443 27 27", status: "open", distance: "490m", rating: "4.9", type: "Randevulu" },
+                    { name: "Düğün Fotoğrafçısı", address: "Nilüfer/Bursa", phone: "0224 443 28 28", status: "open", distance: "1.9km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            djservis: {
+                title: "DJ & Ses Sistemleri",
+                icon: "music_cast",
+                color: "primary",
+                providers: [
+                    { name: "Bursa DJ Hizmeti", address: "Osmangazi/Bursa", phone: "0224 443 29 29", status: "open", distance: "550m", rating: "4.9", type: "Randevulu" },
+                    { name: "Ses Sistemi Kiralama", address: "Nilüfer/Bursa", phone: "0224 443 30 30", status: "open", distance: "2.1km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+            dekorasyon: {
+                title: "Dekorasyon Hizmetleri",
+                icon: "celebration",
+                color: "primary",
+                providers: [
+                    { name: "Bursa Dekorasyon", address: "Osmangazi/Bursa", phone: "0224 443 31 31", status: "open", distance: "510m", rating: "4.9", type: "Randevulu" },
+                    { name: "Organizasyon Dekor", address: "Nilüfer/Bursa", phone: "0224 443 32 32", status: "open", distance: "2.0km", rating: "4.8", type: "Randevulu" }
+                ]
+            },
+
+            // GIDA & MARKET
+            susiparis: {
+                title: "Su Siparişi",
+                icon: "water_drop",
+                color: "health",
+                providers: [
+                    { name: "Damacana Su Sipariş", address: "Osmangazi/Bursa", phone: "0224 443 33 33", status: "open", distance: "340m", rating: "4.9", type: "7/24" },
+                    { name: "Su Bayii", address: "Nilüfer/Bursa", phone: "0224 443 34 34", status: "open", distance: "1.5km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            manav: {
+                title: "Manavlar",
+                icon: "nutrition",
+                color: "health",
+                providers: [
+                    { name: "Bursa Manav", address: "Osmangazi/Bursa", phone: "0224 443 35 35", status: "open", distance: "280m", rating: "4.9", type: "Açık" },
+                    { name: "Sebze Meyve", address: "Nilüfer/Bursa", phone: "0224 443 36 36", status: "open", distance: "1.3km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            kasap: {
+                title: "Kasaplar",
+                icon: "restaurant",
+                color: "health",
+                providers: [
+                    { name: "Bursa Kasap", address: "Osmangazi/Bursa", phone: "0224 443 37 37", status: "open", distance: "320m", rating: "4.9", type: "Açık" },
+                    { name: "Et Dükkanı", address: "Nilüfer/Bursa", phone: "0224 443 38 38", status: "open", distance: "1.4km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            ekmekfirini: {
+                title: "Ekmek Fırınları",
+                icon: "bakery_dining",
+                color: "health",
+                providers: [
+                    { name: "Bursa Fırın", address: "Osmangazi/Bursa", phone: "0224 443 39 39", status: "open", distance: "260m", rating: "4.9", type: "24 Saat" },
+                    { name: "Ekmek Fabrikası", address: "Nilüfer/Bursa", phone: "0224 443 40 40", status: "open", distance: "1.6km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            pastane: {
+                title: "Pastaneler",
+                icon: "cookie",
+                color: "health",
+                providers: [
+                    { name: "Bursa Pastane", address: "Osmangazi/Bursa", phone: "0224 443 41 41", status: "open", distance: "380m", rating: "4.9", type: "Açık" },
+                    { name: "Tatlıcı", address: "Nilüfer/Bursa", phone: "0224 443 42 42", status: "open", distance: "1.7km", rating: "4.8", type: "Açık" }
+                ]
+            },
+            kuruyemis: {
+                title: "Kuruyemişçiler",
+                icon: "grain",
+                color: "health",
+                providers: [
+                    { name: "Bursa Kuruyemiş", address: "Osmangazi/Bursa", phone: "0224 443 43 43", status: "open", distance: "420m", rating: "4.9", type: "Açık" },
+                    { name: "Çerezciler", address: "Nilüfer/Bursa", phone: "0224 443 44 44", status: "open", distance: "1.8km", rating: "4.8", type: "Açık" }
+                ]
+            }
+        };
+
+        // ============================================
+        // RENK SINIFLARI
+        // ============================================
+        
+        const colorClasses = {
+            health: "bg-emerald-500",
+            vehicle: "bg-amber-500",
+            home: "bg-blue-500",
+            service: "bg-violet-500",
+            pet: "bg-pink-500",
+            emergency: "bg-red-500",
+            primary: "bg-amber-400"
+        };
+
+        // ============================================
+        // AI CHAT YANITLARI
+        // ============================================
+        
+        const aiResponses = {
+            "eczane": "Size en yakın nöbetçi eczane: **Şahin Eczanesi** - Hamitler Mah. 75. Sok. No:12 (240m) - 0224 441 40 00. Şu an açık ve nöbetçi.",
+            "çilingir": "Acil çilingir hizmeti için **Bursa Çilingir 7/24**'ü arayabilirsiniz. Osmangazi'de, 280m mesafede ve 7/24 hizmet veriyor. Tel: 0224 441 86 86",
+            "taksi": "En yakın taksi durağı **Hamitler Taksi Durağı** - sadece 180m mesafede, 3 araç hazır. Tel: 0224 441 66 66",
+            "elektrik": "Elektrik arızası için **Bursa Elektrikçi 7/24**'ü öneririm. Osmangazi'de, 290m mesafede ve 7/24 acil servis var. Tel: 0224 441 93 93",
+            "su": "Su tesisatı için **Bursa Tesisat 7/24**'ü arayın. 320m mesafede, 7/24 acil servis mevcut. Tel: 0224 441 90 90",
+            "veteriner": "Acil veteriner için **Acil Veteriner Kliniği**'ni arayın. Osmangazi'de, 450m mesafede ve 7/24 açık. Tel: 0224 441 42 42",
+            "ambulans": "Özel ambulans için **Bursa Özel Ambulans**'ı arayın. 600m mesafede, 7/24 hizmet. Tel: 0224 441 49 49",
+            "yol yardım": "Yol yardımı için **Bursa Yol Yardım**'ı arayın. 500m mesafede, 7/24 hizmet. Tel: 0224 441 63 63",
+            "çekici": "Çekici için **Bursa Çekici 7/24**'ü arayın. 350m mesafede, 7/24 hizmet. Tel: 0224 441 71 71",
+            "tesisat": "Tesisat için **Bursa Tesisat 7/24**'ü arayın. 320m mesafede, 7/24 hizmet. Tel: 0224 441 90 90",
+            "doğalgaz": "Doğalgaz arızası için **Bursa Doğalgaz 7/24**'ü arayın. 410m mesafede, 7/24 acil servis. Tel: 0224 441 97 97 veya resmi hat 186",
+            "klima": "Klima servisi için **Bursa Klima Servis**'i arayın. 360m mesafede, açık. Tel: 0224 441 99 99",
+            "beyaz eşya": "Beyaz eşya için **Bursa Beyaz Eşya** servisini arayın. 430m mesafede. Tel: 0224 442 02 02",
+            "temizlik": "Ev temizliği için **Bursa Ev Temizlik**'i öneririm. 440m mesafede, randevulu. Tel: 0224 442 33 33",
+            "nakliyat": "Evden eve nakliyat için **Bursa Evden Eve**'yi arayın. 460m mesafede, randevulu. Tel: 0224 442 75 75",
+            "default": "Anladım! Size yardımcı olmak için uygun hizmet sağlayıcılarını arıyorum. Lütfen bekleyin..."
+        };
+
+        // ============================================
+        // HİZMET MODAL FONKSİYONLARI
+        // ============================================
+        
+        function openServiceModal(serviceType) {
+            const modal = document.getElementById('serviceModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalBody = document.getElementById('modalBody');
+
+            const service = serviceProviders[serviceType];
+            if (!service) {
+                console.error('Service not found:', serviceType);
+                return;
+            }
+
+            // Modal başlık ve ikon ayarla
+            modalTitle.textContent = service.title;
+            modalSubtitle.textContent = `Bursa'daki ${service.providers.length} sağlayıcı`;
+            
+            // İkon ve renk ayarla
+            const iconSpan = modalIcon.querySelector('span');
+            iconSpan.textContent = service.icon;
+            modalIcon.className = `w-10 h-10 rounded-full flex items-center justify-center ${colorClasses[service.color] || 'bg-gray-500'}`;
+
+            // Sağlayıcı kartlarını oluştur
+            modalBody.innerHTML = service.providers.map((provider, index) => `
+                <div class="provider-card" onclick="goToProviderDetail('${serviceType}', ${index})">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center border border-primary/30">
+                                <span class="material-symbols-outlined text-primary text-xl">store</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm">${provider.name}</h4>
+                                <p class="text-xs text-gray-400 mt-0.5">${provider.address}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="status-${provider.status} text-[10px] px-2 py-1 rounded-full font-medium">
+                                ${provider.status === 'open' ? 'Açık' : 'Kapalı'}
+                            </span>
+                            <span class="distance-badge text-[10px] px-2 py-1 rounded-full font-medium">
+                                ${provider.distance}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                        <div class="flex items-center gap-2">
+                            <span class="rating-badge text-[10px] px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[12px]">star</span>
+                                ${provider.rating}
+                            </span>
+                            <span class="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded-full">${provider.type}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a href="tel:${provider.phone}" onclick="event.stopPropagation()" class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 active:scale-95 transition-all">
+                                <span class="material-symbols-outlined text-sm">phone</span>
+                            </a>
+                            <button class="w-8 h-8 rounded-full glass-card flex items-center justify-center text-primary active:scale-95 transition-all">
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">phone</span>
+                        ${provider.phone}
+                    </div>
+                </div>
+            `).join('');
+
+            // Modal'ı aç
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeServiceModal() {
+            const modal = document.getElementById('serviceModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeServiceModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeServiceModal();
+            }
+        }
+
+        // Sağlayıcı detay sayfasına yönlendirme
+        function goToProviderDetail(serviceType, providerIndex) {
+            const service = serviceProviders[serviceType];
+            const provider = service.providers[providerIndex];
+            
+            // Detay sayfası URL'si oluştur
+            const detailUrl = `hizmet-detay.html?type=${serviceType}&index=${providerIndex}&name=${encodeURIComponent(provider.name)}`;
+            
+            // Yönlendirme
+            window.location.href = detailUrl;
+        }
+
+        // ============================================
+        // ARAMA FONKSİYONU
+        // ============================================
+        
+        function searchServices(searchTerm) {
+            const term = searchTerm.toLowerCase();
+            const allButtons = document.querySelectorAll('.service-item');
+            
+            allButtons.forEach(button => {
+                const text = button.textContent.toLowerCase();
+                if (text.includes(term)) {
+                    button.style.display = 'flex';
+                } else {
+                    button.style.display = term === '' ? 'flex' : 'none';
+                }
+            });
+        }
+
+        // ============================================
+        // BÖLÜM AÇ/KAPA FONKSİYONU
+        // ============================================
+        
+        function toggleSection(section) {
+            const content = document.getElementById(section + '-content');
+            const icon = document.getElementById(section + '-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = 'expand_more';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = 'expand_less';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // ============================================
+        // AI CHAT FONKSİYONLARI
+        // ============================================
+        
+        function openAIChat() {
+            const modal = document.getElementById('aiChatModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Input'a focus
+            setTimeout(() => {
+                document.getElementById('chatInput').focus();
+            }, 300);
+        }
+
+        function closeAIChat() {
+            const modal = document.getElementById('aiChatModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeAIChatOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeAIChat();
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('chatInput').value = message;
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Kullanıcı mesajını ekle
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Bot yanıtını simüle et
+            showTyping();
+            
+            setTimeout(() => {
+                hideTyping();
+                const response = generateAIResponse(message);
+                addMessage(response, 'bot');
+            }, 1500);
+        }
+
+        function addMessage(text, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start gap-3 animate-fade-in';
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex-1 flex justify-end">
+                        <div class="ai-message user">
+                            ${text}
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-[#0F3E46] text-sm">smart_toy</span>
+                    </div>
+                    <div class="ai-message bot">
+                        ${formatAIResponse(text)}
+                    </div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function formatAIResponse(text) {
+            // Kalın metinleri formatla
+            return text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>');
+        }
+
+        function showTyping() {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.classList.remove('hidden');
+            
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTyping() {
+            document.getElementById('typingIndicator').classList.add('hidden');
+        }
+
+        function generateAIResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            // Anahtar kelimelere göre yanıt bul
+            for (const [key, response] of Object.entries(aiResponses)) {
+                if (lowerMessage.includes(key)) {
+                    return response;
+                }
+            }
+            
+            // Genel yanıt
+            return "Anladım! Size Bursa'daki en yakın ve en iyi hizmet sağlayıcılarını bulmaya çalışıyorum. Lütfen hangi hizmete ihtiyacınız olduğunu daha detaylı belirtin (örneğin: çilingir, tesisat, elektrikçi, taksi vb.)";
+        }
+
+        // ============================================
+        // KLAVYE KISAYOLLARI
+        // ============================================
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeServiceModal();
+                closeAIChat();
+            }
+        });
+
+        // ============================================
+        // SAYFA YÜKLENDİĞİNDE KONSOL MESAJI
+        // ============================================
+        
+        console.log('CityJoy Acil İhtiyaçlar - Sistem Hazır');
+        console.log('Toplam hizmet kategorisi:', Object.keys(serviceProviders).length);
+    </script>
+
+</body>
+</html>

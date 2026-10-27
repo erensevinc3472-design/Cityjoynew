@@ -1,0 +1,1271 @@
+﻿<!-- sfdfdfdf.html - Seyahat Planlayıcı (Güncellenmiş) -->
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CityJOY - Seyahat Planlayıcı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "gold-accent": "#E0B07A",
+                        "deep-teal": "#081F24",
+                        "mid-teal": "#0D3238",
+                        "soft-teal": "#1F5055",
+                        "muted-blue": "#C7D8DA",
+                        "card-bg": "rgba(13, 50, 56, 0.95)",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .glass-card {
+                background: theme('colors.card-bg');
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+            }
+            .glass-card-heavy {
+                background: rgba(8, 31, 36, 0.98);
+                backdrop-filter: blur(30px);
+                -webkit-backdrop-filter: blur(30px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+            }
+            .interactive-card {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .interactive-card:active {
+                transform: scale(0.97);
+            }
+            .mode-active {
+                background: linear-gradient(135deg, rgba(224, 176, 122, 0.25) 0%, rgba(224, 176, 122, 0.1) 100%);
+                border-color: #E0B07A;
+                box-shadow: 0 0 20px rgba(224, 176, 122, 0.3);
+            }
+            .gold-glow {
+                text-shadow: 0 0 10px rgba(224, 176, 122, 0.5);
+            }
+            .gold-glow-box {
+                box-shadow: 0 0 15px rgba(224, 176, 122, 0.3);
+            }
+            .vignette-overlay {
+                background: linear-gradient(to bottom, transparent 0%, #081F24 100%), 
+                            radial-gradient(circle at center, transparent 0%, #081F24 120%);
+            }
+            .noise-texture {
+                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+                opacity: 0.03;
+            }
+            .ambient-glow {
+                background: radial-gradient(circle at 50% -20%, rgba(224, 176, 122, 0.15) 0%, transparent 50%);
+            }
+            .hide-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .hide-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .slide-up {
+                animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            @keyframes slideUp {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            .pulse-gold {
+                animation: pulseGold 2s infinite;
+            }
+            @keyframes pulseGold {
+                0%, 100% { box-shadow: 0 0 5px rgba(224, 176, 122, 0.2); }
+                50% { box-shadow: 0 0 20px rgba(224, 176, 122, 0.5); }
+            }
+            .typing-dot {
+                animation: typing 1.4s infinite ease-in-out both;
+            }
+            .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+            .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+            @keyframes typing {
+                0%, 80%, 100% { transform: scale(0); }
+                40% { transform: scale(1); }
+            }
+        }
+    </style>
+    <style>
+        body {
+            min-height: 100dvh;
+            background-color: #081F24;
+            overscroll-behavior-y: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .safe-bottom {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
+        }
+        .safe-bottom-nav {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+        }
+        .section-transition {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-deep-teal text-white antialiased overflow-hidden selection:bg-gold-accent/30">
+    
+    <!-- Background Effects -->
+    <div class="fixed inset-0 z-0">
+        <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80');"></div>
+        <div class="absolute inset-0 vignette-overlay"></div>
+        <div class="absolute inset-0 noise-texture pointer-events-none"></div>
+        <div class="absolute inset-0 ambient-glow pointer-events-none"></div>
+    </div>
+
+    <!-- Active Plan Banner (Shows if there's an active journey) -->
+    <div id="active-plan-banner" class="fixed top-0 left-0 right-0 z-[60] bg-gold-accent/20 backdrop-blur-xl border-b border-gold-accent/30 transform -translate-y-full transition-transform duration-300">
+        <div class="px-6 pt-14 pb-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="size-8 rounded-full bg-gold-accent/30 flex items-center justify-center animate-pulse">
+                    <span class="material-symbols-outlined text-gold-accent text-lg">directions_car</span>
+                </div>
+                <div>
+                    <p class="text-xs text-gold-accent font-bold">Yolculuğunuz Devam Ediyor</p>
+                    <p class="text-[10px] text-white/70" id="banner-route">İstanbul → Bursa</p>
+                </div>
+            </div>
+            <button onclick="goToCompanion()" class="px-4 py-2 bg-gold-accent text-deep-teal text-xs font-bold rounded-lg interactive-card">
+                Devam Et →
+            </button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-deep-teal/80 backdrop-blur-2xl border-b border-white/5 transition-all duration-300" id="main-header">
+        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
+            <button onclick="goBack()" class="size-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center interactive-card hover:bg-white/10">
+                <span class="material-symbols-outlined text-white text-xl">arrow_back_ios_new</span>
+            </button>
+            <div class="flex-1">
+                <h1 class="text-lg font-bold tracking-tight text-white">Seyahat Planlayıcı</h1>
+                <p class="text-xs text-muted-blue/70" id="ai-status">🤖 AI destekli planlama aktif</p>
+            </div>
+            <button onclick="openAIChat()" class="size-10 rounded-full bg-gold-accent/10 border border-gold-accent/30 flex items-center justify-center interactive-card pulse-gold">
+                <span class="material-symbols-outlined text-gold-accent text-xl">psychology</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 h-screen overflow-y-auto hide-scrollbar pt-[100px] pb-[180px]" id="main-content">
+        
+        <!-- Compact Route Input Section -->
+        <section class="px-6 mb-4" data-ai-context="route-input">
+            <div class="glass-card rounded-2xl p-4 shadow-2xl">
+                <div class="flex flex-col gap-2">
+                    <!-- From -->
+                    <div class="relative group">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gold-accent text-lg">radio_button_checked</span>
+                        <input type="text" 
+                               id="from-input"
+                               value="İstanbul" 
+                               class="w-full h-11 bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 text-sm font-semibold text-white focus:outline-none focus:border-gold-accent/50 focus:bg-black/60 transition-all"
+                               placeholder="Nereden"
+                               onchange="onRouteChange()">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] text-muted-blue uppercase font-bold">KONUM</span>
+                    </div>
+                    
+                    <!-- Swap Button -->
+                    <div class="relative h-5">
+                        <button onclick="swapLocations()" class="absolute left-1/2 -translate-x-1/2 -top-2.5 size-8 rounded-full bg-mid-teal border border-gold-accent/40 flex items-center justify-center shadow-lg interactive-card z-20 hover:rotate-180 transition-transform duration-300">
+                            <span class="material-symbols-outlined text-gold-accent text-lg">swap_vert</span>
+                        </button>
+                        <div class="absolute left-10 right-10 top-1/2 -translate-y-1/2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                    </div>
+                    
+                    <!-- To -->
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gold-accent text-lg">location_on</span>
+                        <input type="text" 
+                               id="to-input"
+                               value="Bursa" 
+                               class="w-full h-11 bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 text-sm font-semibold text-white focus:outline-none focus:border-gold-accent/50 focus:bg-black/60 transition-all"
+                               placeholder="Nereye"
+                               onchange="onRouteChange()">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] text-muted-blue uppercase font-bold">HEDEF</span>
+                    </div>
+                </div>
+                
+                <!-- Date & Passengers -->
+                <div class="flex gap-2 mt-3">
+                    <button class="flex-1 h-10 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center gap-2 interactive-card hover:bg-white/10">
+                        <span class="material-symbols-outlined text-gold-accent text-base">calendar_today</span>
+                        <span class="text-xs font-semibold">Bugün</span>
+                    </button>
+                    <button class="flex-1 h-10 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center gap-2 interactive-card hover:bg-white/10">
+                        <span class="material-symbols-outlined text-gold-accent text-base">person</span>
+                        <span class="text-xs font-semibold">1 Yolcu</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Suggestion Card -->
+        <section id="ai-suggestion" class="px-6 mb-4 slide-up" style="display: none;">
+            <div class="glass-card rounded-2xl p-3 border-l-4 border-l-gold-accent bg-gradient-to-r from-gold-accent/10 to-transparent">
+                <div class="flex items-start gap-3">
+                    <div class="size-8 rounded-full bg-gold-accent/20 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold-accent text-lg">auto_awesome</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[10px] text-gold-accent font-bold uppercase tracking-wider mb-1">🤖 AI Önerisi</p>
+                        <p class="text-xs text-white/90 leading-relaxed" id="ai-message">
+                            Bu rota için uçak + otel kombinasyonu %15 daha ekonomik. 
+                            Ayrıca 3 gecelik konaklama eklediğinizde toplam fiyattan %10 indirim kazanırsınız.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transport Mode Selector -->
+        <section class="px-6 mb-4" data-ai-context="transport-selector">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xs font-bold text-white uppercase tracking-wider">Ulaşım Seçimi</h2>
+                <span class="text-[10px] text-muted-blue">Kaydırarak değiştir</span>
+            </div>
+            
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                <!-- Mode: Own Car -->
+                <button onclick="selectMode('car')" id="mode-car" class="transport-mode flex-shrink-0 w-[85px] h-[100px] rounded-xl glass-card border border-white/10 flex flex-col items-center justify-center gap-1.5 interactive-card mode-active">
+                    <div class="size-10 rounded-lg bg-gold-accent/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-accent text-xl">directions_car</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-white uppercase tracking-wider text-center leading-tight">Kendi<br>Aracım</span>
+                    <span class="text-[9px] text-gold-accent font-semibold">~850 TL</span>
+                </button>
+                
+                <!-- Mode: Bus -->
+                <button onclick="selectMode('bus')" id="mode-bus" class="transport-mode flex-shrink-0 w-[85px] h-[100px] rounded-xl glass-card border border-white/10 flex flex-col items-center justify-center gap-1.5 interactive-card opacity-60">
+                    <div class="size-10 rounded-lg bg-white/5 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-muted-blue text-xl">directions_bus</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-muted-blue uppercase tracking-wider">Otobüs</span>
+                    <span class="text-[9px] text-muted-blue/70 font-semibold">320 TL'den</span>
+                </button>
+                
+                <!-- Mode: Flight -->
+                <button onclick="selectMode('flight')" id="mode-flight" class="transport-mode flex-shrink-0 w-[85px] h-[100px] rounded-xl glass-card border border-white/10 flex flex-col items-center justify-center gap-1.5 interactive-card opacity-60">
+                    <div class="size-10 rounded-lg bg-white/5 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-muted-blue text-xl">flight</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-muted-blue uppercase tracking-wider">Uçak</span>
+                    <span class="text-[9px] text-muted-blue/70 font-semibold">840 TL'den</span>
+                </button>
+                
+                <!-- Mode: Train -->
+                <button onclick="selectMode('train')" id="mode-train" class="transport-mode flex-shrink-0 w-[85px] h-[100px] rounded-xl glass-card border border-white/10 flex flex-col items-center justify-center gap-1.5 interactive-card opacity-60">
+                    <div class="size-10 rounded-lg bg-white/5 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-muted-blue text-xl">train</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-muted-blue uppercase tracking-wider">Tren</span>
+                    <span class="text-[9px] text-muted-blue/70 font-semibold">450 TL'den</span>
+                </button>
+                
+                <!-- Mode: Rental -->
+                <button onclick="selectMode('rental')" id="mode-rental" class="transport-mode flex-shrink-0 w-[85px] h-[100px] rounded-xl glass-card border border-white/10 flex flex-col items-center justify-center gap-1.5 interactive-card opacity-60">
+                    <div class="size-10 rounded-lg bg-white/5 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-muted-blue text-xl">car_rental</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-muted-blue uppercase tracking-wider">Kiralama</span>
+                    <span class="text-[9px] text-muted-blue/70 font-semibold">950 TL'den</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Area -->
+        <section id="content-area" class="px-6 mb-4 section-transition" data-ai-context="selected-content">
+            
+            <!-- OWN CAR CONTENT -->
+            <div id="content-car" class="mode-content">
+                <div class="glass-card rounded-2xl p-4 mb-3">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="text-base font-bold text-white mb-1">Yolculuk Planı</h3>
+                            <div class="flex items-center gap-2 text-gold-accent">
+                                <span class="text-lg font-extrabold">3 sa 45 dk</span>
+                                <span class="text-muted-blue/30 text-xs">|</span>
+                                <span class="text-xs font-semibold text-muted-blue">280 km</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] text-muted-blue uppercase font-bold tracking-widest mb-1">Yakıt Tahmini</p>
+                            <p class="text-lg font-bold text-white">~850 TL</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Route Map Placeholder -->
+                    <div class="w-full h-24 rounded-lg bg-gradient-to-br from-mid-teal to-deep-teal border border-white/10 mb-3 flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(224,176,122,0.1) 10px, rgba(224,176,122,0.1) 20px);"></div>
+                        <div class="flex items-center gap-4 z-10">
+                            <div class="flex flex-col items-center">
+                                <div class="size-2.5 rounded-full bg-gold-accent"></div>
+                                <span class="text-[10px] font-bold mt-1">İST</span>
+                            </div>
+                            <div class="w-16 h-0.5 bg-gold-accent/50 relative">
+                                <span class="material-symbols-outlined absolute -top-2.5 left-1/2 -translate-x-1/2 text-gold-accent text-xs">directions_car</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="size-2.5 rounded-full bg-gold-accent"></div>
+                                <span class="text-[10px] font-bold mt-1">BUR</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div class="bg-white/5 rounded-lg p-2.5 border border-white/5">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="material-symbols-outlined text-emerald-400 text-xs fill-1">check_circle</span>
+                                <span class="text-[9px] font-bold text-muted-blue uppercase">Yol Durumu</span>
+                            </div>
+                            <p class="text-[10px] font-semibold text-white">Çevreyolu Açık</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-2.5 border border-white/5">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="material-symbols-outlined text-gold-accent text-xs fill-1">local_parking</span>
+                                <span class="text-[9px] font-bold text-muted-blue uppercase">Park Alanı</span>
+                            </div>
+                            <p class="text-[10px] font-semibold text-white">4 Müsait Otopark</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="startJourney()" class="flex-1 bg-gold-accent text-deep-teal font-extrabold py-3 rounded-lg flex items-center justify-center gap-1.5 shadow-lg shadow-gold-accent/20 interactive-card text-sm">
+                            <span class="material-symbols-outlined fill-1 text-lg">navigation</span>
+                            Yolculuğu Başlat
+                        </button>
+                        <button class="px-4 glass-card text-white rounded-lg flex items-center justify-center interactive-card border-white/10">
+                            <span class="material-symbols-outlined text-lg">coffee</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Weather Forecast -->
+                <div class="glass-card rounded-xl p-3 mb-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-[10px] font-bold text-muted-blue uppercase tracking-wider">Hava Durumu Tahmini</h4>
+                        <span class="text-[9px] text-gold-accent font-bold">DETAYLI GÖR</span>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto hide-scrollbar">
+                        <div class="flex flex-col items-center bg-white/5 p-2 rounded-lg min-w-[60px] border border-white/5">
+                            <span class="text-[9px] font-bold text-muted-blue">14:00</span>
+                            <span class="material-symbols-outlined text-gold-accent my-0.5 text-base">wb_sunny</span>
+                            <span class="text-xs font-bold">24°C</span>
+                        </div>
+                        <div class="flex flex-col items-center bg-white/5 p-2 rounded-lg min-w-[60px] border border-white/5">
+                            <span class="text-[9px] font-bold text-muted-blue">16:00</span>
+                            <span class="material-symbols-outlined text-gold-accent my-0.5 text-base">partly_cloudy_day</span>
+                            <span class="text-xs font-bold">22°C</span>
+                        </div>
+                        <div class="flex flex-col items-center bg-white/5 p-2 rounded-lg min-w-[60px] border border-white/5">
+                            <span class="text-[9px] font-bold text-muted-blue">Varış</span>
+                            <span class="material-symbols-outlined text-white my-0.5 text-base">cloud</span>
+                            <span class="text-xs font-bold">19°C</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Restaurants on Route -->
+                <div class="glass-card rounded-xl p-3">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-white text-xs">Yol Üzeri Restoranlar</h3>
+                        <span class="material-symbols-outlined text-gold-accent text-base">restaurant</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex gap-3 bg-white/5 p-2.5 rounded-lg border border-white/5 interactive-card">
+                            <div class="size-12 rounded-lg bg-gradient-to-br from-mid-teal to-soft-teal flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-gold-accent text-lg">restaurant</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs font-bold">Lezzet Durağı</span>
+                                    <span class="text-[9px] bg-gold-accent/20 text-gold-accent px-1.5 py-0.5 rounded font-bold">4.8</span>
+                                </div>
+                                <p class="text-[9px] text-muted-blue">Geleneksel mutfak • 120. km'de</p>
+                                <p class="text-[9px] text-gold-accent font-bold mt-0.5 uppercase tracking-tighter">HIZLI SERVİS</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 bg-white/5 p-2.5 rounded-lg border border-white/5 interactive-card">
+                            <div class="size-12 rounded-lg bg-gradient-to-br from-mid-teal to-soft-teal flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-gold-accent text-lg">local_cafe</span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs font-bold">Mola Bahçesi</span>
+                                    <span class="text-[9px] bg-gold-accent/20 text-gold-accent px-1.5 py-0.5 rounded font-bold">4.5</span>
+                                </div>
+                                <p class="text-[9px] text-muted-blue">Kahvaltı & Izgara • 185. km'de</p>
+                                <p class="text-[9px] text-emerald-400 font-bold mt-0.5 uppercase tracking-tighter">ÇOCUK ALANI</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUS CONTENT (Hidden by default) -->
+            <div id="content-bus" class="mode-content hidden">
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-3">
+                    <button class="px-3 py-1.5 rounded-full border border-gold-accent/30 bg-gold-accent/10 text-[10px] font-bold text-gold-accent whitespace-nowrap">En Ucuz</button>
+                    <button class="px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-white/60 whitespace-nowrap">En Hızlı</button>
+                    <button class="px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold text-white/60 whitespace-nowrap">Gece Seferleri</button>
+                </div>
+                
+                <!-- Featured Bus -->
+                <button onclick="selectBusTicket('METRO', '14:30', '18:20', 320)" class="w-full text-left glass-card rounded-2xl p-4 border-l-4 border-l-gold-accent shadow-2xl relative overflow-hidden interactive-card border-gold-accent/30 mb-3">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[9px] font-bold text-gold-accent uppercase tracking-widest bg-gold-accent/10 w-fit px-2 py-0.5 rounded">En Uygun Sefer</span>
+                            <div class="text-[10px] font-bold text-white/90 uppercase tracking-tighter">METRO Turizm</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="bg-gold-accent/10 border border-gold-accent/20 rounded-md px-2 py-0.5 inline-flex items-center gap-1 pulse-gold">
+                                <span class="size-1.5 bg-gold-accent rounded-full"></span>
+                                <span class="text-[8px] font-bold text-gold-accent uppercase">Son 4 Koltuk</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-4">
+                            <div class="text-center">
+                                <div class="text-xl font-bold text-white">14:30</div>
+                                <div class="text-[9px] text-muted-blue font-medium mt-0.5 uppercase">İstanbul</div>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 px-2">
+                                <div class="text-[9px] font-bold text-gold-accent/60 italic">3s 50dk</div>
+                                <div class="w-14 h-px bg-gradient-to-r from-transparent via-gold-accent/40 to-transparent relative">
+                                    <span class="material-symbols-outlined absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[12px] text-gold-accent">directions_bus</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xl font-bold text-white">18:20</div>
+                                <div class="text-[9px] text-muted-blue font-medium mt-0.5 uppercase">Bursa</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-gold-accent gold-glow">320 TL</div>
+                            <div class="text-[8px] text-muted-blue font-semibold uppercase tracking-wider">Koltuk Başı</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 pt-3 border-t border-white/5">
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-gold-accent text-base">wifi</span>
+                            <span class="text-[9px] text-muted-blue">Wi-Fi</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-gold-accent text-base">power</span>
+                            <span class="text-[9px] text-muted-blue">Priz</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-gold-accent text-base">tv</span>
+                            <span class="text-[9px] text-muted-blue">TV</span>
+                        </div>
+                        <div class="ml-auto flex items-center gap-1">
+                            <span class="material-symbols-outlined text-gold-accent text-xs fill-1">star</span>
+                            <span class="text-xs font-bold ml-1 text-white">4.8</span>
+                            <span class="text-[9px] text-muted-blue">/5</span>
+                        </div>
+                    </div>
+                </button>
+                
+                <!-- Other Buses -->
+                <div class="space-y-2">
+                    <h3 class="text-[10px] font-bold text-muted-blue uppercase tracking-widest px-1">Diğer Firmalar</h3>
+                    <button onclick="selectBusTicket('KAMİL KOÇ', '15:15', '19:25', 350)" class="w-full glass-card rounded-xl p-3 border border-white/5 flex items-center justify-between interactive-card">
+                        <div class="flex items-center gap-3">
+                            <div class="size-8 bg-white/5 rounded-lg flex items-center justify-center p-1.5">
+                                <span class="text-[7px] font-black text-white/50 leading-tight text-center">KAMİL<br>KOÇ</span>
+                            </div>
+                            <div class="text-left">
+                                <div class="text-xs font-bold text-white">15:15 <span class="text-[10px] font-normal text-muted-blue ml-2">4s 10dk</span></div>
+                                <div class="text-[9px] text-muted-blue">Standart Konfor</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-base font-bold text-white">350 TL</div>
+                        </div>
+                    </button>
+                    <button onclick="selectBusTicket('PAMUKKALE', '16:00', '19:45', 380)" class="w-full glass-card rounded-xl p-3 border border-white/5 flex items-center justify-between interactive-card">
+                        <div class="flex items-center gap-3">
+                            <div class="size-8 bg-white/5 rounded-lg flex items-center justify-center p-1.5">
+                                <span class="text-[7px] font-black text-white/50 leading-tight text-center">PAMUK<br>KALE</span>
+                            </div>
+                            <div class="text-left">
+                                <div class="text-xs font-bold text-white">16:00 <span class="text-[10px] font-normal text-muted-blue ml-2">3s 45dk</span></div>
+                                <div class="text-[9px] text-muted-blue">Sınırsız İkram</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-base font-bold text-white">380 TL</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FLIGHT CONTENT (Hidden) -->
+            <div id="content-flight" class="mode-content hidden">
+                <div class="space-y-2">
+                    <button onclick="selectFlight('TK', '08:30', '09:40', 'IST', 'AYT', 980)" class="w-full glass-card rounded-2xl p-4 border-white/10 text-left interactive-card border-gold-accent/30">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="size-7 rounded-lg bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-gold-accent text-lg">airplanemode_active</span>
+                                </div>
+                                <span class="text-[10px] font-bold text-white uppercase tracking-wider">Türk Hava Yolları</span>
+                            </div>
+                            <span class="text-[10px] text-gold-accent font-bold">DİREKT</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3">
+                                    <div>
+                                        <p class="text-base font-black text-white">08:30</p>
+                                        <p class="text-[9px] text-muted-blue font-bold">IST</p>
+                                    </div>
+                                    <div class="flex-1 flex flex-col items-center">
+                                        <span class="text-[8px] text-gold-accent font-black tracking-widest mb-1">1s 10dk</span>
+                                        <div class="w-full h-px bg-gradient-to-r from-transparent via-gold-accent/40 to-transparent"></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-base font-black text-white">09:40</p>
+                                        <p class="text-[9px] text-muted-blue font-bold">AYT</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ml-4 text-right">
+                                <p class="text-base font-black text-gold-accent gold-glow">980 TL</p>
+                                <div class="flex gap-1 justify-end mt-1">
+                                    <span class="material-symbols-outlined text-xs text-muted-blue/60">luggage</span>
+                                    <span class="material-symbols-outlined text-xs text-muted-blue/60">restaurant</span>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="selectFlight('PC', '10:15', '11:30', 'SAW', 'AYT', 840)" class="w-full glass-card rounded-2xl p-4 border-white/10 text-left interactive-card">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="size-7 rounded-lg bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-gold-accent text-lg">airplanemode_active</span>
+                                </div>
+                                <span class="text-[10px] font-bold text-white uppercase tracking-wider">Pegasus</span>
+                            </div>
+                            <span class="text-[10px] text-gold-accent font-bold">DİREKT</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3">
+                                    <div>
+                                        <p class="text-base font-black text-white">10:15</p>
+                                        <p class="text-[9px] text-muted-blue font-bold">SAW</p>
+                                    </div>
+                                    <div class="flex-1 flex flex-col items-center">
+                                        <span class="text-[8px] text-gold-accent font-black tracking-widest mb-1">1s 15dk</span>
+                                        <div class="w-full h-px bg-gradient-to-r from-transparent via-gold-accent/40 to-transparent"></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-base font-black text-white">11:30</p>
+                                        <p class="text-[9px] text-muted-blue font-bold">AYT</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ml-4 text-right">
+                                <p class="text-base font-black text-gold-accent gold-glow">840 TL</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TRAIN CONTENT (Hidden) -->
+            <div id="content-train" class="mode-content hidden">
+                <div class="space-y-2">
+                    <button onclick="selectTrain('YHT', '07:15', '11:30', 'ANK', 'IST', 450)" class="w-full glass-card rounded-2xl p-4 border-white/10 text-left interactive-card border-gold-accent/30">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="size-7 rounded-lg bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-gold-accent text-lg">train</span>
+                                </div>
+                                <span class="text-[10px] font-bold text-white uppercase tracking-wider">TCDD Yüksek Hızlı Tren</span>
+                            </div>
+                            <span class="text-[10px] text-gold-accent font-bold">EKSPRES</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3">
+                                    <div>
+                                        <p class="text-base font-black text-white">07:15</p>
+                                        <p class="text-[9px] text-muted-blue font-bold uppercase">ANK</p>
+                                    </div>
+                                    <div class="flex-1 flex flex-col items-center">
+                                        <span class="text-[8px] text-gold-accent font-black tracking-widest mb-1">4s 15dk</span>
+                                        <div class="w-full h-px bg-gradient-to-r from-transparent via-gold-accent/40 to-transparent"></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-base font-black text-white">11:30</p>
+                                        <p class="text-[9px] text-muted-blue font-bold uppercase">IST</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ml-4 text-right">
+                                <p class="text-base font-black text-gold-accent gold-glow">450 TL</p>
+                                <div class="flex gap-1 justify-end mt-1">
+                                    <span class="material-symbols-outlined text-xs text-gold-accent">wifi</span>
+                                    <span class="material-symbols-outlined text-xs text-gold-accent">restaurant</span>
+                                    <span class="material-symbols-outlined text-xs text-gold-accent">power</span>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- RENTAL CONTENT (Hidden) -->
+            <div id="content-rental" class="mode-content hidden">
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-3">
+                    <button class="px-4 py-1.5 rounded-full bg-gold-accent text-deep-teal text-[10px] font-black uppercase whitespace-nowrap">Tümü</button>
+                    <button class="px-4 py-1.5 rounded-full bg-white/5 text-muted-blue text-[10px] font-bold uppercase whitespace-nowrap border border-white/10">Ekonomi</button>
+                    <button class="px-4 py-1.5 rounded-full bg-white/5 text-muted-blue text-[10px] font-bold uppercase whitespace-nowrap border border-white/10">Konfor</button>
+                    <button class="px-4 py-1.5 rounded-full bg-white/5 text-muted-blue text-[10px] font-bold uppercase whitespace-nowrap border border-white/10">Lüks</button>
+                </div>
+                
+                <div class="space-y-2">
+                    <button onclick="selectRental('Renault Clio', 950, 'Manuel', 5, 'Dizel')" class="w-full glass-card rounded-xl p-3 flex gap-3 interactive-card">
+                        <div class="w-24 aspect-[4/3] rounded-lg bg-white/5 flex items-center justify-center relative overflow-hidden">
+                            <span class="material-symbols-outlined text-3xl text-muted-blue/30">directions_car</span>
+                            <div class="absolute bottom-1 left-1 bg-deep-teal/80 px-1.5 py-0.5 rounded text-[7px] font-bold text-gold-accent uppercase">Ekonomi</div>
+                        </div>
+                        <div class="flex-1 flex flex-col justify-between py-0.5">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-bold text-sm text-white">Renault Clio</h3>
+                                    <div class="text-right">
+                                        <span class="text-base font-black text-gold-accent">950 TL</span>
+                                        <span class="text-[8px] text-muted-blue block -mt-0.5 font-bold">/ GÜN</span>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 mt-1.5">
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-gold-accent text-xs">settings_accessibility</span>
+                                        <span class="text-[8px] text-muted-blue font-bold uppercase">Manuel</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-gold-accent text-xs">person</span>
+                                        <span class="text-[8px] text-muted-blue font-bold uppercase">5 Kişi</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-gold-accent text-xs">local_gas_station</span>
+                                        <span class="text-[8px] text-muted-blue font-bold uppercase">Dizel</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="selectRental('Fiat Egea Cross', 1100, 'Manuel', 5, 'Benzin')" class="w-full glass-card rounded-xl p-3 flex gap-3 interactive-card border-l-4 border-l-gold-accent">
+                        <div class="w-24 aspect-[4/3] rounded-lg bg-white/5 flex items-center justify-center relative overflow-hidden">
+                            <span class="material-symbols-outlined text-3xl text-muted-blue/30">directions_car</span>
+                            <div class="absolute bottom-1 left-1 bg-deep-teal/80 px-1.5 py-0.5 rounded text-[7px] font-bold text-gold-accent uppercase">Konfor</div>
+                        </div>
+                        <div class="flex-1 flex flex-col justify-between py-0.5">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-bold text-sm text-white">Fiat Egea Cross</h3>
+                                    <div class="text-right">
+                                        <span class="text-base font-black text-gold-accent">1.100 TL</span>
+                                        <span class="text-[8px] text-muted-blue block -mt-0.5 font-bold">/ GÜN</span>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 mt-1.5">
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-gold-accent text-xs">settings_accessibility</span>
+                                        <span class="text-[8px] text-muted-blue font-bold uppercase">Manuel</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-gold-accent text-xs">person</span>
+                                        <span class="text-[8px] text-muted-blue font-bold uppercase">5 Kişi</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-gold-accent text-xs">local_gas_station</span>
+                                        <span class="text-[8px] text-muted-blue font-bold uppercase">Benzin</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accommodation Section (Redirect Button) -->
+        <section class="px-6 mb-4" data-ai-context="accommodation">
+            <button onclick="goToAccommodation()" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between interactive-card border-gold-accent/20 hover:border-gold-accent/50 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="size-10 rounded-xl bg-gold-accent/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-accent text-xl">hotel</span>
+                    </div>
+                    <div class="text-left">
+                        <h3 class="font-bold text-white text-sm">Konaklama Ekle</h3>
+                        <p class="text-xs text-muted-blue" id="acc-city-text">Bursa'da otel ve pansiyonları keşfet</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-accent">arrow_forward_ios</span>
+                </div>
+            </button>
+        </section>
+
+        <!-- Summary Footer (Sticky) -->
+        <div class="fixed bottom-[90px] left-0 right-0 z-40 px-6" id="summary-bar" style="display: none;">
+            <div class="glass-card-heavy rounded-2xl p-4 shadow-2xl border-gold-accent/30">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] text-muted-blue uppercase font-bold tracking-wider">Toplam Tutar</p>
+                        <p class="text-2xl font-black text-white" id="total-price">850 TL</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="showDetails()" class="px-4 py-3 rounded-xl bg-white/5 text-white font-bold text-xs uppercase tracking-wider interactive-card border border-white/10">
+                            Detay
+                        </button>
+                        <button onclick="confirmPlan()" class="px-6 py-3 rounded-xl bg-gold-accent text-deep-teal font-black text-sm uppercase tracking-wider interactive-card gold-glow-box">
+                            Planı Onayla
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation - Updated -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-card-heavy border-t border-white/10 pb-6 pt-3 px-6 safe-bottom-nav">
+        <div class="flex items-center justify-around">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 group">
+                <span class="material-symbols-outlined text-muted-blue/60 group-hover:text-gold-accent transition-colors text-xl">home</span>
+                <span class="text-[9px] font-bold text-muted-blue/60 group-hover:text-gold-accent tracking-tighter uppercase">Anasayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 group">
+                <span class="material-symbols-outlined text-muted-blue/60 group-hover:text-gold-accent transition-colors text-xl">explore</span>
+                <span class="text-[9px] font-bold text-muted-blue/60 group-hover:text-gold-accent tracking-tighter uppercase">Keşfet</span>
+            </a>
+            <button onclick="goToAccommodation()" class="flex flex-col items-center gap-1 group">
+                <span class="material-symbols-outlined text-gold-accent transition-colors text-xl">hotel</span>
+                <span class="text-[9px] font-bold text-gold-accent tracking-tighter uppercase">Konaklama</span>
+            </button>
+            <a href="ara.html" class="flex flex-col items-center gap-1 group">
+                <span class="material-symbols-outlined text-muted-blue/60 group-hover:text-gold-accent transition-colors text-xl">search</span>
+                <span class="text-[9px] font-bold text-muted-blue/60 group-hover:text-gold-accent tracking-tighter uppercase">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 group">
+                <span class="material-symbols-outlined text-muted-blue/60 group-hover:text-gold-accent transition-colors text-xl">person</span>
+                <span class="text-[9px] font-bold text-muted-blue/60 group-hover:text-gold-accent tracking-tighter uppercase">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- AI Chat Modal -->
+    <div id="ai-chat-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeAIChat()"></div>
+        <div class="absolute inset-x-4 top-20 bottom-24 glass-card-heavy rounded-3xl flex flex-col overflow-hidden border border-gold-accent/30 shadow-2xl">
+            <!-- Chat Header -->
+            <div class="flex items-center justify-between p-4 border-b border-white/10 bg-gold-accent/5">
+                <div class="flex items-center gap-3">
+                    <div class="size-10 rounded-full bg-gold-accent/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-accent text-xl">psychology</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-sm">CityJOY AI Asistan</h3>
+                        <p class="text-[10px] text-gold-accent">Çevrimiçi</p>
+                    </div>
+                </div>
+                <button onclick="closeAIChat()" class="size-8 rounded-full bg-white/5 flex items-center justify-center interactive-card">
+                    <span class="material-symbols-outlined text-white text-lg">close</span>
+                </button>
+            </div>
+            
+            <!-- Chat Messages -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 hide-scrollbar">
+                <div class="flex gap-2">
+                    <div class="size-8 rounded-full bg-gold-accent/20 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold-accent text-sm">psychology</span>
+                    </div>
+                    <div class="glass-card rounded-2xl rounded-tl-sm p-3 max-w-[80%]">
+                        <p class="text-xs text-white/90 leading-relaxed">Merhaba! Seyahat planınızda size nasıl yardımcı olabilirim? 🧳</p>
+                        <span class="text-[9px] text-muted-blue mt-1 block">Şimdi</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Input -->
+            <div class="p-4 border-t border-white/10 bg-deep-teal/50">
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." 
+                           class="flex-1 h-11 bg-black/40 border border-white/10 rounded-xl px-4 text-sm text-white placeholder:text-muted-blue/50 focus:outline-none focus:border-gold-accent/50"
+                           onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button onclick="sendMessage()" class="size-11 rounded-xl bg-gold-accent flex items-center justify-center interactive-card">
+                        <span class="material-symbols-outlined text-deep-teal text-xl">send</span>
+                    </button>
+                </div>
+                <div class="flex gap-2 mt-2 overflow-x-auto hide-scrollbar">
+                    <button onclick="sendQuickMessage('En ucuz ulaşım nedir?')" class="px-3 py-1.5 rounded-full bg-white/5 text-[10px] text-muted-blue whitespace-nowrap border border-white/10 hover:border-gold-accent/30 transition-colors">En ucuz ulaşım?</button>
+                    <button onclick="sendQuickMessage('Otel önerisi')" class="px-3 py-1.5 rounded-full bg-white/5 text-[10px] text-muted-blue whitespace-nowrap border border-white/10 hover:border-gold-accent/30 transition-colors">Otel önerisi</button>
+                    <button onclick="sendQuickMessage('Yol durumu nasıl?')" class="px-3 py-1.5 rounded-full bg-white/5 text-[10px] text-muted-blue whitespace-nowrap border border-white/10 hover:border-gold-accent/30 transition-colors">Yol durumu?</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let currentMode = 'car';
+        let accommodationSelected = false;
+        let totalPrice = 850;
+        let selectedTicket = null;
+        
+        // Mode Selection
+        function selectMode(mode) {
+            // Update visual states
+            document.querySelectorAll('.transport-mode').forEach(el => {
+                el.classList.remove('mode-active');
+                el.classList.add('opacity-60');
+                el.querySelector('.size-10').classList.remove('bg-gold-accent/20');
+                el.querySelector('.size-10').classList.add('bg-white/5');
+                el.querySelector('.material-symbols-outlined').classList.remove('text-gold-accent');
+                el.querySelector('.material-symbols-outlined').classList.add('text-muted-blue');
+            });
+            
+            const activeEl = document.getElementById('mode-' + mode);
+            activeEl.classList.add('mode-active');
+            activeEl.classList.remove('opacity-60');
+            activeEl.querySelector('.size-10').classList.add('bg-gold-accent/20');
+            activeEl.querySelector('.size-10').classList.remove('bg-white/5');
+            activeEl.querySelector('.material-symbols-outlined').classList.add('text-gold-accent');
+            activeEl.querySelector('.material-symbols-outlined').classList.remove('text-muted-blue');
+            
+            // Hide all content
+            document.querySelectorAll('.mode-content').forEach(el => el.classList.add('hidden'));
+            
+            // Show selected content with animation
+            const contentEl = document.getElementById('content-' + mode);
+            contentEl.classList.remove('hidden');
+            contentEl.classList.add('slide-up');
+            
+            currentMode = mode;
+            updatePrice();
+            
+            // Reset selected ticket when changing modes
+            selectedTicket = null;
+            
+            // AI Context Update
+            updateAIContext('transport', mode);
+        }
+        
+        // Price Management
+        function updatePrice() {
+            const prices = {
+                'car': 850,
+                'bus': 320,
+                'flight': 980,
+                'train': 450,
+                'rental': 950
+            };
+            
+            let basePrice = selectedTicket ? selectedTicket.price : (prices[currentMode] || 0);
+            if (accommodationSelected) basePrice += 4500;
+            
+            totalPrice = basePrice;
+            document.getElementById('total-price').textContent = totalPrice.toLocaleString('tr-TR') + ' TL';
+            
+            // Show/hide summary bar
+            const summaryBar = document.getElementById('summary-bar');
+            if (basePrice > 0) {
+                summaryBar.style.display = 'block';
+            }
+        }
+        
+        // Ticket Selection Functions
+        function selectBusTicket(company, departure, arrival, price) {
+            selectedTicket = {
+                type: 'bus',
+                company: company,
+                departure: departure,
+                arrival: arrival,
+                price: price,
+                from: document.getElementById('from-input').value,
+                to: document.getElementById('to-input').value
+            };
+            updatePrice();
+            
+            // Visual feedback
+            event.currentTarget.classList.add('border-gold-accent', 'bg-gold-accent/5');
+        }
+        
+        function selectFlight(airline, departure, arrival, from, to, price) {
+            selectedTicket = {
+                type: 'flight',
+                airline: airline,
+                departure: departure,
+                arrival: arrival,
+                from: from,
+                to: to,
+                price: price
+            };
+            updatePrice();
+        }
+        
+        function selectTrain(trainType, departure, arrival, from, to, price) {
+            selectedTicket = {
+                type: 'train',
+                trainType: trainType,
+                departure: departure,
+                arrival: arrival,
+                from: from,
+                to: to,
+                price: price
+            };
+            updatePrice();
+        }
+        
+        function selectRental(carModel, price, gear, seats, fuel) {
+            selectedTicket = {
+                type: 'rental',
+                carModel: carModel,
+                price: price,
+                gear: gear,
+                seats: seats,
+                fuel: fuel
+            };
+            updatePrice();
+        }
+        
+        // AI Functions
+        function onRouteChange() {
+            const from = document.getElementById('from-input').value;
+            const to = document.getElementById('to-input').value;
+            
+            // Update accommodation text
+            document.getElementById('acc-city-text').textContent = to + "'da otel ve pansiyonları keşfet";
+            
+            // Simulate AI suggestion
+            if (from && to) {
+                setTimeout(() => {
+                    document.getElementById('ai-suggestion').style.display = 'block';
+                    document.getElementById('ai-message').textContent = 
+                        `${from} → ${to} rotası için uçak + otel kombinasyonu %15 daha ekonomik. ` +
+                        `Ayrıca erken rezervasyon avantajıyla toplam fiyattan %10 indirim kazanırsınız.`;
+                }, 500);
+            }
+        }
+        
+        function updateAIContext(type, value) {
+            console.log('AI Context:', { type, value, timestamp: new Date() });
+        }
+        
+        // AI Chat Modal
+        function openAIChat() {
+            const modal = document.getElementById('ai-chat-modal');
+            modal.classList.remove('hidden');
+            document.getElementById('chat-input').focus();
+        }
+        
+        function closeAIChat() {
+            document.getElementById('ai-chat-modal').classList.add('hidden');
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate AI typing
+            setTimeout(() => {
+                showTyping();
+                setTimeout(() => {
+                    removeTyping();
+                    const responses = [
+                        "Harika bir seçim! Bu rota için en uygun seçenekleri analiz ediyorum... 🎯",
+                        "Bursa'da konaklama için önerilerim: 1) Hotel Anatolia 2) Kervansaray Termal 💎",
+                        "Otobüs seferleri saat 14:30, 15:15 ve 16:00'da mevcut. En hızlısı 3 saat 45 dakika sürecek. 🚌",
+                        "Yol durumu oldukça iyi, ancak 120. km'de hafif bir yoğunluk var. Alternatif rotayı gösterelim mi? 🛣️"
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addMessage(randomResponse, 'ai');
+                }, 1500);
+            }, 500);
+        }
+        
+        function sendQuickMessage(text) {
+            document.getElementById('chat-input').value = text;
+            sendMessage();
+        }
+        
+        function addMessage(text, sender) {
+            const container = document.getElementById('chat-messages');
+            const isAI = sender === 'ai';
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex gap-2 ${isAI ? '' : 'flex-row-reverse'}`;
+            messageDiv.innerHTML = `
+                ${isAI ? `
+                <div class="size-8 rounded-full bg-gold-accent/20 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-gold-accent text-sm">psychology</span>
+                </div>
+                ` : `
+                <div class="size-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-white text-sm">person</span>
+                </div>
+                `}
+                <div class="glass-card rounded-2xl ${isAI ? 'rounded-tl-sm' : 'rounded-tr-sm'} p-3 max-w-[80%] ${isAI ? '' : 'bg-gold-accent/10 border-gold-accent/30'}">
+                    <p class="text-xs text-white/90 leading-relaxed">${text}</p>
+                    <span class="text-[9px] text-muted-blue mt-1 block">Şimdi</span>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function showTyping() {
+            const container = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'flex gap-2';
+            typingDiv.innerHTML = `
+                <div class="size-8 rounded-full bg-gold-accent/20 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-gold-accent text-sm">psychology</span>
+                </div>
+                <div class="glass-card rounded-2xl rounded-tl-sm p-3 flex items-center gap-1">
+                    <div class="w-1.5 h-1.5 bg-gold-accent/60 rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-gold-accent/60 rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-gold-accent/60 rounded-full typing-dot"></div>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function removeTyping() {
+            const typing = document.getElementById('typing-indicator');
+            if (typing) typing.remove();
+        }
+        
+        // Plan Management - INTEGRATION POINT
+        function confirmPlan() {
+            try {
+                // Gather all plan data
+                const planData = {
+                    planId: 'plan_' + Date.now(),
+                    from: document.getElementById('from-input').value,
+                    to: document.getElementById('to-input').value,
+                    transport: currentMode,
+                    price: totalPrice,
+                    date: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
+                    status: 'confirmed',
+                    ticket: selectedTicket,
+                    accommodation: accommodationSelected ? {
+                        hotelName: 'Akra Hotel',
+                        checkIn: '14:00',
+                        price: 4500
+                    } : null
+                };
+                
+                // Save to localStorage with error handling
+                if (isLocalStorageAvailable()) {
+                    localStorage.setItem('activePlan', JSON.stringify(planData));
+                    localStorage.setItem('planHistory', JSON.stringify(
+                        JSON.parse(localStorage.getItem('planHistory') || '[]').concat(planData)
+                    ));
+                } else {
+                    // Fallback: use sessionStorage or memory
+                    sessionStorage.setItem('activePlan', JSON.stringify(planData));
+                }
+                
+                // Show success feedback
+                showNotification('Planınız kaydedildi! Yolculuğa başlayabilirsiniz.');
+                
+                // Redirect to Companion page with URL parameters
+                setTimeout(() => {
+                    const params = new URLSearchParams({
+                        plan: planData.planId,
+                        transport: currentMode,
+                        from: planData.from,
+                        to: planData.to
+                    });
+                    window.location.href = `yol-arkadasi.html?${params.toString()}`;
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Plan kaydedilirken hata:', error);
+                showNotification('Bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+            }
+        }
+        
+        function startJourney() {
+            // For car mode - directly start journey
+            confirmPlan();
+        }
+        
+        function goToCompanion() {
+            // Check if there's an active plan
+            const activePlan = getActivePlan();
+            if (activePlan) {
+                const params = new URLSearchParams({
+                    plan: activePlan.planId,
+                    transport: activePlan.transport,
+                    from: activePlan.from,
+                    to: activePlan.to
+                });
+                window.location.href = `yol-arkadasi.html?${params.toString()}`;
+            } else {
+                showNotification('Aktif bir plan bulunamadı.', 'error');
+            }
+        }
+        
+        function getActivePlan() {
+            try {
+                const plan = localStorage.getItem('activePlan') || sessionStorage.getItem('activePlan');
+                return plan ? JSON.parse(plan) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        function isLocalStorageAvailable() {
+            try {
+                const test = '__storage_test__';
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
+        function showNotification(message, type = 'success') {
+            // Simple notification implementation
+            const notif = document.createElement('div');
+            notif.className = `fixed top-24 left-1/2 -translate-x-1/2 z-[80] px-6 py-3 rounded-xl ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} text-white text-sm font-bold shadow-lg slide-up`;
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+        
+        // Check for active plan on page load
+        function checkActivePlan() {
+            const activePlan = getActivePlan();
+            if (activePlan && activePlan.status === 'confirmed') {
+                // Show banner
+                const banner = document.getElementById('active-plan-banner');
+                const header = document.getElementById('main-header');
+                const content = document.getElementById('main-content');
+                
+                banner.classList.remove('-translate-y-full');
+                header.style.top = '60px';
+                content.style.paddingTop = '160px';
+                
+                document.getElementById('banner-route').textContent = `${activePlan.from} → ${activePlan.to}`;
+                
+                // Update transport icon
+                const iconMap = {
+                    'car': 'directions_car',
+                    'bus': 'directions_bus',
+                    'flight': 'flight',
+                    'train': 'train',
+                    'rental': 'car_rental'
+                };
+                banner.querySelector('.material-symbols-outlined').textContent = iconMap[activePlan.transport] || 'directions_car';
+            }
+        }
+        
+        // Go to Accommodation Page
+        function goToAccommodation() {
+            const to = document.getElementById('to-input').value || 'Bursa';
+            const citySlug = to.toLowerCase()
+                .replace(/ı/g, 'i')
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ş/g, 's')
+                .replace(/ö/g, 'o')
+                .replace(/ç/g, 'c')
+                .replace(/[^a-z0-9]/g, '-');
+            window.location.href = `${citySlug}-konaklama.html`;
+        }
+        
+        // Utility Functions
+        function swapLocations() {
+            const from = document.getElementById('from-input');
+            const to = document.getElementById('to-input');
+            const temp = from.value;
+            from.value = to.value;
+            to.value = temp;
+            onRouteChange();
+        }
+        
+        function goBack() {
+            window.location.href = 'seyahat-anasayfa.html';
+        }
+        
+        function showDetails() {
+            // Show plan details modal
+            const plan = getActivePlan();
+            if (plan) {
+                alert(`Plan Detayları:\n\nNereden: ${plan.from}\nNereye: ${plan.to}\nUlaşım: ${plan.transport}\nFiyat: ${plan.price} TL`);
+            } else {
+                alert('Detaylı plan özeti:\n' + document.getElementById('total-price').textContent);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            onRouteChange();
+            checkActivePlan();
+        });
+        
+        // Touch gestures for mode switching
+        let touchStartX = 0;
+        const contentArea = document.getElementById('content-area');
+        
+        contentArea.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+        
+        contentArea.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > 50) {
+                const modes = ['car', 'bus', 'flight', 'train', 'rental'];
+                const currentIndex = modes.indexOf(currentMode);
+                
+                if (diff > 0 && currentIndex < modes.length - 1) {
+                    selectMode(modes[currentIndex + 1]);
+                } else if (diff < 0 && currentIndex > 0) {
+                    selectMode(modes[currentIndex - 1]);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

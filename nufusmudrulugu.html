@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa İl ve İlçe Nüfus Müdürlükleri - Pasaport, kimlik kartı, sürücü belgesi işlemleri adres, telefon ve çalışma saatleri bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Nüfus Müdürlükleri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "nufus-blue": "#3B82F6",
+                        "nufus-purple": "#8B5CF6",
+                        "nufus-orange": "#F97316"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-nufus {
+            animation: pulseNufus 2s infinite;
+        }
+        @keyframes pulseNufus {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .nufus-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nufus-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .service-tag {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .modal-nufus {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .search-input {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">NÜFUS MÜDÜRLÜKLERİ</h1>
+                <p class="text-xs text-gray-text truncate">Bursa İl ve İlçe Nüfus Müdürlükleri</p>
+            </div>
+            <button onclick="openInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-nufus-blue/20 hover:bg-nufus-blue/30 transition-colors shrink-0 pulse-nufus">
+                <span class="material-symbols-outlined text-nufus-blue">badge</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Önemli Bilgi -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-nufus-blue/30 to-nufus-blue/10 flex items-center justify-center shrink-0 pulse-nufus">
+                            <span class="material-symbols-outlined text-nufus-blue text-xl">badge</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Nüfus ve Vatandaşlık</h2>
+                            <p class="text-xs text-gray-text">Kimlik, Pasaport, Sürücü Belgesi</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-nufus-blue/10 border border-nufus-blue/30">
+                        <div class="w-2 h-2 rounded-full bg-nufus-blue animate-pulse"></div>
+                        <span class="text-xs text-nufus-blue font-medium">Aktif</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-nufus-blue">08:30</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Açılış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-nufus-purple">16:30</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Kapanış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">199</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Randevu Hattı</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-nufus-orange">17:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">İlçe Mesai Bitiş</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Müdürlük Bul</h3>
+                        <p class="text-xs text-gray-text truncate">İlçe veya müdürlük adı ara</p>
+                    </div>
+                </div>
+
+                <div class="search-input rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="nufusSearch" placeholder="Örn: Osmangazi, Nilüfer, pasaport..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchNufus()"/>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">İlçe Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterDistrict('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterDistrict('il')" id="btn-il" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">İl Nüfus</span>
+                    </button>
+                    <button onclick="filterDistrict('osmangazi')" id="btn-osmangazi" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Osmangazi</span>
+                    </button>
+                    <button onclick="filterDistrict('nilufer')" id="btn-nilufer" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Nilüfer</span>
+                    </button>
+                    <button onclick="filterDistrict('yildirim')" id="btn-yildirim" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Yıldırım</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Sıkça Sorulan Sorular</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Çalışma Saatleri -->
+                <div class="nufus-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-nufus-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-nufus-blue text-sm">schedule</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Çalışma Saatleri Nedir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                İl Nüfus Müdürlüğü: 08:30 - 12:30 / 13:30 - 16:30 [^4^]
+                                İlçe Nüfus Müdürlükleri: 08:00 - 12:00 / 13:00 - 17:00 [^17^]
+                                Yoğunluk dönemlerinde hafta sonu ve akşam mesaisi uygulanabilir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-nufus-blue">Pzt-Cuma: 08:30-16:30</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-nufus-purple">İlçe: 08:00-17:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-live-red">Hafta Sonu: Kapalı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Randevu Alma -->
+                <div class="nufus-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-nufus-purple/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-nufus-purple text-sm">event_available</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Nasıl Randevu Alırım?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                3 farklı yöntemle randevu alabilirsiniz [^14^]:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text mb-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>randevu.nvi.gov.tr</strong> internet adresinden online</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>Alo 199</strong> çağrı merkezinden</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>e-Devlet</strong> üzerinden</span>
+                                </li>
+                            </ul>
+                            <div class="bg-white/5 rounded-lg p-2 text-[10px] text-gray-text">
+                                <strong class="text-gold">Not:</strong> Randevuya geç kalmamanız önemlidir. 15 dakika gecikme durumunda randevunuz iptal olabilir.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pasaport İşlemleri -->
+                <div class="nufus-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-nufus-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-nufus-orange text-sm">travel</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Pasaport İşlemleri</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                2018'den itibaren pasaport işlemleri nüfus müdürlüklerine devredilmiştir [^2^]. 
+                                Bordo pasaportlar ilçe nüfus müdürlüklerinden, resmi/hizmet/hususi pasaportlar ise 
+                                sadece İl Nüfus Müdürlüğü'nden alınabilir [^2^].
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-nufus-orange">Bordo: İlçelerde</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-nufus-purple">Resmi: Sadece İl</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-nufus-blue">Süre: 5-7 gün</span>
+                            </div>
+                            <p class="text-[10px] text-gray-text mt-2 italic">
+                                * 2026 yılında 1 yıllık pasaport: 5.454 TL, 10 yıllık: 14.761 TL [^2^]
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gerekli Evraklar -->
+                <div class="nufus-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-gold text-sm">description</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Pasaport İçin Gerekli Evraklar</h4>
+                            <ul class="space-y-1 text-xs text-gray-text mt-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>T.C. Kimlik Kartı veya nüfus cüzdanı</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Son 6 ay içinde çekilmiş 1 adet biyometrik fotoğraf (50x50 veya 50x60 mm) [^2^]</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Varsa eski pasaportlar</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Harç ve defter bedeli ödeme dekontu</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Reşit olmayanlar için muvafakatname [^2^]</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kimlik Kartı -->
+                <div class="nufus-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-nufus-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-nufus-blue text-sm">credit_card</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Yeni Kimlik Kartı İşlemleri</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Çipli kimlik kartları tüm nüfus müdürlüklerinden alınabilir. 
+                                Randevu almadan da başvuru yapılabilir ancak randevulu vatandaşlar önceliklidir.
+                            </p>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-nufus-blue text-lg">timer</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Süre: 7-15 gün</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-nufus-blue text-lg">local_shipping</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Kargo ile teslim</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bursa İl Nüfus Müdürlüğü -->
+        <section class="animate-slide-up district-section" data-district="il" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('ilSection', 'ilIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-nufus-blue/30 to-nufus-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-nufus-blue">account_balance</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Bursa İl Nüfus Müdürlüğü</span>
+                        <span class="text-[10px] text-gray-text block truncate">Yıldırım - Merkez</span>
+                    </div>
+                </div>
+                <span id="ilIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="ilSection" class="expandable-section mt-3 space-y-3">
+                <!-- İl Nüfus Müdürlüğü -->
+                <div class="nufus-card rounded-xl p-4" onclick="openNufusDetail('ilnufus')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-nufus-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">İL</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Nüfus ve Vatandaşlık Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Mimarsinan Mah. Ankarayolu Cad. No:436</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(0224) 221 17 26 / (0224) 225 30 16 [^1^]</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-nufus-orange">subway</span>
+                        <span>M1 Hattı - Davutdede durağına yakın</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Osmangazi Nüfus Müdürlüğü -->
+        <section class="animate-slide-up district-section" data-district="osmangazi" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('osmangaziSection', 'osmangaziIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-nufus-purple/30 to-nufus-purple/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-nufus-purple">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Osmangazi İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">İlçe Nüfus Müdürlüğü</span>
+                    </div>
+                </div>
+                <span id="osmangaziIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="osmangaziSection" class="expandable-section mt-3 space-y-3">
+                <!-- Osmangazi İlçe Nüfus -->
+                <div class="nufus-card rounded-xl p-4" onclick="openNufusDetail('osmangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-nufus-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Osmangazi İlçe Nüfus Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Yahşibey Mah. Altıparmak Cd. No:63 Hükümet Konağı Kat 1</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(0224) 220 94 17 [^26^]</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-nufus-orange">directions_bus</span>
+                        <span>Otobüs: 38, 60, 94 hatları (Heykel durağı)</span>
+                    </div>
+                </div>
+
+                <!-- Osmangazi Adliye Nüfus -->
+                <div class="nufus-card rounded-xl p-4" onclick="openNufusDetail('osmangaziadliye')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-nufus-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Osmangazi Adliye Nüfus Temsilciliği</h4>
+                                <p class="text-[10px] text-gray-text">Hacıilyas Mah. Kıbrıs Şehitleri Cad. Adliye E Blok 1.Kat No:128</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">info</span>
+                        <span>Sadece adli işlemler için</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nilüfer Nüfus Müdürlüğü -->
+        <section class="animate-slide-up district-section" data-district="nilufer" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('niluferSection', 'niluferIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-nufus-blue/30 to-nufus-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-nufus-blue">park</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Nilüfer İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">İlçe Nüfus Müdürlüğü</span>
+                    </div>
+                </div>
+                <span id="niluferIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="niluferSection" class="expandable-section mt-3 space-y-3">
+                <!-- Nilüfer İlçe Nüfus -->
+                <div class="nufus-card rounded-xl p-4" onclick="openNufusDetail('nilufer')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-nufus-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer İlçe Nüfus Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">İhsaniye Mah. Nilüfer Cumhuriyet Meydanı No:7/B Hükümet Konağı</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(0224) 245 19 55 / (0224) 249 09 93 [^3^]</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-nufus-orange">subway</span>
+                        <span>BursaRay Nilüfer durağına 5 dk yürüme</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yıldırım Nüfus Müdürlüğü -->
+        <section class="animate-slide-up district-section" data-district="yildirim" style="animation-delay: 0.6s">
+            <button onclick="toggleSection('yildirimSection', 'yildirimIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-nufus-orange/30 to-nufus-orange/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-nufus-orange">mosque</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Yıldırım İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">İlçe Nüfus Müdürlüğü</span>
+                    </div>
+                </div>
+                <span id="yildirimIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="yildirimSection" class="expandable-section mt-3 space-y-3">
+                <!-- Yıldırım İlçe Nüfus -->
+                <div class="nufus-card rounded-xl p-4" onclick="openNufusDetail('yildirim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-nufus-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yıldırım İlçe Nüfus Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Şükraniye Mah. 7.Mercan Sk. No:3 Yıldırım/BURSA</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(0224) 363 91 00 [^29^]</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-nufus-orange">subway</span>
+                        <span>M1 Hattı - Davutdede durağı (460m)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="https://randevu.nvi.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-nufus-blue text-xl">event_available</span>
+                    <span class="text-[10px] text-center">Randevu Al</span>
+                </a>
+                <a href="https://www.nvi.gov.tr/pasaport" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-nufus-orange text-xl">travel</span>
+                    <span class="text-[10px] text-center">Pasaport</span>
+                </a>
+                <a href="https://www.turkiye.gov.tr/nvi-tc-kimlik-karti-basvuru-sorgulama" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-nufus-purple text-xl">credit_card</span>
+                    <span class="text-[10px] text-center">Kimlik</span>
+                </a>
+                <a href="tel:199" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-gold text-xl">phone</span>
+                    <span class="text-[10px] text-center">Alo 199</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.8s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-nufus-orange">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-nufus-orange shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-nufus-orange mb-1">Önemli Bilgi</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            Pasaport başvurularında <strong>şahsen başvuru</strong> zorunludur. 7 yaş üstü çocukların parmak izi, 
+                            12 yaş üstü çocukların imzası alınır [^2^]. Reşit olmayanlar için ebeveyn muvafakatnamesi gereklidir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Nüfus Müdürlüğü Detay Modalı -->
+    <div id="nufusDetailModal" class="fixed inset-0 z-[80] modal-nufus hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeNufusDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Müdürlük Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Nüfus Müdürlüğü Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-nufus-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-nufus-blue text-3xl">badge</span>
+                    </div>
+                    <div>
+                        <h2 id="modalNufusName" class="text-xl font-bold text-white mb-1">Müdürlük Adı</h2>
+                        <p id="modalDistrict" class="text-sm text-gold">İlçe</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p class="text-sm text-white">Hafta İçi: 08:30 - 12:30 / 13:30 - 16:30</p>
+                            <p class="text-xs text-gray-text">Öğle Arası: 12:30 - 13:30</p>
+                            <p class="text-xs text-nufus-orange mt-1">İlçe müdürlükleri: 08:00 - 17:00</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">İletişim</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                            <p class="text-xs text-gray-text mt-1">E-posta: <span id="modalEmail">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım ve Otopark
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Verilen Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">medical_services</span>
+                    Verilen Hizmetler
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-nufus-blue text-xl mb-1">credit_card</span>
+                        <p class="text-xs text-gray-text">T.C. Kimlik Kartı</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-nufus-orange text-xl mb-1">travel</span>
+                        <p class="text-xs text-gray-text">Pasaport</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-nufus-purple text-xl mb-1">directions_car</span>
+                        <p class="text-xs text-gray-text">Sürücü Belgesi</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-nufus-blue text-xl mb-1">family_restroom</span>
+                        <p class="text-xs text-gray-text">Uluslararası Aile Cüzdanı</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-nufus-orange text-xl mb-1">description</span>
+                        <p class="text-xs text-gray-text">Vatandaşlık İşlemleri</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-nufus-purple text-xl mb-1">edit</span>
+                        <p class="text-xs text-gray-text">Kayıt Düzeltme</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-nufus-blue text-xl mb-1">child_care</span>
+                        <p class="text-xs text-gray-text">Doğum/Ölüm İşlemleri</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-nufus-orange text-xl mb-1">favorite</span>
+                        <p class="text-xs text-gray-text">Evlenme/Boşanma</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Randevu Bilgisi -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">event_available</span>
+                    Randevu ve İşlem Bilgileri
+                </h3>
+                <div class="space-y-2 text-xs text-gray-text">
+                    <p class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                        <span>Online randevu zorunludur</span>
+                    </p>
+                    <p class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                        <span>Randevu saatinden 15 dk önce gelinmelidir</span>
+                    </p>
+                    <p class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                        <span>Pasaport teslimatı kargo ile yapılır (5-7 gün)</span>
+                    </p>
+                    <p class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                        <span>7 yaş üstü parmak izi, 12 yaş üstü imza zorunlu</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button onclick="callNumber('199')" class="flex-1 bg-nufus-blue/20 hover:bg-nufus-blue/30 border border-nufus-blue/50 text-nufus-blue py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    199'u Ara
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acil Bilgi Modalı -->
+    <div id="infoModal" class="fixed inset-0 z-[80] modal-nufus hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Önemli İletişim</h1>
+                        <p class="text-xs text-gray-text truncate">Alo 199 ve Diğer Hatlar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-nufus-blue/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-nufus-blue/20 flex items-center justify-center pulse-nufus">
+                        <span class="material-symbols-outlined text-nufus-blue text-3xl">support_agent</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-nufus-blue">199</h2>
+                        <p class="text-sm text-gray-text">NVİ Çağrı Merkezi</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü çağrı merkezi. 
+                    Randevu alma, işlem sorgulama ve bilgi edinme için 7/24 hizmet verir.
+                </p>
+                <button onclick="callNumber('199')" class="w-full bg-nufus-blue/20 hover:bg-nufus-blue/30 border border-nufus-blue/50 text-nufus-blue py-4 rounded-xl text-lg font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    199'u Ara
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-nufus-purple text-2xl mb-2">travel</span>
+                    <p class="text-lg font-bold text-nufus-purple">Pasaport</p>
+                    <p class="text-xs text-gray-text">randevu.nvi.gov.tr</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">credit_card</span>
+                    <p class="text-lg font-bold text-gold">Kimlik</p>
+                    <p class="text-xs text-gray-text">e-Devlet üzerinden</p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-xl p-4 border border-nufus-orange/30">
+                <h3 class="text-sm font-bold text-nufus-orange mb-2">Acil Pasaport İşlemleri</h3>
+                <p class="text-xs text-gray-text">
+                    Acil pasaport ihtiyaçları için (0312) 462 91 46 - 47 numaraları 
+                    hafta içi 09:00-18:00 saatleri arası hizmet vermektedir [^2^].
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Nüfus Müdürlüğü Veritabanı
+        const nufusData = {
+            'ilnufus': {
+                name: 'Bursa İl Nüfus ve Vatandaşlık Müdürlüğü',
+                district: 'Yıldırım',
+                address: 'Mimarsinan Mah. Ankarayolu Cad. No:436 Yıldırım / BURSA',
+                phone: '(0224) 221 17 26 / (0224) 225 30 16',
+                email: 'bursailnufus@nvi.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Davutdede durağı (yürüme mesafesi)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3, 4 hatları' },
+                    { icon: 'local_parking', text: 'Otopark mevcut (sınırlı kapasite)' },
+                    { icon: 'local_taxi', text: 'Taksi durağına 200m mesafe' }
+                ],
+                mapQuery: 'Bursa İl Nüfus ve Vatandaşlık Müdürlüğü, Yıldırım, Bursa'
+            },
+            'osmangazi': {
+                name: 'Osmangazi İlçe Nüfus Müdürlüğü',
+                district: 'Osmangazi',
+                address: 'Yahşibey Mah. Altıparmak Cd. No:63 Hükümet Konağı Kat 1 Osmangazi/BURSA',
+                phone: '(0224) 220 94 17',
+                email: 'osmangazi16@nvi.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 10 dk yürüme' },
+                    { icon: 'local_parking', text: 'Hükümet Konağı otoparkı (ücretli)' },
+                    { icon: 'local_taxi', text: 'Heykel taksi durağına 300m' }
+                ],
+                mapQuery: 'Osmangazi İlçe Nüfus Müdürlüğü, Altıparmak Caddesi, Bursa'
+            },
+            'osmangaziadliye': {
+                name: 'Osmangazi Adliye Nüfus Temsilciliği',
+                district: 'Osmangazi',
+                address: 'Hacıilyas Mah. Kıbrıs Şehitleri Cad. Adliye Nüfus Temsilciliği E Blok 1.Kat No:128 Osmangazi/BURSA',
+                phone: '(0224) 220 94 17',
+                email: 'osmangazi16@nvi.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Adliye otoparkı (ücretli)' },
+                    { icon: 'info', text: 'Sadece adli işlemler için hizmet verir' }
+                ],
+                mapQuery: 'Osmangazi Adliyesi, Kıbrıs Şehitleri Caddesi, Bursa'
+            },
+            'nilufer': {
+                name: 'Nilüfer İlçe Nüfus Müdürlüğü',
+                district: 'Nilüfer',
+                address: 'İhsaniye Mah. Nilüfer Cumhuriyet Meydanı No:7/B Nilüfer/BURSA',
+                phone: '(0224) 245 19 55 / (0224) 249 09 93',
+                email: 'nilufer16@nvi.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Cumhuriyet Meydanı otoparkı (ücretli)' },
+                    { icon: 'local_taxi', text: 'Nilüfer merkez taksi durağı' }
+                ],
+                mapQuery: 'Nilüfer İlçe Nüfus Müdürlüğü, Cumhuriyet Meydanı, Bursa'
+            },
+            'yildirim': {
+                name: 'Yıldırım İlçe Nüfus Müdürlüğü',
+                district: 'Yıldırım',
+                address: 'Şükraniye Mah. 7.Mercan Sk. No:3 Yıldırım/BURSA',
+                phone: '(0224) 363 91 00',
+                email: 'yildirim16@nvi.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Davutdede durağı (460m yürüme)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 6 hatları' },
+                    { icon: 'local_parking', text: 'Sokak içi park (sınırlı)' },
+                    { icon: 'local_taxi', text: 'Davutdede taksi durağına 300m' }
+                ],
+                mapQuery: 'Yıldırım İlçe Nüfus Müdürlüğü, Mercan Sokak, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // District Filter
+        let currentDistrict = 'all';
+        function filterDistrict(district) {
+            currentDistrict = district;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + district).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.district-section');
+            sections.forEach(section => {
+                if (district === 'all' || section.dataset.district === district) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Nufus
+        function searchNufus() {
+            const searchTerm = document.getElementById('nufusSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.nufus-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open Nufus Detail Modal
+        function openNufusDetail(nufusId) {
+            const nufus = nufusData[nufusId];
+            if (!nufus) return;
+
+            document.getElementById('modalNufusName').textContent = nufus.name;
+            document.getElementById('modalDistrict').textContent = nufus.district + ' İlçesi';
+            document.getElementById('modalAddress').textContent = nufus.address;
+            document.getElementById('modalPhone').textContent = nufus.phone;
+            document.getElementById('modalEmail').textContent = nufus.email;
+            
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            nufus.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Harita butonunu güncelle
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${nufus.mapQuery}')`);
+
+            document.getElementById('nufusDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Nufus Detail Modal
+        function closeNufusDetail() {
+            document.getElementById('nufusDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Info Modal
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak FAQ açık
+            document.getElementById('faqSection').classList.add('open');
+            document.getElementById('faqIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>

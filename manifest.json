@@ -1,0 +1,20 @@
+{
+  "name": "CityJoy",
+  "short_name": "CityJoy",
+  "start_url": "/anasayfa.html",
+  "display": "standalone",
+  "background_color": "#0B2B2D",
+  "theme_color": "#0B2B2D",
+  "icons": [
+    {
+      "src": "cityjoy-assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "cityjoy-assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

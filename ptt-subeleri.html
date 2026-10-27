@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa PTT Şubeleri - Tüm ilçelerdeki postane adres, telefon, çalışma saatleri ve hizmet bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa PTT Şubeleri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "posta-yellow": "#FFD700",
+                        "posta-red": "#DC2626",
+                        "bank-green": "#059669"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-posta {
+            animation: pulsePosta 2s infinite;
+        }
+        @keyframes pulsePosta {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(255, 215, 0, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .ptt-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .ptt-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .service-tag {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .modal-ptt {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">PTT ŞUBELERİ</h1>
+                <p class="text-xs text-gray-text truncate">Posta ve Telgraf Teşkilatı</p>
+            </div>
+            <button onclick="openInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-posta-yellow/20 hover:bg-posta-yellow/30 transition-colors shrink-0 pulse-posta">
+                <span class="material-symbols-outlined text-posta-yellow">local_post_office</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - PTT Bilgileri -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-posta-yellow/30 to-posta-yellow/10 flex items-center justify-center shrink-0 pulse-posta">
+                            <span class="material-symbols-outlined text-posta-yellow text-xl">local_post_office</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">PTT Şubeleri</h2>
+                            <p class="text-xs text-gray-text">Posta, Kargo, Bankacılık</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-posta-yellow/10 border border-posta-yellow/30">
+                        <div class="w-2 h-2 rounded-full bg-posta-yellow animate-pulse"></div>
+                        <span class="text-xs text-posta-yellow font-medium">Aktif</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-posta-yellow">08:30</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Açılış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">17:30</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Kapanış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-posta-red">444 1 788</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Çağrı Merkezi</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-bank-green">PTT</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Posta Kodu</p>
+                    </div>
+                </div>
+
+                <button onclick="openPostalCodeModal()" class="w-full mt-4 bg-posta-yellow/20 hover:bg-posta-yellow/30 border border-posta-yellow/50 text-posta-yellow py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">pin</span>
+                    Posta Kodu Sorgula
+                </button>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">PTT Şubesi Bul</h3>
+                        <p class="text-xs text-gray-text truncate">Şube adı veya mahalle ara</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="pttSearch" placeholder="Örn: Heykel, Çekirge, Konak..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchPTT()"/>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">İlçe Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterDistrict('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterDistrict('merkez')" id="btn-merkez" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Merkez</span>
+                    </button>
+                    <button onclick="filterDistrict('osmangazi')" id="btn-osmangazi" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Osmangazi</span>
+                    </button>
+                    <button onclick="filterDistrict('nilufer')" id="btn-nilufer" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Nilüfer</span>
+                    </button>
+                    <button onclick="filterDistrict('yildirim')" id="btn-yildirim" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Yıldırım</span>
+                    </button>
+                    <button onclick="filterDistrict('inegol')" id="btn-inegol" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">İnegöl</span>
+                    </button>
+                    <button onclick="filterDistrict('diger')" id="btn-diger" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Diğer</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+               <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <button onclick="toggleSection('faqSection', 'faqIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all mb-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">help</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Sıkça Sorulan Sorular</span>
+                        <span class="text-[10px] text-gray-text block truncate">PTT hakkında bilgiler</span>
+                    </div>
+                </div>
+                <span id="faqIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="faqSection" class="expandable-section space-y-3">
+                <!-- Posta Gönderimi -->
+                <div class="ptt-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-posta-yellow/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-posta-yellow text-sm">mail</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Posta Gönderimi Nasıl Yapılır?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                PTT şubelerine giderek veya E-PTT üzerinden gönderim yapabilirsiniz. Adres etiketi hazırlayın, 
+                                içeriği beyan edin ve gönderi türünü seçin (TA, APS, Kargo).
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-posta-yellow">TA (Tekel)</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-posta-yellow">APS (Acele)</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-posta-yellow">Kargo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kargo Takibi -->
+                <div class="ptt-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-posta-red/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-posta-red text-sm">local_shipping</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Kargo Takibi Nasıl Yapılır?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                3 farklı yöntemle takip edebilirsiniz:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text mb-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>ptt.gov.tr</strong> - Barkod numarası ile online sorgu</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>444 1 788</strong> - Müşteri hizmetlerini arayarak</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>E-PTT Kargo</strong> mobil uygulamasından</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Posta Kodu -->
+                <div class="ptt-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-gold text-sm">pin</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Posta Kodu Nasıl Öğrenilir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Adresinizin posta kodunu öğrenmek için:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text">
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">language</span>
+                                    <span>ptt.gov.tr adresinden online sorgulama</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                                    <span>444 1 788'i arayarak danışma</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                                    <span>En yakın PTT şubesine danışma</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Posta Kutusu Kirası -->
+                <div class="ptt-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-bank-green/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-bank-green text-sm">mailbox</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Posta Kutusu Kiralama</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Yıllık kira bedeli il ve şube bazında değişiklik gösterir. 
+                                Kiralama için şubelere başvurun veya E-PTT üzerinden rezervasyon yapın.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-bank-green">Bireysel</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-bank-green">Kurumsal</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-bank-green">E-PTT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- E-PTT Kargo -->
+                <div class="ptt-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-posta-yellow/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-posta-yellow text-sm">smartphone</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">E-PTT Kargo Nedir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Online kargo gönderim hizmetidir. E-PTT mobil uygulaması veya web sitesinden 
+                                kargo oluşturabilir, kapıdan teslimat talep edebilirsiniz.
+                            </p>
+                            <div class="bg-white/5 rounded-lg p-2 text-[10px] text-gray-text">
+                                <strong class="text-gold">Avantaj:</strong> Şubeye gitmeden evden/adresten kargo gönderimi
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Uluslararası Gönderim -->
+                <div class="ptt-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-posta-red/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-posta-red text-sm">public</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Uluslararası Gönderim</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                EMS (Express Mail Service) veya standart posta ile yurtdışına gönderim yapabilirsiniz. 
+                                Yasaklı ürünler için gümrük kontrolü uygulanır.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-posta-red">EMS</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-posta-red">Standart</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-posta-red">AP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ziraat Bankası -->
+                <div class="ptt-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-bank-green/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-bank-green text-sm">account_balance</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Ziraat Bankası Şubesi Var mı?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Büyük PTT şubelerinde Ziraat Bankası yetkili teller hizmeti bulunur. 
+                                Para transferi, fatura ödeme ve temel bankacılık işlemleri yapılabilir.
+                            </p>
+                            <div class="bg-white/5 rounded-lg p-2 text-[10px] text-gray-text">
+                                <strong class="text-gold">Not:</strong> Tüm şubelerde olmayabilir, büyük merkez şubeleri tercih edin
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Otopark -->
+                <div class="ptt-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-gold text-sm">local_parking</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Otopark ve Ulaşım</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Merkezi şubelerde otopark sınırlıdır. Tavsiyeler:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text">
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">directions_bus</span>
+                                    <span>Toplu taşıma kullanın (BursaRay + otobüs)</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">local_parking</span>
+                                    <span>AVM veya cadde üzeri otoparkları kullanın</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">schedule</span>
+                                    <span>Sabah erken saatlerde gidin (kalabalık az)</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Merkez Şube -->
+        <section class="animate-slide-up district-section" data-district="merkez" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('merkezSection', 'merkezIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-posta-red/30 to-posta-red/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-posta-red">star</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Merkez Şubeler</span>
+                        <span class="text-[10px] text-gray-text block truncate">Heykel ve Ana Şubeler</span>
+                    </div>
+                </div>
+                <span id="merkezIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="merkezSection" class="expandable-section mt-3 space-y-3">
+                <!-- Heykel Merkez -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('heykel')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">M</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Heykel PTT Merkez</h4>
+                                <p class="text-[10px] text-gray-text">Alacamescit Mah. Atatürk Cad. No:56</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">location_on</span>
+                        <span>Osmangazi - Heykel Meydanı yanı</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-gold">Tapu</span>
+                    </div>
+                </div>
+
+                <!-- Bursa Merkez Müdürlük -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('merkezmudurluk')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">B</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Merkez Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Beşevler Mah. Yıldırım Cad. No:246</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">subway</span>
+                        <span>Nilüfer - BursaRay hattı üzeri</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-red">Pasaport</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Osmangazi Şubeleri -->
+        <section class="animate-slide-up district-section" data-district="osmangazi" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('osmangaziSection', 'osmangaziIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-posta-yellow/30 to-posta-yellow/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-posta-yellow">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Osmangazi İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Çekirge, Geçit, Emek, Hamitler...</span>
+                    </div>
+                </div>
+                <span id="osmangaziIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="osmangaziSection" class="expandable-section mt-3 space-y-3">
+                <!-- Çekirge -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('cekirge')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Çekirge PTT</h4>
+                                <p class="text-[10px] text-gray-text">Çekirge Mah. 1.Nilüfer Cad. No:149/B</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 38, 60, 94 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Geçit -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('gecit')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Geçit PTT</h4>
+                                <p class="text-[10px] text-gray-text">Geçit Mah. 2.Geçit Sk. No:9</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">subway</span>
+                        <span>M1 Hattı - Geçit İstasyonu yanı</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Emek -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('emek')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Emek PTT</h4>
+                                <p class="text-[10px] text-gray-text">Adnan Menderes Mah. Oğuz Han Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">subway</span>
+                        <span>M1 Hattı - Emek İstasyonu yakını</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Hamitler -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('hamitler')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hamitler PTT</h4>
+                                <p class="text-[10px] text-gray-text">Hamitler Mah. Ninehatun Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 3G, 4, 5A, 6, 7, 8, 9, 10</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+
+                <!-- Soğanlı -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('soganli')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Soğanlı PTT</h4>
+                                <p class="text-[10px] text-gray-text">Soğanlı Mah. 1.Nilüfer Cad. No:149A</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 1/A, 38, 94 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Altınova -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('altinova')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Altınova PTT</h4>
+                                <p class="text-[10px] text-gray-text">Altınova Mah. İstanbul Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 2/A, 3, 4, 38 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+
+                <!-- Demirtaş -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('demirtas')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Demirtaş PTT</h4>
+                                <p class="text-[10px] text-gray-text">Demirtaş Mah. Demirtaş Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 1/A, 2/A, 3 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Panayır -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('panayir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Panayır PTT</h4>
+                                <p class="text-[10px] text-gray-text">Panayır Mah. Panayır Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 1, 3, 4, 5A hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nilüfer Şubeleri -->
+        <section class="animate-slide-up district-section" data-district="nilufer" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('niluferSection', 'niluferIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-bank-green/30 to-bank-green/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-bank-green">park</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Nilüfer İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Konak, Özlüce, Üniversite, Görükle...</span>
+                    </div>
+                </div>
+                <span id="niluferIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="niluferSection" class="expandable-section mt-3 space-y-3">
+                <!-- Konak -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('konak')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Konak PTT</h4>
+                                <p class="text-[10px] text-gray-text">Konak Mah. Kudret Sok. No:20</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">subway</span>
+                        <span>BursaRay Nilüfer durağı + 10 dk yürüme</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-gold">Tapu</span>
+                    </div>
+                </div>
+
+                <!-- Özlüce -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('ozluce')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özlüce PTT</h4>
+                                <p class="text-[10px] text-gray-text">Özlüce Mah. 167. Sokak</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 5B, 38, 48, 60 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+
+                <!-- Üniversite -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('universite')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Üniversite PTT</h4>
+                                <p class="text-[10px] text-gray-text">Üniversite Mah. Üniversite Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">subway</span>
+                        <span>M2 Hattı - Üniversite durağı yanı</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Görükle -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('gorukle')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Görükle PTT</h4>
+                                <p class="text-[10px] text-gray-text">Görükle Mah. Görükle Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 5B, 38, 48 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Beşevler -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('besevler')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Beşevler PTT</h4>
+                                <p class="text-[10px] text-gray-text">Beşevler Mah. Beşevler Cad. No:246</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">subway</span>
+                        <span>BursaRay Nilüfer durağına 5 dk</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-gold">Tapu</span>
+                    </div>
+                </div>
+
+                <!-- İhsaniye -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('ihsaniye')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İhsaniye PTT</h4>
+                                <p class="text-[10px] text-gray-text">İhsaniye Mah. Değirmen Sok. No:45</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Metrobus + otobüs bağlantısı</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+
+                <!-- Fethiye -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('fethiye')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Fethiye PTT</h4>
+                                <p class="text-[10px] text-gray-text">Fethiye Mah. Fethiye Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 3, 4, 5A, 6 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+
+                <!-- Çalı -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('cali')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Çalı PTT</h4>
+                                <p class="text-[10px] text-gray-text">Çalı Mah. Çalı Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 38, 60, 94 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yıldırım Şubeleri -->
+        <section class="animate-slide-up district-section" data-district="yildirim" style="animation-delay: 0.6s">
+            <button onclick="toggleSection('yildirimSection', 'yildirimIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-posta-red/30 to-posta-red/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-posta-red">mosque</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Yıldırım İlçesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Beyazıt, Değirmenlikızık, 152 Evler...</span>
+                    </div>
+                </div>
+                <span id="yildirimIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="yildirimSection" class="expandable-section mt-3 space-y-3">
+                <!-- Beyazıt -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('beyazit')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Beyazıt PTT</h4>
+                                <p class="text-[10px] text-gray-text">Beyazıt Mah. 1. Beyazıt Cad. No:45</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 3A, 3B, 4, 5A, 6, 9</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Değirmenlikızık -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('degirmenlikizik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Değirmenlikızık PTT</h4>
+                                <p class="text-[10px] text-gray-text">Değirmenlikızık Mah. Dalyan Sk. 6/1</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 10, 17, 25 hatları (UNESCO)</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+
+                <!-- 152 Evler -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('yuzde52evler')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">152 Evler PTT</h4>
+                                <p class="text-[10px] text-gray-text">152 Evler Mah. Eğitim Cad. No:27 D:29</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 3A, 3B, 4, 6 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Arabayatağı -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('arabayatagi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Arabayatağı PTT</h4>
+                                <p class="text-[10px] text-gray-text">Arabayatağı Mah. Arabayatağı Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">subway</span>
+                        <span>M1 Hattı - Arabayatağı durağı yanı</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Cumalıkızık -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('cumalikizik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Cumalıkızık PTT</h4>
+                                <p class="text-[10px] text-gray-text">Cumalıkızık Mah. Cumalıkızık Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 10, 17, 25 hatları (UNESCO)</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+
+                <!-- Davutdede -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('davutdede')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Davutdede PTT</h4>
+                                <p class="text-[10px] text-gray-text">Davutdede Mah. Davutdede Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Otobüs: 3A, 3B, 4, 6 hatları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- İnegöl ve Diğer İlçeler -->
+        <section class="animate-slide-up district-section" data-district="inegol" style="animation-delay: 0.7s">
+            <button onclick="toggleSection('inegolSection', 'inegolIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-posta-yellow/30 to-posta-yellow/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-posta-yellow">factory</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">İnegöl ve Diğer İlçeler</span>
+                        <span class="text-[10px] text-gray-text block truncate">Gemlik, Mudanya, Karacabey...</span>
+                    </div>
+                </div>
+                <span id="inegolIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="inegolSection" class="expandable-section mt-3 space-y-3">
+                <!-- İnegöl Merkez -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('inegolmerkez')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">İ</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl PTT Merkez</h4>
+                                <p class="text-[10px] text-gray-text">Cumhuriyet Mah. Atatürk Bulvarı No:45</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">location_on</span>
+                        <span>İnegöl ilçe merkezi</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-gold">Tapu</span>
+                    </div>
+                </div>
+
+                <!-- Gemlik -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('gemlik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">G</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik PTT</h4>
+                                <p class="text-[10px] text-gray-text">Cumhuriyet Mah. Atatürk Cad. No:78</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Gemlik merkez, otobüs terminali yakını</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Mudanya -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('mudanya')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">M</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mudanya PTT</h4>
+                                <p class="text-[10px] text-gray-text">Mütareke Mah. Sahil Cad. No:12</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">directions_bus</span>
+                        <span>Mudanya iskele bölgesi</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Karacabey -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('karacabey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">K</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Karacabey PTT</h4>
+                                <p class="text-[10px] text-gray-text">Hürriyet Mah. Atatürk Cad. No:34</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">location_on</span>
+                        <span>Karacabey ilçe merkezi</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Orhangazi -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('orhangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">O</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhangazi PTT</h4>
+                                <p class="text-[10px] text-gray-text">Cumhuriyet Mah. Atatürk Cad. No:56</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">location_on</span>
+                        <span>Orhangazi ilçe merkezi</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Yenişehir -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('yenisehir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-bank-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">Y</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yenişehir PTT</h4>
+                                <p class="text-[10px] text-gray-text">Cumhuriyet Mah. Atatürk Cad. No:23</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">location_on</span>
+                        <span>Yenişehir ilçe merkezi</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- İznik -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('iznik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-yellow flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-deep-teal">İ</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İznik PTT</h4>
+                                <p class="text-[10px] text-gray-text">Cumhuriyet Mah. Atatürk Cad. No:67</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">location_on</span>
+                        <span>İznik ilçe merkezi, tarihi surlar içi</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+
+                <!-- Mustafakemalpaşa -->
+                <div class="ptt-card rounded-xl p-4" onclick="openPTTDetail('mustafakemalpasa')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-posta-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">MK</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mustafakemalpaşa PTT</h4>
+                                <p class="text-[10px] text-gray-text">Cumhuriyet Mah. Atatürk Cad. No:89</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-posta-yellow">location_on</span>
+                        <span>Mustafakemalpaşa ilçe merkezi</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Posta</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-posta-yellow">Kargo</span>
+                        <span class="service-tag px-2 py-0.5 rounded text-[10px] text-bank-green">Bankacılık</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.8s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-3 gap-2">
+                <a href="https://epttavm.com" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-posta-yellow text-xl">local_shipping</span>
+                    <span class="text-[10px] text-center">E-PTT Kargo</span>
+                </a>
+                <button onclick="openPostalCodeModal()" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-gold text-xl">pin</span>
+                    <span class="text-[10px] text-center">Posta Kodu</span>
+                </button>
+                <a href="https://gonderitakip.ptt.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-posta-red text-xl">search</span>
+                    <span class="text-[10px] text-center">Kargo Takip</span>
+                </a>
+                <a href="yurtici-kargo.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-bank-green text-xl">inventory_2</span>
+                    <span class="text-[10px] text-center">Yurtiçi Kargo</span>
+                </a>
+                <a href="aras-kargo.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-posta-yellow text-xl">package</span>
+                    <span class="text-[10px] text-center">Aras Kargo</span>
+                </a>
+                <a href="mng-kargo.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-gold text-xl">local_shipping</span>
+                    <span class="text-[10px] text-center">MNG Kargo</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.9s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-posta-red">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-posta-red shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-posta-red mb-1">Önemli Bilgi</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            PTT şubelerinde <strong>Ziraat Bankası</strong> yetkili teller hizmeti bulunur. 
+                            Ancak tüm şubelerde olmayabilir. Bankacılık işlemleri için büyük merkez şubelerini (Heykel, Konak, Beyazıt) tercih edin. 
+                            Çalışma saatleri: <strong>08:30 - 17:30</strong> (Hafta içi)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+       <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-2 pb-4 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">home</span>
+                <span class="text-[9px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">explore</span>
+                <span class="text-[9px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 text-gold">
+                <div class="bg-gold/20 p-1.5 rounded-lg mb-0">
+                    <span class="material-symbols-outlined text-xl">search</span>
+                </div>
+                <span class="text-[9px] font-bold">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">person</span>
+                <span class="text-[9px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- PTT Detay Modalı -->
+    <div id="pttDetailModal" class="fixed inset-0 z-[80] modal-ptt hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closePTTDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">PTT Şubesi Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Postane Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-posta-yellow/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-posta-yellow text-3xl">local_post_office</span>
+                    </div>
+                    <div>
+                        <h2 id="modalPTTName" class="text-xl font-bold text-white mb-1">PTT Şubesi</h2>
+                        <p id="modalDistrict" class="text-sm text-gold">İlçe</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p class="text-sm text-white">Hafta İçi: 08:30 - 17:30</p>
+                            <p class="text-xs text-gray-text">Öğle Arası: 12:00 - 13:00</p>
+                            <p class="text-xs text-posta-red mt-1">Hafta Sonu: Kapalı</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">İletişim</p>
+                            <p class="text-sm text-white">444 1 788 (Çağrı Merkezi)</p>
+                            <p class="text-xs text-gray-text">Müşteri Hizmetleri 7/24</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    Verilen Hizmetler
+                </h3>
+
+                <div id="modalServices" class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-posta-yellow text-xl mb-1">mail</span>
+                        <p class="text-xs text-gray-text">Posta</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-posta-red text-xl mb-1">local_shipping</span>
+                        <p class="text-xs text-gray-text">Kargo</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-bank-green text-xl mb-1">account_balance</span>
+                        <p class="text-xs text-gray-text">Bankacılık</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-gold text-xl mb-1">real_estate_agent</span>
+                        <p class="text-xs text-gray-text">Tapu</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-posta-yellow text-xl mb-1">passport</span>
+                        <p class="text-xs text-gray-text">Pasaport</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-posta-red text-xl mb-1">local_atm</span>
+                        <p class="text-xs text-gray-text">PTTmatik</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım ve Otopark
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Hizmet Verilen Mahalleler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Hizmet Verilen Bölgeler
+                </h3>
+                <p id="modalMahalleler" class="text-xs text-gray-text leading-relaxed">
+                    <!-- Dinamik içerik -->
+                </p>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button onclick="callNumber('4441788')" class="flex-1 bg-posta-red/20 hover:bg-posta-red/30 border border-posta-red/50 text-posta-red py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    444 1 788 Ara
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posta Kodu Sorgulama Modalı -->
+    <div id="postalCodeModal" class="fixed inset-0 z-[80] modal-ptt hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closePostalCodeModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Posta Kodu Sorgula</h1>
+                        <p class="text-xs text-gray-text truncate">Adresinize ait posta kodunu öğrenin</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-posta-yellow/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-posta-yellow text-2xl">pin</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Online Sorgulama</h2>
+                        <p class="text-xs text-gray-text">ptt.gov.tr üzerinden sorgu yapın</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <a href="https://ptt.gov.tr/posta-kodu-sorgulama" target="_blank" class="w-full bg-posta-yellow/20 hover:bg-posta-yellow/30 border border-posta-yellow/50 text-posta-yellow py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">open_in_new</span>
+                        PTT.gov.tr'de Aç
+                    </a>
+                    
+                    <div class="bg-white/5 rounded-xl p-4">
+                        <p class="text-xs text-gray-text mb-2">Sorgulama için gerekenler:</p>
+                        <ul class="space-y-2 text-xs text-white">
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                <span>İl seçimi (Bursa)</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                <span>İlçe seçimi</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                <span>Mahalle/Semt adı</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                <span>Cadde/Sokak adı</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">phone</span>
+                    Telefonla Sorgulama
+                </h3>
+                <p class="text-xs text-gray-text mb-4">
+                    En yakın PTT şubesini arayarak veya 444 1 788 çağrı merkezini arayarak posta kodunuzu öğrenebilirsiniz.
+                </p>
+                <button onclick="callNumber('4441788')" class="w-full bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    444 1 788'i Ara
+                </button>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4">Popüler Posta Kodları</h3>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-white/5 rounded-lg p-2 flex justify-between">
+                        <span class="text-gray-text">Osmangazi Merkez</span>
+                        <span class="text-posta-yellow font-bold">16040</span>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-2 flex justify-between">
+                        <span class="text-gray-text">Nilüfer Merkez</span>
+                        <span class="text-posta-yellow font-bold">16100</span>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-2 flex justify-between">
+                        <span class="text-gray-text">Yıldırım Merkez</span>
+                        <span class="text-posta-yellow font-bold">16360</span>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-2 flex justify-between">
+                        <span class="text-gray-text">İnegöl</span>
+                        <span class="text-posta-yellow font-bold">16400</span>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-2 flex justify-between">
+                        <span class="text-gray-text">Gemlik</span>
+                        <span class="text-posta-yellow font-bold">16600</span>
+                    </div>
+                    <div class="bg-white/5 rounded-lg p-2 flex justify-between">
+                        <span class="text-gray-text">Mudanya</span>
+                        <span class="text-posta-yellow font-bold">16940</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bilgi Modalı -->
+    <div id="infoModal" class="fixed inset-0 z-[80] modal-ptt hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">PTT Hakkında</h1>
+                        <p class="text-xs text-gray-text truncate">Posta ve Telgraf Teşkilatı</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-posta-yellow/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-posta-yellow/20 flex items-center justify-center pulse-posta">
+                        <span class="material-symbols-outlined text-posta-yellow text-3xl">local_post_office</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-posta-yellow">PTT</h2>
+                        <p class="text-sm text-gray-text">1840'dan beri hizmetinizde</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Posta ve Telgraf Teşkilatı Anonim Şirketi, Türkiye'nin en köklü kuruluşlarından biridir. 
+                    Posta, kargo, bankacılık ve e-ticaret hizmetleri sunar.
+                </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <span class="material-symbols-outlined text-posta-yellow text-2xl mb-2">mail</span>
+                        <p class="text-lg font-bold text-posta-yellow">Posta</p>
+                        <p class="text-xs text-gray-text">Yurtiçi ve yurtdışı</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <span class="material-symbols-outlined text-posta-red text-2xl mb-2">local_shipping</span>
+                        <p class="text-lg font-bold text-posta-red">Kargo</p>
+                        <p class="text-xs text-gray-text">E-PTT Kargo</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <span class="material-symbols-outlined text-bank-green text-2xl mb-2">account_balance</span>
+                        <p class="text-lg font-bold text-bank-green">Bankacılık</p>
+                        <p class="text-xs text-gray-text">Ziraat Bankası işbirliği</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-4 text-center">
+                        <span class="material-symbols-outlined text-gold text-2xl mb-2">shopping_bag</span>
+                        <p class="text-lg font-bold text-gold">E-Ticaret</p>
+                        <p class="text-xs text-gray-text">E-PTT AVM</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4">İletişim</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-posta-red">phone</span>
+                        <div>
+                            <p class="text-sm text-white font-bold">444 1 788</p>
+                            <p class="text-xs text-gray-text">Müşteri Hizmetleri</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-posta-yellow">language</span>
+                        <div>
+                            <p class="text-sm text-white font-bold">ptt.gov.tr</p>
+                            <p class="text-xs text-gray-text">Resmi Web Sitesi</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-bank-green">smartphone</span>
+                        <div>
+                            <p class="text-sm text-white font-bold">E-PTT Mobil</p>
+                            <p class="text-xs text-gray-text">iOS ve Android</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PTT Veritabanı
+        const pttData = {
+            'heykel': {
+                name: 'Heykel PTT Merkez',
+                district: 'Osmangazi',
+                address: 'Alacamescit Mah. Atatürk Cad. No:56, Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'tapu', 'pasaport', 'pttmatik'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 3 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'local_parking', text: 'Heykel Meydanı otoparkı (ücretli, 100m)' },
+                    { icon: 'local_taxi', text: 'Taksi duraklarına 50m mesafe' }
+                ],
+                mahalleler: 'Alacamescit, Tophane, Altıparmak, Çekirge (kısmen), Kükürtlü (kısmen), Hüdavendigar',
+                mapQuery: 'Heykel PTT, Atatürk Caddesi, Osmangazi, Bursa'
+            },
+            'merkezmudurluk': {
+                name: 'Bursa Merkez Müdürlüğü',
+                district: 'Nilüfer',
+                address: 'Beşevler Mah. Yıldırım Cad. No:246, Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'tapu', 'pasaport', 'pttmatik'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı (200m yürüme)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Beşevler pazaryeri otoparkı (cumartesi hariç)' },
+                    { icon: 'local_taxi', text: 'Nilüfer taksi durağına 150m' }
+                ],
+                mahalleler: 'Beşevler, Konak, İhsaniye, Üniversite (kısmen)',
+                mapQuery: 'Bursa PTT Merkez Müdürlüğü, Nilüfer, Bursa'
+            },
+            'cekirge': {
+                name: 'Çekirge PTT',
+                district: 'Osmangazi',
+                address: 'Çekirge Mah. 1.Nilüfer Cad. No:149/B, Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çekirge durağı)' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 10 dk yürüme' },
+                    { icon: 'local_parking', text: 'Sokak içi park (sınırlı, 5-10 yer)' },
+                    { icon: 'pedal_bike', text: 'Bisiklet park alanı mevcut' }
+                ],
+                mahalleler: 'Çekirge, Kükürtlü (büyük bölüm), Muradiye (kısmen)',
+                mapQuery: 'Çekirge PTT, 1.Nilüfer Caddesi, Osmangazi, Bursa'
+            },
+            'gecit': {
+                name: 'Geçit PTT',
+                district: 'Osmangazi',
+                address: 'Geçit Mah. 2.Geçit Sk. No:9, Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Geçit İstasyonu (binanın yanı)' },
+                    { icon: 'local_parking', text: 'Geçit Metro İstasyonu otoparkı (ücretsiz)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 38, 94 hatları' },
+                    { icon: 'directions_walk', text: 'Metro istasyonundan 2 dk yürüme' }
+                ],
+                mahalleler: 'Geçit, Adnan Menderes (kısmen), Emek (kısmen)',
+                mapQuery: 'Geçit PTT, Osmangazi, Bursa'
+            },
+            'emek': {
+                name: 'Emek PTT',
+                district: 'Osmangazi',
+                address: 'Adnan Menderes Mah. Oğuz Han Cad., Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Emek İstasyonu (300m yürüme)' },
+                    { icon: 'local_parking', text: 'Emek Metro otoparkı (ücretli, 7/24 açık)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 38, 94 hatları' },
+                    { icon: 'local_taxi', text: 'Emek taksi durağına 150m' }
+                ],
+                mahalleler: 'Adnan Menderes (Emek), Geçit (kısmen), Soğanlı (kısmen)',
+                mapQuery: 'Emek PTT, Oğuz Han Caddesi, Osmangazi, Bursa'
+            },
+            'hamitler': {
+                name: 'Hamitler PTT',
+                district: 'Osmangazi',
+                address: 'Hamitler Mah. Ninehatun Cad., Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3G, 4, 5A, 6, 7, 8, 9, 10, 17 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı (100m ileride, ücretsiz)' },
+                    { icon: 'local_taxi', text: 'Hamitler merkez taksi durağına 200m' },
+                    { icon: 'pedal_bike', text: 'Bisiklet park alanı mevcut' }
+                ],
+                mahalleler: 'Hamitler, Soğanlı (kısmen), Altınova (kısmen)',
+                mapQuery: 'Hamitler PTT, Ninehatun Caddesi, Osmangazi, Bursa'
+            },
+            'soganli': {
+                name: 'Soğanlı PTT',
+                district: 'Osmangazi',
+                address: 'Soğanlı Mah. 1.Nilüfer Cad. No:149A, Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 38, 94 hatları (Soğanlı durağı)' },
+                    { icon: 'local_parking', text: 'Bulvar üzeri park (sınırlı, 30 dk limitli)' },
+                    { icon: 'local_taxi', text: 'Soğanlı taksi durağı mevcut' }
+                ],
+                mahalleler: 'Soğanlı, Hamitler (kısmen), Altınova (kısmen)',
+                mapQuery: 'Soğanlı PTT, Osmangazi, Bursa'
+            },
+            'altinova': {
+                name: 'Altınova PTT',
+                district: 'Osmangazi',
+                address: 'Altınova Mah. İstanbul Cad., Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 2/A, 3, 4, 38 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı (ASM arkası, ücretsiz)' },
+                    { icon: 'local_taxi', text: 'Altınova taksi durağına 300m' }
+                ],
+                mahalleler: 'Altınova, Hamitler (kısmen), Soğanlı (kısmen)',
+                mapQuery: 'Altınova PTT, İstanbul Caddesi, Osmangazi, Bursa'
+            },
+            'demirtas': {
+                name: 'Demirtaş PTT',
+                district: 'Osmangazi',
+                address: 'Demirtaş Mah. Demirtaş Cad., Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' },
+                    { icon: 'local_parking', text: 'Demirtaş merkez otoparkı (ücretsiz)' },
+                    { icon: 'local_taxi', text: 'Demirtaş taksi durağı mevcut' }
+                ],
+                mahalleler: 'Demirtaş, Duaçınarı (kısmen), Arabayatağı (kısmen)',
+                mapQuery: 'Demirtaş PTT, Osmangazi, Bursa'
+            },
+            'panayir': {
+                name: 'Panayır PTT',
+                district: 'Osmangazi',
+                address: 'Panayır Mah. Panayır Cad., Osmangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4, 5A hatları' },
+                    { icon: 'local_parking', text: 'Panayır pazaryeri otoparkı (cumartesi hariç)' },
+                    { icon: 'local_taxi', text: 'Panayır taksi durağı mevcut' }
+                ],
+                mahalleler: 'Panayır, Hüdavendigar (kısmen), Alemdar (kısmen)',
+                mapQuery: 'Panayır PTT, Osmangazi, Bursa'
+            },
+            'konak': {
+                name: 'Konak PTT',
+                district: 'Nilüfer',
+                address: 'Konak Mah. Kudret Sok. No:20, Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'tapu', 'pttmatik'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı + 10 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'İş merkezi otoparkı (ücretli, 100m)' },
+                    { icon: 'local_taxi', text: 'Konak taksi durağına 150m' }
+                ],
+                mahalleler: 'Konak, Beşevler (kısmen), İhsaniye (kısmen)',
+                mapQuery: 'Konak PTT, Kudret Sokak, Nilüfer, Bursa'
+            },
+            'ozluce': {
+                name: 'Özlüce PTT',
+                district: 'Nilüfer',
+                address: 'Özlüce Mah. 167. Sokak, Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Sokak içi park (geniş alan, ücretsiz)' },
+                    { icon: 'pedal_bike', text: 'Bisiklet park alanı mevcut' }
+                ],
+                mahalleler: 'Özlüce, Görükle (kısmen), Hasanağa (kısmen)',
+                mapQuery: 'Özlüce PTT, Nilüfer, Bursa'
+            },
+            'universite': {
+                name: 'Üniversite PTT',
+                district: 'Nilüfer',
+                address: 'Üniversite Mah. Üniversite Cad., Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'subway', text: 'M2 Hattı - Üniversite durağı (yanında)' },
+                    { icon: 'local_parking', text: 'Üniversite kampüs otoparkı (ücretli)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' }
+                ],
+                mahalleler: 'Üniversite, Görükle (kısmen)',
+                mapQuery: 'Üniversite PTT, Nilüfer, Bursa'
+            },
+            'gorukle': {
+                name: 'Görükle PTT',
+                district: 'Nilüfer',
+                address: 'Görükle Mah. Görükle Cad., Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Görükle merkez otoparkı (ücretsiz)' }
+                ],
+                mahalleler: 'Görükle, Üniversite (kısmen), Özlüce (kısmen)',
+                mapQuery: 'Görükle PTT, Nilüfer, Bursa'
+            },
+            'besevler': {
+                name: 'Beşevler PTT',
+                district: 'Nilüfer',
+                address: 'Beşevler Mah. Beşevler Cad. No:246, Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'tapu', 'pttmatik'],
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Beşevler pazaryeri otoparkı (cumartesi hariç)' }
+                ],
+                mahalleler: 'Beşevler, Konak (kısmen), İhsaniye (kısmen)',
+                mapQuery: 'Beşevler PTT, Nilüfer, Bursa'
+            },
+            'ihsaniye': {
+                name: 'İhsaniye PTT',
+                district: 'Nilüfer',
+                address: 'İhsaniye Mah. Değirmen Sok. No:45, Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Metrobus + otobüs bağlantısı' },
+                    { icon: 'local_parking', text: 'Plaza otoparkları (ücretli, 200m)' },
+                    { icon: 'local_taxi', text: 'FSM Bulvarı taksi durakları' }
+                ],
+                mahalleler: 'İhsaniye, Konak (kısmen), Beşevler (kısmen)',
+                mapQuery: 'İhsaniye PTT, Nilüfer, Bursa'
+            },
+            'fethiye': {
+                name: 'Fethiye PTT',
+                district: 'Nilüfer',
+                address: 'Fethiye Mah. Fethiye Cad., Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı mevcut' }
+                ],
+                mahalleler: 'Fethiye, Çalı (kısmen), Hasanağa (kısmen)',
+                mapQuery: 'Fethiye PTT, Nilüfer, Bursa'
+            },
+            'cali': {
+                name: 'Çalı PTT',
+                district: 'Nilüfer',
+                address: 'Çalı Mah. Çalı Cad., Nilüfer/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Çalı merkez otoparkı (ücretsiz)' }
+                ],
+                mahalleler: 'Çalı, Fethiye (kısmen), Akçalar (kısmen)',
+                mapQuery: 'Çalı PTT, Nilüfer, Bursa'
+            },
+            'beyazit': {
+                name: 'Beyazıt PTT',
+                district: 'Yıldırım',
+                address: 'Beyazıt Mah. 1. Beyazıt Cad. No:45, Yıldırım/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Beyazıt meydanı otoparkı (ücretsiz)' },
+                    { icon: 'local_taxi', text: 'Beyazıt taksi durağı mevcut' }
+                ],
+                mahalleler: 'Beyazıt, Davutdede (kısmen), Hacıseyfettin (kısmen)',
+                mapQuery: 'Beyazıt PTT, Yıldırım, Bursa'
+            },
+            'degirmenlikizik': {
+                name: 'Değirmenlikızık PTT',
+                district: 'Yıldırım',
+                address: 'Değirmenlikızık Mah. Dalyan Sk. 6/1, Yıldırım/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 10, 17, 25 hatları (UNESCO bölgesi)' },
+                    { icon: 'local_parking', text: 'Köy meydanı otopark (ücretsiz, 200m)' },
+                    { icon: 'pedal_bike', text: 'Bisiklet kiralama noktası mevcut' },
+                    { icon: 'directions_walk', text: 'Tarihi evler bölgesine yürüme mesafesi' }
+                ],
+                mahalleler: 'Değirmenlikızık (UNESCO Dünya Mirası)',
+                mapQuery: 'Değirmenlikızık PTT, Yıldırım, Bursa'
+            },
+            'yuzde52evler': {
+                name: '152 Evler PTT',
+                district: 'Yıldırım',
+                address: '152 Evler Mah. Eğitim Cad. No:27 D:29, Yıldırım/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 6 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı mevcut' }
+                ],
+                mahalleler: '152 Evler, Davutdede (kısmen), Beyazıt (kısmen)',
+                mapQuery: '152 Evler PTT, Yıldırım, Bursa'
+            },
+            'arabayatagi': {
+                name: 'Arabayatağı PTT',
+                district: 'Yıldırım',
+                address: 'Arabayatağı Mah. Arabayatağı Cad., Yıldırım/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Arabayatağı durağı (yakınında)' },
+                    { icon: 'local_parking', text: 'Metro otoparkı (ücretli)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' }
+                ],
+                mahalleler: 'Arabayatağı, Akçağlayan (kısmen), Baruthane (kısmen)',
+                mapQuery: 'Arabayatağı PTT, Yıldırım, Bursa'
+            },
+            'cumalikizik': {
+                name: 'Cumalıkızık PTT',
+                district: 'Yıldırım',
+                address: 'Cumalıkızık Mah. Cumalıkızık Cad., Yıldırım/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 10, 17, 25 hatları (UNESCO bölgesi)' },
+                    { icon: 'local_parking', text: 'Köy giriş otoparkı (ücretsiz)' },
+                    { icon: 'pedal_bike', text: 'Bisiklet kiralama mevcut' }
+                ],
+                mahalleler: 'Cumalıkızık (UNESCO Dünya Mirası)',
+                mapQuery: 'Cumalıkızık PTT, Yıldırım, Bursa'
+            },
+            'davutdede': {
+                name: 'Davutdede PTT',
+                district: 'Yıldırım',
+                address: 'Davutdede Mah. Davutdede Cad., Yıldırım/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 6 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı mevcut' }
+                ],
+                mahalleler: 'Davutdede, Beyazıt (kısmen), Ankara Yolu (kısmen)',
+                mapQuery: 'Davutdede PTT, Yıldırım, Bursa'
+            },
+            'inegolmerkez': {
+                name: 'İnegöl PTT Merkez',
+                district: 'İnegöl',
+                address: 'Cumhuriyet Mah. Atatürk Bulvarı No:45, İnegöl/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'tapu', 'pttmatik'],
+                transport: [
+                    { icon: 'location_on', text: 'İnegöl ilçe merkezi' },
+                    { icon: 'directions_bus', text: 'İnegöl terminaline 500m' },
+                    { icon: 'local_parking', text: 'Atatürk Bulvarı otoparkları' }
+                ],
+                mahalleler: 'Cumhuriyet, Mahmudiye, Osmaniye, Süleymaniye',
+                mapQuery: 'İnegöl PTT, Atatürk Bulvarı, İnegöl, Bursa'
+            },
+            'gemlik': {
+                name: 'Gemlik PTT',
+                district: 'Gemlik',
+                address: 'Cumhuriyet Mah. Atatürk Cad. No:78, Gemlik/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Gemlik merkez, otobüs terminali yakını' },
+                    { icon: 'directions_boat', text: 'İstanbul deniz otobüsü iskelesine 300m' },
+                    { icon: 'local_parking', text: 'Terminal otoparkı (ücretli)' }
+                ],
+                mahalleler: 'Cumhuriyet, Hamidiye, Küçükkumla, Umurbey',
+                mapQuery: 'Gemlik PTT, Atatürk Caddesi, Gemlik, Bursa'
+            },
+            'mudanya': {
+                name: 'Mudanya PTT',
+                district: 'Mudanya',
+                address: 'Mütareke Mah. Sahil Cad. No:12, Mudanya/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'directions_bus', text: 'Mudanya iskele bölgesi' },
+                    { icon: 'directions_boat', text: 'Bursa deniz otobüsü iskelesi yanı' },
+                    { icon: 'local_parking', text: 'İskele otoparkı (ücretli)' }
+                ],
+                mahalleler: 'Mütareke, Güzelyalı, Esence, Aydınpınar',
+                mapQuery: 'Mudanya PTT, Sahil Caddesi, Mudanya, Bursa'
+            },
+            'karacabey': {
+                name: 'Karacabey PTT',
+                district: 'Karacabey',
+                address: 'Hürriyet Mah. Atatürk Cad. No:34, Karacabey/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'location_on', text: 'Karacabey ilçe merkezi' },
+                    { icon: 'directions_bus', text: 'Karacabey terminaline 200m' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otoparkları' }
+                ],
+                mahalleler: 'Hürriyet, Gaziosmanpaşa, Yeniköy, Hacıahmetler',
+                mapQuery: 'Karacabey PTT, Atatürk Caddesi, Karacabey, Bursa'
+            },
+            'orhangazi': {
+                name: 'Orhangazi PTT',
+                district: 'Orhangazi',
+                address: 'Cumhuriyet Mah. Atatürk Cad. No:56, Orhangazi/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'location_on', text: 'Orhangazi ilçe merkezi' },
+                    { icon: 'directions_bus', text: 'Orhangazi terminaline 300m' },
+                    { icon: 'directions_boat', text: 'Yalova feribot iskelesine 2km' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otoparkları' }
+                ],
+                mahalleler: 'Cumhuriyet, Kemerpaşa, Mecidiye, Yeniköy',
+                mapQuery: 'Orhangazi PTT, Atatürk Caddesi, Orhangazi, Bursa'
+            },
+            'yenisehir': {
+                name: 'Yenişehir PTT',
+                district: 'Yenişehir',
+                address: 'Cumhuriyet Mah. Atatürk Cad. No:23, Yenişehir/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'location_on', text: 'Yenişehir ilçe merkezi' },
+                    { icon: 'directions_bus', text: 'Yenişehir terminaline 400m' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otoparkları' }
+                ],
+                mahalleler: 'Cumhuriyet, Yenigün, Kurtuluş, Bayraklı',
+                mapQuery: 'Yenişehir PTT, Atatürk Caddesi, Yenişehir, Bursa'
+            },
+            'iznik': {
+                name: 'İznik PTT',
+                district: 'İznik',
+                address: 'Cumhuriyet Mah. Atatürk Cad. No:67, İznik/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'location_on', text: 'İznik ilçe merkezi, tarihi surlar içi' },
+                    { icon: 'directions_bus', text: 'İznik terminaline 500m' },
+                    { icon: 'directions_boat', text: 'İznik Gölü kıyısına 1km' },
+                    { icon: 'local_parking', text: 'Tarihi sur dışı otoparklar' }
+                ],
+                mahalleler: 'Cumhuriyet, Bayındır, Hacıosman, Mustafaca',
+                mapQuery: 'İznik PTT, Atatürk Caddesi, İznik, Bursa'
+            },
+            'mustafakemalpasa': {
+                name: 'Mustafakemalpaşa PTT',
+                district: 'Mustafakemalpaşa',
+                address: 'Cumhuriyet Mah. Atatürk Cad. No:89, Mustafakemalpaşa/Bursa',
+                phone: '444 1 788',
+                services: ['posta', 'kargo', 'bankacilik', 'pttmatik'],
+                transport: [
+                    { icon: 'location_on', text: 'Mustafakemalpaşa ilçe merkezi' },
+                    { icon: 'directions_bus', text: 'Terminaline 300m' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otoparkları' }
+                ],
+                mahalleler: 'Cumhuriyet, Hamidiye, Yeşilova, Karaoğlan',
+                mapQuery: 'Mustafakemalpaşa PTT, Atatürk Caddesi, Mustafakemalpaşa, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // District Filter
+        let currentDistrict = 'all';
+        function filterDistrict(district) {
+            currentDistrict = district;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + district).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.district-section');
+            sections.forEach(section => {
+                if (district === 'all' || section.dataset.district === district) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search PTT
+        function searchPTT() {
+            const searchTerm = document.getElementById('pttSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.ptt-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open PTT Detail Modal
+        function openPTTDetail(pttId) {
+            const ptt = pttData[pttId];
+            if (!ptt) return;
+
+            document.getElementById('modalPTTName').textContent = ptt.name;
+            document.getElementById('modalDistrict').textContent = ptt.district + ' İlçesi';
+            document.getElementById('modalAddress').textContent = ptt.address;
+            document.getElementById('modalMahalleler').textContent = ptt.mahalleler;
+
+            // Hizmetleri göster
+            const servicesContainer = document.getElementById('modalServices');
+            servicesContainer.innerHTML = '';
+            const serviceNames = {
+                'posta': { name: 'Posta', icon: 'mail', color: 'text-posta-yellow' },
+                'kargo': { name: 'Kargo', icon: 'local_shipping', color: 'text-posta-red' },
+                'bankacilik': { name: 'Bankacılık', icon: 'account_balance', color: 'text-bank-green' },
+                'tapu': { name: 'Tapu', icon: 'real_estate_agent', color: 'text-gold' },
+                'pasaport': { name: 'Pasaport', icon: 'passport', color: 'text-posta-yellow' },
+                'pttmatik': { name: 'PTTmatik', icon: 'local_atm', color: 'text-posta-red' }
+            };
+
+            ptt.services.forEach(service => {
+                const info = serviceNames[service];
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 rounded-xl p-3 text-center';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined ${info.color} text-xl mb-1">${info.icon}</span>
+                    <p class="text-xs text-gray-text">${info.name}</p>
+                `;
+                servicesContainer.appendChild(div);
+            });
+
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            ptt.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Harita butonunu güncelle
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${ptt.mapQuery}')`);
+
+            document.getElementById('pttDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close PTT Detail Modal
+        function closePTTDetail() {
+            document.getElementById('pttDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Postal Code Modal
+        function openPostalCodeModal() {
+            document.getElementById('postalCodeModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePostalCodeModal() {
+            document.getElementById('postalCodeModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Info Modal
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        // Initialize - Tüm bölümler kapalı başlar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hepsi kapalı, tıklayınca açılır
+        });
+       
+    </script>
+
+</body>
+</html>

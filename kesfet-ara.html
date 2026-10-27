@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CityJoy - Ara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #081F24;
+            color: #f1f5f9;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 20;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Video Grid Item */
+        .video-grid-item {
+            position: relative;
+            aspect-ratio: 9/16;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .video-grid-item:hover {
+            transform: scale(1.02);
+        }
+        .video-grid-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+        }
+        .video-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px;
+        }
+        .play-icon-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(224, 176, 122, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .video-grid-item:hover .play-icon-overlay {
+            opacity: 1;
+        }
+        .views-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        /* Search Bar */
+        .search-container {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(8, 31, 36, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(63, 110, 112, 0.2);
+        }
+        .search-input {
+            background: rgba(23, 70, 75, 0.5);
+            border: 1px solid rgba(63, 110, 112, 0.3);
+            transition: all 0.3s;
+        }
+        .search-input:focus {
+            background: rgba(23, 70, 75, 0.8);
+            border-color: #E0B07A;
+            outline: none;
+        }
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(23, 70, 75, 0.5) 25%, rgba(63, 110, 112, 0.3) 50%, rgba(23, 70, 75, 0.5) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        /* Video Modal */
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-enter {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        .overlay-enter {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+        /* Full Screen Video Player */
+        .fullscreen-player {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        .fullscreen-player video {
+            flex: 1;
+            width: 100%;
+            object-fit: contain;
+        }
+        .player-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        }
+        /* Bottom Menu */
+        .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: rgba(10, 42, 47, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(63, 110, 112, 0.3);
+            z-index: 50;
+        }
+    </style>
+<base target="_self">
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- Search Header -->
+    <div class="search-container px-4 py-3">
+        <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9FB6B8] text-[20px]">search</span>
+            <input 
+                type="text" 
+                id="searchInput"
+                placeholder="Video, kullanıcı veya etiket ara..." 
+                class="search-input w-full pl-10 pr-10 py-3 rounded-full text-[14px] text-[#C7D8DA] placeholder-[#6E8C8E]"
+            />
+            <button onclick="clearSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#9FB6B8] hover:text-[#C7D8DA]">
+                <span class="material-symbols-outlined text-[20px]" id="clearBtn" style="display:none;">close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="px-2 pt-2 pb-24">
+        
+        <!-- Loading State -->
+        <div id="loading-state" class="grid grid-cols-3 gap-1">
+            ${Array(12).fill(0).map(() => `
+                <div class="skeleton aspect-[9/16] rounded-lg"></div>
+            `).join('')}
+        </div>
+
+        <!-- Video Grid -->
+        <div id="video-grid" class="grid grid-cols-3 gap-1 hidden">
+            <!-- Videos will be loaded here -->
+        </div>
+
+        <!-- Load More -->
+        <div id="load-more" class="flex justify-center py-6 hidden">
+            <button onclick="loadMoreVideos()" class="flex items-center gap-2 px-6 py-2 bg-[#17464B] rounded-full text-[12px] text-[#C7D8DA] hover:bg-[#1d5258] transition-colors">
+                <span class="material-symbols-outlined text-[16px]">refresh</span>
+                Daha Fazla
+            </button>
+        </div>
+
+        <!-- No Results -->
+        <div id="no-results" class="hidden flex flex-col items-center justify-center py-20">
+            <span class="material-symbols-outlined text-[48px] text-[#3F6E70] mb-4">search_off</span>
+            <p class="text-[14px] text-[#9FB6B8]">Sonuç bulunamadı</p>
+        </div>
+    </main>
+
+    <!-- Bottom Menu -->
+    <footer class="bottom-menu px-6 pt-3 pb-8">
+        <div class="flex items-center justify-between">
+            <a href="kesfet-genel.html" class="flex flex-col items-center cursor-pointer text-[#6E8C8E] hover:text-[#9FB6B8] transition-colors py-2 px-2">
+                <span class="material-symbols-outlined text-[24px]">explore</span>
+                <span class="text-[9px] mt-1">Keşfet</span>
+            </a>
+            <a href="reels.html" class="flex flex-col items-center cursor-pointer text-[#6E8C8E] hover:text-[#9FB6B8] transition-colors py-2 px-2">
+                <span class="material-symbols-outlined text-[24px]">play_arrow</span>
+                <span class="text-[9px] mt-1">Reels</span>
+            </a>
+            <a href="mesajlar.html" class="flex flex-col items-center cursor-pointer text-[#6E8C8E] hover:text-[#9FB6B8] transition-colors py-2 px-2 relative">
+                <span class="material-symbols-outlined text-[24px]">chat</span>
+                <span class="text-[9px] mt-1">Mesajlar</span>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-[#E0B07A] rounded-full"></span>
+            </a>
+            <a href="kesfet-ara.html" class="flex flex-col items-center cursor-pointer text-[#E0B07A] py-2 px-2 relative">
+                <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">search</span>
+                <span class="text-[9px] mt-1 font-medium">Ara</span>
+                <span class="absolute -bottom-1 w-1 h-1 bg-[#E0B07A] rounded-full"></span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center cursor-pointer text-[#6E8C8E] hover:text-[#9FB6B8] transition-colors py-2 px-2">
+                <span class="material-symbols-outlined text-[24px]">person</span>
+                <span class="text-[9px] mt-1">Profil</span>
+            </a>
+        </div>
+    </footer>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="fixed inset-0 z-[100] hidden">
+        <div class="fullscreen-player">
+            <video id="modalVideo" loop playsinline></video>
+            
+            <!-- Close Button -->
+            <button onclick="closeVideoModal()" class="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-[24px]">close</span>
+            </button>
+
+            <!-- Video Info Overlay -->
+            <div class="player-controls">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-[#17464B] overflow-hidden border border-[#E0B07A]/30">
+                        <img id="modalAvatar" src="" class="w-full h-full object-cover"/>
+                    </div>
+                    <div class="flex-1">
+                        <p id="modalUsername" class="text-[14px] font-semibold text-white"></p>
+                        <p id="modalDesc" class="text-[12px] text-white/70 line-clamp-1"></p>
+                    </div>
+                    <button class="follow-btn bg-[#E0B07A] text-[#081F24] px-4 py-1.5 rounded-full text-[12px] font-medium">
+                        Takip Et
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full h-1 bg-white/30 rounded-full mb-4 cursor-pointer" onclick="seekVideo(event)">
+                    <div id="progressBar" class="h-full bg-[#E0B07A] rounded-full" style="width: 0%"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleModalPlay()" class="text-white">
+                            <span class="material-symbols-outlined text-[32px]" id="modalPlayBtn">pause</span>
+                        </button>
+                        <button onclick="toggleModalMute()" class="text-white">
+                            <span class="material-symbols-outlined text-[28px]" id="modalMuteBtn">volume_up</span>
+                        </button>
+                        <span id="modalTime" class="text-[12px] text-white/80">0:00 / 0:00</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button onclick="likeVideo()" class="flex items-center gap-1 text-white">
+                            <span class="material-symbols-outlined text-[24px]" id="modalLikeBtn">favorite</span>
+                            <span class="text-[12px]" id="modalLikeCount">0</span>
+                        </button>
+                        <button onclick="shareVideo()" class="text-white">
+                            <span class="material-symbols-outlined text-[24px]">share</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Video Data (12 videos per page)
+        const videoDatabase = [
+            {
+                id: 1,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=600&fit=crop',
+                views: '1.2M',
+                likes: 45600,
+                username: 'haber_kanal',
+                avatar: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&h=100&fit=crop',
+                description: 'Son dakika: Önemli gelişme #haber #gündem',
+                duration: '0:45'
+            },
+            {
+                id: 2,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=600&fit=crop',
+                views: '890K',
+                likes: 32100,
+                username: 'spor_tv',
+                avatar: 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=100&h=100&fit=crop',
+                description: 'Muhteşem gol! ⚽🔥 #spor #futbol',
+                duration: '0:32'
+            },
+            {
+                id: 3,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=600&fit=crop',
+                views: '2.1M',
+                likes: 67800,
+                username: 'muzik_dunyasi',
+                avatar: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&h=100&fit=crop',
+                description: 'Yeni şarkı tanıtımı 🎵 #müzik #yeni',
+                duration: '0:58'
+            },
+            {
+                id: 4,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=600&fit=crop',
+                views: '567K',
+                likes: 23400,
+                username: 'seyahatci',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
+                description: 'Muhteşem manzara 🏔️ #seyahat #doğa',
+                duration: '0:41'
+            },
+            {
+                id: 5,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=600&fit=crop',
+                views: '3.4M',
+                likes: 89200,
+                username: 'eglence_kanal',
+                avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+                description: 'Komik anlar 😂 #komedi #eğlence',
+                duration: '0:28'
+            },
+            {
+                id: 6,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=400&h=600&fit=crop',
+                views: '1.8M',
+                likes: 54300,
+                username: 'araba_dunyasi',
+                avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop',
+                description: 'Yeni model tanıtımı 🚗 #araba #otomobil',
+                duration: '1:12'
+            },
+            {
+                id: 7,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=600&fit=crop',
+                views: '920K',
+                likes: 28900,
+                username: 'yemek_tarifleri',
+                avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop',
+                description: 'Nefis tarif 🍳 #yemek #tarif',
+                duration: '0:55'
+            },
+            {
+                id: 8,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop',
+                views: '4.5M',
+                likes: 123000,
+                username: 'film_kanal',
+                avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
+                description: 'Yeni fragman 🎬 #film #sinema',
+                duration: '2:15'
+            },
+            {
+                id: 9,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=600&fit=crop',
+                views: '1.1M',
+                likes: 36700,
+                username: 'dogada_yasam',
+                avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop',
+                description: 'Kamp hayatı ⛺ #kamp #doğa',
+                duration: '0:48'
+            },
+            {
+                id: 10,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1535016120720-40c646be5580?w=400&h=600&fit=crop',
+                views: '2.3M',
+                likes: 78900,
+                username: 'bilim_kurgu',
+                avatar: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop',
+                description: 'Bilim kurgu kısa film 🚀 #bilimkurgu #film',
+                duration: '3:42'
+            },
+            {
+                id: 11,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=600&fit=crop',
+                views: '780K',
+                likes: 21500,
+                username: 'test_suruşu',
+                avatar: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop',
+                description: 'Detaylı inceleme 🚙 #test #inceleme',
+                duration: '1:25'
+            },
+            {
+                id: 12,
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=600&fit=crop',
+                views: '1.5M',
+                likes: 43200,
+                username: 'moda_dunyasi',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop',
+                description: 'Yeni koleksiyon 👗 #moda #stil',
+                duration: '0:38'
+            }
+        ];
+
+        let currentVideos = [];
+        let currentPage = 1;
+        let currentVideoIndex = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                loadVideos();
+            }, 1500); // Simulate loading
+
+            // Search input listener
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+        });
+
+        function loadVideos() {
+            const loadingState = document.getElementById('loading-state');
+            const videoGrid = document.getElementById('video-grid');
+            const loadMoreBtn = document.getElementById('load-more');
+
+            loadingState.classList.add('hidden');
+            videoGrid.classList.remove('hidden');
+            loadMoreBtn.classList.remove('hidden');
+
+            // Add 12 videos
+            const startIndex = (currentPage - 1) * 12;
+            const endIndex = startIndex + 12;
+            const videosToLoad = videoDatabase.slice(startIndex, endIndex);
+
+            videosToLoad.forEach((video, index) => {
+                currentVideos.push(video);
+                const videoElement = createVideoElement(video, startIndex + index);
+                videoGrid.appendChild(videoElement);
+            });
+        }
+
+        function createVideoElement(video, index) {
+            const div = document.createElement('div');
+            div.className = 'video-grid-item';
+            div.onclick = () => openVideoModal(index);
+            div.innerHTML = `
+                <img src="${video.thumbnail}" class="w-full h-full object-cover" alt="${video.description}">
+                <div class="video-overlay"></div>
+                <div class="views-badge">
+                    <span class="material-symbols-outlined text-[12px]">play_arrow</span>
+                    ${video.views}
+                </div>
+                <div class="play-icon-overlay">
+                    <span class="material-symbols-outlined text-[#081F24] text-[20px]">play_arrow</span>
+                </div>
+                <div class="video-info">
+                    <p class="text-[11px] font-medium text-white line-clamp-2 leading-tight">${video.description}</p>
+                    <p class="text-[10px] text-white/70 mt-1">${video.duration}</p>
+                </div>
+            `;
+            return div;
+        }
+
+        function loadMoreVideos() {
+            currentPage++;
+            // Simulate loading more (in real app, fetch from API)
+            const loadMoreBtn = document.getElementById('load-more');
+            loadMoreBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] spinner">refresh</span> Yükleniyor...';
+            
+            setTimeout(() => {
+                // Duplicate videos with different IDs for demo
+                const newVideos = videoDatabase.map(v => ({
+                    ...v,
+                    id: v.id + (currentPage * 100),
+                    views: formatNumber(parseInt(v.views.replace(/[^0-9]/g, '')) + Math.floor(Math.random() * 100000))
+                }));
+                
+                const videoGrid = document.getElementById('video-grid');
+                newVideos.forEach((video, index) => {
+                    currentVideos.push(video);
+                    const videoElement = createVideoElement(video, currentVideos.length - 1);
+                    videoGrid.appendChild(videoElement);
+                });
+
+                loadMoreBtn.innerHTML = `
+                    <span class="material-symbols-outlined text-[16px]">refresh</span>
+                    Daha Fazla
+                `;
+            }, 1000);
+        }
+
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            const clearBtn = document.getElementById('clearBtn');
+            const videoGrid = document.getElementById('video-grid');
+            const noResults = document.getElementById('no-results');
+
+            clearBtn.style.display = query ? 'block' : 'none';
+
+            if (!query) {
+                // Show all videos
+                Array.from(videoGrid.children).forEach(child => {
+                    child.style.display = 'block';
+                });
+                noResults.classList.add('hidden');
+                return;
+            }
+
+            // Filter videos
+            let visibleCount = 0;
+            Array.from(videoGrid.children).forEach((child, index) => {
+                const video = currentVideos[index];
+                const match = video && (
+                    video.description.toLowerCase().includes(query) ||
+                    video.username.toLowerCase().includes(query) ||
+                    video.description.includes('#' + query)
+                );
+                
+                child.style.display = match ? 'block' : 'none';
+                if (match) visibleCount++;
+            });
+
+            noResults.classList.toggle('hidden', visibleCount > 0);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearBtn').style.display = 'none';
+            handleSearch({ target: { value: '' } });
+        }
+
+        // Video Modal Functions
+        function openVideoModal(index) {
+            currentVideoIndex = index;
+            const video = currentVideos[index];
+            const modal = document.getElementById('videoModal');
+            const modalVideo = document.getElementById('modalVideo');
+            
+            modalVideo.src = video.url;
+            document.getElementById('modalAvatar').src = video.avatar;
+            document.getElementById('modalUsername').textContent = '@' + video.username;
+            document.getElementById('modalDesc').textContent = video.description;
+            document.getElementById('modalLikeCount').textContent = formatNumber(video.likes);
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            modalVideo.play();
+            updateProgress();
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const modalVideo = document.getElementById('modalVideo');
+            
+            modalVideo.pause();
+            modalVideo.src = '';
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function toggleModalPlay() {
+            const video = document.getElementById('modalVideo');
+            const btn = document.getElementById('modalPlayBtn');
+            
+            if (video.paused) {
+                video.play();
+                btn.textContent = 'pause';
+            } else {
+                video.pause();
+                btn.textContent = 'play_arrow';
+            }
+        }
+
+        function toggleModalMute() {
+            const video = document.getElementById('modalVideo');
+            const btn = document.getElementById('modalMuteBtn');
+            
+            video.muted = !video.muted;
+            btn.textContent = video.muted ? 'volume_off' : 'volume_up';
+        }
+
+        function updateProgress() {
+            const video = document.getElementById('modalVideo');
+            const progressBar = document.getElementById('progressBar');
+            const timeDisplay = document.getElementById('modalTime');
+            
+            video.addEventListener('timeupdate', () => {
+                const progress = (video.currentTime / video.duration) * 100;
+                progressBar.style.width = progress + '%';
+                
+                const current = formatTime(video.currentTime);
+                const total = formatTime(video.duration);
+                timeDisplay.textContent = `${current} / ${total}`;
+            });
+        }
+
+        function seekVideo(e) {
+            const video = document.getElementById('modalVideo');
+            const rect = e.currentTarget.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            video.currentTime = pos * video.duration;
+        }
+
+        function likeVideo() {
+            const btn = document.getElementById('modalLikeBtn');
+            const count = document.getElementById('modalLikeCount');
+            const isLiked = btn.style.fontVariationSettings === "'FILL' 1";
+            
+            if (isLiked) {
+                btn.style.fontVariationSettings = "'FILL' 0";
+                btn.style.color = '';
+            } else {
+                btn.style.fontVariationSettings = "'FILL' 1";
+                btn.style.color = '#E0B07A';
+            }
+        }
+
+        function shareVideo() {
+            // Share functionality
+            alert('Paylaş menüsü açıldı');
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+            }
+        });
+
+        // Swipe to next/prev video
+        let touchStartY = 0;
+        document.getElementById('videoModal')?.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.getElementById('videoModal')?.addEventListener('touchend', (e) => {
+            const touchEndY = e.changedTouches[0].clientY;
+            const diff = touchStartY - touchEndY;
+            
+            if (Math.abs(diff) > 50) {
+                if (diff > 0 && currentVideoIndex < currentVideos.length - 1) {
+                    // Swipe up - next video
+                    openVideoModal(currentVideoIndex + 1);
+                } else if (diff < 0 && currentVideoIndex > 0) {
+                    // Swipe down - prev video
+                    openVideoModal(currentVideoIndex - 1);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

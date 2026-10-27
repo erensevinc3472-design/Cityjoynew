@@ -1,0 +1,1568 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy - Park ve Pazar Rehberi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "announcement-blue": "#4A90E2",
+                        "navy-dark": "#081F24"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    },
+                    spacing: {
+                        'safe-bottom': 'env(safe-area-inset-bottom, 24px)',
+                        'nav-height': '80px',
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom, 24px));
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            box-shadow: 0 4px 15px rgba(224, 176, 122, 0.3);
+        }
+        .tab-inactive {
+            background: rgba(255, 255, 255, 0.05);
+            color: #A0B0B5;
+            border: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .district-chip, .day-chip {
+            transition: all 0.3s ease;
+        }
+        .district-chip.active, .day-chip.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            font-weight: 600;
+        }
+        .district-chip:not(.active), .day-chip:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            color: #A0B0B5;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:active {
+            transform: scale(0.98);
+        }
+        @media (hover: hover) {
+            .card-hover:hover {
+                transform: translateY(-4px);
+                border-color: rgba(224, 176, 122, 0.4);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            }
+        }
+        .status-open {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+        .status-closed {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .custom-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .feature-icon {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.2) 0%, rgba(224, 176, 122, 0.05) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .star-filled {
+            color: #E0B07A;
+        }
+        .star-empty {
+            color: rgba(224, 176, 122, 0.2);
+        }
+        .day-badge {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+        }
+        .detail-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            overflow-y: auto;
+            padding-bottom: calc(100px + env(safe-area-inset-bottom, 24px));
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .safe-top {
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 24px);
+        }
+        .day-filter-container {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="text-off-white antialiased">
+
+    <!-- ANA LİSTE GÖRÜNÜMÜ -->
+    <div id="mainView" class="min-h-screen pb-24">
+        <!-- Header -->
+        <header class="sticky top-0 z-40 glass-card-heavy px-4 pt-12 pb-4 safe-top">
+            <div class="flex items-center gap-3 mb-4">
+                <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-colors" aria-label="Geri dön">
+                    <span class="material-symbols-outlined text-gold">arrow_back</span>
+                </button>
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-lg font-bold gold-gradient-text truncate">Park ve Pazar Rehberi</h1>
+                    <p class="text-xs text-gray-text truncate">Bursa'nın yeşil alanları ve pazarları</p>
+                </div>
+                <button onclick="toggleSearch()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-colors" aria-label="Ara">
+                    <span class="material-symbols-outlined text-gold">search</span>
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div id="searchBar" class="hidden mb-4 animate-fade-in">
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-text text-lg">search</span>
+                    <input type="text" id="searchInput" placeholder="Park veya pazar ara..." 
+                           class="w-full bg-white/5 border border-gold/20 rounded-2xl pl-10 pr-4 py-3 text-sm text-off-white placeholder-gray-text focus:outline-none focus:border-gold/50 transition-all"
+                           onkeyup="filterContent()">
+                </div>
+            </div>
+
+            <!-- Ana Sekmeler -->
+            <div class="flex p-1 bg-white/5 rounded-2xl border border-gold/10">
+                <button onclick="switchTab('park')" id="tab-park" class="flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all tab-active flex items-center justify-center gap-1.5">
+                    <span class="material-symbols-outlined text-base">park</span>
+                    <span class="hidden sm:inline">Parklar</span>
+                    <span class="sm:hidden">Park</span>
+                </button>
+                <button onclick="switchTab('pazar')" id="tab-pazar" class="flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all tab-inactive flex items-center justify-center gap-1.5">
+                    <span class="material-symbols-outlined text-base">storefront</span>
+                    <span class="hidden sm:inline">Pazar Alanları</span>
+                    <span class="sm:hidden">Pazar</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="px-4 space-y-4 mt-4">
+            <!-- İlçe Filtreleri -->
+            <div class="animate-fade-in">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">İlçe Seçimi</h3>
+                    <button onclick="resetDistrictFilter()" class="text-[10px] text-gray-text hover:text-gold transition-colors px-2 py-1 rounded-lg active:bg-white/5">Tümünü Göster</button>
+                </div>
+                <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-2" id="districtContainer">
+                    <!-- İlçeler JS ile eklenecek -->
+                </div>
+            </div>
+
+            <!-- Gün Filtreleri (Sadece Pazar için) -->
+            <div id="dayFilterContainer" class="animate-fade-in hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Pazar Günü</h3>
+                    <button onclick="resetDayFilter()" class="text-[10px] text-gray-text hover:text-gold transition-colors px-2 py-1 rounded-lg active:bg-white/5">Tüm Günler</button>
+                </div>
+                <div class="day-filter-container custom-scrollbar" id="dayContainer">
+                    <!-- Günler JS ile eklenecek -->
+                </div>
+            </div>
+
+            <!-- Parklar Listesi -->
+            <div id="parkList" class="space-y-4 animate-slide-up">
+                <!-- Park kartları JS ile eklenecek -->
+            </div>
+
+            <!-- Pazarlar Listesi (Gizli başlangıçta) -->
+            <div id="pazarList" class="space-y-4 hidden animate-slide-up">
+                <!-- Pazar kartları JS ile eklenecek -->
+            </div>
+        </main>
+    </div>
+
+    <!-- DETAY GÖRÜNÜMÜ (SPA) -->
+    <div id="detailView" class="detail-view hidden hide-scrollbar">
+        <!-- Hero Image -->
+        <div class="relative h-64 sm:h-72 w-full">
+            <img id="detailHeroImage" src="" alt="" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-teal via-transparent to-transparent"></div>
+            
+            <!-- Header Buttons -->
+            <div class="absolute top-0 left-0 right-0 p-4 pt-12 flex justify-between items-start safe-top">
+                <button onclick="closeDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white active:bg-black/60 transition-colors" aria-label="Geri dön">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <button onclick="toggleDetailFavorite()" id="detailFavBtn" class="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white active:bg-black/60 transition-colors" aria-label="Favorilere ekle" aria-pressed="false">
+                    <span class="material-symbols-outlined">favorite_border</span>
+                </button>
+            </div>
+
+            <!-- Badges -->
+            <div class="absolute top-20 left-4 flex flex-wrap gap-2" id="detailBadges">
+                <!-- JS ile doldurulacak -->
+            </div>
+        </div>
+
+        <!-- Content -->
+        <main class="px-4 -mt-6 relative z-10 pb-28">
+            <!-- Title -->
+            <h1 id="detailTitle" class="text-2xl font-bold mb-4 animate-fade-in"></h1>
+
+            <!-- Info Cards -->
+            <div class="grid grid-cols-3 gap-2 mb-6 animate-fade-in" style="animation-delay: 0.1s" id="detailInfoCards">
+                <!-- JS ile doldurulacak -->
+            </div>
+
+            <!-- About -->
+            <div class="mb-6 animate-fade-in" style="animation-delay: 0.2s">
+                <h2 class="text-lg font-bold mb-3">Hakkında</h2>
+                <p id="detailDescription" class="text-sm text-gray-text leading-relaxed"></p>
+            </div>
+
+            <!-- Gallery -->
+            <div class="mb-6 animate-fade-in" style="animation-delay: 0.3s">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-lg font-bold">Galeri</h2>
+                    <button class="text-xs text-gold px-2 py-1 rounded-lg active:bg-gold/10">Tümünü Gör</button>
+                </div>
+                <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="detailGallery">
+                    <!-- JS ile doldurulacak -->
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="mb-6 animate-fade-in" style="animation-delay: 0.4s">
+                <h2 class="text-lg font-bold mb-4">Özellikler</h2>
+                <div class="grid grid-cols-4 gap-3" id="detailFeatures">
+                    <!-- JS ile doldurulacak -->
+                </div>
+            </div>
+
+            <!-- Products (Sadece pazar için) -->
+            <div id="detailProductsSection" class="mb-6 hidden animate-fade-in" style="animation-delay: 0.45s">
+                <h2 class="text-lg font-bold mb-3">Ürün Çeşitleri</h2>
+                <div class="flex flex-wrap gap-2" id="detailProducts">
+                    <!-- JS ile doldurulacak -->
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="glass-card rounded-2xl p-5 mb-6 animate-fade-in" style="animation-delay: 0.5s">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <span id="detailRatingScore" class="text-3xl font-bold">4.8</span>
+                        <div>
+                            <div class="flex gap-0.5 mb-1" id="detailRatingStars">
+                                <!-- JS ile doldurulacak -->
+                            </div>
+                            <p id="detailRatingCount" class="text-xs text-gray-text">124 Değerlendirme</p>
+                        </div>
+                    </div>
+                    <button class="text-xs text-gold font-medium px-2 py-1 rounded-lg active:bg-gold/10">Tüm Yorumlar</button>
+                </div>
+
+                <!-- Reviews -->
+                <div class="space-y-4" id="detailReviews">
+                    <!-- JS ile doldurulacak -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Action Button -->
+        <div class="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-gradient-to-t from-deep-teal via-deep-teal to-transparent z-40 safe-bottom">
+            <button onclick="openDirections()" class="w-full bg-gradient-to-r from-gold to-gold-light text-deep-teal font-bold py-3.5 rounded-2xl text-center shadow-lg shadow-gold/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
+                <span class="material-symbols-outlined">near_me</span>
+                Yol Tarifi Al
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation - YENİ DÜZEN -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-2 pb-6 px-4 z-50 safe-bottom" id="bottomNav">
+        <div class="flex justify-around items-center max-w-md mx-auto">
+            <a href="benim-sehrim.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity p-2 rounded-xl active:opacity-100 active:bg-white/5">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity p-2 rounded-xl active:opacity-100 active:bg-white/5">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity p-2 rounded-xl active:opacity-100 active:bg-white/5">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity p-2 rounded-xl active:opacity-100 active:bg-white/5">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Veriler
+        const districts = [
+            "Tümü", "Osmangazi", "Nilüfer", "Yıldırım", "Gürsu", "Kestel",
+            "İnegöl", "Gemlik", "Mudanya", "Karacabey", "Orhangazi",
+            "Mustafakemalpaşa", "İznik", "Orhaneli", "Keles", "Büyükorhan", "Harmancık", "Yenişehir"
+        ];
+
+        const days = ["Tümü", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+
+        // Gerçek Bursa Pazarları Verileri
+        const pazars = [
+            {
+                id: 1,
+                name: "Osmangazi Kapalı Pazar Yeri",
+                district: "Osmangazi",
+                days: "Çarşamba",
+                hours: "08:00-18:00",
+                image: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80",
+                description: "Osmangazi Belediyesi tarafından işletilen modern kapalı pazar yeri. 100'den fazla üretici ve satıcıya ev sahipliği yapar. Taze sebze, meyve, bakliyat ve yöresel ürünler bulunur.",
+                distance: "1.2 km",
+                status: "open",
+                features: [
+                    { icon: "garage", name: "Kapalı Alan" },
+                    { icon: "local_parking", name: "Otopark" },
+                    { icon: "wc", name: "WC" },
+                    { icon: "credit_card", name: "Kart" }
+                ],
+                products: ["Sebze", "Meyve", "Bakliyat", "Süt Ürünleri", "Zeytin", "Peynir", "Yöresel"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=400&q=80",
+                    "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80"
+                ],
+                rating: 4.7,
+                ratingCount: 128,
+                reviews: [
+                    {
+                        name: "Ayşe K.",
+                        avatar: "AK",
+                        date: "2 gün önce",
+                        rating: 5,
+                        text: "Çok temiz ve düzenli. Üreticiler ilgili, fiyatlar uygun."
+                    }
+                ],
+                location: { lat: 40.1828, lng: 29.0669 }
+            },
+            {
+                id: 2,
+                name: "Heykel Semt Pazarı",
+                district: "Osmangazi",
+                days: "Pazartesi",
+                hours: "07:00-17:00",
+                image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80",
+                description: "Bursa'nın en eski ve geleneksel pazarlarından biri. Heykel meydanı civarında kurulur. Organik ürünler ve ev yapımı lezzetler mevcuttur.",
+                distance: "450 m",
+                status: "closed",
+                features: [
+                    { icon: "eco", name: "Organik" },
+                    { icon: "location_city", name: "Merkezi" },
+                    { icon: "pets", name: "Evcil Hayvan" },
+                    { icon: "directions_walk", name: "Yaya" }
+                ],
+                products: ["Organik Sebze", "Meyve", "Ev Reçeli", "Doğal Ürünler", "Zeytinyağı"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80",
+                    "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=400&q=80"
+                ],
+                rating: 4.6,
+                ratingCount: 95,
+                reviews: [
+                    {
+                        name: "Mehmet T.",
+                        avatar: "MT",
+                        date: "1 hafta önce",
+                        rating: 4,
+                        text: "Geleneksel pazar havası var. Pazartesi günleri çok kalabalık."
+                    }
+                ],
+                location: { lat: 40.1845, lng: 29.0601 }
+            },
+            {
+                id: 3,
+                name: "Çekirge Semt Pazarı",
+                district: "Osmangazi",
+                days: "Perşembe",
+                hours: "08:00-18:00",
+                image: "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=800&q=80",
+                description: "Çekirge bölgesinde perşembe günleri kurulan geleneksel semt pazarı. Taze ürünleri ve uygun fiyatlarıyla bilinir.",
+                distance: "2.1 km",
+                status: "open",
+                features: [
+                    { icon: "savings", name: "Uygun Fiyat" },
+                    { icon: "local_parking", name: "Otopark" },
+                    { icon: "wc", name: "WC" }
+                ],
+                products: ["Sebze", "Meyve", "Giyim", "Ev Eşyası", "Kırtasiye"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?w=400&q=80"
+                ],
+                rating: 4.4,
+                ratingCount: 67,
+                reviews: [
+                    {
+                        name: "Fatma H.",
+                        avatar: "FH",
+                        date: "3 gün önce",
+                        rating: 4,
+                        text: "Fiyatlar uygun, pazarlık yapılabilir."
+                    }
+                ],
+                location: { lat: 40.1989, lng: 29.0156 }
+            },
+            {
+                id: 4,
+                name: "Geçit Semt Pazarı",
+                district: "Osmangazi",
+                days: "Cumartesi",
+                hours: "08:00-19:00",
+                image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80",
+                description: "Geçit bölgesinin cumartesi günleri kurulan büyük semt pazarı. Tekstil ürünleri de bulunur.",
+                distance: "3.5 km",
+                status: "open",
+                features: [
+                    { icon: "shopping_bag", name: "Tekstil" },
+                    { icon: "local_parking", name: "Otopark" },
+                    { icon: "restaurant", name: "Yemek" }
+                ],
+                products: ["Sebze", "Meyve", "Giyim", "Ayakkabı", "Aksesuar"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&q=80"
+                ],
+                rating: 4.5,
+                ratingCount: 89,
+                reviews: [
+                    {
+                        name: "Ali R.",
+                        avatar: "AR",
+                        date: "5 gün önce",
+                        rating: 5,
+                        text: "Cumartesi günleri çok canlı, her şey var."
+                    }
+                ],
+                location: { lat: 40.1756, lng: 29.0823 }
+            },
+            {
+                id: 5,
+                name: "Nilüfer Pazaryeri",
+                district: "Nilüfer",
+                days: "Cumartesi",
+                hours: "09:00-19:00",
+                image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&q=80",
+                description: "Nilüfer ilçesinin merkezi pazarı. Modern altyapısı ve düzenli işleyişiyle öne çıkar. Sosyete pazarı olarak da bilinir.",
+                distance: "4.2 km",
+                status: "open",
+                features: [
+                    { icon: "shopping_bag", name: "Tekstil" },
+                    { icon: "local_parking", name: "Otopark" },
+                    { icon: "security", name: "Güvenlik" },
+                    { icon: "wifi", name: "WiFi" }
+                ],
+                products: ["Giyim", "Tekstil", "Aksesuar", "Dekorasyon", "Ayakkabı", "Çanta"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80",
+                    "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&q=80"
+                ],
+                rating: 4.6,
+                ratingCount: 156,
+                reviews: [
+                    {
+                        name: "Zeynep B.",
+                        avatar: "ZB",
+                        date: "2 gün önce",
+                        rating: 5,
+                        text: "Modern ve temiz. Kıyafetler uygun fiyatlı."
+                    }
+                ],
+                location: { lat: 40.2105, lng: 28.9442 }
+            },
+            {
+                id: 6,
+                name: "İhsaniye Semt Pazarı",
+                district: "Nilüfer",
+                days: "Salı",
+                hours: "08:00-18:00",
+                image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80",
+                description: "İhsaniye mahallesinde salı günleri kurulan mahalle pazarı. Samimi satıcıları ve uygun fiyatlarıyla yerel halkın tercihi.",
+                distance: "5.1 km",
+                status: "open",
+                features: [
+                    { icon: "savings", name: "Uygun Fiyat" },
+                    { icon: "home", name: "Mahalle" },
+                    { icon: "local_shipping", name: "Servis" }
+                ],
+                products: ["Sebze", "Meyve", "Temel Gıda", "Kırtasiye", "Temizlik"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&q=80"
+                ],
+                rating: 4.3,
+                ratingCount: 45,
+                reviews: [
+                    {
+                        name: "Can D.",
+                        avatar: "CD",
+                        date: "1 hafta önce",
+                        rating: 4,
+                        text: "Mahalle pazarı havası var, samimi."
+                    }
+                ],
+                location: { lat: 40.2056, lng: 28.9345 }
+            },
+            {
+                id: 7,
+                name: "Fethiye Semt Pazarı",
+                district: "Nilüfer",
+                days: "Perşembe",
+                hours: "08:00-18:00",
+                image: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80",
+                description: "Fethiye bölgesinde perşembe günleri kurulan pazar. Özellikle taze sebze ve meyve çeşitliliğiyle bilinir.",
+                distance: "6.3 km",
+                status: "open",
+                features: [
+                    { icon: "spa", name: "Taze Ürün" },
+                    { icon: "local_parking", name: "Otopark" },
+                    { icon: "wc", name: "WC" }
+                ],
+                products: ["Sebze", "Meyve", "Baharat", "Kuruyemiş", "Zeytinyağı"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=400&q=80"
+                ],
+                rating: 4.5,
+                ratingCount: 72,
+                reviews: [
+                    {
+                        name: "Elif N.",
+                        avatar: "EN",
+                        date: "4 gün önce",
+                        rating: 5,
+                        text: "Ürünler çok taze, özellikle meyveler harika."
+                    }
+                ],
+                location: { lat: 40.2256, lng: 28.9545 }
+            },
+            {
+                id: 8,
+                name: "Yıldırım Kapalı Pazar Yeri",
+                district: "Yıldırım",
+                days: "Cuma",
+                hours: "08:00-19:00",
+                image: "https://images.unsplash.com/photo-1571896349842-68c894f4b4d6?w=800&q=80",
+                description: "Yıldırım Belediyesi tarafından işletilen kapalı pazar yeri. Cuma günleri yoğun ilgi görür.",
+                distance: "3.8 km",
+                status: "open",
+                features: [
+                    { icon: "garage", name: "Kapalı" },
+                    { icon: "local_parking", name: "Otopark" },
+                    { icon: "wc", name: "WC" },
+                    { icon: "restaurant", name: "Kafe" }
+                ],
+                products: ["Sebze", "Meyve", "Et", "Tavuk", "Süt Ürünleri", "Giyim"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1571896349842-68c894f4b4d6?w=400&q=80"
+                ],
+                rating: 4.4,
+                ratingCount: 98,
+                reviews: [
+                    {
+                        name: "Murat S.",
+                        avatar: "MS",
+                        date: "3 gün önce",
+                        rating: 4,
+                        text: "Kapalı alan olması büyük avantaj, her hava koşulunda açık."
+                    }
+                ],
+                location: { lat: 40.1889, lng: 29.1012 }
+            },
+            {
+                id: 9,
+                name: "Şirinevler Semt Pazarı",
+                district: "Yıldırım",
+                days: "Pazartesi",
+                hours: "07:00-17:00",
+                image: "https://images.unsplash.com/photo-1596908181055-e10301d47d03?w=800&q=80",
+                description: "Şirinevler mahallesinde pazartesi günleri kurulan mahalle pazarı. Sabah erken saatlerde kurulur.",
+                distance: "4.5 km",
+                status: "closed",
+                features: [
+                    { icon: "access_time", name: "Erken Açılır" },
+                    { icon: "savings", name: "Uygun Fiyat" },
+                    { icon: "home", name: "Mahalle" }
+                ],
+                products: ["Sebze", "Meyve", "Gıda", "Temizlik"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1596908181055-e10301d47d03?w=400&q=80"
+                ],
+                rating: 4.2,
+                ratingCount: 34,
+                reviews: [
+                    {
+                        name: "Ayşe Y.",
+                        avatar: "AY",
+                        date: "1 hafta önce",
+                        rating: 4,
+                        text: "Sabah erken gitmek lazım, öğleden önce tükeniyor."
+                    }
+                ],
+                location: { lat: 40.1956, lng: 29.1112 }
+            },
+            {
+                id: 10,
+                name: "Değirmenlikızık Semt Pazarı",
+                district: "Yıldırım",
+                days: "Cumartesi",
+                hours: "08:00-18:00",
+                image: "https://images.unsplash.com/photo-1507041957456-9c397ce39c97?w=800&q=80",
+                description: "Değirmenlikızık bölgesinde cumartesi günleri kurulan pazar. UNESCO korumasındaki köy yakınlarında turistik özellik taşır.",
+                distance: "7.2 km",
+                status: "open",
+                features: [
+                    { icon: "photo_camera", name: "Tarihi" },
+                    { icon: "spa", name: "Yöresel" },
+                    { icon: "local_parking", name: "Otopark" }
+                ],
+                products: ["Yöresel Ürünler", "El İşi", "Sebze", "Meyve", "Reçel"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1507041957456-9c397ce39c97?w=400&q=80"
+                ],
+                rating: 4.7,
+                ratingCount: 56,
+                reviews: [
+                    {
+                        name: "Kemal B.",
+                        avatar: "KB",
+                        date: "2 gün önce",
+                        rating: 5,
+                        text: "Yöresel ürünler harika, köy havasında alışveriş."
+                    }
+                ],
+                location: { lat: 40.1789, lng: 29.1212 }
+            },
+            {
+                id: 11,
+                name: "Gürsu Kapalı Pazar Yeri",
+                district: "Gürsu",
+                days: "Çarşamba",
+                hours: "08:00-18:00",
+                image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&q=80",
+                description: "Gürsu ilçesinin merkezi kapalı pazarı. Çarşamba günleri hizmet verir.",
+                distance: "12 km",
+                status: "open",
+                features: [
+                    { icon: "garage", name: "Kapalı" },
+                    { icon: "local_parking", name: "Otopark" },
+                    { icon: "wc", name: "WC" }
+                ],
+                products: ["Sebze", "Meyve", "Giyim", "Ev Eşyası"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&q=80"
+                ],
+                rating: 4.3,
+                ratingCount: 42,
+                reviews: [
+                    {
+                        name: "Selin T.",
+                        avatar: "ST",
+                        date: "5 gün önce",
+                        rating: 4,
+                        text: "Gürsu'nun en işlek pazarı, her şey bulunur."
+                    }
+                ],
+                location: { lat: 40.2189, lng: 29.1912 }
+            },
+            {
+                id: 12,
+                name: "Kestel Semt Pazarı",
+                district: "Kestel",
+                days: "Pazar",
+                hours: "08:00-17:00",
+                image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
+                description: "Kestel ilçesinin pazar günleri kurulan geleneksel pazarı. İlçe merkezinde kurulur.",
+                distance: "18 km",
+                status: "open",
+                features: [
+                    { icon: "location_city", name: "Merkezi" },
+                    { icon: "savings", name: "Uygun Fiyat" }
+                ],
+                products: ["Sebze", "Meyve", "Gıda", "Kırtasiye"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80"
+                ],
+                rating: 4.1,
+                ratingCount: 28,
+                reviews: [
+                    {
+                        name: "Orhan K.",
+                        avatar: "OK",
+                        date: "1 hafta önce",
+                        rating: 4,
+                        text: "Kestel'in tek pazarı, pazar günleri çok kalabalık."
+                    }
+                ],
+                location: { lat: 40.1989, lng: 29.2112 }
+            },
+            {
+                id: 13,
+                name: "İnegöl Belediye Pazarı",
+                district: "İnegöl",
+                days: "Cumartesi",
+                hours: "08:00-19:00",
+                image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80",
+                description: "İnegöl'ün en büyük pazarı. Mobilya şehri İnegöl'de cumartesi günleri kurulur.",
+                distance: "35 km",
+                status: "open",
+                features: [
+                    { icon: "storefront", name: "Büyük Pazar" },
+                    { icon: "local_parking", name: "Geniş Otopark" },
+                    { icon: "restaurant", name: "Yemek" }
+                ],
+                products: ["Sebze", "Meyve", "Giyim", "Mobilya", "Tekstil"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&q=80"
+                ],
+                rating: 4.5,
+                ratingCount: 134,
+                reviews: [
+                    {
+                        name: "Burak L.",
+                        avatar: "BL",
+                        date: "3 gün önce",
+                        rating: 5,
+                        text: "İnegöl'ün en büyük pazarı, her şey var."
+                    }
+                ],
+                location: { lat: 40.0789, lng: 29.5112 }
+            },
+            {
+                id: 14,
+                name: "Gemlik Sahil Pazarı",
+                district: "Gemlik",
+                days: "Pazar",
+                hours: "08:00-18:00",
+                image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80",
+                description: "Gemlik sahilinde pazar günleri kurulan pazar. Zeytin ve zeytinyağı ürünleri meşhurdur.",
+                distance: "32 km",
+                status: "open",
+                features: [
+                    { icon: "water", name: "Sahil" },
+                    { icon: "spa", name: "Zeytin" },
+                    { icon: "local_parking", name: "Otopark" }
+                ],
+                products: ["Zeytin", "Zeytinyağı", "Sebze", "Meyve", "Balık"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&q=80"
+                ],
+                rating: 4.6,
+                ratingCount: 89,
+                reviews: [
+                    {
+                        name: "Zeynep M.",
+                        avatar: "ZM",
+                        date: "4 gün önce",
+                        rating: 5,
+                        text: "Zeytin ve zeytinyağı için tek adres. Gemlik'in meşhur ürünleri."
+                    }
+                ],
+                location: { lat: 40.4389, lng: 29.1512 }
+            },
+            {
+                id: 15,
+                name: "Mudanya Mütareke Pazarı",
+                district: "Mudanya",
+                days: "Cumartesi",
+                hours: "08:00-18:00",
+                image: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80",
+                description: "Mudanya ilçesinin cumartesi günleri kurulan pazarı. Sahil kenti atmosferiyle alışveriş yapılabilir.",
+                distance: "28 km",
+                status: "open",
+                features: [
+                    { icon: "water", name: "Sahil" },
+                    { icon: "history", name: "Tarihi" },
+                    { icon: "local_parking", name: "Otopark" }
+                ],
+                products: ["Sebze", "Meyve", "Balık", "Deniz Ürünleri", "Sahil Ürünleri"],
+                gallery: [
+                    "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400&q=80"
+                ],
+                rating: 4.4,
+                ratingCount: 67,
+                reviews: [
+                    {
+                        name: "Deniz A.",
+                        avatar: "DA",
+                        date: "6 gün önce",
+                        rating: 4,
+                        text: "Sahil manzaralı pazar, balık ürünleri taze."
+                    }
+                ],
+                location: { lat: 40.3789, lng: 28.8812 }
+            }
+        ];
+
+        const parks = [
+            {
+                id: 1,
+                name: "Reşat Oyal Kültürparkı",
+                district: "Osmangazi",
+                area: "390.000 m²",
+                year: 1955,
+                image: "https://images.unsplash.com/photo-1519331379826-fda8ebd5441d?w=800&q=80",
+                description: "1955 yılında hizmete açılan Reşat Oyal Kültürparkı, Bursa'nın en önemli yeşil alanlarından biridir. Şehrin merkezinde nefes alma noktası olan park, geniş yürüyüş yolları, dinlenme alanları ve zengin bitki örtüsüyle ziyaretçilerini ağırlamaktadır.",
+                distance: "1.2 km",
+                status: "open",
+                features: [
+                    { icon: "wc", name: "Tuvalet" },
+                    { icon: "coffee", name: "Kafe" },
+                    { icon: "local_florist", name: "Bahçe" },
+                    { icon: "child_care", name: "Oyun" },
+                    { icon: "fitness_center", name: "Fitness" },
+                    { icon: "directions_bike", name: "Bisiklet" }
+                ],
+                gallery: [
+                    "https://images.unsplash.com/photo-1519331379826-fda8ebd5441d?w=400&q=80",
+                    "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80",
+                    "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&q=80"
+                ],
+                rating: 4.8,
+                ratingCount: 124,
+                reviews: [
+                    {
+                        name: "Murat Kaya",
+                        avatar: "MK",
+                        date: "2 gün önce",
+                        rating: 5,
+                        text: "Hafta sonları yürüyüş yapmak için harika bir yer. Temizliği ve düzeni gayet iyi."
+                    },
+                    {
+                        name: "Selin Yılmaz",
+                        avatar: "SY",
+                        date: "1 hafta önce",
+                        rating: 5,
+                        text: "Doğası muazzam, özellikle bahar aylarında çiçeklerin kokusu eşliğinde gezmek çok keyifli."
+                    }
+                ],
+                location: { lat: 40.1828, lng: 29.0669 }
+            },
+            {
+                id: 2,
+                name: "Hüdavendigar Kent Parkı",
+                district: "Osmangazi",
+                area: "1.200.000 m²",
+                year: 2008,
+                image: "https://images.unsplash.com/photo-1571896349842-68c894f4b4d6?w=800&q=80",
+                description: "Bursa'nın en büyük kent parkı olan Hüdavendigar Kent Parkı, spor tesisleri, yürüyüş parkurları ve piknik alanlarıyla şehrin akciğeri konumundadır.",
+                distance: "2.5 km",
+                status: "open",
+                features: [
+                    { icon: "sports", name: "Spor" },
+                    { icon: "restaurant", name: "Kafe" },
+                    { icon: "pool", name: "Havuz" },
+                    { icon: "directions_run", name: "Koşu" }
+                ],
+                gallery: [
+                    "https://images.unsplash.com/photo-1571896349842-68c894f4b4d6?w=400&q=80",
+                    "https://images.unsplash.com/photo-1565109160632-4a9585b8328c?w=400&q=80"
+                ],
+                rating: 4.6,
+                ratingCount: 89,
+                reviews: [
+                    {
+                        name: "Ahmet Yılmaz",
+                        avatar: "AY",
+                        date: "3 gün önce",
+                        rating: 4,
+                        text: "Spor yapmak için harika bir yer. Koşu parkurları çok iyi düzenlenmiş."
+                    }
+                ],
+                location: { lat: 40.1956, lng: 29.0821 }
+            },
+            {
+                id: 3,
+                name: "Atatürk Kent Ormanı",
+                district: "Nilüfer",
+                area: "750.000 m²",
+                year: 1998,
+                image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80",
+                description: "Doğal orman yapısını koruyan, yürüyüş parkurları ve piknik alanlarıyla doğa severlerin vazgeçilmezi.",
+                distance: "4.8 km",
+                status: "open",
+                features: [
+                    { icon: "forest", name: "Orman" },
+                    { icon: "hiking", name: "Yürüyüş" },
+                    { icon: "outdoor_grill", name: "Piknik" },
+                    { icon: "pets", name: "Köpek Parkı" }
+                ],
+                gallery: [
+                    "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80",
+                    "https://images.unsplash.com/photo-1507041957456-9c397ce39c97?w=400&q=80"
+                ],
+                rating: 4.9,
+                ratingCount: 156,
+                reviews: [
+                    {
+                        name: "Zeynep K.",
+                        avatar: "ZK",
+                        date: "1 gün önce",
+                        rating: 5,
+                        text: "Şehrin gürültüsünden uzak, huzurlu bir yer. Köpeğimle yürüyüş yapmak için mükemmel."
+                    }
+                ],
+                location: { lat: 40.2105, lng: 28.9442 }
+            },
+            {
+                id: 4,
+                name: "Gölyazı Sahil Parkı",
+                district: "Nilüfer",
+                area: "85.000 m²",
+                year: 2010,
+                image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80",
+                description: "Uluabat Gölü kıyısında, tarihi Gölyazı köyü manzaralı, bisiklet ve yürüyüş yolları olan sahil parkı.",
+                distance: "12 km",
+                status: "open",
+                features: [
+                    { icon: "water", name: "Göl" },
+                    { icon: "directions_bike", name: "Bisiklet" },
+                    { icon: "restaurant", name: "Restoran" },
+                    { icon: "photo_camera", name: "Manzara" }
+                ],
+                gallery: [
+                    "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&q=80",
+                    "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=400&q=80"
+                ],
+                rating: 4.7,
+                ratingCount: 203,
+                reviews: [
+                    {
+                        name: "Can B.",
+                        avatar: "CB",
+                        date: "5 gün önce",
+                        rating: 5,
+                        text: "Gün batımında gitmenizi tavsiye ederim. Harika manzara!"
+                    }
+                ],
+                location: { lat: 40.1789, lng: 28.8834 }
+            },
+            {
+                id: 5,
+                name: "Mihraplı Park",
+                district: "Yıldırım",
+                area: "120.000 m²",
+                year: 2005,
+                image: "https://images.unsplash.com/photo-1596908181055-e10301d47d03?w=800&q=80",
+                description: "Aileler için ideal, çocuk oyun alanları ve koşu parkurlarıyla donatılmış modern park.",
+                distance: "3.2 km",
+                status: "open",
+                features: [
+                    { icon: "child_care", name: "Oyun" },
+                    { icon: "directions_run", name: "Koşu" },
+                    { icon: "family_restroom", name: "Aile" },
+                    { icon: "event", name: "Etkinlik" }
+                ],
+                gallery: [
+                    "https://images.unsplash.com/photo-1596908181055-e10301d47d03?w=400&q=80",
+                    "https://images.unsplash.com/photo-1519331379826-fda8ebd5441d?w=400&q=80"
+                ],
+                rating: 4.5,
+                ratingCount: 78,
+                reviews: [
+                    {
+                        name: "Elif N.",
+                        avatar: "EN",
+                        date: "2 gün önce",
+                        rating: 4,
+                        text: "Çocuklarımla keyifle vakit geçiriyoruz. Oyun alanları güvenli ve temiz."
+                    }
+                ],
+                location: { lat: 40.1889, lng: 29.1012 }
+            }
+        ];
+
+        // State
+        let currentTab = 'park';
+        let selectedDistrict = 'Tümü';
+        let selectedDay = 'Tümü';
+        let currentDetailId = null;
+        let currentDetailType = null;
+
+        // İlçe çiplerini oluştur
+        function renderDistricts() {
+            const container = document.getElementById('districtContainer');
+            container.innerHTML = districts.map(district => `
+                <button onclick="selectDistrict('${district}')" 
+                        class="district-chip px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${district === selectedDistrict ? 'active' : ''}"
+                        aria-pressed="${district === selectedDistrict}">
+                    ${district}
+                </button>
+            `).join('');
+        }
+
+        // Gün çiplerini oluştur
+        function renderDays() {
+            const container = document.getElementById('dayContainer');
+            container.innerHTML = days.map(day => `
+                <button onclick="selectDay('${day}')" 
+                        class="day-chip px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${day === selectedDay ? 'active' : ''}"
+                        aria-pressed="${day === selectedDay}">
+                    ${day}
+                </button>
+            `).join('');
+        }
+
+        // İlçe seçimi
+        function selectDistrict(district) {
+            selectedDistrict = district;
+            renderDistricts();
+            renderContent();
+        }
+
+        // Gün seçimi
+        function selectDay(day) {
+            selectedDay = day;
+            renderDays();
+            renderContent();
+        }
+
+        // Tüm ilçeleri göster
+        function resetDistrictFilter() {
+            selectedDistrict = 'Tümü';
+            renderDistricts();
+            renderContent();
+        }
+
+        // Tüm günleri göster
+        function resetDayFilter() {
+            selectedDay = 'Tümü';
+            renderDays();
+            renderContent();
+        }
+
+        // Sekme değiştirme
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            document.getElementById('tab-park').className = tab === 'park' 
+                ? 'flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all tab-active flex items-center justify-center gap-1.5'
+                : 'flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all tab-inactive flex items-center justify-center gap-1.5';
+            
+            document.getElementById('tab-pazar').className = tab === 'pazar'
+                ? 'flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all tab-active flex items-center justify-center gap-1.5'
+                : 'flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all tab-inactive flex items-center justify-center gap-1.5';
+
+            document.getElementById('parkList').classList.toggle('hidden', tab !== 'park');
+            document.getElementById('pazarList').classList.toggle('hidden', tab !== 'pazar');
+            
+            // Gün filtresini sadece pazar sekmesinde göster
+            document.getElementById('dayFilterContainer').classList.toggle('hidden', tab !== 'pazar');
+
+            renderContent();
+        }
+
+        // İçerik render
+        function renderContent() {
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            
+            if (currentTab === 'park') {
+                renderParks(searchTerm);
+            } else {
+                renderPazars(searchTerm);
+            }
+        }
+
+        // Park kartları
+        function renderParks(searchTerm) {
+            const container = document.getElementById('parkList');
+            let filtered = parks;
+
+            if (selectedDistrict !== 'Tümü') {
+                filtered = filtered.filter(p => p.district === selectedDistrict);
+            }
+
+            if (searchTerm) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm));
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <span class="material-symbols-outlined text-6xl text-gray-text/30 mb-4">park</span>
+                        <p class="text-gray-text text-sm">Bu kriterlere uygun park bulunamadı.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map((park, index) => `
+                <article class="glass-card rounded-2xl overflow-hidden card-hover animate-slide-up cursor-pointer" 
+                         style="animation-delay: ${index * 0.05}s"
+                         onclick="openDetail('park', ${park.id})"
+                         role="button"
+                         tabindex="0"
+                         aria-label="${park.name} park detayını görüntüle">
+                    <div class="relative h-44">
+                        <img src="${park.image}" alt="${park.name}" class="w-full h-full object-cover" loading="lazy">
+                        <div class="absolute top-3 left-3">
+                            <span class="${park.status === 'open' ? 'status-open' : 'status-closed'} text-white text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider shadow-lg">
+                                ${park.status === 'open' ? 'AÇIK' : 'KAPALI'}
+                            </span>
+                        </div>
+                        <div class="absolute bottom-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                            <span class="material-symbols-outlined text-gold text-sm">navigation</span>
+                            <span class="text-xs font-bold text-white">${park.distance}</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <div class="flex-1 pr-2">
+                                <h3 class="text-base font-bold text-white mb-0.5 line-clamp-1">${park.name}</h3>
+                                <p class="text-xs text-gold">${park.district}</p>
+                            </div>
+                            <span class="material-symbols-outlined text-gold text-xl">arrow_forward</span>
+                        </div>
+                        <p class="text-xs text-gray-text leading-relaxed mb-3 line-clamp-2">${park.description}</p>
+                        <div class="flex items-center gap-3 text-xs text-gray-text border-t border-gold/10 pt-3">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold text-sm">square_foot</span>
+                                <span>${park.area}</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold text-sm">calendar_today</span>
+                                <span>${park.year}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 mt-2.5">
+                            ${park.features.slice(0, 3).map(f => `
+                                <span class="text-[10px] bg-white/5 px-2 py-1 rounded-md text-gray-text border border-gold/10">${f.name}</span>
+                            `).join('')}
+                            ${park.features.length > 3 ? `<span class="text-[10px] text-gold">+${park.features.length - 3}</span>` : ''}
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Pazar kartları
+        function renderPazars(searchTerm) {
+            const container = document.getElementById('pazarList');
+            let filtered = pazars;
+
+            // İlçe filtresi
+            if (selectedDistrict !== 'Tümü') {
+                filtered = filtered.filter(p => p.district === selectedDistrict);
+            }
+
+            // Gün filtresi
+            if (selectedDay !== 'Tümü') {
+                filtered = filtered.filter(p => p.days === selectedDay);
+            }
+
+            // Arama filtresi
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) || 
+                    p.district.toLowerCase().includes(searchTerm) ||
+                    p.days.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <span class="material-symbols-outlined text-6xl text-gray-text/30 mb-4">storefront</span>
+                        <p class="text-gray-text text-sm">Bu kriterlere uygun pazar bulunamadı.</p>
+                        <p class="text-xs text-gray-text mt-2">Farklı bir gün veya ilçe seçin</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map((pazar, index) => `
+                <article class="glass-card rounded-2xl overflow-hidden card-hover animate-slide-up cursor-pointer" 
+                         style="animation-delay: ${index * 0.05}s"
+                         onclick="openDetail('pazar', ${pazar.id})"
+                         role="button"
+                         tabindex="0"
+                         aria-label="${pazar.name} pazar detayını görüntüle">
+                    <div class="relative h-44">
+                        <img src="${pazar.image}" alt="${pazar.name}" class="w-full h-full object-cover" loading="lazy">
+                        <div class="absolute top-3 left-3 flex gap-1.5 flex-wrap">
+                            <span class="day-badge text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider shadow-lg">
+                                ${pazar.days.toUpperCase()}
+                            </span>
+                            <span class="${pazar.status === 'open' ? 'status-open' : 'status-closed'} text-white text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider shadow-lg">
+                                ${pazar.status === 'open' ? 'AÇIK' : 'KAPALI'}
+                            </span>
+                        </div>
+                        <div class="absolute bottom-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                            <span class="material-symbols-outlined text-gold text-sm">navigation</span>
+                            <span class="text-xs font-bold text-white">${pazar.distance}</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <div class="flex-1 pr-2">
+                                <h3 class="text-base font-bold text-white mb-0.5 line-clamp-1">${pazar.name}</h3>
+                                <p class="text-xs text-gold">${pazar.district} • ${pazar.hours}</p>
+                            </div>
+                            <span class="material-symbols-outlined text-gold text-xl">arrow_forward</span>
+                        </div>
+                        <p class="text-xs text-gray-text leading-relaxed mb-3 line-clamp-2">${pazar.description}</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${pazar.features.slice(0, 3).map(f => `
+                                <span class="text-[10px] bg-white/5 px-2 py-1 rounded-md text-gray-text border border-gold/10 flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[10px] text-gold">check_circle</span>
+                                    ${f.name}
+                                </span>
+                            `).join('')}
+                            ${pazar.features.length > 3 ? `<span class="text-[10px] text-gold">+${pazar.features.length - 3}</span>` : ''}
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-gold/10">
+                            <p class="text-[10px] text-gray-text">
+                                <span class="material-symbols-outlined text-[10px] text-gold align-text-bottom">shopping_basket</span>
+                                ${pazar.products.slice(0, 4).join(', ')}${pazar.products.length > 4 ? '...' : ''}
+                            </p>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Detay sayfasını aç (SPA)
+        function openDetail(type, id) {
+            const data = type === 'park' ? parks.find(p => p.id === id) : pazars.find(p => p.id === id);
+            
+            if (!data) {
+                console.error('Veri bulunamadı:', type, id);
+                return;
+            }
+
+            currentDetailId = id;
+            currentDetailType = type;
+
+            // Hero image
+            const heroImg = document.getElementById('detailHeroImage');
+            heroImg.src = data.image;
+            heroImg.alt = data.name;
+
+            // Başlık ve bilgiler
+            document.getElementById('detailTitle').textContent = data.name;
+            document.getElementById('detailDescription').textContent = data.description;
+
+            // Badge'ler
+            const badgesContainer = document.getElementById('detailBadges');
+            if (type === 'pazar') {
+                badgesContainer.innerHTML = `
+                    <span class="day-badge text-[10px] font-bold px-3 py-1.5 rounded-full tracking-wider shadow-lg">${data.days.toUpperCase()}</span>
+                    <span class="${data.status === 'open' ? 'status-open' : 'status-closed'} text-white text-[10px] font-bold px-3 py-1.5 rounded-full tracking-wider shadow-lg">
+                        ${data.status === 'open' ? 'AÇIK' : 'KAPALI'}
+                    </span>
+                `;
+            } else {
+                badgesContainer.innerHTML = `
+                    <span class="bg-gold text-deep-teal text-[10px] font-bold px-3 py-1.5 rounded-full tracking-wider shadow-lg">PARK ALANI</span>
+                `;
+            }
+
+            // Info Cards
+            const infoCards = document.getElementById('detailInfoCards');
+            if (type === 'park') {
+                infoCards.innerHTML = `
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-gold text-lg mb-1 block">square_foot</span>
+                        <p class="text-[9px] text-gray-text uppercase tracking-wider mb-0.5">Alan</p>
+                        <p class="text-xs font-bold text-white truncate">${data.area}</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-gold text-lg mb-1 block">calendar_today</span>
+                        <p class="text-[9px] text-gray-text uppercase tracking-wider mb-0.5">Açılış</p>                        <p class="text-xs font-bold text-white">${data.year}</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-gold text-lg mb-1 block">location_on</span>
+                        <p class="text-[9px] text-gray-text uppercase tracking-wider mb-0.5">İlçe</p>
+                        <p class="text-xs font-bold text-white truncate">${data.district}</p>
+                    </div>
+                `;
+            } else {
+                infoCards.innerHTML = `
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-gold text-lg mb-1 block">calendar_today</span>
+                        <p class="text-[9px] text-gray-text uppercase tracking-wider mb-0.5">Gün</p>
+                        <p class="text-xs font-bold text-white truncate">${data.days}</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-gold text-lg mb-1 block">location_on</span>
+                        <p class="text-[9px] text-gray-text uppercase tracking-wider mb-0.5">İlçe</p>
+                        <p class="text-xs font-bold text-white truncate">${data.district}</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-gold text-lg mb-1 block">schedule</span>
+                        <p class="text-[9px] text-gray-text uppercase tracking-wider mb-0.5">Saat</p>
+                        <p class="text-xs font-bold text-white">${data.hours}</p>
+                    </div>
+                `;
+            }
+
+            // Gallery
+            const galleryContainer = document.getElementById('detailGallery');
+            galleryContainer.innerHTML = data.gallery.map(img => `
+                <img src="${img}" alt="${data.name} görseli" class="w-28 h-20 rounded-xl object-cover flex-shrink-0" loading="lazy">
+            `).join('');
+
+            // Features
+            const featuresContainer = document.getElementById('detailFeatures');
+            featuresContainer.innerHTML = data.features.map(f => `
+                <div class="flex flex-col items-center gap-1.5">
+                    <div class="w-12 h-12 feature-icon rounded-xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold text-xl">${f.icon}</span>
+                    </div>
+                    <span class="text-[9px] text-gray-text text-center leading-tight">${f.name}</span>
+                </div>
+            `).join('');
+
+            // Products (sadece pazar için)
+            const productsSection = document.getElementById('detailProductsSection');
+            if (type === 'pazar' && data.products) {
+                productsSection.classList.remove('hidden');
+                document.getElementById('detailProducts').innerHTML = data.products.map(p => `
+                    <span class="text-xs bg-gold/10 text-gold px-3 py-1.5 rounded-full border border-gold/20">${p}</span>
+                `).join('');
+            } else {
+                productsSection.classList.add('hidden');
+            }
+
+            // Rating
+            document.getElementById('detailRatingScore').textContent = data.rating;
+            document.getElementById('detailRatingCount').textContent = `${data.ratingCount} Değerlendirme`;
+            
+            // Stars
+            const starsContainer = document.getElementById('detailRatingStars');
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(data.rating)) {
+                    starsHtml += '<span class="material-symbols-outlined text-sm star-filled">star</span>';
+                } else if (i === Math.ceil(data.rating) && data.rating % 1 !== 0) {
+                    starsHtml += '<span class="material-symbols-outlined text-sm star-filled">star_half</span>';
+                } else {
+                    starsHtml += '<span class="material-symbols-outlined text-sm star-empty">star</span>';
+                }
+            }
+            starsContainer.innerHTML = starsHtml;
+
+            // Reviews
+            const reviewsContainer = document.getElementById('detailReviews');
+            reviewsContainer.innerHTML = data.reviews.map(review => `
+                <div class="border-t border-gold/10 pt-3 first:border-0 first:pt-0">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-full bg-gold/20 flex items-center justify-center text-gold text-xs font-bold">
+                                ${review.avatar}
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-white">${review.name}</p>
+                                <p class="text-[10px] text-gray-text">${review.date}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-0.5">
+                            ${Array(review.rating).fill('<span class="material-symbols-outlined text-xs star-filled">star</span>').join('')}
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-text leading-relaxed">${review.text}</p>
+                </div>
+            `).join('');
+
+            // Favori durumunu kontrol et
+            updateFavoriteButton();
+
+            // Detay görünümünü göster
+            document.getElementById('detailView').classList.remove('hidden');
+            document.getElementById('detailView').scrollTop = 0;
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Detay sayfasını kapat
+        function closeDetail() {
+            document.getElementById('detailView').classList.add('hidden');
+            document.body.style.overflow = '';
+            currentDetailId = null;
+            currentDetailType = null;
+        }
+
+        // Ana görünüme dön
+        function showMainView() {
+            closeDetail();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Favori toggle
+        function toggleDetailFavorite() {
+            if (!currentDetailId || !currentDetailType) return;
+            
+            const storageKey = currentDetailType === 'park' ? 'favoriteParks' : 'favoritePazars';
+            let favorites = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            
+            if (favorites.includes(currentDetailId)) {
+                favorites = favorites.filter(id => id !== currentDetailId);
+            } else {
+                favorites.push(currentDetailId);
+            }
+            
+            localStorage.setItem(storageKey, JSON.stringify(favorites));
+            updateFavoriteButton();
+        }
+
+        function updateFavoriteButton() {
+            if (!currentDetailId || !currentDetailType) return;
+            
+            const storageKey = currentDetailType === 'park' ? 'favoriteParks' : 'favoritePazars';
+            const favorites = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const btn = document.getElementById('detailFavBtn');
+            const icon = btn.querySelector('span');
+            
+            if (favorites.includes(currentDetailId)) {
+                icon.textContent = 'favorite';
+                btn.classList.add('text-live-red');
+                btn.setAttribute('aria-pressed', 'true');
+            } else {
+                icon.textContent = 'favorite_border';
+                btn.classList.remove('text-live-red');
+                btn.setAttribute('aria-pressed', 'false');
+            }
+        }
+
+        // Yol tarifi
+        function openDirections() {
+            if (!currentDetailId || !currentDetailType) return;
+            
+            const data = currentDetailType === 'park' 
+                ? parks.find(p => p.id === currentDetailId) 
+                : pazars.find(p => p.id === currentDetailId);
+                
+            if (data && data.location) {
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${data.location.lat},${data.location.lng}`, '_blank');
+            }
+        }
+
+        // Arama fonksiyonu
+        function toggleSearch() {
+            const searchBar = document.getElementById('searchBar');
+            searchBar.classList.toggle('hidden');
+            if (!searchBar.classList.contains('hidden')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+
+        function filterContent() {
+            renderContent();
+        }
+
+        // Klavye navigasyonu
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !document.getElementById('detailView').classList.contains('hidden')) {
+                closeDetail();
+            }
+        });
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            renderDistricts();
+            renderDays();
+            renderContent();
+            
+            // URL'den detay parametresi kontrolü
+            const urlParams = new URLSearchParams(window.location.search);
+            const detailType = urlParams.get('type');
+            const detailId = urlParams.get('id');
+            
+            if (detailType && detailId) {
+                openDetail(detailType, parseInt(detailId));
+            }
+        });
+
+        // iOS safe area için
+        if (window.navigator.standalone) {
+            document.body.classList.add('pt-safe');
+        }
+    </script>
+</body>
+</html>
+                        
+

@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bursa Rota Oluşturucu - CityJOY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #081F24;
+            color: #C7D8DA;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 20;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-card {
+            background: rgba(23, 70, 75, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(63, 110, 112, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(10, 42, 47, 0.9);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .ai-orb {
+            background: linear-gradient(135deg, #E0B07A 0%, #00D4AA 50%, #E0B07A 100%);
+            background-size: 200% 200%;
+            animation: shimmer 3s ease infinite;
+            box-shadow: 0 0 30px rgba(224, 176, 122, 0.4), 0 0 60px rgba(0, 212, 170, 0.2);
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.4s ease-out;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #E0B07A 0%, #00D4AA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Gold Button Style - seyahat-anasayfa.html den */
+        .btn-gold {
+            background: linear-gradient(135deg, #E0B07A 0%, #C9A86C 100%);
+            border: 2px solid #E0B07A;
+            color: #081F24;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(224, 176, 122, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .btn-gold:hover:not(:disabled) {
+            background: linear-gradient(135deg, #C9A86C 0%, #E0B07A 100%);
+            box-shadow: 0 6px 20px rgba(224, 176, 122, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        .btn-gold:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        /* Gold Outline Button */
+        .btn-gold-outline {
+            background: transparent;
+            border: 2px solid #E0B07A;
+            color: #E0B07A;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+        .btn-gold-outline:hover {
+            background: rgba(224, 176, 122, 0.1);
+            box-shadow: 0 0 20px rgba(224, 176, 122, 0.2);
+        }
+        
+        /* Secondary Button with Gold Border */
+        .btn-secondary-gold {
+            background: rgba(23, 70, 75, 0.6);
+            border: 1.5px solid rgba(224, 176, 122, 0.4);
+            color: #C7D8DA;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary-gold:hover {
+            border-color: #E0B07A;
+            color: #E0B07A;
+            background: rgba(224, 176, 122, 0.1);
+        }
+        
+        /* Route Chips */
+        .route-chip {
+            background: rgba(224, 176, 122, 0.1);
+            border: 1.5px solid rgba(224, 176, 122, 0.3);
+            color: #E0B07A;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .route-chip:hover {
+            background: rgba(224, 176, 122, 0.2);
+            border-color: #E0B07A;
+            transform: translateY(-2px);
+        }
+        .route-chip.active {
+            background: rgba(224, 176, 122, 0.3);
+            border: 2px solid #E0B07A;
+            box-shadow: 0 0 15px rgba(224, 176, 122, 0.3);
+        }
+        
+        /* Category Accordion */
+        .category-accordion {
+            background: rgba(23, 70, 75, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(63, 110, 112, 0.3);
+            transition: all 0.3s ease;
+        }
+        .category-accordion.open {
+            border-color: rgba(224, 176, 122, 0.4);
+        }
+        
+        /* Place Cards */
+        .place-card-v2 {
+            background: rgba(8, 31, 36, 0.6);
+            border: 1.5px solid rgba(63, 110, 112, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .place-card-v2:hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateX(4px);
+        }
+        .place-card-v2.selected {
+            border: 2px solid #E0B07A;
+            background: rgba(224, 176, 122, 0.12);
+            box-shadow: 0 0 20px rgba(224, 176, 122, 0.15);
+        }
+        .place-check-v2 {
+            border: 2px solid rgba(63, 110, 112, 0.5);
+            transition: all 0.2s ease;
+        }
+        .place-card-v2.selected .place-check-v2 {
+            background: #E0B07A;
+            border-color: #E0B07A;
+            transform: scale(1.1);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 31, 36, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes slideUpModal {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-enter {
+            animation: slideUpModal 0.3s ease-out forwards;
+        }
+        
+        /* Schema Dots */
+        .schema-dot {
+            background: #E0B07A;
+            box-shadow: 0 0 0 3px #081F24, 0 0 0 5px #E0B07A;
+        }
+        .schema-dot.start {
+            background: #00D4AA;
+            box-shadow: 0 0 0 3px #081F24, 0 0 0 5px #00D4AA;
+        }
+        .schema-dot.end {
+            background: #ff6b6b;
+            box-shadow: 0 0 0 3px #081F24, 0 0 0 5px #ff6b6b;
+        }
+        
+        /* Transport Options */
+        .transport-option {
+            background: rgba(23, 70, 75, 0.6);
+            border: 1.5px solid rgba(63, 110, 112, 0.3);
+            color: #9FB6B8;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .transport-option.active {
+            background: rgba(224, 176, 122, 0.2);
+            border: 2px solid #E0B07A;
+            color: #E0B07A;
+            box-shadow: 0 0 15px rgba(224, 176, 122, 0.2);
+        }
+        
+        /* Filter Chips */
+        .filter-chip {
+            background: rgba(23, 70, 75, 0.4);
+            border: 1.5px solid rgba(63, 110, 112, 0.4);
+            color: #9FB6B8;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .filter-chip:hover {
+            border-color: rgba(224, 176, 122, 0.5);
+        }
+        .filter-chip.active {
+            background: rgba(224, 176, 122, 0.2);
+            border: 2px solid #E0B07A;
+            color: #E0B07A;
+            box-shadow: 0 0 10px rgba(224, 176, 122, 0.2);
+        }
+        
+        /* Step Number */
+        .step-number {
+            background: linear-gradient(135deg, #E0B07A 0%, #C9A86C 100%);
+            color: #081F24;
+            font-weight: 700;
+            box-shadow: 0 0 0 3px rgba(224, 176, 122, 0.3);
+        }
+        
+        /* Custom Scroll */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(63, 110, 112, 0.1);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(224, 176, 122, 0.3);
+            border-radius: 2px;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="min-h-screen pb-24">
+
+    <div class="relative mx-auto min-h-screen max-w-[430px] flex flex-col bg-[#081F24] overflow-x-hidden border-x border-[#3F6E70]/20">
+
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-[#081F24]/95 backdrop-blur-xl px-5 pt-14 pb-4 border-b border-[#3F6E70]/30">
+            <div class="grid grid-cols-3 items-center">
+                <div class="flex items-center justify-start">
+                    <button onclick="history.back()" class="cursor-pointer p-2 -ml-2 hover:bg-[#17464B]/30 rounded-lg transition-colors">
+                        <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+                    </button>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                    <h1 class="text-[14px] font-light tracking-[0.2em] uppercase opacity-80 whitespace-nowrap">Rota Oluştur</h1>
+                    <span class="text-[10px] text-[#E0B07A] mt-0.5 font-medium tracking-wider">BURSA KEŞİF</span>
+                </div>
+                <div class="flex items-center justify-end">
+                    <button onclick="openAiModal()" class="group relative cursor-pointer">
+                        <div class="absolute inset-0 rounded-full ai-orb blur-lg opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="relative w-10 h-10 rounded-full ai-orb flex items-center justify-center border-2 border-white/20">
+                            <span class="material-symbols-outlined text-[#081F24] text-[18px]">auto_awesome</span>
+                        </div>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#E0B07A] rounded-full border-2 border-[#081F24] animate-pulse"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto hide-scrollbar pb-32 px-5 pt-6">
+
+            <!-- Hero Section -->
+            <div class="glass-card rounded-2xl p-5 mb-6 relative overflow-hidden animate-slide-up">
+                <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#E0B07A] via-[#00D4AA] to-[#E0B07A]"></div>
+                
+                <h1 class="text-[22px] font-light mb-3 text-[#C7D8DA] tracking-tight">Bursa'yı <span class="text-[#E0B07A] font-medium">Keşfedin</span></h1>
+                
+                <div class="flex gap-4 mb-5 text-[11px] text-[#9FB6B8] font-light tracking-wide">
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[#E0B07A] text-[14px]">location_on</span>
+                        <span>42 mekan</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[#00D4AA] text-[14px]">category</span>
+                        <span>6 kategori</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[#9FB6B8] text-[14px]">schedule</span>
+                        <span>1-8 saat</span>
+                    </div>
+                </div>
+
+                <!-- Quick Routes -->
+                <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-1">
+                    <button onclick="selectQuickRoute('1saat')" id="route-1saat" class="route-chip flex-shrink-0 px-4 py-3 rounded-full text-[11px] flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">timer</span>
+                        1 Saatlik Tur
+                    </button>
+                    <button onclick="selectQuickRoute('yarım')" id="route-yarım" class="route-chip flex-shrink-0 px-4 py-3 rounded-full text-[11px] flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">wb_sunny</span>
+                        Yarım Gün
+                    </button>
+                    <button onclick="selectQuickRoute('tam')" id="route-tam" class="route-chip flex-shrink-0 px-4 py-3 rounded-full text-[11px] flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                        Tam Gün
+                    </button>
+                    <button onclick="selectQuickRoute('lezzet')" id="route-lezzet" class="route-chip flex-shrink-0 px-4 py-3 rounded-full text-[11px] flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">restaurant</span>
+                        Lezzet Rotası
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Recommendation -->
+            <div class="glass-card rounded-2xl p-5 mb-6 bg-gradient-to-br from-[#E0B07A]/10 to-[#00D4AA]/10 border-[#E0B07A]/30 animate-slide-up" style="animation-delay: 0.1s">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E0B07A]/20 border border-[#E0B07A]/30 mb-4">
+                    <span class="material-symbols-outlined text-[#E0B07A] text-[14px] animate-pulse">auto_awesome</span>
+                    <span class="text-[10px] text-[#E0B07A] font-semibold uppercase tracking-wider">AI Önerisi</span>
+                </div>
+                
+                <p class="text-[14px] text-[#C7D8DA] font-light leading-relaxed mb-5" id="aiText">
+                    <strong class="text-[#E0B07A] font-medium">4 saatiniz varsa:</strong> Ulu Cami → Koza Han → İskender Kebap → Yeşil Türbe rotası tam size göre! Tarih, alışveriş ve lezzet bir arada.
+                </p>
+                
+                <div class="flex gap-3">
+                    <button onclick="applyAIRoute()" class="flex-1 h-12 rounded-xl btn-gold text-[12px] flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">check</span>
+                        Rotayı Kullan
+                    </button>
+                    <button onclick="refreshAI()" class="flex-1 h-12 rounded-xl btn-gold-outline text-[12px] flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">refresh</span>
+                        Başka Öner
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="flex gap-3 mb-6 animate-slide-up" style="animation-delay: 0.2s">
+                <button onclick="openFilterModal()" class="flex-1 h-12 rounded-xl btn-secondary-gold text-[12px] flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">tune</span>
+                    Filtrele
+                </button>
+                <button onclick="sortPlaces()" class="flex-1 h-12 rounded-xl btn-secondary-gold text-[12px] flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">sort</span>
+                    Sırala
+                </button>
+                <button onclick="openMapModal()" class="h-12 px-4 rounded-xl btn-gold-outline text-[12px] flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">map</span>
+                    Harita
+                </button>
+            </div>
+
+            <!-- Categories -->
+            <div id="categoriesSection" class="space-y-3 pb-6 animate-slide-up" style="animation-delay: 0.3s">
+                <!-- Categories populated by JS -->
+            </div>
+        </main>
+
+        <!-- Bottom Bar -->
+        <div class="fixed bottom-0 w-full max-w-[430px] bg-gradient-to-t from-[#081F24] via-[#081F24]/95 to-transparent pt-8 pb-8 px-5 z-50">
+            <div id="selectionPreview" class="hidden mb-3 p-4 glass-card rounded-xl border-[#E0B07A]/40">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[11px] text-[#9FB6B8] uppercase tracking-wider font-medium">Seçilen Rota Noktaları</span>
+                    <span id="previewCount" class="text-[11px] text-[#E0B07A] font-semibold">0 yer</span>
+                </div>
+                <div id="previewChips" class="flex gap-2 overflow-x-auto hide-scrollbar pb-1"></div>
+            </div>
+            
+            <button id="createBtn" onclick="openRouteView()" disabled class="w-full h-14 rounded-2xl btn-gold text-[13px] uppercase tracking-wider flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">map</span>
+                Rotayı Görüntüle
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Filter Modal -->
+    <div id="filterModal" class="modal-overlay">
+        <div class="sticky top-0 z-10 bg-[#081F24]/95 backdrop-blur-xl px-5 py-4 border-b border-[#3F6E70]/30 flex items-center gap-4">
+            <button onclick="closeFilterModal()" class="w-10 h-10 rounded-xl btn-secondary-gold flex items-center justify-center">
+                <span class="material-symbols-outlined text-[#9FB6B8]">arrow_back</span>
+            </button>
+            <span class="text-[16px] font-medium text-[#C7D8DA] tracking-wide">Filtrele</span>
+            <div class="w-10"></div>
+        </div>
+        
+        <div class="p-5 space-y-6">
+            <div>
+                <div class="text-[11px] text-[#9FB6B8] uppercase tracking-wider mb-3 font-medium">Ücret</div>
+                <div class="flex flex-wrap gap-2">
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px] active" onclick="toggleFilter(this)">Tümü</button>
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px]" onclick="toggleFilter(this)">Ücretsiz</button>
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px]" onclick="toggleFilter(this)">Ücretli</button>
+                </div>
+            </div>
+            
+            <div>
+                <div class="text-[11px] text-[#9FB6B8] uppercase tracking-wider mb-3 font-medium">Mesafe</div>
+                <div class="flex flex-wrap gap-2">
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px] active" onclick="toggleFilter(this)">Tümü</button>
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px]" onclick="toggleFilter(this)">0-5 km</button>
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px]" onclick="toggleFilter(this)">5-15 km</button>
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px]" onclick="toggleFilter(this)">15+ km</button>
+                </div>
+            </div>
+            
+            <div>
+                <div class="text-[11px] text-[#9FB6B8] uppercase tracking-wider mb-3 font-medium">Süre</div>
+                <div class="flex flex-wrap gap-2">
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px] active" onclick="toggleFilter(this)">Tümü</button>
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px]" onclick="toggleFilter(this)">30 dk</button>
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px]" onclick="toggleFilter(this)">1 saat</button>
+                    <button class="filter-chip px-4 py-3 rounded-full text-[12px]" onclick="toggleFilter(this)">2+ saat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="modal-overlay">
+        <div class="sticky top-0 z-10 bg-[#081F24]/95 backdrop-blur-xl px-5 py-4 border-b border-[#3F6E70]/30 flex items-center gap-4">
+            <button onclick="closeMapModal()" class="w-10 h-10 rounded-xl btn-secondary-gold flex items-center justify-center">
+                <span class="material-symbols-outlined text-[#9FB6B8]">arrow_back</span>
+            </button>
+            <span class="text-[16px] font-medium text-[#C7D8DA] tracking-wide">Haritada Gör</span>
+            <div class="w-10"></div>
+        </div>
+        
+        <div class="flex-1 bg-[#17464B]/20 flex items-center justify-center relative p-5">
+            <div class="text-center">
+                <span class="material-symbols-outlined text-[64px] text-[#3F6E70] mb-4">map</span>
+                <div class="text-[#9FB6B8] text-[14px] font-light">Harita görünümü</div>
+                <p class="text-[#6E8C8E] text-[12px] mt-2 font-light">Seçilen noktalar haritada gösterilecek</p>
+            </div>
+            <div id="mapPoints" class="absolute top-5 left-5 right-5 space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal-overlay">
+        <div class="relative h-[280px]">
+            <img id="detailImg" src="" class="w-full h-full object-cover" alt="">
+            <button onclick="closeDetail()" class="absolute top-4 right-4 w-11 h-11 rounded-xl bg-[#081F24]/80 backdrop-blur border border-[#E0B07A]/30 flex items-center justify-center text-[#E0B07A] hover:bg-[#E0B07A]/20 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div id="detailBadge" class="absolute bottom-4 left-4 px-4 py-2 bg-[#E0B07A] rounded-full text-[11px] font-bold text-[#081F24] uppercase tracking-wider">Tarihi</div>
+        </div>
+        
+        <div class="p-5 pb-24">
+            <h2 id="detailTitle" class="text-[24px] font-light mb-2 text-[#C7D8DA] tracking-tight">Ulu <span class="text-[#E0B07A] font-medium">Cami</span></h2>
+            
+            <div class="flex items-center gap-2 mb-5">
+                <div class="flex text-[#E0B07A]">
+                    <span class="material-symbols-outlined text-[18px]">star</span>
+                    <span class="material-symbols-outlined text-[18px]">star</span>
+                    <span class="material-symbols-outlined text-[18px]">star</span>
+                    <span class="material-symbols-outlined text-[18px]">star</span>
+                    <span class="material-symbols-outlined text-[18px]">star</span>
+                </div>
+                <span id="detailScore" class="text-[13px] text-[#9FB6B8] font-medium">4.9 / 5.0</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="p-4 glass-card rounded-xl border border-[#3F6E70]/30">
+                    <div class="text-[10px] text-[#9FB6B8] uppercase tracking-wider mb-1 font-medium">Giriş Ücreti</div>
+                    <div id="detailPrice" class="text-[15px] font-semibold text-[#E0B07A]">Ücretsiz</div>
+                </div>
+                <div class="p-4 glass-card rounded-xl border border-[#3F6E70]/30">
+                    <div class="text-[10px] text-[#9FB6B8] uppercase tracking-wider mb-1 font-medium">Ziyaret Saatleri</div>
+                    <div id="detailHours" class="text-[15px] font-medium text-[#C7D8DA]">08:00 - 20:00</div>
+                </div>
+                <div class="p-4 glass-card rounded-xl border border-[#3F6E70]/30">
+                    <div class="text-[10px] text-[#9FB6B8] uppercase tracking-wider mb-1 font-medium">Tahmini Süre</div>
+                    <div id="detailDuration" class="text-[15px] font-medium text-[#C7D8DA]">45 dk</div>
+                </div>
+                <div class="p-4 glass-card rounded-xl border border-[#3F6E70]/30">
+                    <div class="text-[10px] text-[#9FB6B8] uppercase tracking-wider mb-1 font-medium">Mesafe</div>
+                    <div id="detailDistance" class="text-[15px] font-medium text-[#C7D8DA]">Merkez</div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="text-[11px] text-[#9FB6B8] uppercase tracking-wider mb-3 font-medium">Hakkında</div>
+                <p id="detailDesc" class="text-[14px] text-[#9FB6B8] leading-relaxed font-light"></p>
+            </div>
+
+            <div class="mb-6">
+                <div class="text-[11px] text-[#9FB6B8] uppercase tracking-wider mb-3 font-medium">Öne Çıkanlar</div>
+                <div id="detailFeatures" class="space-y-2"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-4 border-t border-[#3F6E70]/30">
+                <button onclick="openDirections()" class="h-12 rounded-xl btn-gold-outline text-[13px] flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">directions</span>
+                    Yol Tarifi
+                </button>
+                <button onclick="contactPlace()" class="h-12 rounded-xl btn-gold text-[13px] flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">phone</span>
+                    İletişim
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Route View Modal -->
+    <div id="routeModal" class="modal-overlay">
+        <div class="sticky top-0 z-10 bg-[#081F24]/95 backdrop-blur-xl px-5 py-4 border-b border-[#3F6E70]/30 flex items-center gap-4">
+            <button onclick="closeRouteView()" class="w-10 h-10 rounded-xl btn-secondary-gold flex items-center justify-center">
+                <span class="material-symbols-outlined text-[#9FB6B8]">arrow_back</span>
+            </button>
+            <span class="text-[16px] font-medium text-[#C7D8DA] tracking-wide">Rota Planınız</span>
+            <div class="w-10"></div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scroll pb-32">
+            <!-- Schema -->
+            <div class="p-5 border-b border-[#3F6E70]/20">
+                <div class="text-[11px] text-[#9FB6B8] uppercase tracking-wider mb-4 text-center font-medium">Rota Şeması</div>
+                <div class="h-[120px] bg-[#17464B]/30 rounded-2xl border border-[#3F6E70]/30 relative overflow-hidden">
+                    <div class="absolute top-1/2 left-8 right-8 h-[2px] bg-gradient-to-r from-[#E0B07A] via-[#00D4AA] to-[#E0B07A] opacity-30"></div>
+                    <div id="schemaPoints" class="absolute inset-0 flex items-center justify-between px-8"></div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4 p-5 border-b border-[#3F6E70]/20">
+                <div class="text-center">
+                    <div id="totalStops" class="text-[24px] font-bold text-[#E0B07A] mb-1">0</div>
+                    <div class="text-[10px] text-[#9FB6B8] uppercase tracking-wider font-medium">Durak</div>
+                </div>
+                <div class="text-center">
+                    <div id="totalTime" class="text-[24px] font-bold text-[#E0B07A] mb-1">0 dk</div>
+                    <div class="text-[10px] text-[#9FB6B8] uppercase tracking-wider font-medium">Süre</div>
+                </div>
+                <div class="text-center">
+                    <div id="totalDistance" class="text-[24px] font-bold text-[#E0B07A] mb-1">0 km</div>
+                    <div class="text-[10px] text-[#9FB6B8] uppercase tracking-wider font-medium">Mesafe</div>
+                </div>
+            </div>
+
+            <!-- Transport -->
+            <div class="flex gap-3 p-5 overflow-x-auto hide-scrollbar border-b border-[#3F6E70]/20">
+                <button onclick="setTransport('walking')" id="trans-walking" class="transport-option flex-shrink-0 px-4 py-3 rounded-full text-[12px] flex items-center gap-2 active">
+                    <span class="material-symbols-outlined text-[18px]">directions_walk</span>
+                    Yürüyüş
+                </button>
+                <button onclick="setTransport('car')" id="trans-car" class="transport-option flex-shrink-0 px-4 py-3 rounded-full text-[12px] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">directions_car</span>
+                    Araba
+                </button>
+                <button onclick="setTransport('transit')" id="trans-transit" class="transport-option flex-shrink-0 px-4 py-3 rounded-full text-[12px] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">directions_bus</span>
+                    Toplu Taşıma
+                </button>
+                <button onclick="setTransport('bike')" id="trans-bike" class="transport-option flex-shrink-0 px-4 py-3 rounded-full text-[12px] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">pedal_bike</span>
+                    Bisiklet
+                </button>
+            </div>
+
+            <!-- Steps -->
+            <div class="p-5">
+                <div class="text-[11px] text-[#9FB6B8] uppercase tracking-wider mb-4 font-medium">Sıralı Duraklar</div>
+                <div id="routeStepsList" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="fixed bottom-0 w-full max-w-[430px] bg-gradient-to-t from-[#081F24] via-[#081F24] to-transparent pt-6 pb-8 px-5 space-y-3">
+            <button onclick="startFullNavigation()" class="w-full h-14 rounded-2xl btn-gold text-[13px] uppercase tracking-wider flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">navigation</span>
+                Navigasyonu Başlat
+            </button>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="shareRoute()" class="h-12 rounded-xl btn-gold-outline text-[12px] flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">share</span>
+                    Paylaş
+                </button>
+                <button onclick="saveRoute()" class="h-12 rounded-xl btn-gold-outline text-[12px] flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">bookmark</span>
+                    Kaydet
+                </button>
+            </div>
+            <button onclick="closeRouteView()" class="w-full h-12 rounded-xl btn-secondary-gold text-[12px]">
+                Rotayı Düzenle
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Chat Modal -->
+    <div id="ai-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeAiModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 max-w-[430px] mx-auto h-[85vh] bg-[#081F24] rounded-t-3xl overflow-hidden flex flex-col modal-enter border-x border-t border-[#3F6E70]/30">
+            <div class="px-6 py-4 border-b border-[#3F6E70]/30 flex items-center justify-between bg-[#0A2A2F]/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full ai-orb flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#081F24]">auto_awesome</span>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-[14px] text-[#C7D8DA] tracking-wide">CityJOY AI</h3>
+                        <p class="text-[10px] text-[#00D4AA] font-medium">Çevrimiçi</p>
+                    </div>
+                </div>
+                <button onclick="closeAiModal()" class="w-8 h-8 rounded-full btn-secondary-gold flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm text-[#9FB6B8]">close</span>
+                </button>
+            </div>
+
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scroll">
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full ai-orb flex-shrink-0 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#081F24] text-sm">auto_awesome</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 max-w-[80%] border border-[#3F6E70]/30">
+                        <p class="text-[14px] text-[#C7D8DA] font-light">Bursa rotanızı birlikte planlayalım! Hangi tür mekanları görmek istersiniz? 🕌</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-[#3F6E70]/30 bg-[#0A2A2F]/50">
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-3">
+                    <button onclick="sendQuickMessage('Tarihi yerler')" class="px-3 py-1.5 rounded-full btn-gold-outline text-[10px] whitespace-nowrap">Tarihi yerler</button>
+                    <button onclick="sendQuickMessage('Doğa rotası')" class="px-3 py-1.5 rounded-full btn-gold-outline text-[10px] whitespace-nowrap">Doğa rotası</button>
+                    <button onclick="sendQuickMessage('Lezzet turu')" class="px-3 py-1.5 rounded-full btn-gold-outline text-[10px] whitespace-nowrap">Lezzet turu</button>
+                </div>
+                <div class="flex items-center gap-3 bg-[#17464B]/30 rounded-2xl px-4 py-3 border border-[#3F6E70]/30">
+                    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." class="flex-1 bg-transparent border-none text-[14px] text-[#C7D8DA] placeholder:text-[#6E8C8E] focus:outline-none font-light" onkeypress="if(event.key==='Enter')sendChatMessage()">
+                    <button onclick="sendChatMessage()" class="w-10 h-10 rounded-xl btn-gold flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#081F24]">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const categoriesData = {
+            tarihi: {
+                icon: '🏛️',
+                title: 'Tarihi Yerler',
+                subtitle: '8 mekan',
+                places: [
+                    { id: 1, name: "Ulu Cami", tags: "1399 • 20 Kubbe • Camii", rating: 4.9, price: "Ücretsiz", hours: "08:00 - 20:00", duration: "45 dk", distance: "Merkez • 0 km", coords: { lat: 40.1839, lng: 29.0601 }, desc: "Bursa Ulu Cami, 1396-1399 yılları arasında Sultan Bayezid I tarafından yaptırılmıştır. 20 kubbesi ve 2 minaresi ile Selçuklu-Osmanlı mimarisinin en önemli eserlerinden biridir.", features: ["20 Kubbeli Dev Yapı", "Selçuklu-Osmanlı Mimarisi", "Şadırvanlı İç Avlu"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Bursa_Ulu_Cami%2C_2023.jpg/600px-Bursa_Ulu_Cami%2C_2023.jpg" },
+                    { id: 2, name: "Koza Han", tags: "1491 • İpek Çarşısı • Ticaret", rating: 4.7, price: "Ücretsiz", hours: "08:00 - 20:00", duration: "1 saat", distance: "Merkez • 0.2 km", coords: { lat: 40.1842, lng: 29.0608 }, desc: "II. Bayezid tarafından 1491'de yaptırılan Koza Han, ipek ticaretinin merkezi olmuştur.", features: ["Tarihi Han Yapısı", "İpek Ticareti", "Çınar Ağaçlı Avlu"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Koza_Han%2C_Bursa.jpg/600px-Koza_Han%2C_Bursa.jpg" },
+                    { id: 3, name: "Irgandı Köprüsü", tags: "1442 • Çarşılı Köprü • Tarihi", rating: 4.6, price: "Ücretsiz", hours: "7/24", duration: "20 dk", distance: "Setbaşı • 0.8 km", coords: { lat: 40.1845, lng: 29.0615 }, desc: "1442 yılında yapılan Irgandı Köprüsü, üzerinde çarşı bulunan dünyanın dört köprüsünden biridir.", features: ["Çarşılı Köprü", "1442 Yapımı", "Gökdere Manzarası"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Irgand%C4%B1_Bridge.jpg/600px-Irgand%C4%B1_Bridge.jpg" },
+                    { id: 4, name: "Setbaşı Hanları", tags: "Tarihi Hanlar • Ticaret • Mimari", rating: 4.5, price: "Ücretsiz", hours: "08:00 - 22:00", duration: "45 dk", distance: "Setbaşı • 1 km", coords: { lat: 40.1850, lng: 29.0620 }, desc: "Setbaşı bölgesinde bulunan tarihi hanlar, Osmanlı dönemi ticaret hayatının izlerini taşır.", features: ["Osmanlı Hanları", "Tarihi Mimari", "Esnaf Kültürü"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bursa_Hanlar_Bolgesi.jpg/600px-Bursa_Hanlar_Bolgesi.jpg" },
+                    { id: 5, name: "Tophane Saat Kulesi", tags: "1905 • Tophane • Saat Kulesi", rating: 4.6, price: "Ücretsiz", hours: "7/24", duration: "30 dk", distance: "Tophane • 1.2 km", coords: { lat: 40.1910, lng: 29.0550 }, desc: "1905 yılında Sultan Abdülhamid II döneminde yapılan saat kulesi.", features: ["Tarihi Saat Kulesi", "1905 Yapımı", "Tophane Manzarası"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bursa_Tophane_Clock_Tower.jpg/600px-Bursa_Tophane_Clock_Tower.jpg" },
+                    { id: 6, name: "Tayyare Kültür Merkezi", tags: "Tarihi Bina • Kültür • Etkinlik", rating: 4.5, price: "Değişken", hours: "09:00 - 21:00", duration: "2 saat", distance: "Çekirge • 2 km", coords: { lat: 40.1950, lng: 29.0500 }, desc: "Eski havagazı fabrikası binası restore edilerek kültür merkezine dönüştürülmüştür.", features: ["Restorasyon", "Kültür-Sanat", "Konserler"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tayyare_Kultur_Merkezi.jpg/600px-Tayyare_Kultur_Merkezi.jpg" },
+                    { id: 7, name: "Panorama 1326", tags: "Panorama • Tarih • 1326", rating: 4.8, price: "15 TL", hours: "09:00 - 17:00", duration: "1 saat", distance: "Osmangazi • 3 km", coords: { lat: 40.1800, lng: 29.0700 }, desc: "Bursa'nın fethini üç boyutlu olarak anlatan panoramik müze.", features: ["Panoramik Resim", "1326 Fethi", "Üç Boyutlu Deneyim"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Panorama_1326_Museum.jpg/600px-Panorama_1326_Museum.jpg" },
+                    { id: 8, name: "Bursa Arkeoloji Müzesi", tags: "Arkeoloji • Tarih • Eserler", rating: 4.6, price: "10 TL", hours: "08:30 - 17:30", duration: "1.5 saat", distance: "Kültürpark • 1.5 km", coords: { lat: 40.1856, lng: 29.0598 }, desc: "1902 yılında kurulan müze, Bursa ve çevresinden çıkarılan arkeolojik eserleri sergiler.", features: ["Arkeolojik Eserler", "Prehistorik", "Roma-Bizans"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bursa_Archaeological_Museum.jpg/600px-Bursa_Archaeological_Museum.jpg" }
+                ]
+            },
+            dini: {
+                icon: '🕌',
+                title: 'Dini & Kültürel',
+                subtitle: '7 mekan',
+                places: [
+                    { id: 9, name: "Yeşil Türbe", tags: "1421 • Çelebi Mehmet • UNESCO", rating: 4.8, price: "Ücretsiz", hours: "08:30 - 17:30", duration: "30 dk", distance: "Yeşil • 1 km", coords: { lat: 40.1825, lng: 29.0672 }, desc: "Çelebi Sultan Mehmet'in türbesi olan Yeşil Türbe, İznik çinileriyle kaplı dış cephesiyle ünlüdür.", features: ["İznik Çinileri", "UNESCO Mirası", "Osmanlı Türbesi"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Green_Tomb_%28Ye%C5%9Fil_T%C3%BCrbe%29%2C_Bursa.jpg/600px-Green_Tomb_%28Ye%C5%9Fil_T%C3%BCrbe%29%2C_Bursa.jpg" },
+                    { id: 10, name: "Yeşil Cami", tags: "1424 • Çini • İznik", rating: 4.7, price: "Ücretsiz", hours: "08:30 - 17:30", duration: "30 dk", distance: "Yeşil • 1 km", coords: { lat: 40.1828, lng: 29.0675 }, desc: "Çelebi Sultan Mehmet tarafından 1424'te yaptırılan cami.", features: ["İznik Çinileri", "Mihrab Süslemesi", "Osmanlı Camii"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Green_Mosque_Bursa.jpg/600px-Green_Mosque_Bursa.jpg" },
+                    { id: 11, name: "Emir Sultan Camii", tags: "1805 • Barok • Manzara", rating: 4.7, price: "Ücretsiz", hours: "08:00 - 20:00", duration: "30 dk", distance: "Emir Sultan • 2 km", coords: { lat: 40.1889, lng: 29.0556 }, desc: "Emir Sultan'ın türbesinin yanında bulunan cami, 1805'te III. Selim tarafından yaptırılmıştır.", features: ["Barok Mimari", "Emir Sultan Türbesi", "Bahçe Manzarası"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Emir_Sultan_Mosque.jpg/600px-Emir_Sultan_Mosque.jpg" },
+                    { id: 12, name: "Muradiye Külliyesi", tags: "12 Türbe • Çini • 1426", rating: 4.7, price: "Ücretsiz", hours: "08:30 - 17:30", duration: "1 saat", distance: "Muradiye • 3 km", coords: { lat: 40.1914, lng: 29.0478 }, desc: "II. Murad tarafından 1426'da yaptırılan külliye, 12 padişah türbesini barındırır.", features: ["12 Padişah Türbesi", "İznik Çinileri", "Tarihi Bahçe"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Muradiye_Complex.jpg/600px-Muradiye_Complex.jpg" },
+                    { id: 13, name: "Orhan Gazi Türbesi", tags: "1326 • Kurucu • Tophane", rating: 4.6, price: "Ücretsiz", hours: "08:30 - 17:30", duration: "20 dk", distance: "Tophane • 1.2 km", coords: { lat: 40.1912, lng: 29.0548 }, desc: "Bursa'nın fethini gerçekleştiren Orhan Gazi'nin türbesi.", features: ["Orhan Gazi", "1326 Yapımı", "Kurucu Padişah"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Orhan_Gazi_Tomb.jpg/600px-Orhan_Gazi_Tomb.jpg" },
+                    { id: 14, name: "Osman Gazi Türbesi", tags: "Ertuğrul Gazi • Kurucu • Tophane", rating: 4.6, price: "Ücretsiz", hours: "08:30 - 17:30", duration: "20 dk", distance: "Tophane • 1.2 km", coords: { lat: 40.1915, lng: 29.0545 }, desc: "Osmanlı Devleti'nin kurucusu Osman Gazi'nin türbesi.", features: ["Osman Gazi", "Devlet Kurucusu", "Tophane"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Osman_Gazi_Tomb.jpg/600px-Osman_Gazi_Tomb.jpg" },
+                    { id: 15, name: "Süleyman Çelebi Türbesi", tags: "Mevlit • Şair • Çelebi", rating: 4.5, price: "Ücretsiz", hours: "08:30 - 17:30", duration: "15 dk", distance: "Muradiye • 3 km", coords: { lat: 40.1916, lng: 29.0480 }, desc: "Mevlid-i Şerif'in yazarı Süleyman Çelebi'nin türbesi.", features: ["Mevlid-i Şerif", "Süleyman Çelebi", "Osmanlı Şairi"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Suleyman_Celebi_Tomb.jpg/600px-Suleyman_Celebi_Tomb.jpg" }
+                ]
+            },
+            doga: {
+                icon: '🌲',
+                title: 'Doğa & Manzara',
+                subtitle: '8 mekan',
+                places: [
+                    { id: 16, name: "Uludağ", tags: "Teleferik • Kayak • 2543m", rating: 4.9, price: "Teleferik: 350 TL", hours: "08:00 - 22:00", duration: "Tam Gün", distance: "15 km", coords: { lat: 40.1234, lng: 29.1234 }, desc: "Uludağ, Bursa'nın 15 km güneyinde yer alan ve 2543 metreye ulaşan bir dağdır.", features: ["Kayak Merkezi", "Teleferik", "Milli Park"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Uluda%C4%9F_Mountain.jpg/600px-Uluda%C4%9F_Mountain.jpg" },
+                    { id: 17, name: "Cumalıkızık", tags: "UNESCO • 700 Yıllık • Köy", rating: 4.8, price: "Ücretsiz", hours: "7/24", duration: "2-3 saat", distance: "12 km", coords: { lat: 40.2123, lng: 29.1234 }, desc: "700 yıllık Osmanlı köyü Cumalıkızık, UNESCO Dünya Mirası Listesi'ndedir.", features: ["UNESCO Mirası", "Osmanlı Köyü", "Tarihi Evler"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Cumal%C4%B1k%C4%B1z%C4%B1k_3.JPG/600px-Cumal%C4%B1k%C4%B1z%C4%B1k_3.JPG" },
+                    { id: 18, name: "Gölyazı", tags: "Nilüfer Gölü • Tekne • 25km", rating: 4.6, price: "Tekne: 50 TL", hours: "7/24", duration: "2-3 saat", distance: "25 km", coords: { lat: 40.1567, lng: 28.8765 }, desc: "Uluabat Gölü'ndeki yarımada üzerinde kurulu Gölyazı.", features: ["Göl Manzarası", "Tekne Turu", "Tarihi Kilise"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Golyazi_Bursa.jpg/600px-Golyazi_Bursa.jpg" },
+                    { id: 19, name: "İznik Gölü", tags: "Plaj • Seramik • 85km", rating: 4.8, price: "Plaj: 30 TL", hours: "7/24", duration: "Tam Gün", distance: "85 km", coords: { lat: 40.4567, lng: 29.5678 }, desc: "Türkiye'nin beşinci büyük gölü olan İznik Gölü.", features: ["Türkiye'nin 5. Gölü", "Roma Surları", "Seramik Atölyeleri"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Iznik_Lake.jpg/600px-Iznik_Lake.jpg" },
+                    { id: 20, name: "Saitabat Şelalesi", tags: "Şelale • Doğa • Piknik", rating: 4.7, price: "Ücretsiz", hours: "7/24", duration: "2 saat", distance: "30 km", coords: { lat: 40.1000, lng: 29.2000 }, desc: "Kestel ilçesinde yer alan Saitabat Şelalesi.", features: ["Doğal Şelale", "Piknik Alanı", "Yürüyüş Parkuru"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Saitabat_Waterfall.jpg/600px-Saitabat_Waterfall.jpg" },
+                    { id: 21, name: "Su Uçtu Şelalesi", tags: "Şelale • Orhaneli • Doğa", rating: 4.6, price: "Ücretsiz", hours: "7/24", duration: "3 saat", distance: "50 km", coords: { lat: 39.9000, lng: 28.9000 }, desc: "Orhaneli ilçesindeki Su Uçtu Şelalesi, 38 metrelik yüksekliğiyle etkileyicidir.", features: ["38m Yükseklik", "Doğa Fotoğrafçılığı", "Trekking"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Su_Uctu_Waterfall.jpg/600px-Su_Uctu_Waterfall.jpg" },
+                    { id: 22, name: "Tophane Parkı", tags: "Park • Manzara • Tophane", rating: 4.5, price: "Ücretsiz", hours: "7/24", duration: "1 saat", distance: "1.2 km", coords: { lat: 40.1910, lng: 29.0550 }, desc: "Bursa'nın en eski parklarından biri olan Tophane Parkı.", features: ["Şehir Manzarası", "Tarihi Mezarlık", "Piknik Alanı"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tophane_Park_Bursa.jpg/600px-Tophane_Park_Bursa.jpg" },
+                    { id: 23, name: "Atatürk Orman Çiftliği", tags: "AOÇ • Piknik • Doğa", rating: 4.6, price: "Ücretsiz", hours: "08:00 - 20:00", duration: "2 saat", distance: "8 km", coords: { lat: 40.2200, lng: 29.0800 }, desc: "Atatürk'ün emriyle kurulan orman çiftliği.", features: ["Atatürk Köşkü", "Piknik Alanı", "Gölet"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Ataturk_Orman_Ciftligi.jpg/600px-Ataturk_Orman_Ciftligi.jpg" }
+                ]
+            },
+            lezzet: {
+                icon: '🍽️',
+                title: 'Lezzet Durakları',
+                subtitle: '7 mekan',
+                places: [
+                    { id: 24, name: "İskender Kebap", tags: "1867 • Meşhur • Dana", rating: 4.9, price: "250-350 TL", hours: "11:00 - 22:00", duration: "1 saat", distance: "Kebapçılar • 0.5 km", coords: { lat: 40.1845, lng: 29.0612 }, desc: "Bursa'nın dünyaca ünlü lezzeti İskender Kebap, 1867'de icat edilmiştir.", features: ["Tarihi Lezzet", "Dana Döner", "Tereyağlı"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Iskender_kebap.jpg/600px-Iskender_kebap.jpg" },
+                    { id: 25, name: "Kestane Şekeri", tags: "Tatlı • Hediyelik • 600 Yıllık", rating: 4.7, price: "200-500 TL/kg", hours: "09:00 - 21:00", duration: "30 dk", distance: "Çarşı • 0.3 km", coords: { lat: 40.1840, lng: 29.0605 }, desc: "Bursa'nın en meşhur tatlısı kestane şekeri, 600 yıllık bir geleneğe sahiptir.", features: ["600 Yıllık Gelenek", "Şeker Şerbetli", "Hediyelik"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Chestnuts.jpg/600px-Chestnuts.jpg" },
+                    { id: 26, name: "Tahinli Pide", tags: "Hamur İşi • Geleneksel • Tarihi", rating: 4.6, price: "50-80 TL", hours: "07:00 - 20:00", duration: "30 dk", distance: "Tarihi Çarşı • 0.2 km", coords: { lat: 40.1842, lng: 29.0600 }, desc: "Bursa'nın geleneksel hamur işlerinden tahinli pide.", features: ["Geleneksel", "Tahinli", "Kahvaltılık"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tahinli_Pide.jpg/600px-Tahinli_Pide.jpg" },
+                    { id: 27, name: "Cantık", tags: "Bursa Pidesi • Etli • Tarihi", rating: 4.7, price: "80-120 TL", hours: "10:00 - 22:00", duration: "45 dk", distance: "Merkez • 0.5 km", coords: { lat: 40.1850, lng: 29.0610 }, desc: "Bursa'ya özgü kapalı pide çeşidi cantık.", features: ["Bursa'ya Özgü", "Kapalı Pide", "Kıymalı"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Cantik_Bursa.jpg/600px-Cantik_Bursa.jpg" },
+                    { id: 28, name: "Pideli Köfte", tags: "Köfte • Pide • Et", rating: 4.6, price: "150-200 TL", hours: "11:00 - 22:00", duration: "1 saat", distance: "Merkez • 0.8 km", coords: { lat: 40.1848, lng: 29.0615 }, desc: "Bursa'nın diğer meşhur yemeği pideli köfte.", features: ["Izgara Köfte", "Özel Sos", "Pideli"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Pideli_Kofte.jpg/600px-Pideli_Kofte.jpg" },
+                    { id: 29, name: "İnegöl Köfte", tags: "İnegöl • Köfte • Mangal", rating: 4.8, price: "200-300 TL", hours: "11:00 - 22:00", duration: "1 saat", distance: "İnegöl • 30 km", coords: { lat: 40.0800, lng: 29.5100 }, desc: "Dünyaca ünlü İnegöl köftesi.", features: ["İnegöl Usulü", "Mangal", "Dana Eti"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Inegol_Kofte.jpg/600px-Inegol_Kofte.jpg" },
+                    { id: 30, name: "Bursa Peçetesi", tags: "Tatlı • Şerbetli • İncir", rating: 4.5, price: "100-150 TL/kg", hours: "09:00 - 21:00", duration: "20 dk", distance: "Çarşı • 0.3 km", coords: { lat: 40.1841, lng: 29.0603 }, desc: "İncir ve cevizle hazırlanan geleneksel Bursa tatlısı.", features: ["İncirli", "Cevizli", "Şerbetli"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bursa_Pecetesi.jpg/600px-Bursa_Pecetesi.jpg" }
+                ]
+            },
+            muzeler: {
+                icon: '🏛️',
+                title: 'Müzeler & Sanat',
+                subtitle: '6 mekan',
+                places: [
+                    { id: 31, name: "Bursa Kent Müzesi", tags: "Tarih • Etnografya • 8500 Yıl", rating: 4.6, price: "10 TL", hours: "09:00 - 17:00", duration: "1.5 saat", distance: "Merkez • 0.5 km", coords: { lat: 40.1856, lng: 29.0598 }, desc: "Eski adliye binasında hizmet veren müze.", features: ["8500 Yıllık Tarih", "Arkeoloji", "Etnografya"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bursa_City_Museum.jpg/600px-Bursa_City_Museum.jpg" },
+                    { id: 32, name: "Atatürk Evi Müzesi", tags: "Atatürk • Tarih • Çekirge", rating: 4.5, price: "Ücretsiz", hours: "09:00 - 17:00", duration: "45 dk", distance: "Çekirge • 2 km", coords: { lat: 40.1950, lng: 29.0500 }, desc: "Atatürk'ün Bursa ziyaretlerinde kaldığı tarihi konak.", features: ["Atatürk'ün Eşyaları", "Tarihi Konak", "Fotoğraf Arşivi"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Ataturk_Evi_Museum.jpg/600px-Ataturk_Evi_Museum.jpg" },
+                    { id: 33, name: "Tofaş Anadolu Arabaları Müzesi", tags: "Otomobil • Tarih • Sanayi", rating: 4.7, price: "20 TL", hours: "10:00 - 18:00", duration: "1.5 saat", distance: "Organize Sanayi • 8 km", coords: { lat: 40.2100, lng: 29.0000 }, desc: "Tofaş tarafından kurulan müze.", features: ["Tarihi Araçlar", "At Arabaları", "İlk Yerli Oto"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Tofas_Museum.jpg/600px-Tofas_Museum.jpg" },
+                    { id: 34, name: "Bursa Sanatçılar Derneği", tags: "Sanat • Sergi • Etkinlik", rating: 4.4, price: "Ücretsiz", hours: "10:00 - 19:00", duration: "1 saat", distance: "Merkez • 0.6 km", coords: { lat: 40.1840, lng: 29.0590 }, desc: "BUSAD binasında yer alan sanat merkezi.", features: ["Yerel Sanatçılar", "Resim Sergisi", "Heykel"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bursa_Artists_Association.jpg/600px-Bursa_Artists_Association.jpg" },
+                    { id: 35, name: "Merinos Tekstil Sanayi Müzesi", tags: "Tekstil • Tarih • Sanayi", rating: 4.5, price: "10 TL", hours: "09:00 - 17:00", duration: "1 saat", distance: "Merinos • 1 km", coords: { lat: 40.1860, lng: 29.0650 }, desc: "Eski Merinos fabrikası binasında kurulan müze.", features: ["Tekstil Tarihi", "Dokuma Tezgahları", "İpek Üretimi"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Merinos_Textile_Museum.jpg/600px-Merinos_Textile_Museum.jpg" },
+                    { id: 36, name: "Misi Köyü Etnografya Müzesi", tags: "Etnografya • Misi • Gümüştepe", rating: 4.6, price: "5 TL", hours: "09:00 - 18:00", duration: "1 saat", distance: "Gümüştepe • 12 km", coords: { lat: 40.1500, lng: 29.0500 }, desc: "700 yıllık Misi Köyü'nde yer alan müze.", features: ["Etnografya", "Geleneksel Yaşam", "Misi Köyü"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Misi_Etnography_Museum.jpg/600px-Misi_Etnography_Museum.jpg" }
+                ]
+            },
+            carsi: {
+                icon: '🛍️',
+                title: 'Çarşı & Alışveriş',
+                subtitle: '6 mekan',
+                places: [
+                    { id: 37, name: "Kapalı Çarşı", tags: "Tarihi • Alışveriş • Osmanlı", rating: 4.6, price: "Ücretsiz", hours: "08:00 - 21:00", duration: "2 saat", distance: "Merkez • 0.1 km", coords: { lat: 40.1840, lng: 29.0600 }, desc: "14. yüzyıldan beri ticaretin kalbi olan Kapalı Çarşı.", features: ["130 Dükkan", "Tarihi Çarşı", "Kuyumculuk"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bursa_Kapali_Carsi.jpg/600px-Bursa_Kapali_Carsi.jpg" },
+                    { id: 38, name: "Uzun Çarşı", tags: "Tarihi • Yürüyüş • Alışveriş", rating: 4.5, price: "Ücretsiz", hours: "08:00 - 21:00", duration: "1.5 saat", distance: "Merkez • 0.2 km", coords: { lat: 40.1850, lng: 29.0550 }, desc: "Kapalı Çarşı'dan Tophane'ye uzanan tarihi çarşı.", features: ["Tarihi Sokaklar", "Yürüyüş Rotası", "Eski Dükkanlar"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Uzun_Carsi_Bursa.jpg/600px-Uzun_Carsi_Bursa.jpg" },
+                    { id: 39, name: "Tarihi Hanlar Bölgesi", tags: "Hanlar • Ticaret • Mimari", rating: 4.7, price: "Ücretsiz", hours: "08:00 - 20:00", duration: "2 saat", distance: "Osmangazi • 0.3 km", coords: { lat: 40.1845, lng: 29.0605 }, desc: "Fevzi Paşa Caddesi çevresindeki tarihi hanlar.", features: ["Koza Han", "Pirinç Han", "İpek Han"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Bursa_Hanlar_Region.jpg/600px-Bursa_Hanlar_Region.jpg" },
+                    { id: 40, name: "Zafer Plaza", tags: "AVM • Modern • Merkez", rating: 4.3, price: "Ücretsiz", hours: "10:00 - 22:00", duration: "3 saat", distance: "Merkez • 0.5 km", coords: { lat: 40.1830, lng: 29.0580 }, desc: "Bursa'nın ilk ve en merkezi alışveriş merkezi.", features: ["Ünlü Markalar", "Sinema", "Yemek Katı"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Zafer_Plaza_Bursa.jpg/600px-Zafer_Plaza_Bursa.jpg" },
+                    { id: 41, name: "Korupark AVM", tags: "AVM • Modern • Nilüfer", rating: 4.4, price: "Ücretsiz", hours: "10:00 - 22:00", duration: "3 saat", distance: "Nilüfer • 5 km", coords: { lat: 40.2200, lng: 28.9500 }, desc: "Bursa'nın en büyük alışveriş merkezlerinden biri.", features: ["Geniş Mağazalar", "Eğlence", "Restoranlar"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Korupark_AVM.jpg/600px-Korupark_AVM.jpg" },
+                    { id: 42, name: "CarrefourSA AVM", tags: "AVM • Hipermarket • Osmangazi", rating: 4.2, price: "Ücretsiz", hours: "10:00 - 22:00", duration: "2 saat", distance: "Osmangazi • 4 km", coords: { lat: 40.1900, lng: 29.0800 }, desc: "CarrefourSA hipermarketi bünyesinde barındıran alışveriş merkezi.", features: ["Hipermarket", "Tekstil", "Elektronik"], img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Carrefour_Bursa.jpg/600px-Carrefour_Bursa.jpg" }
+                ]
+            }
+        };
+
+        let selectedPlaces = [];
+        let currentPlaceData = null;
+        let currentTransport = 'walking';
+
+        function init() {
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoriesSection');
+            container.innerHTML = Object.entries(categoriesData).map(([key, category]) => `
+                <div class="category-accordion rounded-2xl overflow-hidden" id="cat-${key}">
+                    <div class="category-header p-5 cursor-pointer flex items-center justify-between hover:bg-[#17464B]/40 transition-colors" onclick="toggleCategory('${key}')">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-[#E0B07A]/15 border border-[#E0B07A]/30 flex items-center justify-center text-2xl">
+                                ${category.icon}
+                            </div>
+                            <div>
+                                <h3 class="text-[16px] font-medium text-[#C7D8DA] tracking-wide">${category.title}</h3>
+                                <p class="text-[12px] text-[#9FB6B8] font-light">${category.subtitle}</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-[#9FB6B8] transition-transform duration-300" id="arrow-${key}">expand_more</span>
+                    </div>
+                    <div class="category-content max-h-0 overflow-hidden transition-all duration-400" id="content-${key}">
+                        <div class="p-4 space-y-3">
+                            ${category.places.map(place => `
+                                <div class="place-card-v2 rounded-xl p-3 flex gap-3 cursor-pointer ${selectedPlaces.includes(place.id) ? 'selected' : ''}" 
+                                     id="place-card-${place.id}"
+                                     onclick="handlePlaceClick(event, ${place.id}, '${key}')">
+                                    <img src="${place.img}" class="w-20 h-20 rounded-lg object-cover shrink-0" alt="${place.name}">
+                                    <div class="flex-1 min-w-0 pr-8">
+                                        <h4 class="text-[15px] font-medium text-[#C7D8DA] tracking-wide truncate mb-1">${place.name}</h4>
+                                        <div class="flex items-center gap-3 text-[11px] text-[#9FB6B8] mb-2 font-light">
+                                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">schedule</span>${place.duration}</span>
+                                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">place</span>${place.distance.split('•')[0].trim()}</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E0B07A]/15 text-[#E0B07A] text-[10px] font-medium">
+                                                <span class="material-symbols-outlined text-[10px]">star</span>
+                                                ${place.rating}
+                                            </span>
+                                            ${place.tags.split('•').slice(0, 1).map(tag => `<span class="px-2 py-0.5 rounded-full bg-[#17464B]/50 text-[#9FB6B8] text-[10px] border border-[#3F6E70]/30 font-light">${tag.trim()}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                    <div class="place-check-v2 absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-[14px] text-[#081F24] opacity-0 transition-opacity">check</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function findPlaceById(id) {
+            for (const cat of Object.values(categoriesData)) {
+                const place = cat.places.find(p => p.id === id);
+                if (place) return place;
+            }
+            return null;
+        }
+
+        function handlePlaceClick(event, id, categoryKey) {
+            event.stopPropagation();
+            const place = findPlaceById(id);
+            currentPlaceData = { ...place, category: categoryKey };
+            
+            if (event.detail === 2) {
+                showDetail(id, categoryKey);
+            } else {
+                togglePlaceVisual(id);
+            }
+        }
+
+        function togglePlaceVisual(id) {
+            const card = document.getElementById(`place-card-${id}`);
+            const index = selectedPlaces.indexOf(id);
+            
+            if (index > -1) {
+                selectedPlaces.splice(index, 1);
+                if (card) {
+                    card.classList.remove('selected');
+                    card.querySelector('.place-check-v2 span').style.opacity = '0';
+                }
+            } else {
+                selectedPlaces.push(id);
+                if (card) {
+                    card.classList.add('selected');
+                    card.querySelector('.place-check-v2 span').style.opacity = '1';
+                }
+            }
+            
+            updateBottomBar();
+        }
+
+        function updateBottomBar() {
+            const preview = document.getElementById('selectionPreview');
+            const count = document.getElementById('previewCount');
+            const chips = document.getElementById('previewChips');
+            const btn = document.getElementById('createBtn');
+            
+            if (selectedPlaces.length > 0) {
+                preview.classList.remove('hidden');
+                preview.classList.add('block');
+                count.textContent = `${selectedPlaces.length} yer`;
+                
+                const selectedData = selectedPlaces.map(id => findPlaceById(id)).filter(Boolean);
+                
+                chips.innerHTML = selectedData.map(p => `
+                    <div class="flex-shrink-0 px-3 py-1.5 rounded-full bg-[#E0B07A]/15 border border-[#E0B07A]/30 text-[11px] text-[#E0B07A] font-medium flex items-center gap-2">
+                        ${p.name}
+                        <span onclick="event.stopPropagation(); removePlace(${p.id})" class="cursor-pointer hover:text-[#00D4AA] transition-colors">×</span>
+                    </div>
+                `).join('');
+                
+                btn.disabled = selectedPlaces.length < 2;
+            } else {
+                preview.classList.add('hidden');
+                preview.classList.remove('block');
+                btn.disabled = true;
+            }
+        }
+
+        function removePlace(id) {
+            togglePlaceVisual(id);
+        }
+
+        function toggleCategory(key) {
+            const content = document.getElementById(`content-${key}`);
+            const arrow = document.getElementById(`arrow-${key}`);
+            const accordion = document.getElementById(`cat-${key}`);
+            
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = '0px';
+                arrow.style.transform = 'rotate(0deg)';
+                accordion.classList.remove('open');
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                arrow.style.transform = 'rotate(180deg)';
+                accordion.classList.add('open');
+            }
+        }
+
+        function selectQuickRoute(type) {
+            selectedPlaces = [];
+            document.querySelectorAll('.place-card-v2').forEach(card => {
+                card.classList.remove('selected');
+                card.querySelector('.place-check-v2 span').style.opacity = '0';
+            });
+            
+            document.querySelectorAll('.route-chip').forEach(chip => chip.classList.remove('active'));
+            document.getElementById(`route-${type}`).classList.add('active');
+            
+            let routeIds = [];
+            switch(type) {
+                case '1saat': routeIds = [1, 2, 24]; break;
+                case 'yarım': routeIds = [1, 2, 9, 10, 24, 25]; break;
+                case 'tam': routeIds = [1, 2, 9, 10, 11, 24, 25, 37, 3, 5]; break;
+                case 'lezzet': routeIds = [24, 25, 26, 27, 28, 2]; break;
+            }
+            
+            routeIds.forEach(id => {
+                if (!selectedPlaces.includes(id)) {
+                    selectedPlaces.push(id);
+                    const card = document.getElementById(`place-card-${id}`);
+                    if (card) {
+                        card.classList.add('selected');
+                        card.querySelector('.place-check-v2 span').style.opacity = '1';
+                    }
+                }
+            });
+            
+            updateBottomBar();
+            
+            routeIds.forEach(id => {
+                Object.entries(categoriesData).forEach(([key, cat]) => {
+                    if (cat.places.find(p => p.id === id)) {
+                        const content = document.getElementById(`content-${key}`);
+                        const arrow = document.getElementById(`arrow-${key}`);
+                        const accordion = document.getElementById(`cat-${key}`);
+                        if (content) {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                            arrow.style.transform = 'rotate(180deg)';
+                            accordion.classList.add('open');
+                        }
+                    }
+                });
+            });
+        }
+
+        function applyAIRoute() {
+            selectQuickRoute('yarım');
+        }
+
+        function refreshAI() {
+            const suggestions = [
+                { ids: [16, 17], text: "<strong class='text-[#E0B07A] font-medium'>Doğa severler için:</strong> Uludağ teleferik ve Cumalıkızık köy turu" },
+                { ids: [9, 10, 11, 12], text: "<strong class='text-[#E0B07A] font-medium'>Tarih ve kültür:</strong> Yeşil Türbe, Yeşil Cami, Emir Sultan ve Muradiye Külliyesi" },
+                { ids: [18, 19], text: "<strong class='text-[#E0B07A] font-medium'>Göl manzarası:</strong> Gölyazı ve İznik Gölü kombinasyonu" },
+                { ids: [31, 32, 8], text: "<strong class='text-[#E0B07A] font-medium'>Müze turu:</strong> Kent Müzesi, Atatürk Evi ve Arkeoloji Müzesi" },
+                { ids: [37, 38, 39], text: "<strong class='text-[#E0B07A] font-medium'>Alışveriş ve tarih:</strong> Kapalı Çarşı, Uzun Çarşı ve Hanlar Bölgesi" }
+            ];
+            const random = suggestions[Math.floor(Math.random() * suggestions.length)];
+            document.getElementById('aiText').innerHTML = random.text;
+            
+            selectedPlaces = [];
+            document.querySelectorAll('.place-card-v2').forEach(card => {
+                card.classList.remove('selected');
+                card.querySelector('.place-check-v2 span').style.opacity = '0';
+            });
+            
+            random.ids.forEach(id => {
+                selectedPlaces.push(id);
+                const card = document.getElementById(`place-card-${id}`);
+                if (card) {
+                    card.classList.add('selected');
+                    card.querySelector('.place-check-v2 span').style.opacity = '1';
+                }
+            });
+            
+            updateBottomBar();
+        }
+
+        function openFilterModal() {
+            document.getElementById('filterModal').classList.add('active');
+        }
+
+        function closeFilterModal() {
+            document.getElementById('filterModal').classList.remove('active');
+        }
+
+        function toggleFilter(element) {
+            const parent = element.parentElement;
+            parent.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+                chip.classList.remove('bg-[#E0B07A]/20', 'text-[#E0B07A]', 'border-[#E0B07A]');
+                chip.classList.add('bg-[#17464B]/40', 'text-[#9FB6B8]', 'border-[#3F6E70]/40');
+            });
+            element.classList.add('active');
+            element.classList.remove('bg-[#17464B]/40', 'text-[#9FB6B8]', 'border-[#3F6E70]/40');
+            element.classList.add('bg-[#E0B07A]/20', 'text-[#E0B07A]', 'border-[#E0B07A]');
+        }
+
+        function sortPlaces() {
+            alert('En yakın mesafeye göre sıralandı');
+        }
+
+        function openMapModal() {
+            const modal = document.getElementById('mapModal');
+            const pointsContainer = document.getElementById('mapPoints');
+            
+            if (selectedPlaces.length === 0) {
+                pointsContainer.innerHTML = '<div class="p-4 glass-card rounded-xl text-center text-[#9FB6B8] text-[12px] border border-[#3F6E70]/30">Henüz seçim yapılmadı</div>';
+            } else {
+                const selectedData = selectedPlaces.map(id => findPlaceById(id)).filter(Boolean);
+                pointsContainer.innerHTML = selectedData.map((p, i) => `
+                    <div class="p-3 glass-card rounded-xl flex items-center gap-3 border border-[#3F6E70]/30">
+                        <div class="w-8 h-8 rounded-full bg-[#E0B07A] text-[#081F24] flex items-center justify-center text-[12px] font-bold">${i + 1}</div>
+                        <div class="flex-1">
+                            <div class="text-[14px] text-[#C7D8DA] font-medium tracking-wide">${p.name}</div>
+                            <div class="text-[11px] text-[#9FB6B8] font-light">${p.distance}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeMapModal() {
+            document.getElementById('mapModal').classList.remove('active');
+        }
+
+        function showDetail(id, categoryKey) {
+            const place = findPlaceById(id);
+            if (!place) return;
+            
+            currentPlaceData = { ...place, category: categoryKey };
+            
+            document.getElementById('detailImg').src = place.img;
+            document.getElementById('detailBadge').textContent = categoryKey.toUpperCase();
+            document.getElementById('detailTitle').innerHTML = `${place.name.split(' ')[0]} <span class="text-[#E0B07A] font-medium">${place.name.split(' ').slice(1).join(' ')}</span>`;
+            document.getElementById('detailScore').textContent = `${place.rating} / 5.0`;
+            document.getElementById('detailPrice').textContent = place.price;
+            document.getElementById('detailHours').textContent = place.hours;
+            document.getElementById('detailDuration').textContent = place.duration;
+            document.getElementById('detailDistance').textContent = place.distance;
+            document.getElementById('detailDesc').textContent = place.desc;
+            
+            document.getElementById('detailFeatures').innerHTML = place.features.map(f => `
+                <div class="flex items-center gap-3 p-3 glass-card rounded-xl border border-[#3F6E70]/30">
+                    <div class="w-9 h-9 rounded-lg bg-[#E0B07A]/15 border border-[#E0B07A]/30 flex items-center justify-center text-[#E0B07A]">
+                        <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                    </div>
+                    <span class="text-[14px] text-[#C7D8DA] font-light">${f}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function openRouteView() {
+            const selectedData = selectedPlaces.map(id => findPlaceById(id)).filter(Boolean);
+            if (selectedData.length === 0) return;
+            
+            const totalStops = selectedData.length;
+            const totalTime = calculateTotalTime(selectedData);
+            const totalDistance = calculateTotalDistance(selectedData);
+            
+            document.getElementById('totalStops').textContent = totalStops;
+            document.getElementById('totalTime').textContent = totalTime + ' dk';
+            document.getElementById('totalDistance').textContent = totalDistance + ' km';
+            
+            generateRouteSchema(selectedData);
+            generateRouteSteps(selectedData);
+            
+            document.getElementById('routeModal').classList.add('active');
+        }
+
+        function calculateTotalTime(places) {
+            let minutes = 0;
+            places.forEach(p => {
+                if (p.duration.includes('dk')) {
+                    minutes += parseInt(p.duration);
+                } else if (p.duration.includes('saat')) {
+                    const hours = parseInt(p.duration);
+                    minutes += hours * 60;
+                }
+            });
+            minutes += (places.length - 1) * 15;
+            return minutes;
+        }
+
+        function calculateTotalDistance(places) {
+            let totalKm = 0;
+            places.forEach(p => {
+                const match = p.distance.match(/(\d+)\s*km/);
+                if (match) totalKm += parseInt(match[1]);
+            });
+            return totalKm > 0 ? totalKm : 5;
+        }
+
+        function generateRouteSchema(places) {
+            const container = document.getElementById('schemaPoints');
+            
+            if (places.length <= 3) {
+                container.innerHTML = places.map((p, i) => `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="schema-dot w-4 h-4 rounded-full ${i === 0 ? 'start' : i === places.length - 1 ? 'end' : ''}"></div>
+                        <div class="text-[10px] text-[#9FB6B8] text-center max-w-[60px] truncate font-light">${p.name.split(' ')[0]}</div>
+                    </div>
+                `).join('');
+            } else {
+                const middleDots = places.slice(1, -1).map(() => `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="schema-dot w-3 h-3 rounded-full"></div>
+                        <div class="text-[10px] text-[#9FB6B8]">...</div>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="schema-dot start w-4 h-4 rounded-full"></div>
+                        <div class="text-[10px] text-[#9FB6B8] text-center max-w-[60px] truncate font-light">${places[0].name.split(' ')[0]}</div>
+                    </div>
+                    ${middleDots}
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="schema-dot end w-4 h-4 rounded-full"></div>
+                        <div class="text-[10px] text-[#9FB6B8] text-center max-w-[60px] truncate font-light">${places[places.length - 1].name.split(' ')[0]}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function generateRouteSteps(places) {
+            const container = document.getElementById('routeStepsList');
+            
+            container.innerHTML = places.map((p, i) => `
+                <div class="flex gap-4 relative">
+                    ${i < places.length - 1 ? `<div class="absolute left-5 top-12 w-0.5 h-[calc(100%+16px)] bg-gradient-to-b from-[#E0B07A] to-[#3F6E70]/30"></div>` : ''}
+                    
+                    <div class="step-number w-10 h-10 rounded-full flex items-center justify-center text-[14px] shrink-0 z-10">${i + 1}</div>
+                    
+                    <div class="flex-1 glass-card rounded-xl p-4 mb-4 border border-[#3F6E70]/30">
+                        <div class="flex gap-3 mb-3">
+                            <img src="${p.img}" class="w-16 h-16 rounded-lg object-cover shrink-0" alt="${p.name}">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-[15px] font-medium text-[#C7D8DA] tracking-wide mb-1 truncate">${p.name}</h4>
+                                <p class="text-[11px] text-[#9FB6B8] font-light truncate">${p.tags}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <div class="flex items-center gap-2 text-[11px] text-[#9FB6B8] font-light">
+                                <span class="material-symbols-outlined text-[#E0B07A] text-[14px]">schedule</span>
+                                ${p.duration}
+                            </div>
+                            <div class="flex items-center gap-2 text-[11px] text-[#9FB6B8] font-light">
+                                <span class="material-symbols-outlined text-[#E0B07A] text-[14px]">place</span>
+                                ${p.distance.split('•')[0].trim()}
+                            </div>
+                            <div class="flex items-center gap-2 text-[11px] text-[#9FB6B8] font-light">
+                                <span class="material-symbols-outlined text-[#E0B07A] text-[14px]">payments</span>
+                                ${p.price}
+                            </div>
+                            <div class="flex items-center gap-2 text-[11px] text-[#9FB6B8] font-light">
+                                <span class="material-symbols-outlined text-[#E0B07A] text-[14px]">star</span>
+                                ${p.rating}
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="navigateToStep(${i}, 'current')" class="flex-1 h-9 rounded-lg btn-gold-outline text-[11px] flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-[16px]">navigation</span>
+                                Yol Tarifi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setTransport(mode) {
+            currentTransport = mode;
+            document.querySelectorAll('.transport-option').forEach(opt => opt.classList.remove('active'));
+            document.getElementById(`trans-${mode}`).classList.add('active');
+            
+            const selectedData = selectedPlaces.map(id => findPlaceById(id)).filter(Boolean);
+            const totalTime = calculateTotalTime(selectedData);
+            let multiplier = 1;
+            
+            switch(mode) {
+                case 'car': multiplier = 0.4; break;
+                case 'transit': multiplier = 0.7; break;
+                case 'bike': multiplier = 0.6; break;
+            }
+            
+            document.getElementById('totalTime').textContent = Math.round(totalTime * multiplier) + ' dk';
+        }
+
+        function navigateToStep(index, type) {
+            const places = selectedPlaces.map(id => findPlaceById(id)).filter(Boolean);
+            if (!places[index]) return;
+            
+            const targetPlace = places[index];
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${targetPlace.coords.lat},${targetPlace.coords.lng}&travelmode=${currentTransport}`;
+            window.open(url, '_blank');
+        }
+
+        function startFullNavigation() {
+            const places = selectedPlaces.map(id => findPlaceById(id)).filter(Boolean);
+            if (places.length === 0) return;
+            
+            const firstPlace = places[0];
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${firstPlace.coords.lat},${firstPlace.coords.lng}&travelmode=${currentTransport}`;
+            window.open(url, '_blank');
+        }
+
+        function shareRoute() {
+            const places = selectedPlaces.map(id => findPlaceById(id)).filter(Boolean);
+            const placeNames = places.map(p => p.name).join(' → ');
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Bursa Rota Planım',
+                    text: `Bursa'da keşfedeceğim rotayı paylaşıyorum: ${placeNames}`,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(`Bursa Rota Planım: ${placeNames}`).then(() => {
+                    alert('Rota panoya kopyalandı!');
+                });
+            }
+        }
+
+        function saveRoute() {
+            const places = selectedPlaces.map(id => findPlaceById(id)).filter(Boolean);
+            const routeData = {
+                places: places,
+                date: new Date().toISOString(),
+                transport: currentTransport
+            };
+            
+            const savedRoutes = JSON.parse(localStorage.getItem('bursaRoutes') || '[]');
+            savedRoutes.push(routeData);
+            localStorage.setItem('bursaRoutes', JSON.stringify(savedRoutes));
+            
+            alert('Rota kaydedildi!');
+        }
+
+        function closeRouteView() {
+            document.getElementById('routeModal').classList.remove('active');
+        }
+
+        function openDirections() {
+            if (currentPlaceData) {
+                const url = `https://www.google.com/maps/dir/?api=1&destination=${currentPlaceData.coords.lat},${currentPlaceData.coords.lng}&travelmode=${currentTransport}`;
+                window.open(url, '_blank');
+            }
+        }
+
+        function contactPlace() {
+            if (currentPlaceData && currentPlaceData.phone) {
+                alert(`${currentPlaceData.name}\nTel: ${currentPlaceData.phone}`);
+            } else {
+                alert('İletişim bilgileri görüntüleniyor...');
+            }
+        }
+
+        function openAiModal() {
+            document.getElementById('ai-modal').classList.remove('hidden');
+        }
+
+        function closeAiModal() {
+            document.getElementById('ai-modal').classList.add('hidden');
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addChatMessage(message, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                addChatMessage(response, 'ai');
+            }, 1000);
+        }
+
+        function sendQuickMessage(message) {
+            addChatMessage(message, 'user');
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                addChatMessage(response, 'ai');
+            }, 800);
+        }
+
+        function addChatMessage(message, sender) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'flex gap-3 animate-fade-in';
+
+            if (sender === 'ai') {
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full ai-orb flex-shrink-0 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#081F24] text-sm">auto_awesome</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 max-w-[80%] border border-[#3F6E70]/30">
+                        <p class="text-[14px] text-[#C7D8DA] font-light">${message}</p>
+                    </div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="flex-1"></div>
+                    <div class="glass-card rounded-2xl p-4 max-w-[80%] bg-[#E0B07A]/20 border-[#E0B07A]/50">
+                        <p class="text-[14px] text-[#C7D8DA] font-light">${message}</p>
+                    </div>
+                `;
+            }
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function generateAIResponse(message) {
+            const lowerMsg = message.toLowerCase();
+            if (lowerMsg.includes('tarih')) return 'Bursa\'nın tarihi yerleri için Ulu Cami, Yeşil Türbe ve Koza Han mutlaka görülmeli. Bu üçlü rotayı öneririm! 🕌';
+            if (lowerMsg.includes('doğa')) return 'Doğa rotası için Uludağ teleferik ve Cumalıkızık köy turu harika bir seçim olacaktır. 🌲';
+            if (lowerMsg.includes('lezzet')) return 'Lezzet turu için İskender Kebap, Kestane Şekeri ve Tahinli Pide rotasını deneyebilirsiniz. Afiyet olsun! 🍽️';
+            return 'Bursa\'da gezilecek çok güzel yerler var! Tarihi, doğa veya lezzet rotalarından birini seçebilirsiniz. Hangisini tercih edersiniz? 🎯';
+        }
+
+        init();
+    </script>
+</body>
+</html>

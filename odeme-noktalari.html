@@ -1,0 +1,385 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Ödeme Noktaları - Osmangazi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E2A76B",
+                        "osman": { dark: "#0A2627", light: "#0F3D3E", card: "#0D3334", accent: "#1A4F50" }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        .gold-gradient { background: linear-gradient(135deg, #E2A76B 0%, #D4935C 100%); }
+        .slide-up { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .pulse-dot { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:active { transform: scale(0.98); }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-osman-dark text-white min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-osman-dark/95 backdrop-blur-lg border-b border-white/5 px-5 pt-6 pb-4">
+        <div class="flex items-center gap-3 mb-4">
+            <button class="w-10 h-10 rounded-full glass flex items-center justify-center active:scale-90 transition-transform">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+            </button>
+            <div class="flex-1">
+                <h1 class="text-lg font-bold">Ödeme Noktaları</h1>
+                <p class="text-xs text-white/50">Osmangazi Belediyesi</p>
+            </div>
+            <button class="w-10 h-10 rounded-full glass flex items-center justify-center relative">
+                <span class="material-symbols-outlined text-sm">notifications</span>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-osman-dark"></span>
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="relative mb-3">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40">search</span>
+            <input type="text" id="searchInput" placeholder="Kurum, semt veya ödeme türü ara..." 
+                   class="w-full glass rounded-2xl py-3 pl-12 pr-12 text-sm focus:outline-none focus:ring-1 focus:ring-primary/50 placeholder:text-white/40">
+            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-white/40">mic</span>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="flex bg-osman-card rounded-2xl p-1">
+            <button class="flex-1 py-2 rounded-xl text-sm font-medium gold-gradient text-[#3B2610] flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-sm">list</span> Liste
+            </button>
+            <a href="odeme-harita.html" class="flex-1 py-2 rounded-xl text-sm font-medium text-white/60 hover:text-white flex items-center justify-center gap-1 transition-colors">
+                <span class="material-symbols-outlined text-sm">map</span> Harita
+            </a>
+        </div>
+    </header>
+
+    <!-- Quick Filters -->
+    <div class="px-5 py-3 flex gap-2 overflow-x-auto hide-scrollbar border-b border-white/5">
+        <button onclick="filterLocations('all')" class="filter-btn active flex items-center gap-1.5 px-4 py-2 rounded-full gold-gradient text-[#3B2610] text-xs font-bold whitespace-nowrap transition-all" data-filter="all">
+            <span class="material-symbols-outlined text-sm">apps</span> Tümü
+        </button>
+        <button onclick="filterLocations('nearby')" class="filter-btn flex items-center gap-1.5 px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 transition-all" data-filter="nearby">
+            <span class="material-symbols-outlined text-primary text-sm">near_me</span> Yakınımda
+        </button>
+        <button onclick="filterLocations('open')" class="filter-btn flex items-center gap-1.5 px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 transition-all" data-filter="open">
+            <span class="material-symbols-outlined text-green-400 text-sm">check_circle</span> Açık
+        </button>
+        <button onclick="filterLocations('bursakart')" class="filter-btn flex items-center gap-1.5 px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 transition-all" data-filter="bursakart">
+            <span class="material-symbols-outlined text-cyan-400 text-sm">credit_card</span> Bursakart
+        </button>
+        <button onclick="filterLocations('buski')" class="filter-btn flex items-center gap-1.5 px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 transition-all" data-filter="buski">
+            <span class="material-symbols-outlined text-blue-400 text-sm">water_drop</span> BUSKİ
+        </button>
+        <button onclick="filterLocations('ptt')" class="filter-btn flex items-center gap-1.5 px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 transition-all" data-filter="ptt">
+            <span class="material-symbols-outlined text-yellow-400 text-sm">local_post_office</span> PTT
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-5 py-4 pb-28 overflow-y-auto">
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-4 gap-2 mb-4 slide-up">
+            <div class="glass rounded-xl p-2 text-center">
+                <div class="text-lg font-bold text-primary">47</div>
+                <div class="text-[9px] text-white/50">Nokta</div>
+            </div>
+            <div class="glass rounded-xl p-2 text-center">
+                <div class="text-lg font-bold text-green-400">12</div>
+                <div class="text-[9px] text-white/50">Açık</div>
+            </div>
+            <div class="glass rounded-xl p-2 text-center">
+                <div class="text-lg font-bold text-blue-400">5</div>
+                <div class="text-[9px] text-white/50">500m</div>
+            </div>
+            <div class="glass rounded-xl p-2 text-center">
+                <div class="text-lg font-bold text-purple-400">8</div>
+                <div class="text-[9px] text-white/50">7/24</div>
+            </div>
+        </div>
+
+        <!-- Results Count -->
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-semibold text-white/70" id="resultsTitle">Tüm Ödeme Noktaları</h2>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-white/40">Sırala:</span>
+                <select id="sortSelect" onchange="sortLocations()" class="bg-transparent text-xs text-primary border-none focus:outline-none cursor-pointer">
+                    <option value="distance" class="bg-osman-dark">Mesafe</option>
+                    <option value="name" class="bg-osman-dark">İsim (A-Z)</option>
+                    <option value="type" class="bg-osman-dark">Tür</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Locations List -->
+        <div class="space-y-3" id="locationsList">
+            <!-- Location Cards will be inserted here by JS -->
+        </div>
+
+        <!-- Load More -->
+        <button onclick="loadMore()" class="w-full mt-4 py-3 rounded-2xl glass text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+            Daha Fazla Göster
+        </button>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-osman-card/95 backdrop-blur-lg border-t border-white/10 px-6 pb-6 pt-3 flex justify-between items-center z-50">
+        <a href="#" class="flex flex-col items-center gap-0.5 opacity-40 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-xl">home</span>
+            <span class="text-[9px] font-bold">Anasayfa</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-0.5 opacity-40 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-xl">explore</span>
+            <span class="text-[9px] font-bold">Keşfet</span>
+        </a>
+        <div class="w-14 h-14 -mt-6 rounded-full gold-gradient flex items-center justify-center shadow-lg shadow-primary/30 border-4 border-osman-dark">
+            <span class="material-symbols-outlined text-[#3B2610] text-2xl">payments</span>
+        </div>
+        <a href="#" class="flex flex-col items-center gap-0.5 opacity-40 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-xl">search</span>
+            <span class="text-[9px] font-bold">Ara</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-0.5 opacity-40 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-xl">person</span>
+            <span class="text-[9px] font-bold">Profil</span>
+        </a>
+    </nav>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-osman-dark rounded-t-3xl max-h-[85vh] overflow-y-auto slide-up">
+            <div class="sticky top-0 bg-osman-dark z-10 pt-3 pb-2 px-6 border-b border-white/5">
+                <div class="w-12 h-1 bg-white/20 rounded-full mx-auto mb-4"></div>
+            </div>
+            <div id="modalContent" class="p-6 pt-2"></div>
+        </div>
+    </div>
+
+    <script>
+        // Location Data
+        const locations = [
+            { id: 1, name: "Bursakart Dolum Merkezi", type: "bursakart", subtype: "Metro", address: "Osmangazi Metro İstasyonu, Altıparmak", distance: 240, status: "open", hours: "06:00-24:00", phone: "-", services: ["Bursakart Dolum", "Bakiye Sorgulama", "Kart Başvurusu"], accessibility: true, busy: "low", lat: 40.1833, lng: 29.0667 },
+            { id: 2, name: "BUSKİ Ödeme Noktası", type: "buski", subtype: "Şube", address: "Şehreküstü Mah. Atatürk Cad. No:12", distance: 380, status: "open", hours: "08:00-17:00", phone: "444 16 00", services: ["Su Faturası", "Yapılandırma", "Abonelik"], accessibility: true, busy: "medium", lat: 40.1850, lng: 29.0600 },
+            { id: 3, name: "PTT Osmangazi", type: "ptt", subtype: "Şube", address: "Çekirge Caddesi No:45", distance: 520, status: "closed", hours: "08:30-17:00", phone: "444 1 788", services: ["Fatura Ödeme", "Kargo", "PTTMatik"], accessibility: false, busy: "none", lat: 40.1900, lng: 29.0500 },
+            { id: 4, name: "Ziraat Bankası ATM", type: "bank", subtype: "ATM", address: "Altıparmak Meydanı", distance: 180, status: "open", hours: "7/24", phone: "444 00 00", services: ["Nakit Çekme", "Fatura Ödeme", "Para Transferi"], accessibility: true, busy: "low", lat: 40.1840, lng: 29.0680 },
+            { id: 5, name: "İş Bankası ATM", type: "bank", subtype: "ATM", address: "Çekirge Caddesi", distance: 450, status: "open", hours: "7/24", phone: "444 02 02", services: ["Nakit Çekme", "Fatura Ödeme"], accessibility: true, busy: "medium", lat: 40.1880, lng: 29.0550 },
+            { id: 6, name: "Bursakart Dolum - Şehreküstü", type: "bursakart", subtype: "Dolum", address: "Şehreküstü Metro İstasyonu", distance: 390, status: "open", hours: "06:00-24:00", phone: "-", services: ["Bursakart Dolum"], accessibility: true, busy: "high", lat: 40.1860, lng: 29.0580 },
+            { id: 7, name: "Osmangazi Belediye Veznesi", type: "vezne", subtype: "Belediye", address: "Osmangazi Belediyesi Zemin Kat", distance: 600, status: "open", hours: "08:30-17:00", phone: "0224 224 00 00", services: ["Vergi Ödeme", "Harç", "Ruhsat"], accessibility: true, busy: "medium", lat: 40.1820, lng: 29.0700 },
+            { id: 8, name: "PTT - Altıparmak", type: "ptt", subtype: "Şube", address: "Altıparmak Bulvarı No:123", distance: 290, status: "open", hours: "08:30-17:00", phone: "444 1 788", services: ["Fatura", "Kargo", "Bankacılık"], accessibility: true, busy: "low", lat: 40.1845, lng: 29.0650 },
+            { id: 9, name: "Vakıfbank ATM", type: "bank", subtype: "ATM", address: "Heykel Meydanı", distance: 750, status: "open", hours: "7/24", phone: "444 07 24", services: ["Nakit", "Fatura"], accessibility: false, busy: "high", lat: 40.1920, lng: 29.0450 },
+            { id: 10, name: "BUSKİ - Osmangazi", type: "buski", subtype: "Vezne", address: "Osmangazi Belediyesi Yanı", distance: 620, status: "closed", hours: "08:00-17:00", phone: "444 16 00", services: ["Su Faturası"], accessibility: true, busy: "none", lat: 40.1815, lng: 29.0710 }
+        ];
+
+        let currentFilter = 'all';
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+        function getIcon(type) {
+            const icons = { bursakart: 'credit_card', buski: 'water_drop', ptt: 'local_post_office', bank: 'local_atm', vezne: 'account_balance_wallet' };
+            return icons[type] || 'location_on';
+        }
+
+        function getColor(type) {
+            const colors = { bursakart: 'from-cyan-600 to-cyan-800', buski: 'from-blue-600 to-blue-800', ptt: 'from-yellow-600 to-yellow-800', bank: 'from-green-600 to-green-800', vezne: 'from-purple-600 to-purple-800' };
+            return colors[type] || 'from-gray-600 to-gray-800';
+        }
+
+        function renderLocations(filter = 'all', search = '') {
+            const list = document.getElementById('locationsList');
+            let filtered = locations;
+
+            if (filter === 'nearby') filtered = locations.filter(l => l.distance <= 500);
+            else if (filter === 'open') filtered = locations.filter(l => l.status === 'open');
+            else if (filter !== 'all') filtered = locations.filter(l => l.type === filter);
+
+            if (search) filtered = filtered.filter(l => l.name.toLowerCase().includes(search.toLowerCase()) || l.address.toLowerCase().includes(search.toLowerCase()));
+
+            // Sort
+            const sortType = document.getElementById('sortSelect').value;
+            if (sortType === 'distance') filtered.sort((a,b) => a.distance - b.distance);
+            else if (sortType === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+            list.innerHTML = filtered.map((loc, i) => `
+                <div class="glass rounded-2xl p-4 card-hover cursor-pointer slide-up" style="animation-delay: ${i*0.05}s" onclick="openDetail(${loc.id})">
+                    <div class="flex items-start gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${getColor(loc.type)} flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-white">${getIcon(loc.type)}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <h3 class="font-bold text-sm truncate">${loc.name}</h3>
+                                    <p class="text-xs text-white/50 truncate">${loc.address}</p>
+                                </div>
+                                <span class="px-2 py-1 rounded-full ${loc.status === 'open' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'} text-[10px] font-bold whitespace-nowrap flex items-center gap-1">
+                                    ${loc.status === 'open' ? '<span class="w-1.5 h-1.5 bg-green-400 rounded-full pulse-dot"></span> Açık' : 'Kapalı'}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3 mt-2">
+                                <span class="text-[10px] text-primary font-bold">${loc.distance}m</span>
+                                <span class="text-[10px] text-white/40">${loc.hours}</span>
+                                ${loc.busy !== 'none' ? `<span class="text-[10px] px-2 py-0.5 rounded-full ${loc.busy === 'high' ? 'bg-red-500/20 text-red-400' : loc.busy === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}">${loc.busy === 'high' ? 'Yoğun' : loc.busy === 'medium' ? 'Orta' : 'Az'} Yoğun</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-3 pt-3 border-t border-white/5">
+                        <a href="odeme-harita.html?lat=${loc.lat}&lng=${loc.lng}&id=${loc.id}" class="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium flex items-center justify-center gap-1 transition-colors" onclick="event.stopPropagation()">
+                            <span class="material-symbols-outlined text-sm">map</span> Haritada Göster
+                        </a>
+                        <button onclick="event.stopPropagation(); toggleFavorite(${loc.id})" class="w-10 h-10 rounded-xl ${favorites.includes(loc.id) ? 'bg-red-500/20 text-red-500' : 'bg-white/5 text-white/60'} hover:bg-white/10 flex items-center justify-center transition-colors">
+                            <span class="material-symbols-outlined text-sm">${favorites.includes(loc.id) ? 'favorite' : 'favorite_border'}</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('resultsTitle').textContent = filter === 'all' ? 'Tüm Ödeme Noktaları' : 
+                filter === 'nearby' ? 'Yakınımdaki Noktalar (500m)' :
+                filter === 'open' ? 'Şu An Açık Olanlar' :
+                filter === 'bursakart' ? 'Bursakart Noktaları' :
+                filter === 'buski' ? 'BUSKİ Ödeme Noktaları' :
+                filter === 'ptt' ? 'PTT Şubeleri' : 'Sonuçlar';
+        }
+
+        function filterLocations(type) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if(btn.dataset.filter === type) {
+                    btn.className = 'filter-btn active flex items-center gap-1.5 px-4 py-2 rounded-full gold-gradient text-[#3B2610] text-xs font-bold whitespace-nowrap transition-all';
+                } else {
+                    btn.className = 'filter-btn flex items-center gap-1.5 px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 transition-all';
+                }
+            });
+            renderLocations(type, document.getElementById('searchInput').value);
+        }
+
+        function sortLocations() {
+            renderLocations(currentFilter, document.getElementById('searchInput').value);
+        }
+
+        function openDetail(id) {
+            const loc = locations.find(l => l.id === id);
+            const isFav = favorites.includes(id);
+            document.getElementById('modalContent').innerHTML = `
+                <div class="flex items-start justify-between mb-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br ${getColor(loc.type)} flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl text-white">${getIcon(loc.type)}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="toggleFavorite(${id}); openDetail(${id})" class="w-12 h-12 rounded-full ${isFav ? 'bg-red-500/20 text-red-500' : 'glass text-white/60'} flex items-center justify-center">
+                            <span class="material-symbols-outlined">${isFav ? 'favorite' : 'favorite_border'}</span>
+                        </button>
+                        <button onclick="closeModal()" class="w-12 h-12 rounded-full glass flex items-center justify-center">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <h2 class="text-xl font-bold mb-1">${loc.name}</h2>
+                <p class="text-sm text-white/60 mb-4">${loc.address}</p>
+
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="glass rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-primary text-lg">schedule</span>
+                        <div class="text-xs text-white/50 mt-1">Çalışma Saatleri</div>
+                        <div class="text-sm font-bold">${loc.hours}</div>
+                    </div>
+                    <div class="glass rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-primary text-lg">location_on</span>
+                        <div class="text-xs text-white/50 mt-1">Mesafe</div>
+                        <div class="text-sm font-bold">${loc.distance}m</div>
+                    </div>
+                </div>
+
+                <div class="space-y-2 mb-4">
+                    <div class="glass rounded-xl p-3 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-white/40">info</span>
+                        <div class="flex-1">
+                            <div class="text-xs text-white/50">Durum</div>
+                            <div class="text-sm font-bold ${loc.status === 'open' ? 'text-green-400' : 'text-red-400'}">${loc.status === 'open' ? 'Şu An Açık' : 'Kapalı'}</div>
+                        </div>
+                    </div>
+                    ${loc.phone !== '-' ? `
+                    <div class="glass rounded-xl p-3 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-white/40">phone</span>
+                        <div class="flex-1">
+                            <div class="text-xs text-white/50">Telefon</div>
+                            <div class="text-sm font-bold">${loc.phone}</div>
+                        </div>
+                        <a href="tel:${loc.phone}" class="px-4 py-2 rounded-full gold-gradient text-[#3B2610] text-xs font-bold">Ara</a>
+                    </div>` : ''}
+                    <div class="glass rounded-xl p-3 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-white/40">accessible</span>
+                        <div class="flex-1">
+                            <div class="text-xs text-white/50">Erişilebilirlik</div>
+                            <div class="text-sm font-bold">${loc.accessibility ? '♿ Engelli girişi mevcut' : 'Engelli girişi yok'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold mb-2">Hizmetler</h3>
+                    <div class="flex flex-wrap gap-2">
+                        ${loc.services.map(s => `<span class="px-3 py-1.5 rounded-full glass text-xs">${s}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <a href="odeme-harita.html?lat=${loc.lat}&lng=${loc.lng}&id=${loc.id}" class="flex-1 py-3 rounded-2xl gold-gradient text-[#3B2610] font-bold flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">map</span> Haritada Aç
+                    </a>
+                    <button onclick="getDirections(${loc.id})" class="flex-1 py-3 rounded-2xl glass font-bold flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">directions</span> Yol Tarifi
+                    </button>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        function toggleFavorite(id) {
+            if(favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+            else favorites.push(id);
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            renderLocations(currentFilter, document.getElementById('searchInput').value);
+        }
+
+        function getDirections(id) {
+            const loc = locations.find(l => l.id === id);
+            window.open(`https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`, '_blank');
+        }
+
+        function loadMore() {
+            alert('Daha fazla nokta yükleniyor...');
+        }
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            renderLocations(currentFilter, e.target.value);
+        });
+
+        // Initialize
+        renderLocations();
+    </script>
+</body>
+</html>

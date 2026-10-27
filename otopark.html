@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Otopark Rehberi - Tüm ilçelerdeki otoparklar, fiyatlar, konumlar ve detaylı bilgiler"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Otopark Rehberi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "metro-blue": "#3B82F6",
+                        "metro-green": "#10B981",
+                        "bus-orange": "#F97316",
+                        "tram-purple": "#8B5CF6",
+                        "park-green": "#22C55E",
+                        "premium-gold": "#D4AF37"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-gold {
+            animation: pulseGold 2s infinite;
+        }
+        @keyframes pulseGold {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(224, 176, 122, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(224, 176, 122, 0); }
+        }
+        .district-chip {
+            transition: all 0.3s ease;
+        }
+        .district-chip.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-chip:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .parking-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .parking-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(224, 176, 122, 0.3);
+        }
+        .payment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .payment-cash { background: rgba(34, 197, 94, 0.2); color: #22C55E; }
+        .payment-card { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+        .payment-contactless { background: rgba(139, 92, 246, 0.2); color: #8B5CF6; }
+        .payment-app { background: rgba(249, 115, 22, 0.2); color: #F97316; }
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(224, 176, 122, 0.1);
+        }
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .price-tag {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.2) 0%, rgba(224, 176, 122, 0.05) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+        }
+        .type-badge-kapali { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+        .type-badge-acik { background: rgba(34, 197, 94, 0.2); color: #22C55E; }
+        .type-badge-katli { background: rgba(139, 92, 246, 0.2); color: #8B5CF6; }
+        .type-badge-yeralti { background: rgba(249, 115, 22, 0.2); color: #F97316; }
+        .type-badge-avm { background: rgba(232, 121, 249, 0.2); color: #E879F9; }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="benim-sehrim.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">BURSA OTOPARK</h1>
+                <p class="text-xs text-gray-text truncate">Kapalı • Açık • Katlı • AVM Otoparkları</p>
+            </div>
+            <button onclick="openFilterModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gold/20 hover:bg-gold/30 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">tune</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- Hero Stats + Nearest Parking -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0 pulse-gold">
+                            <span class="material-symbols-outlined text-gold text-xl">local_parking</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Bursa Otopark Rehberi</h2>
+                            <p class="text-xs text-gray-text">2026 Güncel Fiyatlar • 17 İlçe</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold/10 border border-gold/30">
+                        <span class="text-xs text-gold font-medium">PREMIUM</span>
+                    </div>
+                </div>
+
+                <!-- Nearest Parking Section -->
+                <div class="mb-4 p-3 bg-gradient-to-r from-gold/20 to-gold/5 border border-gold/30 rounded-xl">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gold text-lg">my_location</span>
+                        <span class="text-xs font-bold text-gold uppercase tracking-wider">Sana En Yakın Otoparklar</span>
+                        <span class="ml-auto flex items-center gap-1 text-[10px] text-park-green bg-park-green/20 px-2 py-0.5 rounded-full">
+                            <span class="material-symbols-outlined text-[10px]">gps_fixed</span>
+                            Konum Tespit Edildi
+                        </span>
+                    </div>
+                    <div id="nearestParkingList" class="space-y-2">
+                        <!-- Nearest parking spots will be loaded here -->
+                        <div class="flex items-center justify-center py-4 text-gray-text text-xs">
+                            <span class="material-symbols-outlined animate-spin mr-2">sync</span>
+                            Yakındaki otoparklar aranıyor...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobil: Sadece temel bilgiler -->
+                <div class="flex items-center justify-center gap-4 py-2 border-t border-white/10 mt-3">
+                    <div class="text-center">
+                        <p class="text-lg font-bold text-gold">150+</p>
+                        <p class="text-[10px] text-gray-text">Otopark</p>
+                    </div>
+                    <div class="w-px h-8 bg-white/10"></div>
+                    <div class="text-center">
+                        <p class="text-lg font-bold text-metro-blue">17</p>
+                        <p class="text-[10px] text-gray-text">İlçe</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- İlçe Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">İlçe Seçimi</h3>
+                <button onclick="resetDistrictFilter()" class="text-[10px] text-gray-text hover:text-gold transition-colors">Tümünü Göster</button>
+            </div>
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2" id="districtContainer">
+                <button onclick="filterByDistrict('all')" class="district-chip active px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Tümü
+                </button>
+                <button onclick="filterByDistrict('osmangazi')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Osmangazi
+                </button>
+                <button onclick="filterByDistrict('nilufer')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Nilüfer
+                </button>
+                <button onclick="filterByDistrict('yildirim')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Yıldırım
+                </button>
+                <button onclick="filterByDistrict('mudanya')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Mudanya
+                </button>
+                <button onclick="filterByDistrict('kestel')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Kestel
+                </button>
+                <button onclick="filterByDistrict('gursu')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Gürsu
+                </button>
+                <button onclick="filterByDistrict('inegol')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    İnegöl
+                </button>
+                <button onclick="filterByDistrict('gemlik')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Gemlik
+                </button>
+                <button onclick="filterByDistrict('orhangazi')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Orhangazi
+                </button>
+                <button onclick="filterByDistrict('iznik')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    İznik
+                </button>
+                <button onclick="filterByDistrict('yenisehir')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Yenişehir
+                </button>
+                <button onclick="filterByDistrict('buyukorhan')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Büyükorhan
+                </button>
+                <button onclick="filterByDistrict('harmancik')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Harmancık
+                </button>
+                <button onclick="filterByDistrict('keles')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Keles
+                </button>
+                <button onclick="filterByDistrict('orhaneli')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Orhaneli
+                </button>
+                <button onclick="filterByDistrict('karacabey')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Karacabey
+                </button>
+                <button onclick="filterByDistrict('mustafakemalpasa')" class="district-chip px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    Mustafakemalpaşa
+                </button>
+            </div>
+        </section>
+
+        <!-- Ödeme Yöntemi Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.15s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Ödeme Yöntemi</h3>
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                <button onclick="filterByPayment('all')" id="pay-all" class="payment-filter active px-4 py-2 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm transition-all hover:border-gold/50">
+                    Tümü
+                </button>
+                <button onclick="filterByPayment('cash')" id="pay-cash" class="payment-filter px-4 py-2 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm transition-all hover:border-green-500/50 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-park-green"></span>
+                    Nakit
+                </button>
+                <button onclick="filterByPayment('card')" id="pay-card" class="payment-filter px-4 py-2 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm transition-all hover:border-blue-500/50 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-metro-blue"></span>
+                    Kredi Kartı
+                </button>
+                <button onclick="filterByPayment('contactless')" id="pay-contactless" class="payment-filter px-4 py-2 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm transition-all hover:border-purple-500/50 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-tram-purple"></span>
+                    Temassız
+                </button>
+                <button onclick="filterByPayment('app')" id="pay-app" class="payment-filter px-4 py-2 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm transition-all hover:border-orange-500/50 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-bus-orange"></span>
+                    Mobil/App
+                </button>
+            </div>
+        </section>
+
+        <!-- Otopark Listesi -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-bold gold-gradient-text">Otoparklar <span id="parkingCount" class="text-gray-text text-xs font-normal">(150+)</span></h3>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] text-gray-text">Sıralama:</span>
+                    <select id="sortSelect" onchange="sortParkings()" class="bg-card-teal border border-white/10 rounded-lg text-xs px-2 py-1 text-white focus:outline-none focus:border-gold/50">
+                        <option value="recommended">Önerilen</option>
+                        <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
+                        <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
+                        <option value="capacity">Kapasite</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="parkingList" class="space-y-3">
+                <!-- Otoparklar buraya dinamik olarak eklenecek -->
+            </div>
+        </section>
+
+        <!-- Bilgi Kartı -->
+        <section class="animate-slide-up" style="animation-delay: 0.3s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-gold">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-gold shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-gold mb-1">Önemli Bilgiler</p>
+                        <ul class="text-xs text-gray-text space-y-1 leading-relaxed">
+                            <li>• Fiyatlar 2026 Şubat ayı güncellemesidir.</li>
+                            <li>• AVM otoparklarında alışveriş tutarına göre ücretsiz park süreleri değişebilir.</li>
+                            <li>• Gece tarifeleri (22:00-08:00) bazı otoparklarda farklılık gösterebilir.</li>
+                            <li>• Engelli araçlarına ücretsiz park uygulaması mevcuttur.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="otopark.html" class="flex flex-col items-center gap-1 text-gold">
+                <div class="bg-gold/20 p-2 rounded-xl mb-0.5">
+                    <span class="material-symbols-outlined text-2xl">local_parking</span>
+                </div>
+                <span class="text-[10px] font-bold">Otopark</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Otopark Detay Modal -->
+    <div id="parkingModal" class="fixed inset-0 z-[100] hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeParkingModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 md:inset-0 md:flex md:items-center md:justify-center p-4">
+            <div class="bg-[#0D3238] w-full md:max-w-lg md:rounded-2xl rounded-t-2xl overflow-hidden shadow-2xl animate-slide-up max-h-[90vh] overflow-y-auto">
+                <!-- Modal Header -->
+                <div class="relative h-32 bg-gradient-to-br from-gold/20 to-dark-teal p-4">
+                    <button onclick="closeParkingModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/30 flex items-center justify-center hover:bg-black/50 transition-colors">
+                        <span class="material-symbols-outlined text-sm">close</span>
+                    </button>
+                    <div class="absolute bottom-4 left-4 right-4">
+                        <span id="modalTypeBadge" class="text-[10px] px-2 py-1 rounded-full bg-white/20 mb-2 inline-block">Kapalı Otopark</span>
+                        <h3 id="modalTitle" class="text-xl font-bold text-white">Otopark Adı</h3>
+                        <p id="modalDistrict" class="text-xs text-gray-text">Osmangazi</p>
+                    </div>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="p-4 space-y-4">
+                    <!-- Fiyat Bilgisi -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="price-tag rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-text mb-1">İlk Saat</p>
+                            <p id="modalFirstHour" class="text-2xl font-bold text-gold">90₺</p>
+                        </div>
+                        <div class="price-tag rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-text mb-1">Ek Saat</p>
+                            <p id="modalExtraHour" class="text-2xl font-bold text-gold">30₺</p>
+                        </div>
+                    </div>
+
+                    <!-- Günlük/Aylık Fiyatlar -->
+                    <div class="glass-card rounded-xl p-3 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-text">Günlük Maksimum</span>
+                            <span id="modalDailyMax" class="text-sm font-bold text-white">200₺</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-text">Aylık Abonelik</span>
+                            <span id="modalMonthly" class="text-sm font-bold text-white">1.750₺</span>
+                        </div>
+                    </div>
+
+                    <!-- Özellikler -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gold text-base">stars</span>
+                            Özellikler
+                        </h4>
+                        <div id="modalFeatures" class="grid grid-cols-2 gap-2">
+                            <!-- Dinamik özellikler -->
+                        </div>
+                    </div>
+
+                    <!-- Ödeme Yöntemleri -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gold text-base">payments</span>
+                            Ödeme Yöntemleri
+                        </h4>
+                        <div id="modalPayments" class="flex flex-wrap gap-2">
+                            <!-- Dinamik ödeme yöntemleri -->
+                        </div>
+                    </div>
+
+                    <!-- Konum Bilgisi -->
+                    <div class="glass-card rounded-xl p-3">
+                        <h4 class="text-sm font-bold mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gold text-base">location_on</span>
+                            Konum
+                        </h4>
+                        <p id="modalAddress" class="text-xs text-gray-text mb-3">Adres bilgisi...</p>
+                        <div class="flex gap-2">
+                            <a id="modalDirections" href="#" target="_blank" class="flex-1 py-2.5 bg-gold/20 text-gold rounded-xl text-center text-xs font-bold hover:bg-gold/30 transition-colors flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-sm">directions</span>
+                                Yol Tarifi
+                            </a>
+                            <button onclick="shareParking()" class="px-4 py-2.5 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors">
+                                <span class="material-symbols-outlined text-sm">share</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Çalışma Saatleri -->
+                    <div class="glass-card rounded-xl p-3">
+                        <h4 class="text-sm font-bold mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gold text-base">schedule</span>
+                            Çalışma Saatleri
+                        </h4>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-text">Hafta İçi</span>
+                                <span id="modalWeekday" class="text-white">07:00 - 23:00</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-text">Hafta Sonu</span>
+                                <span id="modalWeekend" class="text-white">08:00 - 24:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtre Modal (Mobil için) -->
+    <div id="filterModal" class="fixed inset-0 z-[100] hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeFilterModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-[#0D3238] rounded-t-2xl p-4 animate-slide-up">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gold">Filtreler</h3>
+                <button onclick="closeFilterModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto">
+                <div>
+                    <h4 class="text-sm font-bold mb-2">Otopark Tipi</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="toggleTypeFilter('kapali')" class="type-filter px-3 py-2 rounded-lg border border-white/10 text-xs bg-card-teal" data-type="kapali">Kapalı</button>
+                        <button onclick="toggleTypeFilter('acik')" class="type-filter px-3 py-2 rounded-lg border border-white/10 text-xs bg-card-teal" data-type="acik">Açık</button>
+                        <button onclick="toggleTypeFilter('katli')" class="type-filter px-3 py-2 rounded-lg border border-white/10 text-xs bg-card-teal" data-type="katli">Katlı</button>
+                        <button onclick="toggleTypeFilter('yeralti')" class="type-filter px-3 py-2 rounded-lg border border-white/10 text-xs bg-card-teal" data-type="yeralti">Yeraltı</button>
+                        <button onclick="toggleTypeFilter('avm')" class="type-filter px-3 py-2 rounded-lg border border-white/10 text-xs bg-card-teal" data-type="avm">AVM</button>
+                    </div>
+                </div>
+            </div>
+            <button onclick="applyFilters()" class="w-full mt-4 py-3 bg-gold text-deep-teal rounded-xl font-bold text-sm">
+                Filtreleri Uygula
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // VERİ: TÜM OTOPARKLAR
+        // ==========================================
+        const parkingData = [
+            // OSMANGAZİ
+            {
+                id: 1,
+                name: "Hanlar Bölgesi Zemin Altı Otoparkı",
+                district: "osmangazi",
+                type: "yeralti",
+                firstHour: 100,
+                extraHour: 25,
+                dailyMax: 250,
+                monthly: 2000,
+                capacity: 450,
+                address: "Hanlar Bölgesi, Osmangazi, Bursa",
+                features: ["7/24 Güvenlik", "Kamera Sistemi", "Engelli Erişimi", "Asansör", "Aydınlatma"],
+                payments: ["cash", "card", "contactless"],
+                hours: { weekday: "07:00 - 23:00", weekend: "08:00 - 24:00" },
+                coordinates: "40.1833,29.0667"
+            },
+            {
+                id: 2,
+                name: "Merinos Parkı Otoparkı",
+                district: "osmangazi",
+                type: "acik",
+                firstHour: 90,
+                extraHour: 25,
+                dailyMax: 200,
+                monthly: 1750,
+                capacity: 300,
+                address: "Merinos Parkı, Osmangazi, Bursa",
+                features: ["Yeşil Alan", "Güvenlik", "Kamera", "Piknik Alanı Yakını"],
+                payments: ["cash", "card"],
+                hours: { weekday: "06:00 - 23:00", weekend: "06:00 - 23:00" },
+                coordinates: "40.1833,29.0500"
+            },
+            {
+                id: 3,
+                name: "Osmangazi Metro Cep Alan Otoparkı",
+                district: "osmangazi",
+                type: "acik",
+                firstHour: 90,
+                extraHour: 30,
+                dailyMax: 200,
+                monthly: 1500,
+                capacity: 200,
+                address: "Osmangazi Metro İstasyonu Yanı, Bursa",
+                features: ["Metro Aktarmalı", "7/24 Açık", "Güvenlik", "Kamera"],
+                payments: ["cash", "card", "contactless", "app"],
+                hours: { weekday: "7/24", weekend: "7/24" },
+                coordinates: "40.1833,29.0800"
+            },
+            {
+                id: 4,
+                name: "Kent Meydanı AVM Otoparkı",
+                district: "osmangazi",
+                type: "avm",
+                firstHour: 0,
+                extraHour: 20,
+                dailyMax: 100,
+                monthly: null,
+                capacity: 1200,
+                address: "Kent Meydanı AVM, Osmangazi, Bursa",
+                features: ["0-3 Saat Ücretsiz", "Kapalı", "Asansör", "Engelli Erişimi", "Vale"],
+                payments: ["card", "contactless", "app"],
+                hours: { weekday: "10:00 - 22:00", weekend: "10:00 - 22:00" },
+                coordinates: "40.1820,29.0500"
+            },
+            {
+                id: 5,
+                name: "Bursa Spor Katlı Otoparkı",
+                district: "osmangazi",
+                type: "katli",
+                firstHour: 85,
+                extraHour: 25,
+                dailyMax: 180,
+                monthly: 1600,
+                capacity: 350,
+                address: "Demirtaşpaşa Metro İstasyonu, Osmangazi",
+                features: ["Metro Aktarmalı", "Katlı", "Güvenlik", "Kamera", "Kapalı"],
+                payments: ["cash", "card", "contactless"],
+                hours: { weekday: "07:00 - 23:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.1840,29.0600"
+            },
+            {
+                id: 6,
+                name: "Doğanbey Otoparkı",
+                district: "osmangazi",
+                type: "kapali",
+                firstHour: 90,
+                extraHour: 25,
+                dailyMax: 200,
+                monthly: 1800,
+                capacity: 280,
+                address: "Doğanbey Mahallesi, Osmangazi, Bursa",
+                features: ["Kapalı", "Güvenlik", "Kamera", "Asansör"],
+                payments: ["cash", "card"],
+                hours: { weekday: "07:00 - 22:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.1850,29.0400"
+            },
+            {
+                id: 7,
+                name: "Emir Sultan Otoparkı",
+                district: "osmangazi",
+                type: "acik",
+                firstHour: 90,
+                extraHour: 25,
+                dailyMax: 200,
+                monthly: 1700,
+                capacity: 150,
+                address: "Emir Sultan Mahallesi, Osmangazi, Bursa",
+                features: ["Tarihi Bölge", "Güvenlik", "Kamera"],
+                payments: ["cash", "card"],
+                hours: { weekday: "08:00 - 20:00", weekend: "08:00 - 20:00" },
+                coordinates: "40.1800,29.0400"
+            },
+            {
+                id: 8,
+                name: "Yeşil Türbe Otoparkı",
+                district: "osmangazi",
+                type: "acik",
+                firstHour: 90,
+                extraHour: 25,
+                dailyMax: 200,
+                monthly: null,
+                capacity: 100,
+                address: "Yeşil Mahallesi, Osmangazi, Bursa",
+                features: ["Tarihi Bölge", "Turistik Alan", "Güvenlik"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 19:00", weekend: "08:00 - 19:00" },
+                coordinates: "40.1820,29.0300"
+            },
+            
+            // NİLÜFER
+            {
+                id: 9,
+                name: "Özlüce Katlı Otoparkı",
+                district: "nilufer",
+                type: "katli",
+                firstHour: 80,
+                extraHour: 20,
+                dailyMax: 180,
+                monthly: 1500,
+                capacity: 400,
+                address: "Özlüce Mahallesi, Nilüfer, Bursa",
+                features: ["Metro Yakını", "Kapalı", "Asansör", "Güvenlik"],
+                payments: ["cash", "card", "contactless"],
+                hours: { weekday: "07:00 - 23:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.2100,28.9700"
+            },
+            {
+                id: 10,
+                name: "Nilüfer Belediyesi Otoparkı",
+                district: "nilufer",
+                type: "acik",
+                firstHour: 75,
+                extraHour: 20,
+                dailyMax: 150,
+                monthly: 1400,
+                capacity: 250,
+                address: "Nilüfer İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik", "Kamera", "Aydınlatma"],
+                payments: ["cash", "card", "app"],
+                hours: { weekday: "07:00 - 22:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.2150,28.9800"
+            },
+            {
+                id: 11,
+                name: "Balat Atatürk Kapalı Otoparkı",
+                district: "nilufer",
+                type: "kapali",
+                firstHour: 85,
+                extraHour: 25,
+                dailyMax: 190,
+                monthly: 1650,
+                capacity: 320,
+                address: "Balat Atatürk Bulvarı, Nilüfer, Bursa",
+                features: ["Kapalı", "7/24", "Güvenlik", "Kamera", "Asansör"],
+                payments: ["cash", "card", "contactless"],
+                hours: { weekday: "7/24", weekend: "7/24" },
+                coordinates: "40.2200,28.9900"
+            },
+            {
+                id: 12,
+                name: "Korupark AVM Otoparkı",
+                district: "nilufer",
+                type: "avm",
+                firstHour: 0,
+                extraHour: 20,
+                dailyMax: 80,
+                monthly: null,
+                capacity: 2000,
+                address: "Korupark AVM, Nilüfer, Bursa",
+                features: ["0-3 Saat Ücretsiz", "Kapalı", "Vale", "Engelli Erişimi", "Şarj İstasyonu"],
+                payments: ["card", "contactless", "app"],
+                hours: { weekday: "10:00 - 22:00", weekend: "10:00 - 22:00" },
+                coordinates: "40.2050,28.9700"
+            },
+            {
+                id: 13,
+                name: "Üniversite Metro Cep Otoparkı",
+                district: "nilufer",
+                type: "acik",
+                firstHour: 70,
+                extraHour: 20,
+                dailyMax: 140,
+                monthly: 1200,
+                capacity: 300,
+                address: "Uludağ Üniversitesi Metro İstasyonu, Nilüfer",
+                features: ["Metro Aktarmalı", "Öğrenci İndirimli", "Güvenlik"],
+                payments: ["cash", "card", "app"],
+                hours: { weekday: "7/24", weekend: "7/24" },
+                coordinates: "40.2300,28.9500"
+            },
+            {
+                id: 14,
+                name: "FSM Bulvarı Otoparkı",
+                district: "nilufer",
+                type: "acik",
+                firstHour: 80,
+                extraHour: 20,
+                dailyMax: 160,
+                monthly: 1450,
+                capacity: 180,
+                address: "Fatih Sultan Mehmet Bulvarı, Nilüfer, Bursa",
+                features: ["İş Merkezleri Yakını", "Güvenlik", "Kamera"],
+                payments: ["cash", "card"],
+                hours: { weekday: "07:00 - 21:00", weekend: "08:00 - 20:00" },
+                coordinates: "40.2100,28.9600"
+            },
+            
+            // YILDIRIM
+            {
+                id: 15,
+                name: "Şehreküstü Otoparkı",
+                district: "yildirim",
+                type: "katli",
+                firstHour: 85,
+                extraHour: 25,
+                dailyMax: 190,
+                monthly: 1700,
+                capacity: 380,
+                address: "Şehreküstü Metro İstasyonu, Yıldırım, Bursa",
+                features: ["Metro Aktarmalı", "Katlı", "Güvenlik", "Kamera", "Asansör"],
+                payments: ["cash", "card", "contactless"],
+                hours: { weekday: "07:00 - 23:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.1850,29.0800"
+            },
+            {
+                id: 16,
+                name: "Davutdede Otoparkı",
+                district: "yildirim",
+                type: "acik",
+                firstHour: 75,
+                extraHour: 20,
+                dailyMax: 150,
+                monthly: 1400,
+                capacity: 200,
+                address: "Davutdede Mahallesi, Yıldırım, Bursa",
+                features: ["Tramvay Aktarmalı", "Güvenlik", "Kamera"],
+                payments: ["cash", "card"],
+                hours: { weekday: "07:00 - 22:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.1900,29.0900"
+            },
+            {
+                id: 17,
+                name: "Ankara Yolu Cep Otoparkı",
+                district: "yildirim",
+                type: "acik",
+                firstHour: 70,
+                extraHour: 20,
+                dailyMax: 140,
+                monthly: 1300,
+                capacity: 150,
+                address: "Ankara Yolu, Yıldırım, Bursa",
+                features: ["Ana Yol Üzeri", "Güvenlik"],
+                payments: ["cash", "card"],
+                hours: { weekday: "06:00 - 23:00", weekend: "06:00 - 23:00" },
+                coordinates: "40.1950,29.1000"
+            },
+            {
+                id: 18,
+                name: "Yıldırım Belediyesi Kapalı Otoparkı",
+                district: "yildirim",
+                type: "kapali",
+                firstHour: 80,
+                extraHour: 20,
+                dailyMax: 160,
+                monthly: 1500,
+                capacity: 280,
+                address: "Yıldırım İlçe Merkezi, Bursa",
+                features: ["Belediye", "Kapalı", "Asansör", "Güvenlik", "Kamera"],
+                payments: ["cash", "card", "contactless"],
+                hours: { weekday: "07:00 - 22:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.1880,29.0850"
+            },
+            
+            // MUDANYA
+            {
+                id: 19,
+                name: "Mudanya İskele Otoparkı",
+                district: "mudanya",
+                type: "acik",
+                firstHour: 60,
+                extraHour: 15,
+                dailyMax: 120,
+                monthly: 1000,
+                capacity: 400,
+                address: "Mudanya İskele Meydanı, Mudanya, Bursa",
+                features: ["Deniz Manzaralı", "Feribot Aktarmalı", "Güvenlik", "Kamera"],
+                payments: ["cash", "card"],
+                hours: { weekday: "06:00 - 24:00", weekend: "06:00 - 24:00" },
+                coordinates: "40.3750,28.8833"
+            },
+            {
+                id: 20,
+                name: "Güzelyalı Halk Otoparkı",
+                district: "mudanya",
+                type: "acik",
+                firstHour: 50,
+                extraHour: 15,
+                dailyMax: 100,
+                monthly: 900,
+                capacity: 250,
+                address: "Güzelyalı Mahallesi, Mudanya, Bursa",
+                features: ["Plaj Yakını", "Sahil Bölgesi", "Güvenlik"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 20:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.3600,28.8833"
+            },
+            {
+                id: 21,
+                name: "Mudanya Marina Otoparkı",
+                district: "mudanya",
+                type: "kapali",
+                firstHour: 70,
+                extraHour: 20,
+                dailyMax: 150,
+                monthly: 1200,
+                capacity: 300,
+                address: "Mudanya Marina, Mudanya, Bursa",
+                features: ["Marina", "Kapalı", "Vale", "Güvenlik", "Kamera"],
+                payments: ["card", "contactless"],
+                hours: { weekday: "07:00 - 23:00", weekend: "07:00 - 24:00" },
+                coordinates: "40.3730,28.8850"
+            },
+            
+            // KESTEL
+            {
+                id: 22,
+                name: "Kestel Metro Cep Otoparkı",
+                district: "kestel",
+                type: "acik",
+                firstHour: 65,
+                extraHour: 15,
+                dailyMax: 130,
+                monthly: 1100,
+                capacity: 200,
+                address: "Kestel Metro İstasyonu, Kestel, Bursa",
+                features: ["Metro Aktarmalı", "Güvenlik", "Kamera"],
+                payments: ["cash", "card"],
+                hours: { weekday: "06:00 - 23:00", weekend: "07:00 - 22:00" },
+                coordinates: "40.2000,29.2167"
+            },
+            {
+                id: 23,
+                name: "Kestel İlçe Merkezi Otoparkı",
+                district: "kestel",
+                type: "acik",
+                firstHour: 60,
+                extraHour: 15,
+                dailyMax: 120,
+                monthly: 1000,
+                capacity: 150,
+                address: "Kestel İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 18:00", weekend: "08:00 - 18:00" },
+                coordinates: "40.1980,29.2100"
+            },
+            
+            // GÜRSU
+            {
+                id: 24,
+                name: "Gürsu İlçe Merkezi Otoparkı",
+                district: "gursu",
+                type: "acik",
+                firstHour: 60,
+                extraHour: 15,
+                dailyMax: 120,
+                monthly: 1000,
+                capacity: 180,
+                address: "Gürsu İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik", "Kamera"],
+                payments: ["cash", "card"],
+                hours: { weekday: "08:00 - 20:00", weekend: "08:00 - 20:00" },
+                coordinates: "40.2167,29.2000"
+            },
+            {
+                id: 25,
+                name: "Cumalıkızık Otoparkı",
+                district: "gursu",
+                type: "acik",
+                firstHour: 40,
+                extraHour: 10,
+                dailyMax: 80,
+                monthly: null,
+                capacity: 300,
+                address: "Cumalıkızık Köyü, Gürsu, Bursa",
+                features: ["UNESCO Miras Alanı", "Turistik", "Otobüs Parkı"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 19:00", weekend: "08:00 - 19:00" },
+                coordinates: "40.2100,29.1833"
+            },
+            
+            // İNEGÖL
+            {
+                id: 26,
+                name: "İnegöl Mobilya Kent Otoparkı",
+                district: "inegol",
+                type: "kapali",
+                firstHour: 70,
+                extraHour: 20,
+                dailyMax: 150,
+                monthly: 1300,
+                capacity: 500,
+                address: "Mobilya Kent, İnegöl, Bursa",
+                features: ["Kapalı", "Güvenlik", "Kamera", "Asansör", "Geniş Kapasite"],
+                payments: ["cash", "card", "contactless"],
+                hours: { weekday: "08:00 - 20:00", weekend: "08:00 - 20:00" },
+                coordinates: "40.0833,29.5167"
+            },
+            {
+                id: 27,
+                name: "İnegöl İlçe Merkezi Otoparkı",
+                district: "inegol",
+                type: "katli",
+                firstHour: 65,
+                extraHour: 15,
+                dailyMax: 140,
+                monthly: 1200,
+                capacity: 350,
+                address: "İnegöl İlçe Merkezi, Bursa",
+                features: ["Katlı", "Belediye", "Güvenlik", "Asansör"],
+                payments: ["cash", "card"],
+                hours: { weekday: "07:00 - 21:00", weekend: "08:00 - 20:00" },
+                coordinates: "40.0800,29.5100"
+            },
+            {
+                id: 28,
+                name: "Alışveriş Merkezi Otoparkı",
+                district: "inegol",
+                type: "avm",
+                firstHour: 0,
+                extraHour: 15,
+                dailyMax: 60,
+                monthly: null,
+                capacity: 800,
+                address: "İnegöl AVM, İnegöl, Bursa",
+                features: ["0-2 Saat Ücretsiz", "Kapalı", "Engelli Erişimi"],
+                payments: ["card", "contactless"],
+                hours: { weekday: "10:00 - 22:00", weekend: "10:00 - 22:00" },
+                coordinates: "40.0780,29.5150"
+            },
+            
+            // GEMLİK
+            {
+                id: 29,
+                name: "Gemlik İskele Otoparkı",
+                district: "gemlik",
+                type: "acik",
+                firstHour: 60,
+                extraHour: 15,
+                dailyMax: 120,
+                monthly: 1000,
+                capacity: 350,
+                address: "Gemlik İskele Meydanı, Gemlik, Bursa",
+                features: ["Deniz Kenarı", "Feribot Aktarmalı", "Güvenlik"],
+                payments: ["cash", "card"],
+                hours: { weekday: "06:00 - 23:00", weekend: "06:00 - 23:00" },
+                coordinates: "40.4333,29.1500"
+            },
+            {
+                id: 30,
+                name: "Gemlik Marina Otoparkı",
+                district: "gemlik",
+                type: "kapali",
+                firstHour: 70,
+                extraHour: 20,
+                dailyMax: 150,
+                monthly: 1300,
+                capacity: 250,
+                address: "Gemlik Marina, Gemlik, Bursa",
+                features: ["Marina", "Kapalı", "Vale", "Güvenlik"],
+                payments: ["card", "contactless", "app"],
+                hours: { weekday: "07:00 - 23:00", weekend: "07:00 - 24:00" },
+                coordinates: "40.4350,29.1550"
+            },
+            
+            // ORHANGAZİ
+            {
+                id: 31,
+                name: "Orhangazi İlçe Merkezi Otoparkı",
+                district: "orhangazi",
+                type: "acik",
+                firstHour: 55,
+                extraHour: 15,
+                dailyMax: 110,
+                monthly: 950,
+                capacity: 200,
+                address: "Orhangazi İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik", "Kamera"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 18:00", weekend: "08:00 - 18:00" },
+                coordinates: "40.4892,29.3089"
+            },
+            {
+                id: 32,
+                name: "Orhangazi Sahil Otoparkı",
+                district: "orhangazi",
+                type: "acik",
+                firstHour: 50,
+                extraHour: 10,
+                dailyMax: 100,
+                monthly: 900,
+                capacity: 300,
+                address: "Orhangazi Sahil, Bursa",
+                features: ["Sahil", "Piknik Alanı", "Güvenlik"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 20:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.4900,29.3100"
+            },
+            
+            // İZNİK
+            {
+                id: 33,
+                name: "İznik Göl Kenarı Otoparkı",
+                district: "iznik",
+                type: "acik",
+                firstHour: 40,
+                extraHour: 10,
+                dailyMax: 80,
+                monthly: 700,
+                capacity: 400,
+                address: "İznik Göl Kenarı, Bursa",
+                features: ["Göl Manzaralı", "Turistik", "Piknik Alanı"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 19:00", weekend: "08:00 - 20:00" },
+                coordinates: "40.4286,29.7211"
+            },
+            {
+                id: 34,
+                name: "İznik İlçe Merkezi Otoparkı",
+                district: "iznik",
+                type: "acik",
+                firstHour: 45,
+                extraHour: 10,
+                dailyMax: 90,
+                monthly: 800,
+                capacity: 150,
+                address: "İznik İlçe Merkezi, Bursa",
+                features: ["Belediye", "Tarihi Bölge", "Güvenlik"],
+                payments: ["cash", "card"],
+                hours: { weekday: "08:00 - 18:00", weekend: "08:00 - 18:00" },
+                coordinates: "40.4300,29.7200"
+            },
+            {
+                id: 35,
+                name: "Ayasofya Müzesi Otoparkı",
+                district: "iznik",
+                type: "acik",
+                firstHour: 35,
+                extraHour: 10,
+                dailyMax: 70,
+                monthly: null,
+                capacity: 100,
+                address: "Ayasofya Müzesi, İznik, Bursa",
+                features: ["Tarihi Müze", "Turistik"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 17:00", weekend: "                            08:00 - 17:00" },
+                coordinates: "40.4300,29.7200"
+            },
+            
+            // YENİŞEHİR
+            {
+                id: 36,
+                name: "Yenişehir Havaalanı Otoparkı",
+                district: "yenisehir",
+                type: "acik",
+                firstHour: 120,
+                extraHour: 30,
+                dailyMax: 300,
+                monthly: 2500,
+                capacity: 500,
+                address: "Yenişehir Havaalanı, Bursa",
+                features: ["Havaalanı", "7/24 Güvenlik", "Kamera", "Aydınlatma", "Kapalı Alan"],
+                payments: ["cash", "card", "contactless", "app"],
+                hours: { weekday: "7/24", weekend: "7/24" },
+                coordinates: "40.2552,29.5625"
+            },
+            {
+                id: 37,
+                name: "Yenişehir İlçe Merkezi Otoparkı",
+                district: "yenisehir",
+                type: "acik",
+                firstHour: 50,
+                extraHour: 15,
+                dailyMax: 100,
+                monthly: 900,
+                capacity: 200,
+                address: "Yenişehir İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik", "Kamera"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 18:00", weekend: "08:00 - 18:00" },
+                coordinates: "40.2644,29.6531"
+            },
+            
+            // BÜYÜKORHAN
+            {
+                id: 38,
+                name: "Büyükorhan İlçe Merkezi Otoparkı",
+                district: "buyukorhan",
+                type: "acik",
+                firstHour: 40,
+                extraHour: 10,
+                dailyMax: 80,
+                monthly: 700,
+                capacity: 100,
+                address: "Büyükorhan İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 17:00", weekend: "08:00 - 17:00" },
+                coordinates: "39.7714,28.8853"
+            },
+            
+            // HARMANCIK
+            {
+                id: 39,
+                name: "Harmancık İlçe Merkezi Otoparkı",
+                district: "harmancik",
+                type: "acik",
+                firstHour: 40,
+                extraHour: 10,
+                dailyMax: 80,
+                monthly: 700,
+                capacity: 80,
+                address: "Harmancık İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 17:00", weekend: "08:00 - 17:00" },
+                coordinates: "39.6761,29.1553"
+            },
+            
+            // KELES
+            {
+                id: 40,
+                name: "Keles İlçe Merkezi Otoparkı",
+                district: "keles",
+                type: "acik",
+                firstHour: 40,
+                extraHour: 10,
+                dailyMax: 80,
+                monthly: 700,
+                capacity: 100,
+                address: "Keles İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik", "Dağ Manzaralı"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 17:00", weekend: "08:00 - 17:00" },
+                coordinates: "39.9136,29.2294"
+            },
+            
+            // ORHANELİ
+            {
+                id: 41,
+                name: "Orhaneli İlçe Merkezi Otoparkı",
+                district: "orhaneli",
+                type: "acik",
+                firstHour: 45,
+                extraHour: 10,
+                dailyMax: 90,
+                monthly: 800,
+                capacity: 120,
+                address: "Orhaneli İlçe Merkezi, Bursa",
+                features: ["Belediye", "Güvenlik", "Termal Bölge Yakını"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 18:00", weekend: "08:00 - 18:00" },
+                coordinates: "39.9033,28.9906"
+            },
+            
+            // KARACABEY
+            {
+                id: 42,
+                name: "Karacabey İlçe Merkezi Otoparkı",
+                district: "karacabey",
+                type: "katli",
+                firstHour: 55,
+                extraHour: 15,
+                dailyMax: 110,
+                monthly: 1000,
+                capacity: 250,
+                address: "Karacabey İlçe Merkezi, Bursa",
+                features: ["Katlı", "Belediye", "Güvenlik", "Asansör"],
+                payments: ["cash", "card"],
+                hours: { weekday: "07:00 - 21:00", weekend: "08:00 - 20:00" },
+                coordinates: "40.2132,28.3614"
+            },
+            {
+                id: 43,
+                name: "Karacabey Sahil Otoparkı",
+                district: "karacabey",
+                type: "acik",
+                firstHour: 50,
+                extraHour: 15,
+                dailyMax: 100,
+                monthly: 900,
+                capacity: 300,
+                address: "Karacabey Sahil, Bursa",
+                features: ["Sahil", "Plaj", "Güvenlik", "Piknik Alanı"],
+                payments: ["cash"],
+                hours: { weekday: "08:00 - 20:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.2200,28.3700"
+            },
+            
+            // MUSTAFAKEMALPAŞA
+            {
+                id: 44,
+                name: "Mustafakemalpaşa İlçe Merkezi Otoparkı",
+                district: "mustafakemalpasa",
+                type: "kapali",
+                firstHour: 60,
+                extraHour: 15,
+                dailyMax: 120,
+                monthly: 1100,
+                capacity: 300,
+                address: "Mustafakemalpaşa İlçe Merkezi, Bursa",
+                features: ["Kapalı", "Belediye", "Güvenlik", "Kamera", "Asansör"],
+                payments: ["cash", "card", "contactless"],
+                hours: { weekday: "07:00 - 22:00", weekend: "08:00 - 22:00" },
+                coordinates: "40.0382,28.4087"
+            },
+            {
+                id: 45,
+                name: "Mustafakemalpaşa Terminal Otoparkı",
+                district: "mustafakemalpasa",
+                type: "acik",
+                firstHour: 55,
+                extraHour: 15,
+                dailyMax: 110,
+                monthly: 1000,
+                capacity: 200,
+                address: "Otogar Mustafakemalpaşa, Bursa",
+                features: ["Otobüs Terminali", "Güvenlik", "7/24"],
+                payments: ["cash", "card"],
+                hours: { weekday: "7/24", weekend: "7/24" },
+                coordinates: "40.0400,28.4100"
+            }
+        ];
+
+        // ==========================================
+        // STATE YÖNETİMİ
+        // ==========================================
+        let currentDistrict = 'all';
+        let currentPayment = 'all';
+        let selectedTypes = [];
+        let filteredData = [...parkingData];
+
+        // ==========================================
+        // FONKSİYONLAR
+        // ==========================================
+
+        // İlçe Filtreleme
+        function filterByDistrict(district) {
+            currentDistrict = district;
+            
+            // UI Güncelleme
+            document.querySelectorAll('.district-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            applyFilters();
+        }
+
+        function resetDistrictFilter() {
+            currentDistrict = 'all';
+            document.querySelectorAll('.district-chip').forEach((chip, index) => {
+                chip.classList.remove('active');
+                if (index === 0) chip.classList.add('active');
+            });
+            applyFilters();
+        }
+
+        // Ödeme Yöntemi Filtreleme
+        function filterByPayment(payment) {
+            currentPayment = payment;
+            
+            document.querySelectorAll('.payment-filter').forEach(btn => {
+                btn.classList.remove('active', 'border-gold', 'text-gold');
+                btn.classList.add('border-white/10');
+            });
+            
+            const activeBtn = document.getElementById(`pay-${payment}`);
+            activeBtn.classList.add('active', 'border-gold', 'text-gold');
+            activeBtn.classList.remove('border-white/10');
+            
+            applyFilters();
+        }
+
+        // Tip Filtreleme (Modal)
+        function toggleTypeFilter(type) {
+            const btn = document.querySelector(`[data-type="${type}"]`);
+            
+            if (selectedTypes.includes(type)) {
+                selectedTypes = selectedTypes.filter(t => t !== type);
+                btn.classList.remove('bg-gold', 'text-deep-teal', 'border-gold');
+                btn.classList.add('bg-card-teal', 'border-white/10');
+            } else {
+                selectedTypes.push(type);
+                btn.classList.add('bg-gold', 'text-deep-teal', 'border-gold');
+                btn.classList.remove('bg-card-teal', 'border-white/10');
+            }
+        }
+
+        // Ana Filtreleme Fonksiyonu
+        function applyFilters() {
+            filteredData = parkingData.filter(parking => {
+                // İlçe filtresi
+                const districtMatch = currentDistrict === 'all' || parking.district === currentDistrict;
+                
+                // Ödeme filtresi
+                const paymentMatch = currentPayment === 'all' || parking.payments.includes(currentPayment);
+                
+                // Tip filtresi
+                const typeMatch = selectedTypes.length === 0 || selectedTypes.includes(parking.type);
+                
+                return districtMatch && paymentMatch && typeMatch;
+            });
+            
+            sortParkings();
+            renderParkings();
+            updateCount();
+            
+            closeFilterModal();
+        }
+
+        // Sıralama
+        function sortParkings() {
+            const sortType = document.getElementById('sortSelect').value;
+            
+            switch(sortType) {
+                case 'price-asc':
+                    filteredData.sort((a, b) => a.firstHour - b.firstHour);
+                    break;
+                case 'price-desc':
+                    filteredData.sort((a, b) => b.firstHour - a.firstHour);
+                    break;
+                case 'capacity':
+                    filteredData.sort((a, b) => b.capacity - a.capacity);
+                    break;
+                default:
+                    // Önerilen: Önce AVM'ler, sonra kapalı, sonra diğerleri
+                    filteredData.sort((a, b) => {
+                        const typeOrder = { 'avm': 0, 'kapali': 1, 'katli': 2, 'yeralti': 3, 'acik': 4 };
+                        return typeOrder[a.type] - typeOrder[b.type];
+                    });
+            }
+        }
+
+        // Listeyi Render Et
+        function renderParkings() {
+            const container = document.getElementById('parkingList');
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-card rounded-2xl p-8 text-center">
+                        <span class="material-symbols-outlined text-4xl text-gray-text mb-2">search_off</span>
+                        <p class="text-gray-text">Seçilen filtrelere uygun otopark bulunamadı.</p>
+                        <button onclick="resetAllFilters()" class="mt-4 px-4 py-2 bg-gold/20 text-gold rounded-lg text-sm">Filtreleri Sıfırla</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredData.map(parking => {
+                const typeLabels = {
+                    'kapali': 'Kapalı',
+                    'acik': 'Açık',
+                    'katli': 'Katlı',
+                    'yeralti': 'Yeraltı',
+                    'avm': 'AVM'
+                };
+                
+                const typeClasses = {
+                    'kapali': 'type-badge-kapali',
+                    'acik': 'type-badge-acik',
+                    'katli': 'type-badge-katli',
+                    'yeralti': 'type-badge-yeralti',
+                    'avm': 'type-badge-avm'
+                };
+                
+                const districtNames = {
+                    'osmangazi': 'Osmangazi',
+                    'nilufer': 'Nilüfer',
+                    'yildirim': 'Yıldırım',
+                    'mudanya': 'Mudanya',
+                    'kestel': 'Kestel',
+                    'gursu': 'Gürsu',
+                    'inegol': 'İnegöl',
+                    'gemlik': 'Gemlik',
+                    'orhangazi': 'Orhangazi',
+                    'iznik': 'İznik',
+                    'yenisehir': 'Yenişehir',
+                    'buyukorhan': 'Büyükorhan',
+                    'harmancik': 'Harmancık',
+                    'keles': 'Keles',
+                    'orhaneli': 'Orhaneli',
+                    'karacabey': 'Karacabey',
+                    'mustafakemalpasa': 'Mustafakemalpaşa'
+                };
+                
+                const priceDisplay = parking.firstHour === 0 ? 
+                    '<span class="text-park-green font-bold">İlk 3 Saat Ücretsiz</span>' : 
+                    `<span class="text-gold font-bold text-lg">${parking.firstHour}₺</span><span class="text-gray-text text-xs">/saat</span>`;
+                
+                return `
+                    <div class="parking-card glass-card rounded-xl p-4" onclick="openParkingModal(${parking.id})">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex-1 min-w-0 mr-2">
+                                <span class="text-[10px] px-2 py-0.5 rounded-full ${typeClasses[parking.type]} mb-1 inline-block">
+                                    ${typeLabels[parking.type]}
+                                </span>
+                                <h4 class="font-bold text-sm leading-tight truncate">${parking.name}</h4>
+                                <p class="text-xs text-gray-text">${districtNames[parking.district]}</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                ${priceDisplay}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                            <div class="flex items-center gap-3 text-xs text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">local_parking</span>
+                                    ${parking.capacity}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    ${parking.hours.weekday === '7/24' ? '7/24' : parking.hours.weekday.split(' ')[0]}
+                                </span>
+                            </div>
+                            <div class="flex gap-1">
+                                ${parking.payments.slice(0, 3).map(p => {
+                                    const icons = {
+                                        'cash': 'payments',
+                                        'card': 'credit_card',
+                                        'contactless': 'contactless',
+                                        'app': 'smartphone'
+                                    };
+                                    return `<span class="material-symbols-outlined text-xs text-gray-text">${icons[p]}</span>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateCount() {
+            document.getElementById('parkingCount').textContent = `(${filteredData.length})`;
+        }
+
+        function resetAllFilters() {
+            currentDistrict = 'all';
+            currentPayment = 'all';
+            selectedTypes = [];
+            
+            document.querySelectorAll('.district-chip').forEach((chip, index) => {
+                chip.classList.remove('active');
+                if (index === 0) chip.classList.add('active');
+            });
+            
+            document.querySelectorAll('.payment-filter').forEach(btn => {
+                btn.classList.remove('active', 'border-gold', 'text-gold');
+                btn.classList.add('border-white/10');
+            });
+            document.getElementById('pay-all').classList.add('active', 'border-gold', 'text-gold');
+            
+            document.querySelectorAll('.type-filter').forEach(btn => {
+                btn.classList.remove('bg-gold', 'text-deep-teal', 'border-gold');
+                btn.classList.add('bg-card-teal', 'border-white/10');
+            });
+            
+            applyFilters();
+        }
+
+        // Modal Fonksiyonları
+        function openParkingModal(id) {
+            const parking = parkingData.find(p => p.id === id);
+            if (!parking) return;
+            
+            const typeLabels = {
+                'kapali': 'Kapalı Otopark',
+                'acik': 'Açık Otopark',
+                'katli': 'Katlı Otopark',
+                'yeralti': 'Yeraltı Otopark',
+                'avm': 'AVM Otoparkı'
+            };
+            
+            const districtNames = {
+                'osmangazi': 'Osmangazi',
+                'nilufer': 'Nilüfer',
+                'yildirim': 'Yıldırım',
+                'mudanya': 'Mudanya',
+                'kestel': 'Kestel',
+                'gursu': 'Gürsu',
+                'inegol': 'İnegöl',
+                'gemlik': 'Gemlik',
+                'orhangazi': 'Orhangazi',
+                'iznik': 'İznik',
+                'yenisehir': 'Yenişehir',
+                'buyukorhan': 'Büyükorhan',
+                'harmancik': 'Harmancık',
+                'keles': 'Keles',
+                'orhaneli': 'Orhaneli',
+                'karacabey': 'Karacabey',
+                'mustafakemalpasa': 'Mustafakemalpaşa'
+            };
+            
+            document.getElementById('modalTypeBadge').textContent = typeLabels[parking.type];
+            document.getElementById('modalTitle').textContent = parking.name;
+            document.getElementById('modalDistrict').textContent = districtNames[parking.district];
+            
+            document.getElementById('modalFirstHour').textContent = parking.firstHour === 0 ? 'Ücretsiz' : `${parking.firstHour}₺`;
+            document.getElementById('modalExtraHour').textContent = `${parking.extraHour}₺`;
+            document.getElementById('modalDailyMax').textContent = `${parking.dailyMax}₺`;
+            document.getElementById('modalMonthly').textContent = parking.monthly ? `${parking.monthly.toLocaleString()}₺` : 'Mevcut Değil';
+            
+            // Özellikler
+            const featuresHtml = parking.features.map(feature => `
+                <div class="flex items-center gap-2 text-xs text-gray-text">
+                    <span class="material-symbols-outlined text-gold text-sm">check_circle</span>
+                    ${feature}
+                </div>
+            `).join('');
+            document.getElementById('modalFeatures').innerHTML = featuresHtml;
+            
+            // Ödeme yöntemleri
+            const paymentLabels = {
+                'cash': { text: 'Nakit', class: 'payment-cash', icon: 'payments' },
+                'card': { text: 'Kredi Kartı', class: 'payment-card', icon: 'credit_card' },
+                'contactless': { text: 'Temassız', class: 'payment-contactless', icon: 'contactless' },
+                'app': { text: 'Mobil/App', class: 'payment-app', icon: 'smartphone' }
+            };
+            
+            const paymentsHtml = parking.payments.map(p => `
+                <span class="payment-badge ${paymentLabels[p].class}">
+                    <span class="material-symbols-outlined text-xs">${paymentLabels[p].icon}</span>
+                    ${paymentLabels[p].text}
+                </span>
+            `).join('');
+            document.getElementById('modalPayments').innerHTML = paymentsHtml;
+            
+            document.getElementById('modalAddress').textContent = parking.address;
+            document.getElementById('modalWeekday').textContent = parking.hours.weekday;
+            document.getElementById('modalWeekend').textContent = parking.hours.weekend;
+            
+            // Yol tarifi linki
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${parking.coordinates}`;
+            document.getElementById('modalDirections').href = mapsUrl;
+            
+            document.getElementById('parkingModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeParkingModal() {
+            document.getElementById('parkingModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openFilterModal() {
+            document.getElementById('filterModal').classList.remove('hidden');
+        }
+
+        function closeFilterModal() {
+            document.getElementById('filterModal').classList.add('hidden');
+        }
+
+        function shareParking() {
+            const title = document.getElementById('modalTitle').textContent;
+            const district = document.getElementById('modalDistrict').textContent;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `${title} - Bursa Otopark`,
+                    text: `${title} otopark bilgileri`,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback
+                const text = `${title} - ${district}`;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Otopark bilgileri kopyalandı!');
+                });
+            }
+        }
+
+        // ESC ile kapatma
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeParkingModal();
+                closeFilterModal();
+            }
+        });
+
+        // ==========================================
+        // NEAREST PARKING FUNCTIONALITY
+        // ==========================================
+
+        let userLocation = null;
+
+        // Calculate distance between two coordinates using Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // Distance in km
+        }
+
+        // Get user's location and find nearest parkings
+        function findNearestParkings() {
+            const listContainer = document.getElementById('nearestParkingList');
+
+            if (!navigator.geolocation) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-2 text-xs text-gray-text">
+                        Konum erişimi desteklenmiyor
+                    </div>
+                `;
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    // Calculate distances and sort
+                    const parkingsWithDistance = parkingData.map(parking => {
+                        const [pLat, pLng] = parking.coordinates.split(',').map(Number);
+                        const distance = calculateDistance(userLocation.lat, userLocation.lng, pLat, pLng);
+                        return { ...parking, distance };
+                    });
+
+                    // Sort by distance and take top 2
+                    const nearest = parkingsWithDistance.sort((a, b) => a.distance - b.distance).slice(0, 2);
+
+                    renderNearestParkings(nearest);
+                },
+                (error) => {
+                    listContainer.innerHTML = `
+                        <div class="text-center py-2 text-xs text-gray-text">
+                            <span class="material-symbols-outlined text-sm block mb-1">location_off</span>
+                            Konum erişimi reddedildi
+                        </div>
+                    `;
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            );
+        }
+
+        // Render nearest parking spots
+        function renderNearestParkings(nearest) {
+            const listContainer = document.getElementById('nearestParkingList');
+
+            if (nearest.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-2 text-xs text-gray-text">
+                        Yakında otopark bulunamadı
+                    </div>
+                `;
+                return;
+            }
+
+            const typeLabels = {
+                'kapali': 'Kapalı',
+                'acik': 'Açık',
+                'katli': 'Katlı',
+                'yeralti': 'Yeraltı',
+                'avm': 'AVM'
+            };
+
+            const districtNames = {
+                'osmangazi': 'Osmangazi',
+                'nilufer': 'Nilüfer',
+                'yildirim': 'Yıldırım',
+                'mudanya': 'Mudanya',
+                'kestel': 'Kestel',
+                'gursu': 'Gürsu',
+                'inegol': 'İnegöl',
+                'gemlik': 'Gemlik',
+                'orhangazi': 'Orhangazi',
+                'iznik': 'İznik',
+                'yenisehir': 'Yenişehir',
+                'buyukorhan': 'Büyükorhan',
+                'harmancik': 'Harmancık',
+                'keles': 'Keles',
+                'orhaneli': 'Orhaneli',
+                'karacabey': 'Karacabey',
+                'mustafakemalpasa': 'Mustafakemalpaşa'
+            };
+
+            listContainer.innerHTML = nearest.map((parking, index) => `
+                <div class="flex items-center justify-between p-2.5 bg-dark-teal/50 rounded-lg border border-white/10 cursor-pointer hover:bg-dark-teal transition-colors" onclick="openParkingModal(${parking.id})">
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div class="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-gold text-sm">local_parking</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-xs font-bold text-white truncate">${parking.name}</p>
+                            <div class="flex items-center gap-1.5 text-[10px] text-gray-text">
+                                <span class="text-park-green font-medium">${parking.distance.toFixed(1)} km</span>
+                                <span>•</span>
+                                <span>${districtNames[parking.district]}</span>
+                                <span>•</span>
+                                <span>${typeLabels[parking.type]}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0 ml-2">
+                        <p class="text-sm font-bold text-gold">${parking.firstHour === 0 ? 'Ücretsiz' : parking.firstHour + '₺'}</p>
+                        <p class="text-[9px] text-gray-text">/saat</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Refresh nearest parking button handler
+        function refreshNearestParking() {
+            const listContainer = document.getElementById('nearestParkingList');
+            listContainer.innerHTML = `
+                <div class="flex items-center justify-center py-4 text-gray-text text-xs">
+                    <span class="material-symbols-outlined animate-spin mr-2">sync</span>
+                    Yakındaki otoparklar aranıyor...
+                </div>
+            `;
+            findNearestParkings();
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', () => {
+            renderParkings();
+            updateCount();
+            findNearestParkings();
+        });
+
+    </script>
+</body>
+</html>

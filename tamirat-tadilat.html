@@ -1,0 +1,622 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy - Tamirat & Tadilat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#BB9E77",
+                        "primary-light": "#D4B896",
+                        "primary-dark": "#9A8260",
+                        background: "#0F3E46",
+                        surface: "#415B57",
+                        border: "#698383",
+                        accent: "#E8D5B5",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        
+        .glass-card {
+            background: rgba(65, 91, 87, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card:hover {
+            background: rgba(65, 91, 87, 0.6);
+            border-color: rgba(187, 158, 119, 0.5);
+        }
+        
+        .category-pill {
+            background: rgba(65, 91, 87, 0.6);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .category-pill.active {
+            background: rgba(187, 158, 119, 0.2);
+            border-color: rgba(187, 158, 119, 0.6);
+            color: #BB9E77;
+        }
+        
+        .category-pill.active span {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        .master-card {
+            background: linear-gradient(135deg, rgba(65, 91, 87, 0.6) 0%, rgba(65, 91, 87, 0.3) 100%);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .master-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(187, 158, 119, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .master-card:active {
+            transform: scale(0.98);
+        }
+        
+        .price-tag {
+            background: linear-gradient(135deg, rgba(187, 158, 119, 0.2) 0%, rgba(187, 158, 119, 0.1) 100%);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+        }
+        
+        .portfolio-scroll {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .portfolio-item {
+            scroll-snap-align: start;
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.9);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:active {
+            transform: scale(0.9);
+        }
+        
+        .nav-item.active {
+            color: #BB9E77;
+        }
+        
+        .nav-item.active span:first-child {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .verified-badge {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+        
+        .expertise-tag {
+            background: rgba(187, 158, 119, 0.15);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+        }
+        
+        .rating-stars {
+            color: #fbbf24;
+        }
+        
+        .before-after-slider {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .before-after-slider img {
+            transition: transform 0.3s ease;
+        }
+        
+        .before-after-slider:hover img {
+            transform: scale(1.05);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="text-white antialiased pb-24">
+
+    <!-- Header -->
+    <header class="pt-12 px-6 pb-4 sticky top-0 z-40 bg-gradient-to-b from-[#0F3E46] via-[#0F3E46] to-transparent">
+        <div class="flex items-center justify-between mb-6">
+            <a href="diger-ihtiyaclar.html" class="ripple w-11 h-11 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all duration-300">
+                <span class="material-symbols-outlined text-primary text-xl">arrow_back_ios_new</span>
+            </a>
+            <div class="flex flex-col items-center">
+                <span class="text-primary tracking-[0.3em] font-semibold text-xs uppercase">CityJoy</span>
+                <div class="w-8 h-0.5 bg-primary/50 rounded-full mt-1"></div>
+            </div>
+            <div class="w-11"></div>
+        </div>
+        
+        <div class="animate-fade-in">
+            <h1 class="text-3xl font-light mb-2 tracking-tight">Tamirat & Tadilat</h1>
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-16 h-1 bg-gradient-to-r from-primary to-transparent rounded-full"></div>
+                <span class="text-xs text-gray-400 font-light">Planlı hizmetler</span>
+            </div>
+            <p class="text-gray-400 text-sm font-light">Ev ve iş yeriniz için güvenilir ustalar</p>
+        </div>
+
+        <!-- Arama -->
+        <div class="relative mt-4 animate-fade-in" style="animation-delay: 0.1s">
+            <input type="text" placeholder="Ne yaptırmak istiyorsunuz?" 
+                   class="w-full bg-surface/50 border border-border/30 rounded-2xl py-4 pl-12 pr-4 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-primary/50 transition-all">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+        </div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="mt-2">
+        
+        <!-- Kategori Filtreleri -->
+        <section class="px-6 mb-6 animate-fade-in" style="animation-delay: 0.2s">
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                <button class="category-pill active px-4 py-2 rounded-full flex items-center gap-2 text-sm whitespace-nowrap ripple">
+                    <span class="material-symbols-outlined text-lg">apps</span>
+                    <span>Tümü</span>
+                </button>
+                <button class="category-pill px-4 py-2 rounded-full flex items-center gap-2 text-sm whitespace-nowrap ripple text-gray-400">
+                    <span class="material-symbols-outlined text-lg">bolt</span>
+                    <span>Elektrik</span>
+                </button>
+                <button class="category-pill px-4 py-2 rounded-full flex items-center gap-2 text-sm whitespace-nowrap ripple text-gray-400">
+                    <span class="material-symbols-outlined text-lg">water_drop</span>
+                    <span>Su/Tesisat</span>
+                </button>
+                <button class="category-pill px-4 py-2 rounded-full flex items-center gap-2 text-sm whitespace-nowrap ripple text-gray-400">
+                    <span class="material-symbols-outlined text-lg">chair</span>
+                    <span>Mobilya</span>
+                </button>
+                <button class="category-pill px-4 py-2 rounded-full flex items-center gap-2 text-sm whitespace-nowrap ripple text-gray-400">
+                    <span class="material-symbols-outlined text-lg">format_paint</span>
+                    <span>Boya</span>
+                </button>
+                <button class="category-pill px-4 py-2 rounded-full flex items-center gap-2 text-sm whitespace-nowrap ripple text-gray-400">
+                    <span class="material-symbols-outlined text-lg">door_front</span>
+                    <span>Kapı/Pencere</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Sıralama ve Filtre -->
+        <section class="px-6 mb-4 flex items-center justify-between animate-fade-in" style="animation-delay: 0.25s">
+            <span class="text-xs text-gray-400">24 usta bulundu</span>
+            <div class="flex gap-2">
+                <button class="glass-card px-3 py-1.5 rounded-lg flex items-center gap-1 text-xs ripple">
+                    <span class="material-symbols-outlined text-sm">swap_vert</span>
+                    <span>Puan</span>
+                </button>
+                <button class="glass-card px-3 py-1.5 rounded-lg flex items-center gap-1 text-xs ripple">
+                    <span class="material-symbols-outlined text-sm">tune</span>
+                    <span>Filtre</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Usta Kartları -->
+        <section class="px-6 space-y-4">
+            
+            <!-- Usta 1 -->
+            <article class="master-card rounded-3xl overflow-hidden animate-slide-up" style="animation-delay: 0.3s">
+                <!-- Portföy Galerisi -->
+                <div class="relative h-48 bg-surface/50">
+                    <div class="portfolio-scroll flex h-full overflow-x-auto hide-scrollbar">
+                        <div class="portfolio-item flex-shrink-0 w-full h-full relative before-after-slider">
+                            <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&h=300&fit=crop" 
+                                 alt="İş öncesi" class="w-full h-full object-cover opacity-60">
+                            <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+                            <span class="absolute top-4 left-4 bg-black/50 px-3 py-1 rounded-full text-xs">İş Öncesi</span>
+                        </div>
+                        <div class="portfolio-item flex-shrink-0 w-full h-full relative before-after-slider">
+                            <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&h=300&fit=crop" 
+                                 alt="İş sonrası" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+                            <span class="absolute top-4 left-4 bg-primary/80 px-3 py-1 rounded-full text-xs text-black font-medium">İş Sonrası</span>
+                        </div>
+                    </div>
+                    <!-- Galeri İndikatörü -->
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
+                        <div class="w-6 h-1 bg-primary rounded-full"></div>
+                        <div class="w-1.5 h-1 bg-white/30 rounded-full"></div>
+                    </div>
+                    <!-- Verified Badge -->
+                    <div class="absolute top-4 right-4 verified-badge w-8 h-8 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-sm fill-1">verified</span>
+                    </div>
+                </div>
+
+                <!-- Usta Bilgileri -->
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex gap-3">
+                            <div class="w-14 h-14 rounded-2xl bg-surface border border-border/30 overflow-hidden flex-shrink-0">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" 
+                                     alt="Mehmet Usta" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Mehmet Yılmaz</h3>
+                                <p class="text-sm text-primary/80">Elektrik & Tesisat Uzmanı</p>
+                                <div class="flex items-center gap-1 mt-1">
+                                    <div class="flex rating-stars">
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                    </div>
+                                    <span class="text-xs text-gray-400 ml-1">4.9 (127 yorum)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Uzmanlık Alanları -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Avize Montajı</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Priz/Sigorta</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Su Kaçağı</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Klozet</span>
+                    </div>
+
+                    <!-- Fiyat Listesi -->
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center justify-between text-sm py-2 border-b border-border/20">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">light</span>
+                                Avize Montajı
+                            </span>
+                            <span class="font-semibold text-primary">150₺'den</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm py-2 border-b border-border/20">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">electrical_services</span>
+                                Priz/Sigorta Değişimi
+                            </span>
+                            <span class="font-semibold text-primary">80₺'den</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm py-2">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">water_damage</span>
+                                Su Kaçağı Tespiti
+                            </span>
+                            <span class="font-semibold text-primary">400₺'den</span>
+                        </div>
+                    </div>
+
+                    <!-- Alt Bilgi -->
+                    <div class="flex items-center justify-between pt-3 border-t border-border/30">
+                        <div class="flex items-center gap-3 text-xs text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">location_on</span>
+                                1.2 km
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">schedule</span>
+                                Bugün müsait
+                            </span>
+                        </div>
+                        <a href="usta-profil-mehmet.html" class="price-tag px-4 py-2 rounded-xl text-sm font-medium text-primary ripple active:scale-95 transition-all">
+                            Profili Gör
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Usta 2 -->
+            <article class="master-card rounded-3xl overflow-hidden animate-slide-up" style="animation-delay: 0.4s">
+                <div class="relative h-48 bg-surface/50">
+                    <div class="portfolio-scroll flex h-full overflow-x-auto hide-scrollbar">
+                        <div class="portfolio-item flex-shrink-0 w-full h-full relative before-after-slider">
+                            <img src="https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400&h=300&fit=crop" 
+                                 alt="Boya işi" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
+                        <div class="w-6 h-1 bg-primary rounded-full"></div>
+                    </div>
+                    <div class="absolute top-4 right-4 verified-badge w-8 h-8 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-sm fill-1">verified</span>
+                    </div>
+                </div>
+
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex gap-3">
+                            <div class="w-14 h-14 rounded-2xl bg-surface border border-border/30 overflow-hidden flex-shrink-0">
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" 
+                                     alt="Ali Usta" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Ali Kaya</h3>
+                                <p class="text-sm text-primary/80">Boya & Dekorasyon Ustası</p>
+                                <div class="flex items-center gap-1 mt-1">
+                                    <div class="flex rating-stars">
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star_half</span>
+                                    </div>
+                                    <span class="text-xs text-gray-400 ml-1">4.7 (89 yorum)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">İç Cephe Boya</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Dış Cephe</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Alçıpan</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Dekoratif</span>
+                    </div>
+
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center justify-between text-sm py-2 border-b border-border/20">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">format_paint</span>
+                                Tek Oda (100m²)
+                            </span>
+                            <span class="font-semibold text-primary">2.500₺'den</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm py-2 border-b border-border/20">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">apartment</span>
+                                2+1 Daire (Komple)
+                            </span>
+                            <span class="font-semibold text-primary">8.000₺'den</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm py-2">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">brush</span>
+                                Dekoratif Boya (m²)
+                            </span>
+                            <span class="font-semibold text-primary">150₺'den</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-3 border-t border-border/30">
+                        <div class="flex items-center gap-3 text-xs text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">location_on</span>
+                                2.8 km
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">event_available</span>
+                                Yarın müsait
+                            </span>
+                        </div>
+                        <a href="usta-profil-ali.html" class="price-tag px-4 py-2 rounded-xl text-sm font-medium text-primary ripple active:scale-95 transition-all">
+                            Profili Gör
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Usta 3 -->
+            <article class="master-card rounded-3xl overflow-hidden animate-slide-up" style="animation-delay: 0.5s">
+                <div class="relative h-48 bg-surface/50">
+                    <div class="portfolio-scroll flex h-full overflow-x-auto hide-scrollbar">
+                        <div class="portfolio-item flex-shrink-0 w-full h-full relative before-after-slider">
+                            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop" 
+                                 alt="Mobilya" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
+                        <div class="w-6 h-1 bg-primary rounded-full"></div>
+                    </div>
+                </div>
+
+                <div class="p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex gap-3">
+                            <div class="w-14 h-14 rounded-2xl bg-surface border border-border/30 overflow-hidden flex-shrink-0">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" 
+                                     alt="Serkan Usta" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg">Serkan Demir</h3>
+                                <p class="text-sm text-primary/80">Mobilya & Marangoz</p>
+                                <div class="flex items-center gap-1 mt-1">
+                                    <div class="flex rating-stars">
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                        <span class="material-symbols-outlined text-xs fill-1">star</span>
+                                    </div>
+                                    <span class="text-xs text-gray-400 ml-1">5.0 (203 yorum)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">IKEA Montaj</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Özel Dolap</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Mutfak</span>
+                        <span class="expertise-tag px-3 py-1 rounded-full text-xs">Tamir</span>
+                    </div>
+
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center justify-between text-sm py-2 border-b border-border/20">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">chair</span>
+                                IKEA Gardrop Montajı
+                            </span>
+                            <span class="font-semibold text-primary">400₺'den</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm py-2 border-b border-border/20">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">kitchen</span>
+                                Mutfak Dolabı Ayarı
+                            </span>
+                            <span class="font-semibold text-primary">250₺'den</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm py-2">
+                            <span class="text-gray-300 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary text-sm">build</span>
+                                Mobilya Tamiratı
+                            </span>
+                            <span class="font-semibold text-primary">Görüşülür</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-3 border-t border-border/30">
+                        <div class="flex items-center gap-3 text-xs text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm">location_on</span>
+                                0.9 km
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm text-green-400">circle</span>
+                                Şu an müsait
+                            </span>
+                        </div>
+                        <a href="usta-profil-serkan.html" class="price-tag px-4 py-2 rounded-xl text-sm font-medium text-primary ripple active:scale-95 transition-all">
+                            Profili Gör
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- Daha Fazla Yükle -->
+        <section class="px-6 py-8">
+            <button class="w-full glass-card py-4 rounded-2xl text-sm text-gray-400 flex items-center justify-center gap-2 ripple active:scale-95 transition-all hover:text-primary">
+                <span class="material-symbols-outlined">expand_more</span>
+                <span>Daha fazla usta göster</span>
+            </button>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-6 z-40">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px] font-medium">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px] font-medium">Keşfet</span>
+            </a>
+            <a href="ara.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" class="nav-item flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px] font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Kategori filtreleme
+        document.querySelectorAll('.category-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                document.querySelectorAll('.category-pill').forEach(p => {
+                    p.classList.remove('active');
+                    p.classList.add('text-gray-400');
+                });
+                this.classList.add('active');
+                this.classList.remove('text-gray-400');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CityJoy - Seyahat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: transparent;
+            color: white;
+        }
+        .diagonal-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 25;
+            pointer-events: none;
+            background: linear-gradient(to bottom right, transparent calc(50% - 1px), #D9A066 calc(50% - 1px), #D9A066 calc(50% + 1px), transparent calc(50% + 1px));
+        }
+        
+        /* Üst bölüm arka planı - Seyahat1 */
+        .top-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('cityjoy-assets/seyahat1.jpg');
+            background-size: cover;
+            background-position: center;
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+            z-index: 1;
+        }
+        
+        /* Alt bölüm arka planı - Seyahat2 */
+        .bottom-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('cityjoy-assets/seyahat2.jpg');
+            background-size: cover;
+            background-position: center;
+            clip-path: polygon(100% 0, 100% 100%, 0 100%);
+            z-index: 1;
+        }
+        
+        /* Yedek arka plan renkleri - resim yüklenmezse */
+        .top-bg {
+            background-color: #1a4a52;
+        }
+        .bottom-bg {
+            background-color: #0d3d45;
+        }
+        
+        /* Karanlık overlay */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(11, 46, 52, 0.5);
+            z-index: 2;
+        }
+        
+        .content-top-left {
+            position: absolute;
+            top: 30%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 280px;
+            z-index: 30;
+        }
+        .content-bottom-right {
+            position: absolute;
+            top: 70%;
+            left: 70%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 280px;
+            z-index: 30;
+        }
+        
+        /* Mobil uyumluluk */
+        @media (max-width: 640px) {
+            .content-top-left {
+                top: 25%;
+                left: 25%;
+                max-width: 240px;
+            }
+            .content-bottom-right {
+                top: 75%;
+                left: 75%;
+                max-width: 240px;
+            }
+            h1, h2 {
+                font-size: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .content-top-left {
+                top: 22%;
+                left: 22%;
+            }
+            .content-bottom-right {
+                top: 78%;
+                left: 78%;
+            }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Loading Animation -->
+    <div id="loading-screen" class="fixed inset-0 z-[100] bg-[#0B2E34] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative">
+            <div class="w-20 h-20 border-2 border-[#25C6CF]/20 rounded-full animate-spin" style="animation-duration: 3s;"></div>
+            <div class="absolute inset-2 border-2 border-[#D9A066]/30 rounded-full animate-spin" style="animation-duration: 2s; animation-direction: reverse;"></div>
+            <div class="absolute inset-4 bg-gradient-to-br from-[#25C6CF] to-[#0F3A40] rounded-full animate-pulse flex items-center justify-center">
+                <span class="material-icons text-white text-2xl">location_city</span>
+            </div>
+        </div>
+        <div class="mt-6 flex flex-col items-center gap-2">
+            <span class="text-[#D9A066] text-xs font-bold tracking-[0.3em] uppercase animate-pulse">CityJOY</span>
+            <div class="flex gap-1">
+                <span class="w-1.5 h-1.5 bg-[#25C6CF] rounded-full animate-bounce" style="animation-delay: 0s;"></span>
+                <span class="w-1.5 h-1.5 bg-[#25C6CF] rounded-full animate-bounce" style="animation-delay: 0.1s;"></span>
+                <span class="w-1.5 h-1.5 bg-[#25C6CF] rounded-full animate-bounce" style="animation-delay: 0.2s;"></span>
+            </div>
+        </div>
+        <p class="mt-4 text-white/50 text-xs">Yükleniyor...</p>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.style.opacity = '0';
+                setTimeout(function() {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+    </script>
+
+    
+    <!-- Header -->
+    <header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 pt-12 pb-4 pointer-events-none">
+        <a href="anasayfa.html" class="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center border border-white/10 pointer-events-auto active:scale-95 transition-transform">
+            <span class="material-icons text-white">arrow_back</span>
+        </a>
+        <div class="flex items-center gap-1.5 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 pointer-events-auto">
+            <span class="material-icons text-[#25C6CF] text-xl">location_city</span>
+            <span class="text-lg font-bold tracking-tight">CityJOY</span>
+        </div>
+        <div class="w-10"></div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="relative flex-grow w-full h-full overflow-hidden">
+        <!-- Üst Bölüm Arka Plan -->
+        <div class="top-bg"></div>
+        <div class="overlay" style="clip-path: polygon(0 0, 100% 0, 0 100%);"></div>
+        
+        <!-- Alt Bölüm Arka Plan -->
+        <div class="bottom-bg"></div>
+        <div class="overlay" style="clip-path: polygon(100% 0, 100% 100%, 0 100%);"></div>
+        
+        <div class="diagonal-line"></div>
+        
+        <!-- Top Section - Curiosity Mode -->
+        <section class="absolute inset-0 z-20" style="clip-path: polygon(0 0, 100% 0, 0 100%);">
+            <div class="content-top-left flex flex-col items-center text-center gap-4">
+                <div class="flex flex-col items-center gap-1">
+                    <span class="material-icons text-[#D9A066] text-2xl">explore</span>
+                    <span class="text-[#D9A066] text-[10px] font-bold tracking-[0.2em] uppercase">CURIOSITY MODE</span>
+                </div>
+                <h1 class="text-3xl font-bold leading-tight drop-shadow-lg">Keşfet ve<br/>Öğren</h1>
+                <p class="text-white/90 text-xs leading-relaxed max-w-[200px] drop-shadow-md">
+                    Gizli kalmış hikayeleri ve şehrin ruhunu rastlantısal bir yolculukla keşfedin.
+                </p>
+                <a href="kesfet-ogren.html" class="mt-2 bg-[#25C6CF] hover:scale-105 active:scale-95 text-[#0B2E34] font-bold py-3 px-10 rounded-full transition-all shadow-lg shadow-[#25C6CF]/20">
+                    Keşfet
+                </a>
+            </div>
+        </section>
+        
+        <!-- Bottom Section - Efficiency Mode -->
+        <section class="absolute inset-0 z-20" style="clip-path: polygon(100% 0, 100% 100%, 0 100%);">
+            <div class="content-bottom-right flex flex-col items-center text-center gap-4">
+                <div class="flex flex-col items-center gap-1">
+                    <span class="material-icons text-[#D9A066] text-2xl">near_me</span>
+                    <span class="text-[#D9A066] text-[10px] font-bold tracking-[0.2em] uppercase">EFFICIENCY MODE</span>
+                </div>
+                <h2 class="text-3xl font-bold leading-tight drop-shadow-lg">Planla ve<br/>Navigasyon</h2>
+                <p class="text-white/90 text-xs leading-relaxed max-w-[200px] drop-shadow-md">
+                    Hedefinize en hızlı, en konforlu ve en verimli rotalarla ulaşın.
+                </p>
+                <div class="flex gap-4 my-1">
+                    <span class="material-icons text-white/50 text-xl drop-shadow">directions_bus</span>
+                    <span class="material-icons text-white/50 text-xl drop-shadow">train</span>
+                    <span class="material-icons text-white/50 text-xl drop-shadow">map</span>
+                    <span class="material-icons text-white/50 text-xl drop-shadow">alt_route</span>
+                </div>
+                <a href="seyahat-anasayfa.html" class="mt-2 bg-white/5 border border-white/20 hover:bg-white/10 active:scale-95 text-white font-bold py-3 px-8 rounded-full transition-all flex items-center justify-center gap-2 backdrop-blur-sm">
+                    Yolculuğa Başla
+                    <span class="material-icons text-[#25C6CF] text-lg">arrow_forward</span>
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Bottom Indicator -->
+    <div class="fixed bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/10 rounded-full z-[60]"></div>
+</body>
+</html>

@@ -1,0 +1,1265 @@
+﻿<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>Bursa Sosyal - Fırsat Ağı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@200;300;400;500;600;700&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#D4A373",
+                        "primary-light": "#F5D08B",
+                        "primary-dark": "#BC9A17",
+                        "luxury-gold": "#FFD700",
+                        background: "#0B2B2D",
+                        surface: "#1a4447",
+                        "surface-light": "#2a5457",
+                        "deep-teal": "#0B2B2D",
+                        "rich-gold": "#D4A373",
+                        "bursa-green": "#2D5A3D",
+                        "uludag-white": "#F0F8FF",
+                    },
+                    fontFamily: {
+                        display: ['Playfair Display', 'serif'],
+                        luxury: ['Cinzel', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        * { 
+            scrollbar-width: none !important; 
+            -ms-overflow-style: none !important; 
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+        *::-webkit-scrollbar { 
+            display: none !important; 
+        }
+        
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            height: 100vh;
+            background: linear-gradient(180deg, #0B2B2D 0%, #0f3a3d 50%, #0B2B2D 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .font-luxury {
+            font-family: 'Cinzel', 'serif';
+        }
+
+        .noise-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.04;
+            z-index: 0;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .ambient-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-1 {
+            background: radial-gradient(circle, rgba(212, 163, 115, 0.4) 0%, transparent 70%);
+            top: -100px;
+            right: -100px;
+        }
+
+        .glow-2 {
+            background: radial-gradient(circle, rgba(45, 90, 61, 0.3) 0%, transparent 70%);
+            bottom: 20%;
+            left: -150px;
+        }
+
+        .glass-premium {
+            background: rgba(26, 68, 71, 0.4);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(212, 163, 115, 0.15);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(26, 68, 71, 0.6) 0%, rgba(26, 68, 71, 0.3) 100%);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(212, 163, 115, 0.12);
+            border-radius: 24px;
+            box-shadow: 
+                0 4px 24px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.02),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(212, 163, 115, 0.25);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 
+                0 8px 40px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(212, 163, 115, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #D4A373 0%, #F5D08B 50%, #D4A373 100%);
+            background-size: 200% 200%;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #D4A373 0%, #F5D08B 50%, #D4A373 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .category-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px 20px;
+        }
+
+        .category-pill {
+            flex: 0 0 auto;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 20px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            min-width: 80px;
+        }
+
+        .category-pill.active {
+            background: linear-gradient(135deg, rgba(212, 163, 115, 0.25), rgba(212, 163, 115, 0.1));
+            border-color: rgba(212, 163, 115, 0.5);
+            box-shadow: 
+                0 0 30px rgba(212, 163, 115, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .category-pill.active .category-icon {
+            color: #F5D08B;
+            transform: scale(1.1);
+        }
+
+        .category-pill.active .category-label {
+            color: #F5D08B;
+            font-weight: 700;
+        }
+
+        .category-icon {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .category-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .filter-toggle {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #D4A373, #F5D08B);
+            color: #0B2B2D;
+            font-weight: 700;
+        }
+
+        .deal-card {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border-radius: 24px;
+        }
+
+        .deal-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .deal-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 10;
+        }
+
+        .badge-flash {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .badge-new {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .badge-deal {
+            background: linear-gradient(135deg, #D4A373, #F5D08B);
+            color: #0B2B2D;
+            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .countdown-timer {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #F5D08B;
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            z-index: 10;
+        }
+
+        .discount-overlay {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+            z-index: 10;
+        }
+
+        .discount-overlay span:first-child {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .discount-overlay span:last-child {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(212, 163, 115, 0.5);
+            object-fit: cover;
+        }
+
+        .verified-badge {
+            color: #D4A373;
+            font-size: 14px;
+            margin-left: 4px;
+        }
+
+        .location-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: rgba(212, 163, 115, 0.15);
+            border: 1px solid rgba(212, 163, 115, 0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            color: #F5D08B;
+            font-weight: 600;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: rgba(212, 163, 115, 0.2);
+            border-color: rgba(212, 163, 115, 0.4);
+            color: #F5D08B;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #D4A373, #F5D08B);
+            color: #0B2B2D;
+            border: none;
+            font-weight: 700;
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
+        }
+
+        .bottom-nav {
+            background: linear-gradient(to top, rgba(11, 43, 45, 0.98), rgba(11, 43, 45, 0.9));
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-top: 1px solid rgba(212, 163, 115, 0.1);
+            padding: 12px 24px calc(12px + env(safe-area-inset-bottom));
+            z-index: 50;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 16px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #D4A373;
+        }
+
+        .nav-item.active .material-icons-round {
+            filter: drop-shadow(0 0 12px rgba(212, 163, 115, 0.8));
+            transform: translateY(-2px) scale(1.1);
+        }
+
+        /* SMART HEADER - Scroll Hide/Show */
+        .smart-header {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: linear-gradient(180deg, rgba(11, 43, 45, 0.98) 0%, rgba(11, 43, 45, 0.95) 100%);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-bottom: 1px solid rgba(212, 163, 115, 0.1);
+            z-index: 40;
+            padding: 16px 20px;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        }
+
+        .smart-header.hidden-header {
+            transform: translateX(-50%) translateY(-100%);
+            opacity: 0;
+        }
+
+        .smart-header.visible-header {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Compact Header - Shows when scrolled */
+        .compact-header {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            width: 100%;
+            max-width: 430px;
+            background: linear-gradient(180deg, rgba(11, 43, 45, 0.95) 0%, rgba(11, 43, 45, 0.9) 100%);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-bottom: 1px solid rgba(212, 163, 115, 0.1);
+            z-index: 39;
+            padding: 12px 20px;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .compact-header.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+            padding-top: 280px; /* Space for header */
+        }
+
+        .neighborhood-filter {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 0;
+            margin-bottom: 16px;
+        }
+
+        .neighborhood-tag {
+            flex: 0 0 auto;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .neighborhood-tag.active {
+            background: rgba(212, 163, 115, 0.2);
+            border-color: rgba(212, 163, 115, 0.5);
+            color: #F5D08B;
+        }
+
+        .social-proof {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .social-avatars {
+            display: flex;
+            margin-right: 8px;
+        }
+
+        .social-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #0B2B2D;
+            margin-left: -8px;
+            object-fit: cover;
+        }
+
+        .social-avatar:first-child {
+            margin-left: 0;
+        }
+
+        .social-text {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .rating-stars {
+            color: #F5D08B;
+            font-size: 12px;
+        }
+
+        /* Pull to refresh indicator */
+        .pull-indicator {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(212, 163, 115, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pull-indicator.visible {
+            opacity: 1;
+        }
+
+        .pull-indicator.spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: translateX(-50%) rotate(0deg); }
+            to { transform: translateX(-50%) rotate(360deg); }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="noise-overlay"></div>
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+
+        <!-- SMART HEADER - Full version (hides on scroll down) -->
+        <header class="smart-header visible-header" id="smartHeader">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <a href="anasayfa.html" class="touch-target flex items-center justify-center p-2 -ml-2 rounded-full hover:bg-white/5 transition-colors group">
+                        <span class="material-icons-round text-primary text-lg group-hover:scale-110 transition-transform">arrow_back_ios</span>
+                    </a>
+                    <div>
+                        <h1 class="text-white text-xl font-bold tracking-tight uppercase font-display gold-gradient-text">Bursa Sosyal</h1>
+                        <p class="text-[10px] text-white/40 uppercase tracking-widest font-medium">Fırsat Ağı & Sosyal Keşif</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="glass-premium px-4 py-2 rounded-full flex items-center gap-2">
+                        <span class="material-icons-round text-primary text-sm">location_on</span>
+                        <span class="text-xs font-bold tracking-wider text-primary font-luxury">BURSA</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Toggle -->
+            <div class="filter-toggle mb-4">
+                <button class="filter-btn active" onclick="setFilter('all')">Hepsi</button>
+                <button class="filter-btn" onclick="setFilter('deals')">Sadece Fırsatlar</button>
+                <button class="filter-btn" onclick="setFilter('social')">Sadece Sosyal</button>
+            </div>
+
+            <!-- Category Pills -->
+            <div class="category-scroll" id="categoryScroll">
+                <div class="category-pill active" onclick="selectCategory(this, 'all')">
+                    <span class="material-icons-round category-icon">apps</span>
+                    <span class="category-label">Tümü</span>
+                </div>
+                <div class="category-pill" onclick="selectCategory(this, 'market')">
+                    <span class="material-icons-round category-icon">shopping_cart</span>
+                    <span class="category-label">Market</span>
+                </div>
+                <div class="category-pill" onclick="selectCategory(this, 'family')">
+                    <span class="material-icons-round category-icon">family_restroom</span>
+                    <span class="category-label">Aile</span>
+                </div>
+                <div class="category-pill" onclick="selectCategory(this, 'events')">
+                    <span class="material-icons-round category-icon">event</span>
+                    <span class="category-label">Etkinlik</span>
+                </div>
+                <div class="category-pill" onclick="selectCategory(this, 'health')">
+                    <span class="material-icons-round category-icon">health_and_safety</span>
+                    <span class="category-label">Sağlık</span>
+                </div>
+                <div class="category-pill" onclick="selectCategory(this, 'home')">
+                    <span class="material-icons-round category-icon">home</span>
+                    <span class="category-label">Ev</span>
+                </div>
+                <div class="category-pill" onclick="selectCategory(this, 'deals')">
+                    <span class="material-icons-round category-icon">local_offer</span>
+                    <span class="category-label">Fırsat</span>
+                </div>
+            </div>
+
+            <!-- Neighborhood Filter -->
+            <div class="neighborhood-filter">
+                <div class="neighborhood-tag active">Tümü</div>
+                <div class="neighborhood-tag">Nilüfer</div>
+                <div class="neighborhood-tag">Osmangazi</div>
+                <div class="neighborhood-tag">Yıldırım</div>
+                <div class="neighborhood-tag">Mudanya</div>
+            </div>
+        </header>
+
+        <!-- COMPACT HEADER - Shows when scrolled (only title and back) -->
+        <div class="compact-header" id="compactHeader">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <a href="anasayfa.html" class="flex items-center justify-center p-2 -ml-2 rounded-full hover:bg-white/5 transition-colors">
+                        <span class="material-icons-round text-primary text-lg">arrow_back_ios</span>
+                    </a>
+                    <h1 class="text-white text-lg font-bold tracking-tight uppercase font-display gold-gradient-text">Bursa Sosyal</h1>
+                </div>
+                <div class="glass-premium px-3 py-1.5 rounded-full flex items-center gap-2">
+                    <span class="material-icons-round text-primary text-xs">location_on</span>
+                    <span class="text-[10px] font-bold tracking-wider text-primary font-luxury">BURSA</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <main class="scrollable-content" id="scrollContent">
+            <div class="pull-indicator" id="pullIndicator">
+                <span class="material-icons-round text-primary">refresh</span>
+            </div>
+            
+            <!-- Featured Flash Deal -->
+            <section class="mb-5">
+                <div class="glass-card deal-card cursor-pointer group">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80" class="deal-image" alt="Kebapçı İskender">
+                        <div class="deal-badge badge-flash">
+                            <span class="material-icons-round text-[14px] mr-1">flash_on</span>
+                            FLASH SALE
+                        </div>
+                        <div class="countdown-timer">
+                            <span class="material-icons-round text-[12px] mr-1">timer</span>
+                            04:32:15
+                        </div>
+                        <div class="discount-overlay">
+                            <span>%40</span>
+                            <span>İndirim</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/150?img=11" class="user-avatar" alt="User">
+                                <div>
+                                    <div class="flex items-center">
+                                        <h3 class="font-bold text-white text-sm">Kebapçı İskender</h3>
+                                        <span class="material-icons-round verified-badge" style="font-variation-settings: 'FILL' 1">verified</span>
+                                    </div>
+                                    <span class="text-[10px] text-white/40">Mavi Dükkan • 1867'den beri</span>
+                                </div>
+                            </div>
+                            <div class="location-tag">
+                                <span class="material-icons-round text-[12px]">location_on</span>
+                                Osmangazi
+                            </div>
+                        </div>
+                        
+                        <h2 class="text-lg font-bold text-white leading-tight mb-2 font-display group-hover:gold-gradient-text transition-all">
+                            İskender Kebap + Sütlü Kadayıf %40 İndirim
+                        </h2>
+                        
+                        <p class="text-white/60 text-sm leading-relaxed mb-4">
+                            Bursa'nın efsanevi lezzeti İskender Kebap'ta sınırlı süreli kampanya. Menü eşliğinde sütlü kadayıf hediye!
+                        </p>
+
+                        <div class="social-proof">
+                            <div class="social-avatars">
+                                <img src="https://i.pravatar.cc/150?img=1" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=2" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=3" class="social-avatar" alt="User">
+                            </div>
+                            <span class="social-text">12 kişi kullandı • 4.9 <span class="rating-stars">★★★★★</span></span>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-2">
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">favorite_border</span>
+                                    45
+                                </button>
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">chat_bubble_outline</span>
+                                    12
+                                </button>
+                            </div>
+                            <button class="action-btn primary">
+                                <span class="material-icons-round text-[16px]">navigation</span>
+                                Yol Tarifi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Deals Grid -->
+            <section class="space-y-4 pb-4">
+                
+                <!-- Deal 1: Market -->
+                <article class="glass-card deal-card group cursor-pointer">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80" class="deal-image" alt="Market">
+                        <div class="deal-badge badge-deal">MARKET</div>
+                        <div class="countdown-timer">
+                            <span class="material-icons-round text-[12px] mr-1">schedule</span>
+                            2 gün kaldı
+                        </div>
+                        <div class="discount-overlay" style="background: linear-gradient(135deg, #10b981, #059669);">
+                            <span>%25</span>
+                            <span>İndirim</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/150?img=5" class="user-avatar" alt="User">
+                                <div>
+                                    <h3 class="font-bold text-white text-sm">Migros Ata Bulvarı</h3>
+                                    <span class="text-[10px] text-white/40">Money Kampanyası</span>
+                                </div>
+                            </div>
+                            <div class="location-tag">
+                                <span class="material-icons-round text-[12px]">location_on</span>
+                                Nilüfer
+                            </div>
+                        </div>
+                        
+                        <h4 class="text-base font-bold text-white mb-2 leading-snug font-display group-hover:gold-gradient-text transition-all">
+                            Ramazan Alışverişi %25 İndirim + 100 Money
+                        </h4>
+                        
+                        <p class="text-white/60 text-sm leading-relaxed mb-3">
+                            23 Nisan Bulvarı mağazasına özel kampanya. Seçili ürünlerde %25 indirim ve 100 Money hediye!
+                        </p>
+
+                        <div class="social-proof">
+                            <div class="social-avatars">
+                                <img src="https://i.pravatar.cc/150?img=6" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=7" class="social-avatar" alt="User">
+                            </div>
+                            <span class="social-text">89 kişi kullandı • 4.7 <span class="rating-stars">★★★★★</span></span>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-2">
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">favorite_border</span>
+                                    23
+                                </button>
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">chat_bubble_outline</span>
+                                    8
+                                </button>
+                            </div>
+                            <button class="action-btn primary">
+                                <span class="material-icons-round text-[16px]">shopping_bag</span>
+                                Fırsatı Kullan
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Deal 2: Aile - Uludağ -->
+                <article class="glass-card deal-card group cursor-pointer">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1551524559-8af4e6624178?w=800&q=80" class="deal-image" alt="Uludağ">
+                        <div class="deal-badge badge-new">
+                            <span class="material-icons-round text-[14px] mr-1">fiber_new</span>
+                            YENİ
+                        </div>
+                        <div class="countdown-timer">
+                            <span class="material-icons-round text-[12px] mr-1">date_range</span>
+                            Sezon Sonu
+                        </div>
+                        <div class="discount-overlay" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
+                            <span>%35</span>
+                            <span>İndirim</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/150?img=8" class="user-avatar" alt="User">
+                                <div>
+                                    <h3 class="font-bold text-white text-sm">Uludağ Kayak Merkezi</h3>
+                                    <span class="text-[10px] text-white/40">Sezon Sonu Kampanyası</span>
+                                </div>
+                            </div>
+                            <div class="location-tag">
+                                <span class="material-icons-round text-[12px]">location_on</span>
+                                Uludağ
+                            </div>
+                        </div>
+                        
+                        <h4 class="text-base font-bold text-white mb-2 leading-snug font-display group-hover:gold-gradient-text transition-all">
+                            Günübirlik Kayak Paketi %35 İndirim
+                        </h4>
+                        
+                        <p class="text-white/60 text-sm leading-relaxed mb-3">
+                            Ekipman kiralama + Gondol + Sıcak içecek paketinde sınırlı süreli indirim. Aile boyu aktivite!
+                        </p>
+
+                        <div class="social-proof">
+                            <div class="social-avatars">
+                                <img src="https://i.pravatar.cc/150?img=9" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=10" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=11" class="social-avatar" alt="User">
+                            </div>
+                            <span class="social-text">156 kişi kullandı • 4.8 <span class="rating-stars">★★★★★</span></span>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-2">
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">favorite_border</span>
+                                    67
+                                </button>
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">chat_bubble_outline</span>
+                                    23
+                                </button>
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">share</span>
+                                </button>
+                            </div>
+                            <button class="action-btn primary">
+                                <span class="material-icons-round text-[16px]">book_online</span>
+                                Rezervasyon
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Deal 3: Restoran - Pidecioğlu -->
+                <article class="glass-card deal-card group cursor-pointer">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&q=80" class="deal-image" alt="Pide">
+                        <div class="deal-badge badge-deal">RESTORAN</div>
+                        <div class="countdown-timer">
+                            <span class="material-icons-round text-[12px] mr-1">schedule</span>
+                            Hafta içi
+                        </div>
+                        <div class="discount-overlay" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                            <span>%20</span>
+                            <span>İndirim</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/150?img=12" class="user-avatar" alt="User">
+                                <div>
+                                    <div class="flex items-center">
+                                        <h3 class="font-bold text-white text-sm">Pidecioğlu</h3>
+                                        <span class="material-icons-round verified-badge" style="font-variation-settings: 'FILL' 1">verified</span>
+                                    </div>
+                                    <span class="text-[10px] text-white/40">116 yıllık lezzet • Cantık Ustası</span>
+                                </div>
+                            </div>
+                            <div class="location-tag">
+                                <span class="material-icons-round text-[12px]">location_on</span>
+                                Osmangazi
+                            </div>
+                        </div>
+                        
+                        <h4 class="text-base font-bold text-white mb-2 leading-snug font-display group-hover:gold-gradient-text transition-all">
+                            Cantık Pide + Domates Çorbası %20 İndirim
+                        </h4>
+                        
+                        <p class="text-white/60 text-sm leading-relaxed mb-3">
+                            Hafta içi öğle yemeklerinde geçerli. Peynirli, kıymalı veya kuşbaşılı cantık seçenekleriyle...
+                        </p>
+
+                        <div class="social-proof">
+                            <div class="social-avatars">
+                                <img src="https://i.pravatar.cc/150?img=13" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=14" class="social-avatar" alt="User">
+                            </div>
+                            <span class="social-text">234 kişi kullandı • 4.9 <span class="rating-stars">★★★★★</span></span>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-2">
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">favorite_border</span>
+                                    89
+                                </button>
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">chat_bubble_outline</span>
+                                    34
+                                </button>
+                            </div>
+                            <button class="action-btn primary">
+                                <span class="material-icons-round text-[16px]">navigation</span>
+                                Yol Tarifi
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Deal 4: Alışveriş - Koza Han -->
+                <article class="glass-card deal-card group cursor-pointer">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" class="deal-image" alt="Koza Han">
+                        <div class="deal-badge badge-deal">ALIŞVERİŞ</div>
+                        <div class="countdown-timer">
+                            <span class="material-icons-round text-[12px] mr-1">schedule</span>
+                            Sınırlı Stok
+                        </div>
+                        <div class="discount-overlay" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+                            <span>%30</span>
+                            <span>İndirim</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/150?img=15" class="user-avatar" alt="User">
+                                <div>
+                                    <div class="flex items-center">
+                                        <h3 class="font-bold text-white text-sm">Koza Han</h3>
+                                        <span class="material-icons-round verified-badge" style="font-variation-settings: 'FILL' 1">verified</span>
+                                    </div>
+                                    <span class="text-[10px] text-white/40">UNESCO Dünya Mirası • İpek Çarşısı</span>
+                                </div>
+                            </div>
+                            <div class="location-tag">
+                                <span class="material-icons-round text-[12px]">location_on</span>
+                                Osmangazi
+                            </div>
+                        </div>
+                        
+                        <h4 class="text-base font-bold text-white mb-2 leading-snug font-display group-hover:gold-gradient-text transition-all">
+                            İpek Şal & Eşarp %30 İndirim + Kahve İkramı
+                        </h4>
+                        
+                        <p class="text-white/60 text-sm leading-relaxed mb-3">
+                            Hanlar Bölgesi'nde seçili dükkânlarda geçerli. Geleneksel Bursa ipeği alışverişinde kahve ikramı...
+                        </p>
+
+                        <div class="social-proof">
+                            <div class="social-avatars">
+                                <img src="https://i.pravatar.cc/150?img=16" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=17" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=18" class="social-avatar" alt="User">
+                            </div>
+                            <span class="social-text">45 kişi kullandı • 4.6 <span class="rating-stars">★★★★☆</span></span>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-2">
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">favorite_border</span>
+                                    34
+                                </button>
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">chat_bubble_outline</span>
+                                    12
+                                </button>
+                            </div>
+                            <button class="action-btn primary">
+                                <span class="material-icons-round text-[16px]">navigation</span>
+                                Yol Tarifi
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Deal 5: Sağlık - Spor -->
+                <article class="glass-card deal-card group cursor-pointer">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80" class="deal-image" alt="Spor">
+                        <div class="deal-badge badge-deal">SAĞLIK</div>
+                        <div class="countdown-timer">
+                            <span class="material-icons-round text-[12px] mr-1">schedule</span>
+                            Üyelik
+                        </div>
+                        <div class="discount-overlay" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
+                            <span>%50</span>
+                            <span>İndirim</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/150?img=19" class="user-avatar" alt="User">
+                                <div>
+                                    <h3 class="font-bold text-white text-sm">Fitness Plus Nilüfer</h3>
+                                    <span class="text-[10px] text-white/40">Yılbaşı Kampanyası</span>
+                                </div>
+                            </div>
+                            <div class="location-tag">
+                                <span class="material-icons-round text-[12px]">location_on</span>
+                                Nilüfer
+                            </div>
+                        </div>
+                        
+                        <h4 class="text-base font-bold text-white mb-2 leading-snug font-display group-hover:gold-gradient-text transition-all">
+                            3 Aylık Üyelik %50 İndirim + PT Seansı
+                        </h4>
+                        
+                        <p class="text-white/60 text-sm leading-relaxed mb-3">
+                            Yeni yıl formuna gir! 3 aylık sınırsız üyelikte %50 indirim ve ücretsiz 2 PT seansı hediye.
+                        </p>
+
+                        <div class="social-proof">
+                            <div class="social-avatars">
+                                <img src="https://i.pravatar.cc/150?img=20" class="social-avatar" alt="User">
+                                <img src="https://i.pravatar.cc/150?img=21" class="social-avatar" alt="User">
+                            </div>
+                            <span class="social-text">78 kişi kullandı • 4.5 <span class="rating-stars">★★★★☆</span></span>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-2">
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">favorite_border</span>
+                                    56
+                                </button>
+                                <button class="action-btn">
+                                    <span class="material-icons-round text-[16px]">chat_bubble_outline</span>
+                                    18
+                                </button>
+                            </div>
+                            <button class="action-btn primary">
+                                <span class="material-icons-round text-[16px]">card_membership</span>
+                                Üye Ol
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+            </section>
+
+            <!-- Bottom spacing -->
+            <div class="h-20"></div>
+
+        </main>
+
+        <!-- Fixed Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="flex justify-around items-center">
+                <a href="anasayfa.html" class="nav-item group">
+                    <span class="material-icons-round text-2xl group-hover:scale-110 transition-transform">home</span>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter">Ana Sayfa</span>
+                </a>
+                <a href="kesfet-genel.html" class="nav-item group">
+                    <span class="material-icons-round text-2xl group-hover:scale-110 transition-transform">explore</span>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter">Keşfet</span>
+                </a>
+                <button class="nav-item active group">
+                    <span class="material-icons-round text-2xl" style="font-variation-settings: 'FILL' 1">local_offer</span>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter">Fırsatlar</span>
+                </button>
+                <a href="ara.html" class="nav-item group">
+                    <span class="material-icons-round text-2xl group-hover:scale-110 transition-transform">search</span>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter">Ara</span>
+                </a>
+                <a href="profil.html" class="nav-item group">
+                    <span class="material-icons-round text-2xl group-hover:scale-110 transition-transform">person</span>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter">Profil</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // SMART SCROLL BEHAVIOR
+        const smartHeader = document.getElementById('smartHeader');
+        const compactHeader = document.getElementById('compactHeader');
+        const scrollContent = document.getElementById('scrollContent');
+        const pullIndicator = document.getElementById('pullIndicator');
+        
+        let lastScrollTop = 0;
+        let scrollThreshold = 100;
+        let isScrollingDown = false;
+        
+        scrollContent.addEventListener('scroll', function() {
+            const scrollTop = scrollContent.scrollTop;
+            
+            // Determine scroll direction
+            if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+                // Scrolling down - hide full header, show compact
+                if (!isScrollingDown) {
+                    smartHeader.classList.remove('visible-header');
+                    smartHeader.classList.add('hidden-header');
+                    
+                    // Show compact header after a delay
+                    setTimeout(() => {
+                        if (scrollTop > scrollThreshold) {
+                            compactHeader.classList.add('visible');
+                        }
+                    }, 200);
+                    
+                    isScrollingDown = true;
+                }
+            } else if (scrollTop < lastScrollTop) {
+                // Scrolling up - show full header, hide compact
+                if (isScrollingDown || scrollTop < scrollThreshold) {
+                    compactHeader.classList.remove('visible');
+                    
+                    setTimeout(() => {
+                        smartHeader.classList.remove('hidden-header');
+                        smartHeader.classList.add('visible-header');
+                    }, 100);
+                    
+                    isScrollingDown = false;
+                }
+            }
+            
+            // Pull to refresh indicator
+            if (scrollTop < -50) {
+                pullIndicator.classList.add('visible');
+                if (scrollTop < -100) {
+                    pullIndicator.classList.add('spinning');
+                }
+            } else {
+                pullIndicator.classList.remove('visible', 'spinning');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+        
+        // Filter Toggle Function
+        function setFilter(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter logic here
+            console.log('Filter set to:', type);
+        }
+
+        // Category Selection
+        function selectCategory(element, category) {
+            document.querySelectorAll('.category-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            // Category filter logic here
+            console.log('Category selected:', category);
+        }
+
+        // Neighborhood Filter
+        document.querySelectorAll('.neighborhood-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                document.querySelectorAll('.neighborhood-tag').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // Countdown Timer Animation
+        function updateCountdown() {
+            const timers = document.querySelectorAll('.countdown-timer');
+            timers.forEach(timer => {
+                // Simulate countdown update
+                const time = timer.textContent.match(/(\d{2}):(\d{2}):(\d{2})/);
+                if (time) {
+                    let [_, hours, minutes, seconds] = time.map(Number);
+                    
+                    if (seconds > 0) {
+                        seconds--;
+                    } else if (minutes > 0) {
+                        minutes--;
+                        seconds = 59;
+                    } else if (hours > 0) {
+                        hours--;
+                        minutes = 59;
+                        seconds = 59;
+                    }
+                    
+                    timer.innerHTML = `<span class="material-icons-round text-[12px] mr-1">timer</span>${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }
+            });
+        }
+
+        // Update countdown every second
+        setInterval(updateCountdown, 1000);
+
+        // Action Button Interactions
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                if (this.innerHTML.includes('favorite')) {
+                    const isLiked = this.innerHTML.includes('favorite');
+                    if (isLiked) {
+                        this.innerHTML = '<span class="material-icons-round text-[16px]" style="color: #ef4444;">favorite</span>' + (parseInt(this.textContent) + 1);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,1304 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>CityJoy - Profil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-teal": "#2D8A8A",
+                        "red": "#EF4444",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(100%)' }, '100%': { transform: 'translateY(0)' } },
+                        slideDown: { '0%': { transform: 'translateY(-20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                        scaleIn: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } },
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+            .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            .glass-panel {
+                background: rgba(23, 70, 75, 0.4);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+            }
+            .glass-panel-heavy {
+                background: rgba(8, 31, 36, 0.95);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+            }
+            .gradient-text {
+                background: linear-gradient(135deg, #E0B07A 0%, #F0B36F 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .masonry-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .masonry-item:nth-child(even) {
+                margin-top: 24px;
+            }
+            .modal-overlay {
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(4px);
+            }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-darkest font-display text-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-darkest/95 backdrop-blur-xl border-b border-border-subtle/20 pt-4 pb-3 px-4">
+        <div class="flex items-center justify-between">
+            <a href="anasayfa.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-card-bg/50 active:scale-90 transition-transform">
+                <span class="material-symbols-outlined text-white">arrow_back</span>
+            </a>
+            <h1 class="text-lg font-bold tracking-tight">Profilim</h1>
+            <div class="flex items-center gap-2">
+                <!-- Bildirim Butonu -->
+                <button onclick="openModal('notifications-modal')" class="w-10 h-10 flex items-center justify-center rounded-full bg-card-bg/50 active:scale-90 transition-transform relative">
+                    <span class="material-symbols-outlined text-white">notifications</span>
+                    <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
+                </button>
+                <!-- Ayarlar Butonu -->
+                <button onclick="openModal('settings-modal')" class="w-10 h-10 flex items-center justify-center rounded-full bg-card-bg/50 active:scale-90 transition-transform">
+                    <span class="material-symbols-outlined text-white">settings</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-4 mt-6 space-y-6">
+
+        <!-- Profile Info Card -->
+        <section class="glass-panel rounded-2xl p-5 border border-gold-primary/20 animate-fade-in">
+            <div class="flex items-center gap-6 mb-5">
+                <div class="relative group cursor-pointer" onclick="openEditProfile()">
+                    <div class="w-24 h-24 rounded-full p-1 bg-gradient-to-br from-gold-primary to-gold-nav">
+                        <div class="w-full h-full rounded-full border-4 border-darkest overflow-hidden relative">
+                            <img id="profile-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" alt="Mert Demir" class="w-full h-full object-cover"/>
+                            <div class="absolute inset-0 bg-darkest/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <span class="material-symbols-outlined text-white text-2xl">edit</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-green-500 rounded-full border-4 border-darkest flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-xs">check</span>
+                    </div>
+                </div>
+                <div class="flex-1 flex justify-between text-center">
+                    <div class="flex-1">
+                        <p id="stat-posts" class="text-xl font-bold text-white">128</p>
+                        <p class="text-[10px] text-text-desc uppercase tracking-wider">Gönderi</p>
+                    </div>
+                    <div class="flex-1 border-x border-border-subtle/30">
+                        <p id="stat-followers" class="text-xl font-bold text-white">12.5K</p>
+                        <p class="text-[10px] text-text-desc uppercase tracking-wider">Takipçi</p>
+                    </div>
+                    <div class="flex-1">
+                        <p id="stat-following" class="text-xl font-bold text-white">842</p>
+                        <p class="text-[10px] text-text-desc uppercase tracking-wider">Takip</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                    <h2 id="profile-name" class="text-2xl font-bold text-white">Mert Demir</h2>
+                    <span class="material-symbols-outlined text-gold-primary text-xl fill-1">verified</span>
+                </div>
+                <p id="profile-username" class="text-gold-primary font-medium text-sm">@mert.explorer</p>
+                <p id="profile-cityid" class="text-text-desc text-xs">CityJoy ID yükleniyor...</p>
+                <div class="flex items-center gap-2 text-text-secondary mt-3">
+                    <span class="material-symbols-outlined text-gold-primary text-base">photo_camera</span>
+                    <span id="profile-job" class="text-sm">City explorer & Lifestyle photographer</span>
+                </div>
+                <div class="flex items-center gap-2 text-text-secondary">
+                    <span class="material-symbols-outlined text-red-400 text-base fill-1">location_on</span>
+                    <span id="profile-location" class="text-sm">Bursa, TR</span>
+                </div>
+                <p id="profile-bio" class="text-text-desc text-sm pt-1 leading-relaxed">Bursa'nın gizli köşelerini keşfediyor. Tarih, doğa ve lezzet rotaları 🕌🌲🍽️</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3 mt-6">
+                <button onclick="openEditProfile()" class="flex-1 py-2.5 rounded-xl border border-border-subtle/50 font-semibold text-sm bg-card-bg/50 text-center active:scale-95 transition-all hover:border-gold-primary/50 hover:bg-card-bg">
+                    Profili Düzenle
+                </button>
+                <button onclick="openSOSFamily()" class="flex-[1.2] py-2.5 rounded-xl bg-gold-primary text-darkest font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-gold-primary/20 active:scale-95 transition-all hover:bg-gold-nav">
+                    <span class="material-symbols-outlined text-lg fill-1">shield</span>
+                    Ailem (SOS)
+                </button>
+                <button onclick="shareProfile()" class="w-11 h-11 flex items-center justify-center rounded-xl border border-border-subtle/50 bg-card-bg/50 active:scale-95 transition-all hover:border-gold-primary/50 hover:bg-card-bg">
+                    <span class="material-symbols-outlined text-white">share</span>
+                </button>
+            </div>
+
+            <!-- İşletme Bölümü - _currentUser.hasBusiness durumuna göre göster -->
+            <div id="business-section" class="mt-4" style="display:none">
+                <!-- hasBusiness: false ve hasPendingBusiness: false ise -->
+                <button
+                    id="btn-apply-business"
+                    onclick="window.rnSend && window.rnSend({action:'navigate', screen:'BusinessApply'})"
+                    class="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
+                    style="display:none; background: linear-gradient(135deg, rgba(224,176,122,0.15), rgba(224,176,122,0.08)); border: 1px solid rgba(224,176,122,0.4); color: #E0B07A;"
+                >
+                    <span style="font-size:18px">🏻</span>
+                    <span>İşletmeye Bağla</span>
+                </button>
+
+                <!-- hasPendingBusiness: true ise -->
+                <div
+                    id="pending-business"
+                    class="w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2"
+                    style="display:none; background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.3); color: #fb923c;"
+                >
+                    <span style="font-size:16px">⏳</span>
+                    <span>İşletme başvurunuz inceleniyor...</span>
+                </div>
+
+                <!-- hasBusiness: true ise -->
+                <button
+                    id="active-business"
+                    onclick="window.rnSend && window.rnSend({action:'navigate', screen:'BusinessProfile'})"
+                    class="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all"
+                    style="display:none; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.3); color: #4ade80;"
+                >
+                    <span style="font-size:16px">✅</span>
+                    <span>İşletme Profilim</span>
+                </button>
+            </div>
+
+        </section>
+
+        <!-- Stats Cards -->
+        <section class="grid grid-cols-3 gap-3 animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="glass-panel p-3 rounded-xl text-center border border-gold-primary/10">
+                <span class="material-symbols-outlined text-gold-primary text-2xl">explore</span>
+                <p class="text-lg font-bold text-white mt-1">24</p>
+                <p class="text-[10px] text-text-desc">Rota</p>
+            </div>
+            <div class="glass-panel p-3 rounded-xl text-center border border-gold-primary/10">
+                <span class="material-symbols-outlined text-gold-primary text-2xl">favorite</span>
+                <p class="text-lg font-bold text-white mt-1">3.2K</p>
+                <p class="text-[10px] text-text-desc">Beğeni</p>
+            </div>
+            <div class="glass-panel p-3 rounded-xl text-center border border-gold-primary/10">
+                <span class="material-symbols-outlined text-gold-primary text-2xl">bookmark</span>
+                <p class="text-lg font-bold text-white mt-1">56</p>
+                <p class="text-[10px] text-text-desc">Kayıt</p>
+            </div>
+        </section>
+
+        <!-- Tabs -->
+        <div class="border-b border-border-subtle/30 animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="flex">
+                <button onclick="switchTab('fotograflar')" id="tab-fotograflar" class="flex-1 flex flex-col items-center py-4 text-gold-primary border-b-2 border-gold-primary transition-all">
+                    <span class="material-symbols-outlined mb-1 fill-1">grid_view</span>
+                    <span class="text-[10px] font-bold tracking-widest">FOTOĞRAFLAR</span>
+                </button>
+                <button onclick="switchTab('videolar')" id="tab-videolar" class="flex-1 flex flex-col items-center py-4 text-nav-passive hover:text-text-secondary transition-all">
+                    <span class="material-symbols-outlined mb-1">play_circle</span>
+                    <span class="text-[10px] font-bold tracking-widest">VİDEOLAR</span>
+                </button>
+                <button onclick="switchTab('kaydedilenler')" id="tab-kaydedilenler" class="flex-1 flex flex-col items-center py-4 text-nav-passive hover:text-text-secondary transition-all">
+                    <span class="material-symbols-outlined mb-1">bookmark</span>
+                    <span class="text-[10px] font-bold tracking-widest">KAYDEDİLENLER</span>
+                </button>
+                <button onclick="switchTab('gezilerim')" id="tab-gezilerim" class="flex-1 flex flex-col items-center py-4 text-nav-passive hover:text-text-secondary transition-all">
+                    <span class="material-symbols-outlined mb-1">explore</span>
+                    <span class="text-[10px] font-bold tracking-widest">GEZİLERİM</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Photo Grid Content -->
+        <div id="content-fotograflar" class="tab-content animate-fade-in">
+            <div class="masonry-grid">
+                <div class="space-y-3">
+                    <a href="fotograf-detay.html" class="block rounded-2xl overflow-hidden aspect-[4/5] border border-border-subtle/20 group relative">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.uludaginfo.com/348b5753974665aaf2c95d881cb3fff7dc464b37.jpg" alt="Uludağ Kayak" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <span class="text-xs font-bold text-white">Uludağ Kayak Merkezi ❄️</span>
+                        </div>
+                    </a>
+                    <a href="fotograf-detay.html" class="block rounded-2xl overflow-hidden aspect-square border border-border-subtle/20 group relative">
+                        <img src="https://kimi-web-img.moonshot.cn/img/dynamic-media-cdn.tripadvisor.com/1ef16bca244b23266245870aa221ef2fd53d5dda.jpg" alt="Koza Han" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <span class="text-xs font-bold text-white">Koza Han 🏛️</span>
+                        </div>
+                    </a>
+                    <a href="fotograf-detay.html" class="block rounded-2xl overflow-hidden aspect-[4/5] border border-border-subtle/20 group relative">
+                        <img src="https://kimi-web-img.moonshot.cn/img/media-cdn.tripadvisor.com/7acb6e7ea0f21f43aebd50c61afd12863c12d65c.jpg" alt="Gölyazı Gün Batımı" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <span class="text-xs font-bold text-white">Gölyazı Gün Batımı 🌅</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="space-y-3">
+                    <a href="fotograf-detay.html" class="block rounded-2xl overflow-hidden aspect-square border border-border-subtle/20 group relative">
+                        <img src="https://kimi-web-img.moonshot.cn/img/media-cdn.tripadvisor.com/1ddf2fb8ec72abfa491a29bd14499bc38c2bff82.jpg" alt="İskender Kebap" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <span class="text-xs font-bold text-white">Bursa İskender 🍽️</span>
+                        </div>
+                    </a>
+                    <a href="fotograf-detay.html" class="block rounded-2xl overflow-hidden aspect-[4/5] border border-border-subtle/20 group relative">
+                        <img src="https://kimi-web-img.moonshot.cn/img/travelatelier.com/2794c96bc4ab52962db330c6b4ba35f0e91f83aa.jpg" alt="Cumalıkızık" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <span class="text-xs font-bold text-white">Cumalıkızık 🏘️</span>
+                        </div>
+                    </a>
+                    <a href="fotograf-detay.html" class="block rounded-2xl overflow-hidden aspect-square border border-border-subtle/20 group relative">
+                        <img src="https://kimi-web-img.moonshot.cn/img/c8.alamy.com/5d18c329fbfda05c29f7d2ce1a2bc19c061656b4.jpg" alt="Ulu Cami" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <span class="text-xs font-bold text-white">Ulu Cami İçi 🕌</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Videos Content (Hidden by default) -->
+        <div id="content-videolar" class="tab-content hidden">
+            <div class="space-y-4">
+                <div class="glass-panel rounded-2xl overflow-hidden border border-border-subtle/20">
+                    <div class="relative aspect-video">
+                        <img src="https://kimi-web-img.moonshot.cn/img/cdn.gundembursa.com/bb512c86482a3ad23b02ac18a6dfdbe320c7cf57.jpeg" alt="Gölyazı Video" class="w-full h-full object-cover"/>
+                        <div class="absolute inset-0 bg-darkest/40 flex items-center justify-center">
+                            <div class="w-16 h-16 rounded-full bg-gold-primary/90 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-darkest text-3xl">play_arrow</span>
+                            </div>
+                        </div>
+                        <span class="absolute bottom-2 right-2 px-2 py-1 bg-darkest/80 rounded text-xs font-bold">2:34</span>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-bold text-white">Gölyazı'da Gün Batımı Timelapse</h3>
+                        <p class="text-xs text-text-desc mt-1">1.2K görüntüleme • 2 gün önce</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl overflow-hidden border border-border-subtle/20">
+                    <div class="relative aspect-video">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.iznikcini.com/682ab7c310a966239989608b41ff5670d51da526.jpg" alt="Çini Video" class="w-full h-full object-cover"/>
+                        <div class="absolute inset-0 bg-darkest/40 flex items-center justify-center">
+                            <div class="w-16 h-16 rounded-full bg-gold-primary/90 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-darkest text-3xl">play_arrow</span>
+                            </div>
+                        </div>
+                        <span class="absolute bottom-2 right-2 px-2 py-1 bg-darkest/80 rounded text-xs font-bold">4:15</span>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="text-sm font-bold text-white">İznik Çini Sanatı: Ustanın Ellerinden</h3>
+                        <p class="text-xs text-text-desc mt-1">856 görüntüleme • 1 hafta önce</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saved Content (Hidden by default) -->
+        <div id="content-kaydedilenler" class="tab-content hidden">
+            <div class="glass-panel rounded-2xl p-4 border border-border-subtle/20">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gold-primary/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary">collections_bookmark</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Bursa Tarih Rotası</h3>
+                        <p class="text-xs text-text-desc">12 mekan • Kaydedildi</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <img src="https://kimi-web-img.moonshot.cn/img/c8.alamy.com/5d18c329fbfda05c29f7d2ce1a2bc19c061656b4.jpg" class="w-20 h-20 rounded-lg object-cover flex-shrink-0"/>
+                    <img src="https://kimi-web-img.moonshot.cn/img/dynamic-media-cdn.tripadvisor.com/1ef16bca244b23266245870aa221ef2fd53d5dda.jpg" class="w-20 h-20 rounded-lg object-cover flex-shrink-0"/>
+                    <img src="https://kimi-web-img.moonshot.cn/img/travelatelier.com/2794c96bc4ab52962db330c6b4ba35f0e91f83aa.jpg" class="w-20 h-20 rounded-lg object-cover flex-shrink-0"/>
+                    <div class="w-20 h-20 rounded-lg bg-card-bg/50 flex items-center justify-center flex-shrink-0">
+                        <span class="text-lg font-bold text-gold-primary">+9</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trips Content (Hidden by default) -->
+        <div id="content-gezilerim" class="tab-content hidden">
+            <div class="space-y-3">
+                <div class="glass-panel rounded-2xl p-4 border border-border-subtle/20 flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-gold-primary/20 to-gold-nav/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">terrain</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold text-white">Uludağ Kış Turu</h3>
+                        <p class="text-xs text-text-desc">15-17 Aralık 2024</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[10px] rounded-full">Tamamlandı</span>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-text-desc">chevron_right</span>
+                </div>
+                <div class="glass-panel rounded-2xl p-4 border border-border-subtle/20 flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-gold-primary/20 to-gold-nav/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">history_edu</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold text-white">Bursa Tarih Gezisi</h3>
+                        <p class="text-xs text-text-desc">Planlanıyor</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="px-2 py-0.5 bg-gold-primary/20 text-gold-primary text-[10px] rounded-full">Yaklaşan</span>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-text-desc">chevron_right</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Section -->
+        <section class="glass-panel rounded-2xl p-4 border border-gold-primary/20 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc">🏆 Başarımlar</h2>
+                <span class="text-[10px] text-gold-primary">3/12</span>
+            </div>
+            <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+                <div class="flex-shrink-0 flex flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full bg-gold-primary/20 border-2 border-gold-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary">photo_camera</span>
+                    </div>
+                    <span class="text-[10px] text-text-secondary text-center">İlk Paylaşım</span>
+                </div>
+                <div class="flex-shrink-0 flex flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full bg-gold-primary/20 border-2 border-gold-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary">terrain</span>
+                    </div>
+                    <span class="text-[10px] text-text-secondary text-center">Dağcı</span>
+                </div>
+                <div class="flex-shrink-0 flex flex-col items-center gap-2">
+                    <div class="w-14 h-14 rounded-full bg-gold-primary/20 border-2 border-gold-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary">restaurant</span>
+                    </div>
+                    <span class="text-[10px] text-text-secondary text-center">Gurme</span>
+                </div>
+                <div class="flex-shrink-0 flex flex-col items-center gap-2 opacity-50">
+                    <div class="w-14 h-14 rounded-full bg-card-bg/50 border-2 border-border-subtle flex items-center justify-center">
+                        <span class="material-symbols-outlined text-text-desc">lock</span>
+                    </div>
+                    <span class="text-[10px] text-text-desc text-center">Keşifçi</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation - AYNI SEKMEDE AÇILACAK -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-nav-bg border-t border-border-subtle/50 pb-safe z-40">
+        <div class="flex items-center justify-around px-6 py-3">
+            <a href="anasayfa.html" target="_self" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors">
+                <span class="material-symbols-outlined text-xl">home</span>
+                <span class="text-[9px] font-medium">Anasayfa</span>
+            </a>
+            <a href="kesfet-genel.html" target="_self" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors">
+                <span class="material-symbols-outlined text-xl">explore</span>
+                <span class="text-[9px] font-medium">Keşfet</span>
+            </a>
+            <!-- Ortadaki Artı Butonu - AYNI SEKMEDE AÇILACAK -->
+            <a href="yeni-gonderi.html" target="_self" class="relative -top-4">
+                <div class="w-14 h-14 rounded-full bg-gold-primary flex items-center justify-center shadow-lg shadow-gold-primary/40 border-4 border-darkest active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-darkest text-2xl font-bold">add</span>
+                </div>
+            </a>
+            <a href="ara.html" target="_self" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" target="_self" class="flex flex-col items-center gap-0.5 text-gold-nav">
+                <span class="material-symbols-outlined text-xl fill-1">person</span>
+                <span class="text-[9px] font-bold">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ==================== MODALLAR ==================== -->
+
+    <!-- Ayarlar Modal - Instagram Tarzı Genişletilmiş Versiyon -->
+    <div id="settings-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('settings-modal')"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-darkest rounded-t-3xl border-t border-gold-primary/30 max-h-[90vh] overflow-y-auto animate-slide-up">
+            <div class="sticky top-0 bg-darkest/95 backdrop-blur-xl border-b border-border-subtle/20 px-4 py-4 flex items-center justify-between z-10">
+                <h2 class="text-lg font-bold">Ayarlar</h2>
+                <button onclick="closeModal('settings-modal')" class="w-8 h-8 rounded-full bg-card-bg/50 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white">close</span>
+                </button>
+            </div>
+            
+            <div class="p-4 space-y-6 pb-8">
+                
+                <!-- Hesap Merkezi -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Hesap Merkezi</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button onclick="openEditProfile(); closeModal('settings-modal');" class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">person</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Kişisel Bilgiler</p>
+                                <p class="text-[10px] text-text-desc">Ad, kullanıcı adı, iletişim bilgileri</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">shield</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Şifre ve Güvenlik</p>
+                                <p class="text-[10px] text-text-desc">Şifre değiştir, iki faktörlü doğrulama</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">credit_card</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Ödemeler</p>
+                                <p class="text-[10px] text-text-desc">Ödeme yöntemleri, güvenlik PIN'i</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Gizlilik -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Gizlilik</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">lock</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Hesap Gizliliği</p>
+                                <p class="text-[10px] text-text-desc">Gizli hesap, gönderi görünürlüğü</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">chat_bubble</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Mesajlar ve Hikayeler</p>
+                                <p class="text-[10px] text-text-desc">Yanıtlar, paylaşımlar, etiketler</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">block</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Engellenenler</p>
+                                <p class="text-[10px] text-text-desc">Engellenen hesapları yönet</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bildirimler -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Bildirimler</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button onclick="openModal('notifications-modal'); closeModal('settings-modal');" class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">notifications</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Push Bildirimleri</p>
+                                <p class="text-[10px] text-text-desc">Beğeni, yorum, takip bildirimleri</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">mail</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">E-posta ve SMS</p>
+                                <p class="text-[10px] text-text-desc">E-posta bildirim tercihleri</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- İçerik Tercihleri -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">İçerik Tercihleri</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">visibility</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Hassas İçerik Kontrolü</p>
+                                <p class="text-[10px] text-text-desc">Hassas içerikleri sınırla veya göster</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">hide_image</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Gizli Kelimeler</p>
+                                <p class="text-[10px] text-text-desc">Yorumlarda engellenecek kelimeler</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Etkileşimlar -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Etkileşimlar ve Paylaşım</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">group</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Arkadaşlarını Takip Et</p>
+                                <p class="text-[10px] text-text-desc">Rehberinden kişileri bul</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">person_add</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Arkadaşlarını Davet Et</p>
+                                <p class="text-[10px] text-text-desc">CityJoy'a davet linki gönder</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reels ve Video -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Reels ve Video</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">smart_display</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Video Kalitesi</p>
+                                <p class="text-[10px] text-text-desc">Otomatik, yüksek veya veri tasarrufu</p>
+                            </div>
+                            <span class="text-[10px] text-gold-primary font-medium">Otomatik</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">volume_off</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Ses Ayarları</p>
+                                <p class="text-[10px] text-text-desc">Otomatik oynatma sesi</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Arşiv ve Kaydedilenler -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Arşiv ve Kaydedilenler</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">archive</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Arşiv</p>
+                                <p class="text-[10px] text-text-desc">Gizli gönderilerin ve hikayelerin</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">schedule</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Hareket Durumu</p>
+                                <p class="text-[10px] text-text-desc">Son görülme ve çevrimiçi durumu</p>
+                            </div>
+                            <span class="text-[10px] text-gold-primary font-medium">Açık</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">favorite</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Beğenilen Gönderiler</p>
+                                <p class="text-[10px] text-text-desc">Beğendiğin tüm gönderiler</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Uygulama ve Medya -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Uygulama ve Medya</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">dark_mode</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Tema</p>
+                            </div>
+                            <span class="text-[10px] text-gold-primary font-medium">Koyu Mod</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">translate</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Dil</p>
+                            </div>
+                            <span class="text-[10px] text-gold-primary font-medium">Türkçe</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">save</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Medya Kaydetme</p>
+                                <p class="text-[10px] text-text-desc">Orijinal gönderileri kaydet</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Yardım ve Hakkında -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Yardım ve Hakkında</h3>
+                    <div class="glass-panel rounded-2xl overflow-hidden">
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">help_center</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Yardım Merkezi</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 border-b border-border-subtle/20 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">report_problem</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Sorun Bildir</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                        <button class="w-full flex items-center gap-4 px-4 py-4 active:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary">info</span>
+                            <div class="flex-1 text-left">
+                                <p class="text-sm font-medium">Hakkında</p>
+                                <p class="text-[10px] text-text-desc">Sürüm 1.0.0</p>
+                            </div>
+                            <span class="material-symbols-outlined text-text-desc text-sm">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Meta Hesapları -->
+                <div class="glass-panel rounded-2xl p-4 border border-border-subtle/20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white text-lg">account_circle</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-white">Hesap Merkezi</p>
+                            <p class="text-xs text-text-desc">CityJoy ve bağlı hesaplarını yönet</p>
+                        </div>
+                        <span class="material-symbols-outlined text-text-desc">chevron_right</span>
+                    </div>
+                </div>
+
+                <!-- Çıkış -->
+                <div class="space-y-2 pt-4">
+                    <button id="switchAccountBtn" class="w-full py-4 text-red-400 text-sm font-medium hover:bg-red-500/10 rounded-xl transition-colors border border-red-500/20">
+                        Hesabı Değiştir
+                    </button>
+                    <button id="logoutBtn" class="w-full py-4 text-red-400 text-sm font-medium hover:bg-red-500/10 rounded-xl transition-colors border border-red-500/20">
+                        Oturumu Kapat
+                    </button>
+                </div>
+
+                <div class="text-center pt-4 pb-8">
+                    <p class="text-[10px] text-text-desc">CityJoy © 2024</p>
+                    <div class="flex justify-center gap-4 mt-2 text-[10px] text-text-desc">
+                        <a href="#" class="hover:text-gold-primary">Gizlilik Politikası</a>
+                        <a href="#" class="hover:text-gold-primary">Kullanım Koşulları</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bildirimler Modal -->
+    <div id="notifications-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('notifications-modal')"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-darkest rounded-t-3xl border-t border-gold-primary/30 max-h-[85vh] overflow-y-auto animate-slide-up">
+            <div class="sticky top-0 bg-darkest/95 backdrop-blur-xl border-b border-border-subtle/20 px-4 py-4 flex items-center justify-between z-10">
+                <h2 class="text-lg font-bold">Bildirimler</h2>
+                <button onclick="closeModal('notifications-modal')" class="w-8 h-8 rounded-full bg-card-bg/50 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white">close</span>
+                </button>
+            </div>
+            
+            <div class="p-4 space-y-3 pb-8">
+                <div class="glass-panel rounded-xl p-4 border-l-4 border-gold-primary flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gold-primary/20 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-gold-primary">favorite</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-white"><span class="font-bold">Ayşe Yılmaz</span> gönderinizi beğendi</p>
+                        <p class="text-[10px] text-text-desc mt-1">2 dakika önce</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-xl p-4 border-l-4 border-accent-teal flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-accent-teal/20 flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-accent-teal">person_add</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-white"><span class="font-bold">Mehmet Kaya</span> sizi takip etmeye başladı</p>
+                        <p class="text-[10px] text-text-desc mt-1">1 saat önce</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-xl p-4 border-l-4 border-border-subtle flex items-start gap-3 opacity-70">
+                    <div class="w-10 h-10 rounded-full bg-card-bg flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-text-desc">comment</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-white"><span class="font-bold">Zeynep Demir</span> yorum yaptı: "Harika fotoğraf!"</p>
+                        <p class="text-[10px] text-text-desc mt-1">3 saat önce</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profili Düzenle Modal -->
+    <div id="edit-profile-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('edit-profile-modal')"></div>
+        <div class="absolute inset-x-0 top-20 bottom-0 bg-darkest rounded-t-3xl border-t border-gold-primary/30 overflow-y-auto animate-slide-up">
+            <div class="sticky top-0 bg-darkest/95 backdrop-blur-xl border-b border-border-subtle/20 px-4 py-4 flex items-center justify-between z-10">
+                <h2 class="text-lg font-bold">Profili Düzenle</h2>
+                <div class="flex items-center gap-2">
+                    <button onclick="closeModal('edit-profile-modal')" class="px-4 py-2 text-text-desc text-sm">İptal</button>
+                    <button onclick="saveProfile()" class="px-4 py-2 bg-gold-primary text-darkest rounded-lg font-bold text-sm">Kaydet</button>
+                </div>
+            </div>
+            
+            <div class="p-4 space-y-6 pb-32">
+                <!-- Profil Fotoğrafı -->
+                <div class="flex flex-col items-center gap-3">
+                    <div class="relative">
+                        <div class="w-28 h-28 rounded-full p-1 bg-gradient-to-br from-gold-primary to-gold-nav">
+                            <div class="w-full h-full rounded-full border-4 border-darkest overflow-hidden">
+                                <img id="edit-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" class="w-full h-full object-cover"/>
+                            </div>
+                        </div>
+                        <button class="absolute bottom-0 right-0 w-9 h-9 bg-gold-primary rounded-full border-4 border-darkest flex items-center justify-center shadow-lg">
+                            <span class="material-symbols-outlined text-darkest text-lg">photo_camera</span>
+                        </button>
+                    </div>
+                    <button class="text-gold-primary text-sm font-medium">Profil Fotoğrafını Değiştir</button>
+                </div>
+
+                <!-- Form Alanları -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-2 block px-1">Ad Soyad</label>
+                        <input type="text" id="input-name" value="Mert Demir" class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl px-4 py-3 text-white focus:border-gold-primary focus:outline-none transition-colors"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-2 block px-1">Kullanıcı Adı</label>
+                        <input type="text" id="input-username" value="@mert.explorer" class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl px-4 py-3 text-white focus:border-gold-primary focus:outline-none transition-colors"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-2 block px-1">Meslek</label>
+                        <input type="text" id="input-job" value="City explorer & Lifestyle photographer" class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl px-4 py-3 text-white focus:border-gold-primary focus:outline-none transition-colors"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-2 block px-1">Konum</label>
+                        <input type="text" id="input-location" value="Bursa, TR" class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl px-4 py-3 text-white focus:border-gold-primary focus:outline-none transition-colors"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-2 block px-1">Biyografi</label>
+                        <textarea id="input-bio" rows="3" class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl px-4 py-3 text-white focus:border-gold-primary focus:outline-none transition-colors resize-none">Bursa'nın gizli köşelerini keşfediyor. Tarih, doğa ve lezzet rotaları 🕌🌲🍽️</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOS Ailem Modal -->
+    <div id="sos-family-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal('sos-family-modal')"></div>
+        <div class="absolute inset-x-0 top-20 bottom-0 bg-darkest rounded-t-3xl border-t border-red-500/30 overflow-y-auto animate-slide-up">
+            <div class="sticky top-0 bg-darkest/95 backdrop-blur-xl border-b border-border-subtle/20 px-4 py-4 flex items-center justify-between z-10">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-red-500 fill-1">shield</span>
+                    <h2 class="text-lg font-bold">Ailem (SOS)</h2>
+                </div>
+                <button onclick="closeModal('sos-family-modal')" class="w-8 h-8 rounded-full bg-card-bg/50 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white">close</span>
+                </button>
+            </div>
+            
+            <div class="p-4 space-y-6 pb-32">
+                <!-- Bilgi Kartı -->
+                <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-red-400 text-2xl">info</span>
+                        <div>
+                            <h3 class="text-sm font-bold text-white mb-1">Acil Durum Bilgisi</h3>
+                            <p class="text-xs text-text-desc leading-relaxed">Acil durum butonuna basıldığında, burada eklediğiniz kişilere otomatik olarak konum bilginiz ve acil durum mesajı gönderilecektir.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ekli Kişiler -->
+                <div>
+                    <h3 class="text-[10px] font-bold text-text-desc uppercase tracking-widest mb-3 px-1">Ekli Kişiler</h3>
+                    <div id="family-members-list" class="space-y-3">
+                        <!-- Örnek Kişi -->
+                        <div class="glass-panel rounded-xl p-4 flex items-center gap-3 border border-gold-primary/20">
+                            <div class="w-12 h-12 rounded-full bg-gold-primary/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gold-primary">person</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-bold text-white">Anne</p>
+                                <p class="text-xs text-text-desc">ID: 12345678</p>
+                            </div>
+                            <button onclick="removeFamilyMember(this)" class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-400">
+                                <span class="material-symbols-outlined text-sm">delete</span>
+                            </button>
+                        </div>
+                        <div class="glass-panel rounded-xl p-4 flex items-center gap-3 border border-gold-primary/20">
+                            <div class="w-12 h-12 rounded-full bg-gold-primary/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gold-primary">person</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-bold text-white">Baba</p>
+                                <p class="text-xs text-text-desc">ID: 87654321</p>
+                            </div>
+                            <button onclick="removeFamilyMember(this)" class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-400">
+                                <span class="material-symbols-outlined text-sm">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yeni Kişi Ekle -->
+                <div class="glass-panel rounded-2xl p-4 border border-border-subtle/30">
+                    <h3 class="text-sm font-bold text-white mb-4">Yeni Kişi Ekle</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="new-member-name" placeholder="İsim (örn: Anne, Arkadaş)" class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl px-4 py-3 text-white focus:border-gold-primary focus:outline-none transition-colors text-sm"/>
+                        <input type="text" id="new-member-id" placeholder="Kullanıcı ID veya Telefon" class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl px-4 py-3 text-white focus:border-gold-primary focus:outline-none transition-colors text-sm"/>
+                        <button onclick="addFamilyMember()" class="w-full py-3 bg-gold-primary text-darkest rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined text-lg">person_add</span>
+                            Kişi Ekle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Test Butonu -->
+                <button onclick="testSOS()" class="w-full py-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 font-bold text-sm flex items-center justify-center gap-2 hover:bg-red-500/30 transition-colors">
+                    <span class="material-symbols-outlined">warning</span>
+                    Acil Durum Testi (Konum Gönder)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+
+            document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+                tab.classList.remove('text-gold-primary', 'border-b-2', 'border-gold-primary');
+                tab.classList.add('text-nav-passive');
+                tab.querySelector('.material-symbols-outlined').classList.remove('fill-1');
+            });
+
+            const activeTab = document.getElementById('tab-' + tabName);
+            activeTab.classList.remove('text-nav-passive');
+            activeTab.classList.add('text-gold-primary', 'border-b-2', 'border-gold-primary');
+            activeTab.querySelector('.material-symbols-outlined').classList.add('fill-1');
+        }
+
+        // Profili Düzenle
+        function openEditProfile() {
+            // Mevcut değerleri inputlara doldur
+            document.getElementById('input-name').value = document.getElementById('profile-name').textContent;
+            document.getElementById('input-username').value = document.getElementById('profile-username').textContent;
+            document.getElementById('input-job').value = document.getElementById('profile-job').textContent;
+            document.getElementById('input-location').value = document.getElementById('profile-location').textContent;
+            document.getElementById('input-bio').value = document.getElementById('profile-bio').textContent;
+            
+            openModal('edit-profile-modal');
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('input-name').value.trim();
+            const job = document.getElementById('input-job').value.trim();
+            const location = document.getElementById('input-location').value.trim();
+            const bio = document.getElementById('input-bio').value.trim();
+
+            // Ekranda göster
+            if (name) document.getElementById('profile-name').textContent = name;
+            document.getElementById('profile-job').textContent = job;
+            document.getElementById('profile-location').textContent = location;
+            document.getElementById('profile-bio').textContent = bio;
+
+            closeModal('edit-profile-modal');
+            showToast('Kaydediliyor...');
+
+            // Firebase'e kaydet (module scope'dan auth ve db'yi kullan)
+            window._saveProfileToFirebase(name, job, location, bio);
+        }
+
+        // SOS Ailem Fonksiyonları
+        function openSOSFamily() {
+            openModal('sos-family-modal');
+        }
+
+        function addFamilyMember() {
+            const name = document.getElementById('new-member-name').value;
+            const id = document.getElementById('new-member-id').value;
+            
+            if (!name || !id) {
+                showToast('Lütfen tüm alanları doldurun');
+                return;
+            }
+
+            const list = document.getElementById('family-members-list');
+            const newMember = document.createElement('div');
+            newMember.className = 'glass-panel rounded-xl p-4 flex items-center gap-3 border border-gold-primary/20 animate-scale-in';
+            newMember.innerHTML = `
+                <div class="w-12 h-12 rounded-full bg-gold-primary/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-gold-primary">person</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-bold text-white">${name}</p>
+                    <p class="text-xs text-text-desc">ID: ${id}</p>
+                </div>
+                <button onclick="removeFamilyMember(this)" class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-400">
+                    <span class="material-symbols-outlined text-sm">delete</span>
+                </button>
+            `;
+            
+            list.appendChild(newMember);
+            
+            // Inputları temizle
+            document.getElementById('new-member-name').value = '';
+            document.getElementById('new-member-id').value = '';
+            
+            showToast('Kişi eklendi');
+        }
+
+        function removeFamilyMember(btn) {
+            btn.closest('.glass-panel').remove();
+            showToast('Kişi silindi');
+        }
+
+        function testSOS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
+                        
+                        // Konum bilgisi ve mesaj oluştur
+                        const message = `🚨 ACİL DURUM!\n\nMert Demir'in konumu:\n${mapsUrl}\n\nLütfen hemen ulaşın!`;
+                        
+                        // Web Share API ile paylaş (veya SMS/email simülasyonu)
+                        if (navigator.share) {
+                            navigator.share({
+                                title: 'ACİL DURUM - Konum Bildirimi',
+                                text: message,
+                            }).then(() => {
+                                showToast('Konum paylaşıldı!');
+                            }).catch(() => {
+                                showToast('Konum alındı: ' + mapsUrl);
+                            });
+                        } else {
+                            // Fallback: Clipboard'a kopyala
+                            navigator.clipboard.writeText(message).then(() => {
+                                showToast('Konum kopyalandı!');
+                            });
+                        }
+                    },
+                    (error) => {
+                        showToast('Konum alınamadı: ' + error.message);
+                    }
+                );
+            } else {
+                showToast('Tarayıcınız konum desteklemiyor');
+            }
+        }
+
+        // Web Share API - Profil Paylaş
+        async function shareProfile() {
+            const shareData = {
+                title: 'Mert Demir - CityJoy Profili',
+                text: 'Bursa\'nın gizli köşelerini keşfeden city explorer 📸 @mert.explorer',
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                    showToast('Paylaşıldı!');
+                } else if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(window.location.href);
+                    showToast('Profil linki kopyalandı!');
+                } else {
+                    showToast('Paylaşım desteklenmiyor');
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showToast('Paylaşım hatası: ' + err.message);
+                }
+            }
+        }
+
+        // Toast Bildirim
+        function showToast(message) {
+            // Basit toast implementasyonu
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-card-bg border border-gold-primary/30 text-white px-6 py-3 rounded-full text-sm font-medium z-50 animate-fade-in shadow-lg';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2500);
+        }
+
+        // ESC tuşu ile modalları kapat
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('[id$="-modal"]').forEach(modal => {
+                    if (!modal.classList.contains('hidden')) {
+                        closeModal(modal.id);
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Firebase Profil & Çıkış -->
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Oturum kontrolü
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'giris.html';
+                return;
+            }
+
+            // Önce Auth bilgisini hemen göster
+            if (user.photoURL) {
+                document.getElementById('profile-avatar').src = user.photoURL;
+            }
+
+            // Firestore'dan detaylı bilgileri çek
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userRef);
+
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+
+                    // İsim → Firestore > Auth displayName > email prefix
+                    const adSoyad = ((data.ad || '') + ' ' + (data.soyad || '')).trim();
+                    const isim = adSoyad || user.displayName || (data.email || user.email || '').split('@')[0] || 'Kullanıcı';
+                    document.getElementById('profile-name').textContent = isim;
+                    
+                    // Eğer Firestore'da ad yoksa ama Auth'da displayName varsa güncelle
+                    if (!adSoyad && user.displayName) {
+                        const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                        const parts = user.displayName.split(' ');
+                        await updateDoc(doc(db, 'users', user.uid), {
+                            ad: parts[0] || '',
+                            soyad: parts.slice(1).join(' ') || ''
+                        });
+                    }
+
+                    // Username → CityJoy ID göster
+                    if (data.cityJoyId) {
+                        document.getElementById('profile-username').textContent = data.cityJoyId;
+                        document.getElementById('profile-cityid').textContent = '📧 ' + (data.email || user.email || '');
+                    }
+
+                    // Profil fotoğrafı
+                    if (data.profilResim) document.getElementById('profile-avatar').src = data.profilResim;
+
+                } else {
+                    // Firestore'da kayıt yok → oluştur
+                    const { setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                    const cityJoyId = 'CJ-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 900000 + 100000);
+
+                    await setDoc(userRef, {
+                        uid: user.uid,
+                        cityJoyId: cityJoyId,
+                        ad: user.displayName?.split(' ')[0] || user.email?.split('@')[0] || '',
+                        soyad: user.displayName?.split(' ').slice(1).join(' ') || '',
+                        email: user.email || '',
+                        rol: 'kullanici',
+                        dil: 'tr',
+                        bildirimAktif: true,
+                        profilResim: user.photoURL || '',
+                        sehirId: '',
+                        mahalle: '',
+                        kayitTarihi: serverTimestamp()
+                    });
+
+                    document.getElementById('profile-name').textContent = user.displayName || user.email?.split('@')[0] || 'Kullanıcı';
+                    document.getElementById('profile-username').textContent = cityJoyId;
+                    document.getElementById('profile-cityid').textContent = '📧 ' + (user.email || '');
+                }
+            } catch (error) {
+                console.log('Firestore hatası:', error.message);
+                document.getElementById('profile-cityid').textContent = '⚠️ Bilgiler yüklenemedi';
+            }
+        });
+
+        // Profil kaydetme fonksiyonu (global)
+        window._saveProfileToFirebase = async (name, job, location, bio) => {
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const nameParts = name.split(' ');
+                const ad = nameParts[0] || '';
+                const soyad = nameParts.slice(1).join(' ') || '';
+
+                const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                await updateDoc(doc(db, 'users', user.uid), {
+                    ad: ad,
+                    soyad: soyad,
+                    meslek: job,
+                    konum: location,
+                    biyografi: bio
+                });
+
+                // Auth displayName güncelle
+                const { updateProfile } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js");
+                await updateProfile(user, { displayName: name });
+
+                showToast('✅ Profil güncellendi!');
+            } catch (err) {
+                showToast('❌ Kaydedilemedi: ' + err.message);
+            }
+        };
+
+        // Oturumu Kapat
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            const confirm = window.confirm('Oturumu kapatmak istediğinizden emin misiniz?');
+            if (!confirm) return;
+
+            try {
+                await signOut(auth);
+                localStorage.removeItem('cj_oturum');
+                window.location.href = 'giris.html';
+            } catch (error) {
+                alert('Çıkış yapılamadı!');
+            }
+        });
+
+        // Hesabı Değiştir
+        document.getElementById('switchAccountBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                localStorage.removeItem('cj_oturum');
+                window.location.href = 'giris.html';
+            } catch (error) {
+                alert('Hata oluştu!');
+            }
+        });
+    </script>
+
+    <!-- İşletme Bölümü UI Güncellemesi -->
+    <script>
+    (function() {
+        // _currentUser hazır olunca işletme UI'nı güncelle
+        function updateBusinessUI() {
+            var user = window._currentUser;
+            if (!user) return;
+
+            var section = document.getElementById('business-section');
+            var btnApply = document.getElementById('btn-apply-business');
+            var pendingDiv = document.getElementById('pending-business');
+            var activeDiv = document.getElementById('active-business');
+
+            if (!section) return;
+
+            // Bölümü göster
+            section.style.display = 'block';
+
+            // Duruma göre ilgili elementi göster
+            if (user.hasBusiness) {
+                // Onaylanmış işletme var
+                if (activeDiv) activeDiv.style.display = 'flex';
+            } else if (user.hasPendingBusiness) {
+                // Başvuru beklemede
+                if (pendingDiv) pendingDiv.style.display = 'flex';
+            } else {
+                // Henüz başvuru yok
+                if (btnApply) btnApply.style.display = 'flex';
+            }
+        }
+
+        // Sayfa yüklenince çağır
+        document.addEventListener('DOMContentLoaded', function() {
+            // _currentUser inject edilmiş olabilir, biraz bekle
+            setTimeout(updateBusinessUI, 500);
+        });
+
+        // RN'den userProfile gelince yeniden çağır
+        window.onUserProfile = function(profile) {
+            if (profile && window._currentUser) {
+                window._currentUser.hasBusiness = profile.hasBusiness || false;
+                window._currentUser.hasPendingBusiness = profile.hasPendingBusiness || false;
+                window._currentUser.businessId = profile.businessId || null;
+            }
+            updateBusinessUI();
+        };
+
+        // _currentUser inject edildikten sonra da çağır
+        setTimeout(updateBusinessUI, 800);
+    })();
+    </script>
+</body>
+</html>

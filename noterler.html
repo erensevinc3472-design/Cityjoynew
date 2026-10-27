@@ -1,0 +1,173 @@
+﻿
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Hastaneler - Bursa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; background-color: #0D3238; overflow-x: hidden; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="text-white min-h-screen flex flex-col">
+    <header class="sticky top-0 z-20 bg-[#081F24] border-b border-[#3F6E70]/30 px-4 py-4 flex items-center justify-between">
+        <a href="onemli-kurumlar.html" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#E0B07A]/10 transition-colors active:scale-95">
+            <span class="material-symbols-outlined text-[#E0B07A]">arrow_back</span>
+        </a>
+        <h1 class="text-xl font-bold">Hastaneler</h1>
+        <div class="w-10"></div>
+    </header>
+
+    <div class="px-4 py-4 sticky top-[72px] z-10 bg-[#0D3238]">
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center">
+                <span class="material-symbols-outlined text-[#E0B07A]/60">search</span>
+            </div>
+            <input class="block w-full pl-11 pr-4 py-3 bg-[#17464B] border border-[#3F6E70] focus:ring-2 focus:ring-[#E0B07A] rounded-xl placeholder-[#9FB6B8] text-white" placeholder="Hastane ara..."/>
+        </div>
+    </div>
+
+    <div class="px-4 py-2 overflow-x-auto flex gap-2 no-scrollbar">
+        <button class="px-6 py-2 rounded-full bg-[#E0B07A] text-[#0D3238] text-sm font-bold">Tümü</button>
+        <button class="px-6 py-2 rounded-full bg-[#17464B] border border-[#3F6E70] text-[#C7D8DA] text-sm">Osmangazi</button>
+        <button class="px-6 py-2 rounded-full bg-[#17464B] border border-[#3F6E70] text-[#C7D8DA] text-sm">Nilüfer</button>
+        <button class="px-6 py-2 rounded-full bg-[#17464B] border border-[#3F6E70] text-[#C7D8DA] text-sm">Yıldırım</button>
+    </div>
+
+    <div class="px-4 pt-6 pb-2">
+        <h2 class="text-xs font-bold text-[#C7D8DA] uppercase tracking-[0.2em]">YAKININDAKİ HASTANELER</h2>
+    </div>
+
+    <main class="flex-1 px-4 pb-24 space-y-4">
+        <!-- Hastane 1: Bursa Şehir Hastanesi -->
+        <div class="bg-[#17464B] rounded-xl border border-[#3F6E70] p-4">
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs text-[#C7D8DA]">Açık • 24 Saat</span>
+                    </div>
+                    <h3 class="text-lg font-bold">Bursa Şehir Hastanesi</h3>
+                    <p class="text-sm text-[#9FB6B8] flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-sm">location_on</span> Nilüfer, Bursa
+                    </p>
+                    <div class="mt-3 flex gap-2">
+                        <a href="https://maps.google.com/?q=Bursa+Şehir+Hastanesi" class="flex items-center gap-2 bg-[#E0B07A] text-[#0D3238] px-4 py-2 rounded-lg text-sm font-bold active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined text-sm">navigation</span> Yol Tarifi
+                        </a>
+                        <a href="tel:+90224400100" class="p-2 rounded-lg border border-[#3F6E70] text-[#E0B07A] active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined">call</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAAgyWJs96cj3nnNf7aSpRzX8_IGWBhIl7YRkFSTYhlgfZwqXM4cK8yXJa0sPG27_v-bv7ux0ADHo45TadQwp6bILiItrVtKEoZ58E3bFPJYTmwnXF4kHGCi2-CmLrUng181kc01uO8DzdfApTCwkpRs73R35judjxXQkgr0J-JiNS7jPfszMoskoVKYySaEKoIJIl4rr4gdt6haUG5gmXMxykN9E-PkWj1eW4Zi3UlNyD6YKX7jvIfjOMkowCE9mFPdaeA3otWLVk')"></div>
+            </div>
+        </div>
+
+        <!-- Hastane 2: Çekirge Devlet Hastanesi -->
+        <div class="bg-[#17464B] rounded-xl border border-[#3F6E70] p-4">
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs text-[#C7D8DA]">Açık • 24 Saat</span>
+                    </div>
+                    <h3 class="text-lg font-bold">Çekirge Devlet Hastanesi</h3>
+                    <p class="text-sm text-[#9FB6B8] flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-sm">location_on</span> Osmangazi, Bursa
+                    </p>
+                    <div class="mt-3 flex gap-2">
+                        <a href="https://maps.google.com/?q=Çekirge+Devlet+Hastanesi" class="flex items-center gap-2 bg-[#E0B07A] text-[#0D3238] px-4 py-2 rounded-lg text-sm font-bold active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined text-sm">navigation</span> Yol Tarifi
+                        </a>
+                        <a href="tel:+902242331100" class="p-2 rounded-lg border border-[#3F6E70] text-[#E0B07A] active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined">call</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAAgyWJs96cj3nnNf7aSpRzX8_IGWBhIl7YRkFSTYhlgfZwqXM4cK8yXJa0sPG27_v-bv7ux0ADHo45TadQwp6bILiItrVtKEoZ58E3bFPJYTmwnXF4kHGCi2-CmLrUng181kc01uO8DzdfApTCwkpRs73R35judjxXQkgr0J-JiNS7jPfszMoskoVKYySaEKoIJIl4rr4gdt6haUG5gmXMxykN9E-PkWj1eW4Zi3UlNyD6YKX7jvIfjOMkowCE9mFPdaeA3otWLVk')"></div>
+            </div>
+        </div>
+
+        <!-- Hastane 3: Dörtçelik Çocuk Hastanesi -->
+        <div class="bg-[#17464B] rounded-xl border border-[#3F6E70] p-4">
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs text-[#C7D8DA]">Açık • 24 Saat</span>
+                    </div>
+                    <h3 class="text-lg font-bold">Dörtçelik Çocuk Hastanesi</h3>
+                    <p class="text-sm text-[#9FB6B8] flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-sm">location_on</span> Nilüfer, Bursa
+                    </p>
+                    <div class="mt-3 flex gap-2">
+                        <a href="https://maps.google.com/?q=Dörtçelik+Çocuk+Hastanesi" class="flex items-center gap-2 bg-[#E0B07A] text-[#0D3238] px-4 py-2 rounded-lg text-sm font-bold active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined text-sm">navigation</span> Yol Tarifi
+                        </a>
+                        <a href="tel:+902242331122" class="p-2 rounded-lg border border-[#3F6E70] text-[#E0B07A] active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined">call</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAAgyWJs96cj3nnNf7aSpRzX8_IGWBhIl7YRkFSTYhlgfZwqXM4cK8yXJa0sPG27_v-bv7ux0ADHo45TadQwp6bILiItrVtKEoZ58E3bFPJYTmwnXF4kHGCi2-CmLrUng181kc01uO8DzdfApTCwkpRs73R35judjxXQkgr0J-JiNS7jPfszMoskoVKYySaEKoIJIl4rr4gdt6haUG5gmXMxykN9E-PkWj1eW4Zi3UlNyD6YKX7jvIfjOMkowCE9mFPdaeA3otWLVk')"></div>
+            </div>
+        </div>
+
+        <!-- Hastane 4: Yüksek İhtisas Hastanesi -->
+        <div class="bg-[#17464B] rounded-xl border border-[#3F6E70] p-4">
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs text-[#C7D8DA]">Açık • 24 Saat</span>
+                    </div>
+                    <h3 class="text-lg font-bold">Yüksek İhtisas Hastanesi</h3>
+                    <p class="text-sm text-[#9FB6B8] flex items-center gap-1 mt-1">
+                        <span class="material-symbols-outlined text-sm">location_on</span> Yıldırım, Bursa
+                    </p>
+                    <div class="mt-3 flex gap-2">
+                        <a href="https://maps.google.com/?q=Yüksek+İhtisas+Hastanesi+Bursa" class="flex items-center gap-2 bg-[#E0B07A] text-[#0D3238] px-4 py-2 rounded-lg text-sm font-bold active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined text-sm">navigation</span> Yol Tarifi
+                        </a>
+                        <a href="tel:+902244441515" class="p-2 rounded-lg border border-[#3F6E70] text-[#E0B07A] active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined">call</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="w-24 h-24 rounded-lg bg-cover bg-center shrink-0" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAAgyWJs96cj3nnNf7aSpRzX8_IGWBhIl7YRkFSTYhlgfZwqXM4cK8yXJa0sPG27_v-bv7ux0ADHo45TadQwp6bILiItrVtKEoZ58E3bFPJYTmwnXF4kHGCi2-CmLrUng181kc01uO8DzdfApTCwkpRs73R35judjxXQkgr0J-JiNS7jPfszMoskoVKYySaEKoIJIl4rr4gdt6haUG5gmXMxykN9E-PkWj1eW4Zi3UlNyD6YKX7jvIfjOMkowCE9mFPdaeA3otWLVk')"></div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#0A2A2F] border-t border-[#3F6E70] px-2 pb-6 pt-3 z-50">
+        <div class="flex justify-around items-center">
+            <a href="index.html" class="flex flex-col items-center gap-1 text-[#6E8C8E]">
+                <span class="material-symbols-outlined">home</span>
+                <span class="text-[10px]">Anasayfa</span>
+            </a>
+            <a href="kesfet.html" class="flex flex-col items-center gap-1 text-[#6E8C8E]">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 text-[#F0B36F]">
+                <span class="material-symbols-outlined">search</span>
+                <span class="text-[10px] font-bold">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 text-[#6E8C8E]">
+                <span class="material-symbols-outlined">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+</body>
+</html>
+
+

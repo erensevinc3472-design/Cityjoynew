@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Kütüphaneleri - İl Halk Kütüphanesi, ilçe kütüphaneleri, belediye kütüphaneleri adres, telefon ve çalışma saatleri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Kütüphaneleri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "library-blue": "#3B82F6",
+                        "library-purple": "#8B5CF6",
+                        "library-amber": "#F59E0B",
+                        "library-rose": "#F43F5E"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .library-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .library-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .service-tag {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .modal-library {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .pulse-library {
+            animation: pulseLibrary 2s infinite;
+        }
+        @keyframes pulseLibrary {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">KÜTÜPHANELER</h1>
+                <p class="text-xs text-gray-text truncate">Bursa İl ve İlçe Halk Kütüphaneleri</p>
+            </div>
+            <button onclick="openInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-library-blue/20 hover:bg-library-blue/30 transition-colors shrink-0 pulse-library">
+                <span class="material-symbols-outlined text-library-blue">help</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Kütüphane Bilgi -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-library-blue/30 to-library-blue/10 flex items-center justify-center shrink-0 pulse-library">
+                            <span class="material-symbols-outlined text-library-blue text-xl">local_library</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Bursa Kütüphaneleri</h2>
+                            <p class="text-xs text-gray-text">Halk, Çocuk ve Akademik Kütüphaneler</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-library-blue/10 border border-library-blue/30">
+                        <div class="w-2 h-2 rounded-full bg-library-blue animate-pulse"></div>
+                        <span class="text-xs text-library-blue font-medium">Aktif</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-library-blue">75K+</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Kitap Sayısı (İl Halk)</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-library-purple">08:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Açılış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-library-amber">20:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Kapanış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">30+</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Kütüphane</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme - DÜZELTİLMİŞ BOYUT -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Kütüphane Bul</h3>
+                        <p class="text-xs text-gray-text truncate">İsim veya ilçe ara</p>
+                    </div>
+                </div>
+
+                <!-- DÜZELTİLMİŞ ARAMA ÇUBUĞU - Diğer sayfalarla aynı boyut -->
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="librarySearch" placeholder="Örn: İl Halk, Akkılıç, Osmangazi..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchLibrary()"/>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">İlçe Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterDistrict('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterDistrict('merkez')" id="btn-merkez" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Merkez</span>
+                    </button>
+                    <button onclick="filterDistrict('osmangazi')" id="btn-osmangazi" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Osmangazi</span>
+                    </button>
+                    <button onclick="filterDistrict('nilufer')" id="btn-nilufer" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Nilüfer</span>
+                    </button>
+                    <button onclick="filterDistrict('yildirim')" id="btn-yildirim" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Yıldırım</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Sıkça Sorulan Sorular</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Üyelik -->
+                <div class="library-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-library-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-library-blue text-sm">card_membership</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Nasıl Üye Olurum?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Nüfus cüzdanı veya kimlik kartı ile kütüphaneye başvurmanız yeterlidir. 
+                                Üyelik ücretsizdir ve tüm Bursa kütüphanelerinde geçerlidir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">Ücretsiz Üyelik</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">Tüm İlçelerde Geçerli</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Çalışma Saatleri -->
+                <div class="library-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-library-purple/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-library-purple text-sm">schedule</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Çalışma Saatleri Nedir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                İl Halk Kütüphanesi: Hafta içi 08:00-20:00, Cumartesi 08:00-20:00.
+                                Belediye kütüphaneleri genellikle 09:00-21:00 arası hizmet verir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">Hafta İçi: 08:00-20:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">Cumartesi: 08:00-20:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-library-rose">Pazar: Kapalı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ödünç Alma -->
+                <div class="library-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-library-amber/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-library-amber text-sm">book</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Kaç Kitap Ödünç Alabilirim?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Yetişkinler 3 kitap, çocuklar 2 kitap ödünç alabilir. 
+                                Süre 15 gündür, 1 kez uzatma hakkı vardır.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">Yetişkin: 3 Kitap</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">Çocuk: 2 Kitap</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">15 Gün</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hizmetler -->
+                <div class="library-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-library-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-library-blue text-sm">menu_book</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Hangi Hizmetler Verilir?</h4>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-library-blue text-lg">wifi</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Ücretsiz Wi-Fi</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-library-blue text-lg">computer</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Bilgisayar</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-library-blue text-lg">scan</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Fotokopi</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-library-blue text-lg">event</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Etkinlikler</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- İL HALK KÜTÜPHANESİ (Merkez) -->
+        <section class="animate-slide-up district-section" data-district="merkez" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('merkezSection', 'merkezIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-library-blue/30 to-library-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-library-blue">account_balance</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">İl Halk Kütüphanesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Karaağaç, Yıldırım</span>
+                    </div>
+                </div>
+                <span id="merkezIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="merkezSection" class="expandable-section open mt-3 space-y-3">
+                <!-- Bursa İl Halk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('ilhalk')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Karaağaç Mah. İpekçilik Cad. No:40</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 326 79 09</span>
+                        <span class="mx-1">•</span>
+                        <span class="material-symbols-outlined text-[14px] text-gold">schedule</span>
+                        <span>08:00-20:00</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">75.000+ Kitap</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">Gazete Arşivi</span>
+                    </div>
+                </div>
+
+                <!-- Atatürk Stadyumu Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('stadyum')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Atatürk Stadyumu Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Gaziakdemir Mah. Stadyum Cad. No:1</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 716 25 72</span>
+                        <span class="mx-1">•</span>
+                        <span class="material-symbols-outlined text-[14px] text-gold">schedule</span>
+                        <span>09:00-22:00 (7/24)</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">345 Kişi Kapasite</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">Hafta Sonu Açık</span>
+                    </div>
+                </div>
+
+                <!-- İnebey Yazma Eserler Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('inebey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnebey Yazma Eserler Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi (Tarihi Bina)</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">auto_stories</span>
+                        <span>Nadir Eserler, El Yazmaları</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">Tarihi Eserler</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">Araştırma</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Osmangazi Kütüphaneleri -->
+        <section class="animate-slide-up district-section" data-district="osmangazi" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('osmangaziSection', 'osmangaziIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-library-purple/30 to-library-purple/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-library-purple">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Osmangazi Kütüphaneleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">12 Kütüphane</span>
+                    </div>
+                </div>
+                <span id="osmangaziIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="osmangaziSection" class="expandable-section mt-3 space-y-3">
+                <!-- Mehmet Ali Deniz Halk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('mehmetali')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mehmet Ali Deniz Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">İbrahimpaşa Mah. Akbıyık Cad. No:10</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 77 53</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">35.873 Kitap</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">Heykel Bölgesi</span>
+                    </div>
+                </div>
+
+                <!-- Ömer Mercan Halk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('omermercan')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Ömer Mercan Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Hürriyet Mah. Hürriyet Cad. No:75/A</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 246 44 41</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">Halk Kütüphanesi</span>
+                    </div>
+                </div>
+
+                <!-- Hüsniye Bilsen Halk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('husniye')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hüsniye Bilsen Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Başaran Mah. Hüsniye Bilsen Sok. No:7</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 253 20 00</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">Çocuk & Yetişkin</span>
+                    </div>
+                </div>
+
+                <!-- Hasan Ali Yücel Dünya Klasikleri Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('hasanaliyucel')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hasan Ali Yücel Dünya Klasikleri</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi Meydanı</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">book</span>
+                        <span>Dünya Klasikleri, Edebiyat</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">Klasik Eserler</span>
+                    </div>
+                </div>
+
+                <!-- Demirtaş Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('demirtas')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Demirtaş Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Demirtaş Kültür Merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">child_care</span>
+                        <span>Çocuk ve Yetişkin Bölümleri</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">4.934 Kitap</span>
+                    </div>
+                </div>
+
+                <!-- Emek Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('emek')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Emek Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Emek Yetenek Evi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">menu_book</span>
+                        <span>Çocuk ve Yetişkin</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">5.412 Kitap</span>
+                    </div>
+                </div>
+
+                <!-- Hüdavendigar Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('hudavendigar')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hüdavendigar Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Hüdavendigar Sosyal Gelişim Merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">groups</span>
+                        <span>Çocuk ve Yetişkin</span>
+                    </div>
+                </div>
+
+                <!-- Pınarbaşı Nilüfer Hatun Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('niluferhatun')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Pınarbaşı Nilüfer Hatun Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Pınarbaşı Mahallesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">child_care</span>
+                        <span>Çocuk ve Yetişkin</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">4.738 Kitap</span>
+                    </div>
+                </div>
+
+                <!-- Şadırvanlı Han Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('sadirvanli')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">9</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Şadırvanlı Han Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Kayhan Mahallesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">history_edu</span>
+                        <span>Edebiyat, Felsefe, Din, Kültür</span>
+                    </div>
+                </div>
+
+                <!-- Tophane Çocuk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('tophanecocuk')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">10</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Tophane Çocuk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Tophane Bölgesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">child_care</span>
+                        <span>Sadece Çocuk</span>
+                    </div>
+                </div>
+
+                <!-- Lala Şahin Paşa Çocuk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('lalasahin')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">11</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Lala Şahin Paşa Çocuk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Kavaklı Mah. Ortapazar Cad. No:5</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 224 71 79</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">Tarihi Medrese</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">6.078 Kitap</span>
+                    </div>
+                </div>
+
+                <!-- Alipaşa Oyuncak Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('alipasaoyuncak')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">12</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Alipaşa Oyuncak Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Alipaşa Mah. Yüceyer Cad. No:1/A</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 368 99 54</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">0-12 Yaş</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">Oyuncak Ödünç</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">937 Oyuncak</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nilüfer Kütüphaneleri -->
+        <section class="animate-slide-up district-section" data-district="nilufer" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('niluferSection', 'niluferIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-library-amber/30 to-library-amber/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-library-amber">park</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Nilüfer Kütüphaneleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">8 Kütüphane</span>
+                    </div>
+                </div>
+                <span id="niluferIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="niluferSection" class="expandable-section mt-3 space-y-3">
+                <!-- Akkılıç Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('akkilic')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Akkılıç Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Ataevler Mah. Yılmaz Akkılıç Cd. Basın Kültür Sarayı K:2</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 441 01 42</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">42.000 Kitap</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">1.000 m²</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">Gazete Arşivi</span>
+                    </div>
+                </div>
+
+                <!-- Nilüfer İlçe Halk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('niluferilce')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer İlçe Merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">account_balance</span>
+                        <span>Millî Eğitim Bakanlığı</span>
+                    </div>
+                </div>
+
+                <!-- Üçevler Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('ucevler')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Üçevler Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Üçevler Bölgesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">25.320 Kitap</span>
+                    </div>
+                </div>
+
+                <!-- Demirci Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('demirci')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Demirci Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Demirci Mahallesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">5.653 Kitap</span>
+                    </div>
+                </div>
+
+                <!-- Şiir Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('siir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Şiir Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer Belediyesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">17.748 Kitap</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-purple">Sadece Şiir</span>
+                    </div>
+                </div>
+
+                <!-- Misi Çocuk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('misi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Misi Çocuk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Misi (Gümüştepe)</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">18.042 Kitap</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-amber">Çocuk</span>
+                    </div>
+                </div>
+
+                <!-- Koza Kütüphane -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('koza')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Koza Kütüphane</h4>
+                                <p class="text-[10px] text-gray-text">Üniversite Cad. No:6, Görükle</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">calendar_today</span>
+                        <span>Açılış: Mart 2024</span>
+                        <span class="mx-1">•</span>
+                        <span>1.930 m²</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">15.000 Kitap</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-blue">2 Katlı</span>
+                    </div>
+                </div>
+
+                <!-- Çocuk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('cocuk')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Çocuk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer Belediyesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">child_care</span>
+                        <span>Sadece Çocuklara Özel</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yıldırım Kütüphaneleri -->
+        <section class="animate-slide-up district-section" data-district="yildirim" style="animation-delay: 0.6s">
+            <button onclick="toggleSection('yildirimSection', 'yildirimIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-library-rose/30 to-library-rose/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-library-rose">mosque</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Yıldırım Kütüphaneleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">2 Kütüphane</span>
+                    </div>
+                </div>
+                <span id="yildirimIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="yildirimSection" class="expandable-section mt-3 space-y-3">
+                <!-- Mümine Şeremet Uyumayan Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('mumine')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-rose flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mümine Şeremet Uyumayan Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım Belediyesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">schedule</span>
+                        <span>24 Saat Açık</span>
+                    </div>
+                    <div class="mt-2 flex gap-2 flex-wrap">
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-rose">32.282 Kitap</span>
+                        <span class="service-tag px-2 py-1 rounded text-[10px] text-library-rose">7/24 Açık</span>
+                    </div>
+                </div>
+
+                <!-- Yıldırım İlçe Halk Kütüphanesi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('yildirimilce')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yıldırım İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım İlçe Merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">account_balance</span>
+                        <span>Millî Eğitim Bakanlığı</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diğer İlçe Kütüphaneleri -->
+        <section class="animate-slide-up district-section" data-district="diger" style="animation-delay: 0.7s">
+            <button onclick="toggleSection('digerSection', 'digerIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-library-blue/30 to-library-purple/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-library-blue">map</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Diğer İlçe Kütüphaneleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">10 İlçe</span>
+                    </div>
+                </div>
+                <span id="digerIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="digerSection" class="expandable-section mt-3 space-y-3">
+                <!-- Gürsu -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('gursu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gürsu İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Zafer Mah. Karaca Sok., Gürsu</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 371 12 72</span>
+                    </div>
+                </div>
+
+                <!-- Kestel -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('kestel')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Kestel İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Avp Mah. Gazi Cad. No:10, Kestel</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 372 11 12</span>
+                    </div>
+                </div>
+
+                <!-- Mudanya -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('mudanya')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mudanya İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Halitpaşa Mah. Geniş Sok. No:36/A, Mudanya</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 544 12 07</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('inegol')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl İshakpaşa İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">İnegöl İlçe Merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">child_care</span>
+                        <span>Çocuk Kütüphanesi Mevcut</span>
+                    </div>
+                </div>
+
+                <!-- Karacabey -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('karacabey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Karacabey Sadık Yılmaz İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Tavşanlı Mah. Sadık Yılmaz Cad. No:25/18 B Blok</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 676 15 93</span>
+                    </div>
+                </div>
+
+                <!-- Mustafakemalpaşa -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('mustafakemalpasa')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mustafakemalpaşa İsmail Hakkı Şenpamukçu Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Hamza Bey Mah. Hüseyin Özlü Sok. No:5</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 771 16 69</span>
+                    </div>
+                </div>
+
+                <!-- Orhaneli -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('orhaneli')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhaneli İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Karaoğlan Mah. Şehitler Cad. No:13, Orhaneli</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 381 22 70</span>
+                    </div>
+                </div>
+
+                <!-- Orhangazi -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('orhangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-purple flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhangazi İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Camiikebir Mah. Orhangazi Cad. No:18</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 573 11 77</span>
+                    </div>
+                </div>
+
+                <!-- Gemlik -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('gemlik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-amber flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">9</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">Gemlik İlçe Merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">child_care</span>
+                        <span>Çocuk Kütüphanesi Mevcut</span>
+                    </div>
+                </div>
+
+                <!-- İznik -->
+                <div class="library-card rounded-xl p-4" onclick="openLibraryDetail('iznik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-library-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">10</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İznik İlçe Halk Kütüphanesi</h4>
+                                <p class="text-[10px] text-gray-text">İznik İlçe Merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.8s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="saglik-ocaklari.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-library-rose text-xl">local_hospital</span>
+                    <span class="text-[10px] text-center">Sağlık</span>
+                </a>
+                <a href="hastaneler.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-library-blue text-xl">emergency</span>
+                    <span class="text-[10px] text-center">Hastaneler</span>
+                </a>
+                <a href="eczaneler.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-library-amber text-xl">local_pharmacy</span>
+                    <span class="text-[10px] text-center">Eczaneler</span>
+                </a>
+                <a href="belediyeler.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-library-purple text-xl">account_balance</span>
+                    <span class="text-[10px] text-center">Belediyeler</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.9s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-library-amber">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-library-amber shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-library-amber mb-1">Önemli Bilgi</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            Kütüphaneler genellikle 08:00-20:00 saatleri arasında açıktır. 
+                            Resmi tatillerde ve bayramlarda çalışma saatleri değişebilir. 
+                            Özel koleksiyonlar (İnebey Yazma Eserler vb.) için önceden randevu almanız önerilir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Kütüphane Detay Modalı -->
+    <div id="libraryDetailModal" class="fixed inset-0 z-[80] modal-library hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeLibraryDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Kütüphane Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Kütüphane Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-library-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-library-blue text-3xl">local_library</span>
+                    </div>
+                    <div>
+                        <h2 id="modalLibraryName" class="text-xl font-bold text-white mb-1">Kütüphane Adı</h2>
+                        <p id="modalDistrict" class="text-sm text-gold">İlçe</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p id="modalHours" class="text-sm text-white">Hafta İçi: 08:00 - 20:00</p>
+                            <p class="text-xs text-gray-text mt-1">Cumartesi: 08:00 - 20:00</p>
+                            <p class="text-xs text-library-rose mt-1">Pazar: Kapalı</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">İletişim</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div id="modalBookCount" class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">menu_book</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Koleksiyon</p>
+                            <p id="modalBooks" class="text-sm text-white">Kitap sayısı...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım ve Otopark
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">menu_book</span>
+                    Verilen Hizmetler
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-library-blue text-lg">wifi</span>
+                        <p class="text-xs text-gray-text mt-1">Ücretsiz Wi-Fi</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-library-blue text-lg">computer</span>
+                        <p class="text-xs text-gray-text mt-1">Bilgisayar</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-library-blue text-lg">scan</span>
+                        <p class="text-xs text-gray-text mt-1">Fotokopi/Tarama</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-library-blue text-lg">event</span>
+                        <p class="text-xs text-gray-text mt-1">Etkinlikler</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-library-blue text-lg">child_care</span>
+                        <p class="text-xs text-gray-text mt-1">Çocuk Bölümü</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-library-blue text-lg">newspaper</span>
+                        <p class="text-xs text-gray-text mt-1">Gazete/Dergi</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Özellikler -->
+            <div id="modalFeatures" class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">star</span>
+                    Özellikler
+                </h3>
+                <div id="modalFeaturesContent" class="flex gap-2 flex-wrap">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button id="modalCallBtn" onclick="callNumber('')" class="flex-1 bg-library-blue/20 hover:bg-library-blue/30 border border-library-blue/50 text-library-blue py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Ara
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bilgi Modalı -->
+    <div id="infoModal" class="fixed inset-0 z-[80] modal-library hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Kütüphane Hakkında</h1>
+                        <p class="text-xs text-gray-text truncate">Sıkça Sorulan Sorular</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-library-blue/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-library-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-library-blue text-3xl">local_library</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-library-blue">Bursa Kütüphaneleri</h2>
+                        <p class="text-sm text-gray-text">30+ Kütüphane, 500.000+ Kitap</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Bursa'da İl Halk Kütüphanesi, belediye kütüphaneleri ve ilçe halk kütüphaneleri olmak üzere 
+                    zengin bir kütüphane ağı bulunmaktadır. Tüm kütüphaneler ücretsizdir ve üyelik tüm kütüphanelerde geçerlidir.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-library-purple text-2xl mb-2">card_membership</span>
+                    <p class="text-lg font-bold text-library-purple">Ücretsiz</p>
+                    <p class="text-xs text-gray-text">Üyelik</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-library-amber text-2xl mb-2">book</span>
+                    <p class="text-lg font-bold text-library-amber">3 Kitap</p>
+                    <p class="text-xs text-gray-text">Ödünç Limiti</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-library-blue text-2xl mb-2">schedule</span>
+                    <p class="text-lg font-bold text-library-blue">15 Gün</p>
+                    <p class="text-xs text-gray-text">Ödünç Süresi</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-library-rose text-2xl mb-2">wifi</span>
+                    <p class="text-lg font-bold text-library-rose">Ücretsiz</p>
+                    <p class="text-xs text-gray-text">Wi-Fi</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Kütüphane Veritabanı
+        const libraryData = {
+            'ilhalk': {
+                name: 'Bursa İl Halk Kütüphanesi',
+                district: 'Yıldırım (Merkez)',
+                address: 'Karaağaç Mah. İpekçilik Cad. No:40, Yıldırım/Bursa',
+                phone: '0224 326 79 09',
+                hours: 'Hafta İçi: 08:00 - 20:00',
+                books: '75.000+ Kitap, Gazete Arşivi (1936-2008)',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 3G, 3T, 4, 6, 9, 10, 17, 25, 38, 60, 94' },
+                    { icon: 'local_parking', text: 'Kütüphane otoparkı mevcut (sınırlı)' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 15 dk yürüme' }
+                ],
+                features: ['75.000+ Kitap', 'Gazete Arşivi', 'Atatürk Köşesi', 'Çocuk Bölümü', 'Engelli Erişimi'],
+                mapQuery: 'Bursa İl Halk Kütüphanesi, İpekçilik Caddesi, Yıldırım'
+            },
+            'stadyum': {
+                name: 'Atatürk Stadyumu Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Gaziakdemir Mah. Stadyum Cad. No:1, Osmangazi/Bursa',
+                phone: '0224 716 25 72',
+                hours: '09:00 - 22:00 (7/24 Açık)',
+                books: '345 Kişi Kapasite, 7/24 Hizmet',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4, 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Stadyum otoparkı (ücretli)' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına yakın' }
+                ],
+                features: ['345 Kişi Kapasite', '7/24 Açık', 'Bilgisayar Salonu', 'Wi-Fi', 'Çalışma Odaları'],
+                mapQuery: 'Atatürk Stadyumu Kütüphanesi, Bursa'
+            },
+            'inebey': {
+                name: 'İnebey Yazma Eserler Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Osmangazi (Tarihi Bina)',
+                phone: 'Belirtilmemiş',
+                hours: 'Belirtilmemiş',
+                books: 'Nadir Eserler, El Yazmaları',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'directions_walk', text: 'Heykel\'den yürüme mesafesi' }
+                ],
+                features: ['Tarihi Eserler', 'El Yazmaları', 'Nadir Kitaplar', 'Araştırma'],
+                mapQuery: 'İnebey Yazma Eserler Kütüphanesi, Bursa'
+            },
+            'mehmetali': {
+                name: 'Mehmet Ali Deniz Halk Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'İbrahimpaşa Mah. Akbıyık Cad. No:10, Osmangazi',
+                phone: '0224 221 77 53',
+                hours: '08:00 - 20:00',
+                books: '35.873 Kitap',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'local_parking', text: 'Heykel meydanı otoparkı' }
+                ],
+                features: ['35.873 Kitap', 'Heykel Bölgesi', 'Tarihi Konum'],
+                mapQuery: 'Mehmet Ali Deniz Halk Kütüphanesi, Osmangazi, Bursa'
+            },
+            'omermercan': {
+                name: 'Ömer Mercan Halk Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Hürriyet Mah. Hürriyet Cad. No:75/A, Osmangazi',
+                phone: '0224 246 44 41',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A, 6 hatları' }
+                ],
+                features: ['Halk Kütüphanesi'],
+                mapQuery: 'Ömer Mercan Halk Kütüphanesi, Osmangazi, Bursa'
+            },
+            'husniye': {
+                name: 'Hüsniye Bilsen Halk Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Başaran Mah. Hüsniye Bilsen Sok. No:7, Osmangazi',
+                phone: '0224 253 20 00',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4 hatları' }
+                ],
+                features: ['Çocuk ve Yetişkin'],
+                mapQuery: 'Hüsniye Bilsen Halk Kütüphanesi, Osmangazi, Bursa'
+            },
+            'hasanaliyucel': {
+                name: 'Hasan Ali Yücel Dünya Klasikleri Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Osmangazi Meydanı',
+                phone: 'Belirtilmemiş',
+                hours: '08:00 - 20:00',
+                books: 'Dünya Klasikleri',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' }
+                ],
+                features: ['Dünya Klasikleri', 'Edebiyat', 'Felsefe'],
+                mapQuery: 'Hasan Ali Yücel Kütüphanesi, Osmangazi, Bursa'
+            },
+            'demirtas': {
+                name: 'Demirtaş Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Demirtaş Kültür Merkezi, Osmangazi',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: '4.934 Kitap',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' }
+                ],
+                features: ['4.934 Kitap', 'Çocuk ve Yetişkin'],
+                mapQuery: 'Demirtaş Kütüphanesi, Osmangazi, Bursa'
+            },
+            'emek': {
+                name: 'Emek Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Emek Yetenek Evi, Osmangazi',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: '5.412 Kitap',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Emek İstasyonu' }
+                ],
+                features: ['5.412 Kitap', 'Çocuk ve Yetişkin'],
+                mapQuery: 'Emek Kütüphanesi, Osmangazi, Bursa'
+            },
+            'hudavendigar': {
+                name: 'Hüdavendigar Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Hüdavendigar Sosyal Gelişim Merkezi, Osmangazi',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' }
+                ],
+                features: ['Çocuk ve Yetişkin'],
+                mapQuery: 'Hüdavendigar Kütüphanesi, Osmangazi, Bursa'
+            },
+            'niluferhatun': {
+                name: 'Pınarbaşı Nilüfer Hatun Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Pınarbaşı Mahallesi, Osmangazi',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: '4.738 Kitap',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A hatları' }
+                ],
+                features: ['4.738 Kitap', 'Çocuk ve Yetişkin'],
+                mapQuery: 'Pınarbaşı Nilüfer Hatun Kütüphanesi, Osmangazi, Bursa'
+            },
+            'sadirvanli': {
+                name: 'Şadırvanlı Han Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Kayhan Mahallesi, Osmangazi',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: 'Edebiyat, Felsefe, Din, Kültür',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Çarşı durağı)' }
+                ],
+                features: ['Edebiyat', 'Felsefe', 'Din', 'Kültür'],
+                mapQuery: 'Şadırvanlı Han Kütüphanesi, Osmangazi, Bursa'
+            },
+            'tophanecocuk': {
+                name: 'Tophane Çocuk Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Tophane Bölgesi, Osmangazi',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: 'Çocuk Kitapları',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' }
+                ],
+                features: ['Sadece Çocuk'],
+                mapQuery: 'Tophane Çocuk Kütüphanesi, Osmangazi, Bursa'
+            },
+            'lalasahin': {
+                name: 'Lala Şahin Paşa Çocuk Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Kavaklı Mah. Ortapazar Cad. No:5, Osmangazi',
+                phone: '0224 224 71 79',
+                hours: '09:00 - 21:00',
+                books: '6.078 Kitap',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A hatları' }
+                ],
+                features: ['6.078 Kitap', 'Tarihi Medrese', 'Sadece Çocuk'],
+                mapQuery: 'Lala Şahin Paşa Çocuk Kütüphanesi, Osmangazi, Bursa'
+            },
+            'alipasaoyuncak': {
+                name: 'Alipaşa Oyuncak Kütüphanesi',
+                district: 'Osmangazi',
+                address: 'Alipaşa Mah. Yüceyer Cad. No:1/A, Osmangazi',
+                phone: '0224 368 99 54',
+                hours: '09:00 - 21:00',
+                books: '937 Oyuncak',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' }
+                ],
+                features: ['0-12 Yaş', 'Oyuncak Ödünç', '937 Oyuncak', 'Eğitici Oyunlar'],
+                mapQuery: 'Alipaşa Oyuncak Kütüphanesi, Osmangazi, Bursa'
+            },
+            'akkilic': {
+                name: 'Akkılıç Kütüphanesi',
+                district: 'Nilüfer',
+                address: 'Ataevler Mah. Yılmaz Akkılıç Cd. Basın Kültür Sarayı K:2, Nilüfer',
+                phone: '0224 441 01 42',
+                hours: '08:00 - 20:00',
+                books: '42.000 Kitap, 1.000 m²',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı + 10 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Basın Kültür Sarayı otoparkı' }
+                ],
+                features: ['42.000 Kitap', '1.000 m²', 'Gazete Arşivi', 'Çocuk Bölümü', 'Bilgisayar Salonu'],
+                mapQuery: 'Akkılıç Kütüphanesi, Nilüfer, Bursa'
+            },
+            'niluferilce': {
+                name: 'Nilüfer İlçe Halk Kütüphanesi',
+                district: 'Nilüfer',
+                address: 'Nilüfer İlçe Merkezi',
+                phone: 'Belirtilmemiş',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Nilüfer İlçe Halk Kütüphanesi, Bursa'
+            },
+            'ucevler': {
+                name: 'Üçevler Kütüphanesi',
+                district: 'Nilüfer',
+                address: 'Üçevler Bölgesi, Nilüfer',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: '25.320 Kitap',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' }
+                ],
+                features: ['25.320 Kitap'],
+                mapQuery: 'Üçevler Kütüphanesi, Nilüfer, Bursa'
+            },
+            'demirci': {
+                name: 'Demirci Kütüphanesi',
+                district: 'Nilüfer',
+                address: 'Demirci Mahallesi, Nilüfer',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: '5.653 Kitap',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' }
+                ],
+                features: ['5.653 Kitap'],
+                mapQuery: 'Demirci Kütüphanesi, Nilüfer, Bursa'
+            },
+            'siir': {
+                name: 'Şiir Kütüphanesi',
+                district: 'Nilüfer',
+                address: 'Nilüfer Belediyesi',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: '17.748 Kitap',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı' }
+                ],
+                features: ['17.748 Kitap', 'Sadece Şiir', 'Edebiyat'],
+                mapQuery: 'Şiir Kütüphanesi, Nilüfer, Bursa'
+            },
+            'misi': {
+                name: 'Misi Çocuk Kütüphanesi',
+                district: 'Nilüfer',
+                address: 'Misi (Gümüştepe), Nilüfer',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: '18.042 Kitap',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38 hatları' }
+                ],
+                features: ['18.042 Kitap', 'Çocuk', 'Tarihi Köy'],
+                mapQuery: 'Misi Çocuk Kütüphanesi, Nilüfer, Bursa'
+            },
+            'koza': {
+                name: 'Koza Kütüphane',
+                district: 'Nilüfer',
+                address: 'Üniversite Cad. No:6, Görükle, Nilüfer',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: '15.000 Kitap',
+                transport: [
+                    { icon: 'subway', text: 'M2 Hattı - Üniversite durağı' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' }
+                ],
+                features: ['15.000 Kitap', '1.930 m²', '2 Katlı', 'Mart 2024 Açılış'],
+                mapQuery: 'Koza Kütüphane, Görükle, Nilüfer, Bursa'
+            },
+            'cocuk': {
+                name: 'Çocuk Kütüphanesi',
+                district: 'Nilüfer',
+                address: 'Nilüfer Belediyesi',
+                phone: 'Belirtilmemiş',
+                hours: '09:00 - 21:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı' }
+                ],
+                features: ['Sadece Çocuklara Özel'],
+                mapQuery: 'Çocuk Kütüphanesi, Nilüfer, Bursa'
+            },
+            'mumine': {
+                name: 'Mümine Şeremet Uyumayan Kütüphanesi',
+                district: 'Yıldırım',
+                address: 'Yıldırım Belediyesi',
+                phone: 'Belirtilmemiş',
+                hours: '24 Saat Açık',
+                books: '32.282 Kitap',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' }
+                ],
+                features: ['32.282 Kitap', '7/24 Açık', 'Gece Hizmeti'],
+                mapQuery: 'Mümine Şeremet Uyumayan Kütüphanesi, Yıldırım, Bursa'
+            },
+            'yildirimilce': {
+                name: 'Yıldırım İlçe Halk Kütüphanesi',
+                district: 'Yıldırım',
+                address: 'Yıldırım İlçe Merkezi',
+                phone: 'Belirtilmemiş',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Yıldırım İlçe Halk Kütüphanesi, Bursa'
+            },
+            'gursu': {
+                name: 'Gürsu İlçe Halk Kütüphanesi',
+                district: 'Gürsu',
+                address: 'Zafer Mah. Karaca Sok., Gürsu',
+                phone: '0224 371 12 72',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Gürsu hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Gürsu İlçe Halk Kütüphanesi, Bursa'
+            },
+            'kestel': {
+                name: 'Kestel İlçe Halk Kütüphanesi',
+                district: 'Kestel',
+                address: 'Avp Mah. Gazi Cad. No:10, Kestel',
+                phone: '0224 372 11 12',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Kestel hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Kestel İlçe Halk Kütüphanesi, Bursa'
+            },
+            'mudanya': {
+                name: 'Mudanya İlçe Halk Kütüphanesi',
+                district: 'Mudanya',
+                address: 'Halitpaşa Mah. Geniş Sok. No:36/A, Mudanya',
+                phone: '0224 544 12 07',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Mudanya hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Mudanya İlçe Halk Kütüphanesi, Bursa'
+            },
+            'inegol': {
+                name: 'İnegöl İshakpaşa İlçe Halk Kütüphanesi',
+                district: 'İnegöl',
+                address: 'İnegöl İlçe Merkezi',
+                phone: 'Belirtilmemiş',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: İnegöl hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi', 'Çocuk Kütüphanesi'],
+                mapQuery: 'İnegöl İlçe Halk Kütüphanesi, Bursa'
+            },
+            'karacabey': {
+                name: 'Karacabey Sadık Yılmaz İlçe Halk Kütüphanesi',
+                district: 'Karacabey',
+                address: 'Tavşanlı Mah. Sadık Yılmaz Cad. No:25/18 B Blok, Karacabey',
+                phone: '0224 676 15 93',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Karacabey hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Karacabey İlçe Halk Kütüphanesi, Bursa'
+            },
+            'mustafakemalpasa': {
+                name: 'Mustafakemalpaşa İsmail Hakkı Şenpamukçu Kütüphanesi',
+                district: 'Mustafakemalpaşa',
+                address: 'Hamza Bey Mah. Hüseyin Özlü Sok. No:5, Mustafakemalpaşa',
+                phone: '0224 771 16 69',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Mustafakemalpaşa hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Mustafakemalpaşa İlçe Halk Kütüphanesi, Bursa'
+            },
+            'orhaneli': {
+                name: 'Orhaneli İlçe Halk Kütüphanesi',
+                district: 'Orhaneli',
+                address: 'Karaoğlan Mah. Şehitler Cad. No:13, Orhaneli',
+                phone: '0224 381 22 70',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Orhaneli hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Orhaneli İlçe Halk Kütüphanesi, Bursa'
+            },
+            'orhangazi': {
+                name: 'Orhangazi İlçe Halk Kütüphanesi',
+                district: 'Orhangazi',
+                address: 'Camiikebir Mah. Orhangazi Cad. No:18, Orhangazi',
+                phone: '0224 573 11 77',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Orhangazi hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'Orhangazi İlçe Halk Kütüphanesi, Bursa'
+            },
+            'gemlik': {
+                name: 'Gemlik İlçe Halk Kütüphanesi',
+                district: 'Gemlik',
+                address: 'Gemlik İlçe Merkezi',
+                phone: 'Belirtilmemiş',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Gemlik hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi', 'Çocuk Kütüphanesi'],
+                mapQuery: 'Gemlik İlçe Halk Kütüphanesi, Bursa'
+            },
+            'iznik': {
+                name: 'İznik İlçe Halk Kütüphanesi',
+                district: 'İznik',
+                address: 'İznik İlçe Merkezi',
+                phone: 'Belirtilmemiş',
+                hours: '08:00 - 20:00',
+                books: 'Belirtilmemiş',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: İznik hatları' }
+                ],
+                features: ['İlçe Halk Kütüphanesi'],
+                mapQuery: 'İznik İlçe Halk Kütüphanesi, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // District Filter
+        let currentDistrict = 'all';
+        function filterDistrict(district) {
+            currentDistrict = district;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + district).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.district-section');
+            sections.forEach(section => {
+                if (district === 'all' || section.dataset.district === district) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Library
+        function searchLibrary() {
+            const searchTerm = document.getElementById('librarySearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.library-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open Library Detail Modal
+        function openLibraryDetail(libraryId) {
+            const library = libraryData[libraryId];
+            if (!library) return;
+
+            document.getElementById('modalLibraryName').textContent = library.name;
+            document.getElementById('modalDistrict').textContent = library.district;
+            document.getElementById('modalAddress').textContent = library.address;
+            document.getElementById('modalPhone').textContent = library.phone;
+            document.getElementById('modalHours').textContent = library.hours;
+            document.getElementById('modalBooks').textContent = library.books;
+
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            library.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Özellikleri doldur
+            const featuresContainer = document.getElementById('modalFeaturesContent');
+            featuresContainer.innerHTML = '';
+            library.features.forEach(feature => {
+                const span = document.createElement('span');
+                span.className = 'service-tag px-3 py-1.5 rounded-lg text-xs text-library-blue';
+                span.textContent = feature;
+                featuresContainer.appendChild(span);
+            });
+
+            // Telefon butonunu güncelle
+            const phoneBtn = document.getElementById('modalCallBtn');
+            if (library.phone && library.phone !== 'Belirtilmemiş') {
+                phoneBtn.style.display = 'flex';
+                phoneBtn.setAttribute('onclick', `callNumber('${library.phone.replace(/\s/g, '')}')`);
+            } else {
+                phoneBtn.style.display = 'none';
+            }
+
+            // Harita butonunu güncelle
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${library.mapQuery}')`);
+
+            document.getElementById('libraryDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Library Detail Modal
+        function closeLibraryDetail() {
+            document.getElementById('libraryDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Info Modal
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak FAQ açık
+            document.getElementById('faqSection').classList.add('open');
+            document.getElementById('faqIcon').classList.add('open');
+            
+            // Tüm section'ları açık yap
+            document.getElementById('merkezSection').classList.add('open');
+            document.getElementById('merkezIcon').classList.add('open');
+            document.getElementById('osmangaziSection').classList.add('open');
+            document.getElementById('osmangaziIcon').classList.add('open');
+            document.getElementById('niluferSection').classList.add('open');
+            document.getElementById('niluferIcon').classList.add('open');
+            document.getElementById('yildirimSection').classList.add('open');
+            document.getElementById('yildirimIcon').classList.add('open');
+            document.getElementById('digerSection').classList.add('open');
+            document.getElementById('digerIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>

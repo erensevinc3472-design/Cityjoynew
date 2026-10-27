@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>CityJoy - Keşfet Genel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #081F24;
+            color: #f1f5f9;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 20;
+        }
+        .active-tab {
+            border-bottom: 2px solid #E0B07A;
+            color: #E0B07A;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .hashtag {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            padding: 6px 12px;
+            border: 1px solid rgba(63, 110, 112, 0.3);
+            border-radius: 9999px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .hashtag span {
+            color: #E0B07A;
+            font-weight: 500;
+        }
+        .hashtag-active {
+            background: rgba(224, 176, 122, 0.1);
+            border-color: rgba(224, 176, 122, 0.3);
+            color: #f1f5f9;
+        }
+        .news-badge-api {
+            background: rgba(30, 215, 96, 0.2);
+            color: #1ED760;
+        }
+        @keyframes heartBurst {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .heart-active {
+            animation: heartBurst 0.3s ease;
+            font-variation-settings: 'FILL' 1;
+            color: #E0B07A;
+        }
+        @keyframes bookmarkSlide {
+            0% { transform: translateY(-10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .bookmark-active {
+            animation: bookmarkSlide 0.3s ease;
+            font-variation-settings: 'FILL' 1;
+            color: #E0B07A;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        /* Modal Animations */
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        .modal-enter {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        .overlay-enter {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+        .menu-enter {
+            animation: slideInLeft 0.3s ease-out forwards;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(63, 110, 112, 0.1);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(224, 176, 122, 0.3);
+            border-radius: 2px;
+        }
+        .menu-item {
+            transition: all 0.2s ease;
+        }
+        .menu-item:hover {
+            background: rgba(224, 176, 122, 0.1);
+            transform: translateX(4px);
+        }
+        /* Video Container Styles */
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .video-container video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .video-controls {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        .video-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            color: white;
+        }
+        .video-btn:hover {
+            background: rgba(224, 176, 122, 0.8);
+        }
+        /* Post Divider */
+        .post-divider {
+            height: 8px;
+            background: linear-gradient(to bottom, rgba(63, 110, 112, 0.1), rgba(63, 110, 112, 0.3), rgba(63, 110, 112, 0.1));
+            margin: 0 -20px;
+            border-top: 1px solid rgba(63, 110, 112, 0.2);
+            border-bottom: 1px solid rgba(63, 110, 112, 0.2);
+        }
+        /* Comments Preview */
+        .comments-preview {
+            background: rgba(23, 70, 75, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        .comment-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .comment-item:last-child {
+            margin-bottom: 0;
+        }
+        .follow-btn {
+            background: transparent;
+            border: 1px solid #E0B07A;
+            color: #E0B07A;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .follow-btn:hover {
+            background: #E0B07A;
+            color: #081F24;
+        }
+        .follow-btn.following {
+            background: #E0B07A;
+            color: #081F24;
+        }
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            background: #E0B07A;
+            color: #081F24;
+            border-radius: 9px;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(23, 70, 75, 0.5) 25%, rgba(63, 110, 112, 0.3) 50%, rgba(23, 70, 75, 0.5) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        /* Swipe Indicators */
+        .swipe-indicator {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 40;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .swipe-indicator.show {
+            opacity: 1;
+        }
+        .swipe-indicator.left {
+            left: 8px;
+        }
+        .swipe-indicator.right {
+            right: 8px;
+        }
+        .swipe-arrow {
+            width: 40px;
+            height: 40px;
+            background: rgba(224, 176, 122, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #E0B07A;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-24">
+    <!-- Swipe Indicators -->
+    <div class="swipe-indicator left" id="swipeLeft">
+        <div class="swipe-arrow">
+            <span class="material-symbols-outlined">chevron_left</span>
+        </div>
+    </div>
+    <div class="swipe-indicator right" id="swipeRight">
+        <div class="swipe-arrow">
+            <span class="material-symbols-outlined">chevron_right</span>
+        </div>
+    </div>
+
+    <div class="relative mx-auto min-h-screen max-w-[430px] flex flex-col bg-[#081F24] overflow-x-hidden border-x border-[#3F6E70]/20" id="mainContainer">
+
+        <div id="pull-indicator" class="hidden fixed top-0 left-0 right-0 z-50 flex justify-center pt-4">
+            <div class="bg-[#17464B]/90 backdrop-blur rounded-full px-4 py-2 flex items-center gap-2">
+                <span class="material-symbols-outlined spinner text-[#E0B07A]">refresh</span>
+                <span class="text-xs text-[#9FB6B8]">Yenileniyor...</span>
+            </div>
+        </div>
+
+        <header class="sticky top-0 z-30 bg-[#081F24]/95 backdrop-blur-xl px-5 pt-14 pb-4 border-b border-[#3F6E70]/30">
+            <div class="grid grid-cols-3 items-center">
+                <div class="flex items-center justify-start">
+                    <button onclick="openMenu()" class="cursor-pointer p-2 -ml-2 hover:bg-[#17464B]/30 rounded-lg transition-colors">
+                        <span class="material-symbols-outlined text-[24px]">menu</span>
+                    </button>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                    <h1 class="text-[14px] font-light tracking-[0.2em] uppercase opacity-80 whitespace-nowrap">Keşfet</h1>
+                    <span class="text-[10px] text-[#E0B07A] mt-0.5">Genel</span>
+                </div>
+                <div class="flex items-center justify-end gap-4">
+                    <a href="yeni-gonderi.html" onclick="if(window.rnSend){event.preventDefault();window.rnSend({action:'replace',file:'yeni-gonderi.html'});}" class="cursor-pointer hover:text-[#E0B07A] transition-colors">
+                        <span class="material-symbols-outlined text-[24px]">add_circle</span>
+                    </a>
+                    <a href="bildirimler.html" class="cursor-pointer relative hover:text-[#E0B07A] transition-colors">
+                        <span class="material-symbols-outlined text-[22px]">notifications</span>
+                        <span class="notification-badge">5</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <nav class="sticky top-[101px] z-20 bg-[#081F24]/95 backdrop-blur-xl px-5 border-b border-[#3F6E70]/20">
+            <div class="flex justify-between items-center">
+                <a href="kesfet-mahallem.html" class="flex-1 py-3 text-[11px] font-normal tracking-wider text-[#9FB6B8]/70 text-center hover:text-[#C7D8DA] transition-colors">MAHALLEM</a>
+                <a href="kesfet-bolgesel.html" class="flex-1 py-3 text-[11px] font-normal tracking-wider text-[#9FB6B8]/70 text-center hover:text-[#C7D8DA] transition-colors">BÖLGESEL</a>
+                <button class="flex-1 py-3 text-[11px] font-medium tracking-wider active-tab text-center">GENEL</button>
+            </div>
+        </nav>
+
+        <div class="sticky top-[146px] z-20 bg-[#081F24]/95 backdrop-blur-xl py-3 border-b border-[#3F6E70]/20">
+            <div class="flex items-center gap-3 overflow-x-auto hide-scrollbar px-5">
+                <button onclick="filterNews('all')" class="hashtag hashtag-active" data-filter="all"><span>#</span>Tümü</button>
+                <button onclick="filterNews('gundem')" class="hashtag" data-filter="gundem"><span>#</span>Gündem</button>
+                <button onclick="filterNews('dunya')" class="hashtag" data-filter="dunya"><span>#</span>Dünya</button>
+                <button onclick="filterNews('ekonomi')" class="hashtag" data-filter="ekonomi"><span>#</span>Ekonomi</button>
+                <button onclick="filterNews('spor')" class="hashtag" data-filter="spor"><span>#</span>Spor</button>
+                <button onclick="filterNews('teknoloji')" class="hashtag" data-filter="teknoloji"><span>#</span>Teknoloji</button>
+            </div>
+        </div>
+
+        <main id="content-area" class="flex-1 px-5 pb-32 overflow-y-auto hide-scrollbar">
+            
+            <!-- Loading State -->
+            <div id="loading-state" class="py-8">
+                <div class="flex items-center justify-center gap-2 mb-6">
+                    <span class="material-symbols-outlined spinner text-[#E0B07A]">refresh</span>
+                    <span class="text-[12px] text-[#9FB6B8]">Haberler yükleniyor...</span>
+                </div>
+                <div class="space-y-6">
+                    <div class="skeleton h-64 rounded-xl"></div>
+                    <div class="skeleton h-32 rounded-xl"></div>
+                    <div class="skeleton h-64 rounded-xl"></div>
+                </div>
+            </div>
+
+            <!-- News Container -->
+            <div id="news-container" class="hidden">
+                <!-- Content will be loaded here -->
+            </div>
+
+        </main>
+
+        <footer class="fixed bottom-0 w-full max-w-[430px] bg-[#0A2A2F]/95 backdrop-blur-2xl border-t border-[#3F6E70]/30 px-6 pt-3 pb-8 z-50">
+            <div class="flex items-center justify-between">
+                <a href="kesfet-genel.html" class="flex flex-col items-center cursor-pointer text-[#E0B07A] py-2 px-2 relative">
+                    <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">explore</span>
+                    <span class="text-[9px] mt-1 font-medium">Keşfet</span>
+                    <span class="absolute -bottom-1 w-1 h-1 bg-[#E0B07A] rounded-full"></span>
+                </a>
+                <a href="reels.html" class="flex flex-col items-center cursor-pointer text-[#6E8C8E] hover:text-[#9FB6B8] transition-colors py-2 px-2">
+                    <span class="material-symbols-outlined text-[24px]">play_arrow</span>
+                    <span class="text-[9px] mt-1">Reels</span>
+                </a>
+                <a href="mesajlar.html" class="flex flex-col items-center cursor-pointer text-[#6E8C8E] hover:text-[#9FB6B8] transition-colors py-2 px-2 relative">
+                    <span class="material-symbols-outlined text-[24px]">chat</span>
+                    <span class="text-[9px] mt-1">Mesajlar</span>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-[#E0B07A] rounded-full"></span>
+                </a>
+                <a href="kesfet-ara.html" class="flex flex-col items-center cursor-pointer text-[#6E8C8E] hover:text-[#9FB6B8] transition-colors py-2 px-2">
+                    <span class="material-symbols-outlined text-[24px]">search</span>
+                    <span class="text-[9px] mt-1">Ara</span>
+                </a>
+                <a href="profil.html" class="flex flex-col items-center cursor-pointer text-[#6E8C8E] hover:text-[#9FB6B8] transition-colors py-2 px-2">
+                    <span class="material-symbols-outlined text-[24px]">person</span>
+                    <span class="text-[9px] mt-1">Profil</span>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Menu Modal -->
+    <div id="menuModal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm overlay-enter" onclick="closeMenu()"></div>
+        <div class="absolute top-0 left-0 bottom-0 w-[300px] bg-[#0A2A2F] menu-enter overflow-y-auto custom-scroll">
+            <div class="p-5 border-b border-[#3F6E70]/30">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[20px] font-semibold text-[#C7D8DA]">Menü</span>
+                    <button onclick="closeMenu()" class="text-[#9FB6B8] hover:text-[#C7D8DA] transition-colors">
+                        <span class="material-symbols-outlined text-[24px]">close</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-full bg-[#17464B] overflow-hidden border-2 border-[#E0B07A]/30">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face" alt="Profile" class="w-full h-full object-cover"/>
+                    </div>
+                    <div>
+                        <p class="text-[15px] font-semibold text-[#C7D8DA]">Kullanıcı Adı</p>
+                        <p class="text-[12px] text-[#9FB6B8]">@kullanici</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="p-4">
+                <a href="anasayfa.html" class="menu-item flex items-center gap-4 p-3.5 rounded-xl text-[#C7D8DA] mb-1">
+                    <span class="material-symbols-outlined text-[24px] text-[#E0B07A]">home</span>
+                    <span class="text-[14px] font-medium">Ana Sayfa</span>
+                </a>
+
+                <a href="benim-sehrim.html" class="menu-item flex items-center gap-4 p-3.5 rounded-xl text-[#C7D8DA] mb-1">
+                    <span class="material-symbols-outlined text-[24px] text-[#E0B07A]">location_city</span>
+                    <span class="text-[14px] font-medium">Benim Şehrim</span>
+                </a>
+
+                <a href="seyahat.html" class="menu-item flex items-center gap-4 p-3.5 rounded-xl text-[#C7D8DA] mb-1">
+                    <span class="material-symbols-outlined text-[24px] text-[#E0B07A]">flight</span>
+                    <span class="text-[14px] font-medium">Seyahat</span>
+                </a>
+
+                <a href="sosyal-harmoni.html" class="menu-item flex items-center gap-4 p-3.5 rounded-xl text-[#C7D8DA] mb-1">
+                    <span class="material-symbols-outlined text-[24px] text-[#E0B07A]">diversity_3</span>
+                    <span class="text-[14px] font-medium">Sosyal Harmoni</span>
+                </a>
+
+                <a href="acil-ihtiyaclar.html" class="menu-item flex items-center gap-4 p-3.5 rounded-xl text-[#C7D8DA] mb-1">
+                    <span class="material-symbols-outlined text-[24px] text-[#E0B07A]">emergency</span>
+                    <span class="text-[14px] font-medium">Acil İhtiyaçlar</span>
+                </a>
+            </nav>
+
+            <div class="mx-4 border-t border-[#3F6E70]/30 my-2"></div>
+
+            <nav class="px-4 pb-4">
+                <a href="ayarlar.html" class="menu-item flex items-center gap-4 p-3.5 rounded-xl text-[#C7D8DA] mb-1">
+                    <span class="material-symbols-outlined text-[24px] text-[#9FB6B8]">settings</span>
+                    <span class="text-[14px] font-medium">Ayarlar</span>
+                </a>
+                <a href="yardim.html" class="menu-item flex items-center gap-4 p-3.5 rounded-xl text-[#C7D8DA] mb-1">
+                    <span class="material-symbols-outlined text-[24px] text-[#9FB6B8]">help_outline</span>
+                    <span class="text-[14px] font-medium">Yardım</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Comments Modal -->
+    <div id="commentsModal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm overlay-enter" onclick="closeCommentsModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-[#0A2A2F] rounded-t-3xl modal-enter max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-[#3F6E70]/30">
+                <span class="text-[16px] font-semibold text-[#C7D8DA]">Yorumlar</span>
+                <button onclick="closeCommentsModal()" class="text-[#9FB6B8] hover:text-[#C7D8DA] transition-colors">
+                    <span class="material-symbols-outlined text-[24px]">close</span>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto custom-scroll p-5" id="commentsList">
+                <!-- Comments will be loaded here -->
+            </div>
+
+            <div class="p-4 border-t border-[#3F6E70]/30 bg-[#081F24]">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#17464B] overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=50&h=50&fit=crop&crop=face" class="w-full h-full object-cover"/>
+                    </div>
+                    <div class="flex-1 flex items-center gap-2 bg-[#17464B]/50 rounded-full px-4 py-2.5">
+                        <input type="text" id="commentInput" placeholder="Yorum yaz..." 
+                            class="flex-1 bg-transparent text-[14px] text-[#C7D8DA] placeholder-[#6E8C8E] outline-none">
+                        <button onclick="submitComment()" class="text-[#E0B07A] font-semibold text-[13px]">Gönder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm overlay-enter" onclick="closeShareModal()"></div>
+        <div class="absolute bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-[#0A2A2F] rounded-t-3xl modal-enter">
+            <div class="p-5">
+                <h3 class="text-[16px] font-semibold text-[#C7D8DA] mb-4 text-center">Paylaş</h3>
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <button class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-[#17464B]/30 transition-colors">
+                        <div class="w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white text-[24px]">chat</span>
+                        </div>
+                        <span class="text-[11px] text-[#9FB6B8]">WhatsApp</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-[#17464B]/30 transition-colors">
+                        <div class="w-12 h-12 rounded-full bg-[#0088cc] flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white text-[24px]">send</span>
+                        </div>
+                        <span class="text-[11px] text-[#9FB6B8]">Telegram</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-[#17464B]/30 transition-colors">
+                        <div class="w-12 h-12 rounded-full bg-[#1DA1F2] flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white text-[24px]">alternate_email</span>
+                        </div>
+                        <span class="text-[11px] text-[#9FB6B8]">Twitter</span>
+                    </button>
+                    <button class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-[#17464B]/30 transition-colors">
+                        <div class="w-12 h-12 rounded-full bg-[#E0B07A] flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[#081F24] text-[24px]">link</span>
+                        </div>
+                        <span class="text-[11px] text-[#9FB6B8]">Link Kopyala</span>
+                    </button>
+                </div>
+                <button onclick="closeShareModal()" class="w-full py-3 bg-[#17464B] rounded-xl text-[14px] text-[#C7D8DA] hover:bg-[#1d5258] transition-colors">
+                    İptal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // RSS News Sources
+        const RSS_SOURCES = [
+            { url: 'https://www.hurriyet.com.tr/rss/anasayfa', name: 'Hürriyet', category: 'gundem', icon: 'H' },
+            { url: 'https://www.ntv.com.tr/son-dakika.rss', name: 'NTV', category: 'gundem', icon: 'N' },
+            { url: 'https://www.sabah.com.tr/rss/anasayfa.xml', name: 'Sabah', category: 'gundem', icon: 'S' },
+            { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', name: 'BBC World', category: 'dunya', icon: 'B' },
+            { url: 'https://www.cnbc.com/id/19746125/device/rss/rss.xml', name: 'CNBC', category: 'ekonomi', icon: 'C' },
+            { url: 'https://www.espn.com/espn/rss/news', name: 'ESPN', category: 'spor', icon: 'E' },
+            { url: 'https://techcrunch.com/feed/', name: 'TechCrunch', category: 'teknoloji', icon: 'T' }
+        ];
+
+        // Sample Video Content
+        const VIDEO_POSTS = [
+            {
+                id: 'video1',
+                type: 'video',
+                source: 'CNN Türk',
+                avatar: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=100&h=100&fit=crop',
+                title: 'Son Dakika: Merkez Bankası Faiz Kararını Açıkladı',
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=400&fit=crop',
+                views: '1.2M',
+                likes: 45600,
+                comments: 1234,
+                time: '15 dk önce',
+                category: 'ekonomi'
+            },
+            {
+                id: 'video2',
+                type: 'video',
+                source: 'NTV',
+                avatar: 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=100&h=100&fit=crop',
+                title: 'Dünya Kupası Elemelerinde Büyük Sürpriz',
+                videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                thumbnail: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&h=400&fit=crop',
+                views: '890K',
+                likes: 32100,
+                comments: 892,
+                time: '32 dk önce',
+                category: 'spor'
+            }
+        ];
+
+        let allNews = [];
+        let currentFilter = 'all';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNews();
+            setupSwipe();
+            // Firebase bridge: RN'den post yükle
+            if (window.loadPosts) window.loadPosts('genel');
+        });
+
+        // RN'den gelen postları render et (bridge yoksa kendi loadNews çalışır)
+        window.receivePosts = window.receivePosts || function(posts) {
+            var container = document.getElementById('news-container') || document.getElementById('posts-container') || document.querySelector('[data-posts]');
+            if (!container) return;
+            // Post render için mevcut receivePosts implementasyonu kullanılır
+        };
+
+        async function loadNews() {
+            const loadingState = document.getElementById('loading-state');
+            const newsContainer = document.getElementById('news-container');
+            
+            loadingState.classList.remove('hidden');
+            newsContainer.classList.add('hidden');
+
+            allNews = [];
+
+            // Fetch RSS feeds
+            await Promise.all(RSS_SOURCES.map(async (source) => {
+                try {
+                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source.url)}&count=5`;
+                    const res = await fetch(apiUrl);
+                    const data = await res.json();
+                    
+                    if (data.status === 'ok' && data.items?.length > 0) {
+                        data.items.forEach(item => {
+                            allNews.push({
+                                id: 'news_' + Math.random().toString(36).substr(2, 9),
+                                type: 'news',
+                                source: source.name,
+                                sourceIcon: source.icon,
+                                category: source.category,
+                                title: item.title,
+                                description: item.description?.replace(/<[^>]*>/g, '').substring(0, 150) + '...',
+                                image: item.thumbnail || item.enclosure?.link || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=300&fit=crop',
+                                link: item.link,
+                                pubDate: new Date(item.pubDate),
+                                likes: Math.floor(Math.random() * 5000) + 100,
+                                comments: Math.floor(Math.random() * 500) + 10,
+                                isApi: true
+                            });
+                        });
+                    }
+                } catch(e) {
+                    console.error('Error fetching:', source.name, e);
+                }
+            }));
+
+            // Sort by date
+            allNews.sort((a, b) => b.pubDate - a.pubDate);
+
+            // Mix videos with news
+            const mixedContent = [];
+            let newsIndex = 0;
+            let videoIndex = 0;
+
+            while (newsIndex < allNews.length || videoIndex < VIDEO_POSTS.length) {
+                // Add 2-3 news items
+                for (let i = 0; i < 3 && newsIndex < allNews.length; i++) {
+                    mixedContent.push(allNews[newsIndex++]);
+                }
+                // Add 1 video
+                if (videoIndex < VIDEO_POSTS.length) {
+                    mixedContent.push(VIDEO_POSTS[videoIndex++]);
+                }
+            }
+
+            loadingState.classList.add('hidden');
+            newsContainer.classList.remove('hidden');
+            
+            renderNews(mixedContent);
+        }
+
+        function renderNews(items) {
+            const container = document.getElementById('news-container');
+            container.innerHTML = '';
+
+            items.forEach((item, index) => {
+                if (currentFilter !== 'all' && item.category !== currentFilter) {
+                    return;
+                }
+
+                // Add divider between posts
+                if (index > 0) {
+                    const divider = document.createElement('div');
+                    divider.className = 'post-divider';
+                    container.appendChild(divider);
+                }
+
+                if (item.type === 'video') {
+                    container.appendChild(createVideoPost(item));
+                } else {
+                    container.appendChild(createNewsPost(item));
+                }
+            });
+
+            // Initialize video observers
+            initVideoObservers();
+        }
+
+        function createNewsPost(item) {
+            const article = document.createElement('article');
+            article.className = 'py-6';
+            article.setAttribute('data-post-id', item.id);
+            article.setAttribute('data-category', item.category);
+
+            const timeAgo = getTimeAgo(item.pubDate);
+            const badgeClass = item.isApi ? 'news-badge-api' : 'bg-[#E0B07A]/20 text-[#E0B07A]';
+            const badgeText = item.isApi ? 'API' : item.category;
+
+            article.innerHTML = `
+                <div class="flex gap-3 mb-3">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 rounded-full border border-[#3F6E70]/30 bg-[#17464B] flex items-center justify-center overflow-hidden">
+                            <span class="text-[14px] font-bold text-[#E0B07A]">${item.sourceIcon}</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <p class="text-[13px] font-semibold text-[#C7D8DA]">${item.source}</p>
+                                <span class="text-[9px] ${badgeClass} px-1.5 py-0.5 rounded tracking-widest font-bold">${badgeText}</span>
+                            </div>
+                            <p class="text-[11px] text-[#9FB6B8]">@${item.source.toLowerCase().replace(/\s+/g, '')}</p>
+                        </div>
+                        <button class="follow-btn" onclick="toggleFollow(this)">Takip Et</button>
+                    </div>
+                </div>
+
+                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="block">
+                    <div class="w-full h-48 rounded-xl overflow-hidden border border-[#3F6E70]/30 mb-3">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=300&fit=crop'"/>
+                    </div>
+                    <h3 class="text-[15px] font-semibold text-[#C7D8DA] leading-snug mb-2">${item.title}</h3>
+                    <p class="text-[13px] text-[#9FB6B8] leading-relaxed mb-3">${item.description}</p>
+                </a>
+
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleLike(this)" class="flex items-center gap-1.5 hover:text-[#E0B07A] transition-colors group">
+                            <span class="material-symbols-outlined text-[24px] heart-icon transition-transform group-hover:scale-110">favorite</span>
+                            <span class="text-[12px] font-medium like-count">${formatNumber(item.likes)}</span>
+                        </button>
+                        <button onclick="openCommentsModal('${item.id}')" class="flex items-center gap-1.5 hover:text-[#C7D8DA] transition-colors">
+                            <span class="material-symbols-outlined text-[24px]">chat_bubble</span>
+                            <span class="text-[12px] font-medium">${item.comments}</span>
+                        </button>
+                        <button onclick="openShareModal('${item.id}')" class="flex items-center gap-1.5 hover:text-[#E0B07A] transition-colors">
+                            <span class="material-symbols-outlined text-[24px]">share</span>
+                        </button>
+                    </div>
+                    <button onclick="toggleSave(this)" class="hover:text-[#E0B07A] transition-colors">
+                        <span class="material-symbols-outlined text-[24px] bookmark-icon">bookmark</span>
+                    </button>
+                </div>
+
+                <p class="text-[12px] text-[#9FB6B8] px-1">${timeAgo} • <span class="text-[#E0B07A]">${item.source}</span></p>
+
+                <!-- Comments Preview -->
+                <div class="comments-preview mt-3">
+                    <div class="comment-item">
+                        <div class="w-6 h-6 rounded-full bg-[#17464B] overflow-hidden flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=face" class="w-full h-full object-cover"/>
+                        </div>
+                        <div class="flex-1">
+                            <span class="font-semibold text-[#C7D8DA]">kullanici_123</span>
+                            <span class="text-[#9FB6B8]">Çok önemli bir gelişme 👀</span>
+                        </div>
+                    </div>
+                    <button onclick="openCommentsModal('${item.id}')" class="text-[11px] text-[#9FB6B8] mt-2 hover:text-[#E0B07A] transition-colors">
+                        ${item.comments - 1} yorum daha gör...
+                    </button>
+                </div>
+            `;
+
+            return article;
+        }
+
+        function createVideoPost(item) {
+            const article = document.createElement('article');
+            article.className = 'py-6';
+            article.setAttribute('data-post-id', item.id);
+            article.setAttribute('data-category', item.category);
+
+            article.innerHTML = `
+                <div class="flex gap-3 mb-3">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 rounded-full border-2 border-[#E0B07A] bg-[#17464B] flex items-center justify-center overflow-hidden">
+                            <img src="${item.avatar}" alt="${item.source}" class="w-full h-full object-cover"/>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <p class="text-[13px] font-semibold text-[#C7D8DA]">${item.source}</p>
+                                <span class="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded tracking-widest font-bold">CANLI</span>
+                            </div>
+                            <p class="text-[11px] text-[#9FB6B8]">@${item.source.toLowerCase().replace(/\s+/g, '')}</p>
+                        </div>
+                        <button class="follow-btn" onclick="toggleFollow(this)">Takip Et</button>
+                    </div>
+                </div>
+
+                <div class="video-container mb-3" data-video="true">
+                    <video 
+                        src="${item.videoUrl}" 
+                        poster="${item.thumbnail}"
+                        loop 
+                        playsinline
+                        preload="metadata"
+                        class="video-element"
+                    ></video>
+                    <div class="video-overlay"></div>
+                    <div class="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1">
+                        <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                        CANLI
+                    </div>
+                    <div class="absolute bottom-4 left-4 text-white text-[13px]">
+                        ${item.views} görüntülenme
+                    </div>
+                    <div class="video-controls">
+                        <button class="video-btn" onclick="toggleMute(this)">
+                            <span class="material-symbols-outlined text-white text-[18px] volume-icon">volume_up</span>
+                        </button>
+                        <button class="video-btn" onclick="togglePlay(this)">
+                            <span class="material-symbols-outlined text-white text-[18px] play-icon">pause</span>
+                        </button>
+                    </div>
+                </div>
+
+                <h3 class="text-[15px] font-semibold text-[#C7D8DA] leading-snug mb-2 px-1">${item.title}</h3>
+
+                <div class="flex items-center justify-between mb-3 px-1">
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleLike(this)" class="flex items-center gap-1.5 hover:text-[#E0B07A] transition-colors group">
+                            <span class="material-symbols-outlined text-[24px] heart-icon transition-transform group-hover:scale-110">favorite</span>
+                            <span class="text-[12px] font-medium like-count">${formatNumber(item.likes)}</span>
+                        </button>
+                        <button onclick="openCommentsModal('${item.id}')" class="flex items-center gap-1.5 hover:text-[#C7D8DA] transition-colors">
+                            <span class="material-symbols-outlined text-[24px]">chat_bubble</span>
+                            <span class="text-[12px] font-medium">${formatNumber(item.comments)}</span>
+                        </button>
+                        <button onclick="openShareModal('${item.id}')" class="flex items-center gap-1.5 hover:text-[#E0B07A] transition-colors">
+                            <span class="material-symbols-outlined text-[24px]">share</span>
+                        </button>
+                    </div>
+                    <button onclick="toggleSave(this)" class="hover:text-[#E0B07A] transition-colors">
+                        <span class="material-symbols-outlined text-[24px] bookmark-icon">bookmark</span>
+                    </button>
+                </div>
+
+                <p class="text-[12px] text-[#9FB6B8] px-1">${item.time} • <span class="text-[#E0B07A]">${item.source}</span></p>
+
+                <!-- Comments Preview -->
+                <div class="comments-preview mt-3 mx-1">
+                    <div class="comment-item">
+                        <div class="w-6 h-6 rounded-full bg-[#17464B] overflow-hidden flex-shrink-0">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face" class="w-full h-full object-cover"/>
+                        </div>
+                        <div class="flex-1">
+                            <span class="font-semibold text-[#C7D8DA]">spor_sever</span>
+                            <span class="text-[#9FB6B8]">Muhteşem bir maç! ⚽🔥</span>
+                        </div>
+                    </div>
+                    <button onclick="openCommentsModal('${item.id}')" class="text-[11px] text-[#9FB6B8] mt-2 hover:text-[#E0B07A] transition-colors">
+                        ${item.comments - 1} yorum daha gör...
+                    </button>
+                </div>
+            `;
+
+            return article;
+        }
+
+        function filterNews(category) {
+            currentFilter = category;
+            
+            // Update active hashtag
+            document.querySelectorAll('.hashtag').forEach(tag => {
+                tag.classList.remove('hashtag-active');
+                if (tag.getAttribute('data-filter') === category) {
+                    tag.classList.add('hashtag-active');
+                }
+            });
+
+            // Reload with filter
+            const container = document.getElementById('news-container');
+            const items = container.querySelectorAll('article');
+            
+            items.forEach(item => {
+                if (category === 'all' || item.getAttribute('data-category') === category) {
+                    item.style.display = 'block';
+                    const divider = item.previousElementSibling;
+                    if (divider && divider.classList.contains('post-divider')) {
+                        divider.style.display = 'block';
+                    }
+                } else {
+                    item.style.display = 'none';
+                    const divider = item.previousElementSibling;
+                    if (divider && divider.classList.contains('post-divider')) {
+                        divider.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Video Auto-play with Intersection Observer
+        function initVideoObservers() {
+            const videoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target.querySelector('video');
+                    if (video) {
+                        if (entry.isIntersecting) {
+                            video.play().catch(e => console.log('Autoplay prevented:', e));
+                        } else {
+                            video.pause();
+                            video.currentTime = 0;
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.6
+            });
+
+            document.querySelectorAll('[data-video="true"]').forEach(container => {
+                videoObserver.observe(container);
+            });
+        }
+
+        // Video Controls
+        function togglePlay(btn) {
+            const container = btn.closest('.video-container');
+            const video = container.querySelector('video');
+            const icon = btn.querySelector('.play-icon');
+            
+            if (video.paused) {
+                video.play();
+                icon.textContent = 'pause';
+            } else {
+                video.pause();
+                icon.textContent = 'play_arrow';
+            }
+        }
+
+        function toggleMute(btn) {
+            const container = btn.closest('.video-container');
+            const video = container.querySelector('video');
+            const icon = btn.querySelector('.volume-icon');
+            
+            video.muted = !video.muted;
+            icon.textContent = video.muted ? 'volume_off' : 'volume_up';
+        }
+
+        // Like functionality
+        function toggleLike(btn) {
+            const icon = btn.querySelector('.heart-icon');
+            const countSpan = btn.querySelector('.like-count');
+            const isLiked = icon.classList.contains('heart-active');
+            let countText = countSpan.textContent;
+            let count = parseFloat(countText.replace(/[KMB]/g, ''));
+            let multiplier = 1;
+            
+            if (countText.includes('K')) multiplier = 1000;
+            if (countText.includes('M')) multiplier = 1000000;
+            if (countText.includes('B')) multiplier = 1000000000;
+            
+            let actualCount = count * multiplier;
+
+            if (isLiked) {
+                icon.classList.remove('heart-active');
+                icon.style.fontVariationSettings = "'FILL' 0";
+                icon.style.color = '';
+                actualCount--;
+            } else {
+                icon.classList.add('heart-active');
+                icon.style.fontVariationSettings = "'FILL' 1";
+                icon.style.color = '#E0B07A';
+                actualCount++;
+            }
+            
+            countSpan.textContent = formatNumber(actualCount);
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+
+            if (diff < 60) return 'Şimdi';
+            if (diff < 3600) return Math.floor(diff / 60) + ' dk önce';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' sa önce';
+            return Math.floor(diff / 86400) + ' gün önce';
+        }
+
+        // Follow functionality
+        function toggleFollow(btn) {
+            if (btn.classList.contains('following')) {
+                btn.classList.remove('following');
+                btn.textContent = 'Takip Et';
+            } else {
+                btn.classList.add('following');
+                btn.textContent = 'Takiptesin';
+            }
+        }
+
+        // Save functionality
+        function toggleSave(btn) {
+            const icon = btn.querySelector('.bookmark-icon');
+            const isSaved = icon.style.fontVariationSettings === "'FILL' 1";
+            
+            if (isSaved) {
+                icon.style.fontVariationSettings = "'FILL' 0";
+                icon.style.color = '';
+            } else {
+                icon.classList.add('bookmark-active');
+                icon.style.fontVariationSettings = "'FILL' 1";
+                icon.style.color = '#E0B07A';
+            }
+        }
+
+        // Comments Modal
+        function openCommentsModal(postId) {
+            const modal = document.getElementById('commentsModal');
+            const list = document.getElementById('commentsList');
+            
+            const comments = [
+                { user: 'ahmet_kaya', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop&crop=face', text: 'Çok önemli bir gelişme! 👏', time: '2 saat önce', likes: 45 },
+                { user: 'zeynep_ozturk', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop&crop=face', text: 'Detayları merakla bekliyorum', time: '3 saat önce', likes: 23 },
+                { user: 'burak_t', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face', text: 'Haberi ilk buradan öğrendim 📰', time: '5 saat önce', likes: 12 }
+            ];
+
+            list.innerHTML = comments.map(c => `
+                <div class="flex gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-[#17464B] overflow-hidden flex-shrink-0">
+                        <img src="${c.avatar}" class="w-full h-full object-cover"/>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-[13px] text-[#C7D8DA]">${c.user}</span>
+                            <span class="text-[10px] text-[#9FB6B8]">${c.time}</span>
+                        </div>
+                        <p class="text-[13px] text-[#9FB6B8] mb-2">${c.text}</p>
+                        <div class="flex items-center gap-4">
+                            <button class="flex items-center gap-1 text-[11px] text-[#9FB6B8] hover:text-[#E0B07A]">
+                                <span class="material-symbols-outlined text-[16px]">favorite</span>
+                                ${c.likes}
+                            </button>
+                            <button class="text-[11px] text-[#9FB6B8] hover:text-[#E0B07A]">Yanıtla</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCommentsModal() {
+            document.getElementById('commentsModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function submitComment() {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const list = document.getElementById('commentsList');
+            const newComment = document.createElement('div');
+            newComment.className = 'flex gap-3 mb-4';
+            newComment.innerHTML = `
+                <div class="w-10 h-10 rounded-full bg-[#17464B] overflow-hidden flex-shrink-0">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=50&h=50&fit=crop&crop=face" class="w-full h-full object-cover"/>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-semibold text-[13px] text-[#C7D8DA]">kullanici</span>
+                        <span class="text-[10px] text-[#9FB6B8]">Şimdi</span>
+                    </div>
+                    <p class="text-[13px] text-[#9FB6B8] mb-2">${text}</p>
+                    <div class="flex items-center gap-4">
+                        <button class="flex items-center gap-1 text-[11px] text-[#9FB6B8] hover:text-[#E0B07A]">
+                            <span class="material-symbols-outlined text-[16px]">favorite</span>
+                            0
+                        </button>
+                        <button class="text-[11px] text-[#9FB6B8] hover:text-[#E0B07A]">Yanıtla</button>
+                    </div>
+                </div>
+            </div>
+            `;
+            list.insertBefore(newComment, list.firstChild);
+            input.value = '';
+        }
+
+        // Share Modal
+        function openShareModal(postId) {
+            document.getElementById('shareModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+                // Pull to refresh - FIXED: Only when at top and pulling down
+        (function() {
+            const contentArea = document.getElementById('content-area');
+            const pullIndicator = document.getElementById('pull-indicator');
+            
+            let touchStartY = 0;
+            let touchCurrentY = 0;
+            let isPulling = false;
+            let startScrollTop = 0;
+            
+            const PULL_THRESHOLD = 100;
+
+            contentArea.addEventListener('touchstart', (e) => {
+                startScrollTop = contentArea.scrollTop;
+                if (startScrollTop > 5) return;
+                
+                touchStartY = e.touches[0].clientY;
+                touchCurrentY = touchStartY;
+                isPulling = true;
+            }, {passive: true});
+            
+            contentArea.addEventListener('touchmove', (e) => {
+                if (!isPulling) return;
+                
+                touchCurrentY = e.touches[0].clientY;
+                const pullDistance = touchCurrentY - touchStartY;
+                
+                if (pullDistance > 20 && contentArea.scrollTop <= 5) {
+                    pullIndicator.classList.remove('hidden');
+                    const opacity = Math.min(pullDistance / PULL_THRESHOLD, 1);
+                    pullIndicator.style.opacity = opacity;
+                    
+                    if (e.cancelable && pullDistance > 0) {
+                        e.preventDefault();
+                    }
+                }
+            }, {passive: false});
+            
+            contentArea.addEventListener('touchend', () => {
+                if (!isPulling) return;
+                
+                const pullDistance = touchCurrentY - touchStartY;
+                
+                pullIndicator.classList.add('hidden');
+                pullIndicator.style.opacity = '';
+                
+                if (pullDistance > PULL_THRESHOLD && startScrollTop <= 5) {
+                    pullIndicator.classList.remove('hidden');
+                    pullIndicator.querySelector('span:last-child').textContent = 'Yenileniyor...';
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
+                }
+                
+                touchStartY = 0;
+                touchCurrentY = 0;
+                isPulling = false;
+                startScrollTop = 0;
+            }, {passive: true});
+            
+            contentArea.addEventListener('touchcancel', () => {
+                pullIndicator.classList.add('hidden');
+                pullIndicator.style.opacity = '';
+                touchStartY = 0;
+                touchCurrentY = 0;
+                isPulling = false;
+                startScrollTop = 0;
+            }, {passive: true});
+        })();
+
+        // Menu Modal
+        function openMenu() {
+            document.getElementById('menuModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            document.getElementById('menuModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Swipe handling - FIXED: Only touch, no mouse, proper click handling
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let isDragging = false;
+        let isHorizontalSwipe = false;
+        const swipeLeftIndicator = document.getElementById('swipeLeft');
+        const swipeRightIndicator = document.getElementById('swipeRight');
+        const mainContainer = document.getElementById('mainContainer');
+
+        // Show indicators briefly on load
+        setTimeout(() => {
+            swipeLeftIndicator.classList.add('show');
+            swipeRightIndicator.classList.add('show');
+            setTimeout(() => {
+                swipeLeftIndicator.classList.remove('show');
+                swipeRightIndicator.classList.remove('show');
+            }, 1500);
+        }, 500);
+
+        // Touch events only - attached to main container
+        mainContainer.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            isHorizontalSwipe = false;
+        }, {passive: true});
+
+        mainContainer.addEventListener('touchmove', e => {
+            if (!isDragging) return;
+            
+            currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = currentX - startX;
+            const diffY = currentY - startY;
+            
+            // Determine if horizontal swipe (only after moving enough)
+            if (Math.abs(diffX) > 10 && Math.abs(diffX) > Math.abs(diffY)) {
+                isHorizontalSwipe = true;
+                
+                // Show left indicator (go to Bölgesel)
+                if (diffX > 50) {
+                    swipeLeftIndicator.classList.add('show');
+                    swipeRightIndicator.classList.remove('show');
+                }
+                // Show right indicator (go to Takip)
+                else if (diffX < -50) {
+                    swipeRightIndicator.classList.add('show');
+                    swipeLeftIndicator.classList.remove('show');
+                } else {
+                    swipeLeftIndicator.classList.remove('show');
+                    swipeRightIndicator.classList.remove('show');
+                }
+            }
+        }, {passive: true});
+
+        mainContainer.addEventListener('touchend', e => {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const diffX = currentX - startX;
+            const diffY = e.changedTouches[0].clientY - startY;
+            const threshold = window.innerWidth * 0.25;
+            
+            // Only navigate if it was a horizontal swipe
+            if (isHorizontalSwipe && Math.abs(diffX) > threshold && Math.abs(diffX) > Math.abs(diffY)) {
+                // Swipe right -> Go to Bölgesel (previous)
+                if (diffX > 0) {
+                    window.location.href = 'kesfet-bolgesel.html';
+                }
+                // Swipe left -> Go to Takip (next)
+                else {
+                    window.location.href = 'kesfet-takip.html';
+                }
+            }
+            
+            swipeLeftIndicator.classList.remove('show');
+            swipeRightIndicator.classList.remove('show');
+            startX = 0;
+            startY = 0;
+            currentX = 0;
+            isHorizontalSwipe = false;
+        }, {passive: true});
+
+        // Cancel drag if touch leaves screen
+        mainContainer.addEventListener('touchcancel', () => {
+            isDragging = false;
+            isHorizontalSwipe = false;
+            swipeLeftIndicator.classList.remove('show');
+            swipeRightIndicator.classList.remove('show');
+        }, {passive: true});
+
+        function setupSwipe() {
+            // Already set up above
+        }
+
+        // Enter key for comment
+        document.getElementById('commentInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitComment();
+        });
+    </script>
+
+    <script type="module">
+        import { KonumManager } from '/js/konum.js';
+        window._KM = KonumManager;
+
+        // Header'a konum badge ekle
+        async function konumBadgeEkle() {
+            const header = document.querySelector('header');
+            if (!header) return;
+
+            // Zaten varsa ekleme
+            if (document.getElementById('kesfetKonumBadge')) return;
+
+            const kayitli = KonumManager.getKayitliKonum();
+            const il = kayitli?.il || null;
+
+            const badge = document.createElement('div');
+            badge.id = 'kesfetKonumBadge';
+            badge.onclick = () => location.href = '/sehir-sec.html';
+            badge.style.cssText = `
+                display:flex; align-items:center; gap:4px;
+                padding: 4px 10px; border-radius:20px;
+                background: rgba(201,168,108,0.12);
+                border: 1px solid rgba(201,168,108,0.25);
+                cursor:pointer; font-size:11px; font-weight:600;
+                color: #C9A86C; margin: 0 auto 8px;
+                width: fit-content;
+            `;
+            badge.innerHTML = `
+                <span class="material-symbols-outlined" style="font-size:13px;">location_on</span>
+                <span id="kesfetKonumText">${il || 'Şehir Seç'}</span>
+            `;
+
+            // Header'ın hemen altına, nav'ın üstüne ekle
+            const nav = header.nextElementSibling;
+            if (nav) header.parentNode.insertBefore(badge, nav);
+            else header.insertAdjacentElement('afterend', badge);
+
+            // Konum yoksa GPS dene
+            if (!il) {
+                const konum = await KonumManager.konumAl();
+                if (konum?.il) {
+                    document.getElementById('kesfetKonumText').textContent = konum.il;
+                }
+            }
+        }
+
+        konumBadgeEkle();
+
+        window.addEventListener('konumGuncellendi', (e) => {
+            const el = document.getElementById('kesfetKonumText');
+            if (el && e.detail?.il) el.textContent = e.detail.il;
+        });
+    </script>
+</body>
+</html>

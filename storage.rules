@@ -1,0 +1,87 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ─── YARDIMCI FONKSİYONLAR ────────────────────────────────────
+
+    // Giriş yapmış mı?
+    function girisYapti() {
+      return request.auth != null;
+    }
+
+    // Kendi klasörüne mi yazıyor?
+    function kendisiMi(uid) {
+      return request.auth.uid == uid;
+    }
+
+    // Görsel mi? (güvenli tipler)
+    function gorselMi() {
+      return request.resource.contentType.matches('image/.*')
+        && request.resource.size < 5 * 1024 * 1024; // maks 5MB
+    }
+
+    // Video mu?
+    function videoMu() {
+      return request.resource.contentType.matches('video/.*')
+        && request.resource.size < 50 * 1024 * 1024; // maks 50MB
+    }
+
+    // ─── PROFİL FOTOĞRAFLARI ──────────────────────────────────────
+    // /profil/{uid}/foto.jpg
+    match /profil/{uid}/{dosya} {
+      // Herkes görebilir
+      allow read: if girisYapti();
+
+      // Sadece kendi profil fotoğrafını yükleyebilir
+      allow write: if girisYapti()
+        && kendisiMi(uid)
+        && gorselMi();
+
+      // Sadece kendisi silebilir
+      allow delete: if girisYapti() && kendisiMi(uid);
+    }
+
+    // ─── GÖNDERİ MEDYASı ──────────────────────────────────────────
+    // /gonderiler/{uid}/{dosyaId}
+    match /gonderiler/{uid}/{dosyaId} {
+      // Giriş yapan herkes görebilir
+      allow read: if girisYapti();
+
+      // Sadece kendi klasörüne yükleyebilir
+      allow create: if girisYapti()
+        && kendisiMi(uid)
+        && (gorselMi() || videoMu());
+
+      // Güncelleme yok
+      allow update: if false;
+
+      // Sadece kendisi silebilir
+      allow delete: if girisYapti() && kendisiMi(uid);
+    }
+
+    // ─── SOHBET MEDYASı ───────────────────────────────────────────
+    // /sohbetler/{sohbetId}/{dosyaId}
+    match /sohbetler/{sohbetId}/{dosyaId} {
+      // Güvenlik: sadece auth kullanıcıları
+      allow read: if girisYapti();
+
+      allow create: if girisYapti()
+        && (gorselMi() || videoMu());
+
+      allow update, delete: if false;
+    }
+
+    // ─── DUYURU / ETKİNLİK GÖRSELLERİ ────────────────────────────
+    // /duyurular/{dosyaId}
+    match /duyurular/{dosyaId} {
+      allow read: if true; // herkese açık
+      allow write: if girisYapti() && gorselMi();
+    }
+
+    // ─── GERİ KALAN HER ŞEY KAPALI ────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,759 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy Bursa - Tesisat & Arıza</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#BB9E77",
+                        "background": "#0F3E46",
+                        "surface": "#415B57",
+                        "border": "#698383",
+                        "emergency": "#EF4444",
+                        "success": "#22C55E",
+                        "warning": "#F59E0B",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 100%);
+            min-height: 100dvh;
+        }
+        
+        .glass-card {
+            background: rgba(65, 91, 87, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.95);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .page-transition {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+        
+        .status-open {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #4ade80;
+        }
+        
+        .status-busy {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+        }
+        
+        .emergency-btn {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4);
+            transform: translateY(-10px);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .emergency-btn:active {
+            transform: translateY(-8px) scale(0.95);
+        }
+        
+        .rating-stars {
+            color: #FBBF24;
+        }
+        
+        .tag {
+            background: rgba(187, 158, 119, 0.2);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+            color: #BB9E77;
+        }
+        
+        .category-chip {
+            background: rgba(65, 91, 87, 0.6);
+            border: 1px solid rgba(105, 131, 131, 0.3);
+            transition: all 0.2s;
+        }
+        
+        .category-chip.active {
+            background: rgba(187, 158, 119, 0.3);
+            border-color: #BB9E77;
+            color: #BB9E77;
+        }
+        
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .expandable-content.expanded {
+            max-height: 600px;
+        }
+        
+        .service-icon {
+            background: linear-gradient(135deg, rgba(187, 158, 119, 0.2) 0%, rgba(187, 158, 119, 0.1) 100%);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+        }
+
+        .search-bar {
+            background: rgba(65, 91, 87, 0.8);
+            border: 1px solid rgba(105, 131, 131, 0.5);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="text-white antialiased pb-28">
+
+    <!-- Compact Header -->
+    <header class="pt-6 px-6 pb-2 sticky top-0 z-40 bg-gradient-to-b from-[#0F3E46] via-[#0F3E46] to-transparent backdrop-blur-md">
+        <div class="flex items-center justify-between mb-3">
+            <a href="acil-ihtiyaclar.html" class="ripple w-10 h-10 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all duration-300">
+                <span class="material-symbols-outlined text-primary text-lg">arrow_back_ios_new</span>
+            </a>
+            <div class="flex flex-col items-center">
+                <span class="text-primary tracking-[0.3em] font-semibold text-xs uppercase">CityJoy Bursa</span>
+                <div class="w-6 h-0.5 bg-primary/50 rounded-full mt-0.5"></div>
+            </div>
+            <div class="w-10"></div>
+        </div>
+        
+        <div class="page-transition">
+            <h1 class="text-2xl font-semibold mb-1 tracking-tight">Tesisat & Arıza</h1>
+            <div class="flex items-center gap-2">
+                <div class="w-12 h-0.5 bg-gradient-to-r from-primary to-transparent rounded-full"></div>
+                <span class="text-xs text-gray-400 font-light">7/24 acil servis</span>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="page-transition stagger-1 mt-3">
+            <div class="search-bar rounded-xl p-3 flex items-center gap-3">
+                <span class="material-symbols-outlined text-gray-400 text-sm">search</span>
+                <input type="text" placeholder="Tesisatçı veya hizmet ara..." class="bg-transparent border-none outline-none text-white placeholder-gray-400 flex-1 text-sm">
+                <button class="text-primary text-xs font-medium px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors">Filtrele</button>
+            </div>
+        </div>
+
+        <!-- Category Filter Chips -->
+        <div class="page-transition stagger-2 mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <button class="category-chip active px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">apps</span> Tümü
+            </button>
+            <button class="category-chip px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">water_drop</span> Su Tesisatı
+            </button>
+            <button class="category-chip px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">bolt</span> Elektrik
+            </button>
+            <button class="category-chip px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">mode_heat</span> Kombi/Doğalgaz
+            </button>
+            <button class="category-chip px-3 py-1.5 rounded-full text-xs whitespace-nowrap flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">handyman</span> Genel Tamir
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-6 space-y-4 mt-2">
+
+        <!-- Emergency Banner -->
+        <div class="page-transition stagger-2">
+            <div class="emergency-btn rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">water_damage</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base">SU KAÇAĞI / ELEKTRİK ARIZASI?</h3>
+                        <p class="text-xs text-white/90">En yakın usta: 12 dk içinde kapınızda</p>
+                    </div>
+                </div>
+                <a href="tel:+905344046282" class="bg-white text-red-600 px-3 py-2 rounded-xl font-bold text-sm flex items-center gap-1 active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-sm">call</span>
+                    Ara
+                </a>
+            </div>
+        </div>
+
+        <!-- Service 1: Bursa Su Kaçak Servisi (7/24) -->
+        <div class="page-transition stagger-3 glass-card rounded-3xl overflow-hidden">
+            <div class="p-4 cursor-pointer" onclick="toggleExpand('service1')">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="service-icon w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary text-3xl">water_drop</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="status-open px-2 py-0.5 text-[10px] font-medium rounded-full uppercase tracking-wider">● Müsait</span>
+                            <div class="flex items-center gap-0.5 rating-stars">
+                                <span class="material-symbols-outlined text-xs fill">star</span>
+                                <span class="text-xs font-bold text-white">4.9</span>
+                                <span class="text-[10px] text-gray-400">(127)</span>
+                            </div>
+                        </div>
+                        <h3 class="text-base font-semibold text-white truncate">Bursa Su Kaçak Servisi</h3>
+                        <p class="text-xs text-primary/80 mb-1">💧 Su Kaçağı • 🔧 Tıkanıklık • 📷 Kamera</p>
+                        <div class="flex items-center gap-3 text-[10px] text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">schedule</span>
+                                7/24 Açık
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">location_on</span>
+                                Nilüfer (1.2 km)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🔍 Termal Kamera</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🎧 Akustik Dinleme</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🌡️ Petek Temizliği</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🚽 Gider Açma</span>
+                </div>
+
+                <div class="flex gap-2">
+                    <a href="tel:+905344046282" class="flex-1 bg-primary text-background py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 active:opacity-90 ripple">
+                        <span class="material-symbols-outlined text-base">call</span>
+                        Hemen Ara
+                    </a>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">chat</span>
+                    </button>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">expand_more</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="service1" class="expandable-content bg-black/20">
+                <div class="p-4 border-t border-white/10 space-y-3 text-sm">
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">place</span>
+                        <div>
+                            <p class="font-medium text-xs">Üçevler Mah. Üçgül Sk No:1</p>
+                            <p class="text-[10px] text-gray-400">Nilüfer/Bursa</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">schedule</span>
+                        <div>
+                            <p class="font-medium text-xs">7/24 Acil Servis</p>
+                            <p class="text-[10px] text-gray-400">23 yıllık tecrübe • 1 yıl garanti</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-2.5 rounded-lg">
+                        <p class="text-[10px] text-gray-300 mb-1">💰 Keşif Ücreti: Ücretsiz</p>
+                        <p class="text-[10px] text-gray-400">Su kaçağı tespiti ve tamiri için ücretsiz keşif</p>
+                    </div>
+
+                    <div>
+                        <p class="font-medium text-xs mb-1.5">Hizmet Bölgeleri:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Nilüfer</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Osmangazi</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Yıldırım</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Gemlik</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Mudanya</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-2.5 rounded-lg">
+                        <div class="flex items-center gap-1 mb-1">
+                            <div class="rating-stars flex text-[10px]">
+                                <span class="material-symbols-outlined fill">star</span>
+                                <span class="material-symbols-outlined fill">star</span>
+                                <span class="material-symbols-outlined fill">star</span>
+                                <span class="material-symbols-outlined fill">star</span>
+                                <span class="material-symbols-outlined fill">star</span>
+                            </div>
+                            <span class="text-[10px] text-gray-400">1 hafta önce</span>
+                        </div>
+                        <p class="text-[10px] text-gray-300">"Su kaçağını kırmadan tespit ettiler. Termal kamera ile gösterdiler, çok profesyonel."</p>
+                        <p class="text-[10px] text-gray-500 mt-1">— Mehmet Y., Osmangazi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service 2: Albayrak Tesisat - Celal Usta -->
+        <div class="page-transition stagger-4 glass-card rounded-3xl overflow-hidden">
+            <div class="p-4 cursor-pointer" onclick="toggleExpand('service2')">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="service-icon w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary text-3xl">plumbing</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="status-busy px-2 py-0.5 text-[10px] font-medium rounded-full uppercase tracking-wider">● Meşgul</span>
+                            <div class="flex items-center gap-0.5 rating-stars">
+                                <span class="material-symbols-outlined text-xs fill">star</span>
+                                <span class="text-xs font-bold text-white">4.8</span>
+                                <span class="text-[10px] text-gray-400">(89)</span>
+                            </div>
+                        </div>
+                        <h3 class="text-base font-semibold text-white truncate">Albayrak Tesisat (Celal Usta)</h3>
+                        <p class="text-xs text-primary/80 mb-1">🚿 Musluk • 🚽 Rezervuar • 🛁 Tesisat</p>
+                        <div class="flex items-center gap-3 text-[10px] text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">schedule</span>
+                                7/24 Açık
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">location_on</span>
+                                Merkez (2.5 km)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🚿 Musluk/Batarya</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🚽 Klozet</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🛁 Lavabo</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🔧 Tıkanıklık</span>
+                </div>
+
+                <div class="flex gap-2">
+                    <a href="tel:+905377762167" class="flex-1 bg-primary text-background py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 active:opacity-90 ripple">
+                        <span class="material-symbols-outlined text-base">call</span>
+                        Hemen Ara
+                    </a>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">chat</span>
+                    </button>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">expand_more</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="service2" class="expandable-content bg-black/20">
+                <div class="p-4 border-t border-white/10 space-y-3 text-sm">
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">place</span>
+                        <div>
+                            <p class="font-medium text-xs">Bursa Merkez (Gezici Servis)</p>
+                            <p class="text-[10px] text-gray-400">Tüm Bursa'ya hizmet</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">schedule</span>
+                        <div>
+                            <p class="font-medium text-xs">7/24 Acil Servis</p>
+                            <p class="text-[10px] text-gray-400">Aynı gün servis garantisi</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-2.5 rounded-lg">
+                        <p class="text-[10px] text-gray-300 mb-1">💰 Keşif: 150₺ (İşlem yapılırsa düşülür)</p>
+                        <p class="text-[10px] text-gray-400">Şeffaf fiyatlandırma, gizli ücret yok</p>
+                    </div>
+
+                    <div>
+                        <p class="font-medium text-xs mb-1.5">Özellikler:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">✅ Garantili İşçilik</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">✅ Faturalı Hizmet</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">✅ Termal Kamera</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-2.5 rounded-lg">
+                        <p class="text-[10px] text-gray-300">"Celal Usta çok nazik ve işinin ehli. Tıkanan lavabomuzu robotla açtı, kırmadı dökmedi."</p>
+                        <p class="text-[10px] text-gray-500 mt-1">— Ayşe T., Nilüfer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service 3: Mehmet Usta (10+ Yıl) -->
+        <div class="page-transition stagger-5 glass-card rounded-3xl overflow-hidden">
+            <div class="p-4 cursor-pointer" onclick="toggleExpand('service3')">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="service-icon w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary text-3xl">handyman</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="status-open px-2 py-0.5 text-[10px] font-medium rounded-full uppercase tracking-wider">● Müsait</span>
+                            <div class="flex items-center gap-0.5 rating-stars">
+                                <span class="material-symbols-outlined text-xs fill">star</span>
+                                <span class="text-xs font-bold text-white">4.7</span>
+                                <span class="text-[10px] text-gray-400">(156)</span>
+                            </div>
+                        </div>
+                        <h3 class="text-base font-semibold text-white truncate">Mehmet Usta Tesisat</h3>
+                        <p class="text-xs text-primary/80 mb-1">🏠 Daire İçi • 🔧 Acil • 💧 Kaçak</p>
+                        <div class="flex items-center gap-3 text-[10px] text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">schedule</span>
+                                09:00-22:00
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">location_on</span>
+                                Yıldırım (0.8 km)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🏠 Daire Tesisatı</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🚿 Banyo</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🍳 Mutfak</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🌡️ Kalorifer</span>
+                </div>
+
+                <div class="flex gap-2">
+                    <a href="tel:+905323132901" class="flex-1 bg-primary text-background py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 active:opacity-90 ripple">
+                        <span class="material-symbols-outlined text-base">call</span>
+                        Hemen Ara
+                    </a>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">chat</span>
+                    </button>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">expand_more</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="service3" class="expandable-content bg-black/20">
+                <div class="p-4 border-t border-white/10 space-y-3 text-sm">
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">place</span>
+                        <div>
+                            <p class="font-medium text-xs">Yıldırım, Osmangazi, Nilüfer</p>
+                            <p class="text-[10px] text-gray-400">3 ilçeye hizmet</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">schedule</span>
+                        <div>
+                            <p class="font-medium text-xs">09:00 - 22:00</p>
+                            <p class="text-[10px] text-gray-400">Acil durumlarda 7/24 ulaşılabilir</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-2.5 rounded-lg">
+                        <p class="text-[10px] text-gray-300 mb-1">💰 Ücretlendirme: İşlem bazlı</p>
+                        <p class="text-[10px] text-gray-400">Musluk değişimi: 200-400₺ arası</p>
+                    </div>
+
+                    <div>
+                        <p class="font-medium text-xs mb-1.5">Hizmetler:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Musluk/Batarya</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Rezervuar</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Lavabo/Evye</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Acil Servis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service 4: Bursa Elektrikçi (7/24) -->
+        <div class="page-transition stagger-5 glass-card rounded-3xl overflow-hidden">
+            <div class="p-4 cursor-pointer" onclick="toggleExpand('service4')">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="service-icon w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary text-3xl">bolt</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="status-open px-2 py-0.5 text-[10px] font-medium rounded-full uppercase tracking-wider">● Müsait</span>
+                            <div class="flex items-center gap-0.5 rating-stars">
+                                <span class="material-symbols-outlined text-xs fill">star</span>
+                                <span class="text-xs font-bold text-white">4.8</span>
+                                <span class="text-[10px] text-gray-400">(203)</span>
+                            </div>
+                        </div>
+                        <h3 class="text-base font-semibold text-white truncate">Bursa Elektrikçi (7/24)</h3>
+                        <p class="text-xs text-primary/80 mb-1">⚡ Arıza • 💡 Avize • 🔌 Priz • 🌐 İnternet</p>
+                        <div class="flex items-center gap-3 text-[10px] text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">schedule</span>
+                                7/24 Açık
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">location_on</span>
+                                Tüm Bursa
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">⚡ Elektrik Arıza</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">💡 Avize Montaj</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🔌 Priz/Anahtar</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🌐 İnternet Arıza</span>
+                </div>
+
+                <div class="flex gap-2">
+                    <a href="tel:+905331644660" class="flex-1 bg-primary text-background py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 active:opacity-90 ripple">
+                        <span class="material-symbols-outlined text-base">call</span>
+                        Hemen Ara
+                    </a>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">chat</span>
+                    </button>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">expand_more</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="service4" class="expandable-content bg-black/20">
+                <div class="p-4 border-t border-white/10 space-y-3 text-sm">
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">place</span>
+                        <div>
+                            <p class="font-medium text-xs">Bursa Geneli (Gezici Servis)</p>
+                            <p class="text-[10px] text-gray-400">Nilüfer, Osmangazi, Mudanya, Yıldırım</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">schedule</span>
+                        <div>
+                            <p class="font-medium text-xs">7/24 Kesintisiz Hizmet</p>
+                            <p class="text-[10px] text-gray-400">Gece gündüz acil elektrik arızalarına müdahale</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-2.5 rounded-lg">
+                        <p class="text-[10px] text-gray-300 mb-1">💰 Servis Ücreti: 200₺ (Gece 300₺)</p>
+                        <p class="text-[10px] text-gray-400">Parça değişimi ek ücrete tabi</p>
+                    </div>
+
+                    <div>
+                        <p class="font-medium text-xs mb-1.5">Hizmetler:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Elektrik Arıza</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Avize Montaj</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Priz/Anahtar</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Sigorta/Pano</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">İnternet Arıza</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-2.5 rounded-lg">
+                        <p class="text-[10px] text-gray-300">"Gece sigorta attı, 20 dakikada geldiler. Çok hızlı ve güvenilir."</p>
+                        <p class="text-[10px] text-gray-500 mt-1">— Can K., Nilüfer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service 5: İstes Doğalgaz & Kombi -->
+        <div class="page-transition stagger-5 glass-card rounded-3xl overflow-hidden">
+            <div class="p-4 cursor-pointer" onclick="toggleExpand('service5')">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="service-icon w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-primary text-3xl">mode_heat</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="status-open px-2 py-0.5 text-[10px] font-medium rounded-full uppercase tracking-wider">● Müsait</span>
+                            <div class="flex items-center gap-0.5 rating-stars">
+                                <span class="material-symbols-outlined text-xs fill">star</span>
+                                <span class="text-xs font-bold text-white">4.9</span>
+                                <span class="text-[10px] text-gray-400">(78)</span>
+                            </div>
+                        </div>
+                        <h3 class="text-base font-semibold text-white truncate">İstes Doğalgaz & Kombi</h3>
+                        <p class="text-xs text-primary/80 mb-1">🔥 Kombi • 🌡️ Petek • ⛽ Doğalgaz</p>
+                        <div class="flex items-center gap-3 text-[10px] text-gray-400">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">schedule</span>
+                                08:00-20:00
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">location_on</span>
+                                Bursa Geneli
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🔥 Kombi Montaj</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🌡️ Petek Temizliği</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">⛽ Doğalgaz Tesisat</span>
+                    <span class="tag px-2 py-0.5 rounded text-[10px]">🔧 Kombi Bakım</span>
+                </div>
+
+                <div class="flex gap-2">
+                    <a href="tel:+902242501606" class="flex-1 bg-primary text-background py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 active:opacity-90 ripple">
+                        <span class="material-symbols-outlined text-base">call</span>
+                        Hemen Ara
+                    </a>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">chat</span>
+                    </button>
+                    <button class="w-12 aspect-square border border-primary/30 rounded-xl flex items-center justify-center active:bg-primary/10 ripple">
+                        <span class="material-symbols-outlined text-primary text-lg">expand_more</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="service5" class="expandable-content bg-black/20">
+                <div class="p-4 border-t border-white/10 space-y-3 text-sm">
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">place</span>
+                        <div>
+                            <p class="font-medium text-xs">Bursa İçi Tüm Bölgeler</p>
+                            <p class="text-[10px] text-gray-400">Ücretsiz keşif hizmeti</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-base mt-0.5">schedule</span>
+                        <div>
+                            <p class="font-medium text-xs">08:00 - 20:00</p>
+                            <p class="text-[10px] text-gray-400">BURSAGAZ onaylı, sertifikalı ekipler</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-2.5 rounded-lg">
+                        <p class="text-[10px] text-gray-300 mb-1">💰 Keşif: Ücretsiz</p>
+                        <p class="text-[10px] text-gray-400">Petek temizliği: 500-800₺ (daire başı)</p>
+                    </div>
+
+                    <div>
+                        <p class="font-medium text-xs mb-1.5">Hizmetler:</p>
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Kombi Montaj</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Petek Temizliği</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Doğalgaz Tesisat</span>
+                            <span class="bg-white/10 px-2 py-0.5 rounded text-[10px]">Kombi Bakım</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-500/10 border border-yellow-500/30 p-2 rounded-lg">
+                        <p class="text-[10px] text-yellow-200">⚠️ BURSAGAZ onaylı firmadır. Kaçak işlem yaptırılmaz.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-2 pb-6 px-6 z-50">
+        <div class="flex justify-around items-end max-w-lg mx-auto relative">
+            
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors pb-2 w-16">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px] font-medium">Ana Sayfa</span>
+            </a>
+
+            <a href="tel:+905344046282" class="emergency-btn -mt-8 w-16 h-16 rounded-full flex flex-col items-center justify-center text-white active:scale-95 transition-transform">
+                <span class="material-symbols-outlined text-3xl">emergency</span>
+                <span class="text-[9px] font-bold mt-0.5">ACİL</span>
+            </a>
+
+            <a href="ara.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors pb-2 w-16">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px] font-medium">Ara</span>
+            </a>
+
+            <a href="profil.html" class="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors pb-2 w-16">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px] font-medium">Profil</span>
+            </a>
+
+        </div>
+    </nav>
+
+    <script>
+        function toggleExpand(id) {
+            const element = document.getElementById(id);
+            const isExpanded = element.classList.contains('expanded');
+            
+            document.querySelectorAll('.expandable-content').forEach(el => {
+                el.classList.remove('expanded');
+            });
+            
+            if (!isExpanded) {
+                element.classList.add('expanded');
+            }
+        }
+
+        document.querySelectorAll('.category-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+</html>

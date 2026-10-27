@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    <meta name="description" content="CityJoy - Nasıl Yapılır? Şehir hayatını kolaylaştıran ipuçları ve püf noktaları"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>CityJoy - Nasıl Yapılır?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "ai-purple": "#8B5CF6",
+                        "ai-blue": "#3B82F6",
+                        "success-green": "#10B981",
+                        "warning-orange": "#F97316",
+                        "life-blue": "#06B6D4",
+                        "pro-pink": "#EC4899",
+                        "live-red": "#EF4444"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'wave': 'wave 1.5s ease-in-out infinite',
+                        'shimmer': 'shimmer 2s linear infinite',
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .ai-gradient-text {
+            background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 50%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .life-gradient-text {
+            background: linear-gradient(135deg, #22D3EE 0%, #06B6D4 50%, #0891B2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .shimmer-bg {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+        .tip-card {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            transition: all 0.3s ease;
+        }
+        .tip-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 10px 40px -10px rgba(6, 182, 212, 0.2);
+        }
+        .category-btn {
+            transition: all 0.3s ease;
+        }
+        .category-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .category-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .step-number {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        .pro-tip {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        .hidden-gem {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .solution-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        .input-glow:focus {
+            box-shadow: 0 0 0 3px rgba(224, 176, 122, 0.2);
+        }
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+            50% { box-shadow: 0 0 20px 10px rgba(139, 92, 246, 0); }
+        }
+        .wave-animation {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 20px;
+        }
+        .wave-bar {
+            width: 3px;
+            background: linear-gradient(to top, #8B5CF6, #E0B07A);
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+        .wave-bar:nth-child(1) { height: 20%; animation-delay: 0s; }
+        .wave-bar:nth-child(2) { height: 60%; animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { height: 40%; animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { height: 80%; animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { height: 30%; animation-delay: 0.4s; }
+        @keyframes wave {
+            0%, 100% { transform: scaleY(0.5); }
+            50% { transform: scaleY(1); }
+        }
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="benim-sehrim.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">NASIL YAPILIR?</h1>
+                <p class="text-xs text-gray-text truncate">Şehir Hayatı İpuçları & AI Asistan</p>
+            </div>
+            <button onclick="showFavorites()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0 relative">
+                <span class="material-symbols-outlined text-gold">bookmark</span>
+                <span class="absolute top-2 right-2 w-2 h-2 bg-pro-pink rounded-full"></span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-6 mt-4">
+
+        <!-- AI Assistant Section (Yeni) -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-6">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-ai-purple/20 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 bg-gold/20 rounded-full blur-3xl -ml-16 -mb-16"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-ai-purple/30 to-gold/20 flex items-center justify-center border border-ai-purple/30 pulse-glow">
+                            <span class="material-symbols-outlined text-2xl text-transparent bg-clip-text bg-gradient-to-r from-ai-purple to-gold">smart_toy</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h2 class="text-lg font-bold ai-gradient-text">CityJoy Asistan</h2>
+                            <p class="text-xs text-gray-text">Sorunuzu yazın veya sesli sorun</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button onclick="quickAsk('Osmangazi\'de nöbetçi eczane nasıl bulurum?')" class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs hover:bg-ai-purple/20 hover:border-ai-purple/50 transition-all">
+                            🏥 Nöbetçi eczane
+                        </button>
+                        <button onclick="quickAsk('BursaKart nasıl doldurulur?')" class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs hover:bg-ai-purple/20 hover:border-ai-purple/50 transition-all">
+                            💳 BursaKart
+                        </button>
+                        <button onclick="quickAsk('Heykel\'de otopark var mı?')" class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs hover:bg-ai-purple/20 hover:border-ai-purple/50 transition-all">
+                            🅿️ Otopark
+                        </button>
+                        <button onclick="quickAsk('Belediyeye dilekçe nasıl verilir?')" class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs hover:bg-ai-purple/20 hover:border-ai-purple/50 transition-all">
+                            📝 Dilekçe
+                        </button>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="relative mb-3">
+                        <textarea 
+                            id="questionInput" 
+                            rows="2" 
+                            placeholder="Örneğin: Arabamı sokağa park ettim, çekilir mi?"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl p-3 pr-10 text-sm text-off-white placeholder-gray-text focus:outline-none focus:border-ai-purple/50 focus:bg-white/[0.07] transition-all resize-none input-glow"
+                        ></textarea>
+                        <button onclick="clearInput()" class="absolute top-2 right-2 text-gray-text hover:text-white transition-colors">
+                            <span class="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+
+                    <!-- Voice & Submit -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleVoiceInput()" id="voiceBtn" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-ai-purple/20 hover:border-ai-purple/50 transition-all group">
+                            <span class="material-symbols-outlined text-ai-purple group-hover:scale-110 transition-transform" id="voiceIcon">mic</span>
+                            <span class="text-xs font-medium" id="voiceText">Sesli</span>
+                        </button>
+                        <button onclick="submitQuestion()" class="flex-1 bg-gradient-to-r from-ai-purple/30 to-gold/20 hover:from-ai-purple/40 hover:to-gold/30 border border-ai-purple/50 text-gold py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">send</span>
+                            Çözüm Bul
+                        </button>
+                    </div>
+
+                    <!-- Recording Indicator -->
+                    <div id="recordingIndicator" class="hidden items-center justify-center gap-3 py-3 bg-ai-purple/10 rounded-xl border border-ai-purple/30 mt-3">
+                        <div class="wave-animation">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                        <span class="text-sm text-ai-purple font-medium">Dinleniyor...</span>
+                        <button onclick="stopRecording()" class="w-8 h-8 rounded-full bg-live-red/20 flex items-center justify-center hover:bg-live-red/30 transition-colors">
+                            <span class="material-symbols-outlined text-live-red text-sm">stop</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section id="loadingState" class="hidden animate-slide-up">
+            <div class="glass-card rounded-2xl p-6 text-center">
+                <div class="flex justify-center gap-1 mb-3">
+                    <div class="w-2 h-2 rounded-full bg-ai-purple typing-dot"></div>
+                    <div class="w-2 h-2 rounded-full bg-ai-purple typing-dot"></div>
+                    <div class="w-2 h-2 rounded-full bg-ai-purple typing-dot"></div>
+                </div>
+                <p class="text-sm text-gray-text">CityJoy Asistan düşünüyor...</p>
+            </div>
+        </section>
+
+        <!-- Solution Result -->
+        <section id="solutionResult" class="hidden animate-slide-up">
+            <div class="solution-card rounded-2xl p-5 border-l-4 border-ai-purple">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-ai-purple/20 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-ai-purple">lightbulb</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-base font-bold text-white mb-0.5">Çözüm Önerisi</h3>
+                        <p class="text-xs text-ai-purple">AI tarafından oluşturuldu</p>
+                    </div>
+                    <button onclick="speakResult()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-ai-purple/20 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold text-sm">volume_up</span>
+                    </button>
+                </div>
+                
+                <div id="solutionContent" class="space-y-3 text-sm text-off-white leading-relaxed mb-4">
+                    <!-- Content will be inserted here -->
+                </div>
+
+                <div class="flex gap-2 pt-3 border-t border-white/10">
+                    <button onclick="markHelpful(true)" class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-success-green/10 border border-success-green/30 text-success-green text-xs font-medium hover:bg-success-green/20 transition-colors">
+                        <span class="material-symbols-outlined text-sm">thumb_up</span>
+                        Yardımcı Oldu
+                    </button>
+                    <button onclick="shareSolution()" class="w-10 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-text hover:bg-white/10 transition-colors">
+                        <span class="material-symbols-outlined text-sm">share</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kategoriler -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                <button onclick="filterCategory('all')" id="cat-all" class="category-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    <span class="material-symbols-outlined text-[18px]">apps</span>
+                    Tümü
+                </button>
+                <button onclick="filterCategory('transport')" id="cat-transport" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    <span class="material-symbols-outlined text-[18px]">directions_bus</span>
+                    Ulaşım
+                </button>
+                <button onclick="filterCategory('money')" id="cat-money" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    <span class="material-symbols-outlined text-[18px]">payments</span>
+                    Tasarruf
+                </button>
+                <button onclick="filterCategory('time')" id="cat-time" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    <span class="material-symbols-outlined text-[18px]">schedule</span>
+                    Zaman
+                </button>
+                <button onclick="filterCategory('life')" id="cat-life" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    <span class="material-symbols-outlined text-[18px]">psychology</span>
+                    Pratik
+                </button>
+                <button onclick="filterCategory('hidden')" id="cat-hidden" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white text-sm">
+                    <span class="material-symbols-outlined text-[18px]">diamond</span>
+                    Gizli Cevherler
+                </button>
+            </div>
+        </section>
+
+        <!-- Aklınıza Gelmeyecekler (Popüler Sorular Tasarımı) -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-life-blue uppercase flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                    Aklınıza Gelmeyecekler
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3" id="tipsContainer">
+                
+                <!-- İpucu 1: Teleferik -->
+                <div class="tip-card rounded-2xl p-5 cursor-pointer" onclick="showDetail('teleferik-vip')" data-category="transport hidden">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-life-blue/30 to-life-blue/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-life-blue text-2xl">cable</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-base font-bold text-white">Teleferik'te Sıra Beklemeden Binme</h4>
+                                <span class="px-2 py-0.5 rounded bg-pro-pink/20 text-pro-pink text-[10px] font-bold">BİLİNMEYEN</span>
+                            </div>
+                            <p class="text-sm text-gray-text line-clamp-2">
+                                Sabah 09:00-10:00 arası "dönüş yolcuları" az olduğu için teleferik boş gidiyor. Bu saatte binerseniz özel kabin hissi yaşarsınız ve manzarayı rahatça izlersiniz.
+                            </p>
+                            <div class="flex items-center gap-4 mt-3 text-xs text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    2 dk okuma
+                                </span>
+                                <span class="flex items-center gap-1 text-life-blue">
+                                    <span class="material-symbols-outlined text-[14px]">visibility</span>
+                                    1.2K görüntülenme
+                                </span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+                <!-- İpucu 2: Otopark -->
+                <div class="tip-card rounded-2xl p-5 cursor-pointer" onclick="showDetail('otopark-hack')" data-category="money time">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-success-green/30 to-success-green/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-success-green text-2xl">local_parking</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-base font-bold text-white">Ücretsiz Park Yeri Bulma Taktiği</h4>
+                                <span class="px-2 py-0.5 rounded bg-success-green/20 text-success-green text-[10px] font-bold">TASARRUF</span>
+                            </div>
+                            <p class="text-sm text-gray-text line-clamp-2">
+                                AVM'lerde 3 saat ücretsiz park hakkınız var ama sinemaya gitmenize gerek yok. Sadece bilet alıp giriş yapın, filmi izlemeyin. Park çıkışında bileti gösterin, 3 saat bedava!
+                            </p>
+                            <div class="flex items-center gap-4 mt-3 text-xs text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">payments</span>
+                                    60₺ tasarruf
+                                </span>
+                                <span class="flex items-center gap-1 text-warning-orange">
+                                    <span class="material-symbols-outlined text-[14px]">warning</span>
+                                    Etik mi? Tartışmalı
+                                </span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+                <!-- İpucu 3: Belediye -->
+                <div class="tip-card rounded-2xl p-5 cursor-pointer" onclick="showDetail('belediye-hizli')" data-category="time life">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-gold text-2xl">account_balance</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-base font-bold text-white">Belediyede Sıra Beklemeden İşlem</h4>
+                                <span class="px-2 py-0.5 rounded bg-gold/20 text-gold text-[10px] font-bold">ZAMAN</span>
+                            </div>
+                            <p class="text-sm text-gray-text line-clamp-2">
+                                153'ü arayıp randevu almak yerine, direkt "Alo 153" WhatsApp hattına TC'nizi yazın. Otomatik sıra numarası alırsınız ve sıranız gelince haber verilir. Bekleme salonunda zaman kaybetmeyin.
+                            </p>
+                            <div class="flex items-center gap-4 mt-3 text-xs text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">timer</span>
+                                    45 dk kazanç
+                                </span>
+                                <span class="flex items-center gap-1 text-life-blue">
+                                    <span class="material-symbols-outlined text-[14px]">chat</span>
+                                    WhatsApp: 0530 153 00 00
+                                </span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+                <!-- İpucu 4: Gizli Cevher -->
+                <div class="hidden-gem rounded-2xl p-5 cursor-pointer" onclick="showDetail('gizli-teras')" data-category="hidden life">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-ai-purple/30 to-ai-purple/10 flex items-center justify-center shrink-0 pulse-glow">
+                            <span class="material-symbols-outlined text-ai-purple text-2xl">diamond</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-base font-bold text-white">Ücretsiz Manzara Terası (Çoğu Bursalı Bilmez)</h4>
+                                <span class="px-2 py-0.5 rounded bg-ai-purple/20 text-ai-purple text-[10px] font-bold">GİZLİ</span>
+                            </div>
+                            <p class="text-sm text-gray-text line-clamp-2">
+                                Tophane'deki saat kulesinin arkasındaki belediye binasının 5. katındaki kafeterya halka açık ve ücretsiz. Uludağ manzaralı kahve içebilirsiniz. Çoğu turist rehane bilmez.
+                            </p>
+                            <div class="flex items-center gap-4 mt-3 text-xs text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                    Tophane Belediye Binası
+                                </span>
+                                <span class="flex items-center gap-1 text-success-green">
+                                    <span class="material-symbols-outlined text-[14px]">paid</span>
+                                    Ücretsiz giriş
+                                </span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+                <!-- İpucu 5: Sağlık -->
+                <div class="tip-card rounded-2xl p-5 cursor-pointer" onclick="showDetail('acil-muayene')" data-category="life time">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-live-red/30 to-live-red/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-live-red text-2xl">health_and_safety</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-base font-bold text-white">Acil Serviste Hızlı Muayene</h4>
+                                <span class="px-2 py-0.5 rounded bg-live-red/20 text-live-red text-[10px] font-bold">SAĞLIK</span>
+                            </div>
+                            <p class="text-sm text-gray-text line-clamp-2">
+                                Acile gece 23:00-01:00 arası gidin. Vardiya değişimi sonrası doktorlar daha taze ve hasta az olur. Ayrıca "ağrım çok şiddetli" demek yerine "göğüs ağrım var" derseniz triyajda öncelik alırsınız.
+                            </p>
+                            <div class="flex items-center gap-4 mt-3 text-xs text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">nightlight</span>
+                                    Gece 23:00-01:00
+                                </span>
+                                <span class="flex items-center gap-1 text-warning-orange">
+                                    <span class="material-symbols-outlined text-[14px]">info</span>
+                                    Ciddi durumlar hariç
+                                </span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+                <!-- İpucu 6: Market -->
+                <div class="tip-card rounded-2xl p-5 cursor-pointer" onclick="showDetail('market-indirim')" data-category="money">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-warning-orange/30 to-warning-orange/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-warning-orange text-2xl">shopping_basket</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-base font-bold text-white">Market İndirim Saatleri</h4>
+                                <span class="px-2 py-0.5 rounded bg-warning-orange/20 text-warning-orange text-[10px] font-bold">FIRSAT</span>
+                            </div>
+                            <p class="text-sm text-gray-text line-clamp-2">
+                                Büyük marketlerde et, balık ve hazır yemekler saat 20:00'den sonra %50 indirimli. Etiketlerde turuncu çıkartma arayın. Ayrıca Perşembe günleri yeni indirim dönemi başlar, en taze ürünler bu gündür.
+                            </p>
+                            <div class="flex items-center gap-4 mt-3 text-xs text-gray-text">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                    20:00-22:00
+                                </span>
+                                <span class="flex items-center gap-1 text-success-green">
+                                    <span class="material-symbols-outlined text-[14px]">savings</span>
+                                    %50'ye varan
+                                </span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+            </div>
+            
+            <button onclick="loadMore()" class="w-full mt-4 py-3 rounded-xl border border-white/10 text-gray-text text-sm hover:bg-white/5 transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">expand_more</span>
+                Daha Fazla İpucu Göster
+            </button>
+        </section>
+
+        <!-- Pratik Rehber: Adım Adım -->
+        <section class="animate-slide-up" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">school</span>
+                    Adım Adım Rehberler
+                </h3>
+                <button onclick="toggleSection('guidesSection', 'guidesIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="guidesIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="guidesSection" class="expandable-section open space-y-3">
+                
+                <!-- Rehber 1 -->
+                <div class="glass-card rounded-xl overflow-hidden cursor-pointer" onclick="showGuideDetail('guide-bursaray')">
+                    <div class="w-full p-4 flex items-center justify-between text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-life-blue">description</span>
+                            <span class="text-sm font-medium">İlk Defa BursaRay Kullanacaklar İçin</span>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+                <!-- Rehber 2 -->
+                <div class="glass-card rounded-xl overflow-hidden cursor-pointer" onclick="showGuideDetail('guide-edevlet')">
+                    <div class="w-full p-4 flex items-center justify-between text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-success-green">verified</span>
+                            <span class="text-sm font-medium">E-Devlet'te Bursa'ya Özel Hizmetler</span>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+                <!-- Rehber 3 -->
+                <div class="glass-card rounded-xl overflow-hidden cursor-pointer" onclick="showGuideDetail('guide-iskender')">
+                    <div class="w-full p-4 flex items-center justify-between text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-warning-orange">restaurant</span>
+                            <span class="text-sm font-medium">İskender Kebap Yeme Protokolü</span>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Yerel Hayat Hileleri -->
+        <section class="animate-slide-up" style="animation-delay: 0.4s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-pro-pink uppercase mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">psychology_alt</span>
+                Yerel Hayat Hileleri
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass-card rounded-xl p-4 border border-pro-pink/20 hover:border-pro-pink/50 transition-all cursor-pointer" onclick="showLifeHack('taksi')">
+                    <span class="material-symbols-outlined text-pro-pink text-2xl mb-2">local_taxi</span>
+                    <h4 class="text-sm font-bold mb-1">Taksi Pazarlığı</h4>
+                    <p class="text-xs text-gray-text">Metre yerine kapıda fiyat söyleyin, %20 ucuzlar</p>
+                </div>
+                
+                <div class="glass-card rounded-xl p-4 border border-life-blue/20 hover:border-life-blue/50 transition-all cursor-pointer" onclick="showLifeHack('pazar')">
+                    <span class="material-symbols-outlined text-life-blue text-2xl mb-2">storefront</span>
+                    <h4 class="text-sm font-bold mb-1">Pazar Saati</h4>
+                    <p class="text-xs text-gray-text">Kapanış saatinden 1 saat önce gidin, kilo fiyatı yarıya iner</p>
+                </div>
+                
+                <div class="glass-card rounded-xl p-4 border border-success-green/20 hover:border-success-green/50 transition-all cursor-pointer" onclick="showLifeHack('wifi')">
+                    <span class="material-symbols-outlined text-success-green text-2xl mb-2">wifi</span>
+                    <h4 class="text-sm font-bold mb-1">Ücretsiz WiFi</h4>
+                    <p class="text-xs text-gray-text">BursaBuyuksehir şifresi: her ay "Bursa2024" değişir</p>
+                </div>
+                
+                <div class="glass-card rounded-xl p-4 border border-warning-orange/20 hover:border-warning-orange/50 transition-all cursor-pointer" onclick="showLifeHack('muzee')">
+                    <span class="material-symbols-outlined text-warning-orange text-2xl mb-2">museum</span>
+                    <h4 class="text-sm font-bold mb-1">Müze Günü</h4>
+                    <p class="text-xs text-gray-text">Her ay ilk Pazartesi tüm müzeler ücretsiz (yerel halka)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sık Yapılan Hatalar -->
+        <section class="animate-slide-up" style="animation-delay: 0.5s">
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-live-red cursor-pointer" onclick="showDetail('turist-hatalar')">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-live-red flex items-center gap-2">
+                        <span class="material-symbols-outlined">error</span>
+                        Turistlerin Sık Yaptığı Hatalar
+                    </h3>
+                    <span class="material-symbols-outlined text-gray-text">arrow_forward_ios</span>
+                </div>
+                <ul class="space-y-2 text-sm text-gray-text">
+                    <li class="flex items-start gap-2">
+                        <span class="text-live-red shrink-0">✗</span>
+                        <span><strong>Teleferik için hafta sonu gitmek:</strong> 3 saat kuyruk beklersiniz. Salı-Çarşamba idealdir.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-live-red shrink-0">✗</span>
+                        <span><strong>Uludağ'da kayak malzemesi kiralamak:</strong> Şehirdeki spor salonları %40 daha ucuz.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Topluluk İpuçları -->
+        <section class="animate-slide-up" style="animation-delay: 0.6s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-ai-purple uppercase flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">groups</span>
+                    Topluluktan İpuçları
+                </h3>
+                <button onclick="openSubmitTip()" class="text-xs text-ai-purple hover:text-ai-purple/80 transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">add_circle</span>
+                    Sen de Ekle
+                </button>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="glass-card rounded-xl p-4 cursor-pointer" onclick="showDetail('topluluk-1')">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-ai-purple/20 flex items-center justify-center shrink-0 text-xs font-bold text-ai-purple">AY</div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-text mb-2">"Çekirge'deki eski kitabevinin üst katında gizli kahve dükkanı var, kimse bilmez."</p>
+                            <div class="flex items-center gap-3 text-xs text-gray-text">
+                                <span>@ayse_34</span>
+                                <span class="flex items-center gap-1 text-gold">
+                                    <span class="material-symbols-outlined text-[14px]">thumb_up</span>
+                                    234
+                                </span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text text-sm">arrow_forward_ios</span>
+                    </div>
+                </div>
+                
+                <div class="glass-card rounded-xl p-4 cursor-pointer" onclick="showDetail('topluluk-2')">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-success-green/20 flex items-center justify-center shrink-0 text-xs font-bold text-success-green">MK</div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-text mb-2">"BursaRay'de aktarma yaparken aynı yöne 90 dk içinde ikinci biniş ücretsiz. Ama farklı yöne giderseniz ücret alınır."</p>
+                            <div class="flex items-center gap-3 text-xs text-gray-text">
+                                <span>@mehmet_k</span>
+                                <span class="flex items-center gap-1 text-gold">
+                                    <span class="material-symbols-outlined text-[14px]">thumb_up</span>
+                                    189
+                                </span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gray-text text-sm">arrow_forward_ios</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Boşluk - Bottom nav için -->
+        <div class="h-8"></div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="benim-sehrim.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">location_city</span>
+                <span class="text-[10px]">Şehrim</span>
+            </a>
+            <a href="rehber.html" class="flex flex-col items-center gap-1 text-gold">
+                <div class="bg-gold/20 p-2 rounded-xl mb-0.5">
+                    <span class="material-symbols-outlined text-2xl">lightbulb</span>
+                </div>
+                <span class="text-[10px] font-bold">Nasıl Yapılır</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 z-[80] bg-deep-teal hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <button onclick="closeDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                    <span class="material-symbols-outlined text-gold">arrow_back</span>
+                </button>
+                <button onclick="saveDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                    <span class="material-symbols-outlined text-gold">bookmark_border</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="px-4 sm:px-6 py-6 max-w-2xl mx-auto" id="detailContent">
+            <!-- Content loaded dynamically -->
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = 'all';
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        let isRecording = false;
+        let recognition;
+
+        // Speech Recognition Init
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'tr-TR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('questionInput').value = transcript;
+                stopRecording();
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error', event.error);
+                stopRecording();
+            };
+
+            recognition.onend = function() {
+                stopRecording();
+            };
+        }
+
+        // AI Functions
+        function toggleVoiceInput() {
+            if (!recognition) {
+                alert('Tarayıcınız sesli girişi desteklemiyor.');
+                return;
+            }
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            isRecording = true;
+            recognition.start();
+            document.getElementById('voiceBtn').classList.add('bg-ai-purple/20', 'border-ai-purple');
+            document.getElementById('voiceIcon').textContent = 'mic_off';
+            document.getElementById('voiceText').textContent = 'Durdur';
+            document.getElementById('recordingIndicator').classList.remove('hidden');
+            document.getElementById('recordingIndicator').classList.add('flex');
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            if (recognition) recognition.stop();
+            document.getElementById('voiceBtn').classList.remove('bg-ai-purple/20', 'border-ai-purple');
+            document.getElementById('voiceIcon').textContent = 'mic';
+            document.getElementById('voiceText').textContent = 'Sesli';
+            document.getElementById('recordingIndicator').classList.add('hidden');
+            document.getElementById('recordingIndicator').classList.remove('flex');
+        }
+
+        function clearInput() {
+            document.getElementById('questionInput').value = '';
+        }
+
+        function quickAsk(question) {
+            document.getElementById('questionInput').value = question;
+            submitQuestion();
+        }
+
+        function submitQuestion() {
+            const question = document.getElementById('questionInput').value.trim();
+            if (!question) {
+                alert('Lütfen bir soru girin');
+                return;
+            }
+            
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('solutionResult').classList.add('hidden');
+            
+            setTimeout(() => {
+                generateSolution(question);
+            }, 1500);
+        }
+
+        function generateSolution(question) {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('solutionResult').classList.remove('hidden');
+
+            let solutionHTML = '';
+            const lowerQ = question.toLowerCase();
+
+            if (lowerQ.includes('eczane')) {
+                solutionHTML = `
+                    <p><strong class="text-gold">Hemen şu adımları izleyin:</strong></p>
+                    <ol class="list-decimal list-inside space-y-2 ml-2">
+                        <li>Uygulama ana sayfasından <strong>"Nöbetçi Eczane"</strong> ikonuna tıklayın</li>
+                        <li>Bulunduğunuz konum otomatik olarak tespit edilecektir</li>
+                        <li>Size en yakın 3 nöbetçi eczane listelenecektir</li>
+                    </ol>
+                    <div class="bg-gold/10 rounded-lg p-3 mt-3 border border-gold/30">
+                        <p class="text-xs text-gold"><strong>İpucu:</strong> Eczaneler 19:00'da nöbet değişimi yapar.</p>
+                    </div>
+                `;
+            } else if (lowerQ.includes('otopark') || lowerQ.includes('park')) {
+                solutionHTML = `
+                    <p><strong class="text-gold">Otopark Seçenekleri:</strong></p>
+                    <ul class="list-disc list-inside space-y-2 ml-2">
+                        <li><strong>Belediye Otoparkları:</strong> Saatlik 15₺, günlük maksimum 100₺</li>
+                        <li><strong>ISpark:</strong> Bursa Büyükşehir Belediyesi otoparkları</li>
+                    </ul>
+                `;
+            } else if (lowerQ.includes('bursakart') || lowerQ.includes('kart')) {
+                solutionHTML = `
+                    <p><strong class="text-gold">BursaKart İşlemleri:</strong></p>
+                    <div class="space-y-3">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <p class="font-medium text-gold mb-1">Dolum Noktaları:</p>
+                            <p class="text-xs text-gray-text">• BursaRay istasyonları<br>• Şehir içi dolum bayileri<br>• Online dolum (Mobil uygulama)</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                solutionHTML = `
+                    <p>Sorunuzu aldım. Size yardımcı olmak için:</p>
+                    <div class="bg-ai-purple/10 rounded-lg p-4 border border-ai-purple/30 mt-3">
+                        <p class="text-sm leading-relaxed">
+                            <strong>1.</strong> Daha spesifik bir soru sorun<br>
+                            <strong>2.</strong> İlgili kategoriyi seçin<br>
+                            <strong>3.</strong> Acil durumlar için 153'ü arayın
+                        </p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('solutionContent').innerHTML = solutionHTML;
+            document.getElementById('solutionResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function speakResult() {
+            if ('speechSynthesis' in window) {
+                const text = document.getElementById('solutionContent').innerText;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'tr-TR';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function markHelpful(helpful) {
+            alert(helpful ? 'Geri bildiriminiz için teşekkürler!' : 'Özür dileriz. Geliştirme ekibimize iletildi.');
+        }
+
+        function shareSolution() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'CityJoy - Nasıl Yapılır?',
+                    text: document.getElementById('solutionContent').innerText,
+                    url: window.location.href
+                });
+            }
+        }
+
+        // Category Filter
+        function filterCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('cat-' + category).classList.add('active');
+            
+            const cards = document.querySelectorAll('#tipsContainer > div');
+            cards.forEach(card => {
+                if (category === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    const categories = card.getAttribute('data-category') || '';
+                    card.style.display = categories.includes(category) ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            
+            if (section.classList.contains('open')) {
+                section.classList.remove('open');
+                icon.classList.remove('open');
+            } else {
+                section.classList.add('open');
+                icon.classList.add('open');
+            }
+        }
+
+        // Detail Modal Functions
+        function showDetail(type) {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            
+            let html = '';
+            
+            if (type === 'teleferik-vip') {
+                html = `
+                    <div class="animate-fade-in">
+                        <span class="px-3 py-1 rounded-full bg-life-blue/20 border border-life-blue/30 text-life-blue text-xs font-bold mb-4 inline-block">ULAŞIM</span>
+                        <h1 class="text-2xl font-bold mb-4 life-gradient-text">Teleferik'te Sıra Beklemeden Binme Taktiği</h1>
+                        
+                        <div class="space-y-4 text-sm text-gray-text leading-relaxed">
+                            <p>Teleferik Bursa'nın en popüler turistik aktivitesi olduğu için hafta sonları 2-3 saat kuyruk beklemek normal. Ancak bazı püf noktalarla bu süreyi sıfıra indirebilirsiniz.</p>
+                            
+                            <div class="bg-white/5 rounded-xl p-4 space-y-3">
+                                <h3 class="text-white font-bold flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-life-blue">schedule</span>
+                                    En İyi Saatler
+                                </h3>
+                                <ul class="space-y-2 ml-6 list-disc">
+                                    <li><strong class="text-life-blue">09:00-10:00:</strong> Açılış saati, çoğu turist kahvaltıda olduğu için boş</li>
+                                    <li><strong class="text-life-blue">14:00-15:00:</strong> Öğle yemeği arası</li>
+                                    <li><strong class="text-life-blue">19:00 sonrası:</strong> Dönüş saatleri</li>
+                                </ul>
+                            </div>
+
+                            <div class="pro-tip rounded-xl p-4">
+                                <h4 class="text-pro-pink font-bold mb-2 flex items-center gap-2">
+                                    <span class="material-symbols-outlined">diamond</span>
+                                    Gizli Bilgi
+                                </h4>
+                                <p>Teferrüç istasyonunda değil, Kültürpark istasyonundan binin. Çoğu insan Teferrüç'ten başlar, Kültürpark'ta duraklar boş kalır.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'otopark-hack') {
+                html = `
+                    <div class="animate-fade-in">
+                        <span class="px-3 py-1 rounded-full bg-success-green/20 border border-success-green/30 text-success-green text-xs font-bold mb-4 inline-block">TASARRUF</span>
+                        <h1 class="text-2xl font-bold mb-4 text-success-green">AVM Otopark Hilesi</h1>
+                        
+                        <div class="bg-warning-orange/10 border border-warning-orange/30 rounded-xl p-4 mb-4">
+                            <p class="text-sm text-warning-orange flex items-center gap-2">
+                                <span class="material-symbols-outlined">warning</span>
+                                <strong>Etik Uyarı:</strong> Bu yöntem gri alanda. Kendi riskinizde kullanın.
+                            </p>
+                        </div>
+
+                        <div class="space-y-4 text-sm text-gray-text">
+                            <p>Büyük AVM'lerde (Korupark, Carrefour, Özdilek) 3 saate kadar ücretsiz park vardır. Ancak sinemaya gitmeniz şart değil.</p>
+                            
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <h3 class="text-white font-bold mb-3">Nasıl Çalışır?</h3>
+                                <ol class="space-y-2 list-decimal list-inside">
+                                    <li>AVM'ye girin, park edin</li>
+                                    <li>Sinema katına çıkın, bileti alın (online daha ucuz)</li>
+                                    <li>Bileti otopark çıkışında gösterin</li>
+                                    <li>3 saat ücretsiz</li>
+                                </ol>
+                            </div>
+
+                            <div class="pro-tip rounded-xl p-4">
+                                <p class="text-pro-pink"><strong>Daha Etik Alternatif:</strong> AVM'deki marketten 50₺'lik alışveriş yapın, fişi gösterin. Aynı hakka sahip olursunuz.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'turist-hatalar') {
+                html = `
+                    <div class="animate-fade-in">
+                        <span class="px-3 py-1 rounded-full bg-live-red/20 border border-live-red/30 text-live-red text-xs font-bold mb-4 inline-block">DİKKAT</span>
+                        <h1 class="text-2xl font-bold mb-4 text-live-red">Turistlerin Sık Yaptığı Hatalar</h1>
+                        
+                        <div class="space-y-4 text-sm text-gray-text">
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <h3 class="text-white font-bold mb-2 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-live-red">cable</span>
+                                    Teleferik Hatası
+                                </h3>
+                                <p>Hafta sonu gitmek 3 saat kuyruk demek. Salı-Çarşamba günleri idealdir.</p>
+                            </div>
+
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <h3 class="text-white font-bold mb-2 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-live-red">downhill_skiing</span>
+                                    Kayak Malzemesi
+                                </h3>
+                                <p>Uludağ'da kiralamak yerine şehirdeki spor salonları %40 daha ucuz.</p>
+                            </div>
+
+                            <div class="bg-white/5 rounded-xl p-4">
+                                <h3 class="text-white font-bold mb-2 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-live-red">restaurant</span>
+                                    Kahvaltı Yeri
+                                </h3>
+                                <p>Osmangazi'de kahvaltı yapmayın. Doğrusu Kırkpınar veya Gölyazı'da serpme kahvaltıdır.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="animate-fade-in">
+                        <h1 class="text-2xl font-bold mb-4 gold-gradient-text">Detaylar</h1>
+                        <p class="text-gray-text">Bu içerik için detay sayfası hazırlanıyor.</p>
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showGuideDetail(guideType) {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            let html = '';
+
+            if (guideType === 'guide-bursaray') {
+                html = `
+                    <div class="animate-fade-in">
+                        <span class="px-3 py-1 rounded-full bg-life-blue/20 border border-life-blue/30 text-life-blue text-xs font-bold mb-4 inline-block">ULAŞIM</span>
+                        <h1 class="text-2xl font-bold mb-4 life-gradient-text">İlk Defa BursaRay Kullanacaklar İçin</h1>
+                        
+                        <div class="space-y-4 text-sm text-gray-text">
+                            <div class="flex gap-3">
+                                <span class="step-number text-2xl">1</span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">BursaKart Edinin</p>
+                                    <p class="text-xs text-gray-text">İstasyonlardaki gişelerden veya online sipariş verin. Depozito: 25₺</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <span class="step-number text-2xl">2</span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Bakiye Yükleyin</p>
+                                    <p class="text-xs text-gray-text">Turnikeden önceki makinelere kartınızı yaklaştırın. Minimum: 15₺</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <span class="step-number text-2xl">3</span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Turnikeden Geçin</p>
+                                    <p class="text-xs text-gray-text">Kartı okuyucuya değdirin, yeşil ışık yanınca geçin. 90 dk içinde aktarmalısınız.</p>
+                                </div>
+                            </div>
+                            <div class="pro-tip rounded-lg p-3 mt-3">
+                                <p class="text-xs text-pro-pink flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-sm shrink-0">lightbulb</span>
+                                    <span><strong>Pro İpucu:</strong> Telefonunuza BursaKart uygulamasını indirin, bakiyenizi anlık takip edin.</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (guideType === 'guide-edevlet') {
+                html = `
+                    <div class="animate-fade-in">
+                        <span class="px-3 py-1 rounded-full bg-success-green/20 border border-success-green/30 text-success-green text-xs font-bold mb-4 inline-block">BELEDİYE</span>
+                        <h1 class="text-2xl font-bold mb-4 text-success-green">E-Devlet'te Bursa'ya Özel Hizmetler</h1>
+                        
+                        <div class="space-y-4 text-sm text-gray-text">
+                            <div class="flex gap-3">
+                                <span class="step-number text-2xl">1</span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Bursa Büyükşehir Portalı</p>
+                                    <p class="text-xs text-gray-text">E-Devlet > Kurumlar > Bursa Büyükşehir Belediyesi</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <span class="step-number text-2xl">2</span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Yapabilecekleriniz</p>
+                                    <p class="text-xs text-gray-text">• Raylı sistem ihlal sorgulama<br>• Vergi borcu ödeme<br>• Nikah randevu<br>• Mezar yeri sorgulama</p>
+                                </div>
+                            </div>
+                            <div class="pro-tip rounded-lg p-3 mt-3">
+                                <p class="text-xs text-pro-pink flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-sm shrink-0">lightbulb</span>
+                                    <span><strong>Bilinmeyen:</strong> "İmar Barışı" başvuruları sadece E-Devlet üzerinden yapılıyor!</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (guideType === 'guide-iskender') {
+                html = `
+                    <div class="animate-fade-in">
+                        <span class="px-3 py-1 rounded-full bg-warning-orange/20 border border-warning-orange/30 text-warning-orange text-xs font-bold mb-4 inline-block">YEMEK</span>
+                        <h1 class="text-2xl font-bold mb-4 text-warning-orange">İskender Kebap Yeme Protokolü</h1>
+                        
+                        <div class="space-y-4 text-sm text-gray-text">
+                            <div class="flex gap-3">
+                                <span class="step-number text-2xl">1</span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Doğru Lokanta Seçimi</p>
+                                    <p class="text-xs text-gray-text">Kebapçılar Caddesi'ndeki tarihi yerler (1865'ten beri) en iyisidir.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <span class="step-number text-2xl">                                <span class="step-number text-2xl">2</span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Sipariş Sırası</p>
+                                    <p class="text-xs text-gray-text">Önce "pide ıslak" deyin (üzerine dökülen yağlı ekmek), sonra İskender. Yanında şıra için.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <span class="step-number text-2xl">3</span>
+                                <div>
+                                    <p class="text-sm font-medium text-white">Tatlı Zamanı</p>
+                                    <p class="text-xs text-gray-text">Asla tatlıyı aynı yerde yemeyin. 200 metre ilerideki "Sakarya Tatlıcısı"nda tulumba tatlısı yiyin.</p>
+                                </div>
+                            </div>
+                            <div class="pro-tip rounded-lg p-3 mt-3">
+                                <p class="text-xs text-pro-pink flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-sm shrink-0">lightbulb</span>
+                                    <span><strong>Yerel Sır:</strong> "Tahinli pide" söyleyin, menüde yazar ama turistler bilmez!</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="animate-fade-in">
+                        <h1 class="text-2xl font-bold mb-4 gold-gradient-text">Rehber</h1>
+                        <p class="text-gray-text">Rehber içeriği yükleniyor...</p>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function saveDetail() {
+            alert('İpucu kaydedildi!');
+        }
+
+        function saveTip(btn) {
+            const icon = btn.querySelector('span');
+            if (icon.textContent === 'bookmark_border') {
+                icon.textContent = 'bookmark';
+                btn.classList.add('bg-pro-pink/20', 'border-pro-pink/50');
+            } else {
+                icon.textContent = 'bookmark_border';
+                btn.classList.remove('bg-pro-pink/20', 'border-pro-pink/50');
+            }
+        }
+
+        function showFavorites() {
+            alert('Favoriler sayfasına yönlendiriliyorsunuz...');
+        }
+
+        function loadMore() {
+            const btn = event.currentTarget;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Yükleniyor...';
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined">check</span> Tümü Gösterildi';
+                btn.disabled = true;
+                btn.classList.add('opacity-50');
+            }, 1000);
+        }
+
+        function showLifeHack(type) {
+            const messages = {
+                'taksi': 'Taksimetre açıkken "şuraya kadar ne kadar tutar?" diye sorun. Şoför genelde tahmini fiyat söyler. Bu fiyatın %20 altına "şu kadar vereyim" deyin. Kabul etmezse başka taksi bulun.',
+                'pazar': 'Pazar yerlerinde saat 16:00-17:00 arası gidin. Satıcılar ürünleri çürümeden elden çıkarmak ister. "Son fiyat" demeyin, "elinde ne varsa toplu alayım" deyin.',
+                'wifi': 'BursaBuyuksehir ağına bağlanın. Şifre genelde "Bursa2024" veya "Bursa2025" olur. Değişirse 153\'ü arayıp güncel şifreyi öğrenebilirsiniz.',
+                'muzee': 'Bursa Müzesi, Atatürk Evi, Türk İslam Eserleri Müzesi her ayın ilk Pazartesi günü Bursa yerlilerine ücretsiz (TC kimlik ile). Turistler ödeme yapar, siz yapmayın!'
+            };
+            
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            
+            content.innerHTML = `
+                <div class="animate-fade-in">
+                    <span class="px-3 py-1 rounded-full bg-pro-pink/20 border border-pro-pink/30 text-pro-pink text-xs font-bold mb-4 inline-block">YEREL HAYAT HİLESİ</span>
+                    <h1 class="text-2xl font-bold mb-4 text-pro-pink">${type.charAt(0).toUpperCase() + type.slice(1)} Hilesi</h1>
+                    <div class="glass-card rounded-xl p-5">
+                        <p class="text-sm text-gray-text leading-relaxed">${messages[type]}</p>
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        <button onclick="closeDetail()" class="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-medium hover:bg-white/10 transition-colors">
+                            Kapat
+                        </button>
+                        <button onclick="saveDetail()" class="flex-1 py-3 rounded-xl bg-pro-pink/20 border border-pro-pink/50 text-pro-pink text-sm font-medium hover:bg-pro-pink/30 transition-colors">
+                            Kaydet
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openSubmitTip() {
+            const tip = prompt('Sizin püf noktanız nedir?');
+            if (tip) {
+                alert('Teşekkürler! İpucunuz moderatör onayından sonra yayınlanacak.');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('guidesSection').classList.add('open');
+            document.getElementById('guidesIcon').classList.add('open');
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDetail();
+            }
+        });
+    </script>
+
+</body>
+</html>

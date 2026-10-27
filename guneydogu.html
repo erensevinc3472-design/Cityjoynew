@@ -1,0 +1,587 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Güneydoğu Anadolu Bölgesi - Şehir Keşfi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.7s ease-out',
+                        'slide-right': 'slideRight 0.5s ease-out',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'shimmer': 'shimmer 2.5s infinite',
+                        'pulse-ring': 'pulseRing 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideRight: {
+                            '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.4)' },
+                            '50%': { boxShadow: '0 0 35px rgba(224, 176, 122, 0.7)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                        pulseRing: {
+                            '0%': { transform: 'scale(1)', opacity: '1' },
+                            '100%': { transform: 'scale(1.5)', opacity: '0' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .sidebar-scroll::-webkit-scrollbar {
+                width: 2px;
+            }
+            .sidebar-scroll::-webkit-scrollbar-track {
+                background: rgba(63, 110, 112, 0.2);
+            }
+            .sidebar-scroll::-webkit-scrollbar-thumb {
+                background: rgba(224, 176, 122, 0.5);
+                border-radius: 4px;
+            }
+            .glow-gold-active {
+                box-shadow: 0 0 15px rgba(224, 176, 122, 0.5);
+            }
+            .card-inner-glow {
+                box-shadow: inset 0 0 20px rgba(31, 80, 85, 0.6);
+            }
+            .card-gradient-gold {
+                background: linear-gradient(135deg, rgba(23, 70, 75, 0.95) 0%, rgba(23, 70, 75, 0.4) 50%, transparent 100%);
+            }
+            .nav-glow-gold {
+                filter: drop-shadow(0 0 8px rgba(240, 179, 111, 0.7));
+            }
+            .city-card-hover {
+                transform: translateY(-5px) scale(1.02);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(224, 176, 122, 0.3);
+            }
+            .glass-panel {
+                background: rgba(13, 50, 56, 0.85);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+            }
+            .text-glow {
+                text-shadow: 0 0 20px rgba(224, 176, 122, 0.5);
+            }
+            .shimmer-bg {
+                background: linear-gradient(90deg, transparent, rgba(224, 176, 122, 0.1), transparent);
+                background-size: 200% 100%;
+                animation: shimmer 3s infinite;
+            }
+            .hero-gradient {
+                background: linear-gradient(to bottom, transparent 0%, rgba(8, 31, 36, 0.8) 60%, rgba(8, 31, 36, 1) 100%);
+            }
+            .stat-card {
+                background: rgba(23, 70, 75, 0.6);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(224, 176, 122, 0.3);
+            }
+            .play-button-ring {
+                position: absolute;
+                inset: -4px;
+                border: 2px solid rgba(224, 176, 122, 0.5);
+                border-radius: 50%;
+                animation: pulseRing 2s infinite;
+            }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden">
+
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-darkest/90 backdrop-blur-md border-b border-border-subtle/30">
+    <div class="flex items-center gap-3">
+        <a class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group" href="kesfet-ogren.html">
+            <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+        </a>
+        <div class="flex flex-col">
+            <div class="flex items-center gap-2 text-[10px] text-gold-primary tracking-wider uppercase">
+                <span>Güneydoğu Anadolu Bölgesi</span>
+                <span class="text-border-subtle">/</span>
+                <span class="text-text-desc">Şehir Seçimi</span>
+            </div>
+            <h1 class="text-sm font-bold tracking-[0.2em] uppercase text-white leading-none">TRAVELJOY</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-3">
+        <button class="flex items-center gap-1.5 px-3 py-1.5 bg-card-bg/50 rounded-full border border-border-subtle/30 hover:border-gold-primary/50 transition-colors" onclick="toggleFilter()">
+            <span class="material-symbols-outlined text-gold-primary text-sm">tune</span>
+            <span class="text-xs text-text-secondary hidden sm:inline">Filtrele</span>
+        </button>
+        <a class="text-text-secondary hover:text-gold-primary transition-colors relative" href="bildirim.html">
+            <span class="material-symbols-outlined text-xl">notifications</span>
+            <span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-gold-primary rounded-full animate-pulse"></span>
+        </a>
+    </div>
+</header>
+
+<section class="relative h-[60vh] min-h-[450px] w-full overflow-hidden">
+    <div class="absolute inset-0">
+        <img alt="Güneydoğu Anadolu Bölgesi" class="w-full h-full object-cover scale-110" id="hero-image" src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1920&amp;q=80"/>
+        <div class="absolute inset-0 bg-darkest/30"></div>
+        <div class="absolute inset-0 hero-gradient"></div>
+    </div>
+    
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-2 h-2 bg-gold-primary/30 rounded-full animate-float" style="animation-delay: 0s;"></div>
+        <div class="absolute top-1/3 right-1/3 w-1 h-1 bg-gold-primary/50 rounded-full animate-float" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-gold-primary/40 rounded-full animate-float" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-6 md:px-12">
+        <div class="max-w-4xl animate-slide-up">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="px-2 py-0.5 bg-gold-primary/20 border border-gold-primary/40 rounded-full text-gold-primary text-[9px] tracking-[0.15em] uppercase font-bold backdrop-blur-sm">
+                    Lezzet ve Tarih
+                </span>
+                <div class="flex items-center gap-1 text-gold-primary">
+                    <span class="material-symbols-outlined text-xs fill-1">star</span>
+                    <span class="text-xs font-bold">4.8</span>
+                    <span class="text-[10px] text-text-desc">(2.3k)</span>
+                </div>
+            </div>
+            
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 text-glow tracking-tight">
+                Güneydoğu Anadolu Bölgesi
+            </h1>
+            <p class="text-sm md:text-base text-text-secondary max-w-xl leading-relaxed mb-6">
+                Gaziantep'in mutfağı, Şanlıurfa'nın tarihi ve Mardin'in taş konakları. Mezopotamya'nın büyüsü.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-4 animate-fade-in" style="animation-delay: 0.3s;">
+                <button class="group relative flex items-center gap-3 px-5 py-2.5 bg-gold-primary text-darkest rounded-full font-bold text-xs uppercase tracking-wider hover:scale-105 transition-all duration-300 shadow-lg shadow-gold-primary/30" onclick="openVideoModal()">
+                    <div class="relative">
+                        <div class="w-6 h-6 rounded-full bg-darkest/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-sm fill-1">play_arrow</span>
+                        </div>
+                        <div class="play-button-ring"></div>
+                    </div>
+                    <span>Tanıtım Videosu</span>
+                    <span class="text-[10px] opacity-70">(2:40)</span>
+                </button>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 px-3 py-1.5 bg-card-bg/60 backdrop-blur-sm rounded-full border border-border-subtle/30">
+                        <span class="material-symbols-outlined text-gold-primary text-xs">location_city</span>
+                        <span class="text-xs font-bold text-white">8</span>
+                        <span class="text-[10px] text-text-desc uppercase">Şehir</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 px-3 py-1.5 bg-card-bg/60 backdrop-blur-sm rounded-full border border-border-subtle/30">
+                        <span class="material-symbols-outlined text-gold-primary text-xs">restaurant</span>
+                        <span class="text-xs font-bold text-white">50+</span>
+                        <span class="text-[10px] text-text-desc uppercase">Lezzet</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 px-3 py-1.5 bg-card-bg/60 backdrop-blur-sm rounded-full border border-border-subtle/30">
+                        <span class="material-symbols-outlined text-gold-primary text-xs">account_balance</span>
+                        <span class="text-xs font-bold text-white">20+</span>
+                        <span class="text-[10px] text-text-desc uppercase">Tarihi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce">
+        <span class="text-[9px] text-text-desc uppercase tracking-widest">Keşfet</span>
+        <span class="material-symbols-outlined text-gold-primary text-sm">expand_more</span>
+    </div>
+</section>
+
+<div class="sticky top-[60px] z-40 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 py-3 px-6" id="filter-bar">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
+            <button class="filter-btn active px-3 py-1.5 rounded-full bg-gold-primary text-darkest text-[10px] font-bold uppercase tracking-wider transition-all hover:scale-105" data-filter="all">Tümü</button>
+            <button class="filter-btn px-3 py-1.5 rounded-full bg-card-bg border border-border-subtle text-text-secondary text-[10px] font-bold uppercase tracking-wider transition-all hover:border-gold-primary hover:text-gold-primary" data-filter="gastronomy">Lezzet</button>
+            <button class="filter-btn px-3 py-1.5 rounded-full bg-card-bg border border-border-subtle text-text-secondary text-[10px] font-bold uppercase tracking-wider transition-all hover:border-gold-primary hover:text-gold-primary" data-filter="history">Tarih</button>
+            <button class="filter-btn px-3 py-1.5 rounded-full bg-card-bg border border-border-subtle text-text-secondary text-[10px] font-bold uppercase tracking-wider transition-all hover:border-gold-primary hover:text-gold-primary" data-filter="nature">Doğa</button>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] text-text-desc">Sırala:</span>
+            <select class="bg-card-bg border border-border-subtle rounded-lg px-2 py-1 text-[10px] text-text-secondary focus:border-gold-primary focus:outline-none">
+                <option>Popüler</option>
+                <option>Puan</option>
+                <option>Alfabetik</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<main class="relative z-10 bg-darkest min-h-screen pb-24">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="flex items-end justify-between mb-6 animate-fade-in">
+            <div>
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-1">Şehirleri Keşfet</h2>
+                <p class="text-text-desc text-xs">Güneydoğu'nun tarihi şehirlerinden birini seçin</p>
+            </div>
+            <div class="hidden md:flex items-center gap-1 text-[10px] text-text-desc">
+                <span class="material-symbols-outlined text-gold-primary text-xs">info</span>
+                <span>8 şehir</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="cities-grid"></div>
+
+        <div class="mt-10 text-center">
+            <button class="px-6 py-2.5 bg-card-bg border border-gold-primary/30 text-gold-primary rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gold-primary hover:text-darkest transition-all duration-300 group">
+                Daha Fazla
+                <span class="material-symbols-outlined inline-block ml-1 text-xs group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </button>
+        </div>
+    </div>
+</main>
+
+<div class="fixed inset-0 z-[70] hidden items-center justify-center p-4" id="video-modal">
+    <div class="absolute inset-0 bg-darkest/95 backdrop-blur-md" onclick="closeVideoModal()"></div>
+    <div class="relative w-full max-w-4xl bg-card-bg rounded-2xl overflow-hidden border border-border-subtle shadow-2xl animate-slide-up">
+        <div class="flex items-center justify-between p-4 border-b border-border-subtle/30">
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Güneydoğu Anadolu Bölgesi Tanıtımı</h3>
+            <button class="w-8 h-8 rounded-full bg-darkest/50 flex items-center justify-center text-white hover:bg-gold-primary hover:text-darkest transition-colors" onclick="closeVideoModal()">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+        <div class="aspect-video bg-darkest flex items-center justify-center">
+            <div class="text-center">
+                <div class="w-16 h-16 rounded-full bg-gold-primary/20 flex items-center justify-center mb-4 mx-auto animate-pulse">
+                    <span class="material-symbols-outlined text-3xl text-gold-primary">play_circle</span>
+                </div>
+                <p class="text-text-secondary text-sm">Video oynatıcı burada görünecek</p>
+                <p class="text-text-desc text-xs mt-1">YouTube/Vimeo entegrasyonu için hazır</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav class="fixed bottom-0 left-0 right-0 flex items-center justify-around px-6 py-3 bg-nav-bg border-t border-border-subtle/50 pb-6 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="anasayfa.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">home</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ana Sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-nav nav-glow-gold" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-lg fill-1">explore</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="ara.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">search</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group" href="profil.html">
+        <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">person</span>
+        <span class="text-[8px] font-bold tracking-wider uppercase">Profil</span>
+    </a>
+</nav>
+
+<script>
+const citiesData = [
+    {
+        id: "gaziantep",
+        name: "Gaziantep",
+        subtitle: "Gastronomi Başkenti",
+        category: ["gastronomy", "history"],
+        rating: 4.9,
+        image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80",
+        description: "UNESCO gastronomi şehri, baklava ve antep fıstığı.",
+        highlights: ["Baklava", "Zeugma", "Antep Fıstığı", "Copper"],
+        distance: "0 km",
+        duration: "Merkez",
+        budget: "$$",
+        temperature: 32,
+        weather: "sunny"
+    },
+    {
+        id: "sanliurfa",
+        name: "Şanlıurfa",
+        subtitle: "Peygamberler Şehri",
+        category: ["history", "gastronomy"],
+        rating: 4.8,
+        image: "https://images.unsplash.com/photo-1594924862961-e6b107626bd1?w=800&q=80",
+        description: "Göbeklitepe, Balıklıgöl ve çiğ köfte.",
+        highlights: ["Göbeklitepe", "Balıklıgöl", "Çiğ Köfte", "Harran"],
+        distance: "150 km",
+        duration: "2 sa",
+        budget: "$",
+        temperature: 35,
+        weather: "sunny"
+    },
+    {
+        id: "mardin",
+        name: "Mardin",
+        subtitle: "Taş Konaklar",
+        category: ["history", "gastronomy"],
+        rating: 4.9,
+        image: "https://images.unsplash.com/photo-1559628233-100c798642d4?w=800&q=80",
+        description: "Eski Mardin, Deyrulzafaran Manastırı ve telkari.",
+        highlights: ["Eski Mardin", "Deyrulzafaran", "Telkari", "Zinciriye"],
+        distance: "200 km",
+        duration: "3 sa",
+        budget: "$$",
+        temperature: 34,
+        weather: "sunny"
+    },
+    {
+        id: "diyarbakir",
+        name: "Diyarbakır",
+        subtitle: "Surlar Şehri",
+        category: ["history", "gastronomy"],
+        rating: 4.7,
+        image: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=800&q=80",
+        description: "Dünya çevre surları, Ulu Camii ve karpuz.",
+        highlights: ["Surlar", "Ulu Camii", "Hasanpaşa", "Hevsel"],
+        distance: "120 km",
+        duration: "1.5 sa",
+        budget: "$",
+        temperature: 36,
+        weather: "sunny"
+    },
+    {
+        id: "adiyaman",
+        name: "Adıyaman",
+        subtitle: "Nemrut Dağı",
+        category: ["history", "nature"],
+        rating: 4.8,
+        image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+        description: "Nemrut Dağı heykelleri, Cendere Köprüsü ve kahta.",
+        highlights: ["Nemrut", "Cendere", "Perre", "Kahta"],
+        distance: "180 km",
+        duration: "2.5 sa",
+        budget: "$",
+        temperature: 33,
+        weather: "sunny"
+    },
+    {
+        id: "batman",
+        name: "Batman",
+        subtitle: "Hasankeyf",
+        category: ["history", "nature"],
+        rating: 4.6,
+        image: "https://images.unsplash.com/photo-1566125882500-87e10f726cdc?w=800&q=80",
+        description: "Hasankeyf kalesi, Dicle Nehri ve petrol kenti.",
+        highlights: ["Hasankeyf", "Dicle", "Malabadi", "Kozluk"],
+        distance: "220 km",
+        duration: "3 sa",
+        budget: "$",
+        temperature: 34,
+        weather: "sunny"
+    },
+    {
+        id: "siirt",
+        name: "Siirt",
+        subtitle: "Fıstık ve Bıttım",
+        category: ["gastronomy", "history"],
+        rating: 4.5,
+        image: "https://images.unsplash.com/photo-1543255006-d6395b6f1171?w=800&q=80",
+        description: "Siirt fıstığı, bıttım sabunu ve tarihi camiler.",
+        highlights: ["Fıstık", "Ulu Camii", "Sağlarca", "Tillo"],
+        distance: "280 km",
+        duration: "4 sa",
+        budget: "$",
+        temperature: 35,
+        weather: "sunny"
+    },
+    {
+        id: "kilis",
+        name: "Kilis",
+        subtitle: "Küçük Antep",
+        category: ["gastronomy", "history"],
+        rating: 4.4,
+        image: "https://images.unsplash.com/photo-1527838832700-5059252407fa?w=800&q=80",
+        description: "Kilis tava, Ravanda Kalesi ve sakin yaşam.",
+        highlights: ["Kilis Tava", "Ravanda", "Canpolat", "Elbeyli"],
+        distance: "60 km",
+        duration: "1 sa",
+        budget: "$",
+        temperature: 33,
+        weather: "sunny"
+    }
+];
+
+let currentFilter = 'all';
+
+function renderCities() {
+    const container = document.getElementById('cities-grid');
+    container.innerHTML = '';
+    
+    const filteredCities = currentFilter === 'all' 
+        ? citiesData 
+        : citiesData.filter(city => city.category.includes(currentFilter));
+    
+    filteredCities.forEach((city, index) => {
+        const card = document.createElement('a');
+        card.href = `${city.id}.html`;
+        card.className = 'group relative h-[340px] rounded-xl overflow-hidden cursor-pointer border border-border-subtle bg-card-bg card-inner-glow transition-all duration-500 animate-slide-up block';
+        card.style.animationDelay = `${index * 0.08}s`;
+        
+        const weatherIcon = city.weather === 'sunny' ? 'wb_sunny' : 'cloud';
+        
+        card.innerHTML = `
+            <div class="relative h-[50%] overflow-hidden">
+                <img src="${city.image}" alt="${city.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-card-bg via-transparent to-transparent opacity-60"></div>
+                
+                <div class="absolute top-3 left-3 flex gap-2">
+                    <div class="flex items-center gap-1 bg-darkest/60 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
+                        <span class="material-symbols-outlined text-gold-primary text-[10px]">${weatherIcon}</span>
+                        <span class="text-[10px] text-white font-bold">${city.temperature}°</span>
+                    </div>
+                </div>
+                
+                <div class="absolute top-3 right-3 flex items-center gap-1 bg-gold-primary/90 px-1.5 py-0.5 rounded-full">
+                    <span class="material-symbols-outlined text-darkest text-[10px] fill-1">star</span>
+                    <span class="text-darkest text-[10px] font-bold">${city.rating}</span>
+                </div>
+                
+                <div class="absolute bottom-3 left-3 flex gap-1">
+                    ${city.category.slice(0, 2).map(cat => `
+                        <span class="text-[8px] px-1.5 py-0.5 bg-white/10 backdrop-blur-md rounded-full text-white border border-white/20 uppercase tracking-wider">
+                            ${getCategoryLabel(cat)}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="p-3 h-[50%] flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-0.5">
+                        <h3 class="text-lg font-bold text-white group-hover:text-gold-primary transition-colors">${city.name}</h3>
+                    </div>
+                    <p class="text-[10px] text-gold-primary uppercase tracking-wider mb-1.5">${city.subtitle}</p>
+                    <p class="text-[11px] text-text-desc line-clamp-2 leading-relaxed">${city.description}</p>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="flex flex-wrap gap-1">
+                        ${city.highlights.slice(0, 3).map(h => `
+                            <span class="text-[8px] px-1.5 py-0.5 bg-darkest/50 rounded text-text-secondary border border-border-subtle/30">
+                                ${h}
+                            </span>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="flex items-center justify-between pt-2 border-t border-border-subtle/30">
+                        <div class="flex items-center gap-2 text-[9px] text-text-desc">
+                            <span class="flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[10px]">location_on</span>
+                                ${city.distance}
+                            </span>
+                            <span class="flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[10px]">schedule</span>
+                                ${city.duration}
+                            </span>
+                        </div>
+                        <div class="w-7 h-7 rounded-full bg-gold-primary/10 border border-gold-primary/30 flex items-center justify-center text-gold-primary group-hover:bg-gold-primary group-hover:text-darkest transition-all duration-300">
+                            <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none border-2 border-gold-primary/30 rounded-xl"></div>
+        `;
+        
+        card.addEventListener('mouseenter', () => {
+            card.classList.add('city-card-hover');
+        });
+        card.addEventListener('mouseleave', () => {
+            card.classList.remove('city-card-hover');
+        });
+        
+        container.appendChild(card);
+    });
+}
+
+function getCategoryLabel(cat) {
+    const labels = {
+        'sea': 'Deniz',
+        'history': 'Tarih',
+        'nature': 'Doğa',
+        'gastronomy': 'Lezzet'
+    };
+    return labels[cat] || cat;
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.remove('active', 'bg-gold-primary', 'text-darkest');
+            b.classList.add('bg-card-bg', 'text-text-secondary', 'border-border-subtle');
+        });
+        
+        e.target.classList.remove('bg-card-bg', 'text-text-secondary', 'border-border-subtle');
+        e.target.classList.add('active', 'bg-gold-primary', 'text-darkest');
+        
+        currentFilter = e.target.dataset.filter;
+        renderCities();
+    });
+});
+
+function openVideoModal() {
+    document.getElementById('video-modal').classList.remove('hidden');
+    document.getElementById('video-modal').classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeVideoModal() {
+    document.getElementById('video-modal').classList.add('hidden');
+    document.getElementById('video-modal').classList.remove('flex');
+    document.body.style.overflow = '';
+}
+
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const heroImage = document.getElementById('hero-image');
+    if (heroImage && scrolled < window.innerHeight) {
+        heroImage.style.transform = `translateY(${scrolled * 0.5}px) scale(1.1)`;
+    }
+});
+
+renderCities();
+</script>
+
+</body>
+</html>
+

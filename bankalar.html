@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Kamu Bankaları - Halkbank, Ziraat Bankası, Vakıfbank şubeleri, adres, telefon ve çalışma saatleri bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Kamu Bankaları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "halk-red": "#E31837",
+                        "ziraat-red": "#C41E3A",
+                        "vakif-green": "#006A4E",
+                        "bank-gold": "#D4AF37"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .bank-card-halk {
+            background: linear-gradient(135deg, rgba(227, 24, 55, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(227, 24, 55, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .bank-card-halk:hover {
+            border-color: rgba(227, 24, 55, 0.5);
+            transform: translateY(-2px);
+        }
+        .bank-card-ziraat {
+            background: linear-gradient(135deg, rgba(196, 30, 58, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(196, 30, 58, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .bank-card-ziraat:hover {
+            border-color: rgba(196, 30, 58, 0.5);
+            transform: translateY(-2px);
+        }
+        .bank-card-vakif {
+            background: linear-gradient(135deg, rgba(0, 106, 78, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(0, 106, 78, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .bank-card-vakif:hover {
+            border-color: rgba(0, 106, 78, 0.5);
+            transform: translateY(-2px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .modal-bank {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .service-tag {
+            background: rgba(224, 176, 122, 0.15);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">KAMU BANKALARI</h1>
+                <p class="text-xs text-gray-text truncate">Halkbank • Ziraat • Vakıfbank</p>
+            </div>
+            <button onclick="openInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-bank-gold/20 hover:bg-bank-gold/30 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-bank-gold">info</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Banka Bilgileri -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-bank-gold/30 to-bank-gold/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-bank-gold text-xl">account_balance</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Kamu Bankaları</h2>
+                            <p class="text-xs text-gray-text">Bursa İli Şubeleri</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-bank-gold/10 border border-bank-gold/30">
+                        <div class="w-2 h-2 rounded-full bg-bank-gold animate-pulse"></div>
+                        <span class="text-xs text-bank-gold font-medium">Aktif</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                    <div class="bg-halk-red/10 border border-halk-red/20 rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-halk-red">37</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Halkbank</p>
+                    </div>
+                    <div class="bg-ziraat-red/10 border border-ziraat-red/20 rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-ziraat-red">49</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Ziraat</p>
+                    </div>
+                    <div class="bg-vakif-green/10 border border-vakif-green/20 rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-vakif-green">25+</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Vakıfbank</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme - Diğer Sayfalarla Aynı Boyut -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Şube Bul</h3>
+                        <p class="text-xs text-gray-text truncate">Banka adı veya konum ara</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="bankSearch" placeholder="Örn: Osmangazi, Heykel, Nilüfer..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchBank()"/>
+                </div>
+
+                <!-- Banka Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Banka Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterBank('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="material-symbols-outlined text-sm">account_balance</span>
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterBank('halkbank')" id="btn-halkbank" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="w-2 h-2 rounded-full bg-halk-red"></span>
+                        <span class="text-sm">Halkbank</span>
+                    </button>
+                    <button onclick="filterBank('ziraat')" id="btn-ziraat" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="w-2 h-2 rounded-full bg-ziraat-red"></span>
+                        <span class="text-sm">Ziraat</span>
+                    </button>
+                    <button onclick="filterBank('vakifbank')" id="btn-vakifbank" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="w-2 h-2 rounded-full bg-vakif-green"></span>
+                        <span class="text-sm">Vakıfbank</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Sıkça Sorulan Sorular</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Çalışma Saatleri -->
+                <div class="glass-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-bank-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-bank-gold text-sm">schedule</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Çalışma Saatleri Nedir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Kamu bankaları genellikle hafta içi 09:00 - 12:30 ve 13:30 - 17:00/17:30 arası hizmet verir.
+                                Öğle arası 12:30 - 13:30 arasıdır.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-bank-gold">Halkbank: 09:00-17:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-bank-gold">Ziraat: 09:00-17:30</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-live-red">Hafta Sonu: Kapalı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ATM ve Dijital Hizmetler -->
+                <div class="glass-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-bank-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-bank-gold text-sm">atm</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">ATM ve Dijital Hizmetler</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Tüm kamu bankaları 7/24 ATM hizmeti sunar. Mobil şube ve internet bankacılığı ile 
+                                işlemlerinizi her yerden gerçekleştirebilirsiniz.
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Para çekme/yatırma (ATM)</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Havale/EFT (Mobil/İnternet)</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Fatura ödeme (Otomatik)</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kredi ve Destek Paketleri -->
+                <div class="glass-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-bank-gold/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-bank-gold text-sm">credit_score</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Kredi ve Destek Paketleri</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Kamu bankaları çeşitli destek kredileri sunar:
+                            </p>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-halk-red text-lg">agriculture</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Tarım Kredisi</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-ziraat-red text-lg">store</span>
+                                    <p class="text-[10px] text-gray-text mt-1">ESNAF Destek</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-vakif-green text-lg">home</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Konut Kredisi</p>
+                                </div>
+                                <div class="bg-white/5 rounded-lg p-2 text-center">
+                                    <span class="material-symbols-outlined text-bank-gold text-lg">school</span>
+                                    <p class="text-[10px] text-gray-text mt-1">Eğitim Kredisi</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Halkbank Şubeleri -->
+        <section class="animate-slide-up bank-section" data-bank="halkbank" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('halkbankSection', 'halkbankIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-halk-red/30 to-halk-red/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-halk-red">account_balance</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Halkbank</span>
+                        <span class="text-[10px] text-gray-text block truncate">37 Şube - Bursa</span>
+                    </div>
+                </div>
+                <span id="halkbankIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="halkbankSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa Merkez -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-bursa')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Atatürk Cad. No:36, Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 220 0607</span>
+                    </div>
+                </div>
+
+                <!-- Heykel -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-heykel')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Heykel Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Atatürk Cad., Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">subway</span>
+                        <span>BursaRay Şehreküstü durağına yakın</span>
+                    </div>
+                </div>
+
+                <!-- Geçit -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-gecit')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Geçit Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Geçit Mah., Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">subway</span>
+                        <span>M1 Hattı - Geçit İstasyonu yanında</span>
+                    </div>
+                </div>
+
+                <!-- Nilüfer -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-nilufer')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">FSM Bulvarı, Nilüfer</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">subway</span>
+                        <span>BursaRay Nilüfer durağına yakın</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-inegol')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Atatürk Bulvarı No:11, İnegöl</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 275 8200</span>
+                    </div>
+                </div>
+
+                <!-- Gemlik -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-gemlik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Hamidiye Mah., Gemlik</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 280 7230</span>
+                    </div>
+                </div>
+
+                <!-- Mudanya -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-mudanya')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mudanya Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Ömerbey Mah., Mudanya</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 324 9870</span>
+                    </div>
+                </div>
+
+                <!-- Karacabey -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-karacabey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Karacabey Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Tavşanlı Mah. Bursa Cad., Karacabey</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 324 9810</span>
+                    </div>
+                </div>
+
+                <!-- Gökdere -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-gokdere')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">9</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gökdere Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 280 5911</span>
+                    </div>
+                </div>
+
+                <!-- Dumlupınar -->
+                <div class="bank-card-halk rounded-xl p-4" onclick="openBankDetail('halk-dumlupinar')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-halk-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">10</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Dumlupınar Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Celal Bayar Cad. yakınında</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ziraat Bankası Şubeleri -->
+        <section class="animate-slide-up bank-section" data-bank="ziraat" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('ziraatSection', 'ziraatIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-ziraat-red/30 to-ziraat-red/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-ziraat-red">agriculture</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Ziraat Bankası</span>
+                        <span class="text-[10px] text-gray-text block truncate">49 Şube - Bursa</span>
+                    </div>
+                </div>
+                <span id="ziraatIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="ziraatSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa Merkez -->
+                <div class="bank-card-ziraat rounded-xl p-4" onclick="openBankDetail('ziraat-bursa')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ziraat-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Atatürk Cad. No:36, Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 224 6542</span>
+                    </div>
+                </div>
+
+                <!-- Ulucami -->
+                <div class="bank-card-ziraat rounded-xl p-4" onclick="openBankDetail('ziraat-ulucami')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ziraat-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Ulucami Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Tahtakale Mah. Atatürk Cd. No:81</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 220 9503</span>
+                    </div>
+                </div>
+
+                <!-- Cumhuriyet Cad. -->
+                <div class="bank-card-ziraat rounded-xl p-4" onclick="openBankDetail('ziraat-cumhuriyet')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ziraat-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Cumhuriyet Caddesi Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Cumhuriyet Cad. No:112, Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">directions_bus</span>
+                        <span>Otobüs: 38, 60, 94 hatları</span>
+                    </div>
+                </div>
+
+                <!-- Yıldırım -->
+                <div class="bank-card-ziraat rounded-xl p-4" onclick="openBankDetail('ziraat-yildirim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ziraat-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yıldırım Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Davutdede Mah. Ankara Yolu Cd. 164B</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 364 9400</span>
+                    </div>
+                </div>
+
+                <!-- Yeşilyayla -->
+                <div class="bank-card-ziraat rounded-xl p-4" onclick="openBankDetail('ziraat-yesilyayla')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ziraat-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yeşilyayla Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">directions_bus</span>
+                        <span>Otobüs: 3A, 3B, 4, 6 hatları</span>
+                    </div>
+                </div>
+
+                <!-- Hürriyet -->
+                <div class="bank-card-ziraat rounded-xl p-4" onclick="openBankDetail('ziraat-hurriyet')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ziraat-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Hürriyet Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Ankara Yolu üzerinde</span>
+                    </div>
+                </div>
+
+                <!-- Kıbrıs Şehitleri -->
+                <div class="bank-card-ziraat rounded-xl p-4" onclick="openBankDetail('ziraat-kibris')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ziraat-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Kıbrıs Şehitleri Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Kıbrıs Şehitleri Cad. No:28F, Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">directions_bus</span>
+                        <span>Merkez bölge</span>
+                    </div>
+                </div>
+
+                <!-- Değirmen Sokak -->
+                <div class="bank-card-ziraat rounded-xl p-4" onclick="openBankDetail('ziraat-degirmen')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ziraat-red flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Aktar Hüssam Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">1. Değirmen Sok. No:2A, Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Çarşı içi, Kapalıçarşı yakını</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vakıfbank Şubeleri -->
+        <section class="animate-slide-up bank-section" data-bank="vakifbank" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('vakifbankSection', 'vakifbankIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-vakif-green/30 to-vakif-green/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-vakif-green">mosque</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Vakıfbank</span>
+                        <span class="text-[10px] text-gray-text block truncate">25+ Şube - Bursa</span>
+                    </div>
+                </div>
+                <span id="vakifbankIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="vakifbankSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa Merkez -->
+                <div class="bank-card-vakif rounded-xl p-4" onclick="openBankDetail('vakif-bursa')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-vakif-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Alacamescit Mah. Gümüşçeken Cd. No:2</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 280 4666</span>
+                    </div>
+                </div>
+
+                <!-- Fomara -->
+                <div class="bank-card-vakif rounded-xl p-4" onclick="openBankDetail('vakif-fomara')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-vakif-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Fomara Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Osmangazi, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>(224) 221 0022</span>
+                    </div>
+                </div>
+
+                <!-- Özlüce -->
+                <div class="bank-card-vakif rounded-xl p-4" onclick="openBankDetail('vakif-ozluce')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-vakif-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Özlüce Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Altınşehir Mah. 330. Sok. No:21A, Nilüfer</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">subway</span>
+                        <span>Özlüce / 29 Ekim metro durağı (490m)</span>
+                    </div>
+                </div>
+
+                <!-- Özel Bankacılık -->
+                <div class="bank-card-vakif rounded-xl p-4" onclick="openBankDetail('vakif-ozel')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-vakif-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Özel Bankacılık</h4>
+                                <p class="text-[10px] text-gray-text">Odunluk Mah. Akpınar Cad. Efe Towers No:15</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Nilüfer, Kat:9 A/33</span>
+                    </div>
+                </div>
+
+                <!-- Gemlik -->
+                <div class="bank-card-vakif rounded-xl p-4" onclick="openBankDetail('vakif-gemlik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-vakif-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Gemlik, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Şube Kodu: 149</span>
+                    </div>
+                </div>
+
+                <!-- Gürsu -->
+                <div class="bank-card-vakif rounded-xl p-4" onclick="openBankDetail('vakif-gursu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-vakif-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gürsu Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Gürsu, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Şube Kodu: 1059</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl -->
+                <div class="bank-card-vakif rounded-xl p-4" onclick="openBankDetail('vakif-inegol')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-vakif-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">İnegöl, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Şube Kodu: 190</span>
+                    </div>
+                </div>
+
+                <!-- Karacabey -->
+                <div class="bank-card-vakif rounded-xl p-4" onclick="openBankDetail('vakif-karacabey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-vakif-green flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Karacabey Şubesi</h4>
+                                <p class="text-[10px] text-gray-text">Karacabey, Bursa</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">location_on</span>
+                        <span>Şube Kodu: 249</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.6s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="halkbank-mobil.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-halk-red text-xl">smartphone</span>
+                    <span class="text-[10px] text-center">Halkbank<br/>Mobil</span>
+                </a>
+                <a href="ziraat-mobil.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-ziraat-red text-xl">agriculture</span>
+                    <span class="text-[10px] text-center">Ziraat<br/>Mobil</span>
+                </a>
+                <a href="vakif-mobil.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-vakif-green text-xl">account_balance</span>
+                    <span class="text-[10px] text-center">Vakıfbank<br/>Mobil</span>
+                </a>
+                <a href="doviz-kurlari.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-bank-gold text-xl">currency_exchange</span>
+                    <span class="text-[10px] text-center">Döviz<br/>Kurları</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-bank-gold">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-bank-gold shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-bank-gold mb-1">Önemli Bilgi</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            Şube bilgileri değişiklik gösterebilir. En güncel bilgiler için bankaların resmi web sitelerini 
+                            veya çağrı merkezlerini kontrol ediniz. 
+                            <strong>Halkbank:</strong> 0850 222 0400 | 
+                            <strong>Ziraat:</strong> 0850 220 0000 | 
+                            <strong>Vakıfbank:</strong> 0850 222 0724
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation - Keşfet ve Profil ile Aynı Boyut -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Banka Detay Modalı -->
+    <div id="bankDetailModal" class="fixed inset-0 z-[80] modal-bank hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeBankDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Şube Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Banka Şubesi Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-bank-gold/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-bank-gold text-3xl">account_balance</span>
+                    </div>
+                    <div>
+                        <h2 id="modalBankName" class="text-xl font-bold text-white mb-1">Şube Adı</h2>
+                        <p id="modalBankType" class="text-sm text-gold">Banka Türü</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p class="text-sm text-white">Hafta İçi: 09:00 - 12:30 / 13:30 - 17:00</p>
+                            <p class="text-xs text-gray-text">Öğle Arası: 12:30 - 13:30</p>
+                            <p class="text-xs text-live-red mt-1">Hafta Sonu: Kapalı</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">İletişim</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                            <p id="modalFax" class="text-xs text-gray-text mt-1">Fax: -</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">tag</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Şube Kodu</p>
+                            <p id="modalCode" class="text-sm text-white">Kod bilgisi...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım ve Otopark
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">payments</span>
+                    Sunulan Hizmetler
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-bank-gold text-xl mb-1">account_balance_wallet</span>
+                        <p class="text-xs text-gray-text">Mevduat</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-bank-gold text-xl mb-1">credit_score</span>
+                        <p class="text-xs text-gray-text">Kredi</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-bank-gold text-xl mb-1">currency_exchange</span>
+                        <p class="text-xs text-gray-text">Döviz</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-bank-gold text-xl mb-1">send_money</span>
+                        <p class="text-xs text-gray-text">EFT/Havale</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-bank-gold text-xl mb-1">receipt_long</span>
+                        <p class="text-xs text-gray-text">Fatura Ödeme</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-bank-gold text-xl mb-1">atm</span>
+                        <p class="text-xs text-gray-text">ATM</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button id="modalCallBtn" onclick="callNumber('')" class="flex-1 bg-bank-gold/20 hover:bg-bank-gold/30 border border-bank-gold/50 text-bank-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    <span id="callBtnText">Ara</span>
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bilgi Modalı -->
+    <div id="infoModal" class="fixed inset-0 z-[80] modal-bank hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Banka Bilgileri</h1>
+                        <p class="text-xs text-gray-text truncate">Çağrı Merkezleri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <!-- Halkbank -->
+            <div class="glass-card rounded-2xl p-5 border border-halk-red/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-halk-red/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-halk-red text-2xl">account_balance</span>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-halk-red">Halkbank</h2>
+                        <p class="text-sm text-gray-text">Türkiye Halk Bankası A.Ş.</p>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <span class="text-sm text-gray-text">Çağrı Merkezi</span>
+                        <span class="text-sm font-bold text-white">0850 222 0 400</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <span class="text-sm text-gray-text">Şube Sayısı (Bursa)</span>
+                        <span class="text-sm font-bold text-white">37</span>
+                    </div>
+                </div>
+                <button onclick="callNumber('08502220400')" class="w-full mt-3 bg-halk-red/20 hover:bg-halk-red/30 border border-halk-red/50 text-halk-red py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Halkbank'ı Ara
+                </button>
+            </div>
+
+            <!-- Ziraat Bankası -->
+            <div class="glass-card rounded-2xl p-5 border border-ziraat-red/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-ziraat-red/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-ziraat-red text-2xl">agriculture</span>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-ziraat-red">Ziraat Bankası</h2>
+                        <p class="text-sm text-gray-text">Türkiye Cumhuriyeti Ziraat Bankası A.Ş.</p>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <span class="text-sm text-gray-text">Çağrı Merkezi</span>
+                        <span class="text-sm font-bold text-white">0850 220 0000</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <span class="text-sm text-gray-text">Şube Sayısı (Bursa)</span>
+                        <span class="text-sm font-bold text-white">49</span>
+                    </div>
+                </div>
+                <button onclick="callNumber('08502200000')" class="w-full mt-3 bg-ziraat-red/20 hover:bg-ziraat-red/30 border border-ziraat-red/50 text-ziraat-red py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Ziraat'i Ara
+                </button>
+            </div>
+
+            <!-- Vakıfbank -->
+            <div class="glass-card rounded-2xl p-5 border border-vakif-green/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-vakif-green/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-vakif-green text-2xl">mosque</span>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-vakif-green">Vakıfbank</h2>
+                        <p class="text-sm text-gray-text">Türkiye Vakıflar Bankası T.A.O.</p>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <span class="text-sm text-gray-text">Çağrı Merkezi</span>
+                        <span class="text-sm font-bold text-white">0850 222 0724</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <span class="text-sm text-gray-text">Şube Sayısı (Bursa)</span>
+                        <span class="text-sm font-bold text-white">25+</span>
+                    </div>
+                </div>
+                <button onclick="callNumber('08502220724')" class="w-full mt-3 bg-vakif-green/20 hover:bg-vakif-green/30 border border-vakif-green/50 text-vakif-green py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Vakıfbank'ı Ara
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Banka Veritabanı
+        const bankData = {
+            // Halkbank
+            'halk-bursa': {
+                name: 'Bursa Şubesi',
+                bank: 'Halkbank',
+                type: 'Bölge Müdürlüğü',
+                address: 'Atatürk Cad. No:36, Osmangazi, Bursa',
+                phone: '(224) 220 0607',
+                fax: '(224) 220 0608',
+                code: '1001',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 3 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'local_parking', text: 'Heykel Meydanı otoparkı (ücretli, 100m)' },
+                    { icon: 'local_taxi', text: 'Taksi duraklarına 50m mesafe' }
+                ],
+                mapQuery: 'Halkbank Bursa Şubesi, Atatürk Caddesi, Osmangazi, Bursa'
+            },
+            'halk-heykel': {
+                name: 'Heykel Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'Atatürk Cad., Osmangazi, Bursa',
+                phone: '(224) 220 0610',
+                fax: '-',
+                code: '1002',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına yakın' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Heykel bölgesi otoparkları' }
+                ],
+                mapQuery: 'Halkbank Heykel Şubesi, Osmangazi, Bursa'
+            },
+            'halk-gecit': {
+                name: 'Geçit Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'Geçit Mah., Osmangazi, Bursa',
+                phone: '(224) 220 0620',
+                fax: '-',
+                code: '1003',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Geçit İstasyonu yanında' },
+                    { icon: 'local_parking', text: 'Geçit Metro otoparkı (ücretsiz)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 38, 94 hatları' }
+                ],
+                mapQuery: 'Halkbank Geçit Şubesi, Osmangazi, Bursa'
+            },
+            'halk-nilufer': {
+                name: 'Nilüfer Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'FSM Bulvarı, Nilüfer, Bursa',
+                phone: '(224) 441 8200',
+                fax: '-',
+                code: '1004',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına yakın' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'FSM Bulvarı üzeri park alanları' }
+                ],
+                mapQuery: 'Halkbank Nilüfer Şubesi, FSM Bulvarı, Bursa'
+            },
+            'halk-inegol': {
+                name: 'İnegöl Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'Atatürk Bulvarı No:11, İnegöl, Bursa',
+                phone: '(224) 275 8200',
+                fax: '-',
+                code: '1005',
+                transport: [
+                    { icon: 'directions_bus', text: 'İnegöl merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'Atatürk Bulvarı üzeri park alanları' }
+                ],
+                mapQuery: 'Halkbank İnegöl Şubesi, Atatürk Bulvarı, İnegöl, Bursa'
+            },
+            'halk-gemlik': {
+                name: 'Gemlik Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'Hamidiye Mah., Gemlik, Bursa',
+                phone: '(224) 280 7230',
+                fax: '-',
+                code: '1006',
+                transport: [
+                    { icon: 'directions_bus', text: 'Gemlik merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'Hamidiye mahallesi park alanları' }
+                ],
+                mapQuery: 'Halkbank Gemlik Şubesi, Gemlik, Bursa'
+            },
+            'halk-mudanya': {
+                name: 'Mudanya Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'Ömerbey Mah., Mudanya, Bursa',
+                phone: '(224) 324 9870',
+                fax: '-',
+                code: '1007',
+                transport: [
+                    { icon: 'directions_bus', text: 'Mudanya merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'Ömerbey mahallesi park alanları' }
+                ],
+                mapQuery: 'Halkbank Mudanya Şubesi, Mudanya, Bursa'
+            },
+            'halk-karacabey': {
+                name: 'Karacabey Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'Tavşanlı Mah. Bursa Cad., Karacabey, Bursa',
+                phone: '(224) 324 9810',
+                fax: '-',
+                code: '1008',
+                transport: [
+                    { icon: 'directions_bus', text: 'Karacabey merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'Bursa Caddesi üzeri park alanları' }
+                ],
+                mapQuery: 'Halkbank Karacabey Şubesi, Karacabey, Bursa'
+            },
+            'halk-gokdere': {
+                name: 'Gökdere Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'Gökdere Mah., Yıldırım, Bursa',
+                phone: '(224) 280 5911',
+                fax: '-',
+                code: '1009',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 3 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı mevcut' }
+                ],
+                mapQuery: 'Halkbank Gökdere Şubesi, Yıldırım, Bursa'
+            },
+            'halk-dumlupinar': {
+                name: 'Dumlupınar Şubesi',
+                bank: 'Halkbank',
+                type: 'Şube',
+                address: 'Celal Bayar Cad. yakınında, Osmangazi, Bursa',
+                phone: '(224) 220 0630',
+                fax: '-',
+                code: '1010',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A hatları' },
+                    { icon: 'local_parking', text: 'Sokak içi park alanları' }
+                ],
+                mapQuery: 'Halkbank Dumlupınar Şubesi, Osmangazi, Bursa'
+            },
+            // Ziraat Bankası
+            'ziraat-bursa': {
+                name: 'Bursa Şubesi',
+                bank: 'Ziraat Bankası',
+                type: 'Bölge Müdürlüğü',
+                address: 'Atatürk Cad. No:36, Osmangazi, Bursa',
+                phone: '(224) 224 6542',
+                fax: '(224) 224 6543',
+                code: '2001',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 3 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'local_parking', text: 'Heykel Meydanı otoparkı (ücretli)' }
+                ],
+                mapQuery: 'Ziraat Bankası Bursa Şubesi, Atatürk Caddesi, Osmangazi, Bursa'
+            },
+            'ziraat-ulucami': {
+                name: 'Ulucami Şubesi',
+                bank: 'Ziraat Bankası',
+                type: 'Şube',
+                address: 'Tahtakale Mah. Atatürk Cd. No:81, Osmangazi, Bursa',
+                phone: '(224) 220 9503',
+                fax: '-',
+                code: '2002',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Ulucami çevresi park alanları' }
+                ],
+                mapQuery: 'Ziraat Bankası Ulucami Şubesi, Osmangazi, Bursa'
+            },
+            'ziraat-cumhuriyet': {
+                name: 'Cumhuriyet Caddesi Şubesi',
+                bank: 'Ziraat Bankası',
+                type: 'Şube',
+                address: 'Cumhuriyet Cad. No:112, Osmangazi, Bursa',
+                phone: '(224) 220 9505',
+                fax: '-',
+                code: '2003',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Cumhuriyet Caddesi üzeri park' }
+                ],
+                mapQuery: 'Ziraat Bankası Cumhuriyet Caddesi Şubesi, Osmangazi, Bursa'
+            },
+            'ziraat-yildirim': {
+                name: 'Yıldırım Şubesi',
+                bank: 'Ziraat Bankası',
+                type: 'Şube',
+                address: 'Davutdede Mah. Ankara Yolu Cd. 164B, Yıldırım, Bursa',
+                phone: '(224) 364 9400',
+                fax: '-',
+                code: '2004',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Ankara Yolu üzeri park alanları' }
+                ],
+                mapQuery: 'Ziraat Bankası Yıldırım Şubesi, Yıldırım, Bursa'
+            },
+            'ziraat-yesilyayla': {
+                name: 'Yeşilyayla Şubesi',
+                bank: 'Ziraat Bankası',
+                type: 'Şube',
+                address: 'Yeşilyayla Mah., Yıldırım, Bursa',
+                phone: '(224) 364 9405',
+                fax: '-',
+                code: '2005',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 6 hatları' },
+                    { icon: 'local_parking', text: 'Mahalle otoparkı mevcut' }
+                ],
+                mapQuery: 'Ziraat Bankası Yeşilyayla Şubesi, Yıldırım, Bursa'
+            },
+            'ziraat-hurriyet': {
+                name: 'Hürriyet Şubesi',
+                bank: 'Ziraat Bankası',
+                type: 'Şube',
+                address: 'Hürriyet Mah., Yıldırım, Bursa',
+                phone: '(224) 364 9410',
+                fax: '-',
+                code: '2006',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Ankara Yolu üzerinde park alanları' }
+                ],
+                mapQuery: 'Ziraat Bankası Hürriyet Şubesi, Yıldırım, Bursa'
+            },
+            'ziraat-kibris': {
+                name: 'Kıbrıs Şehitleri Şubesi',
+                bank: 'Ziraat Bankası',
+                type: 'Şube',
+                address: 'Kıbrıs Şehitleri Cad. No:28F, Osmangazi, Bursa',
+                phone: '(224) 220 9510',
+                fax: '-',
+                code: '2007',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Merkez bölge otoparkları' }
+                ],
+                mapQuery: 'Ziraat Bankası Kıbrıs Şehitleri Şubesi, Osmangazi, Bursa'
+            },
+            'ziraat-degirmen': {
+                name: 'Aktar Hüssam Şubesi',
+                bank: 'Ziraat Bankası',
+                type: 'Şube',
+                address: '1. Değirmen Sok. No:2A, Osmangazi, Bursa',
+                phone: '(224) 220 9515',
+                fax: '-',
+                code: '2008',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Çarşı içi, Kapalıçarşı yakını' }
+                ],
+                mapQuery: 'Ziraat Bankası Aktar Hüssam Şubesi, Osmangazi, Bursa'
+            },
+            // Vakıfbank
+            'vakif-bursa': {
+                name: 'Bursa Şubesi',
+                bank: 'Vakıfbank',
+                type: 'Bölge Müdürlüğü',
+                address: 'Alacamescit Mah. Gümüşçeken Cd. No:2, Osmangazi, Bursa',
+                phone: '(224) 280 4666',
+                fax: '(224) 280 4667',
+                code: '3001',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Heykel bölgesi otoparkları' }
+                ],
+                mapQuery: 'Vakıfbank Bursa Şubesi, Gümüşçeken Caddesi, Osmangazi, Bursa'
+            },
+            'vakif-fomara': {
+                name: 'Fomara Şubesi',
+                bank: 'Vakıfbank',
+                type: 'Şube',
+                address: 'Fomara, Osmangazi, Bursa',
+                phone: '(224) 221 0022',
+                fax: '-',
+                code: '3002',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Fomara bölgesi otoparkları' }
+                ],
+                mapQuery: 'Vakıfbank Fomara Şubesi, Osmangazi, Bursa'
+            },
+            'vakif-ozluce': {
+                name: 'Özlüce Şubesi',
+                bank: 'Vakıfbank',
+                type: 'Şube',
+                address: 'Altınşehir Mah. 330. Sok. No:21A, Nilüfer, Bursa',
+                phone: '(224) 441 8500',
+                fax: '-',
+                code: '3003',
+                transport: [
+                    { icon: 'subway', text: 'Özlüce / 29 Ekim metro durağı (490m)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Altınşehir mahallesi otoparkı' }
+                ],
+                mapQuery: 'Vakıfbank Özlüce Şubesi, Nilüfer, Bursa'
+            },
+            'vakif-ozel': {
+                name: 'Bursa Özel Bankacılık',
+                bank: 'Vakıfbank',
+                type: 'Özel Bankacılık Merkezi',
+                address: 'Odunluk Mah. Akpınar Cad. Efe Towers No:15, Nilüfer, Bursa',
+                phone: '(224) 280 4700',
+                fax: '-',
+                code: '3004',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına yakın' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Efe Towers otoparkı' }
+                ],
+                mapQuery: 'Vakıfbank Bursa Özel Bankacılık, Efe Towers, Nilüfer, Bursa'
+            },
+            'vakif-gemlik': {
+                name: 'Gemlik Şubesi',
+                bank: 'Vakıfbank',
+                type: 'Şube',
+                address: 'Gemlik, Bursa',
+                phone: '(224) 280 4720',
+                fax: '-',
+                code: '149',
+                transport: [
+                    { icon: 'directions_bus', text: 'Gemlik merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'Gemlik merkez otoparkları' }
+                ],
+                mapQuery: 'Vakıfbank Gemlik Şubesi, Gemlik, Bursa'
+            },
+            'vakif-gursu': {
+                name: 'Gürsu Şubesi',
+                bank: 'Vakıfbank',
+                type: 'Şube',
+                address: 'Gürsu, Bursa',
+                phone: '(224) 280 4730',
+                fax: '-',
+                code: '1059',
+                transport: [
+                    { icon: 'directions_bus', text: 'Gürsu merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'Gürsu merkez otoparkları' }
+                ],
+                mapQuery: 'Vakıfbank Gürsu Şubesi, Gürsu, Bursa'
+            },
+            'vakif-inegol': {
+                name: 'İnegöl Şubesi',
+                bank: 'Vakıfbank',
+                type: 'Şube',
+                address: 'İnegöl, Bursa',
+                phone: '(224) 280 4740',
+                fax: '-',
+                code: '190',
+                transport: [
+                    { icon: 'directions_bus', text: 'İnegöl merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'İnegöl merkez otoparkları' }
+                ],
+                mapQuery: 'Vakıfbank İnegöl Şubesi, İnegöl, Bursa'
+            },
+            'vakif-karacabey': {
+                name: 'Karacabey Şubesi',
+                bank: 'Vakıfbank',
+                type: 'Şube',
+                address: 'Karacabey, Bursa',
+                phone: '(224) 280 4750',
+                fax: '-',
+                code: '249',
+                transport: [
+                    { icon: 'directions_bus', text: 'Karacabey merkez otobüs hatları' },
+                    { icon: 'local_parking', text: 'Karacabey merkez otoparkları' }
+                ],
+                mapQuery: 'Vakıfbank Karacabey Şubesi, Karacabey, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // Bank Filter
+        let currentBank = 'all';
+        function filterBank(bank) {
+            currentBank = bank;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + bank).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.bank-section');
+            sections.forEach(section => {
+                if (bank === 'all' || section.dataset.bank === bank) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Bank
+        function searchBank() {
+            const searchTerm = document.getElementById('bankSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.bank-card-halk, .bank-card-ziraat, .bank-card-vakif');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open Bank Detail Modal
+        function openBankDetail(bankId) {
+            const bank = bankData[bankId];
+            if (!bank) return;
+
+            // Renk ayarları
+            let bankColor = 'bank-gold';
+            let bankIcon = 'account_balance';
+            if (bank.bank === 'Halkbank') {
+                bankColor = 'halk-red';
+                bankIcon = 'account_balance';
+            } else if (bank.bank === 'Ziraat Bankası') {
+                bankColor = 'ziraat-red';
+                bankIcon = 'agriculture';
+            } else if (bank.bank === 'Vakıfbank') {
+                bankColor = 'vakif-green';
+                bankIcon = 'mosque';
+            }
+
+            document.getElementById('modalBankName').textContent = bank.name;
+            document.getElementById('modalBankType').textContent = bank.bank + ' - ' + bank.type;
+            document.getElementById('modalBankType').className = 'text-sm text-' + bankColor;
+            document.getElementById('modalAddress').textContent = bank.address;
+            document.getElementById('modalPhone').textContent = bank.phone;
+            document.getElementById('modalFax').textContent = bank.fax !== '-' ? 'Fax: ' + bank.fax : 'Fax: Belirtilmemiş';
+            document.getElementById('modalCode').textContent = bank.code;
+
+            // İkon ayarları
+            const iconEl = document.getElementById('modalIcon');
+            iconEl.className = 'w-16 h-16 rounded-2xl bg-' + bankColor + '/20 flex items-center justify-center';
+            iconEl.innerHTML = '<span class="material-symbols-outlined text-' + bankColor + ' text-3xl">' + bankIcon + '</span>';
+
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            bank.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Butonları güncelle
+            document.getElementById('modalCallBtn').setAttribute('onclick', `callNumber('${bank.phone.replace(/[^0-9]/g, '')}')`);
+            document.getElementById('modalCallBtn').className = `flex-1 bg-${bankColor}/20 hover:bg-${bankColor}/30 border border-${bankColor}/50 text-${bankColor} py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2`;
+            document.getElementById('callBtnText').textContent = bank.phone + ' Ara';
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${bank.mapQuery}')`);
+
+            document.getElementById('bankDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Bank Detail Modal
+        function closeBankDetail() {
+            document.getElementById('bankDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            // Sadece rakamları al
+            const cleanNumber = number.replace(/\D/g, '');
+            if (cleanNumber.length > 0) {
+                window.location.href = 'tel:' + cleanNumber;
+            }
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Info Modal
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+                // Initialize - Tüm bölümler varsayılan olarak KAPALI
+        document.addEventListener('DOMContentLoaded', function() {
+            // FAQ kapalı - açmak için tıklayın
+            // document.getElementById('faqSection').classList.add('open');
+            // document.getElementById('faqIcon').classList.add('open');
+            
+            // Banka bölümleri kapalı - açmak için tıklayın
+            // document.getElementById('halkbankSection').classList.add('open');
+            // document.getElementById('halkbankIcon').classList.add('open');
+            // document.getElementById('ziraatSection').classList.add('open');
+            // document.getElementById('ziraatIcon').classList.add('open');
+            // document.getElementById('vakifbankSection').classList.add('open');
+            // document.getElementById('vakifbankIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Haberler - Bursa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                        "warning": "#f97316",
+                        "success": "#22c55e",
+                        "info": "#3b82f6",
+                        "breaking": "#ef4444",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-glow': 'pulseGlow 3s infinite',
+                        'shimmer': 'shimmer 2.5s infinite',
+                        'breaking-flash': 'breakingFlash 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 10px rgba(224, 176, 122, 0.3)' },
+                            '50%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.6)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                        breakingFlash: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' },
+                        },
+                    }
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                background: rgba(13, 50, 56, 0.6);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+            }
+            .glass-panel-hover:hover {
+                background: rgba(23, 70, 75, 0.8);
+                border-color: rgba(224, 176, 122, 0.3);
+            }
+            .text-glow {
+                text-shadow: 0 0 10px rgba(224, 176, 122, 0.3);
+            }
+            .news-card {
+                background: linear-gradient(135deg, rgba(23, 70, 75, 0.4) 0%, rgba(8, 31, 36, 0.6) 100%);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .news-card:active {
+                transform: scale(0.98);
+            }
+            .tab-active {
+                background: linear-gradient(135deg, rgba(224, 176, 122, 0.9) 0%, rgba(224, 176, 122, 0.7) 100%);
+                color: #081F24;
+                box-shadow: 0 2px 10px rgba(224, 176, 122, 0.3);
+            }
+            .tab-passive {
+                background: rgba(23, 70, 75, 0.3);
+                color: #9FB6B8;
+                border: 1px solid rgba(63, 110, 112, 0.2);
+            }
+            .category-pill {
+                background: rgba(224, 176, 122, 0.1);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+                color: #E0B07A;
+            }
+            .category-pill.active {
+                background: rgba(224, 176, 122, 0.9);
+                color: #081F24;
+            }
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            
+            .breaking-badge {
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                animation: breakingFlash 2s infinite;
+            }
+            
+            .hero-slide {
+                position: absolute;
+                inset: 0;
+                opacity: 0;
+                transition: opacity 0.8s ease-in-out;
+            }
+            .hero-slide.active {
+                opacity: 1;
+            }
+            
+            .hero-progress-container {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: rgba(255, 255, 255, 0.1);
+                z-index: 20;
+            }
+            .hero-progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, #E0B07A, #D4A574);
+                width: 0%;
+                transition: width 0.1s linear;
+                box-shadow: 0 0 10px rgba(224, 176, 122, 0.5);
+            }
+            
+            .news-image-mask {
+                mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+            }
+        }
+    </style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden max-w-md mx-auto min-h-screen relative shadow-2xl">
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 max-w-md mx-auto flex items-center justify-between px-4 py-3 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/20">
+    <div class="flex items-center gap-3">
+        <button onclick="goBack()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+            <span class="material-symbols-outlined text-base text-white">arrow_back</span>
+        </button>
+        <div class="flex flex-col">
+            <span class="text-[9px] text-gold-primary tracking-wider uppercase">Bursa</span>
+            <h1 class="text-base font-bold tracking-tight text-white leading-none">Haberler</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-2">
+        <button onclick="refreshNews()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+            <span class="material-symbols-outlined text-text-secondary text-base" id="refresh-icon">refresh</span>
+        </button>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+            <span class="material-symbols-outlined text-gold-primary text-base">notifications</span>
+        </button>
+    </div>
+</header>
+
+<!-- Hero Slider - Featured News -->
+<section class="relative h-[32vh] min-h-[240px] w-full overflow-hidden mt-[52px]">
+    <div class="hero-slide active" data-index="0">
+        <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80" class="w-full h-full object-cover news-image-mask" alt="Haber"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="breaking-badge px-2 py-0.5 rounded text-[9px] font-bold text-white uppercase tracking-wider">Son Dakika</span>
+                <span class="text-[10px] text-text-secondary">15 dk önce</span>
+            </div>
+            <h2 class="text-lg font-bold text-white leading-tight mb-1">Bursa'da Yeni Metro Hattı İçin İlk Kazma Vuruldu</h2>
+            <p class="text-[11px] text-text-desc line-clamp-2">Şehir içi ulaşımda devrim yaratacak olan 12 km'lik yeni metro hattının temel atma töreni gerçekleşti.</p>
+        </div>
+    </div>
+    <div class="hero-slide" data-index="1">
+        <img src="https://images.unsplash.com/photo-1569025743873-ea3a9da2e2b2?w=800&q=80" class="w-full h-full object-cover news-image-mask" alt="Haber"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="px-2 py-0.5 bg-gold-primary/20 border border-gold-primary/40 rounded text-[9px] font-bold text-gold-primary uppercase">Gündem</span>
+                <span class="text-[10px] text-text-secondary">1 saat önce</span>
+            </div>
+            <h2 class="text-lg font-bold text-white leading-tight mb-1">Uludağ'da Sezonun Son Kayak Festivali Başlıyor</h2>
+            <p class="text-[11px] text-text-desc line-clamp-2">Baharın gelişiyle birlikte kayak sezonunu uğurlamak için büyük festival düzenlenecek.</p>
+        </div>
+    </div>
+    <div class="hero-slide" data-index="2">
+        <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80" class="w-full h-full object-cover news-image-mask" alt="Haber"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="px-2 py-0.5 bg-accent-teal/20 border border-accent-teal/40 rounded text-[9px] font-bold text-accent-teal uppercase">Ekonomi</span>
+                <span class="text-[10px] text-text-secondary">2 saat önce</span>
+            </div>
+            <h2 class="text-lg font-bold text-white leading-tight mb-1">Otomotiv İhracatında Bursa Yine Zirvede</h2>
+            <p class="text-[11px] text-text-desc line-clamp-2">İlk çeyrek sonuçlarına göre Bursa, Türkiye'nin en büyük otomotiv ihracatçısı konumunu korudu.</p>
+        </div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div class="hero-progress-container">
+        <div class="hero-progress-bar" id="hero-progress"></div>
+    </div>
+    
+    <!-- Indicators -->
+    <div class="absolute bottom-4 right-4 flex gap-1.5">
+        <button onclick="goToSlide(0)" class="slide-dot w-6 h-1 rounded-full bg-gold-primary transition-all" data-index="0"></button>
+        <button onclick="goToSlide(1)" class="slide-dot w-1.5 h-1 rounded-full bg-white/30 transition-all" data-index="1"></button>
+        <button onclick="goToSlide(2)" class="slide-dot w-1.5 h-1 rounded-full bg-white/30 transition-all" data-index="2"></button>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24 -mt-4 rounded-t-3xl">
+    <div class="px-4 pt-5">
+        
+        <!-- View Toggle -->
+        <div class="flex justify-center mb-4">
+            <div class="glass-panel rounded-full p-1 flex gap-1">
+                <button id="btn-bolgesel" onclick="switchView('bolgesel')" class="tab-active px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">location_on</span>
+                    Bölgesel
+                </button>
+                <button id="btn-genel" onclick="switchView('genel')" class="tab-passive px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">public</span>
+                    Genel
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Filters -->
+        <div class="mb-4">
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2" id="category-tabs">
+                <button onclick="filterCategory('all')" class="category-pill active px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="all">
+                    <span class="material-symbols-outlined text-[11px]">apps</span>
+                    Tümü
+                </button>
+                <button onclick="filterCategory('breaking')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="breaking">
+                    <span class="material-symbols-outlined text-[11px]">bolt</span>
+                    Son Dakika
+                </button>
+                <button onclick="filterCategory('politics')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="politics">
+                    <span class="material-symbols-outlined text-[11px]">account_balance</span>
+                    Siyaset
+                </button>
+                <button onclick="filterCategory('economy')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="economy">
+                    <span class="material-symbols-outlined text-[11px]">trending_up</span>
+                    Ekonomi
+                </button>
+                <button onclick="filterCategory('sports')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="sports">
+                    <span class="material-symbols-outlined text-[11px]">sports_soccer</span>
+                    Spor
+                </button>
+                <button onclick="filterCategory('culture')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="culture">
+                    <span class="material-symbols-outlined text-[11px]">palette</span>
+                    Kültür
+                </button>
+            </div>
+        </div>
+
+        <!-- News Count -->
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-[11px] text-text-desc">
+                <span id="news-count" class="text-gold-primary font-bold">8</span> haber
+            </p>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleViewMode()" class="text-[10px] text-text-secondary flex items-center gap-0.5">
+                    <span class="material-symbols-outlined text-xs" id="view-icon">view_agenda</span>
+                    <span id="view-text">Liste</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Breaking News Ticker -->
+        <div id="breaking-ticker" class="mb-4 glass-panel rounded-xl p-3 border-l-4 border-breaking hidden">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-breaking text-lg">bolt</span>
+                <span class="text-[10px] font-bold text-breaking uppercase tracking-wider">Son Dakika</span>
+            </div>
+            <div class="overflow-hidden">
+                <p class="text-[11px] text-white font-medium whitespace-nowrap animate-pulse" id="ticker-text">
+                    Bursa'da trafik kazası: Ankara yolu 2 saat trafiğe kapalı...
+                </p>
+            </div>
+        </div>
+
+        <!-- News List -->
+        <div id="news-container" class="space-y-3">
+            <!-- News injected by JS -->
+        </div>
+
+        <!-- Load More -->
+        <div class="mt-6 text-center">
+            <button onclick="loadMoreNews()" class="px-6 py-2.5 glass-panel rounded-full text-text-desc text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all flex items-center justify-center gap-2 mx-auto">
+                <span id="load-more-text">Daha Fazla</span>
+                <span class="material-symbols-outlined text-xs" id="load-more-icon">expand_more</span>
+            </button>
+        </div>
+    </div>
+</main>
+
+<!-- News Detail Modal -->
+<div id="news-modal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-darkest/98 backdrop-blur-lg modal-backdrop opacity-0 transition-opacity duration-300" onclick="closeNewsModal()"></div>
+    <div class="absolute inset-0 overflow-y-auto modal-content translate-y-full transition-transform duration-400" style="transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);">
+        <button onclick="closeNewsModal()" class="fixed top-3 right-3 z-50 w-8 h-8 rounded-full bg-black/40 backdrop-blur flex items-center justify-center active:scale-95">
+            <span class="material-symbols-outlined text-white text-lg">close</span>
+        </button>
+
+        <div class="relative h-[250px] shrink-0">
+            <img id="modal-image" src="" class="w-full h-full object-cover" alt="Haber"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent"></div>
+            <div class="absolute top-3 left-3 flex gap-2">
+                <span id="modal-category-badge" class="px-2 py-0.5 bg-gold-primary/20 border border-gold-primary/40 rounded text-gold-primary text-[9px] font-bold uppercase">Gündem</span>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 p-4">
+                <div class="flex items-center gap-2 mb-2 text-[10px] text-text-secondary">
+                    <span id="modal-source" class="font-semibold text-gold-primary">Bursa Hakimiyet</span>
+                    <span>•</span>
+                    <span id="modal-time">2 saat önce</span>
+                </div>
+                <h2 id="modal-title" class="text-xl font-bold text-white leading-tight">Haber Başlığı</h2>
+            </div>
+        </div>
+
+        <div class="px-4 py-4 space-y-4">
+            
+            <!-- Action Bar -->
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                <button onclick="shareNews()" class="glass-panel rounded-lg px-3 py-2 flex items-center gap-1.5 shrink-0 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">share</span>
+                    <span class="text-[10px] font-bold text-white">Paylaş</span>
+                </button>
+                <button onclick="saveNews()" class="glass-panel rounded-lg px-3 py-2 flex items-center gap-1.5 shrink-0 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-gold-primary text-sm" id="save-icon">bookmark_border</span>
+                    <span class="text-[10px] font-bold text-white" id="save-text">Kaydet</span>
+                </button>
+                <button onclick="textSize()" class="glass-panel rounded-lg px-3 py-2 flex items-center gap-1.5 shrink-0 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">text_fields</span>
+                    <span class="text-[10px] font-bold text-white">Boyut</span>
+                </button>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="glass-panel rounded-xl p-3 border-l-4 border-gold-primary">
+                <p class="text-[11px] text-text-secondary leading-relaxed italic" id="modal-summary">
+                    Haber özeti burada yer alacak...
+                </p>
+            </div>
+
+            <!-- Article Content -->
+            <div class="glass-panel rounded-xl p-4">
+                <div id="modal-content" class="text-[12px] text-text-secondary leading-relaxed space-y-3">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="flex flex-wrap gap-2" id="modal-tags">
+                <!-- Tags injected by JS -->
+            </div>
+
+            <!-- Related News -->
+            <div class="glass-panel rounded-xl p-3">
+                <h3 class="text-xs font-bold text-white mb-3 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">link</span>
+                    İlgili Haberler
+                </h3>
+                <div class="space-y-2" id="related-news">
+                    <!-- Related news injected by JS -->
+                </div>
+            </div>
+
+            <div class="h-8"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex items-center justify-around px-6 py-2 bg-nav-bg/95 backdrop-blur-md border-t border-border-subtle/30 pb-5 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="anasayfa.html">
+        <span class="material-symbols-outlined text-xl">home</span>
+        <span class="text-[8px] font-medium">Ana sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-primary nav-glow-gold" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-xl">explore</span>
+        <span class="text-[8px] font-medium">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="ara.html">
+        <span class="material-symbols-outlined text-xl">search</span>
+        <span class="text-[8px] font-medium">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="profil.html">
+        <span class="material-symbols-outlined text-xl">person</span>
+        <span class="text-[8px] font-medium">Profil</span>
+    </a>
+</nav>
+
+<script>
+// Hero Slider
+let currentSlide = 0;
+const slides = document.querySelectorAll('.hero-slide');
+const dots = document.querySelectorAll('.slide-dot');
+const progressBar = document.getElementById('hero-progress');
+const slideInterval = 6000;
+let slideTimer;
+let progressTimer;
+
+function goToSlide(index) {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('bg-gold-primary', 'w-6');
+    dots[currentSlide].classList.add('bg-white/30', 'w-1.5');
+    
+    currentSlide = index;
+    
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.remove('bg-white/30', 'w-1.5');
+    dots[currentSlide].classList.add('bg-gold-primary', 'w-6');
+    
+    resetProgress();
+}
+
+function nextSlide() {
+    goToSlide((currentSlide + 1) % slides.length);
+}
+
+function resetProgress() {
+    clearInterval(progressTimer);
+    progressBar.style.width = '0%';
+    let progress = 0;
+    const increment = 100 / (slideInterval / 50);
+    
+    progressTimer = setInterval(() => {
+        progress += increment;
+        if (progress >= 100) progress = 0;
+        progressBar.style.width = progress + '%';
+    }, 50);
+}
+
+function startSlider() {
+    slideTimer = setInterval(nextSlide, slideInterval);
+    resetProgress();
+}
+
+startSlider();
+
+// Navigation
+function goBack() {
+    if (window.history.length > 1) window.history.back();
+    else window.location.href = 'bursa.html';
+}
+
+function refreshNews() {
+    const icon = document.getElementById('refresh-icon');
+    icon.classList.add('animate-spin');
+    setTimeout(() => {
+        icon.classList.remove('animate-spin');
+        renderNews();
+    }, 1000);
+}
+
+// News Data
+const newsData = [
+    {
+        id: '1',
+        title: 'Bursa\'da Yeni Metro Hattı İçin İlk Kazma Vuruldu',
+        category: 'politics',
+        type: 'bolgesel',
+        time: '15 dk önce',
+        source: 'Bursa Hakimiyet',
+        image: 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
+        summary: 'Şehir içi ulaşımda devrim yaratacak olan 12 km\'lik yeni metro hattının temel atma töreni gerçekleşti.',
+        content: '<p>Bursa Büyükşehir Belediyesi tarafından yapımına başlanan yeni metro hattı, şehrin trafik sorununa kalıcı çözüm getirmeyi hedefliyor. 12 kilometre uzunluğundaki hat, 8 istasyondan oluşacak.</p><p><strong>Temel atma törenine</strong> katılan yetkililer, projenin 2027 yılı sonunda tamamlanmasının planlandığını açıkladı. Yeni hat günde 150 bin yolcu taşıma kapasitesine sahip olacak.</p><p>Vatandaşlar proje hakkında olumlu düşüncelerini dile getirirken, inşaat sürecindeki trafik yoğunluğundan endişe duyanlar da var.</p>',
+        tags: ['Ulaşım', 'Metro', 'Bursa', 'Altyapı'],
+        isBreaking: true,
+        views: '12.5K'
+    },
+    {
+        id: '2',
+        title: 'Uludağ\'da Sezonun Son Kayak Festivali Başlıyor',
+        category: 'culture',
+        type: 'bolgesel',
+        time: '1 saat önce',
+        source: 'Bursa.com',
+        image: 'https://images.unsplash.com/photo-1569025743873-ea3a9da2e2b2?w=800&q=80',
+        summary: 'Baharın gelişiyle birlikte kayak sezonunu uğurlamak için büyük festival düzenlenecek.',
+        content: '<p>Uludağ\'da bu hafta sonu "Beyaz Veda" festivali düzenlenecek. Etkinlik kapsamında konserler, yarışmalar ve özel indirimler yer alacak.</p><p>Festival, kayakseverlere unutulmaz bir sezon finali yaşatmayı amaçlıyor. Otellerde %50\'ye varan indirimler sunulacak.</p>',
+        tags: ['Uludağ', 'Kayak', 'Festival', 'Turizm'],
+        isBreaking: false,
+        views: '8.2K'
+    },
+    {
+        id: '3',
+        title: 'Otomotiv İhracatında Bursa Yine Zirvede',
+        category: 'economy',
+        type: 'bolgesel',
+        time: '2 saat önce',
+        source: 'Dünya Gazetesi',
+        image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',
+        summary: 'İlk çeyrek sonuçlarına göre Bursa, Türkiye\'nin en büyük otomotiv ihracatçısı konumunu korudu.',
+        content: '<p>Bursa, otomotiv ihracatında yine Türkiye birincisi oldu. İlk üç ayda 2.5 milyar dolarlık ihracat gerçekleştirildi.</p><p>Otomotiv yan sanayindeki büyüme dikkat çekerken, elektrikli araç üretimine yönelik yatırımlar hız kazandı.</p>',
+        tags: ['Ekonomi', 'Otomotiv', 'İhracat', 'Sanayi'],
+        isBreaking: false,
+        views: '15.1K'
+    },
+    {
+        id: '4',
+        title: 'Bursaspor\'da Teknik Direktör Değişikliği',
+        category: 'sports',
+        type: 'bolgesel',
+        time: '3 saat önce',
+        source: 'Sporx',
+        image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+        summary: 'Yeşil-beyazlı kulüpte teknik direktör arayışları başladı. Son maçtaki mağlubiyet sonrası yönetim harekete geçti.',
+        content: '<p>Bursaspor yönetimi, alınan kötü sonuçlar sonrası teknik direktör değişikliğine gitti. Yeni hocanın bu hafta içinde açıklanması bekleniyor.</p><p>Taraftarlar sosyal medyada tepkilerini dile getirirken, camiadan birlik ve beraberlik çağrıları yükseldi.</p>',
+        tags: ['Bursaspor', 'Futbol', 'Spor', 'TFF'],
+        isBreaking: true,
+        views: '25.3K'
+    },
+    {
+        id: '5',
+        title: 'Türkiye\'de Enflasyon Rakamları Açıklandı',
+        category: 'economy',
+        type: 'genel',
+        time: '30 dk önce',
+        source: 'Bloomberg HT',
+        image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
+        summary: 'TÜİK mart ayı enflasyon verilerini açıkladı. Yıllık enflasyon beklentilerin altında kaldı.',
+        content: '<p>Türkiye İstatistik Kurumu (TÜİK) mart ayı enflasyon verilerini açıkladı. Tüketici fiyatları yıllık bazda %38.12 arttı.</p><p>Aylık bazda ise enflasyon %2.46 olarak gerçekleşti. Ulaştırma ve gıda gruplarındaki artışlar dikkat çekti.</p>',
+        tags: ['Enflasyon', 'Ekonomi', 'TÜİK', 'Türkiye'],
+        isBreaking: true,
+        views: '45.2K'
+    },
+    {
+        id: '6',
+        title: 'Cumhurbaşkanı Erdoğan\'dan Bursa Mesajı',
+        category: 'politics',
+        type: 'genel',
+        time: '4 saat önce',
+        source: 'TRT Haber',
+        image: 'https://images.unsplash.com/photo-1523995462485-3d171b5c8fa9?w=800&q=80',
+        summary: 'Cumhurbaşkanı Recep Tayyip Erdoğan, Bursa\'daki yatırımlarla ilgili önemli açıklamalarda bulundu.',
+        content: '<p>Cumhurbaşkanı Erdoğan, partisinin Bursa il teşkilatı toplantısında konuştu. Şehre yapılacak yeni yatırımları duyurdu.</p><p>"Bursa, Türkiye\'nin sanayi başkenti olma yolunda emin adımlarla ilerliyor" dedi.</p>',
+        tags: ['Siyaset', 'Cumhurbaşkanı', 'AK Parti', 'Bursa'],
+        isBreaking: false,
+        views: '32.1K'
+    },
+    {
+        id: '7',
+        title: 'Dünya Kupası Elemelerinde Türkiye Kazandı',
+        category: 'sports',
+        type: 'genel',
+        time: '5 saat önce',
+        source: 'NTV Spor',
+        image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&q=80',
+        summary: 'A Milli Futbol Takımımız, 2026 Dünya Kupası elemelerinde önemli bir galibiyet aldı.',
+        content: '<p>Türkiye A Milli Futbol Takımı, deplasmanda 2-1 kazandı. Goller Kerem Aktürkoğlu ve Cenk Tosun\'dan geldi.</p><p>Grup liderliği için büyük avantaj sağlayan ay-yıldızlılar, son iki maçını da kazanması halinde finallere katılacak.</p>',
+        tags: ['Milli Takım', 'Futbol', 'Dünya Kupası', 'A Milli'],
+        isBreaking: false,
+        views: '28.9K'
+    },
+    {
+        id: '8',
+        title: 'Bursa\'da Tarihi Çarşı Restorasyonu Başlıyor',
+        category: 'culture',
+        type: 'bolgesel',
+        time: '6 saat önce',
+        source: 'Hürriyet',
+        image: 'https://images.unsplash.com/photo-1596727147705-54a9d099308d?w=800&q=80',
+        summary: 'UNESCO Dünya Mirası Listesi\'ndeki tarihi çarşıda kapsamlı restorasyon çalışması başlıyor.',
+        content: '<p>Bursa\'nın simgelerinden tarihi çarşı ve hanlar bölgesinde restorasyon başlıyor. Çalışmalar 18 ay sürecek.</p><p>Esnaf geçici olarak alternatif alanlara taşınırken, restorasyon sonrası bölgenin turizme daha fazla katkı sağlaması hedefleniyor.</p>',
+        tags: ['UNESCO', 'Tarih', 'Restorasyon', 'Turizm'],
+        isBreaking: false,
+        views: '9.4K'
+    }
+];
+
+// State
+let currentView = 'bolgesel';
+let currentCategory = 'all';
+let isCompactView = false;
+let savedNews = [];
+
+// Initialize
+function init() {
+    renderNews();
+    checkBreakingNews();
+}
+
+// View Switcher
+function switchView(view) {
+    currentView = view;
+    const btnBolgesel = document.getElementById('btn-bolgesel');
+    const btnGenel = document.getElementById('btn-genel');
+    
+    if (view === 'bolgesel') {
+        btnBolgesel.className = 'tab-active px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+        btnGenel.className = 'tab-passive px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+    } else {
+        btnBolgesel.className = 'tab-passive px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+        btnGenel.className = 'tab-active px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+    }
+    
+    renderNews();
+}
+
+// Category Filter
+function filterCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.category === category);
+    });
+    
+    renderNews();
+}
+
+// Toggle View Mode
+function toggleViewMode() {
+    isCompactView = !isCompactView;
+    const icon = document.getElementById('view-icon');
+    const text = document.getElementById('view-text');
+    
+    if (isCompactView) {
+        icon.textContent = 'grid_view';
+        text.textContent = 'Kompakt';
+    } else {
+        icon.textContent = 'view_agenda';
+        text.textContent = 'Liste';
+    }
+    
+    renderNews();
+}
+
+// Check Breaking News
+function checkBreakingNews() {
+    const breakingNews = newsData.filter(n => n.isBreaking && n.type === currentView);
+    const ticker = document.getElementById('breaking-ticker');
+    
+    if (breakingNews.length > 0) {
+        ticker.classList.remove('hidden');
+        document.getElementById('ticker-text').textContent = breakingNews[0].title;
+    } else {
+        ticker.classList.add('hidden');
+    }
+}
+
+// Render News
+function renderNews() {
+    const container = document.getElementById('news-container');
+    
+    let filtered = newsData.filter(n => currentView === 'all' || n.type === currentView);
+    if (currentCategory !== 'all') {
+        if (currentCategory === 'breaking') {
+            filtered = filtered.filter(n => n.isBreaking);
+        } else {
+            filtered = filtered.filter(n => n.category === currentCategory);
+        }
+    }
+    
+    document.getElementById('news-count').textContent = filtered.length;
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8">
+                <span class="material-symbols-outlined text-4xl text-text-desc mb-2">newspaper</span>
+                <p class="text-sm text-text-desc">Bu kategoride haber bulunamadı</p>
+            </div>
+        `;
+        return;
+    }
+    
+    if (isCompactView) {
+        container.innerHTML = filtered.map(news => `
+            <div class="news-card rounded-xl overflow-hidden active:scale-[0.98] transition-transform" onclick="showNewsDetail('${news.id}')">
+                <div class="flex items-center gap-3 p-3">
+                    <div class="w-20 h-20 shrink-0 rounded-lg overflow-hidden">
+                        <img src="${news.image}" class="w-full h-full object-cover" alt="${news.title}"/>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            ${news.isBreaking ? '<span class="w-2 h-2 rounded-full bg-breaking animate-pulse"></span>' : ''}
+                            <span class="text-[9px] text-gold-primary font-bold uppercase">${getCategoryName(news.category)}</span>
+                            <span class="text-[9px] text-text-desc">• ${news.time}</span>
+                        </div>
+                        <h3 class="text-[13px] font-bold text-white leading-tight line-clamp-2">${news.title}</h3>
+                        <p class="text-[10px] text-text-desc mt-1 line-clamp-1">${news.source}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        container.innerHTML = filtered.map(news => `
+            <div class="news-card rounded-xl overflow-hidden active:scale-[0.98] transition-transform" onclick="showNewsDetail('${news.id}')">
+                <div class="relative h-40">
+                    <img src="${news.image}" class="w-full h-full object-cover" alt="${news.title}"/>
+                    ${news.isBreaking ? '<div class="absolute top-2 left-2 breaking-badge px-2 py-0.5 rounded text-[9px] font-bold text-white uppercase">Son Dakika</div>' : ''}
+                    <div class="absolute top-2 right-2 glass-panel px-2 py-0.5 rounded text-[9px] text-text-secondary">
+                        <span class="material-symbols-outlined text-[10px] inline align-middle mr-0.5">visibility</span>
+                        ${news.views}
+                    </div>
+                </div>
+                <div class="p-3">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-1.5 py-0.5 bg-${getCategoryColor(news.category)}/20 rounded text-[8px] text-${getCategoryColor(news.category)}-400 font-bold uppercase">${getCategoryName(news.category)}</span>
+                        <span class="text-[9px] text-text-desc">${news.time} • ${news.source}</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-white leading-tight mb-1 line-clamp-2">${news.title}</h3>
+                    <p class="text-[11px] text-text-desc line-clamp-2">${news.summary}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function getCategoryColor(cat) {
+    const colors = { 
+        breaking: 'red', politics: 'blue', economy: 'teal', 
+        sports: 'green', culture: 'purple', all: 'gold' 
+    };
+    return colors[cat] || 'gray';
+}
+
+function getCategoryName(cat) {
+    const names = { 
+        breaking: 'Son Dakika', politics: 'Siyaset', economy: 'Ekonomi', 
+        sports: 'Spor', culture: 'Kültür', all: 'Tümü' 
+    };
+    return names[cat] || cat;
+}
+
+// News Detail Modal
+function showNewsDetail(newsId) {
+    const news = newsData.find(n => n.id === newsId);
+    if (!news) return;
+    
+    document.getElementById('modal-title').textContent = news.title;
+    document.getElementById('modal-image').src = news.image;
+    document.getElementById('modal-source').textContent = news.source;
+    document.getElementById('modal-time').textContent = news.time;
+    document.getElementById('modal-summary').textContent = news.summary;
+    document.getElementById('modal-content').innerHTML = news.content;
+    
+    const badge = document.getElementById('modal-category-badge');
+    badge.textContent = getCategoryName(news.category);
+    badge.className = `px-2 py-0.5 rounded text-[9px] font-bold uppercase ${news.isBreaking ? 'bg-breaking text-white' : 'bg-gold-primary/20 border border-gold-primary/40 text-gold-primary'}`;
+    
+    // Tags
+    document.getElementById('modal-tags').innerHTML = news.tags.map(tag => `
+        <span class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-text-secondary">#${tag}</span>
+    `).join('');
+    
+    // Related News (random 2)
+    const related = newsData.filter(n => n.id !== newsId && n.category === news.category).slice(0, 2);
+    document.getElementById('related-news').innerHTML = related.map(n => `
+        <div class="flex items-center gap-2 p-2 rounded-lg bg-white/5 cursor-pointer active:bg-white/10" onclick="showNewsDetail('${n.id}')">
+            <img src="${n.image}" class="w-12 h-12 rounded object-cover" alt=""/>
+            <div class="flex-1 min-w-0">
+                <p class="text-[10px] font-bold text-white line-clamp-2">${n.title}</p>
+                <p class="text-[9px] text-text-desc">${n.time}</p>
+            </div>
+        </div>
+    `).join('') || '<p class="text-[10px] text-text-desc text-center py-2">İlgili haber bulunamadı</p>';
+    
+    // Save button state
+    const isSaved = savedNews.includes(newsId);
+    document.getElementById('save-icon').textContent = isSaved ? 'bookmark' : 'bookmark_border';
+    document.getElementById('save-text').textContent = isSaved ? 'Kaydedildi' : 'Kaydet';
+    
+    const modal = document.getElementById('news-modal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        modal.querySelector('.modal-backdrop').classList.remove('opacity-0');
+        modal.querySelector('.modal-content').classList.remove('translate-y-full');
+    }, 10);
+    
+    history.pushState({ modal: true }, '');
+}
+
+function closeNewsModal() {
+    const modal = document.getElementById('news-modal');
+    modal.querySelector('.modal-backdrop').classList.add('opacity-0');
+    modal.querySelector('.modal-content').classList.add('translate-y-full');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }, 400);
+}
+
+window.addEventListener('popstate', () => {
+    const modal = document.getElementById('news-modal');
+    if (!modal.classList.contains('hidden')) closeNewsModal();
+});
+
+function shareNews() {
+    if (navigator.share) {
+        navigator.share({
+            title: document.getElementById('modal-title').textContent,
+            url: window.location.href
+        });
+    } else {
+        alert('Haber bağlantısı kopyalandı!');
+    }
+}
+
+function saveNews() {
+    const title = document.getElementById('modal-title').textContent;
+    const newsId = newsData.find(n => n.title === title)?.id;
+    
+    if (newsId) {
+        const index = savedNews.indexOf(newsId);
+        if (index > -1) {
+            savedNews.splice(index, 1);
+            document.getElementById('save-icon').textContent = 'bookmark_border';
+            document.getElementById('save-text').textContent = 'Kaydet';
+        } else {
+            savedNews.push(newsId);
+            document.getElementById('save-icon').textContent = 'bookmark';
+            document.getElementById('save-text').textContent = 'Kaydedildi';
+        }
+    }
+}
+
+function textSize() {
+    const content = document.getElementById('modal-content');
+    const currentSize = window.getComputedStyle(content).fontSize;
+    const newSize = currentSize === '12px' ? '14px' : currentSize === '14px' ? '16px' : '12px';
+    content.style.fontSize = newSize;
+}
+
+function loadMoreNews() {
+    const btn = document.querySelector('button[onclick="loadMoreNews()"]');
+    const icon = document.getElementById('load-more-icon');
+    const text = document.getElementById('load-more-text');
+    
+    icon.classList.add('animate-spin');
+    text.textContent = 'Yükleniyor...';
+    
+    setTimeout(() => {
+        icon.classList.remove('animate-spin');
+        text.textContent = 'Daha Fazla';
+        alert('Daha fazla haber yüklendi!');
+    }, 1500);
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

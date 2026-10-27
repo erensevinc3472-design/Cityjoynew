@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Etkinlikler - Bursa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                        "warning": "#f97316",
+                        "success": "#22c55e",
+                        "info": "#3b82f6",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-glow': 'pulseGlow 3s infinite',
+                        'shimmer': 'shimmer 2.5s infinite',
+                        'spin': 'spin 1s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 10px rgba(224, 176, 122, 0.3)' },
+                            '50%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.6)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                        spin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
+                        },
+                    }
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                background: rgba(13, 50, 56, 0.6);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+            }
+            .glass-panel-hover:hover {
+                background: rgba(23, 70, 75, 0.8);
+                border-color: rgba(224, 176, 122, 0.3);
+            }
+            .text-glow {
+                text-shadow: 0 0 10px rgba(224, 176, 122, 0.3);
+            }
+            .event-card {
+                background: linear-gradient(135deg, rgba(23, 70, 75, 0.4) 0%, rgba(8, 31, 36, 0.6) 100%);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .event-card:active {
+                transform: scale(0.98);
+            }
+            .tab-active {
+                background: linear-gradient(135deg, rgba(224, 176, 122, 0.9) 0%, rgba(224, 176, 122, 0.7) 100%);
+                color: #081F24;
+                box-shadow: 0 2px 10px rgba(224, 176, 122, 0.3);
+            }
+            .tab-passive {
+                background: rgba(23, 70, 75, 0.3);
+                color: #9FB6B8;
+                border: 1px solid rgba(63, 110, 112, 0.2);
+            }
+            .category-pill {
+                background: rgba(224, 176, 122, 0.1);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+                color: #E0B07A;
+            }
+            .category-pill.active {
+                background: rgba(224, 176, 122, 0.9);
+                color: #081F24;
+            }
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            
+            .day-pill {
+                transition: all 0.2s ease;
+                min-width: 56px;
+            }
+            .day-pill.active {
+                background: linear-gradient(135deg, #E0B07A, #D4A574);
+                color: #081F24;
+                transform: scale(1.05);
+                box-shadow: 0 4px 15px rgba(224, 176, 122, 0.4);
+            }
+            .day-pill.has-event::after {
+                content: '';
+                position: absolute;
+                bottom: 6px;
+                width: 4px;
+                height: 4px;
+                background: currentColor;
+                border-radius: 50%;
+                opacity: 0.6;
+            }
+            .day-pill.active.has-event::after {
+                background: #081F24;
+                opacity: 0.8;
+            }
+            
+            .calendar-grid-day {
+                aspect-ratio: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.875rem;
+                border-radius: 0.75rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                position: relative;
+            }
+            .calendar-grid-day:hover:not(.empty):not(.selected):not(.disabled) {
+                background: rgba(224, 176, 122, 0.1);
+            }
+            .calendar-grid-day.selected {
+                background: linear-gradient(135deg, #E0B07A, #D4A574);
+                color: #081F24;
+                font-weight: 700;
+                box-shadow: 0 0 15px rgba(224, 176, 122, 0.4);
+            }
+            .calendar-grid-day.has-event::after {
+                content: '';
+                position: absolute;
+                bottom: 4px;
+                width: 4px;
+                height: 4px;
+                background: #E0B07A;
+                border-radius: 50%;
+            }
+            .calendar-grid-day.selected.has-event::after {
+                background: #081F24;
+            }
+            .calendar-grid-day.today:not(.selected) {
+                border: 1px solid rgba(224, 176, 122, 0.5);
+            }
+            .calendar-grid-day.disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+            .calendar-grid-day.other-month {
+                opacity: 0.4;
+            }
+            
+            .hero-slide {
+                position: absolute;
+                inset: 0;
+                opacity: 0;
+                transition: opacity 0.8s ease-in-out;
+            }
+            .hero-slide.active {
+                opacity: 1;
+            }
+            
+            /* Progress Bar Styles */
+            .hero-progress-container {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: rgba(255, 255, 255, 0.1);
+                z-index: 20;
+            }
+            .hero-progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, #E0B07A, #D4A574);
+                width: 0%;
+                transition: width 0.1s linear;
+                box-shadow: 0 0 10px rgba(224, 176, 122, 0.5);
+            }
+        }
+    </style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden max-w-md mx-auto min-h-screen relative shadow-2xl">
+
+<!-- Pull to Refresh Indicator -->
+<div id="pull-refresh" class="fixed top-0 left-0 right-0 max-w-md mx-auto z-40 flex items-center justify-center h-16 -translate-y-full transition-transform duration-300 pointer-events-none">
+    <div class="flex items-center gap-2 bg-card-bg/90 backdrop-blur-md px-4 py-2 rounded-full border border-gold-primary/30 shadow-lg">
+        <span id="refresh-spinner" class="material-symbols-outlined text-gold-primary animate-spin hidden">sync</span>
+        <span id="refresh-icon" class="material-symbols-outlined text-gold-primary transition-transform duration-200">arrow_downward</span>
+        <span id="refresh-text" class="text-xs text-white font-medium">Yenilemek için çek</span>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 max-w-md mx-auto flex items-center justify-between px-4 py-3 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/20">
+    <div class="flex items-center gap-3">
+        <button onclick="goBack()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+            <span class="material-symbols-outlined text-base text-white">arrow_back</span>
+        </button>
+        <div class="flex flex-col">
+            <span class="text-[9px] text-gold-primary tracking-wider uppercase">Bursa</span>
+            <h1 class="text-base font-bold tracking-tight text-white leading-none">Etkinlikler</h1>
+        </div>
+    </div>
+    <button class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+        <span class="material-symbols-outlined text-gold-primary text-base">notifications</span>
+    </button>
+</header>
+
+<!-- Hero Slider with Progress Bar -->
+<section class="relative h-[28vh] min-h-[220px] w-full overflow-hidden mt-[52px]">
+    <div class="hero-slide active" data-index="0">
+        <img src="https://kimi-web-img.moonshot.cn/img/as1.ftcdn.net/6aacbb01788e8fc9f487b54ad7f8ac1171df90da.jpg" class="w-full h-full object-cover" alt="Bursa"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/40 to-transparent"></div>
+    </div>
+    <div class="hero-slide" data-index="1">
+        <img src="https://kimi-web-img.moonshot.cn/img/mixmag.com.tr/815819c6b05eb9c45494d5ffd234f29b2a699e59.jpg" class="w-full h-full object-cover" alt="Festival"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/40 to-transparent"></div>
+    </div>
+    <div class="hero-slide" data-index="2">
+        <img src="https://kimi-web-img.moonshot.cn/img/iadsb.tmgrup.com.tr/fb9cacf0039b5199076102d660bb6369d70e01bc" class="w-full h-full object-cover" alt="Uludağ"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/40 to-transparent"></div>
+    </div>
+    <div class="hero-slide" data-index="3">
+        <img src="https://kimi-web-img.moonshot.cn/img/idsb.tmgrup.com.tr/af6f0e4e28ae360c7f4dcff6b17462d3558129a2.jpg" class="w-full h-full object-cover" alt="Nevruz"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/40 to-transparent"></div>
+    </div>
+    <div class="hero-slide" data-index="4">
+        <img src="https://kimi-web-img.moonshot.cn/img/toursce.com/e3bc40b059859414cb8bd6bae7fd33abd3f9c331.jpg" class="w-full h-full object-cover" alt="Stadyum"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/40 to-transparent"></div>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div class="hero-progress-container">
+        <div class="hero-progress-bar" id="hero-progress"></div>
+    </div>
+    
+    <!-- Indicators -->
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+        <button onclick="goToSlide(0)" class="slide-dot w-1.5 h-1.5 rounded-full bg-gold-primary transition-all" data-index="0"></button>
+        <button onclick="goToSlide(1)" class="slide-dot w-1.5 h-1.5 rounded-full bg-white/30 transition-all" data-index="1"></button>
+        <button onclick="goToSlide(2)" class="slide-dot w-1.5 h-1.5 rounded-full bg-white/30 transition-all" data-index="2"></button>
+        <button onclick="goToSlide(3)" class="slide-dot w-1.5 h-1.5 rounded-full bg-white/30 transition-all" data-index="3"></button>
+        <button onclick="goToSlide(4)" class="slide-dot w-1.5 h-1.5 rounded-full bg-white/30 transition-all" data-index="4"></button>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24 -mt-4 rounded-t-3xl">
+    <div class="px-4 pt-5">
+        
+        <!-- View Toggle -->
+        <div class="flex justify-center mb-4">
+            <div class="glass-panel rounded-full p-1 flex gap-1">
+                <button id="btn-bolgesel" onclick="switchView('bolgesel')" class="tab-active px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">location_on</span>
+                    Bölgesel
+                </button>
+                <button id="btn-genel" onclick="switchView('genel')" class="tab-passive px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">public</span>
+                    Genel
+                </button>
+            </div>
+        </div>
+
+        <!-- 7-Day Horizontal Calendar + Calendar Button -->
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">calendar_month</span>
+                    <span id="selected-date-display">Bugün</span>
+                </h3>
+                <span class="text-[10px] text-text-desc" id="current-month-display">Mart 2026</span>
+            </div>
+            
+            <!-- Horizontal Days -->
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2" id="week-calendar">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="mb-4">
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2" id="category-tabs">
+                <button onclick="filterCategory('all')" class="category-pill active px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="all">Tümü</button>
+                <button onclick="filterCategory('music')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="music">Müzik</button>
+                <button onclick="filterCategory('art')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="art">Sanat</button>
+                <button onclick="filterCategory('sport')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="sport">Spor</button>
+                <button onclick="filterCategory('food')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="food">Yemek</button>
+                <button onclick="filterCategory('culture')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-category="culture">Kültür</button>
+            </div>
+        </div>
+
+        <!-- Events Count Info -->
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-[11px] text-text-desc">
+                <span id="events-count" class="text-gold-primary font-bold">3</span> etkinlik bulundu
+            </p>
+            <button onclick="resetDateFilter()" id="reset-date-btn" class="text-[10px] text-gold-primary hidden flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-xs">refresh</span>
+                Tümünü Göster
+            </button>
+        </div>
+
+        <!-- Events List -->
+        <div id="events-container" class="space-y-3">
+            <!-- Events injected by JS -->
+        </div>
+
+        <!-- Load More -->
+        <div class="mt-6 text-center">
+            <button class="px-6 py-2.5 glass-panel rounded-full text-text-desc text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all">
+                Daha Fazla
+            </button>
+        </div>
+    </div>
+</main>
+
+<!-- Full Calendar Modal -->
+<div id="full-calendar-modal" class="fixed inset-0 z-[70] hidden items-end">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeFullCalendar()"></div>
+    <div class="relative bg-darkest rounded-t-3xl w-full max-h-[85vh] overflow-hidden transform translate-y-full transition-transform duration-300" id="full-calendar-content">
+        
+        <!-- Handle -->
+        <div class="w-12 h-1 bg-white/20 rounded-full mx-auto mt-3 mb-4"></div>
+        
+        <!-- Header -->
+        <div class="px-4 pb-3 border-b border-white/10">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-white">Takvim</h3>
+                <button onclick="closeFullCalendar()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center active:bg-white/10">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+            
+            <!-- Month/Year Selector -->
+            <div class="flex items-center justify-between mb-4">
+                <button onclick="changeMonth(-1)" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center active:bg-white/10">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <div class="text-center">
+                    <p class="text-sm font-bold text-white" id="modal-month-year">Mart 2026</p>
+                    <p class="text-[10px] text-text-desc">Etkinlikleri görüntüle</p>
+                </div>
+                <button onclick="changeMonth(1)" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center active:bg-white/10">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Calendar Grid -->
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+            <!-- Weekday Headers -->
+            <div class="grid grid-cols-7 gap-1 mb-2 text-center">
+                <div class="text-[10px] text-text-desc font-medium py-2">Pzt</div>
+                <div class="text-[10px] text-text-desc font-medium py-2">Sal</div>
+                <div class="text-[10px] text-text-desc font-medium py-2">Çar</div>
+                <div class="text-[10px] text-text-desc font-medium py-2">Per</div>
+                <div class="text-[10px] text-text-desc font-medium py-2">Cum</div>
+                <div class="text-[10px] text-text-desc font-medium py-2">Cmt</div>
+                <div class="text-[10px] text-text-desc font-medium py-2">Paz</div>
+            </div>
+            
+            <!-- Days Grid -->
+            <div class="grid grid-cols-7 gap-1" id="full-calendar-grid">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="p-4 border-t border-white/10 bg-darkest">
+            <button onclick="selectDateFromModal()" class="w-full py-3 bg-gold-primary text-darkest rounded-xl font-bold text-sm uppercase active:scale-95 transition-all" id="select-date-btn" disabled>
+                Tarih Seç
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Event Detail Modal -->
+<div id="event-modal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-darkest/98 backdrop-blur-lg modal-backdrop opacity-0 transition-opacity duration-300" onclick="closeEventModal()"></div>
+    <div class="absolute inset-0 overflow-y-auto modal-content translate-y-full transition-transform duration-400" style="transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);">
+        <button onclick="closeEventModal()" class="fixed top-3 right-3 z-50 w-8 h-8 rounded-full bg-black/40 backdrop-blur flex items-center justify-center active:scale-95">
+            <span class="material-symbols-outlined text-white text-lg">close</span>
+        </button>
+
+        <div class="relative h-[200px] shrink-0">
+            <img id="modal-image" src="" class="w-full h-full object-cover" alt="Event"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent"></div>
+            <div id="weather-alert" class="absolute top-3 left-3 right-16 glass-panel rounded-lg p-2.5 border-l-4 border-warning hidden">
+                <div class="flex items-start gap-2">
+                    <span class="material-symbols-outlined text-warning text-lg">cloudy_snowing</span>
+                    <div>
+                        <p class="text-[10px] font-bold text-white mb-0.5">Hava Durumu</p>
+                        <p id="weather-text" class="text-[9px] text-text-desc leading-tight">Akşam yağmur bekleniyor</p>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 p-4">
+                <div class="flex items-center gap-2 mb-1.5">
+                    <span id="modal-category" class="px-2 py-0.5 bg-gold-primary/20 border border-gold-primary/40 rounded text-gold-primary text-[9px] font-bold uppercase">Kültür</span>
+                    <span id="modal-family-badge" class="px-2 py-0.5 bg-success/20 border border-success/40 rounded text-success text-[9px] font-bold flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-[10px]">child_care</span>
+                        Aile
+                    </span>
+                </div>
+                <h2 id="modal-title" class="text-xl font-bold text-white leading-tight mb-1">Nevruz Festivali</h2>
+                <div class="flex items-center gap-2 text-[10px]">
+                    <span class="text-gold-primary font-semibold flex items-center gap-0.5">
+                        <span class="material-symbols-outlined text-xs">verified</span>
+                        <span id="modal-organizer">Bursa Büyükşehir</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 py-4 space-y-4">
+            
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                <div class="glass-panel rounded-lg px-3 py-2 flex items-center gap-1.5 shrink-0">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">calendar_today</span>
+                    <div>
+                        <p class="text-[9px] text-text-desc">Tarih</p>
+                        <p id="modal-date" class="text-[11px] font-bold text-white">21 Mart</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-lg px-3 py-2 flex items-center gap-1.5 shrink-0">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">schedule</span>
+                    <div>
+                        <p class="text-[9px] text-text-desc">Saat</p>
+                        <p id="modal-time" class="text-[11px] font-bold text-white">14:00</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-lg px-3 py-2 flex items-center gap-1.5 shrink-0">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">location_on</span>
+                    <div>
+                        <p class="text-[9px] text-text-desc">Yer</p>
+                        <p id="modal-location-short" class="text-[11px] font-bold text-white">Kent Meydanı</p>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-lg px-3 py-2 flex items-center gap-1.5 shrink-0">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">timer</span>
+                    <div>
+                        <p class="text-[9px] text-text-desc">Süre</p>
+                        <p class="text-[11px] font-bold text-white">6 saat</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="smart-alert" class="glass-panel rounded-lg p-3 border-l-4 border-info hidden">
+                <div class="flex items-start gap-2">
+                    <span class="material-symbols-outlined text-info text-lg">lightbulb</span>
+                    <div>
+                        <p class="text-[10px] font-bold text-white mb-0.5">Bilgi</p>
+                        <p id="alert-text" class="text-[9px] text-text-desc leading-relaxed">Etkinlik hakkında bilgi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-3">
+                <div class="flex items-start gap-3">
+                    <div class="w-12 h-12 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold-primary text-xl">map</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 id="modal-location" class="text-xs font-bold text-white mb-0.5 truncate">Kent Meydanı</h3>
+                        <p id="modal-address" class="text-[9px] text-text-desc mb-2 truncate">Osmangazi, Bursa</p>
+                        <button onclick="openMaps()" class="w-full py-2 bg-gold-primary/10 border border-gold-primary/30 rounded-lg text-gold-primary text-[10px] font-bold uppercase active:scale-95 transition-all flex items-center justify-center gap-1">
+                            <span class="material-symbols-outlined text-xs">directions</span>
+                            Yol Tarifi
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-3">
+                <h3 class="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">backpack</span>
+                    Yanına Ne Almalısın?
+                </h3>
+                <div class="space-y-1.5" id="checklist-container"></div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-3">
+                <h3 class="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">family_restroom</span>
+                    Aile Bilgileri
+                </h3>
+                <div class="grid grid-cols-2 gap-2" id="family-info"></div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-3">
+                <h3 class="text-xs font-bold text-white mb-2">Hakkında</h3>
+                <div id="modal-description" class="text-[10px] text-text-secondary leading-relaxed space-y-2"></div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-3">
+                <h3 class="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">open_in_new</span>
+                    Bilet Al
+                </h3>
+                <div class="space-y-2" id="ticket-sources"></div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="shareWhatsApp()" class="flex-1 py-3 bg-green-600/20 border border-green-600/30 rounded-xl text-green-400 text-[10px] font-bold uppercase active:scale-95 flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-sm">share</span>
+                    Paylaş
+                </button>
+                <button onclick="addToCalendar()" class="flex-1 py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-[10px] font-bold uppercase active:scale-95 flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-sm">calendar_add_on</span>
+                    Ekle
+                </button>
+            </div>
+            <div class="h-8"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex items-center justify-around px-6 py-2 bg-nav-bg/95 backdrop-blur-md border-t border-border-subtle/30 pb-5 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="anasayfa.html">
+        <span class="material-symbols-outlined text-xl">home</span>
+        <span class="text-[8px] font-medium">Ana sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-primary nav-glow-gold" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-xl">explore</span>
+        <span class="text-[8px] font-medium">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="ara.html">
+        <span class="material-symbols-outlined text-xl">search</span>
+        <span class="text-[8px] font-medium">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="profil.html">
+        <span class="material-symbols-outlined text-xl">person</span>
+        <span class="text-[8px] font-medium">Profil</span>
+    </a>
+</nav>
+
+<script>
+// Hero Slider with Progress Bar
+let currentSlide = 0;
+const slides = document.querySelectorAll('.hero-slide');
+const dots = document.querySelectorAll('.slide-dot');
+const progressBar = document.getElementById('hero-progress');
+const slideInterval = 5000; // 5 seconds
+let slideTimer;
+let progressTimer;
+
+function goToSlide(index) {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('bg-gold-primary');
+    dots[currentSlide].classList.add('bg-white/30');
+    
+    currentSlide = index;
+    
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.remove('bg-white/30');
+    dots[currentSlide].classList.add('bg-gold-primary');
+    
+    resetProgress();
+}
+
+function nextSlide() {
+    goToSlide((currentSlide + 1) % slides.length);
+}
+
+function resetProgress() {
+    clearInterval(progressTimer);
+    progressBar.style.width = '0%';
+    let progress = 0;
+    const increment = 100 / (slideInterval / 50);
+    
+    progressTimer = setInterval(() => {
+        progress += increment;
+        if (progress >= 100) {
+            progress = 0;
+        }
+        progressBar.style.width = progress + '%';
+    }, 50);
+}
+
+function startSlider() {
+    slideTimer = setInterval(nextSlide, slideInterval);
+    resetProgress();
+}
+
+// Initialize slider
+startSlider();
+
+// Navigation
+function goBack() {
+    if (window.history.length > 1) window.history.back();
+    else window.location.href = 'bursa.html';
+}
+
+// Calendar State
+let currentDate = new Date();
+let selectedDate = null;
+let modalCurrentDate = new Date();
+let modalSelectedDate = null;
+
+// Events Data with dates
+const eventsData = [
+    {
+        id: 'nevruz',
+        title: 'Nevruz Festivali',
+        category: 'culture',
+        type: 'bolgesel',
+        date: '2026-03-21',
+        time: '14:00',
+        location: 'Kent Meydanı',
+        address: 'Osmangazi, Bursa',
+        organizer: 'Bursa Büyükşehir',
+        image: 'https://kimi-web-img.moonshot.cn/img/idsb.tmgrup.com.tr/af6f0e4e28ae360c7f4dcff6b17462d3558129a2.jpg',
+        price: 'free',
+        priceAmount: 'Ücretsiz',
+        district: 'Osmangazi',
+        description: 'Türk dünyasının ortak bayramı Nevruz, Bursa\'da görkemli etkinliklerle kutlanıyor.',
+        weather: { show: true, text: 'Akşam saatlerinde yağmur bekleniyor. Şemsiye getirmeyi unutma!' },
+        alert: { show: true, text: 'Bu etkinlik yoğun olabilir, erken gelmen önerilir.' },
+        family: { kids: '0-12 Ücretsiz', baby: 'Bakım odası var', access: 'Tekerlekli sandalye', sound: 'Yüksek ses' },
+        checklist: ['Kimlik', 'Şemsiye', 'Powerbank', 'Nakit'],
+        tickets: [
+            { source: 'Biletix', price: 'Ücretsiz', features: ['Anında onay'] },
+            { source: 'Passo', price: 'Ücretsiz', features: ['Rezervasyon'] }
+        ]
+    },
+    {
+        id: 'caz',
+        title: 'Uluslararası Caz Festivali',
+        category: 'music',
+        type: 'bolgesel',
+        date: '2026-03-23',
+        time: '20:00',
+        location: 'FSM Parkı',
+        address: 'Nilüfer, Bursa',
+        organizer: 'Nilüfer Belediyesi',
+        image: 'https://kimi-web-img.moonshot.cn/img/mixmag.com.tr/815819c6b05eb9c45494d5ffd234f29b2a699e59.jpg',
+        price: 'paid',
+        priceAmount: '150₺',
+        district: 'Nilüfer',
+        description: 'Dünyaca ünlü caz sanatçılarının katılımıyla açık hava konserleri.',
+        weather: { show: false },
+        alert: { show: true, text: 'Açık alan etkinliği. Mont getirmen önerilir.' },
+        family: { kids: '7+ Önerilir', baby: 'Bebek arabası yasak', access: 'Erişilebilir', sound: 'Çok yüksek ses' },
+        checklist: ['Bilet', 'Ceket', 'Koltuk minderi', 'Su'],
+        tickets: [
+            { source: 'Biletix', price: '150₺', features: ['En uygun'] },
+            { source: 'Passo', price: '170₺', features: ['Koltuk seçimi'] }
+        ]
+    },
+    {
+        id: 'kofte',
+        title: 'İnegöl Köfte Festivali',
+        category: 'food',
+        type: 'bolgesel',
+        date: '2026-03-25',
+        time: '10:00',
+        location: 'İnegöl Meydanı',
+        address: 'İnegöl, Bursa',
+        organizer: 'İnegöl Belediyesi',
+        image: 'https://kimi-web-img.moonshot.cn/img/www.advantour.com/23b6c820b1b5cefce7a4ab78ff52ad6a4d622d70.jpg',
+        price: 'free',
+        priceAmount: 'Ücretsiz',
+        district: 'İnegöl',
+        description: 'Dünyaca ünlü İnegöl köftesinin tanıtıldığı lezzet şöleni.',
+        weather: { show: false },
+        alert: { show: false },
+        family: { kids: 'Tüm yaşlar', baby: 'Emzirme alanı var', access: 'Tam erişim', sound: 'Normal' },
+        checklist: ['Aç gel', 'Nakit', 'Köfte kutusu'],
+        tickets: [
+            { source: 'Ücretsiz Giriş', price: '0₺', features: ['Sınırsız'] }
+        ]
+    },
+    {
+        id: 'sergi',
+        title: 'Çini Sergisi',
+        category: 'art',
+        type: 'genel',
+        date: '2026-03-22',
+        time: '10:00',
+        location: 'Kent Müzesi',
+        address: 'Osmangazi, Bursa',
+        organizer: 'Kültür Bakanlığı',
+        image: 'https://kimi-web-img.moonshot.cn/img/cdn.getyourguide.com/1217fbaa58dcf565180c5128823e0f4038036449.jpg',
+        price: 'free',
+        priceAmount: 'Ücretsiz',
+        district: 'Osmangazi',
+        description: 'Bursa\'nın 700 yıllık çini geleneğinin sergilendiği kapsamlı sergi.',
+        weather: { show: false },
+        alert: { show: false },
+        family: { kids: 'Eğitici', baby: 'Bebek arabası girişi', access: 'Asansör var', sound: 'Sessiz' },
+        checklist: ['Fotoğraf makinesi', 'Not defteri'],
+        tickets: [
+            { source: 'Müze Girişi', price: 'Ücretsiz', features: ['Rehberli tur'] }
+        ]
+    },
+    {
+        id: 'maraton',
+        title: 'Yarı Maraton',
+        category: 'sport',
+        type: 'genel',
+        date: '2026-03-24',
+        time: '08:00',
+        location: 'Merinos Parkı',
+        address: 'Osmangazi, Bursa',
+        organizer: 'Bursaspor',
+        image: 'https://kimi-web-img.moonshot.cn/img/toursce.com/e3bc40b059859414cb8bd6bae7fd33abd3f9c331.jpg',
+        price: 'paid',
+        priceAmount: '100₺',
+        district: 'Osmangazi',
+        description: 'Bursa Uluslararası Yarı Maratonu.',
+        weather: { show: true, text: 'Sabah serin, atletik giyin.' },
+        alert: { show: true, text: 'Sağlık raporu zorunludur.' },
+        family: { kids: '18+', baby: 'İzleyici alanı var', access: 'Kısıtlı', sound: 'Normal' },
+        checklist: ['Spor ayakkabısı', 'Su şişesi', 'Sağlık raporu'],
+        tickets: [
+            { source: 'Biletix', price: '100₺', features: ['Numara verilir'] }
+        ]
+    }
+];
+
+// Initialize Week Calendar
+function initWeekCalendar() {
+    const container = document.getElementById('week-calendar');
+    const today = new Date();
+    const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+    const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+    
+    document.getElementById('current-month-display').textContent = `${monthNames[today.getMonth()]} ${today.getFullYear()}`;
+    
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        
+        const dateStr = formatDate(date);
+        const hasEvents = eventsData.some(e => e.date === dateStr);
+        const isToday = i === 0;
+        
+        const dayPill = document.createElement('button');
+        dayPill.className = `day-pill relative flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 min-w-[64px] ${isToday ? 'active' : ''} ${hasEvents ? 'has-event' : ''}`;
+        dayPill.onclick = () => selectDate(date, dayPill);
+        
+        dayPill.innerHTML = `
+            <span class="text-[9px] uppercase mb-1 opacity-70">${dayNames[date.getDay()]}</span>
+            <span class="text-lg font-bold">${date.getDate()}</span>
+        `;
+        
+        dayPill.dataset.date = dateStr;
+        container.appendChild(dayPill);
+    }
+    
+    const allDatesBtn = document.createElement('button');
+    allDatesBtn.className = 'day-pill flex flex-col items-center justify-center p-3 rounded-2xl bg-gold-primary/10 border border-gold-primary/30 min-w-[64px] ml-1';
+    allDatesBtn.onclick = openFullCalendar;
+    allDatesBtn.innerHTML = `
+        <span class="material-symbols-outlined text-gold-primary text-lg mb-0.5">calendar_month</span>
+        <span class="text-[8px] text-gold-primary font-medium whitespace-nowrap">Tümü</span>
+    `;
+    container.appendChild(allDatesBtn);
+    
+    // Show all events initially
+    renderEvents(eventsData.filter(e => e.type === 'bolgesel'));
+}
+
+function formatDate(date) {
+    return date.toISOString().split('T')[0];
+}
+
+function selectDate(date, element) {
+    selectedDate = date;
+    
+    document.querySelectorAll('.day-pill').forEach(pill => {
+        pill.classList.remove('active');
+    });
+    if (element) element.classList.add('active');
+    
+    const today = new Date();
+    const isToday = formatDate(date) === formatDate(today);
+    const dayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+    
+    document.getElementById('selected-date-display').textContent = isToday ? 'Bugün' : dayNames[date.getDay()];
+    document.getElementById('reset-date-btn').classList.remove('hidden');
+    
+    filterEventsByDate(date);
+}
+
+function filterEventsByDate(date) {
+    const dateStr = formatDate(date);
+    let filtered = eventsData.filter(e => e.date === dateStr);
+    
+    // Apply current view filter
+    if (currentView !== 'all') {
+        filtered = filtered.filter(e => e.type === currentView);
+    }
+    
+    // Apply category filter
+    if (currentCategory !== 'all') {
+        filtered = filtered.filter(e => e.category === currentCategory);
+    }
+    
+    renderEvents(filtered);
+}
+
+function resetDateFilter() {
+    selectedDate = null;
+    document.getElementById('selected-date-display').textContent = 'Tüm Etkinlikler';
+    document.getElementById('reset-date-btn').classList.add('hidden');
+    
+    document.querySelectorAll('.day-pill').forEach(pill => {
+        pill.classList.remove('active');
+    });
+    
+    // Apply current filters
+    let filtered = eventsData;
+    if (currentView !== 'all') {
+        filtered = filtered.filter(e => e.type === currentView);
+    }
+    if (currentCategory !== 'all') {
+        filtered = filtered.filter(e => e.category === currentCategory);
+    }
+    
+    renderEvents(filtered);
+}
+
+// Full Calendar Modal
+function openFullCalendar() {
+    const modal = document.getElementById('full-calendar-modal');
+    const content = document.getElementById('full-calendar-content');
+    
+    modalSelectedDate = null;
+    updateFullCalendar();
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => content.classList.remove('translate-y-full'), 10);
+}
+
+function closeFullCalendar() {
+    const content = document.getElementById('full-calendar-content');
+    content.classList.add('translate-y-full');
+    setTimeout(() => {
+        document.getElementById('full-calendar-modal').classList.add('hidden');
+        document.getElementById('full-calendar-modal').classList.remove('flex');
+    }, 300);
+}
+
+function changeMonth(delta) {
+    modalCurrentDate.setMonth(modalCurrentDate.getMonth() + delta);
+    updateFullCalendar();
+}
+
+function updateFullCalendar() {
+    const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+    document.getElementById('modal-month-year').textContent = `${monthNames[modalCurrentDate.getMonth()]} ${modalCurrentDate.getFullYear()}`;
+    
+    const grid = document.getElementById('full-calendar-grid');
+    grid.innerHTML = '';
+    
+    const year = modalCurrentDate.getFullYear();
+    const month = modalCurrentDate.getMonth();
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+    
+    const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
+    
+    for (let i = adjustedFirstDay - 1; i >= 0; i--) {
+        const day = daysInPrevMonth - i;
+        const dayEl = createCalendarDay(day, true, true);
+        grid.appendChild(dayEl);
+    }
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dateStr = formatDate(date);
+        const hasEvents = eventsData.some(e => e.date === dateStr);
+        const isToday = formatDate(date) === formatDate(new Date());
+        const isSelected = modalSelectedDate && formatDate(date) === formatDate(modalSelectedDate);
+        const isPast = date < new Date().setHours(0,0,0,0) && !isToday;
+        
+        const dayEl = createCalendarDay(day, false, isPast, hasEvents, isToday, isSelected, date);
+        grid.appendChild(dayEl);
+    }
+    
+    const remainingCells = 42 - (adjustedFirstDay + daysInMonth);
+    for (let day = 1; day <= remainingCells; day++) {
+        const dayEl = createCalendarDay(day, true, false);
+        grid.appendChild(dayEl);
+    }
+}
+
+function createCalendarDay(day, isOtherMonth, isDisabled, hasEvents = false, isToday = false, isSelected = false, date = null) {
+    const div = document.createElement('div');
+    div.className = 'calendar-grid-day';
+    div.textContent = day;
+    
+    if (isOtherMonth) div.classList.add('other-month');
+    if (isDisabled) div.classList.add('disabled');
+    if (hasEvents) div.classList.add('has-event');
+    if (isToday) div.classList.add('today');
+    if (isSelected) div.classList.add('selected');
+    
+    if (!isOtherMonth && !isDisabled && date) {
+        div.onclick = () => selectModalDate(date, div);
+    }
+    
+    return div;
+}
+
+function selectModalDate(date, element) {
+    document.querySelectorAll('.calendar-grid-day.selected').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    modalSelectedDate = date;
+    document.getElementById('select-date-btn').disabled = false;
+}
+
+function selectDateFromModal() {
+    if (!modalSelectedDate) return;
+    closeFullCalendar();
+    
+    const dateStr = formatDate(modalSelectedDate);
+    const existingPill = document.querySelector(`.day-pill[data-date="${dateStr}"]`);
+    
+    if (existingPill) {
+        selectDate(modalSelectedDate, existingPill);
+        existingPill.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    } else {
+        const container = document.getElementById('week-calendar');
+        const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+        
+        document.querySelectorAll('.day-pill').forEach(pill => pill.classList.remove('active'));
+        
+        const hasEvents = eventsData.some(e => e.date === dateStr);
+        const dayPill = document.createElement('button');
+        dayPill.className = `day-pill relative flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 min-w-[64px] active has-event`;
+        dayPill.dataset.date = dateStr;
+        dayPill.onclick = () => selectDate(modalSelectedDate, dayPill);
+        dayPill.innerHTML = `
+            <span class="text-[9px] uppercase mb-1 opacity-70">${dayNames[modalSelectedDate.getDay()]}</span>
+            <span class="text-lg font-bold">${modalSelectedDate.getDate()}</span>
+        `;
+        
+        const allDatesBtn = container.lastElementChild;
+        container.insertBefore(dayPill, allDatesBtn);
+        dayPill.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        
+        selectDate(modalSelectedDate, dayPill);
+    }
+}
+
+// View Switcher - DÜZELTİLMİŞ
+let currentView = 'bolgesel';
+function switchView(view) {
+    currentView = view;
+    const btnBolgesel = document.getElementById('btn-bolgesel');
+    const btnGenel = document.getElementById('btn-genel');
+    
+    if (view === 'bolgesel') {
+        btnBolgesel.className = 'tab-active px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+        btnGenel.className = 'tab-passive px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+    } else {
+        btnBolgesel.className = 'tab-passive px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+        btnGenel.className = 'tab-active px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+    }
+    
+    // DÜZELTME: Her zaman filtreleme yap
+    let filtered = eventsData.filter(e => e.type === currentView);
+    
+    // Apply date filter if selected
+    if (selectedDate) {
+        const dateStr = formatDate(selectedDate);
+        filtered = filtered.filter(e => e.date === dateStr);
+    }
+    
+    // Apply category filter
+    if (currentCategory !== 'all') {
+        filtered = filtered.filter(e => e.category === currentCategory);
+    }
+    
+    renderEvents(filtered);
+}
+
+// Category Filter
+let currentCategory = 'all';
+function filterCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.category === category);
+    });
+    
+    // DÜZELTME: Tüm filtreleri uygula
+    let filtered = eventsData.filter(e => e.type === currentView);
+    
+    if (selectedDate) {
+        const dateStr = formatDate(selectedDate);
+        filtered = filtered.filter(e => e.date === dateStr);
+    }
+    
+    if (category !== 'all') {
+        filtered = filtered.filter(e => e.category === category);
+    }
+    
+    renderEvents(filtered);
+}
+
+function renderEvents(events) {
+    const container = document.getElementById('events-container');
+    document.getElementById('events-count').textContent = events.length;
+    
+    if (events.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8">
+                <span class="material-symbols-outlined text-4xl text-text-desc mb-2">event_busy</span>
+                <p class="text-sm text-text-desc">Bu kriterlere uygun etkinlik bulunamadı</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = events.map(event => `
+        <div class="event-card rounded-xl overflow-hidden relative active:scale-[0.98] transition-transform" onclick="showEventDetails('${event.id}')">
+            <div class="flex">
+                <div class="w-24 h-24 shrink-0 relative">
+                    <img src="${event.image}" class="w-full h-full object-cover" alt="${event.title}"/>
+                    ${event.price === 'free' ? '<div class="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-success text-white text-[8px] font-bold rounded">Ücretsiz</div>' : ''}
+                </div>
+                <div class="flex-1 p-3 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="px-1.5 py-0.5 bg-${getCategoryColor(event.category)}/20 rounded text-[8px] text-${getCategoryColor(event.category)}-400 font-bold">${getCategoryName(event.category)}</span>
+                            <span class="text-[9px] text-text-desc flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[10px]">location_on</span>
+                                ${event.district}
+                            </span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white leading-tight mb-1">${event.title}</h3>
+                        <p class="text-[10px] text-text-desc line-clamp-1">${event.description.substring(0, 50)}...</p>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold text-gold-primary">${formatDisplayDate(event.date)}</span>
+                            <span class="text-[9px] text-text-desc">${event.time}</span>
+                        </div>
+                        <span class="text-[9px] ${event.price === 'free' ? 'text-success' : 'text-gold-primary font-semibold'}">
+                            ${event.priceAmount}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getCategoryColor(cat) {
+    const colors = { music: 'purple', art: 'pink', sport: 'red', food: 'orange', culture: 'teal' };
+    return colors[cat] || 'gray';
+}
+
+function getCategoryName(cat) {
+    const names = { music: 'Müzik', art: 'Sanat', sport: 'Spor', food: 'Yemek', culture: 'Kültür' };
+    return names[cat] || cat;
+}
+
+function formatDisplayDate(dateStr) {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    if (dateStr === formatDate(today)) return 'Bugün';
+    if (dateStr === formatDate(tomorrow)) return 'Yarın';
+    
+    return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+}
+
+// Event Detail Modal
+function showEventDetails(eventId) {
+    const event = eventsData.find(e => e.id === eventId);
+    if (!event) return;
+    
+    document.getElementById('modal-title').textContent = event.title;
+    document.getElementById('modal-category').textContent = getCategoryName(event.category);
+    document.getElementById('modal-date').textContent = formatDisplayDate(event.date);
+    document.getElementById('modal-time').textContent = event.time;
+    document.getElementById('modal-location-short').textContent = event.location;
+    document.getElementById('modal-location').textContent = event.location;
+    document.getElementById('modal-address').textContent = event.address;
+    document.getElementById('modal-organizer').textContent = event.organizer;
+    document.getElementById('modal-image').src = event.image;
+    document.getElementById('modal-description').innerHTML = `<p>${event.description}</p>`;
+    
+    const weatherEl = document.getElementById('weather-alert');
+    if (event.weather && event.weather.show) {
+        weatherEl.classList.remove('hidden');
+        document.getElementById('weather-text').textContent = event.weather.text;
+    } else {
+        weatherEl.classList.add('hidden');
+    }
+    
+    const alertEl = document.getElementById('smart-alert');
+    if (event.alert && event.alert.show) {
+        alertEl.classList.remove('hidden');
+        document.getElementById('alert-text').textContent = event.alert.text;
+    } else {
+        alertEl.classList.add('hidden');
+    }
+    
+    document.getElementById('checklist-container').innerHTML = event.checklist.map(item => `
+        <label class="flex items-center gap-2 p-2 rounded-lg bg-white/5 cursor-pointer active:scale-[0.98]">
+            <input type="checkbox" class="w-4 h-4 rounded border-white/20 bg-transparent text-gold-primary focus:ring-0">
+            <span class="text-[10px] text-text-secondary">${item}</span>
+        </label>
+    `).join('');
+    
+    document.getElementById('family-info').innerHTML = `
+        <div class="flex items-center gap-1.5 p-2 rounded-lg bg-white/5">
+            <span class="material-symbols-outlined text-success text-sm">child_care</span>
+            <div>
+                <p class="text-[9px] text-text-desc">Çocuk</p>
+                <p class="text-[10px] text-white font-medium">${event.family.kids}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-1.5 p-2 rounded-lg bg-white/5">
+            <span class="material-symbols-outlined text-success text-sm">baby_changing_station</span>
+            <div>
+                <p class="text-[9px] text-text-desc">Bebek</p>
+                <p class="text-[10px] text-white font-medium">${event.family.baby}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-1.5 p-2 rounded-lg bg-white/5">
+            <span class="material-symbols-outlined text-success text-sm">accessible</span>
+            <div>
+                <p class="text-[9px] text-text-desc">Erişim</p>
+                <p class="text-[10px] text-white font-medium">${event.family.access}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-1.5 p-2 rounded-lg bg-white/5">
+            <span class="material-symbols-outlined text-warning text-sm">volume_up</span>
+            <div>
+                <p class="text-[9px] text-text-desc">Ses</p>
+                <p class="text-[10px] text-white font-medium">${event.family.sound}</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('ticket-sources').innerHTML = event.tickets.map(ticket => `
+        <a href="https://biletix.com" target="_blank" class="flex items-center justify-between p-3 rounded-lg bg-white/5 active:bg-white/10">
+            <div>
+                <p class="text-[11px] font-bold text-white">${ticket.source}</p>
+                <p class="text-[9px] text-text-desc">${ticket.features.join(', ')}</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] text-gold-primary font-bold">${ticket.price}</span>
+                <span class="material-symbols-outlined text-text-desc text-sm">arrow_forward_ios</span>
+            </div>
+        </a>
+    `).join('');
+    
+    const modal = document.getElementById('event-modal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        modal.querySelector('.modal-backdrop').classList.remove('opacity-0');
+        modal.querySelector('.modal-content').classList.remove('translate-y-full');
+    }, 10);
+    
+    history.pushState({ modal: true }, '');
+}
+
+function closeEventModal() {
+    const modal = document.getElementById('event-modal');
+    modal.querySelector('.modal-backdrop').classList.add('opacity-0');
+    modal.querySelector('.modal-content').classList.add('translate-y-full');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }, 400);
+}
+
+window.addEventListener('popstate', () => {
+    const modal = document.getElementById('event-modal');
+    if (!modal.classList.contains('hidden')) closeEventModal();
+});
+
+function openMaps() {
+    window.open('https://maps.google.com/?q=Bursa', '_blank');
+}
+
+function shareWhatsApp() {
+    window.open(`https://wa.me/?text=${encodeURIComponent(window.location.href)}`, '_blank');
+}
+
+function addToCalendar() {
+    alert('Takvime eklendi!');
+}
+
+// PULL TO REFRESH - YENİ EKLENDİ
+let pullStartY = 0;
+let pullCurrentY = 0;
+let isPulling = false;
+let isRefreshing = false;
+const pullThreshold = 80;
+const maxPull = 120;
+
+const refreshContainer = document.getElementById('pull-refresh');
+const refreshText = document.getElementById('refresh-text');
+const refreshIcon = document.getElementById('refresh-icon');
+const refreshSpinner = document.getElementById('refresh-spinner');
+const mainContent = document.querySelector('main');
+
+function initPullToRefresh() {
+    // Touch events
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+    
+    // Mouse events (for desktop testing)
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+}
+
+function handleTouchStart(e) {
+    if (isRefreshing) return;
+    // Sadece en üstteyse ve aşağı çekiyorsa
+    if (window.scrollY <= 0) {
+        pullStartY = e.touches[0].clientY;
+        isPulling = true;
+    }
+}
+
+function handleMouseDown(e) {
+    if (isRefreshing) return;
+    if (window.scrollY <= 0) {
+        pullStartY = e.clientY;
+        isPulling = true;
+    }
+}
+
+function handleTouchMove(e) {
+    if (!isPulling || isRefreshing) return;
+    
+    pullCurrentY = e.touches[0].clientY;
+    const pullDistance = pullCurrentY - pullStartY;
+    
+    if (pullDistance > 0 && window.scrollY <= 0) {
+        e.preventDefault();
+        updatePullState(pullDistance);
+    }
+}
+
+function handleMouseMove(e) {
+    if (!isPulling || isRefreshing) return;
+    
+    pullCurrentY = e.clientY;
+    const pullDistance = pullCurrentY - pullStartY;
+    
+    if (pullDistance > 0 && window.scrollY <= 0) {
+        updatePullState(pullDistance);
+    }
+}
+
+function updatePullState(distance) {
+    const clampedDistance = Math.min(distance, maxPull);
+    const progress = Math.min(distance / pullThreshold, 1);
+    
+    // Visual feedback
+    if (distance < pullThreshold) {
+        refreshText.textContent = 'Yenilemek için çek';
+        refreshIcon.textContent = 'arrow_downward';
+        refreshIcon.style.transform = `rotate(${progress * 180}deg)`;
+        refreshSpinner.classList.add('hidden');
+        refreshIcon.classList.remove('hidden');
+    } else {
+        refreshText.textContent = 'Bırak yenilensin';
+        refreshIcon.textContent = 'refresh';
+        refreshIcon.style.transform = 'none';
+    }
+    
+    // Move container
+    refreshContainer.style.transform = `translateY(${clampedDistance}px)`;
+    refreshContainer.style.transition = 'none';
+    
+    // Add resistance to main content
+    mainContent.style.transform = `translateY(${clampedDistance * 0.3}px)`;
+    mainContent.style.transition = 'none';
+}
+
+function handleTouchEnd() {
+    if (!isPulling) return;
+    finishPull();
+}
+
+function handleMouseUp() {
+    if (!isPulling) return;
+    finishPull();
+}
+
+function finishPull() {
+    isPulling = false;
+    const pullDistance = pullCurrentY - pullStartY;
+    
+    refreshContainer.style.transition = 'transform 0.3s ease';
+    mainContent.style.transition = 'transform 0.3s ease';
+    
+    if (pullDistance >= pullThreshold && !isRefreshing) {
+        // Trigger refresh
+        startRefresh();
+    } else {
+        // Cancel
+        refreshContainer.style.transform = 'translateY(-100%)';
+        mainContent.style.transform = 'translateY(0)';
+        setTimeout(() => {
+            mainContent.style.transition = '';
+        }, 300);
+    }
+}
+
+function startRefresh() {
+    isRefreshing = true;
+    refreshText.textContent = 'Yenileniyor...';
+    refreshIcon.classList.add('hidden');
+    refreshSpinner.classList.remove('hidden');
+    
+    // Simulate refresh
+    setTimeout(() => {
+        // Reload data with current filters
+        let filtered = eventsData.filter(e => e.type === currentView);
+        
+        if (selectedDate) {
+            const dateStr = formatDate(selectedDate);
+            filtered = filtered.filter(e => e.date === dateStr);
+        }
+        
+        if (currentCategory !== 'all') {
+            filtered = filtered.filter(e => e.category === currentCategory);
+        }
+        
+        renderEvents(filtered);
+        showToast('Etkinlikler güncellendi');
+        endRefresh();
+    }, 1500);
+}
+
+function endRefresh() {
+    refreshContainer.style.transform = 'translateY(-100%)';
+    mainContent.style.transform = 'translateY(0)';
+    
+    setTimeout(() => {
+        isRefreshing = false;
+        refreshSpinner.classList.add('hidden');
+        refreshIcon.classList.remove('hidden');
+        mainContent.style.transition = '';
+        refreshIcon.style.transform = 'none';
+    }, 300);
+}
+
+// Toast notification
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-card-bg border border-gold-primary/30 text-white px-4 py-2 rounded-full text-xs font-medium shadow-xl z-50 flex items-center gap-2 animate-fade-in';
+    toast.innerHTML = `
+        <span class="material-symbols-outlined text-gold-primary text-sm">check_circle</span>
+        ${message}
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-10px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+    initWeekCalendar();
+    initPullToRefresh();
+});
+</script>
+
+</body>
+</html>

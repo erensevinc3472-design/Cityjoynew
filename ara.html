@@ -1,0 +1,1101 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    <title>CityJoy - Her Şeyi Ara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-teal": "#2D8A8A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'gradient': 'gradient 8s ease infinite',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        pulseGlow: { '0%, 100%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.3)' }, '50%': { boxShadow: '0 0 40px rgba(224, 176, 122, 0.6)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-20px)' } },
+                        gradient: { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
+                    }
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+            .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            .glass-panel {
+                background: rgba(23, 70, 75, 0.4);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+            }
+            .search-glow:focus {
+                box-shadow: 0 0 0 3px rgba(224, 176, 122, 0.3), 0 0 20px rgba(224, 176, 122, 0.2);
+            }
+            .text-gradient-gold {
+                background: linear-gradient(135deg, #E0B07A 0%, #F0D4A8 50%, #E0B07A 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-size: 200% 200%;
+                animation: gradient 8s ease infinite;
+            }
+        }
+    </style>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; background: #081F24; font-family: 'Space Grotesk', sans-serif; color: white; }
+        
+        /* Ana Viewport - İki Sayfa */
+        .main-viewport {
+            width: 100vw;
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .main-viewport::-webkit-scrollbar { display: none; }
+        
+        .section {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Birinci Sayfa - Hero Arama */
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            background: radial-gradient(ellipse at center, rgba(13, 50, 56, 0.8) 0%, rgba(8, 31, 36, 1) 70%);
+        }
+        
+        .hero-title {
+            font-size: clamp(32px, 8vw, 56px);
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(14px, 3vw, 18px);
+            color: #9FB6B8;
+            text-align: center;
+            margin-bottom: 48px;
+            max-width: 400px;
+        }
+        
+        /* Yeni Arama Kutusu Tasarımı */
+        .hero-search-wrapper {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .hero-search-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        .hero-search-input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(23, 70, 75, 0.6);
+            border: 2px solid rgba(224, 176, 122, 0.3);
+            border-radius: 16px;
+            font-size: 16px;
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-search-input:focus {
+            border-color: rgba(224, 176, 122, 0.8);
+            box-shadow: 0 0 30px rgba(224, 176, 122, 0.2);
+        }
+        
+        .hero-search-input::placeholder {
+            color: rgba(159, 182, 184, 0.6);
+        }
+        
+        /* Mikrofon Butonu - Ayrı */
+        .mic-btn {
+            width: 56px;
+            height: 56px;
+            background: rgba(23, 70, 75, 0.6);
+            border: 2px solid rgba(224, 176, 122, 0.3);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+        
+        .mic-btn:hover {
+            border-color: rgba(224, 176, 122, 0.6);
+            background: rgba(224, 176, 122, 0.1);
+        }
+        
+        .mic-btn span {
+            color: #E0B07A;
+            font-size: 24px;
+        }
+        
+        /* Ara Butonu - Ayrı */
+        .search-btn {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #E0B07A 0%, #C9956A 100%);
+            border: none;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .search-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(224, 176, 122, 0.4);
+        }
+        
+        .search-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .search-btn span {
+            color: #081F24;
+            font-size: 24px;
+        }
+        
+        /* AI Chips */
+        .ai-chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 32px;
+            max-width: 500px;
+        }
+        
+        .ai-chip {
+            padding: 10px 18px;
+            background: rgba(23, 70, 75, 0.4);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            border-radius: 20px;
+            font-size: 13px;
+            color: #C7D8DA;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .ai-chip:hover {
+            background: rgba(224, 176, 122, 0.15);
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .ai-chip span {
+            font-size: 14px;
+        }
+        
+        /* Scroll Hint */
+        .scroll-hint {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+        
+        .scroll-hint-text {
+            font-size: 12px;
+            color: #E0B07A;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+        }
+        
+        .scroll-hint-icon {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(224, 176, 122, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* İkinci Sayfa - Orijinal Tasarım */
+        .content-section {
+            background: #081F24;
+            overflow-y: auto;
+            padding-bottom: 100px;
+        }
+        
+        /* AI Dropdown */
+        .ai-dropdown {
+            position: absolute;
+            top: calc(100% + 12px);
+            left: 0;
+            right: 0;
+            background: rgba(13, 50, 56, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+        
+        .ai-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .ai-dropdown-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(63, 110, 112, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .ai-dropdown-header span {
+            color: #E0B07A;
+            font-size: 18px;
+        }
+        
+        .ai-dropdown-header p {
+            font-size: 12px;
+            font-weight: 600;
+            color: #E0B07A;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .ai-suggestion-item {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(63, 110, 112, 0.1);
+        }
+        
+        .ai-suggestion-item:hover {
+            background: rgba(224, 176, 122, 0.1);
+        }
+        
+        .ai-suggestion-item span {
+            color: #6E8C8E;
+            font-size: 20px;
+        }
+        
+        .ai-suggestion-item p {
+            font-size: 14px;
+            color: #C7D8DA;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 42, 47, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(63, 110, 112, 0.3);
+            padding: 12px 24px calc(12px + env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: #6E8C8E;
+            transition: all 0.3s ease;
+            padding: 4px 12px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            color: #E0B07A;
+        }
+        
+        .nav-item span:first-child {
+            font-size: 24px;
+        }
+        
+        .nav-item span:last-child {
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        /* Responsive */
+        @media (max-width: 380px) {
+            .hero-title { font-size: 28px; }
+            .hero-search-wrapper { gap: 8px; }
+            .mic-btn, .search-btn { width: 48px; height: 48px; }
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+
+</head>
+<body>
+
+    <div class="main-viewport" id="mainViewport">
+        
+        <!-- ==================== BİRİNCİ SAYFA: HERO ARAMA ==================== -->
+        <section class="section hero-section" id="heroSection">
+            
+            <!-- Background Elements -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div class="absolute top-20 left-10 w-32 h-32 bg-gold-primary/10 rounded-full blur-3xl animate-float"></div>
+                <div class="absolute bottom-40 right-10 w-40 h-40 bg-accent-teal/10 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+            </div>
+            
+            <!-- Back Button -->
+            <a href="anasayfa.html" class="absolute top-6 left-6 w-12 h-12 flex items-center justify-center rounded-full bg-card-bg/50 hover:bg-card-bg transition-all z-10">
+                <span class="material-symbols-outlined text-white">arrow_back</span>
+            </a>
+            
+            <!-- AI Assistant Button -->
+            <button onclick="openAIAssistant()" class="absolute top-6 right-6 w-12 h-12 flex items-center justify-center rounded-full bg-gold-primary/10 border border-gold-primary/30 text-gold-primary hover:bg-gold-primary/20 transition-all z-10">
+                <span class="material-symbols-outlined">auto_awesome</span>
+            </button>
+            
+            <!-- Main Content -->
+            <div class="w-full max-w-lg z-10">
+                <h1 class="hero-title">
+                    Ne aramak<br>
+                    <span class="text-gradient-gold">istersiniz?</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Bursa'nın tüm güzelliklerini keşfedin. Yapay zeka destekli arama ile size özel öneriler alın.
+                </p>
+                
+                <!-- Yeni Arama Tasarımı - 3 Parça -->
+                <div class="hero-search-wrapper">
+                    <!-- Mikrofon Butonu -->
+                    <button onclick="startVoiceSearch()" class="mic-btn" title="Sesli Ara">
+                        <span class="material-symbols-outlined">mic</span>
+                    </button>
+                    
+                    <!-- Arama Kutusu -->
+                    <div class="hero-search-container">
+                        <input 
+                            type="text" 
+                            id="heroSearch"
+                            class="hero-search-input"
+                            placeholder="Bir şeyler yazın..."
+                            oninput="handleHeroSearch(this.value)"
+                            onkeypress="if(event.key==='Enter') performHeroSearch()"
+                        />
+                        
+                        <!-- AI Dropdown -->
+                        <div id="aiDropdown" class="ai-dropdown">
+                            <div class="ai-dropdown-header">
+                                <span class="material-symbols-outlined">psychology</span>
+                                <p>AI Önerileri</p>
+                            </div>
+                            <div id="aiSuggestionsList"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ara Butonu -->
+                    <button onclick="performHeroSearch()" class="search-btn" title="Ara">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                </div>
+                
+                <!-- AI Chips -->
+                <div class="ai-chips">
+                    <button onclick="quickSearch('Bugün hava güzel, piknik yapılabilecek yerler')" class="ai-chip">
+                        <span class="material-symbols-outlined">park</span>
+                        Piknik Alanları
+                    </button>
+                    <button onclick="quickSearch('Çocuklu aileler için müzeler')" class="ai-chip">
+                        <span class="material-symbols-outlined">family_restroom</span>
+                        Aile Dostu
+                    </button>
+                    <button onclick="quickSearch('Tarihi mekanlarda fotoğraf çekilecek noktalar')" class="ai-chip">
+                        <span class="material-symbols-outlined">photo_camera</span>
+                        Fotoğrafçılık
+                    </button>
+                    <button onclick="quickSearch('Gece açık lezzet durakları')" class="ai-chip">
+                        <span class="material-symbols-outlined">nightlife</span>
+                        Gece Hayatı
+                    </button>
+                    <button onclick="quickSearch('Toplu taşıma ile ulaşılabilen yerler')" class="ai-chip">
+                        <span class="material-symbols-outlined">directions_bus</span>
+                        Toplu Taşıma
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Scroll Hint -->
+            <div class="scroll-hint" onclick="scrollToContent()">
+                <span class="scroll-hint-text">Keşfetmeye Başla</span>
+                <div class="scroll-hint-icon">
+                    <span class="material-symbols-outlined text-gold-primary">keyboard_arrow_down</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== İKİNCİ SAYFA: ORİJİNAL TASARIM ==================== -->
+        <section class="section content-section hide-scrollbar" id="contentSection">
+            
+            <!-- Header -->
+            <header class="sticky top-0 z-50 bg-darkest/95 backdrop-blur-xl border-b border-border-subtle/20 pt-4 pb-3 px-4">
+                <div class="flex items-center justify-between mb-4">
+                    <a href="anasayfa.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-card-bg/50 active:scale-90 transition-transform">
+                        <span class="material-symbols-outlined text-white">arrow_back</span>
+                    </a>
+                    <h1 class="text-lg font-bold tracking-tight">Her Şeyi Ara</h1>
+                    <button onclick="openAIAssistant()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gold-primary/10 border border-gold-primary/30 text-gold-primary animate-pulse-glow">
+                        <span class="material-symbols-outlined">auto_awesome</span>
+                    </button>
+                </div>
+
+                <!-- AI Search Input -->
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <span class="material-symbols-outlined text-gold-primary">search</span>
+                    </div>
+                    <input type="text" id="main-search" 
+                        class="block w-full pl-12 pr-12 py-3.5 bg-card-bg/50 border-2 border-border-subtle/50 rounded-2xl focus:border-gold-primary/60 focus:outline-none search-glow transition-all text-sm placeholder:text-text-desc"
+                        placeholder="Ne aramak istersiniz? (Örn: 'Bugün 3 saatim var, tarihi yerler görmek istiyorum')"
+                        oninput="handleSearch(this.value)"
+                        onkeypress="if(event.key==='Enter') performSearch()"/>
+                    <button onclick="startVoiceSearch()" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <span class="material-symbols-outlined text-text-desc hover:text-gold-primary transition-colors p-2 rounded-full hover:bg-white/5">mic</span>
+                    </button>
+                    
+                    <!-- AI Suggestions Dropdown -->
+                    <div id="ai-suggestions" class="absolute top-full left-0 right-0 mt-2 bg-card-bg/95 backdrop-blur-xl border border-gold-primary/20 rounded-2xl overflow-hidden hidden z-50 shadow-2xl">
+                        <div class="p-3 border-b border-border-subtle/20">
+                            <p class="text-[10px] text-gold-primary uppercase tracking-wider font-bold">AI Önerileri</p>
+                        </div>
+                        <div id="suggestions-list" class="max-h-60 overflow-y-auto hide-scrollbar"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Filters -->
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar mt-4 pb-1">
+                    <button onclick="filterResults('all')" class="filter-btn active px-4 py-2 rounded-full bg-gold-primary text-darkest text-xs font-bold whitespace-nowrap transition-all">Tümü</button>
+                    <button onclick="filterResults('mekan')" class="filter-btn px-4 py-2 rounded-full bg-card-bg/50 text-text-secondary border border-border-subtle/30 text-xs font-bold whitespace-nowrap transition-all hover:border-gold-primary/50">📍 Mekanlar</button>
+                    <button onclick="filterResults('etkinlik')" class="filter-btn px-4 py-2 rounded-full bg-card-bg/50 text-text-secondary border border-border-subtle/30 text-xs font-bold whitespace-nowrap transition-all hover:border-gold-primary/50">🎉 Etkinlikler</button>
+                    <button onclick="filterResults('rota')" class="filter-btn px-4 py-2 rounded-full bg-card-bg/50 text-text-secondary border border-border-subtle/30 text-xs font-bold whitespace-nowrap transition-all hover:border-gold-primary/50">🗺️ Rotalar</button>
+                    <button onclick="filterResults('konaklama')" class="filter-btn px-4 py-2 rounded-full bg-card-bg/50 text-text-secondary border border-border-subtle/30 text-xs font-bold whitespace-nowrap transition-all hover:border-gold-primary/50">🏨 Konaklama</button>
+                    <button onclick="filterResults('restoran')" class="filter-btn px-4 py-2 rounded-full bg-card-bg/50 text-text-secondary border border-border-subtle/30 text-xs font-bold whitespace-nowrap transition-all hover:border-gold-primary/50">🍽️ Restoran</button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="px-4 mt-6 space-y-6">
+
+                <!-- AI Planner Assistant -->
+                <section class="glass-panel rounded-2xl p-4 border border-gold-primary/20">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-gold-primary/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gold-primary text-sm">smart_toy</span>
+                            </div>
+                            <div>
+                                <h2 class="text-sm font-bold text-white">Seyahat Asistanım</h2>
+                                <p class="text-[10px] text-text-desc">Size özel program oluşturur</p>
+                            </div>
+                        </div>
+                        <button onclick="openPlanner()" class="px-3 py-1.5 bg-gold-primary/10 border border-gold-primary/30 rounded-full text-gold-primary text-[10px] font-bold hover:bg-gold-primary hover:text-darkest transition-all">
+                            Plan Oluştur
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="quickPlan('yarisgun')" class="p-2 bg-card-bg/30 rounded-xl text-center hover:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary text-lg">schedule</span>
+                            <p class="text-[10px] text-white mt-1">Yarım Gün</p>
+                        </button>
+                        <button onclick="quickPlan('tumgun')" class="p-2 bg-card-bg/30 rounded-xl text-center hover:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary text-lg">today</span>
+                            <p class="text-[10px] text-white mt-1">Tüm Gün</p>
+                        </button>
+                        <button onclick="quickPlan('haftasonu')" class="p-2 bg-card-bg/30 rounded-xl text-center hover:bg-card-bg/50 transition-colors">
+                            <span class="material-symbols-outlined text-gold-primary text-lg">calendar_today</span>
+                            <p class="text-[10px] text-white mt-1">Hafta Sonu</p>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Trending Searches -->
+                <section>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc">🔥 Trend Aramalar</h2>
+                        <span class="text-[10px] text-gold-primary">Bursa'da popüler</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="searchTrend('Uludağ kayak')" class="px-3 py-1.5 bg-card-bg/30 rounded-full text-xs text-text-secondary border border-border-subtle/20 hover:border-gold-primary/40 hover:text-gold-primary transition-all">#UludağKayak</button>
+                        <button onclick="searchTrend('İskender nerede yenir')" class="px-3 py-1.5 bg-card-bg/30 rounded-full text-xs text-text-secondary border border-border-subtle/20 hover:border-gold-primary/40 hover:text-gold-primary transition-all">#İskenderNerede</button>
+                        <button onclick="searchTrend('Gölyazı gün batımı')" class="px-3 py-1.5 bg-card-bg/30 rounded-full text-xs text-text-secondary border border-border-subtle/20 hover:border-gold-primary/40 hover:text-gold-primary transition-all">#Gölyazı</button>
+                        <button onclick="searchTrend('Koza Han ipek')" class="px-3 py-1.5 bg-card-bg/30 rounded-full text-xs text-text-secondary border border-border-subtle/20 hover:border-gold-primary/40 hover:text-gold-primary transition-all">#KozaHan</button>
+                        <button onclick="searchTrend('Kapalı çarşı saatleri')" class="px-3 py-1.5 bg-card-bg/30 rounded-full text-xs text-text-secondary border border-border-subtle/20 hover:border-gold-primary/40 hover:text-gold-primary transition-all">#KapalıÇarşı</button>
+                    </div>
+                </section>
+
+                <!-- Bölgedeki Ustalar -->
+                <section>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc">🛠️ Bölgedeki Ustalar</h2>
+                        <a href="ustalar.html" class="text-[10px] text-gold-primary font-bold">Tümünü Gör</a>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="usta-elektrikci.html" class="glass-panel p-3 rounded-xl flex items-center gap-3 hover:border-gold-primary/40 transition-all group">
+                            <div class="w-10 h-10 rounded-full bg-gold-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-gold-primary">electrical_services</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Elektrikçi</p>
+                                <p class="text-[10px] text-text-desc">24 hizmet</p>
+                            </div>
+                        </a>
+                        <a href="usta-tesisatci.html" class="glass-panel p-3 rounded-xl flex items-center gap-3 hover:border-gold-primary/40 transition-all group">
+                            <div class="w-10 h-10 rounded-full bg-gold-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-gold-primary">plumbing</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Tesisatçı</p>
+                                <p class="text-[10px] text-text-desc">18 hizmet</p>
+                            </div>
+                        </a>
+                        <a href="usta-boyaci.html" class="glass-panel p-3 rounded-xl flex items-center gap-3 hover:border-gold-primary/40 transition-all group">
+                            <div class="w-10 h-10 rounded-full bg-gold-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-gold-primary">format_paint</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Boyacı</p>
+                                <p class="text-[10px] text-text-desc">15 hizmet</p>
+                            </div>
+                        </a>
+                        <a href="usta-su.html" class="glass-panel p-3 rounded-xl flex items-center gap-3 hover:border-gold-primary/40 transition-all group">
+                            <div class="w-10 h-10 rounded-full bg-gold-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-gold-primary">water_damage</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Su Ustası</p>
+                                <p class="text-[10px] text-text-desc">12 hizmet</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Popular Routes -->
+                <section>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc">🗺️ Popüler Rotalar</h2>
+                        <a href="rotalar.html" class="text-[10px] text-gold-primary font-bold">Tüm Rotalar</a>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="rota-tarih.html" class="glass-panel p-3 rounded-xl flex items-center gap-3 hover:border-gold-primary/40 transition-all">
+                            <div class="w-14 h-14 rounded-xl bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-gold-primary text-2xl">account_balance</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-bold text-white">Tarihi Bursa Turu</h3>
+                                <p class="text-[10px] text-text-desc">Ulu Cami → Koza Han → Tophane</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] text-gold-primary">⏱️ 4 saat</span>
+                                    <span class="text-[10px] text-text-desc">•</span>
+                                    <span class="text-[10px] text-text-desc">2.4k kez yapıldı</span>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-gold-primary">arrow_forward_ios</span>
+                        </a>
+                        <a href="rota-lezzet.html" class="glass-panel p-3 rounded-xl flex items-center gap-3 hover:border-gold-primary/40 transition-all">
+                            <div class="w-14 h-14 rounded-xl bg-gold-primary/10 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-gold-primary text-2xl">restaurant</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-bold text-white">Lezzet Rotası</h3>
+                                <p class="text-[10px] text-text-desc">İskender → Cantık → Kestane Şekeri</p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-[10px] text-gold-primary">⏱️ 3 saat</span>
+                                    <span class="text-[10px] text-text-desc">•</span>
+                                    <span class="text-[10px] text-text-desc">1.8k kez yapıldı</span>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-gold-primary">arrow_forward_ios</span>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Daily Discovery -->
+                <section>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc">✨ Günün Keşfi</h2>
+                        <button onclick="shuffleDiscovery()" class="text-[10px] text-gold-primary flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">refresh</span> Yenile
+                        </button>
+                    </div>
+                    <div id="daily-discovery" class="glass-panel rounded-2xl overflow-hidden border border-gold-primary/30">
+                        <div class="relative h-32">
+                            <img src="https://images.unsplash.com/photo-1544212414-6f9c5b58f5c5?w=600&q=80" class="w-full h-full object-cover"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-darkest to-transparent"></div>
+                            <div class="absolute bottom-3 left-3 right-3">
+                                <span class="px-2 py-0.5 bg-gold-primary text-darkest text-[10px] font-bold rounded-full">Bugün</span>
+                                <h3 class="text-sm font-bold text-white mt-1">Ulu Cami'nin Gizli Köşeleri</h3>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <p class="text-xs text-text-secondary mb-2">20 kubbeli devasa yapının bilinmeyen 5 özelliği...</p>
+                            <button onclick="openDiscoveryDetail()" class="w-full py-2 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary text-xs font-bold hover:bg-gold-primary hover:text-darkest transition-all">
+                                Keşfet
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Upcoming Events -->
+                <section>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc">📅 Yaklaşan Etkinlikler</h2>
+                        <a href="etkinlikler.html" class="text-[10px] text-gold-primary font-bold">Takvimi Gör</a>
+                    </div>
+                    <div class="space-y-3">
+                        <a href="etkinlik-kilic-kalkan.html" class="glass-panel p-3 rounded-xl flex items-center gap-3 hover:border-gold-primary/40 transition-all">
+                            <div class="w-12 h-12 rounded-xl bg-gold-primary/10 flex flex-col items-center justify-center shrink-0">
+                                <span class="text-[10px] text-gold-primary font-bold">15</span>
+                                <span class="text-[9px] text-text-desc">KAS</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-bold text-white">Kılıç Kalkan Gösterisi</h3>
+                                <p class="text-[10px] text-text-desc">Merinos Parkı • 20:00</p>
+                                <span class="inline-block mt-1 px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] rounded-full">Ücretsiz</span>
+                            </div>
+                        </a>
+                        <a href="etkinlik-iznik-festival.html" class="glass-panel p-3 rounded-xl flex items-center gap-3 hover:border-gold-primary/40 transition-all">
+                            <div class="w-12 h-12 rounded-xl bg-gold-primary/10 flex flex-col items-center justify-center shrink-0">
+                                <span class="text-[10px] text-gold-primary font-bold">22</span>
+                                <span class="text-[9px] text-text-desc">KAS</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-bold text-white">İznik Çini Festivali</h3>
+                                <p class="text-[10px] text-text-desc">İznik Meydan • 10:00</p>
+                                <span class="inline-block mt-1 px-2 py-0.5 bg-gold-primary/20 text-gold-primary text-[9px] rounded-full">Festival</span>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Municipality Announcements -->
+                <section>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc">📢 Belediye Duyuruları</h2>
+                        <a href="duyurular.html" class="text-[10px] text-gold-primary font-bold">Tümü</a>
+                    </div>
+                    <div class="glass-panel p-3 rounded-xl border-l-4 border-gold-primary">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-gold-primary">info</span>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">Tarihi Çarşı Restorasyonu</h3>
+                                <p class="text-[10px] text-text-desc mt-1">Koza Han çevresindeki yenileme çalışmaları tamamlandı. Ziyarete açık!</p>
+                                <p class="text-[9px] text-gold-primary mt-2">2 saat önce • Osmangazi Belediyesi</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Emergency & Quick Access -->
+                <section>
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc mb-3">🚨 Hızlı Erişim</h2>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="quickAccess('eczane')" class="p-3 bg-red-500/10 border border-red-500/30 rounded-xl flex flex-col items-center gap-1 hover:bg-red-500/20 transition-colors">
+                            <span class="material-symbols-outlined text-red-400 text-lg">local_pharmacy</span>
+                            <span class="text-[9px] text-white font-medium">Eczane</span>
+                        </button>
+                        <button onclick="quickAccess('hastane')" class="p-3 bg-red-500/10 border border-red-500/30 rounded-xl flex flex-col items-center gap-1 hover:bg-red-500/20 transition-colors">
+                            <span class="material-symbols-outlined text-red-400 text-lg">local_hospital</span>
+                            <span class="text-[9px] text-white font-medium">Hastane</span>
+                        </button>
+                        <button onclick="quickAccess('polis')" class="p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl flex flex-col items-center gap-1 hover:bg-blue-500/20 transition-colors">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">local_police</span>
+                            <span class="text-[9px] text-white font-medium">Polis</span>
+                        </button>
+                        <button onclick="quickAccess('taksi')" class="p-3 bg-green-500/10 border border-green-500/30 rounded-xl flex flex-col items-center gap-1 hover:bg-green-500/20 transition-colors">
+                            <span class="material-symbols-outlined text-green-400 text-lg">local_taxi</span>
+                            <span class="text-[9px] text-white font-medium">Taksi</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Recent Searches -->
+                <section>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-widest text-text-desc">🕐 Son Aramalar</h2>
+                        <button onclick="clearRecent()" class="text-[10px] text-text-desc hover:text-gold-primary transition-colors">Temizle</button>
+                    </div>
+                    <div id="recent-searches" class="space-y-2">
+                        <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-card-bg/30 hover:bg-card-bg/50 transition-colors group">
+                            <span class="material-symbols-outlined text-text-desc group-hover:text-gold-primary transition-colors">history</span>
+                            <span class="flex-1 text-sm text-text-secondary">Kestane şekeri satan yerler</span>
+                            <span class="material-symbols-outlined text-text-desc text-sm">north_west</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-card-bg/30 hover:bg-card-bg/50 transition-colors group">
+                            <span class="material-symbols-outlined text-text-desc group-hover:text-gold-primary transition-colors">history</span>
+                            <span class="flex-1 text-sm text-text-secondary">Cumalıkızık nasıl gidilir</span>
+                            <span class="material-symbols-outlined text-text-desc text-sm">north_west</span>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Boşluk -->
+                <div style="height: 40px;"></div>
+
+            </main>
+
+            <!-- AI Planner Modal -->
+            <div id="planner-modal" class="fixed inset-0 z-[60] hidden bg-darkest/95 backdrop-blur-xl">
+                <div class="flex flex-col h-full">
+                    <div class="flex items-center justify-between p-4 border-b border-border-subtle/20">
+                        <h2 class="text-lg font-bold">Seyahat Planlayıcı</h2>
+                        <button onclick="closePlanner()" class="w-10 h-10 rounded-full bg-card-bg/50 flex items-center justify-center">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                        <div class="glass-panel p-4 rounded-2xl">
+                            <p class="text-sm text-text-secondary mb-4">Size özel bir program oluşturmam için birkaç soruya cevap verin:</p>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-xs font-bold text-gold-primary uppercase mb-2 block">Ne kadar zamanınız var?</label>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button class="time-select p-2 bg-card-bg/50 rounded-xl text-xs text-center border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-time="2">2-3 Saat</button>
+                                        <button class="time-select p-2 bg-card-bg/50 rounded-xl text-xs text-center border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-time="5">Yarım Gün</button>
+                                        <button class="time-select p-2 bg-card-bg/50 rounded-xl text-xs text-center border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-time="8">Tüm Gün</button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs font-bold text-gold-primary uppercase mb-2 block">İlgi alanınız nedir?</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        <button class="interest-select px-3 py-1.5 bg-card-bg/50 rounded-full text-xs border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-interest="tarih">🏛️ Tarih</button>
+                                        <button class="interest-select px-3 py-1.5 bg-card-bg/50 rounded-full text-xs border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-interest="doga">🌿 Doğa</button>
+                                        <button class="interest-select px-3 py-1.5 bg-card-bg/50 rounded-full text-xs border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-interest="yemek">🍽️ Lezzet</button>
+                                        <button class="interest-select px-3 py-1.5 bg-card-bg/50 rounded-full text-xs border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-interest="alisveris">🛍️ Alışveriş</button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs font-bold text-gold-primary uppercase mb-2 block">Kimlerle birlikte?</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button class="companion-select p-2 bg-card-bg/50 rounded-xl text-xs text-center border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-companion="tek">🧍 Tek Başıma</button>
+                                        <button class="companion-select p-2 bg-card-bg/50 rounded-xl text-xs text-center border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-companion="aile">👨‍👩‍👧‍👦 Aile</button>
+                                        <button class="companion-select p-2 bg-card-bg/50 rounded-xl text-xs text-center border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-companion="cocuk">👶 Çocuklu</button>
+                                        <button class="companion-select p-2 bg-card-bg/50 rounded-xl text-xs text-center border border-border-subtle/30 hover:border-gold-primary/50 transition-all" data-companion="arkadas">👥 Arkadaşlar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="generatePlan()" class="w-full mt-6 py-3 bg-gold-primary text-darkest rounded-xl text-sm font-bold hover:bg-gold-primary/90 transition-all">
+                                Planımı Oluştur
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <nav class="fixed bottom-0 left-0 right-0 bg-nav-bg border-t border-border-subtle/50 pb-safe z-50">
+                <div class="flex items-center justify-around px-6 py-3">
+                    <a href="anasayfa.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors">
+                        <span class="material-symbols-outlined text-xl">home</span>
+                        <span class="text-[9px] font-medium">Anasayfa</span>
+                    </a>
+                    <a href="kesfet-genel.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors">
+                        <span class="material-symbols-outlined text-xl">explore</span>
+                        <span class="text-[9px] font-medium">Keşfet</span>
+                    </a>
+                    <a href="ara.html" class="flex flex-col items-center gap-0.5 text-gold-nav nav-glow-gold">
+                        <span class="material-symbols-outlined text-xl fill-1">search</span>
+                        <span class="text-[9px] font-bold">Ara</span>
+                    </a>
+                    <a href="profil.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors">
+                        <span class="material-symbols-outlined text-xl">person</span>
+                        <span class="text-[9px] font-medium">Profil</span>
+                    </a>
+                </div>
+            </nav>
+        </section>
+
+    </div>
+
+    <script>
+        // AI Önerileri
+        const aiSuggestions = [
+            "Bugün hava güzel, piknik yapılabilecek yerler",
+            "Çocuklu aileler için müzeler",
+            "Tarihi mekanlarda fotoğraf çekilecek noktalar",
+            "Gece açık lezzet durakları",
+            "Toplu taşıma ile ulaşılabilen yerler",
+            "Ücretsiz gezilecek yerler",
+            "Kapalı alanlar (yağmurlu gün)",
+            "Evcil hayvan dostu mekanlar"
+        ];
+
+        // Hero Search Handler
+        function handleHeroSearch(value) {
+            const dropdown = document.getElementById('aiDropdown');
+            const list = document.getElementById('aiSuggestionsList');
+            
+            if (value.length > 1) {
+                dropdown.classList.add('active');
+                const filtered = aiSuggestions.filter(s => 
+                    s.toLowerCase().includes(value.toLowerCase())
+                );
+                
+                list.innerHTML = filtered.length > 0 ? filtered.map(s => `
+                    <div onclick="quickSearch('${s}')" class="ai-suggestion-item">
+                        <span class="material-symbols-outlined">search</span>
+                        <p>${s}</p>
+                    </div>
+                `).join('') : `
+                    <div onclick="quickSearch('${value}')" class="ai-suggestion-item">
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                        <p>"${value}" için ara...</p>
+                    </div>
+                `;
+            } else {
+                dropdown.classList.remove('active');
+            }
+        }
+
+        function performHeroSearch() {
+            const query = document.getElementById('heroSearch').value;
+            if (query) {
+                scrollToContent();
+                setTimeout(() => {
+                    document.getElementById('main-search').value = query;
+                    alert(`"${query}" için arama sonuçları yükleniyor...`);
+                }, 500);
+            }
+        }
+
+        function quickSearch(query) {
+            document.getElementById('heroSearch').value = query;
+            document.getElementById('aiDropdown').classList.remove('active');
+            performHeroSearch();
+        }
+
+        function startVoiceSearch() {
+            alert('Sesli arama başlatılıyor... (Mikrofon izni gerekiyor)');
+        }
+
+        function openAIAssistant() {
+            alert('AI Asistan: Size nasıl yardımcı olabilirim?\n\n"Bugün ne yapsam?" veya "Bursa\'da görülmesi gerekenler" yazabilirsiniz.');
+        }
+
+        // Scroll Functions
+        function scrollToContent() {
+            document.getElementById('mainViewport').scrollTo({
+                top: window.innerHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // İkinci Sayfa Fonksiyonları
+        function handleSearch(value) {
+            const dropdown = document.getElementById('ai-suggestions');
+            const list = document.getElementById('suggestions-list');
+            
+            if (value.length > 2) {
+                dropdown.classList.remove('hidden');
+                list.innerHTML = aiSuggestions.map(s => `
+                    <div onclick="selectSuggestion('${s}')" class="p-3 hover:bg-white/5 cursor-pointer flex items-center gap-2 border-b border-border-subtle/10 last:border-0">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">auto_awesome</span>
+                        <span class="text-sm text-text-secondary">${s}</span>
+                    </div>
+                `).join('');
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        function selectSuggestion(text) {
+            document.getElementById('main-search').value = text;
+            document.getElementById('ai-suggestions').classList.add('hidden');
+            performSearch();
+        }
+
+        function performSearch() {
+            const query = document.getElementById('main-search').value;
+            if (query) {
+                alert(`Arama: ${query}\n\nSonuçlar sayfasına yönlendiriliyor...`);
+            }
+        }
+
+        function filterResults(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-gold-primary', 'text-darkest');
+                btn.classList.add('bg-card-bg/50', 'text-text-secondary');
+            });
+            event.target.classList.remove('bg-card-bg/50', 'text-text-secondary');
+            event.target.classList.add('active', 'bg-gold-primary', 'text-darkest');
+        }
+
+        function openPlanner() {
+            document.getElementById('planner-modal').classList.remove('hidden');
+        }
+
+        function closePlanner() {
+            document.getElementById('planner-modal').classList.add('hidden');
+        }
+
+        function quickPlan(type) {
+            const plans = {
+                'yarisgun': 'Yarım günlük plan oluşturuluyor...',
+                'tumgun': 'Tam günlük plan oluşturuluyor...',
+                'haftasonu': 'Hafta sonu planı oluşturuluyor...'
+            };
+            alert(plans[type]);
+        }
+
+        function generatePlan() {
+            closePlanner();
+            setTimeout(() => {
+                alert('Size özel plan oluşturuldu!\n\n09:00 - Kahvaltı (Sade Kahvaltı)\n10:30 - Ulu Cami Ziyareti\n12:00 - Koza Han\n13:30 - İskender Kebap\n15:00 - Tophane\n17:00 - Alışveriş');
+            }, 300);
+        }
+
+        document.querySelectorAll('.time-select, .interest-select, .companion-select').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const siblings = this.parentElement.querySelectorAll('button');
+                siblings.forEach(b => b.classList.remove('bg-gold-primary', 'text-darkest', 'border-gold-primary'));
+                this.classList.add('bg-gold-primary', 'text-darkest', 'border-gold-primary');
+            });
+        });
+
+        function searchTrend(tag) {
+            document.getElementById('main-search').value = tag;
+            performSearch();
+        }
+
+        function shuffleDiscovery() {
+            const discoveries = [
+                { title: 'Gölyazı\'nın Gizli Koyları', img: 'https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=600&q=80' },
+                { title: 'Koza Han\'ın Tarihi', img: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=80' },
+                { title: 'İskender\'in Hikayesi', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80' }
+            ];
+            const random = discoveries[Math.floor(Math.random() * discoveries.length)];
+            document.querySelector('#daily-discovery img').src = random.img;
+            document.querySelector('#daily-discovery h3').textContent = random.title;
+        }
+
+        function openDiscoveryDetail() {
+            alert('Keşif detayları açılıyor...');
+        }
+
+        function quickAccess(type) {
+            const messages = {
+                'eczane': 'En yakın eczaneler listeleniyor...',
+                'hastane': 'En yakın hastaneler listeleniyor...',
+                'polis': 'En yakın karakollar listeleniyor...',
+                'taksi': 'Taksi çağırma seçenekleri...'
+            };
+            alert(messages[type]);
+        }
+
+        function clearRecent() {
+            document.getElementById('recent-searches').innerHTML = '<p class="text-center text-text-desc text-sm py-4">Son arama bulunmuyor</p>';
+        }
+
+        // Klavye navigasyonu
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                scrollToContent();
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                document.getElementById('mainViewport').scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    </script>
+</body>
+</html>

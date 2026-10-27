@@ -1,0 +1,340 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Ödeme Noktaları Haritası - Osmangazi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#E2A76B",
+                        "osman": { dark: "#0A2627", light: "#0F3D3E", card: "#0D3334" }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        .gold-gradient { background: linear-gradient(135deg, #E2A76B 0%, #D4935C 100%); }
+        .slide-up { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        #map { height: 100vh; width: 100%; }
+        .gm-style-iw { background: #0D3334 !important; color: white !important; }
+        .gm-style-iw-d { overflow: hidden !important; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .map-btn { transition: all 0.2s; }
+        .map-btn:active { transform: scale(0.95); }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-osman-dark text-white h-screen overflow-hidden">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-osman-dark/95 backdrop-blur-lg border-b border-white/5 px-5 pt-6 pb-4">
+        <div class="flex items-center gap-3 mb-3">
+            <a href="odeme-noktalari.html" class="w-10 h-10 rounded-full glass flex items-center justify-center active:scale-90 transition-transform">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+            </a>
+            <div class="flex-1">
+                <h1 class="text-lg font-bold">Ödeme Noktaları</h1>
+                <p class="text-xs text-white/50">Harita Görünümü</p>
+            </div>
+            <button onclick="locateMe()" class="w-10 h-10 rounded-full glass flex items-center justify-center map-btn">
+                <span class="material-symbols-outlined text-primary">my_location</span>
+            </button>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="flex bg-osman-card rounded-2xl p-1">
+            <a href="odeme-noktalari.html" class="flex-1 py-2 rounded-xl text-sm font-medium text-white/60 hover:text-white flex items-center justify-center gap-1 transition-colors">
+                <span class="material-symbols-outlined text-sm">list</span> Liste
+            </a>
+            <button class="flex-1 py-2 rounded-xl text-sm font-medium gold-gradient text-[#3B2610] flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-sm">map</span> Harita
+            </button>
+        </div>
+    </header>
+
+    <!-- Map Filter Chips -->
+    <div class="fixed top-36 left-0 right-0 z-30 px-4">
+        <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+            <button onclick="filterMap('all')" class="map-filter active px-4 py-2 rounded-full gold-gradient text-[#3B2610] text-xs font-bold whitespace-nowrap shadow-lg" data-filter="all">
+                Tümü
+            </button>
+            <button onclick="filterMap('bursakart')" class="map-filter px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 text-cyan-400 border-cyan-400/30" data-filter="bursakart">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">credit_card</span>Bursakart
+            </button>
+            <button onclick="filterMap('buski')" class="map-filter px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 text-blue-400 border-blue-400/30" data-filter="buski">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">water_drop</span>BUSKİ
+            </button>
+            <button onclick="filterMap('ptt')" class="map-filter px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 text-yellow-400 border-yellow-400/30" data-filter="ptt">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">local_post_office</span>PTT
+            </button>
+            <button onclick="filterMap('bank')" class="map-filter px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 text-green-400 border-green-400/30" data-filter="bank">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">local_atm</span>Banka
+            </button>
+            <button onclick="filterMap('open')" class="map-filter px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10" data-filter="open">
+                <span class="material-symbols-outlined text-sm align-middle mr-1 text-green-400">check_circle</span>Açık
+            </button>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map" class="mt-0"></div>
+
+    <!-- Selected Location Card -->
+    <div id="selectedCard" class="fixed bottom-24 left-4 right-4 z-30 glass rounded-2xl p-4 hidden slide-up">
+        <div class="flex items-start gap-3">
+            <div id="cardIcon" class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-white">location_on</span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h3 id="cardTitle" class="font-bold text-sm truncate">Nokta Adı</h3>
+                <p id="cardAddress" class="text-xs text-white/50 truncate">Adres</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <span id="cardDistance" class="text-xs text-primary font-bold">240m</span>
+                    <span id="cardStatus" class="text-[10px] px-2 py-0.5 rounded-full bg-green-500/20 text-green-400">Açık</span>
+                </div>
+            </div>
+            <button onclick="closeCard()" class="w-8 h-8 rounded-full glass flex items-center justify-center">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+        <div class="flex gap-2 mt-3">
+            <button onclick="getDirections()" class="flex-1 py-2 rounded-xl gold-gradient text-[#3B2610] text-xs font-bold flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-sm">directions</span> Yol Tarifi
+            </button>
+            <button onclick="openDetailFromCard()" class="flex-1 py-2 rounded-xl glass text-xs font-bold flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-sm">info</span> Detay
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="fixed bottom-24 right-4 z-30 flex flex-col gap-2">
+        <button onclick="zoomIn()" class="w-12 h-12 rounded-full glass flex items-center justify-center shadow-lg map-btn">
+            <span class="material-symbols-outlined">add</span>
+        </button>
+        <button onclick="zoomOut()" class="w-12 h-12 rounded-full glass flex items-center justify-center shadow-lg map-btn">
+            <span class="material-symbols-outlined">remove</span>
+        </button>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-osman-card/95 backdrop-blur-lg border-t border-white/10 px-6 pb-6 pt-3 flex justify-between items-center z-40">
+        <a href="#" class="flex flex-col items-center gap-0.5 opacity-40 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-xl">home</span>
+            <span class="text-[9px] font-bold">Anasayfa</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-0.5 opacity-40 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-xl">explore</span>
+            <span class="text-[9px] font-bold">Keşfet</span>
+        </a>
+        <a href="odeme-noktalari.html" class="w-14 h-14 -mt-6 rounded-full gold-gradient flex items-center justify-center shadow-lg shadow-primary/30 border-4 border-osman-dark">
+            <span class="material-symbols-outlined text-[#3B2610] text-2xl">payments</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-0.5 opacity-40 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-xl">search</span>
+            <span class="text-[9px] font-bold">Ara</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-0.5 opacity-40 hover:opacity-100 transition-opacity">
+            <span class="material-symbols-outlined text-xl">person</span>
+            <span class="text-[9px] font-bold">Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        let map;
+        let markers = [];
+        let userMarker = null;
+        let selectedLocation = null;
+
+        const locations = [
+            { id: 1, name: "Bursakart Dolum Merkezi", type: "bursakart", address: "Osmangazi Metro İstasyonu", distance: 240, status: "open", hours: "06:00-24:00", lat: 40.1833, lng: 29.0667, services: ["Bursakart Dolum", "Bakiye Sorgulama"] },
+            { id: 2, name: "BUSKİ Ödeme Noktası", type: "buski", address: "Şehreküstü Mah. Atatürk Cad.", distance: 380, status: "open", hours: "08:00-17:00", lat: 40.1850, lng: 29.0600, services: ["Su Faturası", "Yapılandırma"] },
+            { id: 3, name: "PTT Osmangazi", type: "ptt", address: "Çekirge Caddesi No:45", distance: 520, status: "closed", hours: "08:30-17:00", lat: 40.1900, lng: 29.0500, services: ["Fatura Ödeme", "Kargo"] },
+            { id: 4, name: "Ziraat Bankası ATM", type: "bank", address: "Altıparmak Meydanı", distance: 180, status: "open", hours: "7/24", lat: 40.1840, lng: 29.0680, services: ["Nakit Çekme", "Fatura"] },
+            { id: 5, name: "İş Bankası ATM", type: "bank", address: "Çekirge Caddesi", distance: 450, status: "open", hours: "7/24", lat: 40.1880, lng: 29.0550, services: ["Nakit Çekme"] },
+            { id: 6, name: "Bursakart Dolum - Şehreküstü", type: "bursakart", address: "Şehreküstü Metro", distance: 390, status: "open", hours: "06:00-24:00", lat: 40.1860, lng: 29.0580, services: ["Bursakart Dolum"] },
+            { id: 7, name: "Osmangazi Belediye Veznesi", type: "vezne", address: "Osmangazi Belediyesi", distance: 600, status: "open", hours: "08:30-17:00", lat: 40.1820, lng: 29.0700, services: ["Vergi Ödeme", "Harç"] },
+            { id: 8, name: "PTT - Altıparmak", type: "ptt", address: "Altıparmak Bulvarı", distance: 290, status: "open", hours: "08:30-17:00", lat: 40.1845, lng: 29.0650, services: ["Fatura", "Kargo"] },
+            { id: 9, name: "Vakıfbank ATM", type: "bank", address: "Heykel Meydanı", distance: 750, status: "open", hours: "7/24", lat: 40.1920, lng: 29.0450, services: ["Nakit", "Fatura"] },
+            { id: 10, name: "BUSKİ - Osmangazi", type: "buski", address: "Osmangazi Belediyesi Yanı", distance: 620, status: "closed", hours: "08:00-17:00", lat: 40.1815, lng: 29.0710, services: ["Su Faturası"] }
+        ];
+
+        const icons = {
+            bursakart: { color: '#06b6d4', icon: 'credit_card' },
+            buski: { color: '#3b82f6', icon: 'water_drop' },
+            ptt: { color: '#eab308', icon: 'local_post_office' },
+            bank: { color: '#22c55e', icon: 'local_atm' },
+            vezne: { color: '#a855f7', icon: 'account_balance_wallet' }
+        };
+
+        function initMap() {
+            // Get URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetLat = parseFloat(urlParams.get('lat')) || 40.1850;
+            const targetLng = parseFloat(urlParams.get('lng')) || 29.0600;
+            const targetId = urlParams.get('id');
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: targetLat, lng: targetLng },
+                zoom: 15,
+                mapTypeId: 'roadmap',
+                styles: [
+                    { elementType: 'geometry', stylers: [{ color: '#0A2627' }] },
+                    { elementType: 'labels.text.fill', stylers: [{ color: '#ffffff' }] },
+                    { elementType: 'labels.text.stroke', stylers: [{ color: '#0A2627' }] },
+                    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#1A4F50' }] },
+                    { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#0D3334' }] },
+                    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0D3334' }] }
+                ],
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false
+            });
+
+            addMarkers();
+
+            // If specific location requested, show it
+            if (targetId) {
+                const loc = locations.find(l => l.id == targetId);
+                if (loc) showLocationCard(loc);
+            }
+        }
+
+        function addMarkers(filter = 'all') {
+            // Clear existing markers
+            markers.forEach(m => m.setMap(null));
+            markers = [];
+
+            let filtered = locations;
+            if (filter === 'open') filtered = locations.filter(l => l.status === 'open');
+            else if (filter !== 'all') filtered = locations.filter(l => l.type === filter);
+
+            filtered.forEach(loc => {
+                const marker = new google.maps.Marker({
+                    position: { lat: loc.lat, lng: loc.lng },
+                    map: map,
+                    title: loc.name,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: icons[loc.type]?.color || '#E2A76B',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2,
+                        scale: 12
+                    }
+                });
+
+                marker.addListener('click', () => {
+                    showLocationCard(loc);
+                    map.panTo({ lat: loc.lat, lng: loc.lng });
+                });
+
+                markers.push(marker);
+            });
+        }
+
+        function showLocationCard(loc) {
+            selectedLocation = loc;
+            const card = document.getElementById('selectedCard');
+            const iconConfig = icons[loc.type] || { color: '#E2A76B', icon: 'location_on' };
+
+            document.getElementById('cardTitle').textContent = loc.name;
+            document.getElementById('cardAddress').textContent = loc.address;
+            document.getElementById('cardDistance').textContent = loc.distance + 'm';
+            document.getElementById('cardStatus').textContent = loc.status === 'open' ? 'Açık' : 'Kapalı';
+            document.getElementById('cardStatus').className = `text-[10px] px-2 py-0.5 rounded-full ${loc.status === 'open' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`;
+
+            const iconDiv = document.getElementById('cardIcon');
+            iconDiv.className = `w-12 h-12 rounded-xl flex items-center justify-center shrink-0`;
+            iconDiv.style.background = `linear-gradient(135deg, ${iconConfig.color}80, ${iconConfig.color})`;
+            iconDiv.innerHTML = `<span class="material-symbols-outlined text-white">${iconConfig.icon}</span>`;
+
+            card.classList.remove('hidden');
+        }
+
+        function closeCard() {
+            document.getElementById('selectedCard').classList.add('hidden');
+            selectedLocation = null;
+        }
+
+        function filterMap(type) {
+            document.querySelectorAll('.map-filter').forEach(btn => {
+                if(btn.dataset.filter === type) {
+                    btn.className = 'map-filter active px-4 py-2 rounded-full gold-gradient text-[#3B2610] text-xs font-bold whitespace-nowrap shadow-lg';
+                } else {
+                    const colorClass = btn.dataset.filter === 'bursakart' ? 'text-cyan-400 border-cyan-400/30' :
+                                     btn.dataset.filter === 'buski' ? 'text-blue-400 border-blue-400/30' :
+                                     btn.dataset.filter === 'ptt' ? 'text-yellow-400 border-yellow-400/30' :
+                                     btn.dataset.filter === 'bank' ? 'text-green-400 border-green-400/30' : '';
+                    btn.className = `map-filter px-4 py-2 rounded-full glass text-xs font-medium whitespace-nowrap hover:bg-white/10 ${colorClass}`;
+                }
+            });
+            addMarkers(type);
+            closeCard();
+        }
+
+        function locateMe() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+
+                        if (userMarker) userMarker.setMap(null);
+
+                        userMarker = new google.maps.Marker({
+                            position: pos,
+                            map: map,
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                fillColor: '#E2A76B',
+                                fillOpacity: 1,
+                                strokeColor: '#ffffff',
+                                strokeWeight: 3,
+                                scale: 10
+                            }
+                        });
+
+                        map.setCenter(pos);
+                        map.setZoom(16);
+                    },
+                    () => alert('Konum alınamadı. Lütfen konum izinlerini kontrol edin.')
+                );
+            }
+        }
+
+        function zoomIn() {
+            map.setZoom(map.getZoom() + 1);
+        }
+
+        function zoomOut() {
+            map.setZoom(map.getZoom() - 1);
+        }
+
+        function getDirections() {
+            if (selectedLocation) {
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${selectedLocation.lat},${selectedLocation.lng}`, '_blank');
+            }
+        }
+
+        function openDetailFromCard() {
+            if (selectedLocation) {
+                window.location.href = `odeme-noktalari.html?detail=${selectedLocation.id}`;
+            }
+        }
+    </script>
+</body>
+</html>

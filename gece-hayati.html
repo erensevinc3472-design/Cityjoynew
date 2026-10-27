@@ -1,0 +1,278 @@
+﻿
+<!DOCTYPE html>
+<html class="dark" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Gece Hayatı</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d4b07b",
+                        "emerald-dark": "#041F1F",
+                        "emerald-deep": "#0E2A28",
+                        "card-surface": "#123C3A",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #041F1F;
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(18, 60, 58, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 176, 123, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .gold-glow {
+            box-shadow: 0 0 20px rgba(212, 176, 123, 0.15);
+        }
+        .emerald-gradient {
+            background: linear-gradient(180deg, #041F1F 0%, #0E2A28 100%);
+        }
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background-color: rgba(4, 31, 31, 0.98);
+            border-top: 1px solid rgba(212, 176, 123, 0.1);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="text-slate-100 min-h-screen font-display selection:bg-primary/30">
+<div class="relative flex flex-col min-h-screen emerald-gradient overflow-x-hidden pb-32 max-w-md mx-auto">
+<!-- Header -->
+<header class="sticky top-0 z-50 px-4 pt-4 pb-4 bg-emerald-dark/95 backdrop-blur-xl border-b border-primary/5">
+<div class="flex items-center justify-between">
+<a href="sosyal-harmoni.html" class="w-10 h-10 flex items-center justify-center rounded-full glass-card hover:bg-card-surface/80 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl">arrow_back_ios_new</span>
+</a>
+<div class="flex flex-col items-center">
+<h1 class="text-xs font-bold tracking-[0.2em] text-primary uppercase">GECE HAYATI</h1>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="material-symbols-outlined text-[10px] text-primary/60 fill-1">location_on</span>
+<span class="text-[10px] font-extrabold tracking-widest text-primary/60">BURSA</span>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full glass-card hover:bg-card-surface/80 transition-colors">
+<span class="material-symbols-outlined text-primary text-xl">tune</span>
+</button>
+</div>
+</header>
+
+<!-- Category Filter -->
+<section class="px-4 py-4 flex gap-4 overflow-x-auto no-scrollbar border-b border-primary/5">
+<button class="flex flex-col items-center gap-2 group flex-shrink-0">
+<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-emerald-dark gold-glow shadow-primary/20">
+<span class="material-symbols-outlined text-xl font-bold">celebration</span>
+</div>
+<span class="text-[9px] font-bold text-primary uppercase tracking-tighter">Eğlenmek</span>
+</button>
+<button class="flex flex-col items-center gap-2 group flex-shrink-0">
+<div class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-primary/50 group-hover:text-primary transition">
+<span class="material-symbols-outlined text-xl">restaurant</span>
+</div>
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Yemek</span>
+</button>
+<button class="flex flex-col items-center gap-2 group flex-shrink-0">
+<div class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-primary/50 group-hover:text-primary transition">
+<span class="material-symbols-outlined text-xl">music_note</span>
+</div>
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Müzik</span>
+</button>
+<button class="flex flex-col items-center gap-2 group flex-shrink-0">
+<div class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-primary/50 group-hover:text-primary transition">
+<span class="material-symbols-outlined text-xl">local_bar</span>
+</div>
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Kokteyl</span>
+</button>
+<button class="flex flex-col items-center gap-2 group flex-shrink-0">
+<div class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-primary/50 group-hover:text-primary transition">
+<span class="material-symbols-outlined text-xl">theater_comedy</span>
+</div>
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Etkinlik</span>
+</button>
+</section>
+
+<!-- Tonight Section -->
+<section class="pt-6 pb-2">
+<div class="px-4 flex justify-between items-center mb-4">
+<h2 class="text-xs font-extrabold tracking-widest text-slate-100 uppercase">Bu Gece Bursa'da</h2>
+<span class="text-primary text-[9px] font-bold border-b border-primary/30 pb-0.5">TÜMÜ</span>
+</div>
+<div class="flex overflow-x-auto gap-3 px-4 pb-2 no-scrollbar">
+<div class="relative flex-shrink-0 w-48 h-64 rounded-xl overflow-hidden glass-card">
+<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1566737236500-c8ac43014a67?w=400&h=600&fit=crop')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-emerald-dark via-emerald-dark/10 to-transparent"></div>
+<div class="absolute top-3 left-3 flex gap-1.5">
+<span class="bg-primary/90 text-emerald-dark text-[8px] font-black px-2 py-0.5 rounded-sm">CLUB</span>
+<div class="flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+<span class="text-[8px] text-white font-bold uppercase">Açık</span>
+</div>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<h3 class="text-sm font-bold text-white mb-0.5">Club Inferno</h3>
+<p class="text-slate-300 text-[9px] mb-3">Nilüfer, Podyum Park</p>
+<button class="w-full py-2 bg-primary text-emerald-dark font-black rounded-lg text-[9px] tracking-wider transition hover:brightness-110 active:scale-[0.98]">
+                            REZERVASYON
+                        </button>
+</div>
+</div>
+<div class="relative flex-shrink-0 w-48 h-64 rounded-xl overflow-hidden glass-card">
+<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=600&fit=crop')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-emerald-dark via-emerald-dark/10 to-transparent"></div>
+<div class="absolute top-3 left-3 flex gap-1.5">
+<span class="bg-primary/90 text-emerald-dark text-[8px] font-black px-2 py-0.5 rounded-sm">ROOFTOP</span>
+<div class="flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+<span class="text-[8px] text-white font-bold uppercase">Yoğun</span>
+</div>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<h3 class="text-sm font-bold text-white mb-0.5">Sky View Lounge</h3>
+<p class="text-slate-300 text-[9px] mb-3">Osmangazi, City Center</p>
+<button class="w-full py-2 bg-primary text-emerald-dark font-black rounded-lg text-[9px] tracking-wider transition hover:brightness-110 active:scale-[0.98]">
+                            REZERVASYON
+                        </button>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Popular Places -->
+<section class="px-4 space-y-4 pt-4">
+<h2 class="text-xs font-extrabold tracking-widest text-slate-100 uppercase">Popüler Mekanlar</h2>
+
+<!-- Place 1 -->
+<div class="glass-card rounded-xl overflow-hidden border-primary/10">
+<div class="flex">
+<div class="w-24 h-28 bg-cover bg-center flex-shrink-0 relative" style="background-image: url('https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&h=300&fit=crop')">
+<div class="absolute top-2 left-2 glass-card px-1.5 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px] text-primary fill-1">star</span>
+<span class="text-[10px] font-bold text-white">4.9</span>
+</div>
+</div>
+<div class="flex-1 p-3 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<h4 class="text-xs font-bold text-white leading-tight">Emerald Lounge</h4>
+<span class="text-[8px] text-primary/60 font-bold">$$$$</span>
+</div>
+<p class="text-[9px] text-slate-400 mt-0.5">Deep House • Nilüfer</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-1">
+<img alt="User" class="w-4 h-4 rounded-full border border-emerald-deep" src="https://i.pravatar.cc/150?img=33"/>
+<img alt="User" class="w-4 h-4 rounded-full border border-emerald-deep" src="https://i.pravatar.cc/150?img=34"/>
+<img alt="User" class="w-4 h-4 rounded-full border border-emerald-deep" src="https://i.pravatar.cc/150?img=35"/>
+<div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-[6px] font-bold text-primary border border-emerald-deep">+84</div>
+</div>
+<span class="text-[8px] text-primary/80 font-medium">84 aktif</span>
+</div>
+<div class="flex gap-2 mt-2">
+<button class="flex-1 py-1.5 bg-primary text-emerald-dark font-black rounded text-[9px] tracking-tighter">GİT</button>
+<button class="flex-1 py-1.5 glass-card text-primary font-bold rounded text-[9px] border-primary/20">DETAY</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Place 2 -->
+<div class="glass-card rounded-xl overflow-hidden border-primary/10">
+<div class="flex">
+<div class="w-24 h-28 bg-cover bg-center flex-shrink-0 relative" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=300&fit=crop')">
+<div class="absolute top-2 left-2 glass-card px-1.5 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px] text-primary fill-1">star</span>
+<span class="text-[10px] font-bold text-white">4.7</span>
+</div>
+</div>
+<div class="flex-1 p-3 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start">
+<h4 class="text-xs font-bold text-white leading-tight">Gold Bistro &amp; Jazz</h4>
+<span class="text-[8px] text-primary/60 font-bold">$$$</span>
+</div>
+<p class="text-[9px] text-slate-400 mt-0.5">Live Jazz • Osmangazi</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-1">
+<img alt="User" class="w-4 h-4 rounded-full border border-emerald-deep" src="https://i.pravatar.cc/150?img=40"/>
+<img alt="User" class="w-4 h-4 rounded-full border border-emerald-deep" src="https://i.pravatar.cc/150?img=41"/>
+<div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-[6px] font-bold text-primary border border-emerald-deep">+42</div>
+</div>
+<span class="text-[8px] text-primary/80 font-medium">42 aktif</span>
+</div>
+<div class="flex gap-2 mt-2">
+<button class="flex-1 py-1.5 bg-primary text-emerald-dark font-black rounded text-[9px] tracking-tighter">GİT</button>
+<button class="flex-1 py-1.5 glass-card text-primary font-bold rounded text-[9px] border-primary/20">DETAY</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Map Button -->
+<button class="fixed bottom-28 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 bg-primary text-emerald-dark font-black rounded-full gold-glow z-40 transition hover:scale-105 active:scale-95 shadow-xl shadow-black/40">
+<span class="material-symbols-outlined text-sm">map</span>
+<span class="text-[10px] tracking-widest uppercase">Haritayı Keşfet</span>
+</button>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 nav-blur px-6 pb-8 pt-4">
+<div class="flex items-center justify-between max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 flex-1 text-white/40 hover:text-primary transition-colors" href="anasayfa.html">
+<span class="material-symbols-outlined text-2xl">home</span>
+<span class="text-[8px] font-black uppercase tracking-widest">ANA SAYFA</span>
+</a>
+<a class="flex flex-col items-center gap-1 flex-1 text-white/40 hover:text-primary transition-colors" href="kesfet-bolgesel.html">
+<span class="material-symbols-outlined text-2xl">explore</span>
+<span class="text-[8px] font-black uppercase tracking-widest">KEŞFET</span>
+</a>
+<a class="flex flex-col items-center gap-1 flex-1 text-white/40 hover:text-primary transition-colors" href="sosyal-harmoni.html">
+<span class="material-symbols-outlined text-2xl">group</span>
+<span class="text-[8px] font-black uppercase tracking-widest">SOSYAL</span>
+</a>
+<a class="flex flex-col items-center gap-1 flex-1 text-white/40 hover:text-primary transition-colors" href="ara.html">
+<span class="material-symbols-outlined text-2xl">search</span>
+<span class="text-[8px] font-black uppercase tracking-widest">ARA</span>
+</a>
+<a class="flex flex-col items-center gap-1 flex-1 text-white/40 hover:text-primary transition-colors" href="profil.html">
+<span class="material-symbols-outlined text-2xl">account_circle</span>
+<span class="text-[8px] font-black uppercase tracking-widest">PROFİL</span>
+</a>
+</div>
+</nav>
+</div>
+
+</body></html>
+

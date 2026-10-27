@@ -1,0 +1,917 @@
+﻿<!-- yol-arkadasi.html - Yol Arkadaşı (Güncellenmiş) -->
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CityJOY - Yol Arkadaşı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "gold-accent": "#E0B07A",
+                        "deep-teal": "#081F24",
+                        "mid-teal": "#0D3238",
+                        "soft-teal": "#1F5055",
+                        "muted-blue": "#C7D8DA",
+                        "card-bg": "rgba(13, 50, 56, 0.95)",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .glass-card {
+                background: theme('colors.card-bg');
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+            }
+            .glass-card-heavy {
+                background: rgba(8, 31, 36, 0.98);
+                backdrop-filter: blur(30px);
+                -webkit-backdrop-filter: blur(30px);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+            }
+            .interactive-card {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .interactive-card:active {
+                transform: scale(0.97);
+            }
+            .gold-glow {
+                text-shadow: 0 0 10px rgba(224, 176, 122, 0.5);
+            }
+            .gold-glow-box {
+                box-shadow: 0 0 15px rgba(224, 176, 122, 0.3);
+            }
+            .vignette-overlay {
+                background: linear-gradient(to bottom, transparent 0%, #081F24 100%), 
+                            radial-gradient(circle at center, transparent 0%, #081F24 120%);
+            }
+            .noise-texture {
+                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+                opacity: 0.03;
+            }
+            .ambient-glow {
+                background: radial-gradient(circle at 50% -20%, rgba(224, 176, 122, 0.15) 0%, transparent 50%);
+            }
+            .hide-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .hide-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .slide-up {
+                animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            @keyframes slideUp {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            .pulse-ring {
+                animation: pulseRing 2s infinite;
+            }
+            @keyframes pulseRing {
+                0% { box-shadow: 0 0 0 0 rgba(224, 176, 122, 0.4); }
+                70% { box-shadow: 0 0 0 10px rgba(224, 176, 122, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(224, 176, 122, 0); }
+            }
+            .float-animation {
+                animation: float 3s ease-in-out infinite;
+            }
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-5px); }
+            }
+            .progress-bar {
+                background: linear-gradient(90deg, #E0B07A 0%, #E0B07A var(--progress), rgba(255,255,255,0.1) var(--progress), rgba(255,255,255,0.1) 100%);
+            }
+        }
+    </style>
+    <style>
+        body {
+            min-height: 100dvh;
+            background-color: #081F24;
+            overscroll-behavior-y: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .safe-bottom-nav {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="bg-deep-teal text-white antialiased overflow-hidden selection:bg-gold-accent/30">
+    
+    <!-- Background Effects -->
+    <div class="fixed inset-0 z-0">
+        <div class="absolute inset-0 bg-cover bg-center opacity-10" style="background-image: url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80');"></div>
+        <div class="absolute inset-0 vignette-overlay"></div>
+        <div class="absolute inset-0 noise-texture pointer-events-none"></div>
+        <div class="absolute inset-0 ambient-glow pointer-events-none"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-deep-teal/90 backdrop-blur-2xl border-b border-white/5">
+        <div class="px-6 pt-12 pb-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="goBack()" class="size-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center interactive-card hover:bg-white/10">
+                    <span class="material-symbols-outlined text-white text-xl">arrow_back_ios_new</span>
+                </button>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white">Yol Arkadaşı</h1>
+                    <p class="text-xs text-gold-accent flex items-center gap-1">
+                        <span class="size-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                        Yolculuk Aktif
+                    </p>
+                </div>
+            </div>
+            <button onclick="openCompanionAI()" class="size-12 rounded-full bg-gold-accent/20 border-2 border-gold-accent flex items-center justify-center interactive-card pulse-ring relative">
+                <span class="material-symbols-outlined text-gold-accent text-2xl">support_agent</span>
+                <span class="absolute -top-1 -right-1 size-4 bg-red-500 rounded-full text-[8px] font-bold flex items-center justify-center border-2 border-deep-teal" id="notification-badge">2</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 h-screen overflow-y-auto hide-scrollbar pt-[100px] pb-[120px]" id="main-content">
+        
+        <!-- Journey Status Card -->
+        <section class="px-6 mb-4 slide-up">
+            <div class="glass-card rounded-3xl p-5 border-gold-accent/30 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gold-accent/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                
+                <!-- Route Info -->
+                <div class="flex items-center justify-between mb-4 relative z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl font-black text-white" id="from-code">İST</span>
+                            <span class="text-[10px] text-muted-blue" id="departure-time">14:30</span>
+                        </div>
+                        <div class="flex flex-col items-center px-4">
+                            <div class="flex items-center gap-1 mb-1">
+                                <span class="material-symbols-outlined text-gold-accent text-sm" id="transport-icon">directions_car</span>
+                                <span class="text-xs text-gold-accent font-bold" id="transport-type">Kendi Aracım</span>
+                            </div>
+                            <div class="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+                                <div class="h-full bg-gold-accent rounded-full transition-all duration-1000" id="journey-progress" style="width: 35%"></div>
+                            </div>
+                            <span class="text-[10px] text-muted-blue mt-1" id="journey-duration">3s 45dk • 280 km</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-2xl font-black text-white" id="to-code">BUR</span>
+                            <span class="text-[10px] text-gold-accent font-bold" id="arrival-time">18:20</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Status -->
+                <div class="bg-black/30 rounded-2xl p-4 border border-white/5">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-emerald-400 text-lg">schedule</span>
+                            <span class="text-sm font-bold text-white">Tahmini Varış</span>
+                        </div>
+                        <span class="text-lg font-black text-gold-accent" id="estimated-arrival">18:20</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs text-muted-blue" id="live-stats">
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">speed</span>
+                            95 km/s ort.
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">location_on</span>
+                            182 km kaldı
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">timer</span>
+                            2s 15dk
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Smart Suggestions -->
+        <section class="px-6 mb-4">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xs font-bold text-white uppercase tracking-wider">💡 Akıllı Öneriler</h2>
+                <span class="text-[10px] text-gold-accent">AI tarafından</span>
+            </div>
+            
+            <div class="space-y-2" id="smart-suggestions">
+                <!-- Dynamic suggestions based on transport type -->
+            </div>
+        </section>
+
+        <!-- Transport Specific Section -->
+        <section class="px-6 mb-4" id="transport-specific">
+            <!-- Content loaded dynamically based on plan -->
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="px-6 mb-4">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xs font-bold text-white uppercase tracking-wider">⚡ Hızlı Erişim</h2>
+            </div>
+            <div class="grid grid-cols-4 gap-3">
+                <button onclick="openCompanionAI('acil')" class="flex flex-col items-center gap-2 interactive-card">
+                    <div class="size-14 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-red-400 text-2xl">emergency</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-white">Acil</span>
+                </button>
+                <button onclick="openCompanionAI('restoran')" class="flex flex-col items-center gap-2 interactive-card">
+                    <div class="size-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-accent text-2xl">restaurant</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-white">Yemek</span>
+                </button>
+                <button onclick="openCompanionAI('otel')" class="flex flex-col items-center gap-2 interactive-card">
+                    <div class="size-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-accent text-2xl">hotel</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-white">Otel</span>
+                </button>
+                <button onclick="openCompanionAI('gezi')" class="flex flex-col items-center gap-2 interactive-card">
+                    <div class="size-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-accent text-2xl">photo_camera</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-white">Gezi</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Hotel Check-in Reminder -->
+        <section class="px-6 mb-4" id="hotel-section">
+            <div class="glass-card rounded-2xl p-4 border-l-4 border-l-purple-400 bg-gradient-to-r from-purple-400/10 to-transparent">
+                <div class="flex items-start gap-3">
+                    <div class="size-10 rounded-full bg-purple-400/20 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-purple-400 text-xl">hotel</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-xs text-white/90 leading-relaxed mb-2">
+                            <span class="font-bold text-purple-400">Varışınıza 30 dk kaldı!</span> 
+                            Otel rezervasyonunuzu hatırlatalım:
+                        </p>
+                        <div class="bg-black/30 rounded-xl p-3 mb-2">
+                            <p class="text-sm font-bold text-white" id="hotel-name">Akra Hotel</p>
+                            <p class="text-[10px] text-muted-blue">Check-in: <span id="check-in-time">14:00</span> • Rez: #<span id="reservation-code">284756</span></p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="navigateToHotel()" class="flex-1 py-2 rounded-lg bg-gold-accent text-deep-teal text-xs font-bold interactive-card">
+                                Yol Tarifi
+                            </button>
+                            <button onclick="callHotel()" class="flex-1 py-2 rounded-lg bg-white/5 text-white text-xs font-bold interactive-card border border-white/10">
+                                Ara
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Companion AI Modal -->
+    <div id="companion-ai-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeCompanionAI()"></div>
+        <div class="absolute inset-x-4 top-20 bottom-24 glass-card-heavy rounded-3xl flex flex-col overflow-hidden border border-gold-accent/30 shadow-2xl">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b border-white/10 bg-gold-accent/5">
+                <div class="flex items-center gap-3">
+                    <div class="size-10 rounded-full bg-gold-accent/20 flex items-center justify-center pulse-ring">
+                        <span class="material-symbols-outlined text-gold-accent text-xl">support_agent</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Yol Arkadaşı AI</h3>
+                        <p class="text-[10px] text-gold-accent">Yolculuğunuzda yanınızdayım</p>
+                    </div>
+                </div>
+                <button onclick="closeCompanionAI()" class="size-8 rounded-full bg-white/5 flex items-center justify-center interactive-card">
+                    <span class="material-symbols-outlined text-white text-lg">close</span>
+                </button>
+            </div>
+            
+            <!-- Messages -->
+            <div id="companion-messages" class="flex-1 overflow-y-auto p-4 space-y-3 hide-scrollbar">
+                <!-- Welcome message -->
+                <div class="flex gap-2">
+                    <div class="size-8 rounded-full bg-gold-accent/20 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold-accent text-sm">support_agent</span>
+                    </div>
+                    <div class="glass-card rounded-2xl rounded-tl-sm p-3 max-w-[85%]">
+                        <p class="text-xs text-white/90 leading-relaxed">Merhaba! <span id="ai-destination">Bursa</span> yolculuğunuzda size nasıl yardımcı olabilirim? 🎯</p>
+                        <p class="text-[10px] text-muted-blue mt-2">Mola yerleri, acil durumlar, veya otel rezervasyonunuz hakkında sorular sorabilirsiniz.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="px-4 py-2 border-t border-white/5 bg-black/20">
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="sendCompanionMessage('En yakın mola yeri nerede?')" class="px-3 py-1.5 rounded-full bg-white/5 text-[10px] text-muted-blue whitespace-nowrap border border-white/10 hover:border-gold-accent/30 transition-colors">⛽ Yakıt</button>
+                    <button onclick="sendCompanionMessage('Acil eczane var mı?')" class="px-3 py-1.5 rounded-full bg-white/5 text-[10px] text-muted-blue whitespace-nowrap border border-white/10 hover:border-gold-accent/30 transition-colors">🏥 Eczane</button>
+                    <button onclick="sendCompanionMessage('Otele nasıl giderim?')" class="px-3 py-1.5 rounded-full bg-white/5 text-[10px] text-muted-blue whitespace-nowrap border border-white/10 hover:border-gold-accent/30 transition-colors">🏨 Otel</button>
+                    <button onclick="sendCompanionMessage('Yemek önerisi')" class="px-3 py-1.5 rounded-full bg-white/5 text-[10px] text-muted-blue whitespace-nowrap border border-white/10 hover:border-gold-accent/30 transition-colors">🍽️ Yemek</button>
+                </div>
+            </div>
+            
+            <!-- Input -->
+            <div class="p-4 border-t border-white/10 bg-deep-teal/50">
+                <div class="flex gap-2">
+                    <input type="text" id="companion-input" placeholder="Mesajınızı yazın..." 
+                           class="flex-1 h-11 bg-black/40 border border-white/10 rounded-xl px-4 text-sm text-white placeholder:text-muted-blue/50 focus:outline-none focus:border-gold-accent/50"
+                           onkeypress="if(event.key==='Enter') sendCompanionMessage()">
+                    <button onclick="sendCompanionMessage()" class="size-11 rounded-xl bg-gold-accent flex items-center justify-center interactive-card">
+                        <span class="material-symbols-outlined text-deep-teal text-xl">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- No Plan Modal -->
+    <div id="no-plan-modal" class="fixed inset-0 z-[80] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeNoPlanModal()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] max-w-sm glass-card-heavy rounded-3xl p-6 border border-gold-accent/30 text-center">
+            <div class="size-16 rounded-full bg-gold-accent/20 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-gold-accent text-3xl">map</span>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Henüz Plan Yok</h3>
+            <p class="text-sm text-muted-blue mb-6 leading-relaxed">
+                Yol Arkadaşı özelliğini kullanmak için önce bir seyahat planı oluşturmalısınız.
+            </p>
+            <button onclick="goToPlanner()" class="w-full py-3 rounded-xl bg-gold-accent text-deep-teal font-bold text-sm uppercase tracking-wider interactive-card">
+                Plan Oluştur
+            </button>
+            <button onclick="closeNoPlanModal()" class="w-full mt-3 py-3 rounded-xl bg-white/5 text-white font-bold text-sm interactive-card border border-white/10">
+                Kapat
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let currentPlan = null;
+        let currentTransport = 'car';
+        let journeyProgress = 35;
+        let updateInterval = null;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePage();
+        });
+        
+        function initializePage() {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const planId = urlParams.get('plan');
+            const transport = urlParams.get('transport');
+            const from = urlParams.get('from');
+            const to = urlParams.get('to');
+            
+            // Try to get plan from localStorage
+            const savedPlan = getActivePlan();
+            
+            // Validate plan
+            if (!savedPlan && !planId) {
+                showNoPlanModal();
+                return;
+            }
+            
+            // Use URL params or saved plan
+            currentPlan = savedPlan || {
+                planId: planId,
+                transport: transport || 'car',
+                from: from || 'İstanbul',
+                to: to || 'Bursa',
+                price: 850
+            };
+            
+            currentTransport = currentPlan.transport || 'car';
+            
+            // Update UI
+            updateJourneyUI();
+            showTransportSpecific(currentTransport);
+            generateSmartSuggestions();
+            startLiveUpdates();
+            
+            // Update AI welcome message
+            document.getElementById('ai-destination').textContent = currentPlan.to;
+        }
+        
+        function getActivePlan() {
+            try {
+                const plan = localStorage.getItem('activePlan') || sessionStorage.getItem('activePlan');
+                return plan ? JSON.parse(plan) : null;
+            } catch (e) {
+                console.error('Plan okuma hatası:', e);
+                return null;
+            }
+        }
+        
+        function updateJourneyUI() {
+            if (!currentPlan) return;
+            
+            // Update route codes
+            document.getElementById('from-code').textContent = getCityCode(currentPlan.from);
+            document.getElementById('to-code').textContent = getCityCode(currentPlan.to);
+            
+            // Update transport info
+            const transportNames = {
+                'car': 'Kendi Aracım',
+                'bus': 'Otobüs',
+                'flight': 'Uçak',
+                'train': 'Tren',
+                'rental': 'Kiralık Araç'
+            };
+            
+            const transportIcons = {
+                'car': 'directions_car',
+                'bus': 'directions_bus',
+                'flight': 'flight',
+                'train': 'train',
+                'rental': 'car_rental'
+            };
+            
+            document.getElementById('transport-type').textContent = transportNames[currentTransport] || 'Kendi Aracım';
+            document.getElementById('transport-icon').textContent = transportIcons[currentTransport] || 'directions_car';
+            
+            // Update ticket info if available
+            if (currentPlan.ticket) {
+                if (currentPlan.ticket.departure) {
+                    document.getElementById('departure-time').textContent = currentPlan.ticket.departure;
+                }
+                if (currentPlan.ticket.arrival) {
+                    document.getElementById('arrival-time').textContent = currentPlan.ticket.arrival;
+                    document.getElementById('estimated-arrival').textContent = currentPlan.ticket.arrival;
+                }
+            }
+            
+            // Update hotel info if available
+            if (currentPlan.accommodation) {
+                document.getElementById('hotel-name').textContent = currentPlan.accommodation.hotelName;
+                document.getElementById('check-in-time').textContent = currentPlan.accommodation.checkIn;
+            }
+        }
+        
+        function getCityCode(cityName) {
+            const codes = {
+                'istanbul': 'İST',
+                'ankara': 'ANK',
+                'izmir': 'İZM',
+                'antalya': 'AYT',
+                'bursa': 'BUR'
+            };
+            return codes[cityName?.toLowerCase()] || cityName?.substring(0, 3).toUpperCase() || '---';
+        }
+        
+        function showTransportSpecific(type) {
+            const container = document.getElementById('transport-specific');
+            container.innerHTML = ''; // Clear existing
+            
+            const content = generateTransportContent(type);
+            container.innerHTML = content;
+        }
+        
+        function generateTransportContent(type) {
+            const templates = {
+                'car': `
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold text-white uppercase tracking-wider">⛽ Yakıt & Park</h2>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 mb-3">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-gold-accent text-lg">local_gas_station</span>
+                                <span class="text-sm font-bold">Yakıt Durumu</span>
+                            </div>
+                            <span class="text-xs text-emerald-400 font-bold">Yeterli ✓</span>
+                        </div>
+                        <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-2">
+                            <div class="h-full bg-gold-accent rounded-full" style="width: 65%"></div>
+                        </div>
+                        <p class="text-[10px] text-muted-blue">Tahmini ihtiyaç: 28 litre • ${currentPlan?.price || 850} TL</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-gold-accent text-lg">local_parking</span>
+                                <span class="text-sm font-bold">Otopark Rezervasyonu</span>
+                            </div>
+                            <span class="px-2 py-1 bg-emerald-400/20 text-emerald-400 text-[10px] font-bold rounded">Aktif</span>
+                        </div>
+                        <p class="text-xs text-muted-blue mb-2">${currentPlan?.to || 'Bursa'} Şehir Merkezi Otoparkı</p>
+                        <div class="flex gap-2">
+                            <button onclick="navigateToParking()" class="flex-1 py-2 rounded-lg bg-white/5 text-xs font-bold interactive-card border border-white/10">
+                                Yol Tarifi
+                            </button>
+                            <button onclick="showParkingQR()" class="flex-1 py-2 rounded-lg bg-gold-accent text-deep-teal text-xs font-bold interactive-card">
+                                QR Göster
+                            </button>
+                        </div>
+                    </div>
+                `,
+                'flight': `
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold text-white uppercase tracking-wider">✈️ Uçuş Detayları</h2>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 mb-3 border-gold-accent/30">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="size-12 rounded-xl bg-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-gold-accent text-2xl">airplanemode_active</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-white">${currentPlan?.ticket?.airline === 'TK' ? 'TK 2256' : 'PC 1823'}</p>
+                                    <p class="text-[10px] text-muted-blue">${currentPlan?.ticket?.airline === 'TK' ? 'Türk Hava Yolları' : 'Pegasus'}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-black text-gold-accent">${currentPlan?.ticket?.departure || '08:30'}</p>
+                                <p class="text-[10px] text-emerald-400">Vaktinde</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="material-symbols-outlined text-gold-accent text-base">luggage</span>
+                                <span class="text-muted-blue">Bagaj: 15 kg (Check-in açık)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="material-symbols-outlined text-gold-accent text-base">airline_seat_recline_normal</span>
+                                <span class="text-muted-blue">Koltuk: 12A (Pencere)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="material-symbols-outlined text-gold-accent text-base">restaurant</span>
+                                <span class="text-muted-blue">Servis: Kahvaltı + İçecek</span>
+                            </div>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-3 border border-white/5">
+                            <p class="text-[10px] text-gold-accent font-bold uppercase mb-2">Uçuş Saatleri</p>
+                            <div class="flex justify-between text-xs">
+                                <div class="text-center">
+                                    <p class="font-bold text-white">${currentPlan?.ticket?.departure || '08:30'}</p>
+                                    <p class="text-[10px] text-muted-blue">Kalkış</p>
+                                </div>
+                                <div class="flex-1 flex items-center justify-center">
+                                    <div class="w-full h-px bg-gold-accent/30 relative">
+                                        <span class="material-symbols-outlined absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gold-accent text-sm">airplanemode_active</span>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-bold text-white">${currentPlan?.ticket?.arrival || '09:40'}</p>
+                                    <p class="text-[10px] text-muted-blue">Varış</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                'bus': `
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold text-white uppercase tracking-wider">🚌 Otobüs Bilgileri</h2>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 mb-3">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <p class="text-sm font-bold text-white">${currentPlan?.ticket?.company || 'METRO'} Turizm</p>
+                                <p class="text-[10px] text-muted-blue">${currentPlan?.ticket?.departure || '14:30'} - ${currentPlan?.ticket?.arrival || '18:20'}</p>
+                            </div>
+                            <span class="px-3 py-1 bg-gold-accent/20 text-gold-accent text-xs font-bold rounded-full">Platform 7</span>
+                        </div>
+                        <div class="flex gap-4 text-xs text-muted-blue mb-3">
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-gold-accent text-sm">wifi</span> Wi-Fi</span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-gold-accent text-sm">power</span> Priz</span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-gold-accent text-sm">tv</span> Eğlence</span>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-3">
+                            <p class="text-[10px] text-gold-accent font-bold uppercase mb-1">Son Durak Bilgisi</p>
+                            <p class="text-xs text-white">${currentPlan?.to || 'Bursa'} Terminali • Şehir merkezine 3 km</p>
+                        </div>
+                    </div>
+                `,
+                'train': `
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold text-white uppercase tracking-wider">🚆 Tren & Bağlantılar</h2>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 mb-3">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <p class="text-sm font-bold text-white">YHT ${currentPlan?.from || 'Ankara'}-${currentPlan?.to || 'İstanbul'}</p>
+                                <p class="text-[10px] text-muted-blue">${currentPlan?.ticket?.departure || '07:15'} - ${currentPlan?.ticket?.arrival || '11:30'}</p>
+                            </div>
+                            <span class="px-3 py-1 bg-gold-accent/20 text-gold-accent text-xs font-bold rounded-full">Peron 3</span>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-3">
+                            <p class="text-[10px] text-gold-accent font-bold uppercase mb-2">Aktarma: Gar - Otel</p>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-muted-blue">Taksi</span>
+                                    <span class="font-bold text-gold-accent">~85 TL</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                'rental': `
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-bold text-white uppercase tracking-wider">🚗 Araç Kiralama</h2>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4 mb-3">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <p class="text-sm font-bold text-white">${currentPlan?.ticket?.carModel || 'Renault Clio'}</p>
+                                <p class="text-[10px] text-muted-blue">${currentPlan?.ticket?.gear || 'Manuel'} • ${currentPlan?.ticket?.fuel || 'Dizel'}</p>
+                            </div>
+                            <span class="px-2 py-1 bg-emerald-400/20 text-emerald-400 text-[10px] font-bold rounded">Teslim Al</span>
+                        </div>
+                        <div class="bg-black/30 rounded-xl p-3">
+                            <p class="text-[10px] text-gold-accent font-bold uppercase mb-1">Teslimat Noktası</p>
+                            <p class="text-xs text-white">${currentPlan?.to || 'Bursa'} Havalimanı / Şehir Merkezi</p>
+                        </div>
+                    </div>
+                `
+            };
+            
+            return templates[type] || templates['car'];
+        }
+        
+        function generateSmartSuggestions() {
+            const container = document.getElementById('smart-suggestions');
+            const suggestions = [
+                {
+                    icon: 'coffee',
+                    color: 'gold',
+                    title: 'Mola Önerisi',
+                    text: `<span class="font-bold text-gold-accent">15 dk sonra</span> mola öneriyorum! <span class="text-muted-blue">Lezzet Durağı</span> yaklaşıyor (120. km) ☕`,
+                    action: 'Navigasyona Ekle →'
+                },
+                {
+                    icon: 'check_circle',
+                    color: 'emerald',
+                    title: 'Yol Durumu',
+                    text: `Yol durumu <span class="font-bold text-emerald-400">çok iyi</span>! Otobanda ortalama hız 110 km/s. Hedefe zamanında varacaksınız. 🎯`
+                },
+                {
+                    icon: 'cloud',
+                    color: 'blue',
+                    title: 'Hava Durumu',
+                    text: `${currentPlan?.to || 'Bursa'}'da hava <span class="font-bold text-blue-400">yağmurlu</span> görünüyor (19°C). Yanınıza şemsiye almayı unutmayın! 🌧️`
+                }
+            ];
+            
+            container.innerHTML = suggestions.map((s, i) => `
+                <div class="glass-card rounded-2xl p-4 border-l-4 border-l-${s.color}-400 bg-gradient-to-r from-${s.color}-400/10 to-transparent flex items-start gap-3 interactive-card slide-up" style="animation-delay: ${i * 0.1}s">
+                    <div class="size-10 rounded-full bg-${s.color}-400/20 flex items-center justify-center shrink-0 ${i === 0 ? 'float-animation' : ''}">
+                        <span class="material-symbols-outlined text-${s.color}-400 text-xl">${s.icon}</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-xs text-white/90 leading-relaxed mb-1">${s.text}</p>
+                        ${s.action ? `<button onclick="addToNavigation()" class="text-[10px] text-gold-accent font-bold uppercase tracking-wider hover:underline">${s.action}</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Live Updates
+        function startLiveUpdates() {
+            // Simulate live journey updates
+            updateInterval = setInterval(() => {
+                // Update progress
+                journeyProgress = Math.min(100, journeyProgress + Math.random() * 2);
+                document.getElementById('journey-progress').style.width = journeyProgress + '%';
+                
+                // Update stats
+                updateLiveStats();
+                
+                // Check if journey complete
+                if (journeyProgress >= 100) {
+                    clearInterval(updateInterval);
+                    showArrivalNotification();
+                }
+            }, 5000); // Every 5 seconds for demo
+        }
+        
+        function updateLiveStats() {
+            const remainingKm = Math.max(0, Math.round(280 - (280 * journeyProgress / 100)));
+            const remainingTime = Math.max(0, Math.round(135 - (135 * journeyProgress / 100))); // minutes
+            
+            const hours = Math.floor(remainingTime / 60);
+            const mins = remainingTime % 60;
+            
+            const statsHtml = `
+                <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">speed</span>
+                    ${Math.round(90 + Math.random() * 20)} km/s ort.
+                </span>
+                <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">location_on</span>
+                    ${remainingKm} km kaldı
+                </span>
+                <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">timer</span>
+                    ${hours}s ${mins}dk
+                </span>
+            `;
+            
+            document.getElementById('live-stats').innerHTML = statsHtml;
+        }
+        
+        function showArrivalNotification() {
+            const notif = document.createElement('div');
+            notif.className = 'fixed top-24 left-1/2 -translate-x-1/2 z-[80] px-6 py-4 rounded-2xl bg-emerald-500 text-white text-sm font-bold shadow-lg slide-up text-center';
+            notif.innerHTML = `
+                <div class="text-2xl mb-1">🎉</div>
+                <div>Hedefe vardınız!</div>
+                <div class="text-xs font-normal mt-1">Otel yönlendirmesi için tıklayın</div>
+            `;
+            document.body.appendChild(notif);
+            
+            notif.onclick = () => {
+                navigateToHotel();
+                notif.remove();
+            };
+            
+            setTimeout(() => notif.remove(), 5000);
+        }
+        
+        // Companion AI Functions
+        function openCompanionAI(context) {
+            const modal = document.getElementById('companion-ai-modal');
+            modal.classList.remove('hidden');
+            
+            // Clear notification badge
+            document.getElementById('notification-badge').style.display = 'none';
+            
+            // If context provided, send initial message
+            if (context) {
+                setTimeout(() => {
+                    const messages = {
+                        'acil': 'Acil durum için size yardımcı olayım. En yakın hastane, eczane veya polis merkezini gösterebilirim. Neredesiniz şu an? 🚨',
+                        'restoran': `Yol üzerindeki restoranları listeliyorum... Lezzet Durağı (4.8⭐) ve Mola Bahçesi (4.5⭐) önerilerimdir. Hangisini tercih edersiniz? 🍽️`,
+                        'otel': `Otel rezervasyonunuz: ${currentPlan?.accommodation?.hotelName || 'Akra Hotel'}, ${currentPlan?.to || 'Lara'}. Check-in: ${currentPlan?.accommodation?.checkIn || '14:00'}. Otele yol tarifi ister misiniz? 🏨`,
+                        'gezi': `${currentPlan?.to || 'Bursa'}'da mutlaka görmeniz gereken yerler: Uludağ, Yeşil Türbe, Koza Han. Hangisi hakkında bilgi istersiniz? 📸`
+                    };
+                    addCompanionMessage(messages[context] || 'Size nasıl yardımcı olabilirim?', 'ai');
+                }, 300);
+            }
+        }
+        
+        function closeCompanionAI() {
+            document.getElementById('companion-ai-modal').classList.add('hidden');
+        }
+        
+        function sendCompanionMessage(text) {
+            const input = document.getElementById('companion-input');
+            const message = text || input.value.trim();
+            
+            if (!message) return;
+            
+            addCompanionMessage(message, 'user');
+            if (!text) input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                showCompanionTyping();
+                setTimeout(() => {
+                    removeCompanionTyping();
+                    const response = generateAIResponse(message);
+                    addCompanionMessage(response, 'ai');
+                }, 1500);
+            }, 300);
+        }
+        
+        function generateAIResponse(userMsg) {
+            const lower = userMsg.toLowerCase();
+            const destination = currentPlan?.to || 'Bursa';
+            
+            if (lower.includes('yakıt') || lower.includes('benzin')) {
+                return 'En yakın yakıt istasyonu 12 km ileride (Shell). Dizel: 42.50 TL, Benzin: 45.20 TL. Mola öneriyorum! ⛽';
+            } else if (lower.includes('eczane') || lower.includes('hastane')) {
+                return `En yakın eczane: Yıldız Eczanesi (8 km). Acil durum için ${destination} Devlet Hastanesi'ne 25 km kaldı. 🏥`;
+            } else if (lower.includes('otel') || lower.includes('hotel')) {
+                return `${currentPlan?.accommodation?.hotelName || 'Akra Hotel'}'e varışınıza 30 dk kaldı. Check-in saati ${currentPlan?.accommodation?.checkIn || '14:00'}. Otopark ücretsiz. 🏨`;
+            } else if (lower.includes('yemek') || lower.includes('restoran')) {
+                return 'Lezzet Durağı (4.8⭐) - 5 km ileride. Izgara ve ev yemekleri meşhur. Hızlı servis var! 🍽️';
+            } else if (lower.includes('hava') || lower.includes('yağmur')) {
+                return `${destination}'da hava bulutlu, 19°C. Yağmur ihtimali %40. Şemsiye öneririm! 🌧️`;
+            } else if (lower.includes('mola')) {
+                return '15 dk sonra harika bir mola yeri var: Mola Bahçesi. Çocuk parkı, temiz WC ve lezzetli kahve var! ☕';
+            } else {
+                return 'Anladım! Size bu konuda yardımcı olmak için detaylı bilgi getiriyorum... 🎯';
+            }
+        }
+        
+        function addCompanionMessage(text, sender) {
+            const container = document.getElementById('companion-messages');
+            const isAI = sender === 'ai';
+            
+            const div = document.createElement('div');
+            div.className = `flex gap-2 ${isAI ? '' : 'flex-row-reverse'}`;
+            div.innerHTML = `
+                ${isAI ? `
+                <div class="size-8 rounded-full bg-gold-accent/20 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-gold-accent text-sm">support_agent</span>
+                </div>
+                ` : `
+                <div class="size-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-white text-sm">person</span>
+                </div>
+                `}
+                <div class="glass-card rounded-2xl ${isAI ? 'rounded-tl-sm' : 'rounded-tr-sm'} p-3 max-w-[85%] ${isAI ? '' : 'bg-gold-accent/10 border-gold-accent/30'}">
+                    <p class="text-xs text-white/90 leading-relaxed">${text}</p>
+                </div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function showCompanionTyping() {
+            const container = document.getElementById('companion-messages');
+            const div = document.createElement('div');
+            div.id = 'companion-typing';
+            div.className = 'flex gap-2';
+            div.innerHTML = `
+                <div class="size-8 rounded-full bg-gold-accent/20 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-gold-accent text-sm">support_agent</span>
+                </div>
+                <div class="glass-card rounded-2xl rounded-tl-sm p-3 flex items-center gap-1">
+                    <div class="w-1.5 h-1.5 bg-gold-accent/60 rounded-full animate-bounce"></div>
+                    <div class="w-1.5 h-1.5 bg-gold-accent/60 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                    <div class="w-1.5 h-1.5 bg-gold-accent/60 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                </div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function removeCompanionTyping() {
+            const typing = document.getElementById('companion-typing');
+            if (typing) typing.remove();
+        }
+        
+        // Action Functions
+        function addToNavigation() {
+            showNotification('Navigasyona eklendi!');
+        }
+        
+        function navigateToHotel() {
+            showNotification(`${currentPlan?.to || 'Bursa'} - Otel yönlendirmesi başlatıldı`);
+        }
+        
+        function callHotel() {
+            showNotification('Otel aranıyor...');
+        }
+        
+        function navigateToParking() {
+            showNotification('Otopark yönlendirmesi başlatıldı');
+        }
+        
+        function showParkingQR() {
+            showNotification('QR Kod gösteriliyor...');
+        }
+        
+        // No Plan Modal
+        function showNoPlanModal() {
+            document.getElementById('no-plan-modal').classList.remove('hidden');
+        }
+        
+        function closeNoPlanModal() {
+            document.getElementById('no-plan-modal').classList.add('hidden');
+        }
+        
+        function goToPlanner() {
+            window.location.href = 'planlayici.html';
+        }
+        
+        function showNotification(message, type = 'success') {
+            const notif = document.createElement('div');
+            notif.className = `fixed bottom-32 left-1/2 -translate-x-1/2 z-[80] px-6 py-3 rounded-xl ${type === 'success' ? 'bg-emerald-500' : 'bg-red-500'} text-white text-sm font-bold shadow-lg slide-up`;
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+        
+        // Navigation
+        function goBack() {
+            window.location.href = 'planlayici.html';
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (updateInterval) clearInterval(updateInterval);
+        });
+    </script>
+</body>
+</html>

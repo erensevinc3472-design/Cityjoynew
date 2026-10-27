@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Gönüllülük İlanları - Bursa Şehir Rehberi</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .listing-card {
+            background: rgba(23, 70, 75, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            transition: all 0.3s ease;
+        }
+        .listing-card:hover {
+            background: rgba(23, 70, 75, 0.6);
+            border-color: rgba(224, 176, 122, 0.4);
+        }
+        .glass-panel {
+            background: rgba(13, 50, 56, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .category-btn {
+            background: rgba(23, 70, 75, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            transition: all 0.3s ease;
+        }
+        .category-btn:hover {
+            background: rgba(23, 70, 75, 0.6);
+            border-color: rgba(224, 176, 122, 0.4);
+        }
+        .category-btn.active {
+            background: #E0B07A;
+            border-color: #E0B07A;
+            color: #081F24;
+        }
+    </style>
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-darkest/90 backdrop-blur-md border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <a href="gonulluluk.html" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group">
+                <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+            </a>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gold-primary tracking-wider uppercase">Gönüllülük</span>
+                <h1 class="text-lg font-bold tracking-tight text-white leading-none">Aktif İlanlar</h1>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleSearch()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-all">
+                <span class="material-symbols-outlined text-white">search</span>
+            </button>
+            <button onclick="toggleFilter()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-all">
+                <span class="material-symbols-outlined text-white">filter_list</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Search Panel (Inline) -->
+    <div id="searchPanel" class="hidden fixed top-[60px] left-0 right-0 z-40 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 p-4">
+        <div class="relative max-w-7xl mx-auto">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-desc">search</span>
+            <input type="text" placeholder="İlan ara..." class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl py-3 pl-10 pr-4 text-white focus:border-gold-primary focus:outline-none">
+            <button onclick="toggleSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-desc hover:text-white">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Panel (Inline) -->
+    <div id="filterPanel" class="hidden fixed top-[60px] left-0 right-0 z-40 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 p-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-sm font-bold text-white">Filtreler</h3>
+                <button onclick="toggleFilter()" class="text-text-desc hover:text-white">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <label class="flex items-center gap-2 p-3 rounded-xl bg-card-bg/50 cursor-pointer">
+                    <input type="checkbox" class="rounded border-border-subtle/30 text-gold-primary focus:ring-gold-primary">
+                    <span class="text-white text-sm">Çevre</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 rounded-xl bg-card-bg/50 cursor-pointer">
+                    <input type="checkbox" class="rounded border-border-subtle/30 text-gold-primary focus:ring-gold-primary">
+                    <span class="text-white text-sm">Hayvan</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 rounded-xl bg-card-bg/50 cursor-pointer">
+                    <input type="checkbox" class="rounded border-border-subtle/30 text-gold-primary focus:ring-gold-primary">
+                    <span class="text-white text-sm">Afet</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 rounded-xl bg-card-bg/50 cursor-pointer">
+                    <input type="checkbox" class="rounded border-border-subtle/30 text-gold-primary focus:ring-gold-primary">
+                    <span class="text-white text-sm">Sosyal</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Categories - Sticky -->
+    <section class="fixed top-[60px] left-0 right-0 z-30 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 py-4" id="categorySection">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+                <button class="category-btn active px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-filter="all">
+                    Tümü
+                </button>
+                <button class="category-btn px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap text-white" data-filter="environment">
+                    <span class="material-symbols-outlined text-sm mr-1">eco</span>Çevre
+                </button>
+                <button class="category-btn px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap text-white" data-filter="animal">
+                    <span class="material-symbols-outlined text-sm mr-1">pets</span>Hayvan
+                </button>
+                <button class="category-btn px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap text-white" data-filter="disaster">
+                    <span class="material-symbols-outlined text-sm mr-1">emergency</span>Afet
+                </button>
+                <button class="category-btn px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap text-white" data-filter="social">
+                    <span class="material-symbols-outlined text-sm mr-1">volunteer_activism</span>Sosyal
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spacer -->
+    <div class="h-[140px]"></div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 bg-darkest min-h-screen pb-24 pt-6" id="mainContent">
+        <div class="max-w-7xl mx-auto px-6">
+
+            <!-- Stats -->
+            <div class="grid grid-cols-4 gap-3 mb-8">
+                <div class="glass-panel rounded-xl p-3 text-center">
+                    <p class="text-xl font-bold text-gold-primary">156</p>
+                    <p class="text-[9px] text-text-desc uppercase tracking-wider">Toplam</p>
+                </div>
+                <div class="glass-panel rounded-xl p-3 text-center">
+                    <p class="text-xl font-bold text-gold-primary">89</p>
+                    <p class="text-[9px] text-text-desc uppercase tracking-wider">Çevre</p>
+                </div>
+                <div class="glass-panel rounded-xl p-3 text-center">
+                    <p class="text-xl font-bold text-gold-primary">45</p>
+                    <p class="text-[9px] text-text-desc uppercase tracking-wider">Hayvan</p>
+                </div>
+                <div class="glass-panel rounded-xl p-3 text-center">
+                    <p class="text-xl font-bold text-gold-primary">22</p>
+                    <p class="text-[9px] text-text-desc uppercase tracking-wider">Sosyal</p>
+                </div>
+            </div>
+
+            <!-- Listings -->
+            <div class="space-y-4" id="listingsContainer">
+
+                <!-- Listing 1 -->
+                <div class="listing-card rounded-2xl p-5 cursor-pointer" data-category="environment" onclick="openListingDetail('park-temizligi')">
+                    <div class="flex items-start gap-4">
+                        <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1618477461853-5f8dd68aa395?w=400&q=80')"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 bg-accent-teal/20 text-accent-teal text-[9px] font-bold uppercase rounded">Çevre</span>
+                                <span class="text-[10px] text-text-desc">12 Ekim 2026</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-1">Park Temizliği</h3>
+                            <p class="text-sm text-text-desc mb-2 line-clamp-1">Merkez Park'ta çevre temizliği etkinliği. Eldiven ve çöp poşeti bizden!</p>
+                            <div class="flex items-center gap-4 text-xs text-text-desc">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">location_on</span>
+                                    Merkez Park
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    3 Saat
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">people</span>
+                                    12/20
+                                </span>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all shrink-0">
+                            Katıl
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Listing 2 -->
+                <div class="listing-card rounded-2xl p-5 cursor-pointer" data-category="animal" onclick="openListingDetail('hayvan-besleme')">
+                    <div class="flex items-start gap-4">
+                        <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&q=80')"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 bg-gold-primary/20 text-gold-primary text-[9px] font-bold uppercase rounded">Hayvan</span>
+                                <span class="text-[10px] text-text-desc">14 Ekim 2026</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-1">Sokak Hayvanlarını Besleme</h3>
+                            <p class="text-sm text-text-desc mb-2 line-clamp-1">Sahil yolu boyunca sokak hayvanlarına mama ve su dağıtımı.</p>
+                            <div class="flex items-center gap-4 text-xs text-text-desc">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">location_on</span>
+                                    Sahil Yolu
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    2 Saat
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">people</span>
+                                    8/15
+                                </span>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all shrink-0">
+                            Katıl
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Listing 3 -->
+                <div class="listing-card rounded-2xl p-5 cursor-pointer" data-category="environment" onclick="openListingDetail('fidan-dikimi')">
+                    <div class="flex items-start gap-4">
+                        <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&q=80')"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] font-bold uppercase rounded">Doğa</span>
+                                <span class="text-[10px] text-text-desc">15 Ekim 2026</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-1">Fidan Dikimi</h3>
+                            <p class="text-sm text-text-desc mb-2 line-clamp-1">Ağaçlandırma projesi kapsamında 500 fidan dikimi. Tüm malzemeler hazır.</p>
+                            <div class="flex items-center gap-4 text-xs text-text-desc">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">location_on</span>
+                                    Ağaçlandırma Alanı
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    4 Saat
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">people</span>
+                                    45/50
+                                </span>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all shrink-0">
+                            Katıl
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Listing 4 -->
+                <div class="listing-card rounded-2xl p-5 cursor-pointer" data-category="social" onclick="openListingDetail('yasli-ziyareti')">
+                    <div class="flex items-start gap-4">
+                        <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=400&q=80')"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-[9px] font-bold uppercase rounded">Sosyal</span>
+                                <span class="text-[10px] text-text-desc">16 Ekim 2026</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-1">Yaşlı Ziyareti</h3>
+                            <p class="text-sm text-text-desc mb-2 line-clamp-1">Huzurevi ziyareti, sohbet ve aktivite yardımı. Sertifika verilecek.</p>
+                            <div class="flex items-center gap-4 text-xs text-text-desc">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">location_on</span>
+                                    Osmangazi Huzurevi
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    2 Saat
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">people</span>
+                                    5/10
+                                </span>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all shrink-0">
+                            Katıl
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Listing 5 -->
+                <div class="listing-card rounded-2xl p-5 cursor-pointer" data-category="disaster" onclick="openListingDetail('afet-egitimi')">
+                    <div class="flex items-start gap-4">
+                        <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=400&q=80')"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 bg-red-500/20 text-red-400 text-[9px] font-bold uppercase rounded">Afet</span>
+                                <span class="text-[10px] text-text-desc">18 Ekim 2026</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-1">Afet Eğitimi</h3>
+                            <p class="text-sm text-text-desc mb-2 line-clamp-1">Deprem ve yangın tatbikatı. Sertifikalı eğitim, uzman kadro.</p>
+                            <div class="flex items-center gap-4 text-xs text-text-desc">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">location_on</span>
+                                    AFAD Bursa
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    6 Saat
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">people</span>
+                                    28/30
+                                </span>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all shrink-0">
+                            Katıl
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Listing 6 -->
+                <div class="listing-card rounded-2xl p-5 cursor-pointer" data-category="social" onclick="openListingDetail('kutuphane-yardimi')">
+                    <div class="flex items-start gap-4">
+                        <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80')"></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-[9px] font-bold uppercase rounded">Sosyal</span>
+                                <span class="text-[10px] text-text-desc">20 Ekim 2026</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white mb-1">Kütüphane Yardımı</h3>
+                            <p class="text-sm text-text-desc mb-2 line-clamp-1">Kütüphane düzenleme ve kitap kataloglama. Öğrencilere destek.</p>
+                            <div class="flex items-center gap-4 text-xs text-text-desc">
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">location_on</span>
+                                    Merkez Kütüphane
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">schedule</span>
+                                    3 Saat
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">people</span>
+                                    3/8
+                                </span>
+                            </div>
+                        </div>
+                        <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all shrink-0">
+                            Katıl
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Load More -->
+            <div class="mt-8 text-center">
+                <button class="px-8 py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary font-bold text-sm hover:bg-gold-primary hover:text-darkest transition-all">
+                    Daha Fazla Göster
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Listing Detail Inline Layout -->
+    <div id="listingDetailInline" class="hidden bg-darkest min-h-screen pb-24">
+        <!-- Header -->
+        <div class="sticky top-0 z-50 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 px-4 py-3">
+            <div class="flex items-center justify-between max-w-7xl mx-auto">
+                <div class="flex items-center gap-3">
+                    <button onclick="closeListingDetailInline()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group">
+                        <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+                    </button>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-gold-primary tracking-wider uppercase">Gönüllülük</span>
+                        <h1 class="text-lg font-bold tracking-tight text-white leading-none" id="inlineListingTitle">İlan Detayı</h1>
+                    </div>
+                </div>
+                <button class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-all">
+                    <span class="material-symbols-outlined text-white">share</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 pt-6">
+            <!-- Listing Image -->
+            <div class="relative h-72 rounded-2xl overflow-hidden mb-6">
+                <img id="inlineListingImage" src="" class="w-full h-full object-cover" alt="Listing"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-darkest via-transparent to-transparent"></div>
+                <div class="absolute top-4 left-4">
+                    <span id="inlineListingCategory" class="px-3 py-1 rounded-full text-xs font-bold uppercase"></span>
+                </div>
+                <div class="absolute bottom-4 left-4 right-4">
+                    <h1 id="inlineListingTitleLarge" class="text-2xl font-bold text-white mb-1"></h1>
+                    <p id="inlineListingDate" class="text-text-secondary text-sm"></p>
+                </div>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-xl mb-1">location_on</span>
+                    <p id="inlineListingLocation" class="text-white font-bold text-xs truncate"></p>
+                    <p class="text-[10px] text-text-desc uppercase">Konum</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-xl mb-1">schedule</span>
+                    <p id="inlineListingDuration" class="text-white font-bold text-sm"></p>
+                    <p class="text-[10px] text-text-desc uppercase">Süre</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-xl mb-1">people</span>
+                    <p id="inlineListingParticipants" class="text-white font-bold text-sm"></p>
+                    <p class="text-[10px] text-text-desc uppercase">Katılımcı</p>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="glass-panel rounded-2xl p-5 mb-6">
+                <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">description</span>
+                    Detaylar
+                </h3>
+                <p id="inlineListingDesc" class="text-text-secondary text-sm leading-relaxed mb-4"></p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-full bg-gold-primary/10 text-gold-primary text-xs">Eldiven Sağlanacak</span>
+                    <span class="px-3 py-1 rounded-full bg-gold-primary/10 text-gold-primary text-xs">Yemek Dahil</span>
+                    <span class="px-3 py-1 rounded-full bg-gold-primary/10 text-gold-primary text-xs">Sertifika Verilecek</span>
+                </div>
+            </div>
+
+            <!-- Organizer -->
+            <div class="glass-panel rounded-2xl p-5 mb-6">
+                <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">person</span>
+                    Organizatör
+                </h3>
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full bg-gold-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary text-2xl">account_balance</span>
+                    </div>
+                    <div>
+                        <p class="text-white font-medium">Bursa Büyükşehir Belediyesi</p>
+                        <p class="text-sm text-text-desc">Çevre Koruma Dairesi</p>
+                        <div class="flex items-center gap-1 mt-1">
+                            <span class="material-symbols-outlined text-gold-primary text-xs fill-1">star</span>
+                            <span class="text-xs text-gold-primary font-bold">4.9</span>
+                            <span class="text-[10px] text-text-desc">(128 değerlendirme)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requirements -->
+            <div class="glass-panel rounded-2xl p-5 mb-6">
+                <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">checklist</span>
+                    Gereksinimler
+                </h3>
+                <ul class="space-y-2 text-sm text-text-secondary" id="inlineListingRequirements">
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">check_circle</span>
+                        18 yaş üzeri
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">check_circle</span>
+                        Rahat kıyafet ve ayakkabı
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">check_circle</span>
+                        Su şişesi
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Join Button -->
+            <button class="w-full py-4 bg-gold-primary text-darkest rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-gold-primary/30 transition-all flex items-center justify-center gap-2 mb-4">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                Gönüllü Ol
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 flex items-center justify-around px-6 py-3 bg-nav-bg border-t border-border-subtle/50 pb-6 z-50">
+        <a href="anasayfa.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group">
+            <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">home</span>
+            <span class="text-[8px] font-bold tracking-wider uppercase">Anasayfa</span>
+        </a>
+        <a href="kesfet-genel.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group">
+            <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">explore</span>
+            <span class="text-[8px] font-bold tracking-wider uppercase">Keşfet</span>
+        </a>
+        <a href="ara.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group">
+            <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">search</span>
+            <span class="text-[8px] font-bold tracking-wider uppercase">Ara</span>
+        </a>
+        <a href="profil.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group">
+            <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">person</span>
+            <span class="text-[8px] font-bold tracking-wider uppercase">Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        const listingData = {
+            'park-temizligi': {
+                title: 'Park Temizliği',
+                image: 'https://images.unsplash.com/photo-1618477461853-5f8dd68aa395?w=800&q=80',
+                category: 'Çevre',
+                categoryClass: 'bg-accent-teal/20 text-accent-teal',
+                date: '12 Ekim 2026, Cumartesi',
+                location: 'Merkez Park',
+                duration: '3 Saat',
+                participants: '12/20',
+                desc: 'Merkez Park\'ta çevre temizliği etkinliği düzenliyoruz. Amacımız, parkımızı daha temiz ve yaşanabilir hale getirmek. Eldiven, çöp poşeti ve diğer malzemeler belediye tarafından sağlanacaktır. Katılımcılara kahvaltı ve öğle yemeği ikram edilecektir. Etkinlik sonunda katılım sertifikası verilecektir.',
+                tags: ['Eldiven Sağlanacak', 'Yemek Dahil', 'Sertifika Verilecek'],
+                requirements: ['18 yaş üzeri', 'Rahat kıyafet ve ayakkabı', 'Su şişesi']
+            },
+            'hayvan-besleme': {
+                title: 'Sokak Hayvanlarını Besleme',
+                image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800&q=80',
+                category: 'Hayvan',
+                categoryClass: 'bg-gold-primary/20 text-gold-primary',
+                date: '14 Ekim 2026, Pazartesi',
+                location: 'Sahil Yolu',
+                duration: '2 Saat',
+                participants: '8/15',
+                desc: 'Sahil yolu boyunca sokak hayvanlarına mama ve su dağıtımı yapacağız. Özellikle kış ayları yaklaşırken bu hayvanların beslenmesi çok önemli. Mama ve su kapları belediye tarafından sağlanacaktır. Gönüllülerin sadece dağıtıma yardımcı olması yeterlidir. Etkinlik sonrası çay ve simit ikramı olacaktır.',
+                tags: ['Mama Sağlanacak', 'Çay İkramı', 'Kısa Süreli'],
+                requirements: ['18 yaş üzeri', 'Hayvan sevgisi', 'Rahat yürüyüş ayakkabısı']
+            },
+            'fidan-dikimi': {
+                title: 'Fidan Dikimi',
+                image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80',
+                category: 'Doğa',
+                categoryClass: 'bg-green-500/20 text-green-400',
+                date: '15 Ekim 2026, Salı',
+                location: 'Ağaçlandırma Alanı',
+                duration: '4 Saat',
+                participants: '45/50',
+                desc: 'Ağaçlandırma projesi kapsamında 500 fidan dikimi yapılacak. Uludağ eteklerinde gerçekleştirilecek bu etkinlikte, her katılımcıya 10 fidan dikme sorumluluğu verilecek. Tüm malzemeler (kürek, tırmık, fidan) hazır olacaktır. Öğle yemeği ve içecek ikramı yapılacaktır.',
+                tags: ['Öğle Yemeği Dahil', 'Ulaşım Sağlanacak', 'Hatıra Fotoğrafı'],
+                requirements: ['18 yaş üzeri', 'Fiziksel dayanıklılık', 'Outdoor kıyafet']
+            },
+            'yasli-ziyareti': {
+                title: 'Yaşlı Ziyareti',
+                image: 'https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=800&q=80',
+                category: 'Sosyal',
+                categoryClass: 'bg-purple-500/20 text-purple-400',
+                date: '16 Ekim 2026, Çarşamba',
+                location: 'Osmangazi Huzurevi',
+                duration: '2 Saat',
+                participants: '5/10',
+                desc: 'Huzurevi sakinlerini ziyaret edip sohbet edeceğiz. Oyun, müzik ve aktivite yardımı yapılacaktır. Özellikle yalnızlık çeken yaşlılarımıza moral olmak için düzenlenen bu etkinlikte, katılımcılara sosyal sorumluluk sertifikası verilecektir.',
+                tags: ['Sertifika Verilecek', 'Çay İkramı', 'Müzikli Aktivite'],
+                requirements: ['20 yaş üzeri', 'Sabır ve empati', 'Temiz giysi']
+            },
+            'afet-egitimi': {
+                title: 'Afet Eğitimi',
+                image: 'https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=800&q=80',
+                category: 'Afet',
+                categoryClass: 'bg-red-500/20 text-red-400',
+                date: '18 Ekim 2026, Cuma',
+                location: 'AFAD Bursa',
+                duration: '6 Saat',
+                participants: '28/30',
+                desc: 'AFAD uzmanları eşliğinde deprem ve yangın tatbikatı gerçekleştirilecektir. Arama kurtarma teknikleri, ilk yardım ve tahliye prosedürleri öğretilecektir. Eğitim sonunda katılımcılara ulusal geçerli sertifika verilecektir.',
+                tags: ['Ulusal Sertifika', 'Uzman Eğitmen', 'Pratik Tatbikat'],
+                requirements: ['18 yaş üzeri', 'Sağlık problemi olmaması', 'Spor kıyafet']
+            },
+            'kutuphane-yardimi': {
+                title: 'Kütüphane Yardımı',
+                image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+                category: 'Sosyal',
+                categoryClass: 'bg-purple-500/20 text-purple-400',
+                date: '20 Ekim 2026, Pazar',
+                location: 'Merkez Kütüphane',
+                duration: '3 Saat',
+                participants: '3/8',
+                desc: 'Kütüphane düzenleme ve kitap kataloglama çalışması. Ayrıca öğrencilere okuma yardımı ve ders desteği verilecektir. Kitap severlerin ve öğretmen adaylarının katılımını öneririz.',
+                tags: ['Kitap Severlere Özel', 'Öğrenci Desteği', 'Sessiz Ortam'],
+                requirements: ['18 yaş üzeri', 'Okuma yazma bilgisi', 'Sessiz çalışma disiplini']
+            }
+        };
+
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.category-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => {
+                    b.classList.remove('active');
+                    b.classList.add('text-white');
+                });
+                btn.classList.add('active');
+                btn.classList.remove('text-white');
+
+                const filter = btn.dataset.filter;
+                filterListings(filter);
+            });
+        });
+
+        function filterListings(filter) {
+            const listings = document.querySelectorAll('.listing-card');
+            listings.forEach(listing => {
+                if (filter === 'all') {
+                    listing.style.display = 'block';
+                } else {
+                    listing.style.display = listing.dataset.category === filter ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Toggle Search Panel
+        function toggleSearch() {
+            const searchPanel = document.getElementById('searchPanel');
+            const filterPanel = document.getElementById('filterPanel');
+            filterPanel.classList.add('hidden');
+            searchPanel.classList.toggle('hidden');
+        }
+
+        // Toggle Filter Panel
+        function toggleFilter() {
+            const searchPanel = document.getElementById('searchPanel');
+            const filterPanel = document.getElementById('filterPanel');
+            searchPanel.classList.add('hidden');
+            filterPanel.classList.toggle('hidden');
+        }
+
+        // Inline Listing Detail Functions
+        function openListingDetail(listingId) {
+            const listing = listingData[listingId];
+            if (!listing) return;
+
+            document.getElementById('inlineListingImage').src = listing.image;
+            document.getElementById('inlineListingTitle').textContent = listing.title;
+            document.getElementById('inlineListingTitleLarge').textContent = listing.title;
+            document.getElementById('inlineListingDate').textContent = listing.date;
+            document.getElementById('inlineListingLocation').textContent = listing.location;
+            document.getElementById('inlineListingDuration').textContent = listing.duration;
+            document.getElementById('inlineListingParticipants').textContent = listing.participants;
+            document.getElementById('inlineListingDesc').textContent = listing.desc;
+
+            const catEl = document.getElementById('inlineListingCategory');
+            catEl.textContent = listing.category;
+            catEl.className = `px-3 py-1 rounded-full text-xs font-bold uppercase ${listing.categoryClass}`;
+
+            // Update tags
+            const tagsContainer = document.getElementById('inlineListingTags');
+            if (tagsContainer) {
+                tagsContainer.innerHTML = listing.tags.map(tag => 
+                    `<span class="px-3 py-1 rounded-full bg-gold-primary/10 text-gold-primary text-xs">${tag}</span>`
+                ).join('');
+            }
+
+            // Update requirements
+            const reqContainer = document.getElementById('inlineListingRequirements');
+            if (reqContainer) {
+                reqContainer.innerHTML = listing.requirements.map(req => 
+                    `<li class="flex items-center gap-2"><span class="material-symbols-outlined text-gold-primary text-sm">check_circle</span>${req}</li>`
+                ).join('');
+            }
+
+            // Hide main content, show inline detail
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('listingDetailInline').classList.remove('hidden');
+            document.getElementById('categorySection').classList.add('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function closeListingDetailInline() {
+            document.getElementById('listingDetailInline').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('categorySection').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>

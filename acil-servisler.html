@@ -1,0 +1,581 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CityJoy Bursa - Acil Servisler</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#BB9E77",
+                        "background": "#0F3E46",
+                        "surface": "#415B57",
+                        "border": "#698383",
+                        "emergency": "#EF4444",
+                        "health": "#4ECDC4",
+                        "infrastructure": "#F4A261",
+                        "traffic": "#5DADE2",
+                        "tourism": "#BB9E77",
+                        "municipality": "#9B59B6"
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    animation: {
+                        'pulse-ring': 'pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite',
+                    },
+                    keyframes: {
+                        'pulse-ring': {
+                            '0%': { transform: 'scale(0.8)', opacity: '0.8' },
+                            '100%': { transform: 'scale(1.3)', opacity: '0' },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: linear-gradient(180deg, #0F3E46 0%, #0A2E33 100%);
+            min-height: 100dvh;
+        }
+        
+        .glass-card {
+            background: rgba(65, 91, 87, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(105, 131, 131, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            background: rgba(65, 91, 87, 0.6);
+            border-color: rgba(105, 131, 131, 0.4);
+        }
+        
+        .emergency-card {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(65, 91, 87, 0.4) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .emergency-card:hover {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(65, 91, 87, 0.5) 100%);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .health-card {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(65, 91, 87, 0.4) 100%);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+        }
+        
+        .health-card:hover {
+            border-color: rgba(78, 205, 196, 0.3);
+        }
+        
+        .infrastructure-card {
+            background: linear-gradient(135deg, rgba(244, 162, 97, 0.1) 0%, rgba(65, 91, 87, 0.4) 100%);
+            border: 1px solid rgba(244, 162, 97, 0.2);
+        }
+        
+        .infrastructure-card:hover {
+            border-color: rgba(244, 162, 97, 0.3);
+        }
+        
+        .traffic-card {
+            background: linear-gradient(135deg, rgba(93, 173, 226, 0.1) 0%, rgba(65, 91, 87, 0.4) 100%);
+            border: 1px solid rgba(93, 173, 226, 0.2);
+        }
+        
+        .traffic-card:hover {
+            border-color: rgba(93, 173, 226, 0.3);
+        }
+        
+        .tourism-card {
+            background: linear-gradient(135deg, rgba(187, 158, 119, 0.1) 0%, rgba(65, 91, 87, 0.4) 100%);
+            border: 1px solid rgba(187, 158, 119, 0.2);
+        }
+        
+        .tourism-card:hover {
+            border-color: rgba(187, 158, 119, 0.3);
+        }
+        
+        .municipality-card {
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(65, 91, 87, 0.4) 100%);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+        }
+        
+        .municipality-card:hover {
+            border-color: rgba(155, 89, 182, 0.3);
+        }
+        
+        .call-button {
+            background: rgba(187, 158, 119, 0.15);
+            border: 1px solid rgba(187, 158, 119, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .call-button:hover {
+            background: rgba(187, 158, 119, 0.25);
+            transform: scale(1.1);
+        }
+        
+        .call-button:active {
+            transform: scale(0.95);
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(15, 62, 70, 0.9);
+            border-top: 1px solid rgba(105, 131, 131, 0.3);
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple:active::after {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        
+        .page-transition {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stagger-1 { animation-delay: 0.05s; }
+        .stagger-2 { animation-delay: 0.1s; }
+        .stagger-3 { animation-delay: 0.15s; }
+        .stagger-4 { animation-delay: 0.2s; }
+        .stagger-5 { animation-delay: 0.25s; }
+        
+        .hero-112 {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(65, 91, 87, 0.6) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 8px 32px rgba(239, 68, 68, 0.15);
+        }
+        
+        .compact-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .compact-card:active {
+            transform: scale(0.98);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="text-white antialiased pb-28">
+
+    <!-- Header -->
+    <header class="pt-10 px-5 pb-3 sticky top-0 z-40 bg-gradient-to-b from-[#0F3E46] via-[#0F3E46]/95 to-transparent">
+        <div class="flex items-center justify-between mb-4">
+            <a href="acil-ihtiyaclar.html" class="ripple w-9 h-9 flex items-center justify-center rounded-full glass-card active:scale-95 transition-all duration-300">
+                <span class="material-symbols-outlined text-primary text-lg">arrow_back_ios_new</span>
+            </a>
+            <div class="flex flex-col items-center">
+                <span class="text-primary tracking-[0.2em] font-semibold text-[10px] uppercase">CityJoy</span>
+                <span class="text-[9px] text-gray-400 mt-0.5">Bursa</span>
+            </div>
+            <div class="w-9"></div>
+        </div>
+        
+        <div class="page-transition">
+            <h1 class="text-2xl font-light mb-1 tracking-tight">Acil Servisler</h1>
+            <p class="text-xs text-gray-400 font-light">Tek numara: <span class="text-emergency font-semibold">112</span></p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-5 space-y-6 mt-2">
+
+        <!-- 🚨 HERO 112 -->
+        <section class="page-transition stagger-1">
+            <div class="hero-112 rounded-2xl p-5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-emergency/10 rounded-full -mr-8 -mt-8 blur-xl"></div>
+                <div class="flex items-center justify-between relative z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-12 h-12 rounded-xl bg-emergency/20 flex items-center justify-center border border-emergency/30">
+                                <span class="material-symbols-outlined text-emergency text-2xl">emergency</span>
+                            </div>
+                            <div class="pulse-ring"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-200 font-medium text-sm">Tüm Acil Durumlar</h3>
+                            <p class="text-emergency text-3xl font-bold tracking-wider">112</p>
+                            <p class="text-[10px] text-gray-400">Ambulans • Polis • İtfaiye • Jandarma</p>
+                        </div>
+                    </div>
+                    <a href="tel:112" class="call-button w-12 h-12 rounded-full flex items-center justify-center ripple">
+                        <span class="material-symbols-outlined text-primary text-xl fill-1">call</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🚨 HAYATİ ACİL (Eski Numaralar - Yönlendirme) -->
+        <section class="page-transition stagger-2">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-[10px] text-emergency/70 bg-emergency/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Yönlendirme</span>
+                <div class="flex-1 h-px bg-emergency/10"></div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <!-- Polis -->
+                <div class="emergency-card rounded-xl p-3 compact-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-emergency text-base">local_police</span>
+                            </div>
+                            <div>
+                                <p class="text-emergency text-lg font-bold leading-none">155</p>
+                                <p class="text-[10px] text-gray-400">Polis</p>
+                            </div>
+                        </div>
+                        <a href="tel:155" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- İtfaiye -->
+                <div class="emergency-card rounded-xl p-3 compact-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-emergency text-base">fire_truck</span>
+                            </div>
+                            <div>
+                                <p class="text-emergency text-lg font-bold leading-none">110</p>
+                                <p class="text-[10px] text-gray-400">İtfaiye</p>
+                            </div>
+                        </div>
+                        <a href="tel:110" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Jandarma -->
+                <div class="emergency-card rounded-xl p-3 compact-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-emergency text-base">shield</span>
+                            </div>
+                            <div>
+                                <p class="text-emergency text-lg font-bold leading-none">156</p>
+                                <p class="text-[10px] text-gray-400">Jandarma</p>
+                            </div>
+                        </div>
+                        <a href="tel:156" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- AFAD -->
+                <div class="emergency-card rounded-xl p-3 compact-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-emergency/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-emergency text-base">warning</span>
+                            </div>
+                            <div>
+                                <p class="text-emergency text-lg font-bold leading-none">122</p>
+                                <p class="text-[10px] text-gray-400">AFAD</p>
+                            </div>
+                        </div>
+                        <a href="tel:122" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 💊 SAĞLIK -->
+        <section class="page-transition stagger-3">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-[10px] text-health/70 bg-health/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Sağlık</span>
+                <div class="flex-1 h-px bg-health/10"></div>
+            </div>
+            
+            <div class="space-y-2">
+                <div class="health-card rounded-xl p-3 compact-card flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-health/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-health text-base">medication</span>
+                        </div>
+                        <div>
+                            <p class="text-gray-200 text-sm font-medium">Zehir Danışma</p>
+                            <p class="text-health text-lg font-bold leading-none">114</p>
+                        </div>
+                    </div>
+                    <a href="tel:114" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                    </a>
+                </div>
+
+                <div class="health-card rounded-xl p-3 compact-card flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-health/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-health text-base">stethoscope</span>
+                        </div>
+                        <div>
+                            <p class="text-gray-200 text-sm font-medium">Alo Sağlık</p>
+                            <p class="text-health text-lg font-bold leading-none">184</p>
+                        </div>
+                    </div>
+                    <a href="tel:184" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ⚡ ALTYAPI -->
+        <section class="page-transition stagger-4">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-[10px] text-infrastructure/70 bg-infrastructure/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Altyapı</span>
+                <div class="flex-1 h-px bg-infrastructure/10"></div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div class="infrastructure-card rounded-xl p-3 compact-card">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-7 h-7 rounded-lg bg-infrastructure/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-infrastructure text-sm">bolt</span>
+                        </div>
+                        <p class="text-infrastructure text-base font-bold">186</p>
+                    </div>
+                    <p class="text-gray-300 text-xs">Elektrik (UEDAŞ)</p>
+                    <a href="tel:186" class="call-button w-full h-7 rounded-lg flex items-center justify-center mt-2">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+
+                <div class="infrastructure-card rounded-xl p-3 compact-card">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-7 h-7 rounded-lg bg-infrastructure/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-infrastructure text-sm">water_drop</span>
+                        </div>
+                        <p class="text-infrastructure text-base font-bold">185</p>
+                    </div>
+                    <p class="text-gray-300 text-xs">Su (BUSKİ)</p>
+                    <a href="tel:185" class="call-button w-full h-7 rounded-lg flex items-center justify-center mt-2">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+
+                <div class="infrastructure-card rounded-xl p-3 compact-card">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-7 h-7 rounded-lg bg-infrastructure/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-infrastructure text-sm">gas_meter</span>
+                        </div>
+                        <p class="text-infrastructure text-base font-bold">187</p>
+                    </div>
+                    <p class="text-gray-300 text-xs">Doğalgaz</p>
+                    <a href="tel:187" class="call-button w-full h-7 rounded-lg flex items-center justify-center mt-2">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+
+                <div class="infrastructure-card rounded-xl p-3 compact-card">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-7 h-7 rounded-lg bg-infrastructure/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-infrastructure text-sm">wifi</span>
+                        </div>
+                        <p class="text-infrastructure text-base font-bold">121</p>
+                    </div>
+                    <p class="text-gray-300 text-xs">Telefon/İnternet</p>
+                    <a href="tel:121" class="call-button w-full h-7 rounded-lg flex items-center justify-center mt-2">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🌴 BURSA ÖZEL -->
+        <section class="page-transition stagger-5">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-[10px] text-tourism/70 bg-tourism/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Bursa Özel</span>
+                <div class="flex-1 h-px bg-tourism/10"></div>
+            </div>
+            
+            <div class="space-y-2">
+                <!-- Alo 153 -->
+                <div class="municipality-card rounded-xl p-3 compact-card flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-municipality/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-municipality text-base">location_city</span>
+                        </div>
+                        <div>
+                            <p class="text-gray-200 text-sm font-medium">Büyükşehir Belediyesi</p>
+                            <p class="text-municipality text-lg font-bold leading-none">153</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-1">
+                        <a href="tel:153" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                        </a>
+                        <a href="https://wa.me/905011531616" class="whatsapp-button w-8 h-8 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-green-400 text-sm">chat</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Teleferik -->
+                <div class="tourism-card rounded-xl p-3 compact-card flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-tourism/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-tourism text-base">cable_car</span>
+                        </div>
+                        <div>
+                            <p class="text-gray-200 text-sm font-medium">Teleferik Acil</p>
+                            <p class="text-tourism text-lg font-bold leading-none">444 80 01</p>
+                        </div>
+                    </div>
+                    <a href="tel:4448001" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                    </a>
+                </div>
+
+                <!-- Turizm Polisi -->
+                <div class="tourism-card rounded-xl p-3 compact-card flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-tourism/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-tourism text-base">tour</span>
+                        </div>
+                        <div>
+                            <p class="text-gray-200 text-sm font-medium">Turizm Polisi</p>
+                            <p class="text-tourism text-lg font-bold leading-none">153</p>
+                        </div>
+                    </div>
+                    <a href="tel:153" class="call-button w-8 h-8 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-sm fill-1">call</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🚗 TRAFİK -->
+        <section class="page-transition stagger-5">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-[10px] text-traffic/70 bg-traffic/10 px-2 py-0.5 rounded-full uppercase tracking-wider">Trafik</span>
+                <div class="flex-1 h-px bg-traffic/10"></div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div class="traffic-card rounded-xl p-3 compact-card flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-lg bg-traffic/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-traffic text-sm">traffic</span>
+                        </div>
+                        <div>
+                            <p class="text-traffic text-base font-bold">154</p>
+                            <p class="text-[10px] text-gray-400">Trafik Polisi</p>
+                        </div>
+                    </div>
+                    <a href="tel:154" class="call-button w-7 h-7 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+
+                <div class="traffic-card rounded-xl p-3 compact-card flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-lg bg-traffic/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-traffic text-sm">road</span>
+                        </div>
+                        <div>
+                            <p class="text-traffic text-base font-bold">159</p>
+                            <p class="text-[10px] text-gray-400">Yol Yardım</p>
+                        </div>
+                    </div>
+                    <a href="tel:159" class="call-button w-7 h-7 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-xs fill-1">call</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bilgi Kartı -->
+        <div class="page-transition stagger-5 mt-6 p-3 bg-primary/5 rounded-xl border border-primary/20">
+            <div class="flex gap-2 items-start">
+                <span class="material-symbols-outlined text-primary text-base mt-0.5">info</span>
+                <p class="text-[11px] text-gray-400 leading-relaxed">
+                    2024'ten itibaren tüm acil durumlar için <span class="text-emergency font-semibold">112</span> yeterlidir. Diğer numaralar 112'ye yönlendirilmektedir.
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-2 pb-6 px-6 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-0.5 text-primary transition-colors">
+                <span class="material-symbols-outlined text-xl fill-1">home</span>
+                <span class="text-[9px] font-medium">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-xl">explore</span>
+                <span class="text-[9px] font-medium">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-xl">person</span>
+                <span class="text-[9px] font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+</body>
+</html>
+

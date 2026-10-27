@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="description" content="Bursa'daki güncel nöbetçi eczaneleri harita ve liste üzerinden görüntüleyin, konumunuza en yakın eczaneyi bulun."/>
+<meta name="theme-color" content="#0D3238"/>
+<title>Nöbetçi Eczaneler - Bursa Şehir Rehberi</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@100..700&display=swap" rel="stylesheet"/>
+
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    primary: "#E0B07A",
+                    "primary-dark": "#C89B66",
+                    "deep-bg": "#081F24",
+                    "main-bg": "#0D3238",
+                    "card-surface": "#17464B",
+                    "card-hover": "#1E5359",
+                    "bottom-bar": "#0A2A2F",
+                    "active-nav": "#F0B36F",
+                    "main-text": "#FFFFFF",
+                    "secondary-text": "#C7D8DA",
+                    "accent-red": "#FF6B6B",
+                    "accent-green": "#4ECDC4",
+                },
+                fontFamily: {
+                    sans: ["Public Sans", "system-ui", "sans-serif"],
+                },
+                animation: {
+                    "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    "slide-up": "slideUp 0.3s ease-out",
+                    "fade-in": "fadeIn 0.2s ease-out",
+                    "slide-in-right": "slideInRight 0.3s ease-out",
+                },
+                keyframes: {
+                    slideUp: {
+                        "0%": { transform: "translateY(10px)", opacity: "0" },
+                        "100%": { transform: "translateY(0)", opacity: "1" },
+                    },
+                    fadeIn: {
+                        "0%": { opacity: "0" },
+                        "100%": { opacity: "1" },
+                    },
+                    slideInRight: {
+                        "0%": { transform: "translateX(100%)" },
+                        "100%": { transform: "translateX(0)" },
+                    },
+                },
+            },
+        },
+    }
+</script>
+
+<style>
+    * { 
+        box-sizing: border-box; 
+        -webkit-tap-highlight-color: transparent;
+        font-family: 'Public Sans', sans-serif;
+    }
+    
+    html, body {
+        margin: 0; 
+        padding: 0; 
+        width: 100%; 
+        height: 100%;
+        overflow-x: hidden;
+        background-color: #081F24;
+        color: #FFFFFF;
+        -webkit-font-smoothing: antialiased;
+    }
+    
+    #app {
+        max-width: 430px;
+        margin: 0 auto;
+        min-height: 100vh;
+        position: relative;
+        background-color: #0D3238;
+        box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
+    
+    .gold-gradient {
+        background: linear-gradient(135deg, #E0B07A 0%, #C89B66 100%);
+    }
+    
+    .gold-gradient:hover {
+        background: linear-gradient(135deg, #E8BC8A 0%, #D4A576 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(224, 176, 122, 0.3);
+    }
+    
+    .glass-effect {
+        background: rgba(23, 70, 75, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar { 
+        width: 4px; 
+        height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255,255,255,0.05);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(224, 176, 122, 0.3);
+        border-radius: 4px;
+    }
+    
+    .pharmacy-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255,255,255,0.05);
+        cursor: pointer;
+    }
+    
+    .pharmacy-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(224, 176, 122, 0.3);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    
+    .pharmacy-card.active {
+        border-color: rgba(224, 176, 122, 0.5);
+        background: linear-gradient(135deg, rgba(224, 176, 122, 0.1) 0%, rgba(23, 70, 75, 1) 100%);
+    }
+    
+    .status-open {
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4); }
+        50% { box-shadow: 0 0 0 8px rgba(78, 205, 196, 0); }
+    }
+    
+    .filter-chip {
+        transition: all 0.2s ease;
+    }
+    
+    .filter-chip.active {
+        background: linear-gradient(135deg, #E0B07A 0%, #C89B66 100%);
+        color: #081F24;
+        font-weight: 600;
+    }
+    
+    .skeleton {
+        background: linear-gradient(90deg, #17464B 25%, #1E5359 50%, #17464B 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+    
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    
+    @supports (padding-top: env(safe-area-inset-top)) {
+        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    }
+    
+    .ripple {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .ripple::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255,255,255,0.3);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .ripple:active::after {
+        width: 300px;
+        height: 300px;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+    }
+    
+    .modal-content {
+        animation: slideInRight 0.3s ease-out;
+    }
+    
+    @media (min-width: 768px) {
+        .modal-container {
+            max-width: 430px;
+            margin: 0 auto;
+        }
+    }
+</style>
+</head>
+<body>
+<div id="app">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 glass-effect border-b border-white/10 safe-top">
+        <div class="px-4 py-3 flex items-center justify-between">
+            <a href="javascript:history.back()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-primary hover:bg-white/10 transition-colors ripple" aria-label="Geri dön">
+    <span class="material-symbols-rounded text-xl">arrow_back</span>
+</a>
+            <div class="flex flex-col items-center">
+                <h1 class="text-base font-bold tracking-tight text-white">Nöbetçi Eczaneler</h1>
+                <span id="current-date" class="text-[10px] text-secondary-text uppercase tracking-wider font-medium mt-0.5">Yükleniyor...</span>
+            </div>
+            <button onclick="refreshData()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-primary hover:bg-white/10 transition-colors ripple" aria-label="Yenile">
+                <span id="refresh-icon" class="material-symbols-rounded text-xl transition-transform duration-500">refresh</span>
+            </button>
+        </div>
+    </header>
+    
+    <main class="flex-1 pb-24">
+        <!-- Location Bar -->
+        <div class="px-4 py-4 flex items-center justify-between bg-gradient-to-r from-transparent via-white/5 to-transparent">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span class="material-symbols-rounded text-primary">my_location</span>
+                </div>
+                <div>
+                    <p class="text-[10px] text-secondary-text uppercase tracking-wider font-semibold">Konumunuz</p>
+                    <p id="location-text" class="text-white text-sm font-medium flex items-center gap-1">
+                        Bursa <span class="text-secondary-text text-xs">• Tespit ediliyor...</span>
+                    </p>
+                </div>
+            </div>
+            <button onclick="getLocation()" class="text-primary text-xs font-semibold flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors">
+                <span class="material-symbols-rounded text-sm">gps_fixed</span>
+                Güncelle
+            </button>
+        </div>
+        
+        <!-- Duty Status Banner -->
+        <div id="duty-status" class="mx-4 mb-4 p-3 rounded-xl bg-accent-green/10 border border-accent-green/20 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-rounded text-accent-green">check_circle</span>
+                <div>
+                    <p class="text-xs font-bold text-accent-green">Nöbet Aktif</p>
+                    <p class="text-[10px] text-secondary-text">19:00 - 08:30 arası</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p id="countdown" class="text-xs font-mono text-white font-bold">--:--</p>
+                <p class="text-[10px] text-secondary-text">kaldı</p>
+            </div>
+        </div>
+        
+        <!-- Search -->
+        <div class="px-4 mb-4">
+            <div class="relative group">
+                <span class="material-symbols-rounded absolute left-4 top-1/2 -translate-y-1/2 text-secondary-text text-lg group-focus-within:text-primary transition-colors">search</span>
+                <input 
+                    type="text" 
+                    id="search-input"
+                    placeholder="Eczane adı, ilçe veya sokak ara..." 
+                    class="w-full bg-card-surface border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white text-sm placeholder:text-secondary-text/50 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+                    oninput="filterPharmacies(this.value)"
+                />
+                <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-secondary-text hover:text-white transition-colors">
+                    <span class="material-symbols-rounded text-sm">close</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="px-4 mb-4">
+            <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-1" id="filter-container">
+                <button onclick="setFilter('all')" class="filter-chip active px-4 py-2 rounded-full bg-card-surface text-secondary-text text-xs font-medium border border-white/10 whitespace-nowrap flex items-center gap-1.5">
+                    <span class="material-symbols-rounded text-sm">apps</span>
+                    Tümü
+                </button>
+                <button onclick="setFilter('nearby')" class="filter-chip px-4 py-2 rounded-full bg-card-surface text-secondary-text text-xs font-medium border border-white/10 whitespace-nowrap flex items-center gap-1.5">
+                    <span class="material-symbols-rounded text-sm">near_me</span>
+                    Yakınımda
+                </button>
+                <button onclick="setFilter('nilufer')" class="filter-chip px-4 py-2 rounded-full bg-card-surface text-secondary-text text-xs font-medium border border-white/10 whitespace-nowrap">Nilüfer</button>
+                <button onclick="setFilter('osmangazi')" class="filter-chip px-4 py-2 rounded-full bg-card-surface text-secondary-text text-xs font-medium border border-white/10 whitespace-nowrap">Osmangazi</button>
+                <button onclick="setFilter('yildirim')" class="filter-chip px-4 py-2 rounded-full bg-card-surface text-secondary-text text-xs font-medium border border-white/10 whitespace-nowrap">Yıldırım</button>
+                <button onclick="setFilter('buyukorhan')" class="filter-chip px-4 py-2 rounded-full bg-card-surface text-secondary-text text-xs font-medium border border-white/10 whitespace-nowrap">Büyükorhan</button>
+            </div>
+        </div>
+        
+        <!-- Map Preview -->
+        <div class="px-4 mb-4">
+            <div class="relative w-full h-32 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer" onclick="openFullMap()">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d194473.42862603582!2d28.84737335!3d40.22159355!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14ca1582d8d45695%3A0x6a0134c629a9634!2sBursa!5e0!3m2!1str!2str!4v1700000000000!5m2!1str!2str" 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0; filter: grayscale(100%) invert(92%) contrast(83%);" 
+                    allowfullscreen="" 
+                    loading="lazy"
+                    class="transition-transform duration-500 group-hover:scale-105"
+                ></iframe>
+                <div class="absolute inset-0 bg-gradient-to-t from-deep-bg via-transparent to-transparent opacity-80"></div>
+                <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-rounded text-primary text-lg">location_on</span>
+                        <span class="text-xs font-bold text-white">Haritada Görüntüle</span>
+                    </div>
+                    <span class="material-symbols-rounded text-white/70 text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pharmacy List -->
+        <div class="px-4 space-y-3" id="pharmacy-list">
+            <!-- Loading State -->
+            <div class="space-y-3" id="loading-state">
+                <div class="skeleton h-32 rounded-xl"></div>
+                <div class="skeleton h-32 rounded-xl"></div>
+                <div class="skeleton h-32 rounded-xl"></div>
+            </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden px-4 py-12 text-center">
+            <div class="w-16 h-16 rounded-full bg-card-surface flex items-center justify-center mx-auto mb-3">
+                <span class="material-symbols-rounded text-3xl text-secondary-text">search_off</span>
+            </div>
+            <p class="text-white font-medium mb-1">Sonuç bulunamadı</p>
+            <p class="text-secondary-text text-xs">Farklı bir arama terimi deneyin</p>
+        </div>
+    </main>
+    
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-bottom-bar/95 backdrop-blur-lg border-t border-white/10 px-6 py-2 flex items-center justify-between z-40 safe-bottom">
+        <div class="max-w-[430px] mx-auto w-full flex justify-between items-center">
+            <a href="anasayfa.html" class="nav-item flex flex-col items-center gap-0.5 text-secondary-text/60 hover:text-secondary-text transition-colors p-2" aria-label="Anasayfa">
+                <span class="material-symbols-rounded text-2xl">home</span>
+                <span class="text-[10px] font-medium">Anasayfa</span>
+            </a>
+            <a href="kesfet.html" class="nav-item flex flex-col items-center gap-0.5 text-active-nav p-2 relative" aria-label="Keşfet">
+                <span class="material-symbols-rounded text-2xl fill-current">explore</span>
+                <span class="text-[10px] font-bold">Keşfet</span>
+                <div class="absolute -bottom-1 w-1 h-1 rounded-full bg-active-nav"></div>
+            </a>
+            <a href="ara.html" class="nav-item flex flex-col items-center gap-0.5 text-secondary-text/60 hover:text-secondary-text transition-colors p-2" aria-label="Ara">
+                <span class="material-symbols-rounded text-2xl">search</span>
+                <span class="text-[10px] font-medium">Ara</span>
+            </a>
+            <a href="profil.html" class="nav-item flex flex-col items-center gap-0.5 text-secondary-text/60 hover:text-secondary-text transition-colors p-2" aria-label="Profil">
+                <span class="material-symbols-rounded text-2xl">person</span>
+                <span class="text-[10px] font-medium">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- PHARMACY DETAIL MODAL -->
+    <div id="pharmacy-modal" class="fixed inset-0 z-50 hidden">
+        <!-- Overlay -->
+        <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="modal-container absolute inset-0 md:inset-4 md:top-8 md:bottom-8 bg-[#0D3238] md:rounded-2xl overflow-hidden flex flex-col">
+            <div id="modal-body" class="flex-1 overflow-y-auto custom-scrollbar">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==========================================
+// TÜM ECZANE VERİTABANI
+// ==========================================
+const allPharmacies = [
+    {
+        id: 1,
+        name: "Merkez Nilüfer Eczanesi",
+        district: "nilufer",
+        address: "Konak Mah. Yıldırım Cad. No:25 Beşevler",
+        phone: "02244510666",
+        coords: { lat: 40.2189, lng: 28.9784 },
+        services: ["İlaç Takibi", "Nöbetçi Hizmeti", "Kozmetik", "Medikal Ürünler"],
+        hasParking: true,
+        workHours: "08:30 - 19:00",
+        dutyDates: ["2026-03-14", "2026-03-20", "2026-04-05"] // Bu eczane hangi günler nöbetçi
+    },
+    {
+        id: 2,
+        name: "Çamlık Eczanesi",
+        district: "nilufer",
+        address: "30 Ağustos Zafer Mah. 109.(520)Sok. No:1A/B",
+        phone: "02244501988",
+        coords: { lat: 40.2056, lng: 28.9689 },
+        services: ["Nöbetçi Hizmeti", "Anne & Bebek", "Medikal Ürünler"],
+        hasParking: false,
+        workHours: "08:30 - 19:00",
+        dutyDates: ["2026-03-15", "2026-03-21", "2026-04-06"]
+    },
+    {
+        id: 3,
+        name: "Osmangazi Eczanesi",
+        district: "osmangazi",
+        address: "Demirtaş Cumhuriyet Mah. 201 Cad. No:23/A",
+        phone: "02242625562",
+        coords: { lat: 40.1823, lng: 29.0687 },
+        services: ["İlaç Takibi", "Nöbetçi Hizmeti", "Kozmetik"],
+        hasParking: true,
+        workHours: "08:30 - 19:00",
+        dutyDates: ["2026-03-14", "2026-03-22", "2026-04-07"]
+    },
+    {
+        id: 4,
+        name: "Yeşilkent Eczanesi",
+        district: "yildirim",
+        address: "Ortabağlar Mah. Aydoğdu Cad. No:12",
+        phone: "02243664003",
+        coords: { lat: 40.1889, lng: 29.1234 },
+        services: ["Nöbetçi Hizmeti", "Medikal Ürünler"],
+        hasParking: true,
+        workHours: "08:30 - 19:00",
+        dutyDates: ["2026-03-16", "2026-03-23", "2026-04-08"]
+    },
+    {
+        id: 5,
+        name: "Yeni Orhan Eczanesi",
+        district: "buyukorhan",
+        address: "Orhan Mah. Dr.İbrahim Öktem Cad. No:35",
+        phone: "05062260344",
+        coords: { lat: 39.7833, lng: 28.5833 },
+        services: ["Nöbetçi Hizmeti", "İlaç Takibi"],
+        hasParking: false,
+        workHours: "08:30 - 19:00",
+        dutyDates: ["2026-03-17", "2026-03-24", "2026-04-09"]
+    },
+    {
+        id: 6,
+        name: "Karaca Eczanesi",
+        district: "nilufer",
+        address: "Balat Mah. Ahi Evren Cad. No:23/AA",
+        phone: "02244993326",
+        coords: { lat: 40.2256, lng: 28.9856 },
+        services: ["Kozmetik", "Medikal Ürünler"],
+        hasParking: true,
+        workHours: "08:30 - 19:00",
+        dutyDates: ["2026-03-18", "2026-03-25", "2026-04-10"]
+    },
+    {
+        id: 7,
+        name: "Şifa Eczanesi",
+        district: "osmangazi",
+        address: "Kayhan Mah. Ünlü Cadde No:10-12/E",
+        phone: "02242234745",
+        coords: { lat: 40.1823, lng: 29.0687 },
+        services: ["İlaç Takibi", "Anne & Bebek"],
+        hasParking: false,
+        workHours: "08:30 - 19:00",
+        dutyDates: ["2026-03-19", "2026-03-26", "2026-04-11"]
+    }
+];
+
+// ==========================================
+// NÖBETÇİ KONTROL SİSTEMİ
+// ==========================================
+function getTodayString() {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // "2026-03-14"
+}
+
+function isPharmacyOnDuty(pharmacy) {
+    const today = getTodayString();
+    return pharmacy.dutyDates.includes(today);
+}
+
+function getDutyPharmacies() {
+    return allPharmacies.filter(p => isPharmacyOnDuty(p));
+}
+
+// ==========================================
+// UYGULAMA DURUMU
+// ==========================================
+let userLocation = null;
+let currentFilter = 'all';
+let searchTerm = '';
+
+// ==========================================
+// BAŞLATMA
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    updateDate();
+    setInterval(updateCountdown, 1000);
+    setInterval(updateDate, 60000);
+
+    // Firebase bridge: Nöbetçi eczane verilerini RN'den çek
+    if (window.rnSend) {
+        window.rnSend({action: 'fetchEmergencyPharmacy', cityId: window._cityData?.cityKey || 'bursa'});
+    }
+
+    // RN'den cevap gelince listeyi güncelle
+    window.onEmergencyPharmacyResult = function(data) {
+        var container = document.getElementById('pharmacy-list') || document.getElementById('list-container');
+        if (!container) return;
+
+        // Yüklenme durumunu gizle
+        var loadingState = document.getElementById('loading-state');
+        if (loadingState) loadingState.style.display = 'none';
+
+        if (!data || !data.length) {
+            container.innerHTML = '<p style="color:rgba(255,255,255,0.5);text-align:center;padding:20px">Nöbetçi eczane bilgisi bulunamadı</p>';
+            return;
+        }
+        container.innerHTML = '';
+        data.forEach(function(p) {
+            var div = document.createElement('div');
+            div.style.cssText = 'background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.1)';
+            div.innerHTML =
+                '<div style="font-weight:600;color:#fff;font-size:14px">' + (p.name||'') + '</div>' +
+                '<div style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px">' + (p.address||'') + '</div>' +
+                (p.phone ? '<button onclick="window.rnSend({action:\'openPhone\',phone:\'' + p.phone + '\'})" style="margin-top:8px;background:rgba(224,176,122,0.15);border:1px solid rgba(224,176,122,0.3);color:#E0B07A;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer">📞 ' + p.phone + '</button>' : '');
+            container.appendChild(div);
+        });
+    };
+    
+    // Simulate loading
+    setTimeout(() => {
+        document.getElementById('loading-state').style.display = 'none';
+        renderPharmacies();
+    }, 800);
+    
+    // Try to get location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                calculateDistances();
+                document.getElementById('location-text').innerHTML = `Bursa <span class="text-accent-green text-xs">• Konum alındı</span>`;
+            },
+            () => {
+                document.getElementById('location-text').innerHTML = `Bursa <span class="text-secondary-text text-xs">• Varsayılan</span>`;
+            }
+        );
+    }
+
+    // URL hash kontrolü (direkt link ile açılış)
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange();
+});
+
+function handleHashChange() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#eczane-')) {
+        const pharmacyId = parseInt(hash.replace('#eczane-', ''));
+        if (pharmacyId) {
+            openPharmacyModal(pharmacyId);
+        }
+    }
+}
+
+// ==========================================
+// MODAL SİSTEMİ
+// ==========================================
+function openPharmacyModal(pharmacyId) {
+    const pharmacy = allPharmacies.find(p => p.id === pharmacyId);
+    if (!pharmacy) return;
+    
+    const isOnDuty = isPharmacyOnDuty(pharmacy);
+    const distance = pharmacy.distance ? pharmacy.distance.toFixed(1) : null;
+    
+    // Modal içeriğini oluştur
+    const modalHTML = `
+        <div class="relative">
+            <!-- Hero Image -->
+            <div class="relative w-full h-64">
+                <div class="absolute inset-0 bg-gradient-to-br from-[#17464B] to-[#0D3238]">
+                    <div class="absolute inset-0 opacity-30" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23E0B07A\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0D3238] via-transparent to-transparent"></div>
+                
+                <!-- Close Button -->
+                <button onclick="closeModal()" class="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors z-10">
+                    <span class="material-symbols-rounded text-xl">arrow_back</span>
+                </button>
+                
+                <button onclick="sharePharmacy(${pharmacy.id})" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors z-10">
+                    <span class="material-symbols-rounded text-xl">share</span>
+                </button>
+                
+                <!-- Info -->
+                <div class="absolute bottom-4 left-4 right-4">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${isOnDuty ? 'bg-accent-green/20 text-accent-green border border-accent-green/30' : 'bg-white/10 text-secondary-text border border-white/20'} text-[10px] font-bold uppercase tracking-wider mb-2">
+                        ${isOnDuty ? '<span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span> AÇIK - Nöbetçi' : 'Kapalı'}
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-1">${pharmacy.name}</h2>
+                    <div class="flex items-center gap-1 text-secondary-text text-xs">
+                        <span class="material-symbols-rounded text-xs">location_on</span>
+                        Bursa • ${distance ? distance + ' km uzaklıkta' : 'Mesafe hesaplanıyor...'}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="px-4 py-4 flex gap-3">
+                <a href="tel:${pharmacy.phone}" class="flex-1 gold-gradient flex items-center justify-center gap-2 text-deep-bg h-12 rounded-xl font-bold text-sm transition-transform active:scale-95 shadow-lg shadow-primary/20">
+                    <span class="material-symbols-rounded">call</span>
+                    Ara
+                </a>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${pharmacy.coords.lat},${pharmacy.coords.lng}" 
+                   target="_blank"
+                   class="flex-1 flex items-center justify-center gap-2 border-2 border-primary/40 text-primary h-12 rounded-xl font-bold text-sm transition-all hover:bg-primary/10">
+                    <span class="material-symbols-rounded">directions</span>
+                    Yol Tarifi
+                </a>
+            </div>
+            
+            <!-- Info Cards -->
+            <div class="px-4 space-y-3 pb-6">
+                <!-- Adres -->
+                <div class="bg-card-surface p-4 rounded-xl flex items-start gap-3">
+                    <div class="p-2 rounded-lg bg-deep-bg text-primary">
+                        <span class="material-symbols-rounded text-lg">map</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-secondary-text text-[10px] font-medium uppercase tracking-wider mb-1">Adres</p>
+                        <p class="text-white text-sm leading-relaxed">${pharmacy.address}</p>
+                    </div>
+                </div>
+                
+                <!-- Telefon -->
+                <div class="bg-card-surface p-4 rounded-xl flex items-start gap-3">
+                    <div class="p-2 rounded-lg bg-deep-bg text-primary">
+                        <span class="material-symbols-rounded text-lg">phone_in_talk</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-secondary-text text-[10px] font-medium uppercase tracking-wider mb-1">Telefon</p>
+                        <p class="text-white font-semibold text-base">${formatPhone(pharmacy.phone)}</p>
+                    </div>
+                </div>
+                
+                <!-- Otopark -->
+                <div class="bg-card-surface p-4 rounded-xl flex items-start gap-3">
+                    <div class="p-2 rounded-lg bg-deep-bg text-primary">
+                        <span class="material-symbols-rounded text-lg">local_parking</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-secondary-text text-[10px] font-medium uppercase tracking-wider mb-1">Otopark</p>
+                        <p class="text-white font-semibold text-sm">${pharmacy.hasParking ? 'Otopark Var' : 'Otopark Yok'}</p>
+                    </div>
+                </div>
+                
+                <!-- Çalışma Saatleri -->
+                <div class="bg-card-surface p-4 rounded-xl flex items-start gap-3">
+                    <div class="p-2 rounded-lg bg-deep-bg text-primary">
+                        <span class="material-symbols-rounded text-lg">schedule</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-secondary-text text-[10px] font-medium uppercase tracking-wider mb-1">Çalışma Saatleri</p>
+                        <p class="text-white font-semibold text-base">${pharmacy.workHours}</p>
+                        ${isOnDuty ? '<p class="text-accent-green text-xs mt-1">Bugün 19:00 - 08:30 arası nöbetçi</p>' : ''}
+                    </div>
+                </div>
+                
+                <!-- Harita -->
+                <div class="w-full h-48 rounded-xl overflow-hidden border border-card-surface relative">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d${pharmacy.coords.lng}!3d${pharmacy.coords.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDEzJzA4LjAiTiAyOMKwNTgnNDIuNCJF!5e0!3m2!1str!2str!4v1700000000000!5m2!1str!2str" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0; filter: grayscale(100%) invert(92%) contrast(83%);" 
+                        allowfullscreen="" 
+                        loading="lazy"
+                    ></iframe>
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="relative">
+                            <span class="material-symbols-rounded text-primary text-4xl drop-shadow-lg">location_on</span>
+                            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-1 bg-primary/40 rounded-full blur-sm"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hizmetler -->
+                <div class="pt-2">
+                    <h3 class="text-white text-xs font-bold uppercase tracking-widest mb-3">Sunulan Hizmetler</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        ${pharmacy.services.map(service => `
+                            <div class="bg-card-surface/50 border border-card-surface p-3 rounded-xl flex flex-col items-center text-center gap-1">
+                                <span class="material-symbols-rounded text-primary text-2xl">${getServiceIcon(service)}</span>
+                                <span class="text-secondary-text text-xs font-medium">${service}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <!-- Nöbet Takvimi -->
+                <div class="pt-2">
+                    <h3 class="text-white text-xs font-bold uppercase tracking-widest mb-3">Yaklaşan Nöbet Günleri</h3>
+                    <div class="bg-card-surface rounded-xl p-3 space-y-2">
+                        ${pharmacy.dutyDates.slice(0, 3).map(date => {
+                            const dateObj = new Date(date);
+                            const isToday = date === getTodayString();
+                            const dateStr = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+                            return `
+                                <div class="flex items-center justify-between py-2 ${isToday ? 'text-accent-green' : 'text-white'}">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-rounded text-sm">${isToday ? 'today' : 'event'}</span>
+                                        <span class="text-sm font-medium">${dateStr}</span>
+                                    </div>
+                                    ${isToday ? '<span class="text-[10px] font-bold bg-accent-green/20 px-2 py-1 rounded">BUGÜN</span>' : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modal-body').innerHTML = modalHTML;
+    document.getElementById('pharmacy-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    
+    // URL güncelle
+    history.pushState(null, '', `#eczane-${pharmacyId}`);
+}
+
+function closeModal() {
+    document.getElementById('pharmacy-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+    
+    // URL'yi temizle
+    if (window.location.hash.startsWith('#eczane-')) {
+        history.pushState(null, '', window.location.pathname);
+    }
+}
+
+function sharePharmacy(pharmacyId) {
+    const pharmacy = allPharmacies.find(p => p.id === pharmacyId);
+    const shareData = {
+        title: `${pharmacy.name} - Nöbetçi Eczane`,
+        text: `${pharmacy.name} - ${pharmacy.address}`,
+        url: `${window.location.origin}${window.location.pathname}#eczane-${pharmacyId}`
+    };
+    
+    if (navigator.share) {
+        navigator.share(shareData);
+    } else {
+        // Fallback: Clipboard'a kopyala
+        navigator.clipboard.writeText(shareData.url);
+        showToast('Link kopyalandı');
+    }
+}
+
+function getServiceIcon(service) {
+    const icons = {
+        'İlaç Takibi': 'medical_services',
+        'Nöbetçi Hizmeti': 'emergency',
+        'Kozmetik': 'face_6',
+        'Medikal Ürünler': 'health_and_safety',
+        'Anne & Bebek': 'child_care'
+    };
+    return icons[service] || 'medical_services';
+}
+
+function formatPhone(phone) {
+    if (phone.startsWith('0')) {
+        return `(${phone.slice(0, 4)}) ${phone.slice(4, 7)} ${phone.slice(7, 9)} ${phone.slice(9, 11)}`;
+    }
+    return phone;
+}
+
+// ==========================================
+// LİSTELEME FONKSİYONLARI
+// ==========================================
+function renderPharmacies() {
+    const list = document.getElementById('pharmacy-list');
+    const emptyState = document.getElementById('empty-state');
+    
+    // Bugünün nöbetçi eczanelerini al
+    let displayPharmacies = allPharmacies.map(p => ({
+        ...p,
+        isOnDuty: isPharmacyOnDuty(p)
+    }));
+    
+    // Filtreleme
+    if (currentFilter === 'nearby' && userLocation) {
+        displayPharmacies = displayPharmacies.filter(p => (p.distance || 999) < 10);
+        displayPharmacies.sort((a, b) => (a.distance || 999) - (b.distance || 999));
+    } else if (currentFilter !== 'all') {
+        displayPharmacies = displayPharmacies.filter(p => p.district === currentFilter);
+    }
+    
+    // Arama
+    if (searchTerm) {
+        displayPharmacies = displayPharmacies.filter(p => 
+            p.name.toLowerCase().includes(searchTerm) ||
+            p.address.toLowerCase().includes(searchTerm) ||
+            p.district.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    // Sıralama: Nöbetçiler önce
+    displayPharmacies.sort((a, b) => (b.isOnDuty ? 1 : 0) - (a.isOnDuty ? 1 : 0));
+    
+    if (displayPharmacies.length === 0) {
+        list.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+    }
+    
+    emptyState.classList.add('hidden');
+    
+    list.innerHTML = displayPharmacies.map((pharmacy, index) => `
+        <article class="pharmacy-card ${pharmacy.isOnDuty ? 'active' : ''} bg-card-surface rounded-2xl p-4 animate-slide-up" 
+                 style="animation-delay: ${index * 0.05}s"
+                 onclick="openPharmacyModal(${pharmacy.id})">
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 class="text-sm font-bold text-white">${pharmacy.name}</h3>
+                        ${pharmacy.isOnDuty ? `
+                            <span class="status-open px-2 py-0.5 rounded-full bg-accent-green/20 border border-accent-green/30 text-[10px] font-bold text-accent-green flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse"></span>
+                                NÖBETTE
+                            </span>
+                        ` : `
+                            <span class="px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-medium text-secondary-text">
+                                Kapalı
+                            </span>
+                        `}
+                    </div>
+                    <p class="text-[10px] text-secondary-text flex items-center gap-1 mb-1">
+                        <span class="material-symbols-rounded text-xs">location_on</span>
+                        ${pharmacy.address}
+                    </p>
+                    ${pharmacy.distance ? `
+                        <p class="text-[10px] text-primary font-medium flex items-center gap-1">
+                            <span class="material-symbols-rounded text-xs">near_me</span>
+                            ${pharmacy.distance.toFixed(1)} km uzaklıkta
+                        </p>
+                    ` : ''}
+                </div>
+                <span class="material-symbols-rounded text-secondary-text/50">chevron_right</span>
+            </div>
+            
+            <div class="flex items-center gap-2 text-[10px] text-secondary-text mb-3 bg-white/5 rounded-lg p-2">
+                <span class="material-symbols-rounded text-xs">schedule</span>
+                <span>${pharmacy.isOnDuty ? '19:00 - 08:30 (Nöbet)' : pharmacy.workHours}</span>
+            </div>
+            
+            <div class="flex gap-2" onclick="event.stopPropagation()">
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${pharmacy.coords.lat},${pharmacy.coords.lng}" 
+                   target="_blank"
+                   class="flex-1 gold-gradient text-deep-bg font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 ripple transition-all">
+                    <span class="material-symbols-rounded text-base">directions</span>
+                    Yol Tarifi
+                </a>
+                <a href="tel:${pharmacy.phone}" 
+                   class="flex-1 bg-card-hover border border-primary/30 text-primary font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 ripple hover:bg-primary/10 transition-all">
+                    <span class="material-symbols-rounded text-base">call</span>
+                    Ara
+                </a>
+            </div>
+        </article>
+    `).join('');
+}
+
+// ==========================================
+// YARDIMCI FONKSİYONLAR
+// ==========================================
+function updateDate() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateStr = now.toLocaleDateString('tr-TR', options);
+    document.getElementById('current-date').textContent = dateStr;
+}
+
+function updateCountdown() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    let targetHour, targetMinute;
+    
+    if (currentHour >= 19 || currentHour < 8) {
+        targetHour = 8;
+        targetMinute = 30;
+        if (currentHour < 8) {
+            now.setDate(now.getDate() - 1);
+        }
+    } else {
+        targetHour = 19;
+        targetMinute = 0;
+    }
+    
+    const target = new Date(now);
+    target.setHours(targetHour, targetMinute, 0);
+    
+    if (currentHour >= 19) {
+        target.setDate(target.getDate() + 1);
+    }
+    
+    const diff = target - new Date();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    document.getElementById('countdown').textContent = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
+function calculateDistances() {
+    if (!userLocation) return;
+    
+    allPharmacies.forEach(pharmacy => {
+        pharmacy.distance = calculateDistance(
+            userLocation.lat, 
+            userLocation.lng,
+            pharmacy.coords.lat,
+            pharmacy.coords.lng
+        );
+    });
+    
+    renderPharmacies();
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                calculateDistances();
+                document.getElementById('location-text').innerHTML = `Bursa <span class="text-accent-green text-xs">• Konum güncellendi</span>`;
+                showToast('Konum başarıyla güncellendi');
+            },
+            () => {
+                showToast('Konum alınamadı, lütfen izinleri kontrol edin');
+            }
+        );
+    }
+}
+
+function setFilter(filter) {
+    currentFilter = filter;
+    
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.classList.remove('active');
+    });
+    event.target.closest('.filter-chip').classList.add('active');
+    
+    renderPharmacies();
+}
+
+function filterPharmacies(term) {
+    searchTerm = term.toLowerCase();
+    const clearBtn = document.getElementById('clear-search');
+    
+    if (term.length > 0) {
+        clearBtn.classList.remove('hidden');
+    } else {
+        clearBtn.classList.add('hidden');
+    }
+    
+    renderPharmacies();
+}
+
+function clearSearch() {
+    document.getElementById('search-input').value = '';
+    searchTerm = '';
+    document.getElementById('clear-search').classList.add('hidden');
+    renderPharmacies();
+}
+
+function openFullMap() {
+    const dutyPharmacies = getDutyPharmacies();
+    if (dutyPharmacies.length > 0 && userLocation) {
+        // Nöbetçi eczaneleri haritada göster
+        const markers = dutyPharmacies.map(p => `${p.coords.lat},${p.coords.lng}`).join('|');
+        window.open(`https://www.google.com/maps/dir/?api=1&destination=${dutyPharmacies[0].coords.lat},${dutyPharmacies[0].coords.lng}&waypoints=${markers}`, '_blank');
+    } else {
+        window.open('https://www.google.com/maps/search/nöbetçi+eczane+Bursa', '_blank');
+    }
+}
+
+function refreshData() {
+    const icon = document.getElementById('refresh-icon');
+    icon.style.transform = 'rotate(360deg)';
+    
+    setTimeout(() => {
+        icon.style.transform = 'rotate(0deg)';
+        renderPharmacies();
+        showToast('Liste güncellendi');
+    }, 500);
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-card-surface border border-primary/30 text-white px-4 py-2 rounded-full text-xs font-medium shadow-xl z-50 animate-fade-in flex items-center gap-2';
+    toast.innerHTML = `
+        <span class="material-symbols-rounded text-primary text-sm">check_circle</span>
+        ${message}
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-10px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+// ESC tuşu ile kapatma
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+</script>
+</body>
+</html>

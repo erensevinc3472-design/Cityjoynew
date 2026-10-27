@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Hayvan Sahiplenme - Bursa Şehir Rehberi</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .volunteer-card {
+            background: linear-gradient(135deg, rgba(23, 70, 75, 0.8) 0%, rgba(8, 31, 36, 0.9) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+            transition: all 0.4s ease;
+        }
+        .volunteer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(224, 176, 122, 0.2);
+            border-color: rgba(224, 176, 122, 0.6);
+        }
+        .glass-panel {
+            background: rgba(13, 50, 56, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .category-btn {
+            background: rgba(23, 70, 75, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            transition: all 0.3s ease;
+        }
+        .category-btn:hover {
+            background: rgba(23, 70, 75, 0.6);
+            border-color: rgba(224, 176, 122, 0.4);
+        }
+        .category-btn.active {
+            background: #E0B07A;
+            border-color: #E0B07A;
+            color: #081F24;
+        }
+        /* Sticky header için padding */
+        .sticky-header-spacer {
+            padding-top: 140px;
+        }
+    </style>
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-darkest/90 backdrop-blur-md border-b border-border-subtle/30">
+        <div class="flex items-center gap-3">
+            <a href="gonulluluk.html" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group">
+                <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+            </a>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gold-primary tracking-wider uppercase">Gönüllülük</span>
+                <h1 class="text-lg font-bold tracking-tight text-white leading-none">Hayvan Sahiplenme</h1>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleSearch()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-all">
+                <span class="material-symbols-outlined text-white">search</span>
+            </button>
+            <button onclick="toggleFilter()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-all">
+                <span class="material-symbols-outlined text-white">filter_list</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Search Panel (Inline Layout) -->
+    <div id="searchPanel" class="hidden fixed top-[60px] left-0 right-0 z-40 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 p-4">
+        <div class="relative max-w-7xl mx-auto">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-desc">search</span>
+            <input type="text" placeholder="Hayvan ara..." class="w-full bg-card-bg/50 border border-border-subtle/30 rounded-xl py-3 pl-10 pr-4 text-white focus:border-gold-primary focus:outline-none">
+            <button onclick="toggleSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-desc hover:text-white">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Panel (Inline Layout) -->
+    <div id="filterPanel" class="hidden fixed top-[60px] left-0 right-0 z-40 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 p-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-sm font-bold text-white">Filtreler</h3>
+                <button onclick="toggleFilter()" class="text-text-desc hover:text-white">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <label class="flex items-center gap-2 p-3 rounded-xl bg-card-bg/50 cursor-pointer">
+                    <input type="checkbox" class="rounded border-border-subtle/30 text-gold-primary focus:ring-gold-primary">
+                    <span class="text-white text-sm">Köpek</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 rounded-xl bg-card-bg/50 cursor-pointer">
+                    <input type="checkbox" class="rounded border-border-subtle/30 text-gold-primary focus:ring-gold-primary">
+                    <span class="text-white text-sm">Kedi</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 rounded-xl bg-card-bg/50 cursor-pointer">
+                    <input type="checkbox" class="rounded border-border-subtle/30 text-gold-primary focus:ring-gold-primary">
+                    <span class="text-white text-sm">Acil</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 rounded-xl bg-card-bg/50 cursor-pointer">
+                    <input type="checkbox" class="rounded border-border-subtle/30 text-gold-primary focus:ring-gold-primary">
+                    <span class="text-white text-sm">Yavru</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Categories - Sticky -->
+    <section class="fixed top-[60px] left-0 right-0 z-30 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 py-4 transition-all" id="categorySection">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+                <button class="category-btn active px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap" data-filter="all">
+                    Tümü
+                </button>
+                <button class="category-btn px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap text-white" data-filter="dog">
+                    Köpek
+                </button>
+                <button class="category-btn px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap text-white" data-filter="cat">
+                    Kedi
+                </button>
+                <button class="category-btn px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap text-white" data-filter="other">
+                    Diğer
+                </button>
+                <button class="category-btn px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap text-white" data-filter="urgent">
+                    Acil
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spacer for fixed headers -->
+    <div class="h-[140px]"></div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 bg-darkest min-h-screen pb-24 pt-6" id="mainContent">
+        <div class="max-w-7xl mx-auto px-6">
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <p class="text-2xl font-bold text-gold-primary">48</p>
+                    <p class="text-[10px] text-text-desc uppercase tracking-wider">Köpek</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <p class="text-2xl font-bold text-gold-primary">62</p>
+                    <p class="text-[10px] text-text-desc uppercase tracking-wider">Kedi</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <p class="text-2xl font-bold text-gold-primary">12</p>
+                    <p class="text-[10px] text-text-desc uppercase tracking-wider">Acil</p>
+                </div>
+            </div>
+
+            <!-- Pets Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="petsGrid">
+
+                <!-- Pet 1 -->
+                <div class="volunteer-card rounded-2xl overflow-hidden group cursor-pointer" data-type="dog" data-urgent="true" onclick="openPetDetail('pamuk')">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Pamuk"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-red-500/80 text-white text-[9px] font-bold uppercase rounded backdrop-blur-sm">Acil</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <span class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gold-primary text-sm">favorite</span>
+                            </span>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3">
+                            <h3 class="text-xl font-bold text-white">Pamuk</h3>
+                            <p class="text-xs text-text-secondary">2 yaşında • Dişi • Terrier</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-text-desc text-sm">location_on</span>
+                            <span class="text-sm text-text-desc">Osmangazi, Bursa</span>
+                        </div>
+                        <p class="text-sm text-text-secondary mb-4 line-clamp-2">Sevimli ve enerjik. Diğer hayvanlarla uyumlu. Aşıları tam.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold-primary text-sm fill-1">star</span>
+                                <span class="text-sm text-white font-bold">4.9</span>
+                                <span class="text-xs text-text-desc">(12 yorum)</span>
+                            </div>
+                            <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all">
+                                Detaylar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pet 2 -->
+                <div class="volunteer-card rounded-2xl overflow-hidden group cursor-pointer" data-type="cat" data-urgent="false" onclick="openPetDetail('duman')">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Duman"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                        <div class="absolute top-3 right-3">
+                            <span class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gold-primary text-sm">favorite</span>
+                            </span>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3">
+                            <h3 class="text-xl font-bold text-white">Duman</h3>
+                            <p class="text-xs text-text-secondary">1 yaşında • Erkek • British Shorthair</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-text-desc text-sm">location_on</span>
+                            <span class="text-sm text-text-desc">Nilüfer, Bursa</span>
+                        </div>
+                        <p class="text-sm text-text-secondary mb-4 line-clamp-2">Sakin ve sevecen. Ev yaşamına uygun. Kısırlaştırılmış.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold-primary text-sm fill-1">star</span>
+                                <span class="text-sm text-white font-bold">4.8</span>
+                                <span class="text-xs text-text-desc">(8 yorum)</span>
+                            </div>
+                            <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all">
+                                Detaylar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pet 3 -->
+                <div class="volunteer-card rounded-2xl overflow-hidden group cursor-pointer" data-type="dog" data-urgent="false" onclick="openPetDetail('lola')">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Lola"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                        <div class="absolute top-3 right-3">
+                            <span class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white text-sm">favorite</span>
+                            </span>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3">
+                            <h3 class="text-xl font-bold text-white">Lola</h3>
+                            <p class="text-xs text-text-secondary">3 yaşında • Dişi • Golden Retriever</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-text-desc text-sm">location_on</span>
+                            <span class="text-sm text-text-desc">Yıldırım, Bursa</span>
+                        </div>
+                        <p class="text-sm text-text-secondary mb-4 line-clamp-2">Çok oyuncu ve sadık. Çocuklarla harika anlaşır. Eğitimli.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold-primary text-sm fill-1">star</span>
+                                <span class="text-sm text-white font-bold">5.0</span>
+                                <span class="text-xs text-text-desc">(24 yorum)</span>
+                            </div>
+                            <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all">
+                                Detaylar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pet 4 -->
+                <div class="volunteer-card rounded-2xl overflow-hidden group cursor-pointer" data-type="dog" data-urgent="true" onclick="openPetDetail('karabas')">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Karabaş"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-red-500/80 text-white text-[9px] font-bold uppercase rounded backdrop-blur-sm">Acil</span>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3">
+                            <h3 class="text-xl font-bold text-white">Karabaş</h3>
+                            <p class="text-xs text-text-secondary">4 yaşında • Erkek • Anadolu Çoban</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-text-desc text-sm">location_on</span>
+                            <span class="text-sm text-text-desc">Osmangazi, Bursa</span>
+                        </div>
+                        <p class="text-sm text-text-secondary mb-4 line-clamp-2">Sadık ve koruyucu. Bahçeli ev için ideal. Eğitimli.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold-primary text-sm fill-1">star</span>
+                                <span class="text-sm text-white font-bold">4.7</span>
+                                <span class="text-xs text-text-desc">(6 yorum)</span>
+                            </div>
+                            <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all">
+                                Detaylar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pet 5 -->
+                <div class="volunteer-card rounded-2xl overflow-hidden group cursor-pointer" data-type="cat" data-urgent="false" onclick="openPetDetail('minnos')">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Minnoş"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                        <div class="absolute top-3 right-3">
+                            <span class="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gold-primary text-sm">favorite</span>
+                            </span>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3">
+                            <h3 class="text-xl font-bold text-white">Minnoş</h3>
+                            <p class="text-xs text-text-secondary">6 aylık • Dişi • Tekir</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-text-desc text-sm">location_on</span>
+                            <span class="text-sm text-text-desc">Nilüfer, Bursa</span>
+                        </div>
+                        <p class="text-sm text-text-secondary mb-4 line-clamp-2">Oyuncu ve meraklı. Diğer kedilerle uyumlu. Aşıları devam ediyor.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold-primary text-sm fill-1">star</span>
+                                <span class="text-sm text-white font-bold">4.9</span>
+                                <span class="text-xs text-text-desc">(15 yorum)</span>
+                            </div>
+                            <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all">
+                                Detaylar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pet 6 -->
+                <div class="volunteer-card rounded-2xl overflow-hidden group cursor-pointer" data-type="other" data-urgent="false" onclick="openPetDetail('pamuk-papa')">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=600&q=80" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Pamuk"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/50 to-transparent"></div>
+                        <div class="absolute bottom-3 left-3 right-3">
+                            <h3 class="text-xl font-bold text-white">Pamuk (Tavşan)</h3>
+                            <p class="text-xs text-text-secondary">1 yaşında • Erkek • Hollanda Lop</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-text-desc text-sm">location_on</span>
+                            <span class="text-sm text-text-desc">Yıldırım, Bursa</span>
+                        </div>
+                        <p class="text-sm text-text-secondary mb-4 line-clamp-2">Sakin ve sevecen. Apartman yaşamına uygun. Tuvalet eğitimli.</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold-primary text-sm fill-1">star</span>
+                                <span class="text-sm text-white font-bold">4.8</span>
+                                <span class="text-xs text-text-desc">(4 yorum)</span>
+                            </div>
+                            <button class="px-4 py-2 bg-gold-primary text-darkest rounded-xl font-bold text-xs hover:shadow-lg hover:shadow-gold-primary/30 transition-all">
+                                Detaylar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Load More -->
+            <div class="mt-8 text-center">
+                <button class="px-8 py-3 bg-gold-primary/10 border border-gold-primary/30 rounded-xl text-gold-primary font-bold text-sm hover:bg-gold-primary hover:text-darkest transition-all">
+                    Daha Fazla Göster
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pet Detail Inline Layout -->
+    <div id="petDetailInline" class="hidden bg-darkest min-h-screen pb-24">
+        <!-- Header -->
+        <div class="sticky top-0 z-50 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/30 px-4 py-3">
+            <div class="flex items-center justify-between max-w-7xl mx-auto">
+                <div class="flex items-center gap-3">
+                    <button onclick="closePetDetailInline()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 active:scale-95 transition-all border border-border-subtle/20 group">
+                        <span class="material-symbols-outlined text-lg text-white group-hover:text-gold-primary transition-colors">arrow_back</span>
+                    </button>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-gold-primary tracking-wider uppercase">Hayvan Sahiplenme</span>
+                        <h1 class="text-lg font-bold tracking-tight text-white leading-none" id="inlinePetNameHeader">Hayvan Detayı</h1>
+                    </div>
+                </div>
+                <button class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-all">
+                    <span class="material-symbols-outlined text-white">share</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 pt-6">
+            <!-- Pet Image -->
+            <div class="relative h-80 rounded-2xl overflow-hidden mb-6">
+                <img id="inlinePetImage" src="" class="w-full h-full object-cover" alt="Pet"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-darkest via-transparent to-transparent"></div>
+                <div class="absolute bottom-4 left-4 right-4">
+                    <h1 id="inlinePetNameLarge" class="text-3xl font-bold text-white mb-1"></h1>
+                    <p id="inlinePetInfo" class="text-text-secondary"></p>
+                </div>
+            </div>
+
+            <!-- Quick Info Cards -->
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-2xl mb-1">cake</span>
+                    <p id="inlinePetAge" class="text-white font-bold text-sm"></p>
+                    <p class="text-[10px] text-text-desc uppercase">Yaş</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-2xl mb-1">pets</span>
+                    <p id="inlinePetBreed" class="text-white font-bold text-sm truncate"></p>
+                    <p class="text-[10px] text-text-desc uppercase">Irk</p>
+                </div>
+                <div class="glass-panel rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-2xl mb-1">vaccines</span>
+                    <p class="text-white font-bold text-sm">Tam</p>
+                    <p class="text-[10px] text-text-desc uppercase">Aşı</p>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="glass-panel rounded-2xl p-5 mb-6">
+                <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">info</span>
+                    Hakkında
+                </h3>
+                <p id="inlinePetDesc" class="text-text-secondary text-sm leading-relaxed"></p>
+            </div>
+
+            <!-- Location Section -->
+            <div class="glass-panel rounded-2xl p-5 mb-6">
+                <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">location_on</span>
+                    Konum
+                </h3>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gold-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary">home</span>
+                    </div>
+                    <div>
+                        <p id="inlinePetLocation" class="text-white font-medium"></p>
+                        <p class="text-sm text-text-desc">Barınak / Geçici Yuva</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="glass-panel rounded-2xl p-5 mb-6">
+                <h3 class="text-white font-bold mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">contact_phone</span>
+                    İletişim
+                </h3>
+                <div class="space-y-3">
+                    <a href="tel:+905551234567" class="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                        <span class="material-symbols-outlined text-gold-primary">phone</span>
+                        <span class="text-white">+90 555 123 45 67</span>
+                    </a>
+                    <a href="mailto:gonullu@bursa.bel.tr" class="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                        <span class="material-symbols-outlined text-gold-primary">email</span>
+                        <span class="text-white">gonullu@bursa.bel.tr</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button class="w-full py-4 bg-gold-primary text-darkest rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-gold-primary/30 transition-all flex items-center justify-center gap-2 mb-4">
+                <span class="material-symbols-outlined">favorite</span>
+                Sahiplenmek İstiyorum
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 flex items-center justify-around px-6 py-3 bg-nav-bg border-t border-border-subtle/50 pb-6 z-50">
+        <a href="anasayfa.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group">
+            <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">home</span>
+            <span class="text-[8px] font-bold tracking-wider uppercase">Anasayfa</span>
+        </a>
+        <a href="kesfet-genel.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group">
+            <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">explore</span>
+            <span class="text-[8px] font-bold tracking-wider uppercase">Keşfet</span>
+        </a>
+        <a href="ara.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group">
+            <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">search</span>
+            <span class="text-[8px] font-bold tracking-wider uppercase">Ara</span>
+        </a>
+        <a href="profil.html" class="flex flex-col items-center gap-0.5 text-nav-passive hover:text-text-secondary transition-colors group">
+            <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">person</span>
+            <span class="text-[8px] font-bold tracking-wider uppercase">Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        const petData = {
+            'pamuk': {
+                name: 'Pamuk',
+                image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80',
+                info: '2 yaşında • Dişi • Terrier',
+                age: '2 Yaş',
+                breed: 'Terrier',
+                location: 'Osmangazi, Bursa',
+                desc: 'Pamuk çok sevimli ve enerjik bir köpek. Diğer hayvanlarla uyumlu, çocuklarla harika anlaşır. Tüm aşıları tamdır ve kısırlaştırılmıştır. Geçici yuvada kalıyor, kalıcı bir yuva arıyor. Günlük egzersiz ve oyun zamanı gerektirir. Eğitimli ve tuvalet alışkanlığı vardır.'
+            },
+            'duman': {
+                name: 'Duman',
+                image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&q=80',
+                info: '1 yaşında • Erkek • British Shorthair',
+                age: '1 Yaş',
+                breed: 'British',
+                location: 'Nilüfer, Bursa',
+                desc: 'Duman sakin ve sevecen bir kedi. Ev yaşamına çok uygun, kum kullanımı mükemmel. Diğer kedilerle uyumlu. Kısırlaştırılmış ve tüm aşıları tam. Düzenli tüy bakımı gerektirir.'
+            },
+            'lola': {
+                name: 'Lola',
+                image: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=800&q=80',
+                info: '3 yaşında • Dişi • Golden Retriever',
+                age: '3 Yaş',
+                breed: 'Golden',
+                location: 'Yıldırım, Bursa',
+                desc: 'Lola çok oyuncu ve sadık bir köpek. Çocuklarla harika anlaşır, aile köpeği idealidir. Temel komutları bilir, tasmayla yürüyüşe çıkmaya bayılır. Su ve yüzmeyi çok sever.'
+            },
+            'karabas': {
+                name: 'Karabaş',
+                image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=800&q=80',
+                info: '4 yaşında • Erkek • Anadolu Çoban',
+                age: '4 Yaş',
+                breed: 'Anadolu',
+                location: 'Osmangazi, Bursa',
+                desc: 'Karabaş sadık ve koruyucu bir köpek. Bahçeli ev için idealdir. Eğitimli, tuvalet alışkanlığı var. Çocuklarla iyi anlaşır ama yabancılara karşı tedbirli olabilir.'
+            },
+            'minnos': {
+                name: 'Minnoş',
+                image: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=800&q=80',
+                info: '6 aylık • Dişi • Tekir',
+                age: '6 Aylık',
+                breed: 'Tekir',
+                location: 'Nilüfer, Bursa',
+                desc: 'Minnoş oyuncu ve meraklı bir yavru kedi. Diğer kedilerle uyumlu. Aşıları devam ediyor, kısırlaştırma yaşına geldiğinde yapılacak. Çok sevecen ve kucak maymuncuğu.'
+            },
+            'pamuk-papa': {
+                name: 'Pamuk (Tavşan)',
+                image: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800&q=80',
+                info: '1 yaşında • Erkek • Hollanda Lop',
+                age: '1 Yaş',
+                breed: 'Hollanda',
+                location: 'Yıldırım, Bursa',
+                desc: 'Pamuk sakin ve sevecen bir tavşan. Apartman yaşamına uygun, ses çıkarmaz. Tuvalet eğitimli, kafesinde kalışa alışkın. Günlük taze sebze ve mama ile besleniyor.'
+            }
+        };
+
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.category-btn');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => {
+                    b.classList.remove('active');
+                    b.classList.add('text-white');
+                });
+                btn.classList.add('active');
+                btn.classList.remove('text-white');
+
+                const filter = btn.dataset.filter;
+                filterPets(filter);
+            });
+        });
+
+        function filterPets(filter) {
+            const pets = document.querySelectorAll('.volunteer-card');
+            pets.forEach(pet => {
+                if (filter === 'all') {
+                    pet.style.display = 'block';
+                } else if (filter === 'urgent') {
+                    pet.style.display = pet.dataset.urgent === 'true' ? 'block' : 'none';
+                } else {
+                    pet.style.display = pet.dataset.type === filter ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Toggle Search Panel
+        function toggleSearch() {
+            const searchPanel = document.getElementById('searchPanel');
+            const filterPanel = document.getElementById('filterPanel');
+            filterPanel.classList.add('hidden');
+            searchPanel.classList.toggle('hidden');
+        }
+
+        // Toggle Filter Panel
+        function toggleFilter() {
+            const searchPanel = document.getElementById('searchPanel');
+            const filterPanel = document.getElementById('filterPanel');
+            searchPanel.classList.add('hidden');
+            filterPanel.classList.toggle('hidden');
+        }
+
+        // Inline Pet Detail Functions
+        function openPetDetail(petId) {
+            const pet = petData[petId];
+            if (!pet) return;
+
+            document.getElementById('inlinePetImage').src = pet.image;
+            document.getElementById('inlinePetNameHeader').textContent = pet.name;
+            document.getElementById('inlinePetNameLarge').textContent = pet.name;
+            document.getElementById('inlinePetInfo').textContent = pet.info;
+            document.getElementById('inlinePetAge').textContent = pet.age;
+            document.getElementById('inlinePetBreed').textContent = pet.breed;
+            document.getElementById('inlinePetLocation').textContent = pet.location;
+            document.getElementById('inlinePetDesc').textContent = pet.desc;
+
+            // Hide main content, show inline detail
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('petDetailInline').classList.remove('hidden');
+            document.getElementById('categorySection').classList.add('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function closePetDetailInline() {
+            document.getElementById('petDetailInline').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('categorySection').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>

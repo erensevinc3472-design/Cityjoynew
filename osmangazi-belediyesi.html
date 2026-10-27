@@ -1,0 +1,896 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Başkan Erkan Aydın - Osmangazi Belediyesi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "chp-red": "#E30613"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-live {
+            animation: pulseLive 2s infinite;
+        }
+        @keyframes pulseLive {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(255, 68, 68, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .hero-bg {
+            background-image: url('cityjoy-assets/erkanaydin1.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .profile-img {
+            background-image: url('cityjoy-assets/erkanaydin2.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .program-btn {
+            transition: all 0.3s ease;
+        }
+        .program-btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(224, 176, 122, 0.5);
+        }
+        .month-badge {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="belediye-hizmetleri.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">OSMANGAZİ BELEDİYESİ</h1>
+                <p class="text-xs text-gray-text truncate">Osmangazi Belediye Başkanı Erkan AYDIN</p>
+            </div>
+            <button onclick="openRequestForm()" class="w-10 h-10 flex items-center justify-center rounded-full bg-gold/20 hover:bg-gold/30 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">mail</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative">
+                <div class="h-48 sm:h-56 hero-bg relative">
+                    <div class="absolute inset-0 bg-gradient-to-t from-deep-teal via-deep-teal/60 to-transparent"></div>
+                    <div class="absolute -bottom-10 left-4 sm:left-6">
+                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl profile-img border-4 border-deep-teal shadow-2xl"></div>
+                    </div>
+                </div>
+                
+                <div class="pt-12 pb-5 px-4 sm:px-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold">Erkan Aydın</h2>
+                            <p class="text-sm text-gold">Osmangazi'nin Başkanı</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <a href="https://twitter.com/osmangazibld" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                                <span class="material-symbols-outlined text-blue-400 text-lg">chat</span>
+                            </a>
+                            <a href="https://instagram.com/osmangazibld" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                                <span class="material-symbols-outlined text-pink-400 text-lg">photo_camera</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-gradient-to-r from-gold/10 to-transparent border-l-4 border-gold p-3 rounded-r-xl">
+                        <p class="text-sm italic">"Osmangazi'de 'biz' anlayışını değiştiriyoruz. Halkımızı dinledik, ihtiyaçlarını gözlemledik ve projelerimizi buna göre şekillendirdik."</p>
+                    </div>
+
+                    <div class="mt-3 flex items-center gap-3 p-3 bg-live-red/10 border border-live-red/30 rounded-xl">
+                        <div class="w-2.5 h-2.5 rounded-full bg-live-red pulse-live"></div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium truncate">Meclis Canlı Yayını</p>
+                            <p class="text-xs text-gray-text">Her ay ilk Çarşamba • Şeffaf yönetim</p>
+                        </div>
+                        <span class="material-symbols-outlined text-live-red shrink-0">videocam</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 550 Gün -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-green-600/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-green-400 text-xl sm:text-2xl">verified</span>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text truncate">550 Günde Osmangazi</h3>
+                        <p class="text-xs text-gray-text truncate">Şeffaf, tasarruflu ve sosyal belediyecilik</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4">
+                    <div class="stat-card rounded-xl p-2 sm:p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">35</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Temel Atma</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-2 sm:p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">%21</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Tasarruf</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-2 sm:p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">150M</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">TL Tasarruf</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-2 sm:p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">2.5x</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Ucuz Hizmet</p>
+                    </div>
+                </div>
+
+                <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-green-400 shrink-0">visibility</span>
+                    <p class="text-xs text-green-400">Meclis toplantıları canlı yayında • Sayıştay denetimleri</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hikaye -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <button onclick="toggleSection('storySection', 'storyIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">auto_stories</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-medium block truncate">Başkan'ın Hikayesi</span>
+                        <span class="text-[10px] text-gray-text block truncate">Eczacı, milletvekili, belediye başkanı</span>
+                    </div>
+                </div>
+                <span id="storyIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="storySection" class="expandable-section mt-3 space-y-3">
+                <div class="glass-card rounded-2xl p-4 space-y-4">
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-gold">74</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-gold">İstanbul'da Doğdu</p>
+                            <p class="text-xs text-gray-text">Mühendis baba, öğretmen anne. Bursa Orhaneli kökenli.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-gold">97</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-gold">Hacettepe Eczacılık</p>
+                            <p class="text-xs text-gray-text">Üniversite sonrası serbest eczacılık.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-gold text-sm">groups</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-gold">DAĞ-DER Başkanlığı</p>
+                            <p class="text-xs text-gray-text">6 yıl genel başkan. Eğitim, sağlık projeleri.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-chp-red/20 border border-chp-red/50 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-chp-red text-sm">account_balance</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-chp-red">3 Dönem Milletvekili</p>
+                            <p class="text-xs text-gray-text">25-26-27. Dönem CHP Bursa.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gold/30 border-2 border-gold flex items-center justify-center shrink-0 pulse-live">
+                            <span class="text-xs font-bold text-gold">24</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-gold">Osmangazi Başkanı</p>
+                            <p class="text-xs text-gray-text">%46.35 oy. 12 Nisan'da mazbata.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vizyon 2026 -->
+        <section class="animate-slide-up" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('visionSection', 'visionIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/30 to-blue-600/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-blue-400">visibility</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-medium block truncate">Vizyon 2026</span>
+                        <span class="text-[10px] text-gray-text block truncate">Sosyal, şeffaf ve sürdürülebilir Osmangazi</span>
+                    </div>
+                </div>
+                <span id="visionIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="visionSection" class="expandable-section mt-3 space-y-3">
+                <!-- Yapılanlar -->
+                <div class="glass-card rounded-2xl p-4">
+                    <p class="text-xs font-bold tracking-wider text-gold uppercase mb-3">✓ 550 Günde Yapılanlar</p>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+                            <span class="material-symbols-outlined text-gold text-sm shrink-0">child_care</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium truncate">Ayça Azak Kreşi</p>
+                                <p class="text-[10px] text-gray-text truncate">20 anne işgücüne katıldı</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+                            <span class="material-symbols-outlined text-gold text-sm shrink-0">school</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium truncate">Dijiders Platformu</p>
+                                <p class="text-[10px] text-gray-text truncate">5.500 gence dijital eğitim</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+                            <span class="material-symbols-outlined text-gold text-sm shrink-0">music_note</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium truncate">Temiz Orkestra</p>
+                                <p class="text-[10px] text-gray-text truncate">Temizlik personelinden, sıfır maliyetle</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+                            <span class="material-symbols-outlined text-gold text-sm shrink-0">pool</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium truncate">Spor Tesisleri</p>
+                                <p class="text-[10px] text-gray-text truncate">25.000 çocuk yaz okulu</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hedefler -->
+                <div class="glass-card rounded-2xl p-4">
+                    <p class="text-xs font-bold tracking-wider text-blue-400 uppercase mb-3">→ 2026 Hedefleri</p>
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+                            <span class="material-symbols-outlined text-blue-400 text-sm shrink-0">apartment</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium truncate">Kentsel Dönüşüm</p>
+                                <p class="text-[10px] text-gray-text truncate">Çiftehavuzlar'da 300 hak sahibi</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+                            <span class="material-symbols-outlined text-blue-400 text-sm shrink-0">emergency</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium truncate">Afet İstasyonları</p>
+                                <p class="text-[10px] text-gray-text truncate">130→429 toplanma alanı</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+                            <span class="material-symbols-outlined text-blue-400 text-sm shrink-0">agriculture</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium truncate">Yerel Tarım</p>
+                                <p class="text-[10px] text-gray-text truncate">Ata tohumları, 50.000 fide</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+                            <span class="material-symbols-outlined text-blue-400 text-sm shrink-0">eco</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-medium truncate">Yeşil Osmangazi</p>
+                                <p class="text-[10px] text-gray-text truncate">900.000 çiçek, 26.000 ağaç</p>
+                            </div>
+                        </div>
+                        <!-- Romangala -->
+                        <div class="flex items-start gap-2 p-2 rounded-lg bg-white/5 border border-gold/30">
+                            <span class="material-symbols-outlined text-gold text-sm shrink-0">castle</span>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-gold truncate">Romangala Projesi</p>
+                                <p class="text-[10px] text-gray-text truncate">Tarihi mirası geleceğe taşıyan kent müzesi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 700. Yıl - AYRI BÖLÜM (Vizyon 2026'nın altında, ayrı başlık) -->
+        <section class="animate-slide-up" style="animation-delay: 0.35s">
+            <button onclick="open700YilModal()" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/40 transition-all border-2 border-gold/30 program-btn">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/40 to-gold/20 flex items-center justify-center shrink-0 pulse-live">
+                        <span class="material-symbols-outlined text-gold">celebration</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold text-gold block truncate">Osmangazi'nin 700. Yılı</span>
+                        <span class="text-[10px] text-gray-text block truncate">1326-2026 Kutlama Programları • 7 aylık özel etkinlikler</span>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined text-gold shrink-0">arrow_forward</span>
+            </button>
+        </section>
+
+        <!-- Başkan'a Ulaşın -->
+        <section class="animate-slide-up" style="animation-delay: 0.4s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5 border-2 border-gold/30">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0 pulse-live">
+                        <span class="material-symbols-outlined text-gold text-xl sm:text-2xl">mark_email_unread</span>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base sm:text-lg font-bold text-gold truncate">Başkan'a Ulaşın</h3>
+                        <p class="text-xs text-gray-text truncate">Fikir, şikayet, öneri ve randevu</p>
+                    </div>
+                </div>
+
+                <p class="text-xs text-off-white mb-4">"Osmangazi'de 'biz' anlayışını değiştiriyoruz. Her talep dikkatle incelenir, 48 saatte dönüş yapılır."</p>
+
+                <button onclick="openRequestForm()" class="w-full bg-gradient-to-r from-gold/30 to-gold/10 hover:from-gold/40 hover:to-gold/20 border border-gold/50 text-gold py-3 sm:py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">edit_document</span>
+                    Talep Oluştur / Randevu Al
+                </button>
+
+                <div class="grid grid-cols-3 gap-2 mt-4">
+                    <div class="text-center p-2 rounded-lg bg-white/5">
+                        <p class="text-lg font-bold text-gold">48s</p>
+                        <p class="text-[9px] text-gray-text">Dönüş</p>
+                    </div>
+                    <div class="text-center p-2 rounded-lg bg-white/5">
+                        <p class="text-lg font-bold text-gold">7/24</p>
+                        <p class="text-[9px] text-gray-text">Açık Hat</p>
+                    </div>
+                    <div class="text-center p-2 rounded-lg bg-white/5">
+                        <p class="text-lg font-bold text-gold">%100</p>
+                        <p class="text-[9px] text-gray-text">Şeffaf</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Hizmetler -->
+        <section class="animate-slide-up" style="animation-delay: 0.5s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Belediye Hizmetleri</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="su-fatura.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-cyan-400 text-xl">water_drop</span>
+                    <span class="text-[10px] text-center">Su</span>
+                </a>
+                <a href="imar.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-indigo-400 text-xl">domain</span>
+                    <span class="text-[10px] text-center">İmar</span>
+                </a>
+                <a href="park.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-green-400 text-xl">park</span>
+                    <span class="text-[10px] text-center">Park</span>
+                </a>
+                <a href="sosyal-yardim.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-orange-400 text-xl">volunteer_activism</span>
+                    <span class="text-[10px] text-center">Sosyal</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="benim-sehrim.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 700. Yıl Modal -->
+    <div id="modal700Yil" class="fixed inset-0 z-[80] bg-deep-teal hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="close700YilModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Osmangazi'nin 700. Yılı</h1>
+                        <p class="text-xs text-gray-text truncate">1326-2026 Kutlama Programları</p>
+                    </div>
+                </div>
+                <button onclick="close700YilModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                    <span class="material-symbols-outlined text-gold">close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <!-- Video -->
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden">
+                <div class="video-container">
+                    <video controls poster="cityjoy-assets/700yil-poster.jpg" id="video700Yil">
+                        <source src="cityjoy-assets/700yil-videosu.mp4" type="video/mp4">
+                        <source src="cityjoy-assets/700yil-videosu.webm" type="video/webm">
+                        Tarayıcınız video oynatmayı desteklemiyor.
+                    </video>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-2">700 Yıllık Miras</h2>
+                    <p class="text-sm text-gray-text">1326'dan bugüne Osmangazi'nin eşsiz hikayesi. Sultan Orhan Gazi'den Başkan Erkan Aydın'a, fetih ruhu yaşatıyoruz.</p>
+                </div>
+            </div>
+
+            <!-- Programlar -->
+            <div>
+                <h3 class="text-sm font-bold tracking-wider text-gold uppercase mb-4">7 Aylık Program</h3>
+                <div class="space-y-3" id="programList">
+                    <!-- Programlar JS ile doldurulacak -->
+                </div>
+            </div>
+
+            <!-- Program Detayı -->
+            <div id="programDetail" class="hidden glass-card rounded-2xl p-4 sm:p-6 border-2 border-gold/30">
+                <div class="flex items-start gap-3 mb-4">
+                    <div id="detailIcon" class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"></div>
+                    <div class="min-w-0">
+                        <h4 id="detailTitle" class="text-lg font-bold mb-1"></h4>
+                        <p id="detailDate" class="text-xs text-gold"></p>
+                    </div>
+                </div>
+                <p id="detailDesc" class="text-sm text-gray-text mb-4"></p>
+                <div class="flex items-center gap-2 text-xs text-gray-text">
+                    <span class="material-symbols-outlined text-sm">location_on</span>
+                    <span id="detailLocation"></span>
+                </div>
+            </div>
+
+            <!-- Bilgi -->
+            <div class="glass-card rounded-xl p-4 bg-gradient-to-r from-gold/10 to-transparent border-l-4 border-gold">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-gold text-xl shrink-0">info</span>
+                    <div>
+                        <p class="text-xs text-gray-text">Tüm etkinlikler halka açık ve ücretsizdir. Programlarda değişiklik olması durumunda sosyal medya hesaplarımızdan duyuru yapılacaktır.</p>
+                        <div class="flex items-center gap-4 mt-3">
+                            <a href="https://osmangazi.bel.tr" target="_blank" class="text-xs text-gold hover:text-gold-light transition-colors">osmangazi.bel.tr</a>
+                            <a href="tel:153" class="text-xs text-gold hover:text-gold-light transition-colors">Alo 153</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Talep Formu -->
+    <div id="requestFormPage" class="fixed inset-0 z-[70] bg-deep-teal hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center gap-3">
+                <button onclick="closeRequestForm()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                    <span class="material-symbols-outlined text-gold">arrow_back</span>
+                </button>
+                <div class="min-w-0 flex-1">
+                    <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Talep Oluştur</h1>
+                    <p class="text-xs text-gray-text truncate">Başkan Erkan Aydın'a ulaşın</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-lg mx-auto">
+            <!-- Konu -->
+            <div>
+                <label class="text-xs font-bold text-gold uppercase tracking-wider block mb-3">Konu</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="selectTopic(this, 'sikayet')" class="topic-btn glass-card rounded-xl p-3 text-center hover:border-gold/30 transition-all">
+                        <span class="material-symbols-outlined text-orange-400 block mb-1">report_problem</span>
+                        <span class="text-xs">Şikayet</span>
+                    </button>
+                    <button onclick="selectTopic(this, 'talep')" class="topic-btn glass-card rounded-xl p-3 text-center hover:border-gold/30 transition-all">
+                        <span class="material-symbols-outlined text-blue-400 block mb-1">lightbulb</span>
+                        <span class="text-xs">Öneri</span>
+                    </button>
+                    <button onclick="selectTopic(this, 'tesekkur')" class="topic-btn glass-card rounded-xl p-3 text-center hover:border-gold/30 transition-all">
+                        <span class="material-symbols-outlined text-green-400 block mb-1">favorite</span>
+                        <span class="text-xs">Teşekkür</span>
+                    </button>
+                    <button onclick="selectTopic(this, 'randevu')" class="topic-btn glass-card rounded-xl p-3 text-center hover:border-gold/30 transition-all">
+                        <span class="material-symbols-outlined text-purple-400 block mb-1">event_available</span>
+                        <span class="text-xs">Randevu</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Açıklama -->
+            <div>
+                <label class="text-xs font-bold text-gold uppercase tracking-wider block mb-3">Açıklama</label>
+                <textarea id="requestDetail" placeholder="Talebinizi detaylı açıklayın..." class="w-full h-40 bg-white/5 border border-gold/20 rounded-2xl p-4 text-sm text-off-white placeholder-gray-text focus:outline-none focus:border-gold/50 resize-none"></textarea>
+            </div>
+
+            <!-- Dosya -->
+            <div>
+                <label class="text-xs font-bold text-gold uppercase tracking-wider block mb-3">Fotoğraf (Opsiyonel)</label>
+                <div class="glass-card rounded-2xl p-4 border-dashed border-2 border-gold/30 text-center cursor-pointer hover:border-gold/50 transition-colors" onclick="document.getElementById('fileInput').click()">
+                    <span class="material-symbols-outlined text-gold text-3xl mb-2">add_photo_alternate</span>
+                    <p class="text-xs text-gray-text">Fotoğraf ekle</p>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="handleFileSelect(this)">
+                </div>
+                <div id="filePreview" class="hidden mt-2 flex items-center gap-2 p-2 bg-white/5 rounded-lg">
+                    <span class="material-symbols-outlined text-gold text-sm">image</span>
+                    <span id="fileName" class="text-xs flex-1 truncate">dosya.jpg</span>
+                    <button onclick="clearFile()" class="text-gray-text hover:text-live-red">
+                        <span class="material-symbols-outlined text-sm">close</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- İletişim -->
+            <div>
+                <label class="text-xs font-bold text-gold uppercase tracking-wider block mb-3">İletişim</label>
+                <div class="space-y-3">
+                    <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-gold shrink-0">person</span>
+                        <input type="text" id="contactName" placeholder="Ad Soyad" class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0">
+                    </div>
+                    <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <input type="tel" id="contactPhone" placeholder="Telefon" class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0">
+                    </div>
+                    <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-gold shrink-0">email</span>
+                        <input type="email" id="contactEmail" placeholder="E-posta (opsiyonel)" class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Konum -->
+            <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-400 shrink-0">my_location</span>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs text-off-white truncate">Konum: Osmangazi, Bursa</p>
+                    <p class="text-[10px] text-gray-text">Otomatik algılandı</p>
+                </div>
+                <span class="material-symbols-outlined text-green-400 text-sm shrink-0">check_circle</span>
+            </div>
+
+            <!-- Gönder -->
+            <button onclick="submitRequest()" class="w-full bg-gradient-to-r from-gold to-gold-light text-deep-teal py-4 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">send</span>
+                Gönder
+            </button>
+
+            <p class="text-[10px] text-gray-text text-center">48 saat içinde dönüş yapılır • Alo 153: 7/24</p>
+        </div>
+    </div>
+
+    <!-- Başarı Sayfası -->
+    <div id="successPage" class="fixed inset-0 z-[80] bg-deep-teal hidden flex items-center justify-center p-6">
+        <div class="glass-card rounded-3xl p-6 sm:p-8 text-center max-w-sm w-full">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-green-400 text-3xl sm:text-4xl">check_circle</span>
+            </div>
+            <h2 class="text-lg sm:text-xl font-bold text-gold mb-2">Talebiniz Alındı!</h2>
+            <p class="text-xs sm:text-sm text-gray-text mb-6">Başkan Erkan Aydın'a iletilen talebiniz 48 saat içinde değerlendirilecek.</p>
+            
+            <div class="bg-white/5 rounded-xl p-4 mb-6">
+                <p class="text-xs text-gray-text mb-1">Talep No:</p>
+                <p class="text-base sm:text-lg font-bold text-gold" id="requestNumber">#OSM-2026-001847</p>
+            </div>
+
+            <button onclick="closeSuccessPage()" class="w-full bg-gradient-to-r from-gold/30 to-gold/10 border border-gold/50 text-gold py-3 rounded-xl text-sm font-medium transition-all">
+                Ana Sayfaya Dön
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Program verileri
+        const programs = [
+            {
+                id: 'nisan',
+                month: 'NİS',
+                number: '4',
+                title: 'Açılış Töreni & Fetih Yürüyüşü',
+                desc: 'Orhan Gazi Türbesi\'nden başlayarak tarihi yarımada yürüyüşü, mehteran takımı ve halk dansları gösterisi. 700 yıllık mirasımızı kutluyoruz.',
+                location: 'Orhan Gazi Türbesi - Panorama 1326',
+                color: 'gold',
+                icon: 'flag'
+            },
+            {
+                id: 'mayis',
+                month: 'MAY',
+                number: '5',
+                title: 'Uluslararası Tarih Sempozyumu',
+                desc: '"Osmangazi\'nin Dünya Mirasına Katkıları" konulu uluslararası akademik sempozyum. Tarihçiler, akademisyenler ve araştırmacılar bir araya geliyor.',
+                location: 'Osmangazi Belediyesi Kültür Merkezi',
+                color: 'blue',
+                icon: 'school'
+            },
+            {
+                id: 'haziran',
+                month: 'HAZ',
+                number: '6',
+                title: 'Geleneksel Sporlar Festivali',
+                desc: 'Okçuluk, cirit, yağlı güreş ve geleneksel Türk sporları şenliği. Ecdadımızın sporlarını yaşatıyoruz.',
+                location: 'Osmangazi Meydanı',
+                color: 'green',
+                icon: 'sports'
+            },
+            {
+                id: 'temmuz',
+                month: 'TEM',
+                number: '7',
+                title: 'Açık Hava Sinema Geceleri',
+                desc: 'Tarihi mekanlarda Türk sinemasının klasikleri ve fetih temalı filmler. Yeşilçam\'ın unutulmaz eserleri tarihi mekanlarda izlenecek.',
+                location: 'Çiftehavuzlar, Emirsultan, Yeşil',
+                color: 'orange',
+                icon: 'movie'
+            },
+            {
+                id: 'agustos',
+                month: 'AĞU',
+                number: '8',
+                title: 'Halk Sanatları ve El Sanatları Fuarı',
+                desc: '700 yıllık kültürel mirasın günümüzdeki yansımaları, usta zanaatkârlar canlı performans. Ebru, hat, çini, bakırcılık ve daha fazlası.',
+                location: 'Panorama 1326 Çevresi',
+                color: 'purple',
+                icon: 'palette'
+            },
+            {
+                id: 'eylul',
+                month: 'EYL',
+                number: '9',
+                title: 'Fetih Maratonu & Bisiklet Turu',
+                desc: '7 km tarihi yarımada maratonu ve 20 km bisiklet turu. Sporcular ve halk koşusu bir arada, sağlıklı yaşam ve tarihi keşif.',
+                location: 'Panorama 1326 - Şehreküstü',
+                color: 'cyan',
+                icon: 'directions_run'
+            },
+            {
+                id: 'ekim',
+                month: 'EKİ',
+                number: '10',
+                title: 'Kapanış Galası & Işık Gösterisi',
+                desc: 'Drone ışık gösterisi, havai fişek ve konser ile 700. yıl kapanış töreni. Görsel bir şölen ve unutulmaz final.',
+                location: 'Osmangazi Meydanı',
+                color: 'red',
+                icon: 'celebration'
+            }
+        ];
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // 700 Yıl Modal
+        function open700YilModal() {
+            document.getElementById('modal700Yil').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            renderPrograms();
+        }
+
+        function close700YilModal() {
+            document.getElementById('modal700Yil').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            const video = document.getElementById('video700Yil');
+            if (video) video.pause();
+            document.getElementById('programDetail').classList.add('hidden');
+        }
+
+        function renderPrograms() {
+            const container = document.getElementById('programList');
+            container.innerHTML = programs.map(p => `
+                <button onclick="showProgramDetail('${p.id}')" class="w-full program-btn glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center gap-3 border-l-4 border-${p.color}-400">
+                    <div class="month-badge w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex flex-col items-center justify-center shrink-0">
+                        <span class="text-[10px] sm:text-xs font-bold">${p.month}</span>
+                        <span class="text-base sm:text-lg font-bold leading-none">${p.number}</span>
+                    </div>
+                    <div class="text-left min-w-0 flex-1">
+                        <p class="text-xs sm:text-sm font-bold truncate">${p.title}</p>
+                        <p class="text-[10px] text-gray-text truncate">${p.location}</p>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-text shrink-0 text-sm">arrow_forward</span>
+                </button>
+            `).join('');
+        }
+
+        function showProgramDetail(id) {
+            const p = programs.find(x => x.id === id);
+            if (!p) return;
+            
+            document.getElementById('programDetail').classList.remove('hidden');
+            document.getElementById('detailIcon').className = `w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-${p.color}-500/20`;
+            document.getElementById('detailIcon').innerHTML = `<span class="material-symbols-outlined text-${p.color}-400 text-2xl">${p.icon}</span>`;
+            document.getElementById('detailTitle').textContent = p.title;
+            document.getElementById('detailDate').textContent = `${p.month} 2026 • Osmangazi'nin 700. Yılı`;
+            document.getElementById('detailDesc').textContent = p.desc;
+            document.getElementById('detailLocation').textContent = p.location;
+            
+            document.getElementById('programDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Talep Formu
+        function openRequestForm() {
+            document.getElementById('requestFormPage').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeRequestForm() {
+            document.getElementById('requestFormPage').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        let selectedTopic = '';
+        function selectTopic(btn, topic) {
+            document.querySelectorAll('.topic-btn').forEach(b => {
+                b.classList.remove('border-gold', 'bg-gold/10');
+                b.classList.add('glass-card');
+            });
+            btn.classList.remove('glass-card');
+            btn.classList.add('border-gold', 'bg-gold/10');
+            selectedTopic = topic;
+        }
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('fileName').textContent = input.files[0].name;
+                document.getElementById('filePreview').classList.remove('hidden');
+            }
+        }
+
+        function clearFile() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filePreview').classList.add('hidden');
+        }
+
+        function submitRequest() {
+            const detail = document.getElementById('requestDetail').value;
+            const name = document.getElementById('contactName').value;
+            const phone = document.getElementById('contactPhone').value;
+
+            if (!selectedTopic) { alert('Konu seçin'); return; }
+            if (!detail.trim()) { alert('Açıklama yazın'); return; }
+            if (!name.trim() || !phone.trim()) { alert('İletişim bilgilerini doldurun'); return; }
+
+            const randomNum = Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('requestNumber').textContent = `#OSM-2026-${randomNum}`;
+
+            document.getElementById('requestFormPage').classList.add('hidden');
+            document.getElementById('successPage').classList.remove('hidden');
+        }
+
+        function closeSuccessPage() {
+            document.getElementById('successPage').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            
+            document.getElementById('requestDetail').value = '';
+            document.getElementById('contactName').value = '';
+            document.getElementById('contactPhone').value = '';
+            document.getElementById('contactEmail').value = '';
+            clearFile();
+            document.querySelectorAll('.topic-btn').forEach(b => {
+                b.classList.remove('border-gold', 'bg-gold/10');
+                b.classList.add('glass-card');
+            });
+            selectedTopic = '';
+        }
+    </script>
+
+</body>
+</html>

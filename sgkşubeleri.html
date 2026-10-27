@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa SGK İl/İlçe Müdürlükleri - Sosyal Güvenlik Kurumu adres, telefon, çalışma saatleri ve ulaşım bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa SGK İl/İlçe Müdürlükleri</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "sgk-blue": "#0066CC",
+                        "sgk-light": "#4A90D9",
+                        "ambulance-orange": "#F97316"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-sgk {
+            animation: pulseSGK 2s infinite;
+        }
+        @keyframes pulseSGK {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(0, 102, 204, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .sgk-card {
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .sgk-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(74, 144, 217, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(74, 144, 217, 0.2);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .district-btn {
+            transition: all 0.3s ease;
+        }
+        .district-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .district-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .service-tag {
+            background: rgba(0, 102, 204, 0.15);
+            border: 1px solid rgba(0, 102, 204, 0.3);
+        }
+        .modal-sgk {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        /* Arama çubuğu standart boyut - kesfet/profil ile aynı */
+        .search-box {
+            height: 44px;
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="onemli-kurumlar.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">SGK MÜDÜRLÜKLERİ</h1>
+                <p class="text-xs text-gray-text truncate">Sosyal Güvenlik Kurumu Bursa</p>
+            </div>
+            <button onclick="openInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-sgk-blue/20 hover:bg-sgk-blue/30 transition-colors shrink-0 pulse-sgk">
+                <span class="material-symbols-outlined text-sgk-blue">info</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - SGK Bilgi -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sgk-blue/30 to-sgk-light/10 flex items-center justify-center shrink-0 pulse-sgk">
+                            <span class="material-symbols-outlined text-sgk-blue text-xl">account_balance</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Sosyal Güvenlik Kurumu</h2>
+                            <p class="text-xs text-gray-text">Bursa İl ve İlçe Müdürlükleri</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-sgk-blue/10 border border-sgk-blue/30">
+                        <div class="w-2 h-2 rounded-full bg-sgk-blue animate-pulse"></div>
+                        <span class="text-xs text-sgk-blue font-medium">Aktif</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-sgk-light">08:30</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Açılış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-sgk-blue">17:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Kapanış Saati</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">444 7 515</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Alo SGK</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-ambulance-orange">17 İlçe</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Hizmet Noktası</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">SGK Ara</h3>
+                        <p class="text-xs text-gray-text truncate">İlçe veya müdürlük adı ara</p>
+                    </div>
+                </div>
+
+                <!-- Standart boyut arama çubuğu -->
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 mb-4 search-box">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="sgkSearch" placeholder="Örn: Osmangazi, Nilüfer, İnegöl..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0 h-full"
+                        onkeyup="searchSGK()"/>
+                </div>
+
+                <!-- İlçe Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">İlçe Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterDistrict('all')" id="btn-all" class="district-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterDistrict('osmangazi')" id="btn-osmangazi" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Osmangazi</span>
+                    </button>
+                    <button onclick="filterDistrict('nilufer')" id="btn-nilufer" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Nilüfer</span>
+                    </button>
+                    <button onclick="filterDistrict('yildirim')" id="btn-yildirim" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Yıldırım</span>
+                    </button>
+                    <button onclick="filterDistrict('bursail')" id="btn-bursail" class="district-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">İl Müdürlüğü</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Sıkça Sorulan Sorular</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Çalışma Saatleri -->
+                <div class="sgk-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-sgk-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-sgk-blue text-sm">schedule</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Çalışma Saatleri Nedir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Hafta içi 08:30 - 17:00 arası hizmet verilir. Öğle arası 12:30 - 13:30 arasıdır. 
+                                Vezne işlemleri için son başvuru saati 16:30'dur.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-sgk-light">Pzt-Cuma: 08:30-17:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-live-red">Hafta Sonu: Kapalı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hizmet Noktaları -->
+                <div class="sgk-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-sgk-light/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-sgk-light text-sm">location_city</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Hangi İlçelerde Var?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Bursa'da 17 ilçede SGK hizmet noktası bulunmaktadır:
+                            </p>
+                            <div class="grid grid-cols-2 gap-1 text-xs text-gray-text">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Osmangazi (İl Müdürlüğü)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Nilüfer</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Yıldırım</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Gürsu, Kestel</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>İnegöl, Mudanya</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Mustafakemalpaşa</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Yenişehir, İznik</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Orhaneli, Orhangazi</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Online İşlemler -->
+                <div class="sgk-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-ambulance-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-ambulance-orange text-sm">computer</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">e-Devlet İşlemleri</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Birçok işlemi e-Devlet veya SGK internet şubesi üzerinden yapabilirsiniz:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text mb-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Hizmet dökümü alma</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Prim borcu sorgulama</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>Emeklilik yaşı hesaplama</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span>4A/4B/4C prim ödeme</span>
+                                </li>
+                            </ul>
+                            <div class="bg-white/5 rounded-lg p-2 text-[10px] text-gray-text">
+                                <strong class="text-gold">Web:</strong> www.sgk.gov.tr | <strong class="text-gold">Alo SGK:</strong> 444 7 515
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Yapılandırma -->
+                <div class="sgk-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-sgk-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-sgk-blue text-sm">payments</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Prim Borcu Yapılandırma</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                7256 Sayılı Kanun kapsamında SGK prim borçları yapılandırılabilir. 
+                                Başvurular il/ilçe müdürlüklerine şahsen veya online yapılabilir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-sgk-light">Peşin ödeme: %90 indirim</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-sgk-light">Taksit: 18-36 ay</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bursa İl Müdürlüğü -->
+        <section class="animate-slide-up district-section" data-district="bursail" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('ilSection', 'ilIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sgk-blue/30 to-sgk-light/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-sgk-blue">account_balance</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Bursa İl Müdürlüğü</span>
+                        <span class="text-[10px] text-gray-text block truncate">Ana Hizmet Binası</span>
+                    </div>
+                </div>
+                <span id="ilIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="ilSection" class="expandable-section mt-3 space-y-3">
+                <!-- Ana Bina -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('bursail')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">SGK Bursa İl Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Demirtaşpaşa Mah. İnönü Cad. No:114</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 600 10 00</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">tram</span>
+                        <span>T1 - SGK durağı (133m)</span>
+                    </div>
+                </div>
+
+                <!-- Ek Hizmet Binası Nilüfer -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('ekbina')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-light flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Ek Hizmet Binası (Nilüfer)</h4>
+                                <p class="text-[10px] text-gray-text">Fethiye Mah. Peker Sok. No:4, Nilüfer</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">subway</span>
+                        <span>BursaRay Nilüfer durağına yakın</span>
+                    </div>
+                </div>
+
+                <!-- Denetmenler Binası -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('denetmen')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Denetmenler Hizmet Binası</h4>
+                                <p class="text-[10px] text-gray-text">Nilüfer bölgesi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">business</span>
+                        <span>İşyeri denetim ve teftiş birimleri</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Osmangazi SGK Listesi -->
+        <section class="animate-slide-up district-section" data-district="osmangazi" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('osmangaziSection', 'osmangaziIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sgk-blue/30 to-sgk-light/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-sgk-blue">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Osmangazi İlçe Müdürlüğü</span>
+                        <span class="text-[10px] text-gray-text block truncate">SGM - Sosyal Güvenlik Merkezi</span>
+                    </div>
+                </div>
+                <span id="osmangaziIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="osmangaziSection" class="expandable-section mt-3 space-y-3">
+                <!-- Osmangazi SGM -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('osmangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Osmangazi SGM</h4>
+                                <p class="text-[10px] text-gray-text">Demirtaşpaşa Mah. İnönü Cad. No:114</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 600 10 00</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">directions_bus</span>
+                        <span>38, 60, 94, 1/A, 2/A hatları</span>
+                    </div>
+                </div>
+
+                <!-- Nilüfer SGM (Osmangazi sınırlarında) -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('nilufersgm')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-light flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer Sosyal Güvenlik Merkezi</h4>
+                                <p class="text-[10px] text-gray-text">Fevzi Çakmak Cad. No:61, Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">subway</span>
+                        <span>BursaRay Şehreküstü durağı (metro)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nilüfer SGK Listesi -->
+        <section class="animate-slide-up district-section" data-district="nilufer" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('niluferSection', 'niluferIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sgk-light/30 to-sgk-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-sgk-light">park</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Nilüfer İlçe Müdürlüğü</span>
+                        <span class="text-[10px] text-gray-text block truncate">SGM - Ek Hizmet Binası</span>
+                    </div>
+                </div>
+                <span id="niluferIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="niluferSection" class="expandable-section mt-3 space-y-3">
+                <!-- Nilüfer Ek Hizmet -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('nilufer')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-light flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer SGM (Ek Hizmet)</h4>
+                                <p class="text-[10px] text-gray-text">Fethiye Mah. Peker Sok. No:4, Nilüfer</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">subway</span>
+                        <span>BursaRay Nilüfer durağı + yürüme</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">directions_bus</span>
+                        <span>5B, 38, 48, 60 hatları</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yıldırım SGK Listesi -->
+        <section class="animate-slide-up district-section" data-district="yildirim" style="animation-delay: 0.6s">
+            <button onclick="toggleSection('yildirimSection', 'yildirimIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-ambulance-orange/30 to-sgk-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-ambulance-orange">mosque</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Yıldırım İlçe Müdürlüğü</span>
+                        <span class="text-[10px] text-gray-text block truncate">SGM - Sosyal Güvenlik Merkezi</span>
+                    </div>
+                </div>
+                <span id="yildirimIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="yildirimSection" class="expandable-section mt-3 space-y-3">
+                <!-- Yıldırım SGM -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('yildirim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yıldırım SGM</h4>
+                                <p class="text-[10px] text-gray-text">Yıldırım ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 600 10 00 (Ana Hat)</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">directions_bus</span>
+                        <span>3A, 3B, 4, 5A, 6, 9 hatları</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diğer İlçeler -->
+        <section class="animate-slide-up district-section" data-district="diger" style="animation-delay: 0.7s">
+            <button onclick="toggleSection('digerSection', 'digerIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-sgk-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">map</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Diğer İlçe Müdürlükleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">13 ilçe daha</span>
+                    </div>
+                </div>
+                <span id="digerIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="digerSection" class="expandable-section mt-3 space-y-3">
+                <!-- Gürsu -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('gursu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">1</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gürsu SGM</h4>
+                                <p class="text-[10px] text-gray-text">Zafer Mah. Atatürk Cad. No:12 Kat:1, Gürsu</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 376 14 32</span>
+                    </div>
+                </div>
+
+                <!-- Kestel -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('kestel')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-light flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Kestel SGM</h4>
+                                <p class="text-[10px] text-gray-text">Kestel ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 384 10 00</span>
+                    </div>
+                </div>
+
+                <!-- İnegöl -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('inegol')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İnegöl SGM</h4>
+                                <p class="text-[10px] text-gray-text">İnegöl ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 718 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Mudanya -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('mudanya')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">4</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mudanya SGM</h4>
+                                <p class="text-[10px] text-gray-text">Mudanya ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 544 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Mustafakemalpaşa -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('mustafa')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-light flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">5</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Mustafakemalpaşa SGM</h4>
+                                <p class="text-[10px] text-gray-text">Mustafakemalpaşa ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 613 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Yenişehir -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('yenisehir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">6</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yenişehir SGM</h4>
+                                <p class="text-[10px] text-gray-text">Yenişehir ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 773 10 00</span>
+                    </div>
+                </div>
+
+                <!-- İznik -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('iznik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">7</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">İznik SGM</h4>
+                                <p class="text-[10px] text-gray-text">İznik ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 757 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Orhaneli -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('orhaneli')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-light flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">8</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhaneli SGM</h4>
+                                <p class="text-[10px] text-gray-text">Orhaneli ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 635 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Orhangazi -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('orhangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">9</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Orhangazi SGM</h4>
+                                <p class="text-[10px] text-gray-text">Orhangazi ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 573 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Gemlik -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('gemlik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">10</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Gemlik SGM</h4>
+                                <p class="text-[10px] text-gray-text">Gemlik ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 524 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Karacabey -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('karacabey')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-light flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">11</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Karacabey SGM</h4>
+                                <p class="text-[10px] text-gray-text">Karacabey ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 675 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Büyükorhan -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('buyukorhan')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">12</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Büyükorhan SGM</h4>
+                                <p class="text-[10px] text-gray-text">Büyükorhan ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 651 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Harmancık -->
+                <div class="sgk-card rounded-xl p-4" onclick="openSGKDetail('harmancik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-sgk-blue flex items-center justify-center shrink-0">
+                                <span class="text-xs font-bold text-white">13</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Harmancık SGM</h4>
+                                <p class="text-[10px] text-gray-text">Harmancık ilçe merkezi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0 224 644 10 00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.8s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="sgk-yapilandirma.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-sgk-blue text-xl">payments</span>
+                    <span class="text-[10px] text-center">Yapılandırma</span>
+                </a>
+                <a href="sgk-emeklilik.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-gold text-xl">elderly</span>
+                    <span class="text-[10px] text-center">Emeklilik</span>
+                </a>
+                <a href="sgk-prim.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-sgk-light text-xl">receipt_long</span>
+                    <span class="text-[10px] text-center">Prim Sorgu</span>
+                </a>
+                <a href="https://www.sgk.gov.tr" target="_blank" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-ambulance-orange text-xl">language</span>
+                    <span class="text-[10px] text-center">Web Site</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Önemli Uyarı -->
+        <section class="animate-slide-up" style="animation-delay: 0.9s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-sgk-blue">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-sgk-blue shrink-0">info</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-sgk-blue mb-1">Önemli Bilgi</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            SGK işlemlerinizi <strong>e-Devlet</strong> üzerinden 7/24 yapabilirsiniz. 
+                            Şahsen başvuru gerektiren işlemler için randevu almanız önerilir. 
+                            Alo SGK hattı <strong>444 7 515</strong> üzerinden 7 gün 24 saat bilgi alabilirsiniz.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-0.5 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl">search</span>
+                <span class="text-[9px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- SGK Detay Modalı -->
+    <div id="sgkDetailModal" class="fixed inset-0 z-[80] modal-sgk hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeSGKDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">SGK Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Sosyal Güvenlik Kurumu Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-sgk-blue/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-sgk-blue text-3xl">account_balance</span>
+                    </div>
+                    <div>
+                        <h2 id="modalSGKName" class="text-xl font-bold text-white mb-1">SGK Adı</h2>
+                        <p id="modalDistrict" class="text-sm text-gold">İlçe</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p class="text-sm text-white">Hafta İçi: 08:30 - 17:00</p>
+                            <p class="text-xs text-gray-text">Öğle Arası: 12:30 - 13:30</p>
+                            <p class="text-xs text-live-red mt-1">Vezne Son İşlem: 16:30</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">İletişim</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                            <p class="text-xs text-gray-text mt-1">Alo SGK: 444 7 515</p>
+                            <p class="text-xs text-gray-text">Faks: 0 224 225 29 86</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">email</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">E-Posta</p>
+                            <p id="modalEmail" class="text-sm text-white">bursasgim@sgk.gov.tr</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Verilen Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">medical_services</span>
+                    Verilen Hizmetler
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-sgk-blue text-xl mb-1">person_add</span>
+                        <p class="text-xs text-gray-text">4A/4B/4C Tescil</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-sgk-blue text-xl mb-1">receipt_long</span>
+                        <p class="text-xs text-gray-text">Prim Ödeme</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-sgk-blue text-xl mb-1">elderly</span>
+                        <p class="text-xs text-gray-text">Emeklilik İşlemleri</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-sgk-blue text-xl mb-1">payments</span>
+                        <p class="text-xs text-gray-text">Borç Yapılandırma</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-sgk-blue text-xl mb-1">description</span>
+                        <p class="text-xs text-gray-text">Hizmet Dökümü</p>
+                    </div>
+                    <div class="bg-white/5 rounded-xl p-3 text-center">
+                        <span class="material-symbols-outlined text-sgk-blue text-xl mb-1">local_hospital</span>
+                        <p class="text-xs text-gray-text">GSS İşlemleri</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button onclick="callNumber('4447515')" class="flex-1 bg-sgk-blue/20 hover:bg-sgk-blue/30 border border-sgk-blue/50 text-sgk-light py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Alo SGK (444 7 515)
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bilgi Modalı -->
+    <div id="infoModal" class="fixed inset-0 z-[80] modal-sgk hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeInfoModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">SGK Hakkında</h1>
+                        <p class="text-xs text-gray-text truncate">Sıkça Sorulan Sorular</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-sgk-blue/30">
+                <h2 class="text-lg font-bold text-sgk-blue mb-4">Alo SGK (444 7 515)</h2>
+                <p class="text-sm text-gray-text mb-4">
+                    7 gün 24 saat hizmet veren çağrı merkezimizden prim sorgulama, 
+                    borç öğrenme, emeklilik yaşı hesaplama gibi işlemlerinizi yapabilirsiniz.
+                </p>
+                <button onclick="callNumber('4447515')" class="w-full bg-sgk-blue/20 hover:bg-sgk-blue/30 border border-sgk-blue/50 text-sgk-light py-4 rounded-xl text-lg font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    444 7 515'i Ara
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-sgk-light text-2xl mb-2">computer</span>
+                    <p class="text-lg font-bold text-sgk-light">e-Devlet</p>
+                    <p class="text-xs text-gray-text">7/24 Online İşlem</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-gold text-2xl mb-2">language</span>
+                    <p class="text-lg font-bold text-gold">sgk.gov.tr</p>
+                    <p class="text-xs text-gray-text">Resmi Web Sitesi</p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-xl p-4">
+                <h3 class="text-sm font-bold text-gold mb-3">Önemli Hatırlatmalar</h3>
+                <ul class="space-y-2 text-xs text-gray-text">
+                    <li class="flex items-start gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold mt-1.5 shrink-0"></span>
+                        <span>Emeklilik başvuruları için son 7 yılın çalışma kaydı önemlidir</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold mt-1.5 shrink-0"></span>
+                        <span>Prim borçlarınızı yapılandırmak için son tarihi kaçırmayın</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold mt-1.5 shrink-0"></span>
+                        <span>GSS (Genel Sağlık Sigortası) primleri her ay ödenmelidir</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gold mt-1.5 shrink-0"></span>
+                        <span>e-Devlet üzerinden hizmet dökümü alabilirsiniz</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // SGK Veritabanı
+        const sgkData = {
+            'bursail': {
+                name: 'SGK Bursa İl Müdürlüğü',
+                district: 'Osmangazi (Ana Bina)',
+                address: 'Demirtaşpaşa Mah. İnönü Cad. No:114, Osmangazi/Bursa',
+                phone: '0 224 600 10 00',
+                email: 'bursasgim@sgk.gov.tr',
+                transport: [
+                    { icon: 'tram', text: 'T1 Tramvay - SGK durağı (133m yürüme)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94, 1/A, 2/A, 3 hatları' },
+                    { icon: 'local_parking', text: 'İnönü Caddesi üzeri otopark (sınırlı)' },
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 800m' }
+                ],
+                mapQuery: 'SGK Bursa İl Müdürlüğü, İnönü Caddesi, Osmangazi, Bursa'
+            },
+            'ekbina': {
+                name: 'Ek Hizmet Binası (Nilüfer)',
+                district: 'Nilüfer',
+                address: 'Fethiye Mah. Peker Sok. No:4, Nilüfer/Bursa',
+                phone: '0 224 600 10 00',
+                email: 'bursasgim@sgk.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Fethiye bölgesi otoparkları' }
+                ],
+                mapQuery: 'SGK Bursa Ek Hizmet Binası, Fethiye, Nilüfer, Bursa'
+            },
+            'denetmen': {
+                name: 'Denetmenler Hizmet Binası',
+                district: 'Nilüfer',
+                address: 'Nilüfer bölgesi (Denetim birimleri)',
+                phone: '0 224 600 10 00',
+                email: 'bursasgim@sgk.gov.tr',
+                transport: [
+                    { icon: 'business', text: 'Sadece personel ve resmi ziyaretçi' },
+                    { icon: 'directions_car', text: 'Araçla ulaşım önerilir' }
+                ],
+                mapQuery: 'SGK Bursa Denetmenler Binası, Nilüfer, Bursa'
+            },
+            'osmangazi': {
+                name: 'Osmangazi Sosyal Güvenlik Merkezi (SGM)',
+                district: 'Osmangazi',
+                address: 'Demirtaşpaşa Mah. İnönü Cad. No:114, Osmangazi/Bursa',
+                phone: '0 224 600 10 00',
+                email: 'bursasgim@sgk.gov.tr',
+                transport: [
+                    { icon: 'tram', text: 'T1 Tramvay - SGK durağı (133m)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94, 1/A, 2/A hatları' },
+                    { icon: 'local_parking', text: 'Cadde üzeri park (sınırlı)' }
+                ],
+                mapQuery: 'SGK Osmangazi SGM, İnönü Caddesi, Osmangazi, Bursa'
+            },
+            'nilufersgm': {
+                name: 'Nilüfer Sosyal Güvenlik Merkezi',
+                district: 'Osmangazi (Sınır)',
+                address: 'Fevzi Çakmak Cad. No:61, Osmangazi/Bursa',
+                phone: '0 224 600 10 00',
+                email: 'bursasgim@sgk.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağı (metro)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Cadde üzeri park' }
+                ],
+                mapQuery: 'Nilüfer Sosyal Güvenlik Merkezi, Fevzi Çakmak Caddesi, Osmangazi, Bursa'
+            },
+            'nilufer': {
+                name: 'Nilüfer SGM (Ek Hizmet Binası)',
+                district: 'Nilüfer',
+                address: 'Fethiye Mah. Peker Sok. No:4, Nilüfer/Bursa',
+                phone: '0 224 600 10 00',
+                email: 'bursasgim@sgk.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Fethiye bölgesi otoparkları' }
+                ],
+                mapQuery: 'SGK Nilüfer SGM, Fethiye, Nilüfer, Bursa'
+            },
+            'yildirim': {
+                name: 'Yıldırım Sosyal Güvenlik Merkezi (SGM)',
+                district: 'Yıldırım',
+                address: 'Yıldırım ilçe merkezi, Bursa',
+                phone: '0 224 600 10 00',
+                email: 'bursasgim@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otoparkları' }
+                ],
+                mapQuery: 'SGK Yıldırım SGM, Yıldırım, Bursa'
+            },
+            'gursu': {
+                name: 'Gürsu Sosyal Güvenlik Merkezi',
+                district: 'Gürsu',
+                address: 'Zafer Mah. Atatürk Cad. No:12 Kat:1, Gürsu/Bursa',
+                phone: '0 224 376 14 32',
+                email: 'gursusgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Gürsu hatları' },
+                    { icon: 'local_parking', text: 'Atatürk Caddesi üzeri park' }
+                ],
+                mapQuery: 'SGK Gürsu SGM, Atatürk Caddesi, Gürsu, Bursa'
+            },
+            'kestel': {
+                name: 'Kestel Sosyal Güvenlik Merkezi',
+                district: 'Kestel',
+                address: 'Kestel ilçe merkezi, Bursa',
+                phone: '0 224 384 10 00',
+                email: 'kestelsgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Kestel hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Kestel SGM, Kestel, Bursa'
+            },
+            'inegol': {
+                name: 'İnegöl Sosyal Güvenlik Merkezi',
+                district: 'İnegöl',
+                address: 'İnegöl ilçe merkezi, Bursa',
+                phone: '0 224 718 10 00',
+                email: 'inegolsgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: İnegöl hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK İnegöl SGM, İnegöl, Bursa'
+            },
+            'mudanya': {
+                name: 'Mudanya Sosyal Güvenlik Merkezi',
+                district: 'Mudanya',
+                address: 'Mudanya ilçe merkezi, Bursa',
+                phone: '0 224 544 10 00',
+                email: 'mudanyasgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Mudanya hatları' },
+                    { icon: 'directions_boat', text: 'İDO Mudanya iskelesine yakın' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Mudanya SGM, Mudanya, Bursa'
+            },
+            'mustafa': {
+                name: 'Mustafakemalpaşa Sosyal Güvenlik Merkezi',
+                district: 'Mustafakemalpaşa',
+                address: 'Mustafakemalpaşa ilçe merkezi, Bursa',
+                phone: '0 224 613 10 00',
+                email: 'mustafasgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Mustafakemalpaşa hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Mustafakemalpaşa SGM, Mustafakemalpaşa, Bursa'
+            },
+            'yenisehir': {
+                name: 'Yenişehir Sosyal Güvenlik Merkezi',
+                district: 'Yenişehir',
+                address: 'Yenişehir ilçe merkezi, Bursa',
+                phone: '0 224 773 10 00',
+                email: 'yenisehirsgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Yenişehir hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Yenişehir SGM, Yenişehir, Bursa'
+            },
+            'iznik': {
+                name: 'İznik Sosyal Güvenlik Merkezi',
+                district: 'İznik',
+                address: 'İznik ilçe merkezi, Bursa',
+                phone: '0 224 757 10 00',
+                email: 'izniksgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: İznik hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK İznik SGM, İznik, Bursa'
+            },
+            'orhaneli': {
+                name: 'Orhaneli Sosyal Güvenlik Merkezi',
+                district: 'Orhaneli',
+                address: 'Orhaneli ilçe merkezi, Bursa',
+                phone: '0 224 635 10 00',
+                email: 'orhanelisgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Orhaneli hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Orhaneli SGM, Orhaneli, Bursa'
+            },
+            'orhangazi': {
+                name: 'Orhangazi Sosyal Güvenlik Merkezi',
+                district: 'Orhangazi',
+                address: 'Orhangazi ilçe merkezi, Bursa',
+                phone: '0 224 573 10 00',
+                email: 'orhangazisgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Orhangazi hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Orhangazi SGM, Orhangazi, Bursa'
+            },
+            'gemlik': {
+                name: 'Gemlik Sosyal Güvenlik Merkezi',
+                district: 'Gemlik',
+                address: 'Gemlik ilçe merkezi, Bursa',
+                phone: '0 224 524 10 00',
+                email: 'gemliksgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Gemlik hatları' },
+                    { icon: 'directions_boat', text: 'Gemlik Limanına yakın' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Gemlik SGM, Gemlik, Bursa'
+            },
+            'karacabey': {
+                name: 'Karacabey Sosyal Güvenlik Merkezi',
+                district: 'Karacabey',
+                address: 'Karacabey ilçe merkezi, Bursa',
+                phone: '0 224 675 10 00',
+                email: 'karacabeysgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Karacabey hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Karacabey SGM, Karacabey, Bursa'
+            },
+            'buyukorhan': {
+                name: 'Büyükorhan Sosyal Güvenlik Merkezi',
+                district: 'Büyükorhan',
+                address: 'Büyükorhan ilçe merkezi, Bursa',
+                phone: '0 224 651 10 00',
+                email: 'buyukorhansgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Büyükorhat hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Büyükorhan SGM, Büyükorhan, Bursa'
+            },
+            'harmancik': {
+                name: 'Harmancık Sosyal Güvenlik Merkezi',
+                district: 'Harmancık',
+                address: 'Harmancık ilçe merkezi, Bursa',
+                phone: '0 224 644 10 00',
+                email: 'harmanciksgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: Harmancık hatları' },
+                    { icon: 'local_parking', text: 'İlçe merkezi otopark' }
+                ],
+                mapQuery: 'SGK Harmancık SGM, Harmancık, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // District Filter
+        let currentDistrict = 'all';
+        function filterDistrict(district) {
+            currentDistrict = district;
+            
+            // Update buttons
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + district).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.district-section');
+            sections.forEach(section => {
+                if (district === 'all' || section.dataset.district === district) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search SGK
+        function searchSGK() {
+            const searchTerm = document.getElementById('sgkSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.sgk-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open SGK Detail Modal
+        function openSGKDetail(sgkId) {
+            const sgk = sgkData[sgkId];
+            if (!sgk) return;
+
+            document.getElementById('modalSGKName').textContent = sgk.name;
+            document.getElementById('modalDistrict').textContent = sgk.district;
+            document.getElementById('modalAddress').textContent = sgk.address;
+            document.getElementById('modalPhone').textContent = sgk.phone;
+            document.getElementById('modalEmail').textContent = sgk.email;
+            
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            sgk.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Harita butonunu güncelle
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${sgk.mapQuery}')`);
+
+            document.getElementById('sgkDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close SGK Detail Modal
+        function closeSGKDetail() {
+            document.getElementById('sgkDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Info Modal
+        function openInfoModal() {
+            document.getElementById('infoModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak FAQ açık
+            document.getElementById('faqSection').classList.add('open');
+            document.getElementById('faqIcon').classList.add('open');
+            
+            // İl Müdürlüğü açık
+            document.getElementById('ilSection').classList.add('open');
+            document.getElementById('ilIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Osmangazi Belediyesi — Admin Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*{font-family:'Plus Jakarta Sans',sans-serif;}
+body{background:#081F24;color:#f1f5f9;margin:0;}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20;}
+.sidebar{background:#0A2A2F;border-right:1px solid rgba(63,110,112,0.3);width:250px;min-height:100vh;position:fixed;top:0;left:0;z-index:40;transition:transform .3s;overflow-y:auto;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:10px;cursor:pointer;transition:all .2s;color:#9FB6B8;font-size:12px;margin:2px 8px;}
+.sidebar-item:hover{background:rgba(224,176,122,0.08);color:#C7D8DA;}
+.sidebar-item.active{background:rgba(224,176,122,0.12);color:#E0B07A;border:1px solid rgba(224,176,122,0.2);}
+.sidebar-item .material-symbols-outlined{font-size:18px;}
+.main-content{margin-left:250px;min-height:100vh;padding:28px;}
+.card{background:#0A2A2F;border:1px solid rgba(63,110,112,0.3);border-radius:16px;padding:20px;}
+.card-sm{background:#0D3238;border:1px solid rgba(63,110,112,0.2);border-radius:12px;padding:14px;}
+.stat-card{background:linear-gradient(135deg,#0A2A2F,#0D3238);border:1px solid rgba(63,110,112,0.3);border-radius:16px;padding:18px;position:relative;overflow:hidden;}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;}
+.badge-gold{background:rgba(224,176,122,0.2);color:#E0B07A;}
+.badge-green{background:rgba(34,197,94,0.15);color:#4ade80;}
+.badge-red{background:rgba(239,68,68,0.15);color:#f87171;}
+.badge-blue{background:rgba(59,130,246,0.15);color:#60a5fa;}
+.badge-orange{background:rgba(251,146,60,0.15);color:#fb923c;}
+.tab-btn{padding:7px 14px;border-radius:9px;font-size:12px;cursor:pointer;transition:all .2s;color:#6E8C8E;border:1px solid transparent;}
+.tab-btn.active{background:rgba(224,176,122,0.12);color:#E0B07A;border-color:rgba(224,176,122,0.2);}
+.form-input{background:#0D3238;border:1px solid rgba(63,110,112,0.3);border-radius:10px;padding:9px 13px;font-size:13px;color:#C7D8DA;width:100%;outline:none;transition:border .2s;box-sizing:border-box;}
+.form-input:focus{border-color:rgba(224,176,122,0.4);}
+.form-input::placeholder{color:#6E8C8E;}
+.form-select{background:#0D3238;border:1px solid rgba(63,110,112,0.3);border-radius:10px;padding:9px 13px;font-size:13px;color:#C7D8DA;width:100%;outline:none;cursor:pointer;}
+.form-label{font-size:11px;color:#9FB6B8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:block;}
+.form-textarea{background:#0D3238;border:1px solid rgba(63,110,112,0.3);border-radius:10px;padding:9px 13px;font-size:13px;color:#C7D8DA;width:100%;outline:none;resize:vertical;min-height:90px;box-sizing:border-box;}
+.btn-gold{background:#E0B07A;color:#081F24;font-weight:600;font-size:13px;padding:9px 18px;border-radius:10px;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-gold:hover{background:#d4a06e;}
+.btn-outline{border:1px solid rgba(63,110,112,0.4);color:#9FB6B8;font-size:12px;padding:7px 14px;border-radius:9px;cursor:pointer;transition:all .2s;background:transparent;}
+.btn-outline:hover{border-color:#E0B07A;color:#E0B07A;}
+.btn-red{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2);font-size:11px;padding:5px 10px;border-radius:7px;cursor:pointer;}
+.btn-green{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.2);font-size:11px;padding:5px 10px;border-radius:7px;cursor:pointer;}
+.btn-blue{background:rgba(59,130,246,0.12);color:#60a5fa;border:1px solid rgba(59,130,246,0.2);font-size:11px;padding:5px 10px;border-radius:7px;cursor:pointer;}
+.toggle{position:relative;width:40px;height:22px;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#17464B;border-radius:22px;transition:.3s;}
+.toggle-slider:before{position:absolute;content:'';height:16px;width:16px;left:3px;bottom:3px;background:#6E8C8E;border-radius:50%;transition:.3s;}
+input:checked+.toggle-slider{background:rgba(224,176,122,0.3);}
+input:checked+.toggle-slider:before{transform:translateX(18px);background:#E0B07A;}
+.perm-box{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:#0D3238;border-radius:10px;border:1px solid rgba(63,110,112,0.2);}
+.admin-table{width:100%;border-collapse:separate;border-spacing:0 3px;}
+.admin-table th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#6E8C8E;padding:7px 10px;text-align:left;}
+.admin-table td{padding:10px;background:#0D3238;font-size:12px;color:#C7D8DA;}
+.admin-table td:first-child{border-radius:9px 0 0 9px;}
+.admin-table td:last-child{border-radius:0 9px 9px 0;}
+.section{display:none;}
+.section.active{display:block;}
+.progress-bar{height:6px;background:rgba(63,110,112,0.2);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#E0B07A,#c49060);border-radius:3px;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:rgba(224,176,122,0.2);border-radius:2px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:39;}
+.overlay.active{display:block;}
+.toast{position:fixed;bottom:24px;right:24px;z-index:100;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-success{background:#0D3238;border:1px solid rgba(74,222,128,.3);color:#4ade80;}
+.toast-error{background:#0D3238;border:1px solid rgba(248,113,113,.3);color:#f87171;}
+.toast-info{background:#0D3238;border:1px solid rgba(224,176,122,.3);color:#E0B07A;}
+.activity-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(63,110,112,0.12);}
+.chart-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:4px;}
+.chart-bar-wrap{width:100%;background:rgba(63,110,112,0.15);border-radius:4px;position:relative;height:80px;}
+.chart-bar-inner{position:absolute;bottom:0;width:100%;background:linear-gradient(180deg,#E0B07A,#c49060);border-radius:4px;transition:height .8s ease;}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main-content{margin-left:0;padding:14px}}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div id="toast" class="toast"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="p-4 border-b border-[#3F6E70]/30">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-[#E0B07A]/10 border border-[#E0B07A]/30 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[#E0B07A] text-[20px]">account_balance</span>
+      </div>
+      <div>
+        <p class="text-[12px] font-semibold text-[#C7D8DA]">Osmangazi Belediyesi</p>
+        <p class="text-[10px] text-[#E0B07A]">🏛️ Belediye Admin</p>
+      </div>
+    </div>
+  </div>
+  <nav class="p-2">
+    <div class="sidebar-item active" onclick="goTo('dashboard')"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></div>
+
+    <div class="px-3 pt-3 pb-1"><p class="text-[9px] text-[#3F6E70] uppercase tracking-widest">İçerik</p></div>
+    <div class="sidebar-item" onclick="goTo('haber')"><span class="material-symbols-outlined">newspaper</span><span>Haberler</span></div>
+    <div class="sidebar-item" onclick="goTo('etkinlik')"><span class="material-symbols-outlined">event</span><span>Etkinlikler</span></div>
+    <div class="sidebar-item" onclick="goTo('duyuru')"><span class="material-symbols-outlined">campaign</span><span>Duyurular</span></div>
+
+    <div class="px-3 pt-3 pb-1"><p class="text-[9px] text-[#3F6E70] uppercase tracking-widest">Vatandaş</p></div>
+    <div class="sidebar-item" onclick="goTo('sikayet')"><span class="material-symbols-outlined" style="color:#fb923c">report_problem</span><span>Şikayetler</span><span id="sikayet-badge" class="ml-auto bg-[#fb923c] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">0</span></div>
+    <div class="sidebar-item" onclick="goTo('forum')"><span class="material-symbols-outlined">forum</span><span>Forum</span></div>
+    <div class="sidebar-item" onclick="goTo('anket')"><span class="material-symbols-outlined">poll</span><span>Anketler</span></div>
+
+    <div class="px-3 pt-3 pb-1"><p class="text-[9px] text-[#3F6E70] uppercase tracking-widest">Yönetim</p></div>
+    <div class="sidebar-item" onclick="goTo('mahalle')"><span class="material-symbols-outlined">location_city</span><span>Mahalleler</span></div>
+    <div class="sidebar-item" onclick="goTo('bildirim')"><span class="material-symbols-outlined">notifications</span><span>Bildirim Gönder</span></div>
+    <div class="sidebar-item" onclick="goTo('istatistik')"><span class="material-symbols-outlined">bar_chart</span><span>İstatistikler</span></div>
+
+    <div class="border-t border-[#3F6E70]/20 mt-3 pt-2 px-2">
+      <div class="sidebar-item" onclick="window.location='admin-panel.html'"><span class="material-symbols-outlined text-[#6E8C8E]">arrow_back</span><span class="text-[#6E8C8E]">Süper Admin</span></div>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main-content">
+  <!-- Topbar -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <button class="md:hidden p-2 bg-[#0A2A2F] rounded-lg border border-[#3F6E70]/30" onclick="openSidebar()">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <div>
+        <h1 id="page-title" class="text-[18px] font-semibold text-[#C7D8DA]">Dashboard</h1>
+        <p id="page-sub" class="text-[11px] text-[#6E8C8E]">Osmangazi Belediyesi Yönetim Paneli</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="badge badge-green">● Canlı</span>
+      <div class="w-9 h-9 rounded-full bg-[#17464B] border-2 border-[#E0B07A]/40 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[18px] text-[#E0B07A]">person</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ DASHBOARD ════════ -->
+  <div class="section active" id="s-dashboard">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div class="stat-card"><div class="flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-[#E0B07A] text-[16px]">newspaper</span><span class="text-[10px] text-[#9FB6B8]">Toplam Haber</span></div><p class="text-[26px] font-light text-[#C7D8DA]" id="d-haber">—</p><p class="text-[10px] text-[#4ade80] mt-1">↑ +3 bu hafta</p></div>
+      <div class="stat-card"><div class="flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-[#E0B07A] text-[16px]">event</span><span class="text-[10px] text-[#9FB6B8]">Aktif Etkinlik</span></div><p class="text-[26px] font-light text-[#C7D8DA]" id="d-etkinlik">—</p><p class="text-[10px] text-[#9FB6B8] mt-1">Bu ay</p></div>
+      <div class="stat-card"><div class="flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-[#fb923c] text-[16px]">report_problem</span><span class="text-[10px] text-[#9FB6B8]">Bekleyen Şikayet</span></div><p class="text-[26px] font-light text-[#fb923c]" id="d-sikayet">—</p><p class="text-[10px] text-[#fb923c] mt-1">Yanıt bekliyor</p></div>
+      <div class="stat-card"><div class="flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-[#60a5fa] text-[16px]">forum</span><span class="text-[10px] text-[#9FB6B8]">Forum Gönderisi</span></div><p class="text-[26px] font-light text-[#C7D8DA]" id="d-forum">—</p><p class="text-[10px] text-[#9FB6B8] mt-1">Toplam</p></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-3">Son Aktiviteler</h3>
+        <div id="d-aktivite">
+          <div class="activity-item"><div class="w-2 h-2 rounded-full bg-[#4ade80]"></div><div class="flex-1"><p class="text-[12px] text-[#C7D8DA]">Yeni haber yayınlandı</p><p class="text-[10px] text-[#6E8C8E]">5 dk önce</p></div><span class="badge badge-green">Haber</span></div>
+          <div class="activity-item"><div class="w-2 h-2 rounded-full bg-[#fb923c]"></div><div class="flex-1"><p class="text-[12px] text-[#C7D8DA]">Yeni şikayet alındı</p><p class="text-[10px] text-[#6E8C8E]">18 dk önce</p></div><span class="badge badge-orange">Şikayet</span></div>
+          <div class="activity-item"><div class="w-2 h-2 rounded-full bg-[#60a5fa]"></div><div class="flex-1"><p class="text-[12px] text-[#C7D8DA]">Etkinliğe 12 katılım</p><p class="text-[10px] text-[#6E8C8E]">1 saat önce</p></div><span class="badge badge-blue">Etkinlik</span></div>
+          <div class="activity-item" style="border:none"><div class="w-2 h-2 rounded-full bg-[#E0B07A]"></div><div class="flex-1"><p class="text-[12px] text-[#C7D8DA]">Duyuru yayınlandı</p><p class="text-[10px] text-[#6E8C8E]">3 saat önce</p></div><span class="badge badge-gold">Duyuru</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-3">Hızlı İşlemler</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="goTo('haber');setTimeout(()=>haberFormAc(),300)" class="card-sm flex flex-col items-center gap-2 hover:border-[#E0B07A]/30 transition-colors cursor-pointer text-center"><span class="material-symbols-outlined text-[#E0B07A] text-[22px]">add_circle</span><span class="text-[11px] text-[#9FB6B8]">Haber Ekle</span></button>
+          <button onclick="goTo('etkinlik');setTimeout(()=>etkinlikFormAc(),300)" class="card-sm flex flex-col items-center gap-2 hover:border-[#E0B07A]/30 transition-colors cursor-pointer text-center"><span class="material-symbols-outlined text-[#E0B07A] text-[22px]">event_available</span><span class="text-[11px] text-[#9FB6B8]">Etkinlik Ekle</span></button>
+          <button onclick="goTo('sikayet')" class="card-sm flex flex-col items-center gap-2 hover:border-[#fb923c]/30 transition-colors cursor-pointer text-center"><span class="material-symbols-outlined text-[#fb923c] text-[22px]">report</span><span class="text-[11px] text-[#9FB6B8]">Şikayetler</span></button>
+          <button onclick="goTo('bildirim')" class="card-sm flex flex-col items-center gap-2 hover:border-[#60a5fa]/30 transition-colors cursor-pointer text-center"><span class="material-symbols-outlined text-[#60a5fa] text-[22px]">send</span><span class="text-[11px] text-[#9FB6B8]">Bildirim Gönder</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ HABERLER ════════ -->
+  <div class="section" id="s-haber">
+    <div id="haber-liste-view">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex gap-2">
+          <input type="text" class="form-input" style="max-width:220px" placeholder="Haber ara..."/>
+          <select class="form-select" style="max-width:150px">
+            <option>Tüm Kategoriler</option>
+            <option>Genel</option><option>Spor</option><option>Kültür</option>
+            <option>Ekonomi</option><option>Ulaşım</option><option>Sağlık</option>
+          </select>
+        </div>
+        <button class="btn-gold" onclick="haberFormAc()"><span class="material-symbols-outlined text-[16px]">add</span>Yeni Haber</button>
+      </div>
+      <div class="card overflow-x-auto">
+        <table class="admin-table">
+          <thead><tr><th>Başlık</th><th>Kategori</th><th>Tarih</th><th>Görüntülenme</th><th>Durum</th><th>İşlem</th></tr></thead>
+          <tbody id="haber-tbody"><tr><td colspan="6" class="text-center text-[#6E8C8E] py-6">Yükleniyor...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="haber-form-view" class="hidden">
+      <div class="flex items-center gap-3 mb-4">
+        <button onclick="haberFormKapat()" class="btn-outline"><span class="material-symbols-outlined text-[16px]">arrow_back</span>Geri</button>
+        <h3 class="text-[14px] font-semibold text-[#C7D8DA]" id="haber-form-baslik">Yeni Haber Ekle</h3>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 space-y-4">
+          <div class="card space-y-3">
+            <div><label class="form-label">Başlık *</label><input type="text" id="h-baslik" class="form-input" placeholder="Haber başlığı..."/></div>
+            <div><label class="form-label">Özet</label><input type="text" id="h-ozet" class="form-input" placeholder="Kısa özet (liste görünümü için)..."/></div>
+            <div><label class="form-label">İçerik *</label><textarea id="h-icerik" class="form-textarea" style="min-height:180px" placeholder="Haber içeriği..."></textarea></div>
+          </div>
+          <div class="card">
+            <label class="form-label">Kapak Resmi</label>
+            <div class="border-2 border-dashed border-[#3F6E70]/30 rounded-xl p-8 text-center cursor-pointer hover:border-[#E0B07A]/30 transition-colors" onclick="document.getElementById('h-resim').click()">
+              <span class="material-symbols-outlined text-[#6E8C8E] text-[36px]">add_photo_alternate</span>
+              <p class="text-[12px] text-[#6E8C8E] mt-2">Resim seç veya sürükle</p>
+              <input type="file" id="h-resim" class="hidden" accept="image/*"/>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="card space-y-3">
+            <div><label class="form-label">Kategori</label>
+              <select id="h-kategori" class="form-select">
+                <option value="genel">Genel</option><option value="spor">Spor</option>
+                <option value="kultur">Kültür</option><option value="ekonomi">Ekonomi</option>
+                <option value="ulasim">Ulaşım</option><option value="saglik">Sağlık</option>
+              </select>
+            </div>
+            <div><label class="form-label">Durum</label>
+              <select id="h-durum" class="form-select">
+                <option value="yayinda">Yayında</option>
+                <option value="taslak">Taslak</option>
+              </select>
+            </div>
+            <div><label class="form-label">Etiketler</label><input type="text" id="h-etiket" class="form-input" placeholder="osmangazi, ulaşım, ..."/></div>
+          </div>
+          <div class="card space-y-2">
+            <button class="btn-gold w-full" onclick="haberKaydet('yayinda')"><span class="material-symbols-outlined text-[16px]">publish</span>Yayınla</button>
+            <button class="btn-outline w-full" onclick="haberKaydet('taslak')">Taslak Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ ETKİNLİKLER ════════ -->
+  <div class="section" id="s-etkinlik">
+    <div id="etkinlik-liste-view">
+      <div class="flex items-center justify-between mb-4">
+        <select class="form-select" style="max-width:160px"><option>Tüm Etkinlikler</option><option>Aktif</option><option>Geçmiş</option><option>Taslak</option></select>
+        <button class="btn-gold" onclick="etkinlikFormAc()"><span class="material-symbols-outlined text-[16px]">add</span>Yeni Etkinlik</button>
+      </div>
+      <div class="card overflow-x-auto">
+        <table class="admin-table">
+          <thead><tr><th>Etkinlik</th><th>Yer</th><th>Tarih</th><th>Katılımcı</th><th>Kategori</th><th>Durum</th><th>İşlem</th></tr></thead>
+          <tbody id="etkinlik-tbody"><tr><td colspan="7" class="text-center text-[#6E8C8E] py-6">Yükleniyor...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="etkinlik-form-view" class="hidden">
+      <div class="flex items-center gap-3 mb-4">
+        <button onclick="etkinlikFormKapat()" class="btn-outline"><span class="material-symbols-outlined text-[16px]">arrow_back</span>Geri</button>
+        <h3 class="text-[14px] font-semibold text-[#C7D8DA]">Yeni Etkinlik</h3>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 space-y-4">
+          <div class="card space-y-3">
+            <div><label class="form-label">Etkinlik Adı *</label><input type="text" id="e-baslik" class="form-input" placeholder="Etkinlik adı..."/></div>
+            <div><label class="form-label">Açıklama</label><textarea id="e-aciklama" class="form-textarea" placeholder="Etkinlik detayları..."></textarea></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="form-label">Başlangıç</label><input type="datetime-local" id="e-baslangic" class="form-input"/></div>
+              <div><label class="form-label">Bitiş</label><input type="datetime-local" id="e-bitis" class="form-input"/></div>
+            </div>
+          </div>
+          <div class="card">
+            <label class="form-label mb-3 block">Konum Seç (Haritaya tıkla)</label>
+            <div id="etkinlik-map" style="height:280px;border-radius:12px;overflow:hidden;background:#0D3238;border:1px solid rgba(63,110,112,0.2)"></div>
+            <p class="text-[11px] text-[#6E8C8E] mt-2" id="e-konum-txt">Konum seçilmedi</p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="card space-y-3">
+            <div><label class="form-label">Yer Adı</label><input type="text" id="e-yer" class="form-input" placeholder="Merinos Park, Kültür Merkezi..."/></div>
+            <div><label class="form-label">Kategori</label>
+              <select id="e-kategori" class="form-select">
+                <option value="konser">Konser</option><option value="festival">Festival</option>
+                <option value="spor">Spor</option><option value="sergi">Sergi</option>
+                <option value="seminer">Seminer</option><option value="diger">Diğer</option>
+              </select>
+            </div>
+            <div class="perm-box"><span class="text-[12px] text-[#C7D8DA]">Ücretli mi?</span><label class="toggle"><input type="checkbox" id="e-ucretli"/><span class="toggle-slider"></span></label></div>
+            <div><label class="form-label">Kontenjan</label><input type="number" id="e-kontenjan" class="form-input" placeholder="500"/></div>
+          </div>
+          <div class="card space-y-2">
+            <button class="btn-gold w-full" onclick="etkinlikKaydet()"><span class="material-symbols-outlined text-[16px]">publish</span>Yayınla</button>
+            <button class="btn-outline w-full">Taslak</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ DUYURULAR ════════ -->
+  <div class="section" id="s-duyuru">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">Yeni Duyuru</h3>
+        <div class="space-y-3">
+          <div><label class="form-label">Başlık *</label><input type="text" id="du-baslik" class="form-input" placeholder="Duyuru başlığı..."/></div>
+          <div><label class="form-label">İçerik *</label><textarea id="du-icerik" class="form-textarea" placeholder="Duyuru metni..."></textarea></div>
+          <div><label class="form-label">Hedef Kitle</label>
+            <select id="du-hedef" class="form-select">
+              <option value="hepsi">Tüm Osmangazi</option>
+              <option value="mahalle">Belirli Mahalle</option>
+            </select>
+          </div>
+          <div id="du-mahalle-sec" class="hidden">
+            <label class="form-label">Mahalle Seç</label>
+            <select id="du-mahalle" class="form-select"></select>
+          </div>
+          <div><label class="form-label">Tür</label>
+            <select id="du-tur" class="form-select">
+              <option value="genel">Genel</option>
+              <option value="acil">🚨 Acil</option>
+              <option value="bilgilendirme">Bilgilendirme</option>
+            </select>
+          </div>
+          <div class="flex gap-3">
+            <button class="btn-gold flex-1" onclick="duyuruKaydet()">Yayınla</button>
+            <button class="btn-outline flex-1">Taslak</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">Son Duyurular</h3>
+        <div id="duyuru-liste" class="space-y-3">
+          <div class="card-sm"><div class="flex justify-between items-start mb-1"><span class="text-[12px] font-semibold text-[#C7D8DA]">Su Kesintisi Duyurusu</span><span class="badge badge-red">Acil</span></div><p class="text-[11px] text-[#6E8C8E]">Bağlarbaşı Mahallesi — 2 saat önce</p><div class="flex gap-2 mt-2"><button class="btn-outline text-[10px] px-2 py-1">Düzenle</button><button class="btn-red text-[10px] px-2 py-1">Sil</button></div></div>
+          <div class="card-sm"><div class="flex justify-between items-start mb-1"><span class="text-[12px] font-semibold text-[#C7D8DA]">Park Çalışmaları</span><span class="badge badge-blue">Bilgi</span></div><p class="text-[11px] text-[#6E8C8E]">Tüm Osmangazi — dün</p><div class="flex gap-2 mt-2"><button class="btn-outline text-[10px] px-2 py-1">Düzenle</button><button class="btn-red text-[10px] px-2 py-1">Sil</button></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ ŞİKAYETLER ════════ -->
+  <div class="section" id="s-sikayet">
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="stat-card"><p class="text-[10px] text-[#9FB6B8] mb-1">Bekleyen</p><p class="text-[22px] font-light text-[#fb923c]" id="sik-bekleyen">—</p></div>
+      <div class="stat-card"><p class="text-[10px] text-[#9FB6B8] mb-1">İnceleniyor</p><p class="text-[22px] font-light text-[#E0B07A]" id="sik-inceleniyor">—</p></div>
+      <div class="stat-card"><p class="text-[10px] text-[#9FB6B8] mb-1">Çözüldü</p><p class="text-[22px] font-light text-[#4ade80]" id="sik-cozuldu">—</p></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+      <div class="card">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-[13px] font-semibold text-[#C7D8DA]">Şikayet Haritası</h3>
+          <select class="form-select text-[11px]" style="max-width:130px" onchange="sikayetHaritaFiltre(this.value)">
+            <option value="">Tümü</option><option value="altyapi">Altyapı</option>
+            <option value="cevre">Çevre</option><option value="trafik">Trafik</option>
+            <option value="park">Park</option>
+          </select>
+        </div>
+        <div id="sikayet-map" style="height:280px;border-radius:12px;overflow:hidden;background:#0D3238;border:1px solid rgba(63,110,112,0.2)"></div>
+      </div>
+      <div class="card overflow-y-auto" style="max-height:340px">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-3">Bekleyen Şikayetler</h3>
+        <div id="sikayet-liste" class="space-y-2"></div>
+      </div>
+    </div>
+    <div class="card overflow-x-auto">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA]">Tüm Şikayetler</h3>
+        <select class="form-select text-[11px]" style="max-width:140px">
+          <option>Tüm Durumlar</option><option>Bekliyor</option><option>İnceleniyor</option><option>Çözüldü</option>
+        </select>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>Konu</th><th>Kategori</th><th>Mahalle</th><th>Tarih</th><th>Durum</th><th>İşlem</th></tr></thead>
+        <tbody id="sikayet-tablo"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════════ FORUM ════════ -->
+  <div class="section" id="s-forum">
+    <div class="flex gap-2 mb-4">
+      <button class="tab-btn active" onclick="forumTab(this,'tum')">Tüm Gönderiler</button>
+      <button class="tab-btn" onclick="forumTab(this,'sikayet')">Şikayet Edilenler</button>
+      <button class="tab-btn" onclick="forumTab(this,'sabit')">Sabitlenmiş</button>
+    </div>
+    <div class="card overflow-x-auto">
+      <table class="admin-table">
+        <thead><tr><th>Gönderi</th><th>Yazar</th><th>Beğeni</th><th>Yorum</th><th>Tarih</th><th>İşlem</th></tr></thead>
+        <tbody id="forum-tbody">
+          <tr><td colspan="6" class="text-center py-6 text-[#6E8C8E]">Yükleniyor...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ════════ ANKETLER ════════ -->
+  <div class="section" id="s-anket">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">Yeni Anket Oluştur</h3>
+        <div class="space-y-3">
+          <div><label class="form-label">Anket Sorusu</label><input type="text" id="anket-soru" class="form-input" placeholder="Yeni park nereye yapılsın?"/></div>
+          <div id="anket-secenekler" class="space-y-2">
+            <div class="flex gap-2"><input type="text" class="form-input" placeholder="Seçenek 1"/><button class="btn-red px-2" onclick="this.parentElement.remove()">✕</button></div>
+            <div class="flex gap-2"><input type="text" class="form-input" placeholder="Seçenek 2"/><button class="btn-red px-2" onclick="this.parentElement.remove()">✕</button></div>
+          </div>
+          <button class="btn-outline w-full text-[12px]" onclick="secenekEkle()">+ Seçenek Ekle</button>
+          <div><label class="form-label">Bitiş Tarihi</label><input type="date" id="anket-bitis" class="form-input"/></div>
+          <div><label class="form-label">Hedef</label>
+            <select class="form-select">
+              <option>Tüm Osmangazi</option>
+              <option>Belirli Mahalle</option>
+            </select>
+          </div>
+          <button class="btn-gold w-full" onclick="anketKaydet()">Anketi Yayınla</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">Aktif Anketler & Sonuçlar</h3>
+        <div class="space-y-4" id="anket-listesi">
+          <div class="card-sm">
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-[12px] font-semibold text-[#C7D8DA]">En iyi park yeri hangisi?</span>
+              <span class="badge badge-green">Aktif</span>
+            </div>
+            <div class="space-y-2">
+              <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#9FB6B8]">Bağlarbaşı</span><span class="text-[#E0B07A]">42%</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%"></div></div></div>
+              <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#9FB6B8]">Cumhuriyet</span><span class="text-[#E0B07A]">35%</span></div><div class="progress-bar"><div class="progress-fill" style="width:35%"></div></div></div>
+              <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#9FB6B8]">Heykel</span><span class="text-[#E0B07A]">23%</span></div><div class="progress-bar"><div class="progress-fill" style="width:23%"></div></div></div>
+            </div>
+            <p class="text-[10px] text-[#6E8C8E] mt-2">247 oy · 3 gün kaldı</p>
+            <button class="btn-red mt-2 text-[10px] px-2 py-1">Anketi Kapat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ MAHALLELER ════════ -->
+  <div class="section" id="s-mahalle">
+    <div class="card mb-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-[13px] font-semibold text-[#C7D8DA]">Osmangazi Mahalleleri</h3>
+          <p class="text-[11px] text-[#6E8C8E] mt-1">Toplam 42 mahalle</p>
+        </div>
+        <input type="text" class="form-input" style="max-width:200px" placeholder="Mahalle ara..." onkeyup="mahalleAra(this.value)"/>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3" id="mahalle-grid"></div>
+  </div>
+
+  <!-- ════════ BİLDİRİM GÖNDER ════════ -->
+  <div class="section" id="s-bildirim">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card space-y-3">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-2">Osmangazi Bildirimi</h3>
+        <div><label class="form-label">Başlık</label><input type="text" id="bil-baslik" class="form-input" placeholder="Bildirim başlığı..."/></div>
+        <div><label class="form-label">İçerik</label><textarea id="bil-icerik" class="form-textarea" placeholder="Bildirim metni..."></textarea></div>
+        <div><label class="form-label">Hedef Mahalle</label>
+          <select id="bil-mahalle" class="form-select">
+            <option value="hepsi">Tüm Osmangazi</option>
+          </select>
+        </div>
+        <div><label class="form-label">Tür</label>
+          <select id="bil-tur" class="form-select">
+            <option>Genel Duyuru</option><option>Acil</option><option>Etkinlik</option><option>Hizmet</option>
+          </select>
+        </div>
+        <div class="card-sm flex items-center justify-between">
+          <span class="text-[12px] text-[#9FB6B8]">Tahmini Alıcı</span>
+          <span class="text-[16px] font-semibold text-[#E0B07A]">~12.400</span>
+        </div>
+        <div class="flex gap-3">
+          <button class="btn-gold flex-1" onclick="bildirimGonder()">Şimdi Gönder</button>
+          <button class="btn-outline flex-1">⏰ Zamanla</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">Gönderim Geçmişi</h3>
+        <div class="space-y-3">
+          <div class="card-sm"><div class="flex justify-between mb-1"><span class="text-[12px] text-[#C7D8DA]">Su Kesintisi Uyarısı</span><span class="badge badge-red">Acil</span></div><div class="flex justify-between text-[10px] text-[#6E8C8E]"><span>Bağlarbaşı • 1.240 kişi</span><span>%67 açıldı</span></div></div>
+          <div class="card-sm"><div class="flex justify-between mb-1"><span class="text-[12px] text-[#C7D8DA]">Kültür Merkezi Etkinliği</span><span class="badge badge-blue">Etkinlik</span></div><div class="flex justify-between text-[10px] text-[#6E8C8E]"><span>Tüm Osmangazi • 12.400 kişi</span><span>%42 açıldı</span></div></div>
+          <div class="card-sm"><div class="flex justify-between mb-1"><span class="text-[12px] text-[#C7D8DA]">Park Tadilat Duyurusu</span><span class="badge badge-gold">Genel</span></div><div class="flex justify-between text-[10px] text-[#6E8C8E]"><span>Tüm Osmangazi • 12.400 kişi</span><span>%38 açıldı</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ İSTATİSTİKLER ════════ -->
+  <div class="section" id="s-istatistik">
+    <div class="flex gap-2 mb-4">
+      <button class="tab-btn active">Haftalık</button>
+      <button class="tab-btn">Aylık</button>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">Haftalık Kullanıcı Aktivitesi</h3>
+        <div class="flex items-end gap-2 h-28" id="stat-chart"></div>
+        <div class="flex justify-between mt-2 text-[9px] text-[#6E8C8E]" id="stat-labels"></div>
+      </div>
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">En Aktif Mahalleler</h3>
+        <div class="space-y-3">
+          <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#C7D8DA]">Bağlarbaşı</span><span class="text-[#E0B07A]">34%</span></div><div class="progress-bar"><div class="progress-fill" style="width:34%"></div></div></div>
+          <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#C7D8DA]">Cumhuriyet</span><span class="text-[#E0B07A]">28%</span></div><div class="progress-bar"><div class="progress-fill" style="width:28%"></div></div></div>
+          <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#C7D8DA]">Heykel</span><span class="text-[#E0B07A]">19%</span></div><div class="progress-bar"><div class="progress-fill" style="width:19%"></div></div></div>
+          <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#C7D8DA]">Çekirge</span><span class="text-[#E0B07A]">12%</span></div><div class="progress-bar"><div class="progress-fill" style="width:12%"></div></div></div>
+          <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#C7D8DA]">Muradiye</span><span class="text-[#E0B07A]">7%</span></div><div class="progress-bar"><div class="progress-fill" style="width:7%"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">Şikayet Çözüm Oranı</h3>
+        <div class="flex items-center justify-center gap-8">
+          <div class="text-center"><p class="text-[36px] font-light text-[#4ade80]">78%</p><p class="text-[11px] text-[#6E8C8E]">Çözüm Oranı</p></div>
+          <div class="space-y-2 flex-1">
+            <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#4ade80]">Çözüldü</span><span>78%</span></div><div class="progress-bar"><div class="progress-fill" style="width:78%;background:linear-gradient(90deg,#4ade80,#22c55e)"></div></div></div>
+            <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#E0B07A]">İnceleniyor</span><span>14%</span></div><div class="progress-bar"><div class="progress-fill" style="width:14%"></div></div></div>
+            <div><div class="flex justify-between text-[11px] mb-1"><span class="text-[#fb923c]">Bekliyor</span><span>8%</span></div><div class="progress-bar"><div class="progress-fill" style="width:8%;background:linear-gradient(90deg,#fb923c,#f97316)"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="text-[13px] font-semibold text-[#C7D8DA] mb-4">En Çok Okunan Haberler</h3>
+        <div class="space-y-2" id="en-cok-okunan">
+          <div class="card-sm flex items-center justify-between"><span class="text-[12px] text-[#C7D8DA] flex-1 mr-2">Osmangazi'de Yeni Metro Güzergahı</span><span class="badge badge-gold">4.2K</span></div>
+          <div class="card-sm flex items-center justify-between"><span class="text-[12px] text-[#C7D8DA] flex-1 mr-2">Kültür Merkezi Yenilenme Projesi</span><span class="badge badge-blue">2.8K</span></div>
+          <div class="card-sm flex items-center justify-between"><span class="text-[12px] text-[#C7D8DA] flex-1 mr-2">Yeni Park Yapım Çalışmaları</span><span class="badge badge-green">1.9K</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyAZy4hvU2plhOSZjT21sDWQwyRSB0-SORE",
+  authDomain:"cityjoy-d5d29.firebaseapp.com",
+  projectId:"cityjoy-d5d29",
+  storageBucket:"cityjoy-d5d29.firebasestorage.app",
+  messagingSenderId:"1042083508506",
+  appId:"1:1042083508506:web:2c246269fcca10683b3ca3"
+});
+const db = getFirestore(app);
+window._db = db;
+window._fs = { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, serverTimestamp };
+
+// Dashboard yükle
+async function dashboardYukle() {
+  try {
+    const haberSnap = await getDocs(query(collection(db,'news'), where('sehirId','==','osmangazi')));
+    document.getElementById('d-haber').textContent = haberSnap.size;
+
+    const etkinlikSnap = await getDocs(query(collection(db,'events'), where('sehirId','==','osmangazi')));
+    document.getElementById('d-etkinlik').textContent = etkinlikSnap.size;
+
+    const sikayetSnap = await getDocs(query(collection(db,'reports'), where('sehirId','==','osmangazi'), where('durum','==','bekliyor')));
+    document.getElementById('d-sikayet').textContent = sikayetSnap.size;
+    document.getElementById('sikayet-badge').textContent = sikayetSnap.size;
+
+    const forumSnap = await getDocs(query(collection(db,'forum'), where('sehirId','==','osmangazi')));
+    document.getElementById('d-forum').textContent = forumSnap.size;
+  } catch(e) {
+    document.getElementById('d-haber').textContent = '23';
+    document.getElementById('d-etkinlik').textContent = '5';
+    document.getElementById('d-sikayet').textContent = '8';
+    document.getElementById('d-forum').textContent = '142';
+    document.getElementById('sikayet-badge').textContent = '8';
+  }
+}
+
+// Haberleri yükle
+window.haberleriYukle = async function() {
+  const tbody = document.getElementById('haber-tbody');
+  try {
+    const snap = await getDocs(query(collection(db,'news'), where('sehirId','==','osmangazi'), orderBy('tarih','desc')));
+    if (snap.empty) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-[#6E8C8E] py-6">Henüz haber yok. İlk haberi ekleyin!</td></tr>'; return; }
+    tbody.innerHTML = '';
+    snap.forEach(d => {
+      const h = d.data();
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="max-w-[200px]"><p class="truncate font-medium">${h.baslik||'—'}</p></td>
+        <td><span class="badge badge-blue">${h.kategori||'genel'}</span></td>
+        <td class="text-[#6E8C8E]">${h.tarih?.toDate ? h.tarih.toDate().toLocaleDateString('tr-TR') : '—'}</td>
+        <td>${h.goruntulenme||0}</td>
+        <td><span class="badge ${h.durum==='yayinda'?'badge-green':'badge-gold'}">${h.durum||'taslak'}</span></td>
+        <td><div class="flex gap-1">
+          <button class="btn-blue text-[10px] px-2 py-1">Düzenle</button>
+          <button onclick="haberSil('${d.id}')" class="btn-red text-[10px] px-2 py-1">Sil</button>
+        </div></td>`;
+      tbody.appendChild(tr);
+    });
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6">
+      <p class="text-[#6E8C8E] text-[12px]">Demo veriler gösteriliyor</p>
+      <div class="mt-3 space-y-1">
+        ${['Osmangazi\'de Yeni Metro Hattı','Kültür Merkezi Açılıyor','Park Düzenlemesi Tamamlandı'].map(b=>`
+        <div class="flex gap-2 items-center justify-center text-[11px]">
+          <span class="text-[#C7D8DA]">${b}</span>
+          <span class="badge badge-green">Yayında</span>
+        </div>`).join('')}
+      </div>
+    </td></tr>`;
+  }
+};
+
+// Haber kaydet
+window.haberKaydet = async function(durum) {
+  const baslik = document.getElementById('h-baslik').value.trim();
+  const icerik = document.getElementById('h-icerik').value.trim();
+  if (!baslik || !icerik) { showToast('Başlık ve içerik zorunlu!','error'); return; }
+  try {
+    await addDoc(collection(db,'news'), {
+      baslik, icerik,
+      ozet: document.getElementById('h-ozet').value,
+      kategori: document.getElementById('h-kategori').value,
+      durum,
+      sehirId: 'osmangazi',
+      goruntulenme: 0,
+      tarih: serverTimestamp()
+    });
+    showToast('✅ Haber başarıyla kaydedildi!','success');
+    haberFormKapat();
+    window.haberleriYukle();
+  } catch(e) { showToast('Hata: '+e.message,'error'); }
+};
+
+window.haberSil = async function(id) {
+  if (!confirm('Bu haberi silmek istediğinizden emin misiniz?')) return;
+  try { await deleteDoc(doc(db,'news',id)); showToast('Haber silindi','success'); window.haberleriYukle(); }
+  catch(e) { showToast('Hata: '+e.message,'error'); }
+};
+
+// Etkinlik kaydet
+window.etkinlikKaydet = async function() {
+  const baslik = document.getElementById('e-baslik').value.trim();
+  if (!baslik) { showToast('Etkinlik adı zorunlu!','error'); return; }
+  try {
+    await addDoc(collection(db,'events'), {
+      baslik,
+      aciklama: document.getElementById('e-aciklama').value,
+      yer: document.getElementById('e-yer').value,
+      kategori: document.getElementById('e-kategori').value,
+      ucretli: document.getElementById('e-ucretli').checked,
+      kontenjan: parseInt(document.getElementById('e-kontenjan').value)||0,
+      sehirId: 'osmangazi',
+      aktif: true,
+      katilimcilar: [],
+      tarih: serverTimestamp()
+    });
+    showToast('✅ Etkinlik yayınlandı!','success');
+    etkinlikFormKapat();
+  } catch(e) { showToast('Hata: '+e.message,'error'); }
+};
+
+// Duyuru kaydet
+window.duyuruKaydet = async function() {
+  const baslik = document.getElementById('du-baslik').value.trim();
+  const icerik = document.getElementById('du-icerik').value.trim();
+  if (!baslik||!icerik) { showToast('Başlık ve içerik zorunlu!','error'); return; }
+  try {
+    await addDoc(collection(db,'announcements'), {
+      baslik, icerik,
+      hedef: document.getElementById('du-hedef').value,
+      tur: document.getElementById('du-tur').value,
+      sehirId: 'osmangazi',
+      tarih: serverTimestamp()
+    });
+    showToast('✅ Duyuru yayınlandı!','success');
+    document.getElementById('du-baslik').value='';
+    document.getElementById('du-icerik').value='';
+  } catch(e) { showToast('Hata: '+e.message,'error'); }
+};
+
+// Şikayetleri yükle
+window.sikayetleriYukle = async function() {
+  const liste = document.getElementById('sikayet-liste');
+  const tablo = document.getElementById('sikayet-tablo');
+  const demoSikayetler = [
+    {id:'1', konu:'Sokak lambası arızası', kategori:'altyapi', mahalle:'Bağlarbaşı', tarih:'2 saat önce', durum:'bekliyor', lat:40.185, lng:29.062},
+    {id:'2', konu:'Yol çukuru', kategori:'altyapi', mahalle:'Cumhuriyet', tarih:'5 saat önce', durum:'inceleniyor', lat:40.192, lng:29.055},
+    {id:'3', konu:'Çöp konteyneri dolu', kategori:'cevre', mahalle:'Heykel', tarih:'1 gün önce', durum:'cozuldu', lat:40.198, lng:29.061},
+  ];
+  try {
+    const snap = await getDocs(query(collection(db,'reports'), where('sehirId','==','osmangazi'), orderBy('tarih','desc')));
+    let bekleyen=0, inceleniyor=0, cozuldu=0;
+    const sikayetler = [];
+    snap.forEach(d => { const s={id:d.id,...d.data()}; sikayetler.push(s); if(s.durum==='bekliyor')bekleyen++; else if(s.durum==='inceleniyor')inceleniyor++; else if(s.durum==='cozuldu')cozuldu++; });
+    renderSikayetler(sikayetler.length ? sikayetler : demoSikayetler, liste, tablo);
+    document.getElementById('sik-bekleyen').textContent=bekleyen||demoSikayetler.filter(s=>s.durum==='bekliyor').length;
+    document.getElementById('sik-inceleniyor').textContent=inceleniyor||demoSikayetler.filter(s=>s.durum==='inceleniyor').length;
+    document.getElementById('sik-cozuldu').textContent=cozuldu||demoSikayetler.filter(s=>s.durum==='cozuldu').length;
+  } catch(e) {
+    renderSikayetler(demoSikayetler, liste, tablo);
+    document.getElementById('sik-bekleyen').textContent='1';
+    document.getElementById('sik-inceleniyor').textContent='1';
+    document.getElementById('sik-cozuldu').textContent='1';
+  }
+};
+
+function renderSikayetler(list, liste, tablo) {
+  liste.innerHTML=''; tablo.innerHTML='';
+  list.forEach(s => {
+    const renkMap={bekliyor:'badge-orange',inceleniyor:'badge-blue',cozuldu:'badge-green'};
+    const card = document.createElement('div');
+    card.className='card-sm border-l-2 cursor-pointer';
+    card.style.borderLeftColor = s.durum==='bekliyor'?'#fb923c':s.durum==='cozuldu'?'#4ade80':'#60a5fa';
+    card.innerHTML=`<div class="flex justify-between items-center mb-1"><span class="text-[12px] font-medium text-[#C7D8DA]">${s.konu}</span><span class="badge ${renkMap[s.durum]}">${s.durum}</span></div><p class="text-[10px] text-[#6E8C8E]">📍 ${s.mahalle} · ${s.tarih}</p><div class="flex gap-2 mt-2"><button class="btn-green text-[10px] px-2 py-1">İşleme Al</button><button onclick="haritaMerkezle(${s.lat},${s.lng})" class="btn-outline text-[10px] px-2 py-1">Harita</button></div>`;
+    liste.appendChild(card);
+
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${s.konu}</td><td><span class="badge badge-blue">${s.kategori||'diğer'}</span></td><td>${s.mahalle||'—'}</td><td class="text-[#6E8C8E]">${s.tarih||'—'}</td><td><span class="badge ${renkMap[s.durum]}">${s.durum}</span></td><td><div class="flex gap-1"><button class="btn-green text-[10px] px-2 py-1">Güncelle</button><button class="btn-outline text-[10px] px-2 py-1">Harita</button></div></td>`;
+    tablo.appendChild(tr);
+
+    if(window._sikayetMap && s.lat && s.lng) {
+      const renk=s.durum==='bekliyor'?'#fb923c':s.durum==='cozuldu'?'#4ade80':'#60a5fa';
+      L.circleMarker([s.lat,s.lng],{radius:8,fillColor:renk,color:'white',weight:1.5,fillOpacity:0.9}).addTo(window._sikayetMap).bindPopup(`<b>${s.konu}</b><br>${s.mahalle}`);
+    }
+  });
+}
+
+window.sikayetleriYukle();
+
+window.addEventListener('load', () => {
+  dashboardYukle();
+  window.haberleriYukle();
+  mahalleDoldur();
+  grafikOlustur();
+});
+</script>
+
+<script>
+const MAHALLELER = ['Abdurrahman','Acemler','Ahmet Hamdi Tanpınar','Alacahırka','Bademli','Bağlarbaşı','Balat','Cumhuriyet','Çekirge','Değirmenönü','Demirtaş','Dobruca','Dörtyol','Emek','Ertuğrulgazi','Esenevler','Fethiye','Hamitler','Heykel','Hüdavendigar','İnkaya','İstiklal','Karaman','Kayabalık','Kayıhan','Kestel','Küçük Balıklı','Maksem','Muradiye','Namık Kemal','Nilüfer','Osmangazi','Panayır','Pınarbaşı','Santral','Setbaşı','Soğukpınar','Şehreküstü','Tophane','Ulubatlı','Uludağ','Yunuseli'];
+
+let etkinlikMap=null, etkinlikMarker=null, sikayetMap=null;
+
+function goTo(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+  const sec = document.getElementById('s-'+id);
+  if(sec) sec.classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(item=>{if(item.getAttribute('onclick')?.includes(`'${id}'`))item.classList.add('active');});
+  const titles={dashboard:['Dashboard','Osmangazi Belediyesi Yönetim Paneli'],haber:['Haber Yönetimi','Haberleri ekle, düzenle ve yayınla'],etkinlik:['Etkinlik Yönetimi','Etkinlikler ve organizasyonlar'],duyuru:['Duyuru Yönetimi','Vatandaşlara duyuru gönder'],sikayet:['Şikayet & Sorunlar','Vatandaş bildirimleri'],forum:['Forum Moderasyonu','Gönderi yönetimi'],anket:['Anket Yönetimi','Vatandaş anketleri'],mahalle:['Mahalle Yönetimi','42 mahalle yönetimi'],bildirim:['Bildirim Gönder','Hedefli bildirim'],istatistik:['İstatistikler','Analitik ve raporlar']};
+  if(titles[id]){document.getElementById('page-title').textContent=titles[id][0];document.getElementById('page-sub').textContent=titles[id][1];}
+
+  if(id==='sikayet'){setTimeout(()=>sikayetHaritaBaslat(),150);if(window.sikayetleriYukle)window.sikayetleriYukle();}
+  if(id==='etkinlik'){setTimeout(()=>{if(document.getElementById('etkinlik-form-view').classList.contains('hidden')){}else etkinlikHaritaBaslat();},150);}
+  if(id==='haber'&&window.haberleriYukle)window.haberleriYukle();
+  if(id==='forum')forumYukle();
+  closeSidebar();
+}
+
+// Haberler
+function haberFormAc(){document.getElementById('haber-liste-view').classList.add('hidden');document.getElementById('haber-form-view').classList.remove('hidden');}
+function haberFormKapat(){document.getElementById('haber-liste-view').classList.remove('hidden');document.getElementById('haber-form-view').classList.add('hidden');}
+
+// Etkinlikler
+function etkinlikFormAc(){document.getElementById('etkinlik-liste-view').classList.add('hidden');document.getElementById('etkinlik-form-view').classList.remove('hidden');setTimeout(etkinlikHaritaBaslat,200);}
+function etkinlikFormKapat(){document.getElementById('etkinlik-liste-view').classList.remove('hidden');document.getElementById('etkinlik-form-view').classList.add('hidden');}
+
+function etkinlikHaritaBaslat(){
+  if(etkinlikMap) return;
+  etkinlikMap = L.map('etkinlik-map').setView([40.19,29.06],13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(etkinlikMap);
+  etkinlikMap.on('click',function(e){
+    if(etkinlikMarker) etkinlikMap.removeLayer(etkinlikMarker);
+    etkinlikMarker = L.marker(e.latlng).addTo(etkinlikMap);
+    document.getElementById('e-konum-txt').textContent=`📍 ${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`;
+  });
+}
+
+// Şikayet Harita
+function sikayetHaritaBaslat(){
+  if(sikayetMap) return;
+  sikayetMap = L.map('sikayet-map').setView([40.19,29.06],13);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(sikayetMap);
+  window._sikayetMap = sikayetMap;
+  if(window.sikayetleriYukle) window.sikayetleriYukle();
+}
+function sikayetHaritaFiltre(kat){}
+function haritaMerkezle(lat,lng){if(sikayetMap)sikayetMap.setView([lat,lng],15,{animate:true});}
+
+// Forum
+function forumYukle(){
+  const tbody=document.getElementById('forum-tbody');
+  const demo=[
+    {baslik:'Bağlarbaşı sokaklarındaki çukurlar',yazar:'@ahmet_y',begeni:24,yorum:8,tarih:'2 gün önce'},
+    {baslik:'Yeni park alanı önerisi',yazar:'@fatma_k',begeni:67,yorum:23,tarih:'3 gün önce'},
+    {baslik:'Pazar yeri düzenlemesi hakkında',yazar:'@mehmet_a',begeni:12,yorum:5,tarih:'5 gün önce'},
+  ];
+  tbody.innerHTML='';
+  demo.forEach(f=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="max-w-[200px]"><p class="truncate">${f.baslik}</p></td><td class="text-[#6E8C8E]">${f.yazar}</td><td>❤️ ${f.begeni}</td><td>💬 ${f.yorum}</td><td class="text-[#6E8C8E]">${f.tarih}</td><td><div class="flex gap-1"><button class="btn-gold text-[10px] px-2 py-1">📌 Sabitle</button><button class="btn-red text-[10px] px-2 py-1">Sil</button></div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function forumTab(btn,tab){document.querySelectorAll('#s-forum .tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');forumYukle();}
+
+// Anket
+function secenekEkle(){const div=document.createElement('div');div.className='flex gap-2';div.innerHTML=`<input type="text" class="form-input" placeholder="Yeni seçenek"/><button class="btn-red px-2" onclick="this.parentElement.remove()">✕</button>`;document.getElementById('anket-secenekler').appendChild(div);}
+function anketKaydet(){showToast('✅ Anket yayınlandı!','success');}
+
+// Mahalle
+function mahalleDoldur(){
+  const grid=document.getElementById('mahalle-grid');
+  const bilSel=document.getElementById('bil-mahalle');
+  const duSel=document.getElementById('du-mahalle');
+  if(!grid) return;
+  grid.innerHTML='';
+  MAHALLELER.forEach((m,i)=>{
+    const card=document.createElement('div');
+    card.className='card-sm mahalle-kart';
+    card.dataset.ad=m.toLowerCase();
+    card.innerHTML=`<div class="flex items-center justify-between mb-2"><span class="text-[12px] font-semibold text-[#C7D8DA]">${m}</span><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div><div class="flex gap-3 text-[10px] text-[#6E8C8E]"><span>📰 ${Math.floor(Math.random()*20)+1} haber</span><span>⚠️ ${Math.floor(Math.random()*5)} sorun</span></div><button class="btn-outline text-[10px] px-2 py-1 mt-2">Admin Ata</button>`;
+    grid.appendChild(card);
+    if(bilSel){const opt=document.createElement('option');opt.value=m;opt.textContent=m;bilSel.appendChild(opt);}
+    if(duSel){const opt=document.createElement('option');opt.value=m;opt.textContent=m;duSel.appendChild(opt);}
+  });
+}
+function mahalleAra(q){document.querySelectorAll('.mahalle-kart').forEach(c=>{c.style.display=c.dataset.ad.includes(q.toLowerCase())?'':'none';});}
+
+document.getElementById('du-hedef')?.addEventListener('change',function(){
+  document.getElementById('du-mahalle-sec').classList.toggle('hidden',this.value!=='mahalle');
+});
+
+// Bildirim
+function bildirimGonder(){showToast('🔔 Bildirim gönderildi!','success');}
+
+// Grafik
+function grafikOlustur(){
+  const chart=document.getElementById('stat-chart');
+  const labels=document.getElementById('stat-labels');
+  if(!chart||!labels) return;
+  const gunler=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  const vals=[45,62,38,75,89,54,67];
+  const max=Math.max(...vals);
+  chart.innerHTML=''; labels.innerHTML='';
+  gunler.forEach((g,i)=>{
+    const pct=Math.round(vals[i]/max*100);
+    const col=document.createElement('div');
+    col.className='chart-col';
+    col.innerHTML=`<span style="font-size:9px;color:#E0B07A">${vals[i]}</span><div class="chart-bar-wrap w-full"><div class="chart-bar-inner" style="height:${pct}%"></div></div>`;
+    chart.appendChild(col);
+    const lbl=document.createElement('span');
+    lbl.style.cssText='font-size:9px;color:#6E8C8E;flex:1;text-align:center';
+    lbl.textContent=g;
+    labels.appendChild(lbl);
+  });
+}
+
+// Toast
+function showToast(msg, type='info'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className=`toast toast-${type} show`;
+  setTimeout(()=>{t.classList.remove('show');},3000);
+}
+
+// Sidebar
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('active');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('active');}
+</script>
+</body>
+</html>

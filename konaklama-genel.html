@@ -1,0 +1,603 @@
+﻿<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>Konaklama - CityJOY</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-gold": "#E0B07A",
+                        "deep-teal": "#081F24",
+                        "mid-teal": "#0D3238",
+                        "soft-teal": "#1F5055",
+                        "muted-blue": "#C7D8DA",
+                        "ai-glow": "#00D4AA",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        .glass-card-heavy {
+            background: rgba(8, 31, 36, 0.9);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+        }
+        .vignette-overlay {
+            background: linear-gradient(180deg, rgba(8, 31, 36, 0.4) 0%, rgba(8, 31, 36, 0.98) 100%);
+        }
+        .gold-glow {
+            text-shadow: 0 0 12px rgba(224, 176, 122, 0.6);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .fill-1 {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            background-color: #081F24;
+            overscroll-behavior-y: none;
+            min-height: 100dvh;
+        }
+        .sticky-header-container {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: linear-gradient(to bottom, #081F24 0%, rgba(8, 31, 36, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .ai-orb {
+            background: linear-gradient(135deg, #00D4AA 0%, #E0B07A 50%, #00D4AA 100%);
+            background-size: 200% 200%;
+            animation: shimmer 3s ease infinite;
+            box-shadow: 0 0 30px rgba(0, 212, 170, 0.4), 0 0 60px rgba(224, 176, 122, 0.2);
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .accommodation-type-btn {
+            transition: all 0.3s ease;
+        }
+        .accommodation-type-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #00D4AA 100%);
+            color: #081F24;
+            box-shadow: 0 4px 20px rgba(224, 176, 122, 0.4);
+        }
+        .accommodation-type-btn:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .accommodation-type-btn:not(.active):hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(224, 176, 122, 0.3);
+        }
+        .accommodation-card {
+            background: linear-gradient(135deg, rgba(13, 50, 56, 0.8) 0%, rgba(8, 31, 36, 0.9) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .accommodation-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 0 20px rgba(224, 176, 122, 0.4);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+</head>
+<body class="font-display text-white antialiased overflow-x-hidden">
+    <!-- Background - SAME as kendi-aracim.html -->
+    <div class="fixed inset-0 z-0">
+        <div class="absolute inset-0 bg-cover bg-center opacity-30" style="background-image: url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop')"></div>
+        <div class="absolute inset-0 vignette-overlay"></div>
+    </div>
+
+    <!-- Sticky Header Container -->
+    <div class="sticky-header-container pt-safe-top">
+        <!-- Header -->
+        <header class="px-4 pt-4 pb-2 flex items-center gap-3">
+            <a href="seyahat-anasayfa.html" class="w-10 h-10 flex items-center justify-center text-primary-gold bg-deep-teal/80 rounded-full border border-primary-gold/40 active:scale-95 transition-transform">
+                <span class="material-symbols-outlined text-xl font-bold">arrow_back_ios_new</span>
+            </a>
+            <div class="flex-1">
+                <h1 class="text-lg font-bold tracking-tight text-white">Konaklama</h1>
+                <p class="text-[9px] text-white/50 uppercase tracking-widest">Otel & Tatil Evleri</p>
+            </div>
+            <!-- AI Button -->
+            <button onclick="openAiModal()" class="group relative w-10 h-10">
+                <div class="absolute inset-0 rounded-full ai-orb blur-md opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative w-full h-full rounded-full ai-orb flex items-center justify-center border-2 border-white/20">
+                    <span class="material-symbols-outlined text-deep-teal text-lg">auto_awesome</span>
+                </div>
+                <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-deep-teal animate-pulse"></span>
+            </button>
+        </header>
+
+        <!-- Location Input -->
+        <section class="px-4 mb-3">
+            <div class="w-full glass-card-heavy rounded-2xl p-3 flex items-center gap-3 shadow-2xl">
+                <span class="material-symbols-outlined text-primary-gold text-xl gold-glow">location_on</span>
+                <input class="bg-transparent border-none p-0 text-sm focus:ring-0 text-white placeholder:text-white/30 w-full font-medium" placeholder="Nerede konaklamak istiyorsunuz?" type="text" value="Bodrum, Muğla"/>
+                <button class="w-8 h-8 rounded-full bg-primary-gold/20 border border-primary-gold/40 flex items-center justify-center active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-primary-gold text-sm">search</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Date Selection -->
+        <section class="px-4 mb-3">
+            <div class="flex gap-2">
+                <div class="flex-1 glass-card rounded-xl p-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-muted-blue text-base">calendar_today</span>
+                    <div>
+                        <p class="text-[9px] text-white/50 uppercase">Giriş</p>
+                        <p class="text-sm font-bold text-white">15 Mart</p>
+                    </div>
+                </div>
+                <div class="flex-1 glass-card rounded-xl p-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-muted-blue text-base">calendar_today</span>
+                    <div>
+                        <p class="text-[9px] text-white/50 uppercase">Çıkış</p>
+                        <p class="text-sm font-bold text-white">18 Mart</p>
+                    </div>
+                </div>
+                <div class="glass-card rounded-xl p-3 flex items-center gap-2 min-w-[80px]">
+                    <span class="material-symbols-outlined text-muted-blue text-base">person</span>
+                    <div>
+                        <p class="text-[9px] text-white/50 uppercase">Kişi</p>
+                        <p class="text-sm font-bold text-white">2</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accommodation Type Menu - SIMPLIFIED (5 items only) -->
+        <section class="px-4 mb-2">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                <a href="otel.html" class="accommodation-type-btn active flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-xl min-w-[64px]">
+                    <span class="material-symbols-outlined text-xl fill-1">hotel</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Otel</span>
+                </a>
+                
+                <a href="butik.html" class="accommodation-type-btn flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-xl min-w-[64px]">
+                    <span class="material-symbols-outlined text-xl">apartment</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Butik</span>
+                </a>
+                
+                <a href="apart.html" class="accommodation-type-btn flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-xl min-w-[64px]">
+                    <span class="material-symbols-outlined text-xl">domain</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Apart</span>
+                </a>
+                
+                <a href="bungalov.html" class="accommodation-type-btn flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-xl min-w-[64px]">
+                    <span class="material-symbols-outlined text-xl">holiday_village</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Bungalov</span>
+                </a>
+                
+                <a href="karavan.html" class="accommodation-type-btn flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-xl min-w-[64px]">
+                    <span class="material-symbols-outlined text-xl">rv_hookup</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Karavan</span>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex flex-col px-4 pb-32">
+        <!-- AI Suggestion -->
+        <div class="mb-4 mt-2">
+            <div class="glass-card rounded-xl p-3 flex items-center gap-3 border-soft-teal/40">
+                <div class="w-8 h-8 rounded-lg bg-soft-teal/50 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-primary-gold text-base">auto_awesome</span>
+                </div>
+                <p class="text-[11px] text-muted-blue leading-tight">
+                    <span class="text-primary-gold font-bold uppercase tracking-tighter">AI önerisi:</span> Bu tarihlerde <span class="text-white font-bold">%15 indirim</span> fırsatı var. Hemen rezervasyon yapın!
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Filters -->
+        <section class="mb-4">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                <button class="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-white/10 active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-primary-gold text-sm">pool</span>
+                    <span class="text-xs font-bold">Havuz</span>
+                </button>
+                <button class="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-white/10 active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-primary-gold text-sm">beach_access</span>
+                    <span class="text-xs font-bold">Deniz Kenarı</span>
+                </button>
+                <button class="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-white/10 active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-primary-gold text-sm">family_restroom</span>
+                    <span class="text-xs font-bold">Aile</span>
+                </button>
+                <button class="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-white/10 active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-primary-gold text-sm">pets</span>
+                    <span class="text-xs font-bold">Evcil Hayvan</span>
+                </button>
+                <button class="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-white/10 active:scale-95 transition-transform">
+                    <span class="material-symbols-outlined text-primary-gold text-sm">fitness_center</span>
+                    <span class="text-xs font-bold">Spor</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Featured Hotel Card -->
+        <section class="mb-4">
+            <div class="accommodation-card rounded-3xl overflow-hidden relative">
+                <!-- Hotel Image -->
+                <div class="h-48 bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop')">
+                    <div class="absolute inset-0 bg-gradient-to-t from-deep-teal via-transparent to-transparent"></div>
+                    <!-- Badges -->
+                    <div class="absolute top-3 left-3 flex gap-2">
+                        <span class="px-2 py-1 bg-primary-gold/90 text-deep-teal text-[10px] font-bold uppercase rounded-full">Öne Çıkan</span>
+                        <span class="px-2 py-1 bg-red-500/90 text-white text-[10px] font-bold uppercase rounded-full">Son 2 Oda</span>
+                    </div>
+                    <!-- Favorite Button -->
+                    <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center active:scale-95 transition-transform">
+                        <span class="material-symbols-outlined text-white text-sm">favorite_border</span>
+                    </button>
+                </div>
+                <!-- Content -->
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Hilton Bodrum</h3>
+                            <p class="text-[11px] text-muted-blue">Türkbükü, Bodrum</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-primary-gold text-sm fill-1">star</span>
+                                <span class="text-sm font-bold text-white">4.9</span>
+                            </div>
+                            <p class="text-[10px] text-white/50">(328 yorum)</p>
+                        </div>
+                    </div>
+                    <!-- Amenities -->
+                    <div class="flex gap-3 mb-3 flex-wrap">
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-muted-blue text-sm">pool</span>
+                            <span class="text-[10px] text-white/60">Havuz</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-muted-blue text-sm">spa</span>
+                            <span class="text-[10px] text-white/60">Spa</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-muted-blue text-sm">restaurant</span>
+                            <span class="text-[10px] text-white/60">Restoran</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-muted-blue text-sm">wifi</span>
+                            <span class="text-[10px] text-white/60">Wi-Fi</span>
+                        </div>
+                    </div>
+                    <!-- Price -->
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <p class="text-[10px] text-white/50 line-through">4.500 TL</p>
+                            <p class="text-2xl font-bold text-primary-gold">3.570 <span class="text-sm">TL</span></p>
+                            <p class="text-[10px] text-white/50">/ gece (2 kişi)</p>
+                        </div>
+                        <button class="px-6 py-2.5 bg-primary-gold text-deep-teal font-bold text-sm rounded-xl active:scale-95 transition-transform">
+                            İncele
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Accommodations -->
+        <section class="mb-4 space-y-3">
+            <h3 class="text-sm font-bold text-white/80 uppercase tracking-wider mb-3">Tüm Konaklama Seçenekleri</h3>
+            
+            <!-- Hotel 2 -->
+            <div class="accommodation-card rounded-2xl p-4 flex gap-4">
+                <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&auto=format&fit=crop')"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start mb-1">
+                        <h4 class="font-bold text-white truncate">The Marmara Bodrum</h4>
+                        <div class="flex items-center gap-1 shrink-0 ml-2">
+                            <span class="material-symbols-outlined text-primary-gold text-sm fill-1">star</span>
+                            <span class="text-sm font-bold">4.8</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-muted-blue mb-2">Yalıkavak, Bodrum • Otel</p>
+                    <div class="flex gap-2 mb-2">
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Spa</span>
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Deniz Manzarası</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <p class="text-lg font-bold text-primary-gold">4.200 <span class="text-xs">TL</span></p>
+                        <span class="text-[10px] text-white/40">/ gece</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bungalov -->
+            <div class="accommodation-card rounded-2xl p-4 flex gap-4">
+                <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=400&auto=format&fit=crop')"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start mb-1">
+                        <h4 class="font-bold text-white truncate">Doğa Bungalov</h4>
+                        <div class="flex items-center gap-1 shrink-0 ml-2">
+                            <span class="material-symbols-outlined text-primary-gold text-sm fill-1">star</span>
+                            <span class="text-sm font-bold">4.7</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-muted-blue mb-2">Gümüşlük, Bodrum • Bungalov</p>
+                    <div class="flex gap-2 mb-2">
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Jakuzi</span>
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Şömine</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <p class="text-lg font-bold text-primary-gold">2.850 <span class="text-xs">TL</span></p>
+                        <span class="text-[10px] text-white/40">/ gece</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apart -->
+            <div class="accommodation-card rounded-2xl p-4 flex gap-4">
+                <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&auto=format&fit=crop')"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start mb-1">
+                        <h4 class="font-bold text-white truncate">Merkez Apart</h4>
+                        <div class="flex items-center gap-1 shrink-0 ml-2">
+                            <span class="material-symbols-outlined text-primary-gold text-sm fill-1">star</span>
+                            <span class="text-sm font-bold">4.5</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-muted-blue mb-2">Merkez, Bodrum • Apart</p>
+                    <div class="flex gap-2 mb-2">
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Mutfak</span>
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Aile</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <p class="text-lg font-bold text-primary-gold">1.500 <span class="text-xs">TL</span></p>
+                        <span class="text-[10px] text-white/40">/ gece</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Butik Hotel -->
+            <div class="accommodation-card rounded-2xl p-4 flex gap-4">
+                <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&auto=format&fit=crop')"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start mb-1">
+                        <h4 class="font-bold text-white truncate">Eski Taş Otel</h4>
+                        <div class="flex items-center gap-1 shrink-0 ml-2">
+                            <span class="material-symbols-outlined text-primary-gold text-sm fill-1">star</span>
+                            <span class="text-sm font-bold">4.9</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-muted-blue mb-2">Torba, Bodrum • Butik Otel</p>
+                    <div class="flex gap-2 mb-2">
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Tarihi</span>
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Butik</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <p class="text-lg font-bold text-primary-gold">3.200 <span class="text-xs">TL</span></p>
+                        <span class="text-[10px] text-white/40">/ gece</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Karavan -->
+            <div class="accommodation-card rounded-2xl p-4 flex gap-4">
+                <div class="w-24 h-24 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=400&auto=format&fit=crop')"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start mb-1">
+                        <h4 class="font-bold text-white truncate">Bodrum Karavan Park</h4>
+                        <div class="flex items-center gap-1 shrink-0 ml-2">
+                            <span class="material-symbols-outlined text-primary-gold text-sm fill-1">star</span>
+                            <span class="text-sm font-bold">4.6</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-muted-blue mb-2">Turgutreis, Bodrum • Karavan</p>
+                    <div class="flex gap-2 mb-2">
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Deniz Kenarı</span>
+                        <span class="text-[9px] px-2 py-0.5 bg-white/5 rounded-full text-white/60">Elektrik</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <p class="text-lg font-bold text-primary-gold">800 <span class="text-xs">TL</span></p>
+                        <span class="text-[10px] text-white/40">/ gece</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- View Count Banner -->
+    <div class="fixed bottom-[88px] left-0 right-0 z-40 px-4">
+        <div class="glass-card-heavy border border-white/10 py-3 px-4 rounded-2xl flex items-center justify-center shadow-2xl">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary-gold text-base fill-1">visibility</span>
+                <span class="text-xs font-medium text-white/80">Bugün <span class="font-bold text-primary-gold">45 kişi</span> Bodrum'da konaklama aradı.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation - Konaklama selected -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-card-heavy border-t border-white/10 pb-safe pt-3">
+        <div class="flex items-center justify-around max-w-md mx-auto px-2">
+            <a class="flex flex-col items-center gap-1 group px-3 py-1" href="seyahat-anasayfa.html">
+                <span class="material-symbols-outlined text-muted-blue group-hover:text-primary-gold transition-colors text-2xl">home</span>
+                <span class="text-[9px] font-bold text-muted-blue group-hover:text-primary-gold tracking-tighter uppercase">Anasayfa</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 group px-3 py-1" href="#">
+                <span class="material-symbols-outlined text-muted-blue group-hover:text-primary-gold transition-colors text-2xl">explore</span>
+                <span class="text-[9px] font-bold text-muted-blue group-hover:text-primary-gold tracking-tighter uppercase">Keşfet</span>
+            </a>
+            <!-- Konaklama - SELECTED (gold) -->
+            <a class="flex flex-col items-center gap-1 px-3 py-1" href="konaklama-genel.html">
+                <div class="relative flex flex-col items-center">
+                    <span class="material-symbols-outlined text-primary-gold gold-glow scale-110 fill-1 text-2xl">hotel</span>
+                    <span class="text-[9px] font-bold text-primary-gold tracking-tighter uppercase mt-1">Konaklama</span>
+                    <div class="absolute -bottom-1 w-1 h-1 bg-primary-gold rounded-full shadow-[0_0_8px_#E0B07A]"></div>
+                </div>
+            </a>
+            <a class="flex flex-col items-center gap-1 group px-3 py-1" href="#">
+                <span class="material-symbols-outlined text-muted-blue group-hover:text-primary-gold transition-colors text-2xl">search</span>
+                <span class="text-[9px] font-bold text-muted-blue group-hover:text-primary-gold tracking-tighter uppercase">Ara</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 group px-3 py-1" href="#">
+                <span class="material-symbols-outlined text-muted-blue group-hover:text-primary-gold transition-colors text-2xl">person</span>
+                <span class="text-[9px] font-bold text-muted-blue group-hover:text-primary-gold tracking-tighter uppercase">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- AI Modal -->
+    <div id="ai-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-deep-teal/95 backdrop-blur-xl" onclick="closeAiModal()"></div>
+        <div class="relative z-10 h-full flex flex-col max-w-md mx-auto">
+            <div class="p-4 flex items-center justify-between border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full ai-orb flex items-center justify-center">
+                        <span class="material-symbols-outlined text-deep-teal text-xl">auto_awesome</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white">JOY Asistan</h3>
+                        <p class="text-[10px] text-ai-glow uppercase tracking-wider">Konaklama Uzmanı</p>
+                    </div>
+                </div>
+                <button onclick="closeAiModal()" class="w-10 h-10 rounded-full glass-card flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white">close</span>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar" id="ai-chat">
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full ai-orb flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-deep-teal text-sm">auto_awesome</span>
+                    </div>
+                    <div class="glass-card rounded-2xl rounded-tl-none p-3 max-w-[80%]">
+                        <p class="text-sm text-white/90 leading-relaxed">
+                            Merhaba! Konaklama seçenekleri hakkında yardımcı olabilirim. 🏨<br><br>
+                            Otel, butik otel, apart, bungalov veya karavan önerileri için sorabilirsiniz.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-white/10 bg-deep-teal/50">
+                <div class="relative">
+                    <input type="text" id="ai-input" placeholder="Konaklama hakkında soru sorun..." 
+                        class="w-full h-12 bg-white/5 border border-white/10 rounded-2xl pl-4 pr-12 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-primary-gold"
+                        onkeypress="if(event.key==='Enter')sendAiMessage()">
+                    <button onclick="sendAiMessage()" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl ai-orb flex items-center justify-center">
+                        <span class="material-symbols-outlined text-deep-teal text-sm">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAiModal() {
+            document.getElementById('ai-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAiModal() {
+            document.getElementById('ai-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function sendAiMessage(text) {
+            const input = document.getElementById('ai-input');
+            const chat = document.getElementById('ai-chat');
+            
+            const message = text || input.value;
+            if (!message.trim()) return;
+
+            const userDiv = document.createElement('div');
+            userDiv.className = 'flex gap-3 justify-end';
+            userDiv.innerHTML = `
+                <div class="bg-primary-gold/20 border border-primary-gold/40 rounded-2xl rounded-tr-none p-3 max-w-[80%]">
+                    <p class="text-sm text-white">${message}</p>
+                </div>
+            `;
+            chat.appendChild(userDiv);
+            input.value = '';
+
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'flex gap-3';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="w-8 h-8 rounded-full ai-orb flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-deep-teal text-sm">auto_awesome</span>
+                </div>
+                <div class="glass-card rounded-2xl rounded-tl-none p-3">
+                    <div class="flex gap-1">
+                        <div class="w-2 h-2 bg-primary-gold rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-primary-gold rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-2 h-2 bg-primary-gold rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            `;
+            chat.appendChild(typingDiv);
+            chat.scrollTop = chat.scrollHeight;
+
+            setTimeout(() => {
+                document.getElementById('typing-indicator').remove();
+                
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'flex gap-3';
+                aiDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full ai-orb flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-deep-teal text-sm">auto_awesome</span>
+                    </div>
+                    <div class="glass-card rounded-2xl rounded-tl-none p-3 max-w-[80%]">
+                        <p class="text-sm text-white/90 leading-relaxed">
+                            ${getAiResponse(message)}
+                        </p>
+                    </div>
+                `;
+                chat.appendChild(aiDiv);
+                chat.scrollTop = chat.scrollHeight;
+            }, 1500);
+        }
+
+        function getAiResponse(message) {
+            const lower = message.toLowerCase();
+            if (lower.includes('fiyat') || lower.includes('ücret')) {
+                return "Bodrum konaklama fiyatları:<br><br>🏨 <b>Otel:</b> 3.500-4.500 TL<br>🏡 <b>Butik Otel:</b> 2.500-3.500 TL<br>🏠 <b>Apart:</b> 1.000-2.000 TL<br>🏕️ <b>Bungalov:</b> 2.000-3.000 TL<br>🚐 <b>Karavan:</b> 500-1.000 TL<br><br>İndirimli fiyatlar mevcut!";
+            } else if (lower.includes('aile') || lower.includes('çocuk')) {
+                return "Aile dostu öneriler:<br><br>👨‍👩‍👧‍👦 <b>Hilton Bodrum:</b> Çocuk havuzu, oyun alanı<br>👨‍👩‍👧‍👦 <b>Merkez Apart:</b> Mutfaklı, geniş odalar<br>👨‍👩‍👧‍👦 <b>Bodrum Karavan Park:</b> Bahçeli, huzurlu ortam";
+            } else if (lower.includes('ekonomik') || lower.includes('ucuz')) {
+                return "Ekonomik seçenekler:<br><br>💰 <b>Merkez Apart:</b> 1.500 TL<br>💰 <b>Bodrum Karavan Park:</b> 800 TL<br>💰 <b>Doğa Bungalov:</b> 2.850 TL (indirimli)";
+            } else if (lower.includes('lüks') || lower.includes('premium')) {
+                return "Lüks konaklama:<br><br>⭐ <b>Hilton Bodrum:</b> 5 yıldızlı, spa<br>⭐ <b>The Marmara:</b> Infinity havuz<br>⭐ <b>Eski Taş Otel:</b> Butik lüks";
+            }
+            return "Size nasıl yardımcı olabilirim? Fiyat, konum, aile dostu veya ekonomik seçenekler hakkında bilgi alabilirsiniz. 🏨";
+        }
+    </script>
+</body>
+</html>
+

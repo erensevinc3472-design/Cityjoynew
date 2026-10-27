@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yarışmalar - CityJoy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --deep-teal: #1a3b3f;
+            --gold: #c9a962;
+            --gold-light: #e0c78a;
+            --glass-bg: rgba(26, 59, 63, 0.7);
+            --glass-border: rgba(201, 169, 98, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Smoke Background */
+        .smoke-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        .smoke {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><filter id="smoke"><feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" stitchTiles="stitch"/><feDisplacementMap in="SourceGraphic" scale="100"/></filter><rect width="100%25" height="100%25" filter="url(%23smoke)" opacity="0.5"/></svg>');
+            animation: smokeMove 20s ease-in-out infinite;
+        }
+
+        @keyframes smokeMove {
+            0%, 100% { transform: translateX(0) translateY(0) scale(1); }
+            33% { transform: translateX(-20px) translateY(10px) scale(1.1); }
+            66% { transform: translateX(20px) translateY(-10px) scale(0.9); }
+        }
+
+        /* Header */
+        .header {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            background: linear-gradient(to bottom, rgba(26, 59, 63, 0.9), transparent);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(201, 169, 98, 0.2);
+            border: 1px solid var(--glass-border);
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--gold);
+            color: var(--deep-teal);
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: var(--gold);
+        }
+
+        /* Featured Carousel */
+        .featured-section {
+            position: relative;
+            z-index: 5;
+            margin: 0 20px 30px;
+        }
+
+        .featured-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            color: var(--gold);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .carousel-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(26, 59, 63, 0.95), transparent);
+            padding: 30px 20px 20px;
+        }
+
+        .carousel-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--gold);
+            color: var(--deep-teal);
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .carousel-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .carousel-prize {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: var(--gold-light);
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 15px;
+            background: var(--glass-bg);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background: var(--gold);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Filter Toggle */
+        .filter-section {
+            position: relative;
+            z-index: 5;
+            margin: 0 20px 25px;
+        }
+
+        .filter-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 5px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .filter-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--gold);
+            color: var(--deep-teal);
+        }
+
+        /* Competitions List */
+        .competitions-section {
+            position: relative;
+            z-index: 5;
+            padding: 0 20px 100px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: var(--gold);
+        }
+
+        .competition-count {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .competitions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .competition-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .competition-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(201, 169, 98, 0.2);
+            border-color: var(--gold);
+        }
+
+        .competition-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            position: relative;
+        }
+
+        .competition-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .competition-type-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 5px 12px;
+            background: var(--gold);
+            color: var(--deep-teal);
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .competition-prize-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 12px;
+            background: rgba(231, 76, 60, 0.9);
+            color: #fff;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .competition-content {
+            padding: 20px;
+        }
+
+        .competition-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .competition-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .competition-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .meta-item i {
+            color: var(--gold);
+            font-size: 12px;
+        }
+
+        .competition-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stat i {
+            color: var(--gold);
+        }
+
+        .join-btn {
+            padding: 8px 20px;
+            background: var(--gold);
+            color: var(--deep-teal);
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .join-btn:hover {
+            background: var(--gold-light);
+            transform: scale(1.05);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 59, 63, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 10px 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 20px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .nav-item.active {
+            color: var(--gold);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .competitions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .carousel-slide img {
+                height: 180px;
+            }
+            
+            .carousel-title {
+                font-size: 18px;
+            }
+            
+            .filter-btn {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .competition-image {
+                height: 160px;
+            }
+            
+            .competition-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Smoke Background -->
+    <div class="smoke-container">
+        <div class="smoke"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-top">
+            <button class="back-btn" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Yarışmalar</h1>
+        </div>
+    </header>
+
+    <!-- Featured Carousel -->
+    <section class="featured-section">
+        <h2 class="featured-title">
+            <i class="fas fa-star"></i>
+            Öne Çıkan Yarışmalar
+        </h2>
+        <div class="carousel-container">
+            <div class="carousel-track" id="carouselTrack">
+                <!-- Slide 1 -->
+                <div class="carousel-slide" onclick="openCompetition('yarisma1')">
+                    <img src="https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=800&h=400&fit=crop" alt="Ses Yarışması">
+                    <div class="carousel-content">
+                        <span class="carousel-badge">Müzik</span>
+                        <h3 class="carousel-title">Bursa Ses Yarışması 2026</h3>
+                        <div class="carousel-prize">
+                            <i class="fas fa-trophy"></i>
+                            <span>50.000₺ Ödül</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="carousel-slide" onclick="openCompetition('yarisma2')">
+                    <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&h=400&fit=crop" alt="Fotoğraf Yarışması">
+                    <div class="carousel-content">
+                        <span class="carousel-badge">Fotoğraf</span>
+                        <h3 class="carousel-title">Bursa'da Yaşam Fotoğraf Yarışması</h3>
+                        <div class="carousel-prize">
+                            <i class="fas fa-trophy"></i>
+                            <span>25.000₺ Ödül</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="carousel-slide" onclick="openCompetition('yarisma3')">
+                    <img src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&h=400&fit=crop" alt="Resim Yarışması">
+                    <div class="carousel-content">
+                        <span class="carousel-badge">Resim</span>
+                        <h3 class="carousel-title">Genç Sanatçılar Resim Yarışması</h3>
+                        <div class="carousel-prize">
+                            <i class="fas fa-trophy"></i>
+                            <span>30.000₺ Ödül</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-dots" id="carouselDots">
+                <span class="carousel-dot active" onclick="goToSlide(0)"></span>
+                <span class="carousel-dot" onclick="goToSlide(1)"></span>
+                <span class="carousel-dot" onclick="goToSlide(2)"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Toggle -->
+    <section class="filter-section">
+        <div class="filter-toggle">
+            <button class="filter-btn active" onclick="setFilter('bolgesel')">Bölgesel</button>
+            <button class="filter-btn" onclick="setFilter('genel')">Genel</button>
+        </div>
+    </section>
+
+    <!-- Competitions List -->
+    <section class="competitions-section">
+        <div class="section-header">
+            <h2 class="section-title">Tüm Yarışmalar</h2>
+            <span class="competition-count">12 yarışma</span>
+        </div>
+        
+        <div class="competitions-grid" id="competitionsGrid">
+            <!-- Competition 1 -->
+            <div class="competition-card" onclick="openCompetition('yarisma1')">
+                <div class="competition-image">
+                    <img src="https://images.unsplash.com/photo-1516280440614-6697288d5d38?w=600&h=400&fit=crop" alt="Ses Yarışması">
+                    <span class="competition-type-badge">Müzik</span>
+                    <span class="competition-prize-badge"><i class="fas fa-trophy"></i> 50.000₺</span>
+                </div>
+                <div class="competition-content">
+                    <h3 class="competition-title">Bursa Ses Yarışması 2026</h3>
+                    <p class="competition-desc">Bursa'nın en yetenekli seslerini keşfetmek için düzenlenen büyük yarışma. Jüri üyeleri tarafından değerlendirilecek.</p>
+                    <div class="competition-meta">
+                        <div class="meta-item"><i class="fas fa-calendar"></i> 15 Mart - 30 Nisan</div>
+                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i> Bursa</div>
+                    </div>
+                    <div class="competition-stats">
+                        <div class="stat"><i class="fas fa-users"></i> 234 Katılımcı</div>
+                        <div class="stat"><i class="fas fa-clock"></i> 45 Gün Kaldı</div>
+                        <button class="join-btn">Katıl</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competition 2 -->
+            <div class="competition-card" onclick="openCompetition('yarisma2')">
+                <div class="competition-image">
+                    <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&h=400&fit=crop" alt="Fotoğraf Yarışması">
+                    <span class="competition-type-badge">Fotoğraf</span>
+                    <span class="competition-prize-badge"><i class="fas fa-trophy"></i> 25.000₺</span>
+                </div>
+                <div class="competition-content">
+                    <h3 class="competition-title">Bursa'da Yaşam Fotoğraf Yarışması</h3>
+                    <p class="competition-desc">Bursa'nın güzelliklerini fotoğraflarla anlatın. En iyi kareler ödüllendirilecek.</p>
+                    <div class="competition-meta">
+                        <div class="meta-item"><i class="fas fa-calendar"></i> 1 - 30 Mart</div>
+                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i> Bursa</div>
+                    </div>
+                    <div class="competition-stats">
+                        <div class="stat"><i class="fas fa-users"></i> 156 Katılımcı</div>
+                        <div class="stat"><i class="fas fa-clock"></i> 25 Gün Kaldı</div>
+                        <button class="join-btn">Katıl</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competition 3 -->
+            <div class="competition-card" onclick="openCompetition('yarisma3')">
+                <div class="competition-image">
+                    <img src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=400&fit=crop" alt="Resim Yarışması">
+                    <span class="competition-type-badge">Resim</span>
+                    <span class="competition-prize-badge"><i class="fas fa-trophy"></i> 30.000₺</span>
+                </div>
+                <div class="competition-content">
+                    <h3 class="competition-title">Genç Sanatçılar Resim Yarışması</h3>
+                    <p class="competition-desc">18-25 yaş arası genç sanatçılar için düzenlenen resim yarışması.</p>
+                    <div class="competition-meta">
+                        <div class="meta-item"><i class="fas fa-calendar"></i> 15 Mart - 15 Nisan</div>
+                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i> Türkiye Geneli</div>
+                    </div>
+                    <div class="competition-stats">
+                        <div class="stat"><i class="fas fa-users"></i> 89 Katılımcı</div>
+                        <div class="stat"><i class="fas fa-clock"></i> 30 Gün Kaldı</div>
+                        <button class="join-btn">Katıl</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competition 4 -->
+            <div class="competition-card" onclick="openCompetition('yarisma4')">
+                <div class="competition-image">
+                    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&h=400&fit=crop" alt="Kompozisyon Yarışması">
+                    <span class="competition-type-badge">Edebiyat</span>
+                    <span class="competition-prize-badge"><i class="fas fa-trophy"></i> 15.000₺</span>
+                </div>
+                <div class="competition-content">
+                    <h3 class="competition-title">Geleceğin Yazarları Kompozisyon Yarışması</h3>
+                    <p class="competition-desc">Lise ve üniversite öğrencileri için düzenlenen kompozisyon yarışması.</p>
+                    <div class="competition-meta">
+                        <div class="meta-item"><i class="fas fa-calendar"></i> 1 - 31 Mart</div>
+                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i> Bursa</div>
+                    </div>
+                    <div class="competition-stats">
+                        <div class="stat"><i class="fas fa-users"></i> 312 Katılımcı</div>
+                        <div class="stat"><i class="fas fa-clock"></i> 28 Gün Kaldı</div>
+                        <button class="join-btn">Katıl</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competition 5 -->
+            <div class="competition-card" onclick="openCompetition('yarisma5')">
+                <div class="competition-image">
+                    <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop" alt="Dans Yarışması">
+                    <span class="competition-type-badge">Dans</span>
+                    <span class="competition-prize-badge"><i class="fas fa-trophy"></i> 40.000₺</span>
+                </div>
+                <div class="competition-content">
+                    <h3 class="competition-title">Modern Dans Yarışması</h3>
+                    <p class="competition-desc">Modern dans tutkunları için büyük yarışma. Solo ve grup kategorileri mevcut.</p>
+                    <div class="competition-meta">
+                        <div class="meta-item"><i class="fas fa-calendar"></i> 20 Mart - 20 Nisan</div>
+                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i> İstanbul</div>
+                    </div>
+                    <div class="competition-stats">
+                        <div class="stat"><i class="fas fa-users"></i> 67 Katılımcı</div>
+                        <div class="stat"><i class="fas fa-clock"></i> 35 Gün Kaldı</div>
+                        <button class="join-btn">Katıl</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competition 6 -->
+            <div class="competition-card" onclick="openCompetition('yarisma6')">
+                <div class="competition-image">
+                    <img src="https://images.unsplash.com/photo-1514525253440-b393452e8d26?w=600&h=400&fit=crop" alt="Enstrüman Yarışması">
+                    <span class="competition-type-badge">Müzik</span>
+                    <span class="competition-prize-badge"><i class="fas fa-trophy"></i> 35.000₺</span>
+                </div>
+                <div class="competition-content">
+                    <h3 class="competition-title">Genç Yetenekler Enstrüman Yarışması</h3>
+                    <p class="competition-desc">Piyano, keman, gitar ve diğer enstrümanlar için yarışma.</p>
+                    <div class="competition-meta">
+                        <div class="meta-item"><i class="fas fa-calendar"></i> 10 Mart - 10 Mayıs</div>
+                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i> Türkiye Geneli</div>
+                    </div>
+                    <div class="competition-stats">
+                        <div class="stat"><i class="fas fa-users"></i> 123 Katılımcı</div>
+                        <div class="stat"><i class="fas fa-clock"></i> 55 Gün Kaldı</div>
+                        <button class="join-btn">Katıl</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Anasayfa</span>
+        </a>
+        <a href="kesfet-genel.html" class="nav-item">
+            <i class="fas fa-compass"></i>
+            <span>Keşfet</span>
+        </a>
+        <a href="yarismalar.html" class="nav-item active">
+            <i class="fas fa-trophy"></i>
+            <span>Yarışmalar</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-search"></i>
+            <span>Ara</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        // Carousel Auto-play
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.carousel-dot');
+        const track = document.getElementById('carouselTrack');
+        
+        function goToSlide(index) {
+            currentSlide = index;
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+        
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            goToSlide(currentSlide);
+        }
+        
+        // Auto-play every 5 seconds
+        setInterval(nextSlide, 5000);
+        
+        // Filter Toggle
+        function setFilter(type) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter logic here - show/hide competitions based on type
+            console.log('Filter:', type);
+            
+            // Example: Update competition count
+            const count = type === 'bolgesel' ? '8 yarışma' : '4 yarışma';
+            document.querySelector('.competition-count').textContent = count;
+        }
+        
+        // Open Competition Detail
+        function openCompetition(id) {
+            // Navigate to competition detail page
+            window.location.href = `yarisma-detay.html?id=${id}`;
+        }
+        
+        // Prevent button click from triggering card click
+        document.querySelectorAll('.join-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Handle join action
+                alert('Yarışma detay sayfasına yönlendiriliyorsunuz...');
+            });
+        });
+    </script>
+</body>
+</html>

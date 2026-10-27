@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Anketler - Bursa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                "darkest": "#081F24",
+                "main-bg": "#0D3238",
+                "card-bg": "#17464B",
+                "card-glow": "#1F5055",
+                "gold-primary": "#E0B07A",
+                "gold-nav": "#F0B36F",
+                "nav-bg": "#0A2A2F",
+                "nav-passive": "#6E8C8E",
+                "text-secondary": "#C7D8DA",
+                "text-desc": "#9FB6B8",
+                "border-subtle": "#3F6E70",
+                "accent-blue": "#4A90A4",
+                "accent-teal": "#2D8A8A",
+                "accent-purple": "#8B5CF6",
+                "accent-pink": "#EC4899",
+                "warning": "#f97316",
+                "success": "#22c55e",
+                "info": "#3b82f6",
+            },
+            fontFamily: {
+                "display": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            animation: {
+                'fade-in': 'fadeIn 0.4s ease-out',
+                'slide-up': 'slideUp 0.5s ease-out',
+                'pulse-glow': 'pulseGlow 3s infinite',
+                'shimmer': 'shimmer 2.5s infinite',
+                'bounce-slow': 'bounceSlow 2s infinite',
+                'float': 'float 3s ease-in-out infinite',
+            },
+            keyframes: {
+                fadeIn: {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' },
+                },
+                slideUp: {
+                    '0%': { opacity: '0', transform: 'translateY(20px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                pulseGlow: {
+                    '0%, 100%': { boxShadow: '0 0 10px rgba(224, 176, 122, 0.3)' },
+                    '50%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.6)' },
+                },
+                shimmer: {
+                    '0%': { backgroundPosition: '-200% 0' },
+                    '100%': { backgroundPosition: '200% 0' },
+                },
+                bounceSlow: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-5px)' },
+                },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
+                },
+            }
+        },
+    },
+};
+</script>
+<style type="text/tailwindcss">
+    @layer utilities {
+        .glass-panel {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+        }
+        .glass-panel-hover:hover {
+            background: rgba(23, 70, 75, 0.8);
+            border-color: rgba(224, 176, 122, 0.3);
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(224, 176, 122, 0.3);
+        }
+        .survey-card {
+            background: linear-gradient(135deg, rgba(23, 70, 75, 0.4) 0%, rgba(8, 31, 36, 0.6) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .survey-card:active {
+            transform: scale(0.98);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.9) 0%, rgba(224, 176, 122, 0.7) 100%);
+            color: #081F24;
+            box-shadow: 0 2px 10px rgba(224, 176, 122, 0.3);
+        }
+        .tab-passive {
+            background: rgba(23, 70, 75, 0.3);
+            color: #9FB6B8;
+            border: 1px solid rgba(63, 110, 112, 0.2);
+        }
+        .category-pill {
+            background: rgba(224, 176, 122, 0.1);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+            color: #E0B07A;
+        }
+        .category-pill.active {
+            background: rgba(224, 176, 122, 0.9);
+            color: #081F24;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+        }
+        .xp-bar {
+            background: linear-gradient(90deg, #E0B07A 0%, #F0B36F 100%);
+            box-shadow: 0 0 10px rgba(224, 176, 122, 0.5);
+        }
+        .streak-flame {
+            animation: flame 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6));
+        }
+        @keyframes flame {
+            0%, 100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+            50% { transform: scale(1.1) rotate(2deg); opacity: 0.9; }
+        }
+        .coin-spin {
+            animation: coinSpin 2s linear infinite;
+        }
+        @keyframes coinSpin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        .badge-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .badge-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        .option-card {
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .option-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            background: rgba(224, 176, 122, 0.05);
+        }
+        .option-card.selected {
+            border-color: #E0B07A;
+            background: rgba(224, 176, 122, 0.15);
+        }
+        .pulse-dot {
+            animation: pulseDot 2s infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+        .rank-badge {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.2) 0%, rgba(224, 176, 122, 0.05) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+        }
+    }
+</style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden max-w-md mx-auto min-h-screen relative shadow-2xl">
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 max-w-md mx-auto flex items-center justify-between px-4 py-3 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/20">
+    <div class="flex items-center gap-3">
+        <button onclick="goBack()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+            <span class="material-symbols-outlined text-base text-white">arrow_back</span>
+        </button>
+        <div class="flex flex-col">
+            <span class="text-[9px] text-gold-primary tracking-wider uppercase">Bursa</span>
+            <h1 class="text-base font-bold tracking-tight text-white leading-none">Anketler</h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-gold-primary/10 border border-gold-primary/30">
+            <span class="material-symbols-outlined text-gold-primary text-sm coin-spin">monetization_on</span>
+            <span class="text-xs font-bold text-gold-primary" id="user-coins">1,250</span>
+        </div>
+        <button class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all relative">
+            <span class="material-symbols-outlined text-gold-primary text-base">notifications</span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-pink rounded-full pulse-dot"></span>
+        </button>
+    </div>
+</header>
+
+<!-- User Stats & Level Section -->
+<section class="relative mt-[52px] bg-gradient-to-b from-main-bg to-darkest pb-6">
+    <!-- Level Progress -->
+    <div class="px-4 pt-4">
+        <div class="glass-panel rounded-2xl p-4 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gold-primary/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
+            <div class="relative flex items-center gap-4">
+                <div class="relative">
+                    <svg class="w-16 h-16 progress-ring" viewBox="0 0 64 64">
+                        <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(224, 176, 122, 0.1)" stroke-width="4"/>
+                        <circle id="level-progress" cx="32" cy="32" r="28" fill="none" stroke="#E0B07A" stroke-width="4" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="44" class="progress-ring-circle"/>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-xl font-bold text-gold-primary">12</span>
+                    </div>
+                    <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-success rounded-full flex items-center justify-center border-2 border-darkest">
+                        <span class="material-symbols-outlined text-[10px] text-white">check</span>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-sm font-bold text-white">Anket Ustası</h3>
+                        <span class="text-[10px] text-gold-primary font-medium">Seviye 12</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                            <div class="xp-bar h-full rounded-full" style="width: 75%"></div>
+                        </div>
+                        <span class="text-[10px] text-text-desc">750/1000 XP</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-warning text-sm streak-flame">local_fire_department</span>
+                            <span class="text-xs font-bold text-white">5 Gün</span>
+                        </div>
+                        <span class="text-[10px] text-text-desc">Seri!</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-white/10">
+                <div class="text-center">
+                    <p class="text-lg font-bold text-white">24</p>
+                    <p class="text-[9px] text-text-desc uppercase tracking-wide">Tamamlanan</p>
+                </div>
+                <div class="text-center border-x border-white/10">
+                    <p class="text-lg font-bold text-gold-primary">3</p>
+                    <p class="text-[9px] text-text-desc uppercase tracking-wide">Bugün</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-lg font-bold text-accent-purple">#42</p>
+                    <p class="text-[9px] text-text-desc uppercase tracking-wide">Sıralama</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24 -mt-2">
+    <div class="px-4 pt-2">
+        
+        <!-- Daily Bonus Card -->
+        <div id="daily-bonus" class="mb-4 relative overflow-hidden rounded-2xl bg-gradient-to-r from-gold-primary/20 via-gold-primary/10 to-transparent border border-gold-primary/30 p-4">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-gold-primary/20 rounded-full blur-2xl -mr-8 -mt-8"></div>
+            <div class="relative flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-gold-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl text-gold-primary bounce-slow">gift</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Günlük Ödül Hazır!</h3>
+                        <p class="text-[10px] text-text-desc mt-0.5">+50 Coin ve +100 XP kazan</p>
+                    </div>
+                </div>
+                <button onclick="claimDailyBonus()" class="px-4 py-2 bg-gold-primary text-darkest rounded-xl text-xs font-bold uppercase tracking-wider active:scale-95 transition-all">Al</button>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="flex justify-center mb-4">
+            <div class="glass-panel rounded-full p-1 flex gap-1">
+                <button id="btn-active" onclick="switchTab('active')" class="tab-active px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">poll</span>Aktif
+                </button>
+                <button id="btn-completed" onclick="switchTab('completed')" class="tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">task_alt</span>Tamamlanan
+                </button>
+                <button id="btn-rewards" onclick="switchTab('rewards')" class="tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xs">redeem</span>Ödüller
+                </button>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="mb-4">
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2" id="category-tabs">
+                <button onclick="filterCategory('all')" class="category-pill active px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="all">
+                    <span class="material-symbols-outlined text-xs">apps</span>Tümü
+                </button>
+                <button onclick="filterCategory('city')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="city">
+                    <span class="material-symbols-outlined text-xs">location_city</span>Şehir
+                </button>
+                <button onclick="filterCategory('transport')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="transport">
+                    <span class="material-symbols-outlined text-xs">directions_bus</span>Ulaşım
+                </button>
+                <button onclick="filterCategory('culture')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="culture">
+                    <span class="material-symbols-outlined text-xs">theater_comedy</span>Kültür
+                </button>
+                <button onclick="filterCategory('environment')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="environment">
+                    <span class="material-symbols-outlined text-xs">park</span>Çevre
+                </button>
+            </div>
+        </div>
+
+        <!-- Active Surveys Count -->
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-[11px] text-text-desc">
+                <span id="survey-count" class="text-gold-primary font-bold">5</span> aktif anket
+            </p>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] text-text-desc">Sıralama:</span>
+                <span class="text-[10px] text-gold-primary font-bold">#42</span>
+                <span class="text-[9px] text-success">↑3</span>
+            </div>
+        </div>
+
+        <!-- Surveys List -->
+        <div id="surveys-container" class="space-y-3">
+            <!-- Survey cards injected by JS -->
+        </div>
+
+        <!-- Leaderboard Teaser -->
+        <div class="mt-6 glass-panel rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">emoji_events</span>Haftalık Liderlik
+                </h3>
+                <button class="text-[10px] text-gold-primary">Tümünü Gör →</button>
+            </div>
+            <div class="space-y-2">
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-white/5">
+                    <div class="w-6 h-6 rounded-full bg-gold-primary/20 flex items-center justify-center text-xs font-bold text-gold-primary">1</div>
+                    <img src="https://i.pravatar.cc/150?img=1" class="w-8 h-8 rounded-full" alt="User"/>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-white">Ahmet Y.</p>
+                        <p class="text-[9px] text-text-desc">45 anket</p>
+                    </div>
+                    <span class="text-xs font-bold text-gold-primary">2,450</span>
+                </div>
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-white/5">
+                    <div class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-text-secondary">2</div>
+                    <img src="https://i.pravatar.cc/150?img=5" class="w-8 h-8 rounded-full" alt="User"/>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-white">Selin K.</p>
+                        <p class="text-[9px] text-text-desc">42 anket</p>
+                    </div>
+                    <span class="text-xs font-bold text-text-secondary">2,280</span>
+                </div>
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-gold-primary/10 border border-gold-primary/30">
+                    <div class="w-6 h-6 rounded-full bg-gold-primary/30 flex items-center justify-center text-xs font-bold text-gold-primary">42</div>
+                    <div class="w-8 h-8 rounded-full bg-gold-primary/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-gold-primary text-sm">person</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-white">Sen</p>
+                        <p class="text-[9px] text-text-desc">24 anket</p>
+                    </div>
+                    <span class="text-xs font-bold text-gold-primary">1,250</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Survey Detail/Participation Modal -->
+<div id="survey-modal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-darkest/98 backdrop-blur-lg modal-backdrop opacity-0 transition-opacity duration-300" onclick="closeSurveyModal()"></div>
+    <div class="absolute inset-0 overflow-y-auto modal-content translate-y-full transition-transform duration-400" style="transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);">
+        <button onclick="closeSurveyModal()" class="fixed top-3 right-3 z-50 w-8 h-8 rounded-full bg-black/40 backdrop-blur flex items-center justify-center active:scale-95">
+            <span class="material-symbols-outlined text-white text-lg">close</span>
+        </button>
+        <div id="survey-content" class="min-h-screen">
+            <!-- Survey content injected by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Reward Modal -->
+<div id="reward-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeRewardModal()"></div>
+    <div class="relative bg-darkest rounded-3xl p-6 max-w-sm w-full border border-gold-primary/30 transform scale-90 opacity-0 transition-all duration-300" id="reward-content">
+        <div class="text-center">
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gold-primary/20 flex items-center justify-center relative">
+                <span class="material-symbols-outlined text-4xl text-gold-primary bounce-slow">stars</span>
+                <div class="absolute inset-0 rounded-full border-2 border-gold-primary/30 animate-ping"></div>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Tebrikler!</h3>
+            <p class="text-sm text-text-desc mb-4" id="reward-text">Anketi tamamladınız ve ödüller kazandınız!</p>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="glass-panel rounded-xl p-3 text-center">
+                    <span class="material-symbols-outlined text-gold-primary text-2xl mb-1">monetization_on</span>
+                    <p class="text-lg font-bold text-gold-primary" id="reward-coins">+50</p>
+                    <p class="text-[10px] text-text-desc">Coin</p>
+                </div>
+                <div class="glass-panel rounded-xl p-3 text-center">
+                    <span class="material-symbols-outlined text-accent-purple text-2xl mb-1">auto_graph</span>
+                    <p class="text-lg font-bold text-accent-purple" id="reward-xp">+100</p>
+                    <p class="text-[10px] text-text-desc">XP</p>
+                </div>
+            </div>
+            <button onclick="closeRewardModal()" class="w-full py-3 bg-gold-primary text-darkest rounded-xl font-bold text-sm uppercase active:scale-95 transition-all">Harika!</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex items-center justify-around px-6 py-2 bg-nav-bg/95 backdrop-blur-md border-t border-border-subtle/30 pb-5 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="anasayfa.html">
+        <span class="material-symbols-outlined text-xl">home</span>
+        <span class="text-[8px] font-medium">Ana sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-primary nav-glow-gold" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-xl">explore</span>
+        <span class="text-[8px] font-medium">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="ara.html">
+    <span class="material-symbols-outlined text-xl">search</span>
+    <span class="text-[8px] font-medium">Ara</span>
+</a>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="profil.html">
+        <span class="material-symbols-outlined text-xl">person</span>
+        <span class="text-[8px] font-medium">Profil</span>
+    </a>
+</nav>
+
+<script>
+// User Data
+let userData = {
+    level: 12,
+    xp: 750,
+    xpToNext: 1000,
+    coins: 1250,
+    streak: 5,
+    completedSurveys: 24,
+    dailyBonusClaimed: false
+};
+
+// Survey Data
+const surveysData = [
+    {
+        id: 'sehir-1',
+        title: 'Bursa\'da Ulaşım',
+        description: 'Toplu taşıma kullanım alışkanlıklarınızı öğrenmek istiyoruz.',
+        category: 'transport',
+        type: 'active',
+        duration: '2 dk',
+        participants: 1234,
+        points: 50,
+        xp: 100,
+        image: 'https://kimi-web-img.moonshot.cn/img/as1.ftcdn.net/6aacbb01788e8fc9f487b54ad7f8ac1171df90da.jpg',
+        questions: [
+            {
+                question: 'En sık kullandığınız ulaşım aracı nedir?',
+                options: ['Otobüs', 'Metro', 'Dolmuş', 'Özel Araç', 'Bisiklet/Yürüyüş'],
+                type: 'single'
+            },
+            {
+                question: 'Toplu taşıma saatlerinden memnun musunuz?',
+                options: ['Çok memnunum', 'Memnunum', 'Kararsızım', 'Memnun değilim', 'Hiç memnun değilim'],
+                type: 'single'
+            },
+            {
+                question: 'Hangi saatlerde yoğunluk yaşıyorsunuz?',
+                options: ['Sabah 07-09', 'Öğlen 12-14', 'Akşam 17-19', 'Gece 22-24'],
+                type: 'multiple'
+            }
+        ],
+        badge: 'Ulaşım Gönüllüsü'
+    },
+    {
+        id: 'kultur-1',
+        title: 'Kültür Etkinlikleri',
+        description: 'Bursa\'daki kültürel etkinliklere katılımınız hakkında bilgi alalım.',
+        category: 'culture',
+        type: 'active',
+        duration: '3 dk',
+        participants: 856,
+        points: 75,
+        xp: 150,
+        image: 'https://kimi-web-img.moonshot.cn/img/mixmag.com.tr/815819c6b05eb9c45494d5ffd234f29b2a699e59.jpg',
+        questions: [
+            {
+                question: 'Son 3 ayda kaç etkinliğe katıldınız?',
+                options: ['Hiç', '1-2', '3-5', '5+'],
+                type: 'single'
+            },
+            {
+                question: 'Hangi tür etkinlikleri tercih edersiniz?',
+                options: ['Konser', 'Tiyatro', 'Sergi', 'Festival', 'Söyleşi'],
+                type: 'multiple'
+            }
+        ],
+        badge: 'Kültür Elçisi'
+    },
+    {
+        id: 'cevre-1',
+        title: 'Yeşil Bursa',
+        description: 'Çevre bilinci ve geri dönüşüm alışkanlıklarınızı değerlendiriyoruz.',
+        category: 'environment',
+        type: 'active',
+        duration: '2 dk',
+        participants: 2341,
+        points: 60,
+        xp: 120,
+        image: 'https://kimi-web-img.moonshot.cn/img/iadsb.tmgrup.com.tr/fb9cacf0039b5199076102d660bb6369d70e01bc',
+        questions: [
+            {
+                question: 'Geri dönüşüm yapıyor musunuz?',
+                options: ['Her zaman', 'Sık sık', 'Bazen', 'Hiç'],
+                type: 'single'
+            },
+            {
+                question: 'Hangi atıkları ayrıştırıyorsunuz?',
+                options: ['Plastik', 'Kağıt', 'Cam', 'Metal', 'Organik'],
+                type: 'multiple'
+            }
+        ],
+        badge: 'Çevre Dostu'
+    },
+    {
+        id: 'sehir-2',
+        title: 'Park ve Bahçeler',
+        description: 'Bursa\'daki parkları değerlendirin.',
+        category: 'city',
+        type: 'active',
+        duration: '2 dk',
+        participants: 567,
+        points: 40,
+        xp: 80,
+        image: 'https://kimi-web-img.moonshot.cn/img/idsb.tmgrup.com.tr/af6f0e4e28ae360c7f4dcff6b17462d3558129a2.jpg',
+        questions: [
+            {
+                question: 'En çok hangi parkı kullanıyorsunuz?',
+                options: ['Merinos', 'Uludağ Milli Parkı', 'Atatürk Kent Ormanı', 'Diğer'],
+                type: 'single'
+            }
+        ],
+        badge: 'Doğa Sever'
+    },
+    {
+        id: 'ulasim-2',
+        title: 'Bisiklet Yolları',
+        description: 'Bisiklet altyapısı hakkında görüşleriniz.',
+        category: 'transport',
+        type: 'active',
+        duration: '3 dk',
+        participants: 432,
+        points: 80,
+        xp: 160,
+        image: 'https://kimi-web-img.moonshot.cn/img/toursce.com/e3bc40b059859414cb8bd6bae7fd33abd3f9c331.jpg',
+        questions: [
+            {
+                question: 'Bisiklet kullanıyor musunuz?',
+                options: ['Her gün', 'Haftada birkaç kez', 'Ayda birkaç kez', 'Hiç'],
+                type: 'single'
+            }
+        ],
+        badge: 'Bisikletçi'
+    }
+];
+
+// Completed surveys sample
+const completedSurveys = [
+    {
+        id: 'completed-1',
+        title: 'Kütüphane Kullanımı',
+        completedDate: '2026-03-23',
+        pointsEarned: 50,
+        xpEarned: 100,
+        badge: 'Kitap Kurdu'
+    },
+    {
+        id: 'completed-2',
+        title: 'Spor Tesisleri',
+        completedDate: '2026-03-22',
+        pointsEarned: 75,
+        xpEarned: 150,
+        badge: 'Sporcu'
+    }
+];
+
+let currentTab = 'active';
+let currentCategory = 'all';
+let currentSurvey = null;
+let currentQuestion = 0;
+let answers = {};
+
+// Initialize
+function init() {
+    renderSurveys();
+    updateUserStats();
+    checkDailyBonus();
+}
+
+// Render surveys based on tab and category
+function renderSurveys() {
+    const container = document.getElementById('surveys-container');
+    const countEl = document.getElementById('survey-count');
+    
+    if (currentTab === 'active') {
+        let filtered = surveysData;
+        if (currentCategory !== 'all') {
+            filtered = filtered.filter(s => s.category === currentCategory);
+        }
+        countEl.textContent = filtered.length;
+        container.innerHTML = filtered.map(survey => createSurveyCard(survey)).join('');
+    } else if (currentTab === 'completed') {
+        countEl.textContent = completedSurveys.length;
+        container.innerHTML = completedSurveys.map(survey => createCompletedCard(survey)).join('');
+    } else if (currentTab === 'rewards') {
+        countEl.textContent = '3';
+        container.innerHTML = createRewardsSection();
+    }
+}
+
+function createSurveyCard(survey) {
+    const categoryIcons = {
+        city: 'location_city',
+        transport: 'directions_bus',
+        culture: 'theater_comedy',
+        environment: 'park'
+    };
+    
+    return `
+        <div class="survey-card rounded-xl overflow-hidden relative" onclick="openSurvey('${survey.id}')">
+            <div class="flex">
+                <div class="w-24 h-24 shrink-0 relative">
+                    <img src="${survey.image}" class="w-full h-full object-cover" alt="${survey.title}"/>
+                    <div class="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-gold-primary/90 text-darkest text-[8px] font-bold rounded">${survey.duration}</div>
+                </div>
+                <div class="flex-1 p-3 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="material-symbols-outlined text-[10px] text-gold-primary">${categoryIcons[survey.category]}</span>
+                            <span class="text-[9px] text-text-desc uppercase">${survey.category}</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white leading-tight mb-1">${survey.title}</h3>
+                        <p class="text-[10px] text-text-desc line-clamp-1">${survey.description}</p>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] text-text-desc flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[10px]">people</span>${survey.participants}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold text-gold-primary">+${survey.points}</span>
+                            <span class="material-symbols-outlined text-gold-primary text-sm">chevron_right</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5">
+                <div class="h-full bg-gold-primary/50" style="width: ${Math.random() * 40 + 10}%"></div>
+            </div>
+        </div>
+    `;
+}
+
+function createCompletedCard(survey) {
+    return `
+        <div class="survey-card rounded-xl p-3 opacity-75">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-success">check_circle</span>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-white">${survey.title}</h3>
+                    <p class="text-[9px] text-text-desc">${survey.completedDate} tamamlandı</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-bold text-gold-primary">+${survey.pointsEarned}</span>
+                    <p class="text-[8px] text-text-desc">XP +${survey.xpEarned}</p>
+                </div>
+            </div>
+            <div class="mt-2 flex items-center gap-2">
+                <span class="badge-shine px-2 py-0.5 bg-gold-primary/20 border border-gold-primary/30 rounded text-[8px] text-gold-primary font-bold">${survey.badge}</span>
+            </div>
+        </div>
+    `;
+}
+
+function createRewardsSection() {
+    return `
+        <div class="space-y-3">
+            <div class="glass-panel rounded-xl p-4">
+                <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary">redeem</span>Coin Market
+                </h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-accent-blue/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-accent-blue">confirmation_number</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Etkinlik Bileti</p>
+                                <p class="text-[9px] text-text-desc">Bursa Kültür A.Ş.</p>
+                            </div>
+                        </div>
+                        <button class="px-3 py-1.5 bg-gold-primary text-darkest rounded-lg text-[10px] font-bold">500 Coin</button>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-accent-purple/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-accent-purple">local_cafe</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Kahve İndirimi</p>
+                                <p class="text-[9px] text-text-desc">%20 İndirim</p>
+                            </div>
+                        </div>
+                        <button class="px-3 py-1.5 bg-gold-primary text-darkest rounded-lg text-[10px] font-bold">200 Coin</button>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-success/20 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-success">park</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Ağaç Dikme</p>
+                                <p class="text-[9px] text-text-desc">Adınıza 1 Fidan</p>
+                            </div>
+                        </div>
+                        <button class="px-3 py-1.5 bg-gold-primary text-darkest rounded-lg text-[10px] font-bold">1000 Coin</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-panel rounded-xl p-4">
+                <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-purple">military_tech</span>Rozetlerim
+                </h3>
+                <div class="grid grid-cols-4 gap-2">
+                    <div class="text-center p-2 rounded-lg bg-gold-primary/20 border border-gold-primary/30">
+                        <span class="material-symbols-outlined text-gold-primary text-xl">directions_bus</span>
+                        <p class="text-[8px] text-text-desc mt-1">Ulaşım</p>
+                    </div>
+                    <div class="text-center p-2 rounded-lg bg-white/5 opacity-50">
+                        <span class="material-symbols-outlined text-text-desc text-xl">theater_comedy</span>
+                        <p class="text-[8px] text-text-desc mt-1">Kültür</p>
+                    </div>
+                    <div class="text-center p-2 rounded-lg bg-white/5 opacity-50">
+                        <span class="material-symbols-outlined text-text-desc text-xl">park</span>
+                        <p class="text-[8px] text-text-desc mt-1">Çevre</p>
+                    </div>
+                    <div class="text-center p-2 rounded-lg bg-white/5 opacity-50">
+                        <span class="material-symbols-outlined text-text-desc text-xl">add</span>
+                        <p class="text-[8px] text-text-desc mt-1">Daha</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Tab switching
+function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('btn-active').className = tab === 'active' ? 'tab-active px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5' : 'tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+    document.getElementById('btn-completed').className = tab === 'completed' ? 'tab-active px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5' : 'tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+    document.getElementById('btn-rewards').className = tab === 'rewards' ? 'tab-active px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5' : 'tab-passive px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5';
+    renderSurveys();
+}
+
+// Category filtering
+function filterCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.category === category);
+    });
+    renderSurveys();
+}
+
+// Open survey modal
+function openSurvey(surveyId) {
+    currentSurvey = surveysData.find(s => s.id === surveyId);
+    currentQuestion = 0;
+    answers = {};
+    renderSurveyModal();
+    
+    const modal = document.getElementById('survey-modal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        modal.querySelector('.modal-backdrop').classList.remove('opacity-0');
+        modal.querySelector('.modal-content').classList.remove('translate-y-full');
+    }, 10);
+}
+
+function renderSurveyModal() {
+    const content = document.getElementById('survey-content');
+    const question = currentSurvey.questions[currentQuestion];
+    const progress = ((currentQuestion) / currentSurvey.questions.length) * 100;
+    
+    content.innerHTML = `
+        <div class="relative h-[200px] shrink-0">
+            <img src="${currentSurvey.image}" class="w-full h-full object-cover" alt="${currentSurvey.title}"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent"></div>
+            <div class="absolute top-3 left-3 px-2 py-1 rounded-lg bg-white/10 backdrop-blur text-[10px] font-bold text-white">Soru ${currentQuestion + 1}/${currentSurvey.questions.length}</div>
+            <div class="absolute bottom-0 left-0 right-0 p-4">
+                <div class="w-full h-1 bg-white/20 rounded-full mb-3">
+                    <div class="h-full bg-gold-primary rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                </div>
+                <h2 class="text-xl font-bold text-white leading-tight">${currentSurvey.title}</h2>
+            </div>
+        </div>
+        <div class="px-4 py-6">
+            <h3 class="text-base font-bold text-white mb-4">${question.question}</h3>
+            <div class="space-y-2">
+                ${question.options.map((option, idx) => `
+                    <div class="option-card p-4 rounded-xl bg-white/5 cursor-pointer flex items-center gap-3" onclick="selectOption(${idx}, '${option}')" data-idx="${idx}">
+                        <div class="w-5 h-5 rounded-full border-2 border-white/30 flex items-center justify-center">
+                            <div class="w-2.5 h-2.5 rounded-full bg-gold-primary opacity-0 transition-opacity"></div>
+                        </div>
+                        <span class="text-sm text-white">${option}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <button id="next-btn" onclick="nextQuestion()" class="w-full mt-6 py-3 bg-gold-primary text-darkest rounded-xl font-bold text-sm uppercase active:scale-95 transition-all opacity-50" disabled>Devam</button>
+        </div>
+    `;
+}
+
+function selectOption(idx, value) {
+    answers[currentQuestion] = value;
+    document.querySelectorAll('.option-card').forEach((card, i) => {
+        const dot = card.querySelector('.w-2\\.5');
+        if (i === idx) {
+            card.classList.add('selected');
+            dot.classList.remove('opacity-0');
+        } else {
+            card.classList.remove('selected');
+            dot.classList.add('opacity-0');
+        }
+    });
+    document.getElementById('next-btn').disabled = false;
+    document.getElementById('next-btn').classList.remove('opacity-50');
+}
+
+function nextQuestion() {
+    if (currentQuestion < currentSurvey.questions.length - 1) {
+        currentQuestion++;
+        renderSurveyModal();
+    } else {
+        completeSurvey();
+    }
+}
+
+function completeSurvey() {
+    // Update user data
+    userData.coins += currentSurvey.points;
+    userData.xp += currentSurvey.xp;
+    userData.completedSurveys++;
+    
+    // Check level up
+    if (userData.xp >= userData.xpToNext) {
+        userData.level++;
+        userData.xp = userData.xp - userData.xpToNext;
+        userData.xpToNext = Math.floor(userData.xpToNext * 1.2);
+    }
+    
+    updateUserStats();
+    closeSurveyModal();
+    showRewardModal();
+}
+
+// Reward modal
+function showRewardModal() {
+    const modal = document.getElementById('reward-modal');
+    const content = document.getElementById('reward-content');
+    
+    document.getElementById('reward-coins').textContent = `+${currentSurvey.points}`;
+    document.getElementById('reward-xp').textContent = `+${currentSurvey.xp}`;
+    document.getElementById('reward-text').innerHTML = `<b>${currentSurvey.title}</b> anketini tamamladınız!<br><span class="text-gold-primary text-xs">${currentSurvey.badge} rozeti kazandınız!</span>`;
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        content.classList.remove('scale-90', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeRewardModal() {
+    const content = document.getElementById('reward-content');
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-90', 'opacity-0');
+    setTimeout(() => {
+        document.getElementById('reward-modal').classList.add('hidden');
+        document.getElementById('reward-modal').classList.remove('flex');
+    }, 300);
+}
+
+function closeSurveyModal() {
+    const modal = document.getElementById('survey-modal');
+    modal.querySelector('.modal-backdrop').classList.add('opacity-0');
+    modal.querySelector('.modal-content').classList.add('translate-y-full');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }, 400);
+}
+
+// Daily bonus
+function checkDailyBonus() {
+    if (userData.dailyBonusClaimed) {
+        document.getElementById('daily-bonus').style.display = 'none';
+    }
+}
+
+function claimDailyBonus() {
+    userData.coins += 50;
+    userData.xp += 100;
+    userData.dailyBonusClaimed = true;
+    updateUserStats();
+    document.getElementById('daily-bonus').style.display = 'none';
+    
+    // Show mini notification
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 bg-gold-primary text-darkest px-4 py-2 rounded-full text-sm font-bold z-50 animate-bounce';
+    toast.innerHTML = '+50 Coin Kazandınız!';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+}
+
+// Update user stats display
+function updateUserStats() {
+    document.getElementById('user-coins').textContent = userData.coins.toLocaleString();
+    const progressPercent = (userData.xp / userData.xpToNext) * 100;
+    const circle = document.getElementById('level-progress');
+    const circumference = 2 * Math.PI * 28;
+    const offset = circumference - (progressPercent / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
+}
+
+// Navigation
+function goBack() {
+    if (window.history.length > 1) window.history.back();
+    else window.location.href = 'bursa.html';
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

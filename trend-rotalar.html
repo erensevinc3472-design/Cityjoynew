@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#081F24">
+    <title>CityJoy - Trend Rotalar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #081F24;
+            color: #f1f5f9;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 20;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(23, 70, 75, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(63, 110, 112, 0.3);
+            border-radius: 20px;
+        }
+        
+        .glass-button {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-button:active {
+            transform: scale(0.96);
+            background: rgba(224, 176, 122, 0.15);
+            border-color: rgba(224, 176, 122, 0.4);
+        }
+        
+        .glass-button.active {
+            background: rgba(224, 176, 122, 0.25);
+            border-color: rgba(224, 176, 122, 0.5);
+            color: #E0B07A;
+        }
+        
+        /* Toggle Button */
+        .toggle-btn {
+            flex: 1;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(63, 110, 112, 0.4);
+            border-radius: 16px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.02em;
+        }
+        
+        .toggle-btn.active {
+            background: rgba(224, 176, 122, 0.2);
+            border-color: rgba(224, 176, 122, 0.5);
+            color: #E0B07A;
+            box-shadow: 0 4px 20px rgba(224, 176, 122, 0.15);
+        }
+        
+        .toggle-btn .material-symbols-outlined {
+            font-size: 18px;
+        }
+        
+        /* Category Pills */
+        .category-pill {
+            flex-shrink: 0;
+            padding: 10px 18px;
+            background: rgba(23, 70, 75, 0.5);
+            border: 1px solid rgba(63, 110, 112, 0.3);
+            border-radius: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: -0.01em;
+        }
+        
+        .category-pill.active {
+            background: rgba(224, 176, 122, 0.15);
+            border-color: rgba(224, 176, 122, 0.4);
+            color: #E0B07A;
+        }
+        
+        /* Carousel */
+        .carousel-viewport {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 20px 0;
+        }
+        
+        .carousel-viewport::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .carousel-track {
+            display: flex;
+            gap: 16px;
+            padding: 0 20px;
+        }
+        
+        /* Route Cards */
+        .route-card {
+            flex: 0 0 300px;
+            height: 420px;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            scroll-snap-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            background: #000;
+        }
+        
+        .route-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 40%, rgba(0, 0, 0, 0.9) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .card-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .route-card:active .card-bg {
+            transform: scale(1.05);
+        }
+        
+        .card-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px;
+            z-index: 2;
+        }
+        
+        .card-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: rgba(224, 176, 122, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #E0B07A;
+            margin-bottom: 12px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+        
+        .card-subtitle {
+            font-size: 13px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        
+        .card-stats {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+        
+        .stat .material-symbols-outlined {
+            font-size: 16px;
+            color: #E0B07A;
+            font-variation-settings: 'FILL' 1, 'wght' 300;
+        }
+        
+        .card-price {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            background: rgba(8, 31, 36, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.3);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #E0B07A;
+            z-index: 2;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .card-price.updating {
+            animation: pricePulse 0.5s ease;
+        }
+        
+        @keyframes pricePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); background: rgba(224, 176, 122, 0.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Card Action Buttons */
+        .card-actions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 3;
+        }
+        
+        .card-action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(8, 31, 36, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .card-action-btn:hover {
+            background: rgba(224, 176, 122, 0.2);
+            border-color: rgba(224, 176, 122, 0.4);
+        }
+        
+        .card-action-btn .material-symbols-outlined {
+            font-size: 20px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .card-action-btn.active .material-symbols-outlined {
+            color: #ff4757;
+            font-variation-settings: 'FILL' 1, 'wght' 400;
+        }
+        
+        /* Pagination Dots */
+        .pagination-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            padding: 16px 0;
+        }
+        
+        .pagination-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+        }
+        
+        .pagination-dot.active {
+            background: #E0B07A;
+            width: 24px;
+            border-radius: 3px;
+        }
+        
+        /* Smoke Effect */
+        .smoke-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 300px;
+            z-index: 5;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .smoke-layer {
+            position: absolute;
+            bottom: -50px;
+            left: -50%;
+            right: -50%;
+            height: 400px;
+            opacity: 0.6;
+            filter: blur(60px);
+            animation: smokeRise 10s ease-in-out infinite;
+        }
+        
+        .smoke-domestic {
+            background: radial-gradient(ellipse at center bottom, 
+                rgba(224, 176, 122, 0.4) 0%, 
+                rgba(224, 176, 122, 0.2) 30%, 
+                rgba(8, 31, 36, 0.1) 60%, 
+                transparent 100%);
+        }
+        
+        .smoke-international {
+            background: radial-gradient(ellipse at center bottom, 
+                rgba(0, 212, 255, 0.4) 0%, 
+                rgba(0, 212, 255, 0.2) 30%, 
+                rgba(8, 31, 36, 0.1) 60%, 
+                transparent 100%);
+        }
+        
+        @keyframes smokeRise {
+            0%, 100% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translateY(-30px) scale(1.1) rotate(2deg);
+                opacity: 0.7;
+            }
+        }
+        
+        /* Section Title */
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #E0B07A;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-headline {
+            font-size: 28px;
+            font-weight: 300;
+            line-height: 1.2;
+            color: #fff;
+            letter-spacing: -0.03em;
+        }
+        
+        /* Price Update Indicator */
+        .price-update-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: rgba(23, 70, 75, 0.6);
+            border-radius: 20px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0 20px 16px;
+        }
+        
+        .price-update-indicator .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #00d9ff;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        /* Bottom Info */
+        .bottom-info {
+            padding: 20px 24px;
+            background: linear-gradient(to top, rgba(8, 31, 36, 0.98) 0%, rgba(8, 31, 36, 0.8) 60%, transparent 100%);
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+        }
+        
+        .info-text span {
+            color: #E0B07A;
+            font-weight: 500;
+        }
+        
+        /* Navigation - UPDATED */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: rgba(10, 42, 47, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(63, 110, 112, 0.3);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 20px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 400;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+        }
+        
+        .nav-item.active {
+            color: #E0B07A;
+        }
+        
+        .nav-item .material-symbols-outlined {
+            font-size: 24px;
+            font-variation-settings: 'FILL' 0, 'wght' 200;
+            transition: all 0.2s;
+        }
+        
+        .nav-item.active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 300;
+        }
+        
+        /* AI Recommendation Badge */
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(75, 0, 130, 0.3));
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #c77dff;
+            margin-bottom: 16px;
+        }
+        
+        .ai-badge .material-symbols-outlined {
+            font-size: 16px;
+            animation: sparkle 2s infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        /* Price Alert Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: linear-gradient(180deg, #0D3238 0%, #081F24 100%);
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            width: 100%;
+            max-width: 430px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            border-top: 1px solid rgba(224, 176, 122, 0.3);
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        /* Responsive */
+        @media (max-width: 380px) {
+            .route-card {
+                flex: 0 0 260px;
+                height: 380px;
+            }
+            .section-headline {
+                font-size: 24px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .route-card {
+                flex: 0 0 340px;
+                height: 480px;
+            }
+            .carousel-track {
+                padding: 0 calc(50vw - 170px);
+            }
+        }
+        
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body class="min-h-screen pb-24">
+
+    <div class="relative mx-auto min-h-screen max-w-[430px] flex flex-col bg-[#081F24] overflow-x-hidden border-x border-[#3F6E70]/20">
+
+        <!-- Header -->
+        <header class="sticky top-0 z-30 bg-[#081F24]/95 backdrop-blur-xl px-5 pt-14 pb-4 border-b border-[#3F6E70]/30">
+            <div class="grid grid-cols-3 items-center">
+                <div class="flex items-center justify-start">
+                    <button onclick="goBack()" class="cursor-pointer p-2 -ml-2 hover:bg-[#17464B]/30 rounded-lg transition-colors">
+                        <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+                    </button>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                    <h1 class="text-[14px] font-light tracking-[0.2em] uppercase opacity-80 whitespace-nowrap">Trend Rotalar</h1>
+                    <span class="text-[10px] text-[#E0B07A] mt-0.5" id="regionLabel">Yurt İçi</span>
+                </div>
+                <div class="flex items-center justify-end"></div>
+            </div>
+        </header>
+
+        
+
+        <!-- Toggle -->
+        <div class="px-5 pt-2 pb-2">
+            <div class="flex gap-3">
+                <button class="toggle-btn active" onclick="setRegion('domestic')" id="btn-domestic">
+                    <span class="material-symbols-outlined">home</span>
+                    Yurt İçi
+                </button>
+                <button class="toggle-btn" onclick="setRegion('international')" id="btn-international">
+                    <span class="material-symbols-outlined">flight</span>
+                    Yurt Dışı
+                </button>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="px-5 py-3">
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar" id="categoryContainer">
+                <button class="category-pill active" onclick="setCategory('all')">Tümü</button>
+                <button class="category-pill" onclick="setCategory('nature')">Doğa</button>
+                <button class="category-pill" onclick="setCategory('culture')">Kültür</button>
+                <button class="category-pill" onclick="setCategory('sea')">Deniz</button>
+                <button class="category-pill" onclick="setCategory('adventure')">Macera</button>
+            </div>
+        </div>
+
+        <!-- Section Title -->
+        <div class="px-5 pt-2 pb-4">
+            <div class="section-label">
+                <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+                Popüler Rotalar
+            </div>
+            <h2 class="section-headline" id="sectionTitle">Türkiye'nin Gizli Cennetleri</h2>
+        </div>
+
+        <!-- Live Price Indicator -->
+        <div class="price-update-indicator">
+            <span class="live-dot"></span>
+            <span>Fiyatlar canlı güncelleniyor • Son: <span id="lastUpdate">şimdi</span></span>
+        </div>
+
+        <!-- Carousel -->
+        <div class="carousel-viewport" id="carouselViewport">
+            <div class="carousel-track" id="carouselTrack">
+                
+                <!-- Kart 1: Karadeniz -->
+                <article class="route-card" data-index="0" data-category="nature" onclick="openRouteDetail('karadeniz')">
+                    <div class="card-actions">
+                        <button class="card-action-btn" onclick="event.stopPropagation(); toggleFavorite(this)">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </button>
+                        <button class="card-action-btn" onclick="event.stopPropagation(); shareRoute('karadeniz')">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                    <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=800&q=80')"></div>
+                    <div class="card-price" id="price-karadeniz">₺12,500</div>
+                    <div class="card-content">
+                        <div class="card-badge">Doğa</div>
+                        <h3 class="card-title">Karadeniz Yaylaları</h3>
+                        <div class="card-subtitle">Rize, Trabzon, Artvin • 5-7 gün</div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="material-symbols-outlined">star</span>
+                                4.8
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">groups</span>
+                                850K
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">eco</span>
+                                Sürdürülebilir
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Kart 2: Kapadokya -->
+                <article class="route-card" data-index="1" data-category="culture" onclick="openRouteDetail('kapadokya')">
+                    <div class="card-actions">
+                        <button class="card-action-btn" onclick="event.stopPropagation(); toggleFavorite(this)">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </button>
+                        <button class="card-action-btn" onclick="event.stopPropagation(); shareRoute('kapadokya')">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                    <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=800&q=80')"></div>
+                    <div class="card-price" id="price-kapadokya">₺8,900</div>
+                    <div class="card-content">
+                        <div class="card-badge">Kültür</div>
+                        <h3 class="card-title">Kapadokya & Nevşehir</h3>
+                        <div class="card-subtitle">Peri bacaları, balon turları • 3-4 gün</div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="material-symbols-outlined">star</span>
+                                4.9
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">groups</span>
+                                1.2M
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">flight</span>
+                                Balon
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Kart 3: Antalya -->
+                <article class="route-card" data-index="2" data-category="sea" onclick="openRouteDetail('antalya')">
+                    <div class="card-actions">
+                        <button class="card-action-btn" onclick="event.stopPropagation(); toggleFavorite(this)">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </button>
+                        <button class="card-action-btn" onclick="event.stopPropagation(); shareRoute('antalya')">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                    <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80')"></div>
+                    <div class="card-price" id="price-antalya">₺15,200</div>
+                    <div class="card-content">
+                        <div class="card-badge">Deniz</div>
+                        <h3 class="card-title">Antalya & Kaş</h3>
+                        <div class="card-subtitle">Turkuaz koylar, Likya yolu • 4-5 gün</div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="material-symbols-outlined">star</span>
+                                4.7
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">groups</span>
+                                2.1M
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">beach_access</span>
+                                Mavi Bayrak
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Kart 4: Pamukkale -->
+                <article class="route-card" data-index="3" data-category="adventure" onclick="openRouteDetail('pamukkale')">
+                    <div class="card-actions">
+                        <button class="card-action-btn" onclick="event.stopPropagation(); toggleFavorite(this)">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </button>
+                        <button class="card-action-btn" onclick="event.stopPropagation(); shareRoute('pamukkale')">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                    <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1527838832700-5059252407fa?w=800&q=80')"></div>
+                    <div class="card-price" id="price-pamukkale">₺6,500</div>
+                    <div class="card-content">
+                        <div class="card-badge">Macera</div>
+                        <h3 class="card-title">Pamukkale & Salda</h3>
+                        <div class="card-subtitle">Beyaz travertenler, glamping • 2-3 gün</div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="material-symbols-outlined">star</span>
+                                4.6
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">groups</span>
+                                420K
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">terrain</span>
+                                UNESCO
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Kart 5: Abant -->
+                <article class="route-card" data-index="4" data-category="nature" onclick="openRouteDetail('abant')">
+                    <div class="card-actions">
+                        <button class="card-action-btn" onclick="event.stopPropagation(); toggleFavorite(this)">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </button>
+                        <button class="card-action-btn" onclick="event.stopPropagation(); shareRoute('abant')">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                    <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80')"></div>
+                    <div class="card-price" id="price-abant">₺4,200</div>
+                    <div class="card-content">
+                        <div class="card-badge">Doğa</div>
+                        <h3 class="card-title">Abant & Gölcük</h3>
+                        <div class="card-subtitle">Göl manzarası, doğa yürüyüşü • 2 gün</div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="material-symbols-outlined">star</span>
+                                4.5
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">groups</span>
+                                380K
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">forest</span>
+                                Milli Park
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Kart 6: Efes -->
+                <article class="route-card" data-index="5" data-category="culture" onclick="openRouteDetail('efes')">
+                    <div class="card-actions">
+                        <button class="card-action-btn" onclick="event.stopPropagation(); toggleFavorite(this)">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </button>
+                        <button class="card-action-btn" onclick="event.stopPropagation(); shareRoute('efes')">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                    <div class="card-bg" style="background-image: url('https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=800&q=80')"></div>
+                    <div class="card-price" id="price-efes">₺5,800</div>
+                    <div class="card-content">
+                        <div class="card-badge">Kültür</div>
+                        <h3 class="card-title">Efes & Şirince</h3>
+                        <div class="card-subtitle">Antik kent, şarap köyü • 2-3 gün</div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="material-symbols-outlined">star</span>
+                                4.7
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">groups</span>
+                                650K
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">history</span>
+                                Antik
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-dots" id="paginationDots">
+            <div class="pagination-dot active" onclick="scrollToCard(0)"></div>
+            <div class="pagination-dot" onclick="scrollToCard(1)"></div>
+            <div class="pagination-dot" onclick="scrollToCard(2)"></div>
+            <div class="pagination-dot" onclick="scrollToCard(3)"></div>
+            <div class="pagination-dot" onclick="scrollToCard(4)"></div>
+            <div class="pagination-dot" onclick="scrollToCard(5)"></div>
+        </div>
+
+        <!-- Smoke Effect -->
+        <div class="smoke-container">
+            <div class="smoke-layer smoke-domestic" id="smokeLayer"></div>
+        </div>
+
+        <!-- Bottom Info -->
+        <div class="bottom-info">
+            <p class="info-text">2025'in en çok tercih edilen <span>6 rota</span></p>
+        </div>
+
+        <!-- Bottom Navigation - 4 ITEMS -->
+        <nav class="bottom-nav">
+            <a href="anasayfa.html" class="nav-item" onclick="setActiveNav(this)">
+                <span class="material-symbols-outlined">home</span>
+                <span>Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="nav-item active" onclick="setActiveNav(this)">
+                <span class="material-symbols-outlined">explore</span>
+                <span>Keşfet</span>
+            </a>
+            <a href="kesfet-ara.html" class="nav-item" onclick="setActiveNav(this)">
+                <span class="material-symbols-outlined">search</span>
+                <span>Ara</span>
+            </a>
+            <a href="profil.html" class="nav-item" onclick="setActiveNav(this)">
+                <span class="material-symbols-outlined">person</span>
+                <span>Profil</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- Price Alert Modal -->
+    <div class="modal-overlay" id="priceAlertModal" onclick="closePriceAlert()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-white">Fiyat Alarmı</h3>
+                <button onclick="closePriceAlert()" class="p-2 hover:bg-white/10 rounded-full">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <p class="text-sm text-white/70 mb-4">Bu rotanın fiyatı düştüğünde bildirim alacaksınız.</p>
+            <div class="flex gap-3">
+                <button class="flex-1 py-3 bg-white/10 rounded-xl text-white text-sm font-medium hover:bg-white/20 transition-colors" onclick="closePriceAlert()">İptal</button>
+                <button class="flex-1 py-3 bg-[#E0B07A] rounded-xl text-[#081F24] text-sm font-semibold hover:bg-[#d4a06a] transition-colors" onclick="setPriceAlert()">Alarm Kur</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const domesticRoutes = [
+            { index: 0, category: 'nature', id: 'karadeniz', image: 'https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?w=800&q=80', badge: 'Doğa', title: 'Karadeniz Yaylaları', subtitle: 'Rize, Trabzon, Artvin • 5-7 gün', price: 12500, rating: '4.8', visitors: '850K', tag: 'Sürdürülebilir', tagIcon: 'eco' },
+            { index: 1, category: 'culture', id: 'kapadokya', image: 'https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?w=800&q=80', badge: 'Kültür', title: 'Kapadokya & Nevşehir', subtitle: 'Peri bacaları, balon turları • 3-4 gün', price: 8900, rating: '4.9', visitors: '1.2M', tag: 'Balon', tagIcon: 'flight' },
+            { index: 2, category: 'sea', id: 'antalya', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80', badge: 'Deniz', title: 'Antalya & Kaş', subtitle: 'Turkuaz koylar, Likya yolu • 4-5 gün', price: 15200, rating: '4.7', visitors: '2.1M', tag: 'Mavi Bayrak', tagIcon: 'beach_access' },
+            { index: 3, category: 'adventure', id: 'pamukkale', image: 'https://images.unsplash.com/photo-1527838832700-5059252407fa?w=800&q=80', badge: 'Macera', title: 'Pamukkale & Salda', subtitle: 'Beyaz travertenler, glamping • 2-3 gün', price: 6500, rating: '4.6', visitors: '420K', tag: 'UNESCO', tagIcon: 'terrain' },
+            { index: 4, category: 'nature', id: 'abant', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80', badge: 'Doğa', title: 'Abant & Gölcük', subtitle: 'Göl manzarası, doğa yürüyüşü • 2 gün', price: 4200, rating: '4.5', visitors: '380K', tag: 'Milli Park', tagIcon: 'forest' },
+            { index: 5, category: 'culture', id: 'efes', image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=800&q=80', badge: 'Kültür', title: 'Efes & Şirince', subtitle: 'Antik kent, şarap köyü • 2-3 gün', price: 5800, rating: '4.7', visitors: '650K', tag: 'Antik', tagIcon: 'history' }
+        ];
+
+        const internationalRoutes = [
+            { index: 0, category: 'culture', id: 'kyoto', image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80', badge: 'Trend #1', badgeStyle: 'background: rgba(255,56,100,0.2); border-color: rgba(255,56,100,0.3); color: #ff6b8a;', title: 'Kyoto & Osaka', subtitle: 'Japonya • 7-10 gün • Sakura mevsimi', price: 1899, currency: '€', rating: '4.9', visitors: '2.4M', tag: '+180%', tagIcon: 'trending_up' },
+            { index: 1, category: 'culture', id: 'puglia', image: 'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800&q=80', badge: 'Editör Seçimi', badgeStyle: 'background: rgba(255,215,0,0.2); border-color: rgba(255,215,0,0.3); color: #ffd700;', title: 'Puglia & Matera', subtitle: 'İtalya • 6-8 gün • Trulli evleri', price: 1450, currency: '€', rating: '4.9', visitors: '1.2M', tag: 'UNESCO', tagIcon: 'museum' },
+            { index: 2, category: 'sea', id: 'zakynthos', image: 'https://images.unsplash.com/photo-1613395877344-13d4c79e4284?w=800&q=80', badge: 'Deniz', badgeStyle: 'background: rgba(0,212,255,0.2); border-color: rgba(0,212,255,0.3); color: #00d4ff;', title: 'Zakynthos & Kefalonya', subtitle: 'Yunanistan • 5-6 gün • İyon adaları', price: 980, currency: '€', rating: '4.7', visitors: '980K', tag: 'Mavi Mağara', tagIcon: 'beach_access' },
+            { index: 3, category: 'nature', id: 'bali', image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80', badge: 'Doğa', badgeStyle: 'background: rgba(0,255,150,0.2); border-color: rgba(0,255,150,0.3); color: #00ff96;', title: 'Bali & Ubud', subtitle: 'Endonezya • 8-10 gün • Tropik cennet', price: 1200, currency: '€', rating: '4.8', visitors: '1.8M', tag: 'Yoga', tagIcon: 'spa' },
+            { index: 4, category: 'adventure', id: 'safari', image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&q=80', badge: 'Macera', badgeStyle: 'background: rgba(138,43,226,0.2); border-color: rgba(138,43,226,0.3); color: #b76eff;', title: 'Safari & Cape Town', subtitle: 'Güney Afrika • 7-9 gün • Big Five', price: 2400, currency: '€', rating: '4.9', visitors: '450K', tag: 'Safari', tagIcon: 'photo_camera' },
+            { index: 5, category: 'nature', id: 'swiss', image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80', badge: 'Doğa', badgeStyle: 'background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); color: #fff;', title: 'Swiss Alps', subtitle: 'İsviçre • 5-7 gün • Glacier Express', price: 1800, currency: '€', rating: '4.9', visitors: '720K', tag: 'Kayak', tagIcon: 'ac_unit' }
+        ];
+
+        let currentRegion = 'domestic';
+        let currentIndex = 0;
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        let priceUpdateInterval;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupObserver();
+            setupTouchEvents();
+            startLivePriceUpdates();
+            updateFavoritesUI();
+        });
+
+        function setupObserver() {
+            const viewport = document.getElementById('carouselViewport');
+            const cards = document.querySelectorAll('.route-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+                        const index = parseInt(entry.target.dataset.index);
+                        if (currentIndex !== index) {
+                            currentIndex = index;
+                            updateDots(index);
+                            entry.target.classList.add('active');
+                        }
+                    } else {
+                        entry.target.classList.remove('active');
+                    }
+                });
+            }, { root: viewport, threshold: 0.5 });
+
+            cards.forEach(card => observer.observe(card));
+        }
+
+        function updateDots(index) {
+            const dots = document.querySelectorAll('.pagination-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        function scrollToCard(index) {
+            const viewport = document.getElementById('carouselViewport');
+            const cardWidth = window.innerWidth < 380 ? 276 : 316;
+            const centerOffset = (viewport.offsetWidth - 300) / 2;
+            
+            viewport.scrollTo({
+                left: index * cardWidth - centerOffset,
+                behavior: 'smooth'
+            });
+        }
+
+        function setRegion(region) {
+            currentRegion = region;
+            
+            // Update buttons
+            document.getElementById('btn-domestic').classList.toggle('active', region === 'domestic');
+            document.getElementById('btn-international').classList.toggle('active', region === 'international');
+            
+            // Update labels
+            document.getElementById('regionLabel').textContent = region === 'domestic' ? 'Yurt İçi' : 'Yurt Dışı';
+            document.getElementById('sectionTitle').textContent = region === 'domestic' ? 'Türkiye\'nin Gizli Cennetleri' : '2025\'in Trend Destinasyonları';
+            
+            // Update smoke effect
+            const smoke = document.getElementById('smokeLayer');
+            smoke.className = `smoke-layer ${region === 'domestic' ? 'smoke-domestic' : 'smoke-international'}`;
+            
+            // Update cards
+            const routes = region === 'domestic' ? domesticRoutes : internationalRoutes;
+            renderCards(routes);
+            
+            // Reset scroll
+            currentIndex = 0;
+            updateDots(0);
+            scrollToCard(0);
+            
+            // Restart price updates
+            startLivePriceUpdates();
+        }
+
+        function renderCards(routes) {
+            const track = document.getElementById('carouselTrack');
+            const currency = currentRegion === 'domestic' ? '₺' : '€';
+            
+            track.innerHTML = routes.map((route, i) => `
+                <article class="route-card ${i === 0 ? 'active' : ''}" data-index="${i}" data-category="${route.category}" data-id="${route.id}" onclick="openRouteDetail('${route.id}')">
+                    <div class="card-actions">
+                        <button class="card-action-btn ${favorites.includes(route.id) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite('${route.id}', this)">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </button>
+                        <button class="card-action-btn" onclick="event.stopPropagation(); shareRoute('${route.id}')">
+                            <span class="material-symbols-outlined">share</span>
+                        </button>
+                    </div>
+                    <div class="card-bg" style="background-image: url('${route.image}')"></div>
+                    <div class="card-price" id="price-${route.id}" data-base-price="${route.price}">${currency}${route.price.toLocaleString()}</div>
+                    <div class="card-content">
+                        <div class="card-badge" style="${route.badgeStyle || ''}">${route.badge}</div>
+                        <h3 class="card-title">${route.title}</h3>
+                        <div class="card-subtitle">${route.subtitle}</div>
+                        <div class="card-stats">
+                            <div class="stat">
+                                <span class="material-symbols-outlined">star</span>
+                                ${route.rating}
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">groups</span>
+                                ${route.visitors}
+                            </div>
+                            <div class="stat">
+                                <span class="material-symbols-outlined">${route.tagIcon}</span>
+                                ${route.tag}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+            
+            setupObserver();
+        }
+
+        function setCategory(category) {
+            // Update active pill
+            document.querySelectorAll('.category-pill').forEach(pill => {
+                pill.classList.remove('active');
+                if (pill.textContent.toLowerCase() === category || (category === 'all' && pill.textContent === 'Tümü')) {
+                    pill.classList.add('active');
+                }
+            });
+            
+            // Filter cards
+            const cards = document.querySelectorAll('.route-card');
+            let visibleCount = 0;
+            
+            cards.forEach((card, index) => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                    card.style.flex = '0 0 300px';
+                    card.dataset.index = visibleCount;
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                    card.style.flex = '0 0 0';
+                }
+            });
+            
+            // Update dots
+            const dotsContainer = document.getElementById('paginationDots');
+            dotsContainer.innerHTML = Array.from({length: visibleCount}, (_, i) => 
+                `<div class="pagination-dot ${i === 0 ? 'active' : ''}" onclick="scrollToCard(${i})"></div>`
+            ).join('');
+            
+            currentIndex = 0;
+            scrollToCard(0);
+        }
+
+        function setupTouchEvents() {
+            const viewport = document.getElementById('carouselViewport');
+            let startX = 0;
+            let isDragging = false;
+
+            viewport.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            }, { passive: true });
+
+            viewport.addEventListener('touchend', (e) => {
+                if (!isDragging) return;
+                
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+                const visibleCards = document.querySelectorAll('.route-card[style*="display: block"], .route-card:not([style*="display: none"])');
+                const maxIndex = visibleCards.length - 1;
+                
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0 && currentIndex < maxIndex) {
+                        scrollToCard(currentIndex + 1);
+                    } else if (diff < 0 && currentIndex > 0) {
+                        scrollToCard(currentIndex - 1);
+                    }
+                }
+                
+                isDragging = false;
+            }, { passive: true });
+        }
+
+        // Live Price Updates
+        function startLivePriceUpdates() {
+            if (priceUpdateInterval) clearInterval(priceUpdateInterval);
+            
+            // Update every 30 seconds
+            priceUpdateInterval = setInterval(() => {
+                updatePrices();
+            }, 30000);
+            
+            // Initial update
+            updateLastUpdateTime();
+        }
+
+        function updatePrices() {
+            const routes = currentRegion === 'domestic' ? domesticRoutes : internationalRoutes;
+            const currency = currentRegion === 'domestic' ? '₺' : '€';
+            
+            routes.forEach(route => {
+                const priceElement = document.getElementById(`price-${route.id}`);
+                if (priceElement) {
+                    // Simulate price change (-5% to +5%)
+                    const change = (Math.random() - 0.5) * 0.1;
+                    const newPrice = Math.round(route.price * (1 + change));
+                    const basePrice = parseInt(priceElement.dataset.basePrice) || route.price;
+                    
+                    // Update display
+                    priceElement.textContent = `${currency}${newPrice.toLocaleString()}`;
+                    priceElement.classList.add('updating');
+                    
+                    // Color indication
+                    if (newPrice < basePrice) {
+                        priceElement.style.color = '#4ade80'; // Green for lower
+                    } else if (newPrice > basePrice) {
+                        priceElement.style.color = '#f87171'; // Red for higher
+                    } else {
+                        priceElement.style.color = '#E0B07A'; // Gold for same
+                    }
+                    
+                    setTimeout(() => {
+                        priceElement.classList.remove('updating');
+                        priceElement.style.color = '#E0B07A';
+                    }, 500);
+                }
+            });
+            
+            updateLastUpdateTime();
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastUpdate').textContent = timeStr;
+        }
+
+        // Favorites
+        function toggleFavorite(routeId, btn) {
+            const index = favorites.indexOf(routeId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                if (btn) btn.classList.remove('active');
+            } else {
+                favorites.push(routeId);
+                if (btn) btn.classList.add('active');
+                
+                // Animation
+                if (btn) {
+                    btn.style.transform = 'scale(1.2)';
+                    setTimeout(() => btn.style.transform = 'scale(1)', 200);
+                }
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+        }
+
+        function updateFavoritesUI() {
+            document.querySelectorAll('.card-action-btn').forEach(btn => {
+                const card = btn.closest('.route-card');
+                if (card) {
+                    const routeId = card.dataset.id;
+                    if (favorites.includes(routeId)) {
+                        btn.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        // Share
+        function shareRoute(routeId) {
+            const routes = [...domesticRoutes, ...internationalRoutes];
+            const route = routes.find(r => r.id === routeId);
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `${route.title} - CityJoy`,
+                    text: `${route.subtitle} - ${route.rating}⭐`,
+                    url: `${window.location.origin}/rota-${routeId}.html`
+                });
+            } else {
+                // Fallback - copy to clipboard
+                const url = `${window.location.origin}/rota-${routeId}.html`;
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('Link kopyalandı!');
+                });
+            }
+        }
+
+        // Navigation
+        function setActiveNav(element) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'anasayfa.html';
+            }
+        }
+
+        // Route Detail Navigation
+        function openRouteDetail(routeId) {
+            // Map route IDs to HTML files
+            const routeFiles = {
+                'karadeniz': 'rota-karadeniz.html',
+                'kapadokya': 'rota-kapadokya.html',
+                'antalya': 'rota-antalya.html',
+                'pamukkale': 'rota-pamukkale.html',
+                'abant': 'rota-abant.html',
+                'efes': 'rota-efes.html',
+                'kyoto': 'rota-kyoto.html',
+                'puglia': 'rota-puglia.html',
+                'zakynthos': 'rota-zakynthos.html',
+                'bali': 'rota-bali.html',
+                'safari': 'rota-safari.html',
+                'swiss': 'rota-swiss.html'
+            };
+            
+            const targetFile = routeFiles[routeId] || `rota-${routeId}.html`;
+            window.location.href = targetFile;
+        }
+
+        // Filters
+        function openFilters() {
+            console.log('Opening filters...');
+            // Filter modal implementation
+        }
+
+        // Price Alert
+        function openPriceAlert() {
+            document.getElementById('priceAlertModal').classList.add('active');
+        }
+
+        function closePriceAlert() {
+            document.getElementById('priceAlertModal').classList.remove('active');
+        }
+
+        function setPriceAlert() {
+            showToast('Fiyat alarmı kuruldu!');
+            closePriceAlert();
+        }
+
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-[#17464B] text-white px-6 py-3 rounded-full text-sm font-medium shadow-lg z-50 animate-bounce';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (priceUpdateInterval) clearInterval(priceUpdateInterval);
+        });
+    </script>
+</body>
+</html>

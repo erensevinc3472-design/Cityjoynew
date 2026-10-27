@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Seyahat Kaşifi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-deep: #081F24;
+            --bg-card: rgba(23, 70, 75, 0.75);
+            --bg-hover: rgba(23, 70, 75, 0.9);
+            --gold: #E0B07A;
+            --gold-soft: rgba(224, 176, 122, 0.2);
+            --gold-border: rgba(224, 176, 122, 0.4);
+            --cyan: #00D4AA;
+            --text-primary: #C7D8DA;
+            --text-secondary: #9FB6B8;
+            --text-muted: #6E8C8E;
+            --border-subtle: rgba(63, 110, 112, 0.4);
+        }
+
+        html, body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: transparent;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Arka Plan - Şeffaf */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -3;
+        }
+
+        .bg-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(4px) brightness(0.5);
+            transform: scale(1.05);
+        }
+
+        /* Overlay - Daha hafif */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                180deg,
+                rgba(8, 31, 36, 0.4) 0%,
+                rgba(8, 31, 36, 0.6) 50%,
+                rgba(8, 31, 36, 0.8) 100%
+            );
+            z-index: -2;
+        }
+
+        /* Sis Efekti */
+        .fog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 0% 100%, rgba(224, 176, 122, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 100% 0%, rgba(0, 212, 170, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* Container */
+        .app-container {
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        /* Header */
+        .header {
+            padding-top: 50px;
+            margin-bottom: 20px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: rgba(23, 70, 75, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button:hover {
+            background: rgba(23, 70, 75, 0.9);
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .back-button .material-symbols-outlined {
+            font-size: 1.4rem;
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .header-spacer {
+            width: 44px;
+        }
+
+        .logo {
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .logo span {
+            color: var(--gold);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .tagline {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hero-subtitle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(0, 212, 170, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 20px;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 16px;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 300;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-title .italic {
+            color: var(--gold);
+            font-weight: 400;
+        }
+
+        .hero-description {
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* CTA */
+        .cta-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Ana Buton - Rota Oluştur ve Trend Rotaları için */
+        .cta-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 20px 32px;
+            background: rgba(10, 42, 47, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1.5px solid var(--gold-border);
+            border-radius: 16px;
+            color: var(--gold);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(224, 176, 122, 0.1);
+        }
+
+        .cta-primary:hover {
+            background: rgba(224, 176, 122, 0.2);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(224, 176, 122, 0.2);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0 20px;
+            opacity: 0.7;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+        }
+
+        .divider-text {
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* Services Section */
+        .services-section {
+            margin-bottom: 20px;
+        }
+
+        /* Tabs */
+        .service-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .service-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .service-tab {
+            flex-shrink: 0;
+            padding: 12px 22px;
+            background: rgba(23, 70, 75, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 25px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 400;
+        }
+
+        .service-tab.active {
+            color: var(--gold);
+            background: rgba(224, 176, 122, 0.15);
+            border-color: var(--gold-border);
+        }
+
+        /* Info Cards Grid (Non-clickable) */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .info-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 18px 6px;
+            background: rgba(23, 70, 75, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            cursor: default;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-card .material-symbols-outlined {
+            font-size: 1.4rem;
+            color: var(--gold);
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .info-card span:last-child {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        /* Package Cards (Clickable) */
+        .package-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .package-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 20px;
+            background: rgba(23, 70, 75, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .package-card:hover {
+            background: rgba(23, 70, 75, 0.85);
+            border-color: rgba(224, 176, 122, 0.4);
+        }
+
+        .package-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(224, 176, 122, 0.2);
+            border: 1px solid var(--gold-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .package-icon .material-symbols-outlined {
+            font-size: 1.4rem;
+            color: var(--gold);
+        }
+
+        .package-info {
+            flex: 1;
+        }
+
+        .package-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .package-desc {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .package-arrow {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .package-card:hover .package-arrow {
+            color: var(--gold);
+            transform: translateX(4px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 31, 36, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: rgba(23, 70, 75, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--gold-border);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 380px;
+            width: 100%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(224, 176, 122, 0.1);
+            border: 1px solid var(--gold-border);
+            border-radius: 10px;
+            color: var(--gold);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(224, 176, 122, 0.2);
+        }
+
+        .modal-close .material-symbols-outlined {
+            font-size: 1.2rem;
+        }
+
+        .modal-body {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .modal-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .modal-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(224, 176, 122, 0.1);
+            border: 1px solid var(--gold-border);
+            border-radius: 12px;
+        }
+
+        .modal-feature .material-symbols-outlined {
+            color: var(--gold);
+            font-size: 1.3rem;
+        }
+
+        .modal-feature span:last-child {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .modal-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 16px;
+            background: rgba(224, 176, 122, 0.2);
+            border: 1.5px solid var(--gold-border);
+            border-radius: 12px;
+            color: var(--gold);
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-cta:hover {
+            background: rgba(224, 176, 122, 0.3);
+            border-color: var(--gold);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            padding: 16px 28px 32px;
+            background: rgba(10, 42, 47, 0.9);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-top: 1px solid var(--border-subtle);
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.55rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            padding: 8px 14px;
+        }
+
+        .nav-item:hover {
+            color: var(--text-secondary);
+        }
+
+        .nav-item.active {
+            color: var(--gold);
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 1.5rem;
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Spacer */
+        .spacer {
+            height: 100px;
+        }
+
+        /* Selection */
+        ::selection {
+            background: var(--gold);
+            color: var(--bg-deep);
+        }
+
+        /* Safe Area */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .header {
+                padding-top: calc(50px + env(safe-area-inset-top));
+            }
+            .bottom-nav {
+                padding-bottom: calc(32px + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Arka Plan - cityjoy-assets klasöründen -->
+    <div class="bg-image">
+        <img src="cityjoy-assets/seyahat-kesif1.jpg" alt="Seyahat Manzarası">
+    </div>
+    <div class="bg-overlay"></div>
+    <div class="fog-overlay"></div>
+
+    <!-- Container -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <a href="seyahat.html" class="back-button">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </a>
+                <div class="logo">SEYAHAT <span>Kaşifi</span></div>
+                <div class="header-spacer"></div>
+            </div>
+            <div class="tagline">Sınır Tanımayan Keşif</div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-subtitle">
+                <span class="material-symbols-outlined" style="font-size: 0.9rem;">psychology</span>
+                AI Destekli
+            </div>
+            <h1 class="hero-title">
+                Dünyayı<br><span class="italic">yeniden</span> keşfet
+            </h1>
+            <p class="hero-description">
+                Özenle seçilmiş destinasyonlar ve unutulmaz deneyimler.
+            </p>
+        </section>
+
+        <!-- CTA - Sadece Rota Oluştur ve Trend Rotaları -->
+        <div class="cta-container">
+            <a href="rota.html" class="cta-primary">
+                <span class="material-symbols-outlined" style="font-size: 1.1rem;">auto_awesome</span>
+                <span>Rotanı Oluştur</span>
+            </a>
+
+            <a href="trend-rotalar.html" class="cta-primary">
+                <span class="material-symbols-outlined" style="font-size: 1.1rem;">trending_up</span>
+                <span>Trend Rotaları</span>
+            </a>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider">
+            <div class="divider-line"></div>
+            <span class="divider-text">Hizmetler</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <!-- Services -->
+        <section class="services-section">
+            <div class="service-tabs">
+                <button class="service-tab active" onclick="switchTab('transport', this)">Ulaşım</button>
+                <button class="service-tab" onclick="switchTab('stay', this)">Konaklama</button>
+                <button class="service-tab" onclick="switchTab('package', this)">Paketler</button>
+            </div>
+
+            <!-- Ulaşım - Sadece Bilgi Kartları (Tıklanamaz) -->
+            <div id="transport" class="service-content" style="display: block;">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">directions_bus</span>
+                        <span>Otobüs</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">flight</span>
+                        <span>Uçak</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">train</span>
+                        <span>Tren</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">directions_car</span>
+                        <span>Araba</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">directions_boat</span>
+                        <span>Feribot</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">airport_shuttle</span>
+                        <span>Servis</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">local_taxi</span>
+                        <span>Taksi</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">hiking</span>
+                        <span>Yürüyüş</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Konaklama - Sadece Bilgi Kartları (Tıklanamaz) -->
+            <div id="stay" class="service-content" style="display: none;">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">hotel</span>
+                        <span>Otel</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">cabin</span>
+                        <span>Bungalov</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">apartment</span>
+                        <span>Butik</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">domain</span>
+                        <span>Apart</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">bed</span>
+                        <span>Pansiyon</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">night_shelter</span>
+                        <span>Hostel</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">villa</span>
+                        <span>Villa</span>
+                    </div>
+                    <div class="info-card">
+                        <span class="material-symbols-outlined">camping</span>
+                        <span>Kamp</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paketler - Tıklanabilir Kartlar -->
+            <div id="package" class="service-content" style="display: none;">
+                <div class="package-list">
+                    <div class="package-card" onclick="openPackageModal('akilli-paket', 'Akıllı Paket Oluştur', 'Ulaşım + Konaklama + Aktiviteler', 'akilli-paket.html')">
+                        <div class="package-icon">
+                            <span class="material-symbols-outlined">auto_awesome</span>
+                        </div>
+                        <div class="package-info">
+                            <div class="package-title">Akıllı Paket Oluştur</div>
+                            <div class="package-desc">Ulaşım + Konaklama + Aktiviteler</div>
+                        </div>
+                        <span class="material-symbols-outlined package-arrow">arrow_forward</span>
+                    </div>
+                    <div class="package-card" onclick="openPackageModal('aile-paket', 'Aile Paketleri', 'Çocuk dostu oteller + Aktiviteler', 'aile-paketleri.html')">
+                        <div class="package-icon">
+                            <span class="material-symbols-outlined">family_restroom</span>
+                        </div>
+                        <div class="package-info">
+                            <div class="package-title">Aile Paketleri</div>
+                            <div class="package-desc">Çocuk dostu oteller + Aktiviteler</div>
+                        </div>
+                        <span class="material-symbols-outlined package-arrow">arrow_forward</span>
+                    </div>
+                    <div class="package-card" onclick="openPackageModal('balayi-paket', 'Balayı Paketleri', 'Romantik kaçamaklar', 'balayi-paketleri.html')">
+                        <div class="package-icon">
+                            <span class="material-symbols-outlined">favorite</span>
+                        </div>
+                        <div class="package-info">
+                            <div class="package-title">Balayı Paketleri</div>
+                            <div class="package-desc">Romantik kaçamaklar</div>
+                        </div>
+                        <span class="material-symbols-outlined package-arrow">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="spacer"></div>
+    </div>
+
+    <!-- Paket Modal -->
+    <div id="packageModal" class="modal-overlay" onclick="closePackageModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Paket Detayı</h3>
+                <button class="modal-close" onclick="closePackageModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Paket içeriği burada görüntülenecek.
+            </div>
+            <div class="modal-features" id="modalFeatures">
+                <!-- Dinamik özellikler buraya gelecek -->
+            </div>
+            <a href="#" class="modal-cta" id="modalCta">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>Seç</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="anasayfa.html" class="nav-item active">
+            <span class="material-symbols-outlined">home</span>
+            <span>Ana</span>
+        </a>
+        <a href="kesfet-genel.html" class="nav-item">
+            <span class="material-symbols-outlined">explore</span>
+            <span>Keşfet</span>
+        </a>
+        <a href="seyahat-ara.html" class="nav-item">
+            <span class="material-symbols-outlined">search</span>
+            <span>Ara</span>
+        </a>
+        <a href="profil.html" class="nav-item">
+            <span class="material-symbols-outlined">person</span>
+            <span>Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        // Sekme değiştirme
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.service-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.querySelectorAll('.service-content').forEach(c => c.style.display = 'none');
+            document.getElementById(tab).style.display = 'block';
+        }
+
+        // Paket verileri
+        const packageData = {
+            'akilli-paket': {
+                title: 'Akıllı Paket Oluştur',
+                description: 'Yapay zeka destekli paket oluşturucumuz ile size en uygun ulaşım, konaklama ve aktivite kombinasyonunu oluşturun.',
+                features: [
+                    { icon: 'psychology', text: 'AI Destekli Öneriler' },
+                    { icon: 'savings', text: 'En Uygun Fiyat Garantisi' },
+                    { icon: 'schedule', text: 'Esnek Tarih Seçenekleri' }
+                ],
+                link: 'akilli-paket.html'
+            },
+            'aile-paket': {
+                title: 'Aile Paketleri',
+                description: 'Çocuk dostu oteller, aile aktiviteleri ve güvenli ulaşım seçenekleri ile unutulmaz bir aile tatili planlayın.',
+                features: [
+                    { icon: 'child_care', text: 'Çocuk Dostu Tesisler' },
+                    { icon: 'sports_esports', text: 'Aile Aktiviteleri' },
+                    { icon: 'local_dining', text: 'Çocuk Menülü Restoranlar' }
+                ],
+                link: 'aile-paketleri.html'
+            },
+            'balayi-paket': {
+                title: 'Balayı Paketleri',
+                description: 'Romantik bir kaçamak için özel hazırlanmış balayı paketleri. Lüks konaklama, özel akşam yemekleri ve unutulmaz anlar.',
+                features: [
+                    { icon: 'spa', text: 'Spa ve Wellness' },
+                    { icon: 'restaurant', text: 'Romantik Akşam Yemekleri' },
+                    { icon: 'photo_camera', text: 'Profesyonel Fotoğraf Çekimi' }
+                ],
+                link: 'balayi-paketleri.html'
+            }
+        };
+
+        // Modal açma
+        function openPackageModal(packageId, title, desc, link) {
+            const modal = document.getElementById('packageModal');
+            const data = packageData[packageId];
+            
+            document.getElementById('modalTitle').textContent = data.title;
+            document.getElementById('modalBody').textContent = data.description;
+            document.getElementById('modalCta').href = data.link;
+            
+            // Özellikleri ekle
+            const featuresContainer = document.getElementById('modalFeatures');
+            featuresContainer.innerHTML = '';
+            data.features.forEach(feature => {
+                featuresContainer.innerHTML += `
+                    <div class="modal-feature">
+                        <span class="material-symbols-outlined">${feature.icon}</span>
+                        <span>${feature.text}</span>
+                    </div>
+                `;
+            });
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Modal kapatma
+        function closePackageModal(event) {
+            if (!event || event.target.id === 'packageModal' || event.target.closest('.modal-close')) {
+                const modal = document.getElementById('packageModal');
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // ESC tuşu ile modal kapatma
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePackageModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Kamu Kurumları - Valilik, Belediye, Emniyet, Sağlık Müdürlüğü ve diğer resmi kurumların adres, telefon ve iletişim bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Kamu Kurumları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "health-green": "#10B981",
+                        "health-blue": "#3B82F6",
+                        "ambulance-orange": "#F97316",
+                        "institution-purple": "#8B5CF6",
+                        "institution-indigo": "#6366F1"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 5000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .institution-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .institution-card:hover {
+            border-color: rgba(224, 176, 122, 0.4);
+            transform: translateY(-2px);
+        }
+        .category-btn {
+            transition: all 0.3s ease;
+        }
+        .category-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .category-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .modal-institution {
+            background: rgba(8, 31, 36, 0.98);
+            backdrop-filter: blur(20px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .service-tag {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+    </style>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="anasayfa.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">KAMU KURUMLARI</h1>
+                <p class="text-xs text-gray-text truncate">Bursa Resmi Kurum ve Kuruluşları</p>
+            </div>
+            <button onclick="openEmergencyModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-live-red/20 hover:bg-live-red/30 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-live-red">emergency</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Acil Bilgi -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-institution-indigo/30 to-institution-purple/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-institution-indigo text-xl">account_balance</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Bursa Kamu Kurumları</h2>
+                            <p class="text-xs text-gray-text">Resmi Kurum ve Kuruluşlar Rehberi</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-health-green/10 border border-health-green/30">
+                        <div class="w-2 h-2 rounded-full bg-health-green animate-pulse"></div>
+                        <span class="text-xs text-health-green font-medium">Güncel</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="info-card rounded-xl p-3 text-center" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%); border: 1px solid rgba(99, 102, 241, 0.2);">
+                        <p class="text-xl sm:text-2xl font-bold text-institution-indigo">08:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Mesai Başlangıcı</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%); border: 1px solid rgba(16, 185, 129, 0.2);">
+                        <p class="text-xl sm:text-2xl font-bold text-health-green">17:00</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Mesai Bitişi</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center" style="background: linear-gradient(135deg, rgba(224, 176, 122, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%); border: 1px solid rgba(224, 176, 122, 0.2);">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">Pzt-Cuma</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Çalışma Günleri</p>
+                    </div>
+                    <div class="info-card rounded-xl p-3 text-center" style="background: linear-gradient(135deg, rgba(248, 113, 82, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%); border: 1px solid rgba(248, 113, 82, 0.2);">
+                        <p class="text-xl sm:text-2xl font-bold text-ambulance-orange">Açık</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Durum</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Arama ve Filtreleme -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">search</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Kurum Ara</h3>
+                        <p class="text-xs text-gray-text truncate">Kurum adı veya kategori ara</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                    <input type="text" id="institutionSearch" placeholder="Örn: Valilik, Belediye, Emniyet..." 
+                        class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"
+                        onkeyup="searchInstitution()"/>
+                </div>
+
+                <!-- Kategori Filtreleri -->
+                <h4 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Kategori Seçin</h4>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button onclick="filterCategory('all')" id="btn-all" class="category-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Tümü</span>
+                    </button>
+                    <button onclick="filterCategory('valilik')" id="btn-valilik" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Valilik</span>
+                    </button>
+                    <button onclick="filterCategory('belediye')" id="btn-belediye" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Belediye</span>
+                    </button>
+                    <button onclick="filterCategory('emniyet')" id="btn-emniyet" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Emniyet</span>
+                    </button>
+                    <button onclick="filterCategory('saglik')" id="btn-saglik" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Sağlık</span>
+                    </button>
+                    <button onclick="filterCategory('egitim')" id="btn-egitim" class="category-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                        <span class="text-sm">Eğitim</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sıkça Sorulan Sorular -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Sıkça Sorulan Sorular</h3>
+                <button onclick="toggleSection('faqSection', 'faqIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="faqIcon" class="material-symbols-outlined rotate-icon open">expand_more</span>
+                </button>
+            </div>
+
+            <div id="faqSection" class="expandable-section open space-y-3">
+                <!-- Çalışma Saatleri -->
+                <div class="institution-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-health-green/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-health-green text-sm">schedule</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Kurumların Çalışma Saatleri Nedir?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Kamu kurumları genellikle hafta içi 08:00 - 17:00 saatleri arasında hizmet verir. 
+                                Öğle arası 12:00 - 13:00 arasıdır. Cuma günleri bazı kurumlar farklı mesai saatleri uygulayabilir.
+                            </p>
+                            <div class="flex gap-2 flex-wrap">
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-health-green">Pzt-Per: 08:00-17:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-health-green">Cuma: 08:00-17:00</span>
+                                <span class="service-tag px-2 py-1 rounded text-[10px] text-live-red">Hafta Sonu: Kapalı</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Randevu Alma -->
+                <div class="institution-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-health-blue/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-health-blue text-sm">event_available</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">Nasıl Randevu Alırım?</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Çoğu kurum için randevu alma yöntemleri:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text mb-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>e-Devlet</strong> üzerinden online randevu</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>Alo 153</strong> (Büyükşehir Belediyesi)</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                                    <span><strong>Kurumun kendi web sitesi</strong> üzerinden</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gerekli Belgeler -->
+                <div class="institution-card rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-ambulance-orange/20 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-ambulance-orange text-sm">description</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-sm mb-1">İşlem İçin Gerekli Belgeler</h4>
+                            <p class="text-xs text-gray-text leading-relaxed mb-2">
+                                Genel olarak talep edilen belgeler:
+                            </p>
+                            <ul class="space-y-1 text-xs text-gray-text">
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Nüfus cüzdanı veya kimlik kartı</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>İkametgah belgesi (e-Devlet'ten alınabilir)</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Fotoğraf (vesikalık)</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[14px] text-gold">check_circle</span>
+                                    <span>Dilekçe (kurumdan temin edilebilir)</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Valilik ve İl Müdürlükleri -->
+        <section class="animate-slide-up category-section" data-category="valilik" style="animation-delay: 0.3s">
+            <button onclick="toggleSection('valilikSection', 'valilikIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-live-red/30 to-live-red/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-live-red">account_balance</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Valilik ve İl Müdürlükleri</span>
+                        <span class="text-[10px] text-gray-text block truncate">Valilik, Kaymakamlıklar, İl Müdürlükleri</span>
+                    </div>
+                </div>
+                <span id="valilikIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="valilikSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa Valiliği -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('valilik')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-live-red flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">account_balance</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Valiliği</h4>
+                                <p class="text-[10px] text-gray-text">Hocaalizade Mah. 6. Kültür Sok. No:2</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 225 19 00 - 0224 222 60 00</span>
+                    </div>
+                </div>
+
+                <!-- Bursa İl Göç İdaresi -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('gocidaresi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">passport</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Göç İdaresi Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Veysel Karani Mah. Sevgi Cad. No:2</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 256 64 58</span>
+                    </div>
+                </div>
+
+                <!-- Bursa İl Nüfus Müdürlüğü -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('nufus')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-green flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">badge</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Nüfus ve Vatandaşlık Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Mimarsinan Mah. Emniyet Cad. No:1/27</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 17 26 - 0224 225 30 16</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Belediyeler -->
+        <section class="animate-slide-up category-section" data-category="belediye" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('belediyeSection', 'belediyeIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-health-blue/30 to-health-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-health-blue">location_city</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Belediyeler</span>
+                        <span class="text-[10px] text-gray-text block truncate">Büyükşehir ve İlçe Belediyeleri</span>
+                    </div>
+                </div>
+                <span id="belediyeIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="belediyeSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa Büyükşehir Belediyesi -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('buyuksehir')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">apartment</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Büyükşehir Belediyesi</h4>
+                                <p class="text-[10px] text-gray-text">Zafer Mah. Ankara Yolu Cd. C Blok No:1</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>Alo 153 / 444 16 00</span>
+                    </div>
+                </div>
+
+                <!-- Osmangazi Belediyesi -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('osmangazi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-institution-indigo flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">home_work</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Osmangazi Belediyesi</h4>
+                                <p class="text-[10px] text-gray-text">Çekirge Mah. Çekirge Cad. No:57</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 10 00</span>
+                    </div>
+                </div>
+
+                <!-- Nilüfer Belediyesi -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('nilufer')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-green flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">park</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Nilüfer Belediyesi</h4>
+                                <p class="text-[10px] text-gray-text">Konak Mah. İhsaniye Cad. No:1</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 441 16 16</span>
+                    </div>
+                </div>
+
+                <!-- Yıldırım Belediyesi -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('yildirim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">mosque</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Yıldırım Belediyesi</h4>
+                                <p class="text-[10px] text-gray-text">Beyazıt Mah. 1. Beyazıt Cad. No:1</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 327 27 27</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Emniyet ve Jandarma -->
+        <section class="animate-slide-up category-section" data-category="emniyet" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('emniyetSection', 'emniyetIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-institution-purple/30 to-institution-purple/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-institution-purple">local_police</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Emniyet ve Jandarma</span>
+                        <span class="text-[10px] text-gray-text block truncate">İl Emniyet, Jandarma, Polis</span>
+                    </div>
+                </div>
+                <span id="emniyetIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="emniyetSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa İl Emniyet Müdürlüğü -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('emniyet')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-institution-purple flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">local_police</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Emniyet Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">İhsaniye Mah. Beşevler Kavşağı</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 270 50 00 - 155</span>
+                    </div>
+                </div>
+
+                <!-- Bursa İl Jandarma Komutanlığı -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('jandarma')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-live-red flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">military_tech</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Jandarma Komutanlığı</h4>
+                                <p class="text-[10px] text-gray-text">Alaşar Mah. İstanbul Cad. 8.Km</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 261 57 07 - 156</span>
+                    </div>
+                </div>
+
+                <!-- Bursa AFAD -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('afad')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">warning</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa AFAD İl Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Küçükbalıklı Mah. 11 Eylül Blv. No:197</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 216 00 00 - 112</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sağlık Kurumları -->
+        <section class="animate-slide-up category-section" data-category="saglik" style="animation-delay: 0.6s">
+            <button onclick="toggleSection('saglikSection', 'saglikIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-health-green/30 to-health-green/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-health-green">local_hospital</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Sağlık Kurumları</span>
+                        <span class="text-[10px] text-gray-text block truncate">İl Sağlık Müdürlüğü, Hastaneler</span>
+                    </div>
+                </div>
+                <span id="saglikIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="saglikSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa İl Sağlık Müdürlüğü -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('saglikmudurlugu')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-green flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">health_and_safety</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Sağlık Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Çekirge Mah. Mimar Sinan Cad. No:6</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 221 19 00 - 184</span>
+                    </div>
+                </div>
+
+                <!-- Bursa Şehir Hastanesi -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('sehirhastanesi')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">emergency</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Şehir Hastanesi</h4>
+                                <p class="text-[10px] text-gray-text">Dumlupınar Mah. 16270 Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 215 00 00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Eğitim Kurumları -->
+        <section class="animate-slide-up category-section" data-category="egitim" style="animation-delay: 0.7s">
+            <button onclick="toggleSection('egitimSection', 'egitimIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">school</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Eğitim Kurumları</span>
+                        <span class="text-[10px] text-gray-text block truncate">İl Milli Eğitim, Üniversiteler</span>
+                    </div>
+                </div>
+                <span id="egitimIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="egitimSection" class="expandable-section mt-3 space-y-3">
+                <!-- Bursa İl Milli Eğitim Müdürlüğü -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('milliegitim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">cast_for_education</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Milli Eğitim Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Hocahasan Mah. İlkbahar Cad. No:38</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 445 16 00 - 147</span>
+                    </div>
+                </div>
+
+                <!-- Uludağ Üniversitesi -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('uludag')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-institution-indigo flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">account_balance</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Uludağ Üniversitesi</h4>
+                                <p class="text-[10px] text-gray-text">Görükle Kampüsü, Nilüfer</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 294 00 00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diğer Kurumlar -->
+        <section class="animate-slide-up category-section" data-category="diger" style="animation-delay: 0.8s">
+            <button onclick="toggleSection('digerSection', 'digerIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-500/30 to-gray-500/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gray-400">business</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold block truncate">Diğer Kurumlar</span>
+                        <span class="text-[10px] text-gray-text block truncate">SGK, İŞKUR, Müftülük, Tarım</span>
+                    </div>
+                </div>
+                <span id="digerIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="digerSection" class="expandable-section mt-3 space-y-3">
+                <!-- SGK -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('sgk')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-blue flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">social_distance</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">SGK Bursa İl Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">İnönü Cad. No:114/3 Osmangazi</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 600 10 00</span>
+                    </div>
+                </div>
+
+                <!-- İŞKUR -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('iskur')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-green flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">work</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Çalışma ve İş Kurumu (İŞKUR)</h4>
+                                <p class="text-[10px] text-gray-text">Üçevler Mah. Esra Sokak No:1 Nilüfer</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 225 15 15 - 444 75 87</span>
+                    </div>
+                </div>
+
+                <!-- Müftülük -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('muftuluk')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-gold flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">mosque</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Müftülüğü</h4>
+                                <p class="text-[10px] text-gray-text">Altınova Mah. İstanbul Cad. No:394</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 220 21 66</span>
+                    </div>
+                </div>
+
+                <!-- Tarım ve Orman -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('tarim')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-health-green flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">agriculture</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Tarım ve Orman Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Adalet Mah. 1. Hürriyet Cad.</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 246 42 30</span>
+                    </div>
+                </div>
+
+                <!-- Kültür ve Turizm -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('kultur')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-institution-purple flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">museum</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa İl Kültür ve Turizm Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Kavaklı Mah. 2. Osmangazi Cad. No:18</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 220 99 26</span>
+                    </div>
+                </div>
+
+                <!-- Ticaret İl Müdürlüğü -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('ticaret')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-ambulance-orange flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">store</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Ticaret İl Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Fethiye OSB Mah. Sarı Cad. No:2/1</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 503 73 06</span>
+                    </div>
+                </div>
+
+                <!-- Aile ve Sosyal Hizmetler -->
+                <div class="institution-card rounded-xl p-4" onclick="openInstitutionDetail('aile')">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-live-red flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-white text-sm">family_restroom</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Bursa Aile ve Sosyal Hizmetler İl Müdürlüğü</h4>
+                                <p class="text-[10px] text-gray-text">Kükürtlü Mah. Mudanya Cd. No:141</p>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined text-gold">chevron_right</span>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-[14px] text-gold">phone</span>
+                        <span>0224 223 19 26</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.9s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="saglik-ocaklari.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-health-green text-xl">local_hospital</span>
+                    <span class="text-[10px] text-center">Sağlık Ocakları</span>
+                </a>
+                <a href="hastaneler.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-live-red text-xl">emergency</span>
+                    <span class="text-[10px] text-center">Hastaneler</span>
+                </a>
+                <a href="eczaneler.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-health-blue text-xl">local_pharmacy</span>
+                    <span class="text-[10px] text-center">Eczaneler</span>
+                </a>
+                <a href="onemli-kurumlar.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-gold text-xl">account_balance</span>
+                    <span class="text-[10px] text-center">Diğer Kurumlar</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation - Hiçbir buton seçili değil -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="kamu-kurumlari.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">account_balance</span>
+                <span class="text-[10px]">kamu kurumları</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Kurum Detay Modalı -->
+    <div id="institutionDetailModal" class="fixed inset-0 z-[80] modal-institution hidden overflow-y-auto">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeInstitutionDetail()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="modalTitle" class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Kurum Detayı</h1>
+                        <p id="modalSubtitle" class="text-xs text-gray-text truncate">Kurum Bilgileri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto pb-24">
+            <!-- Temel Bilgiler -->
+            <div class="glass-card rounded-2xl p-5">
+                <div class="flex items-center gap-4 mb-4">
+                    <div id="modalIcon" class="w-16 h-16 rounded-2xl bg-institution-indigo/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-institution-indigo text-3xl">account_balance</span>
+                    </div>
+                    <div>
+                        <h2 id="modalInstitutionName" class="text-xl font-bold text-white mb-1">Kurum Adı</h2>
+                        <p id="modalCategory" class="text-sm text-gold">Kategori</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">location_on</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Adres</p>
+                            <p id="modalAddress" class="text-sm text-white">Adres bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">schedule</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Çalışma Saatleri</p>
+                            <p class="text-sm text-white">Hafta İçi: 08:00 - 17:00</p>
+                            <p class="text-xs text-gray-text">Öğle Arası: 12:00 - 13:00</p>
+                            <p class="text-xs text-live-red mt-1">Hafta Sonu: Kapalı</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">phone</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Telefon</p>
+                            <p id="modalPhone" class="text-sm text-white">Telefon bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">print</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">Faks</p>
+                            <p id="modalFax" class="text-sm text-white">Faks bilgisi...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-3 bg-white/5 rounded-xl">
+                        <span class="material-symbols-outlined text-gold shrink-0">email</span>
+                        <div>
+                            <p class="text-xs text-gray-text mb-1">E-Posta</p>
+                            <p id="modalEmail" class="text-sm text-white">E-posta bilgisi...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ulaşım Bilgileri -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">directions_bus</span>
+                    Ulaşım
+                </h3>
+
+                <div id="modalTransport" class="space-y-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Verilen Hizmetler -->
+            <div class="glass-card rounded-2xl p-5">
+                <h3 class="text-sm font-bold text-gold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined">handshake</span>
+                    Hizmetler
+                </h3>
+
+                <div id="modalServices" class="grid grid-cols-2 gap-3">
+                    <!-- Dinamik içerik -->
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex gap-3">
+                <button id="modalCallBtn" onclick="callNumber('')" class="flex-1 bg-health-green/20 hover:bg-health-green/30 border border-health-green/50 text-health-green py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    Ara
+                </button>
+                <button id="modalMapBtn" onclick="showMap('')" class="flex-1 bg-gold/20 hover:bg-gold/30 border border-gold/50 text-gold py-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">map</span>
+                    Haritada Aç
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acil Durum Modalı -->
+    <div id="emergencyModal" class="fixed inset-0 z-[80] modal-institution hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeEmergencyModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Acil Durumlar</h1>
+                        <p class="text-xs text-gray-text truncate">Acil Çağrı Merkezleri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <div class="glass-card rounded-2xl p-6 border border-live-red/30">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 rounded-full bg-live-red/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-live-red text-3xl">emergency</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-live-red">112</h2>
+                        <p class="text-sm text-gray-text">Acil Çağrı Merkezi</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-text mb-4">
+                    Hayati tehlike, kaza, yangın, sağlık aciliyeti ve güvenlik durumlarında ücretsiz arayın.
+                </p>
+                <button onclick="callNumber('112')" class="w-full bg-live-red/20 hover:bg-live-red/30 border border-live-red/50 text-live-red py-4 rounded-xl text-lg font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">call</span>
+                    112'yi Ara
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-institution-purple text-2xl mb-2">local_police</span>
+                    <p class="text-lg font-bold text-institution-purple">155</p>
+                    <p class="text-xs text-gray-text">Polis İmdat</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-health-green text-2xl mb-2">military_tech</span>
+                    <p class="text-lg font-bold text-health-green">156</p>
+                    <p class="text-xs text-gray-text">Jandarma</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-health-blue text-2xl mb-2">local_fire_department</span>
+                    <p class="text-lg font-bold text-health-blue">110</p>
+                    <p class="text-xs text-gray-text">İtfaiye</p>
+                </div>
+                <div class="glass-card rounded-xl p-4 text-center">
+                    <span class="material-symbols-outlined text-ambulance-orange text-2xl mb-2">warning</span>
+                    <p class="text-lg font-bold text-ambulance-orange">122</p>
+                    <p class="text-xs text-gray-text">AFAD</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Kurum Veritabanı
+        const institutionData = {
+            'valilik': {
+                name: 'Bursa Valiliği',
+                category: 'Valilik ve İl Müdürlükleri',
+                address: 'Hocaalizade Mah. 6. Kültür Sok. No:2 Heykel, Osmangazi/BURSA',
+                phone: '0224 225 19 00 - 0224 222 60 00',
+                fax: '0224 225 40 07',
+                email: 'bursa@icisleri.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları (Heykel durağı)' },
+                    { icon: 'local_parking', text: 'Valilik yanı otopark (sınırlı)' }
+                ],
+                services: ['İdari İşlemler', 'Valilik Makamı', 'İl Özel İdare', 'Hukuk İşleri', 'Basın ve Halkla İlişkiler'],
+                mapQuery: 'Bursa Valiliği, Heykel, Osmangazi, Bursa'
+            },
+            'gocidaresi': {
+                name: 'Bursa İl Göç İdaresi Müdürlüğü',
+                category: 'Valilik ve İl Müdürlükleri',
+                address: 'Veysel Karani Mahallesi Sevgi Caddesi No:2/1-2-3-4 Osmangazi/BURSA (BTSO Eğitim Kampüsü Yanı)',
+                phone: '0224 256 64 58',
+                fax: '0224 361 05 09',
+                email: 'bursa@goc.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Yıldırım/Davutdede durağı (yakınında)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 5A, 9 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['İkamet İzni', 'Çalışma İzni', 'Vatandaşlık İşlemleri', 'Yabancı Danışma', 'Geri Gönderme'],
+                mapQuery: 'Bursa İl Göç İdaresi Müdürlüğü, Osmangazi, Bursa'
+            },
+            'nufus': {
+                name: 'Bursa İl Nüfus ve Vatandaşlık Müdürlüğü',
+                category: 'Valilik ve İl Müdürlükleri',
+                address: 'Mimarsinan Mah. Emniyet Cad. No:1/27 PK:16310 Yıldırım/BURSA',
+                phone: '0224 221 17 26 - 0224 225 30 16',
+                fax: '0224 221 17 26',
+                email: 'bursailnufus@nvi.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Nüfus Cüzdanı', 'Pasaport', 'Vatandaşlık', 'Adres Değişikliği', 'Kimlik Kartı'],
+                mapQuery: 'Bursa İl Nüfus ve Vatandaşlık Müdürlüğü, Yıldırım, Bursa'
+            },
+            'buyuksehir': {
+                name: 'Bursa Büyükşehir Belediyesi',
+                category: 'Belediye',
+                address: 'Zafer Mah. Ankara Yolu Cad. C Blok No:1 Osmangazi/BURSA',
+                phone: 'Alo 153 / 444 16 00',
+                fax: '0224 271 84 15',
+                email: 'bursabb@bursa.bel.tr',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Hamitler/Fethiye durağı (yakınında)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 38, 94 hatları' },
+                    { icon: 'local_parking', text: 'Belediye otoparkı (ücretsiz)' }
+                ],
+                services: ['Belediye Hizmetleri', 'Ulaşım (BURULAŞ)', 'Su (BUSKİ)', 'İmar ve Şehircilik', 'Sosyal Hizmetler', 'Çevre Koruma'],
+                mapQuery: 'Bursa Büyükşehir Belediyesi, Osmangazi, Bursa'
+            },
+            'osmangazi': {
+                name: 'Osmangazi Belediyesi',
+                category: 'Belediye',
+                address: 'Çekirge Mah. Çekirge Cad. No:57 Osmangazi/BURSA',
+                phone: '0224 221 10 00',
+                fax: '0224 221 10 01',
+                email: 'osmangazi@osmangazi.bel.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 10 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Belediye otoparkı mevcut' }
+                ],
+                services: ['Nüfus Müdürlüğü', 'Evlendirme', 'Mezarlık İşleri', 'Temizlik', 'Zabıta', 'Sosyal Yardım'],
+                mapQuery: 'Osmangazi Belediyesi, Çekirge, Bursa'
+            },
+            'nilufer': {
+                name: 'Nilüfer Belediyesi',
+                category: 'Belediye',
+                address: 'Konak Mah. İhsaniye Cad. No:1 Nilüfer/BURSA',
+                phone: '0224 441 16 16',
+                fax: '0224 441 16 17',
+                email: 'nilufer@nilufer.bel.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Belediye otoparkı mevcut' }
+                ],
+                services: ['Nüfus Müdürlüğü', 'Evlendirme', 'Parks Bahçeler', 'Kültür ve Sanat', 'Spor Tesisleri', 'Sosyal Yardım'],
+                mapQuery: 'Nilüfer Belediyesi, Konak, Bursa'
+            },
+            'yildirim': {
+                name: 'Yıldırım Belediyesi',
+                category: 'Belediye',
+                address: 'Beyazıt Mah. 1. Beyazıt Cad. No:1 Yıldırım/BURSA',
+                phone: '0224 327 27 27',
+                fax: '0224 327 27 28',
+                email: 'yildirim@yildirim.bel.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3A, 3B, 4, 5A, 6, 9 hatları' },
+                    { icon: 'local_parking', text: 'Belediye otoparkı mevcut' }
+                ],
+                services: ['Nüfus Müdürlüğü', 'Evlendirme', 'Mezarlık İşleri', 'Temizlik', 'Zabıta', 'Sosyal Yardım'],
+                mapQuery: 'Yıldırım Belediyesi, Beyazıt, Bursa'
+            },
+            'emniyet': {
+                name: 'Bursa İl Emniyet Müdürlüğü',
+                category: 'Emniyet',
+                address: 'İhsaniye Mah. Beşevler Kavşağı Nilüfer/BURSA',
+                phone: '0224 270 50 00 - 155',
+                fax: '0224 270 50 01',
+                email: 'bursa@egm.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Nilüfer durağı (yakınında)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48, 60 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Kimlik İşlemleri', 'Pasaport', 'Ehliyet', 'Adli İşlemler', 'Asayiş', 'Trafik'],
+                mapQuery: 'Bursa İl Emniyet Müdürlüğü, Nilüfer, Bursa'
+            },
+            'jandarma': {
+                name: 'Bursa İl Jandarma Komutanlığı',
+                category: 'Emniyet',
+                address: 'Alaşar Mah. İstanbul Cad. 8.Km Osmangazi/BURSA',
+                phone: '0224 261 57 07 - 156',
+                fax: '0224 261 57 15',
+                email: 'basin16@jandarma.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 2, 38 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Asayiş', 'Trafik', 'Köy Jandarma', 'Özel Harekat', 'Sahil Güvenlik', 'Terörle Mücadele'],
+                mapQuery: 'Bursa İl Jandarma Komutanlığı, Osmangazi, Bursa'
+            },
+            'afad': {
+                name: 'Bursa AFAD İl Müdürlüğü',
+                category: 'Emniyet',
+                address: 'Küçükbalıklı Mah. 11 Eylül Bulvarı No:197/1-2 Osmangazi/BURSA',
+                phone: '0224 216 00 00 - 122',
+                fax: '0224 216 00 09',
+                email: 'bursamdr@afad.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 38, 94 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Afet Yönetimi', 'Acil Yardım', 'Arama Kurtarma', 'Eğitim ve Bilinçlendirme', 'Risk Analizi', 'Müdahale'],
+                mapQuery: 'Bursa AFAD İl Müdürlüğü, Osmangazi, Bursa'
+            },
+            'saglikmudurlugu': {
+                name: 'Bursa İl Sağlık Müdürlüğü',
+                category: 'Sağlık',
+                address: 'Çekirge Mah. Mimar Sinan Cad. No:6 Osmangazi/BURSA',
+                phone: '0224 221 19 00 - 184',
+                fax: '0224 221 19 01',
+                email: 'bursa@saglik.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 8 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Hastaneler', 'Aile Sağlığı Merkezleri', 'Halk Sağlığı', 'Acil Sağlık', 'Ruhsatlandırma', 'Denetim'],
+                mapQuery: 'Bursa İl Sağlık Müdürlüğü, Çekirge, Bursa'
+            },
+            'sehirhastanesi': {
+                name: 'Bursa Şehir Hastanesi',
+                category: 'Sağlık',
+                address: 'Dumlupınar Mah. 16270 Osmangazi/BURSA',
+                phone: '0224 215 00 00',
+                fax: '0224 215 00 01',
+                email: 'bursa@sbu.edu.tr',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Şehir Hastanesi durağı (yanında)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 38 hatları' },
+                    { icon: 'local_parking', text: 'Hastane otoparkı (ücretli)' }
+                ],
+                services: ['Acil Servis', 'Poliklinikler', 'Ameliyathane', 'Yoğun Bakım', 'Radyoloji', 'Laboratuvar'],
+                mapQuery: 'Bursa Şehir Hastanesi, Osmangazi, Bursa'
+            },
+            'milliegitim': {
+                name: 'Bursa İl Milli Eğitim Müdürlüğü',
+                category: 'Eğitim',
+                address: 'Hocahasan Mah. İlkbahar Cad. No:38 Yeni Hükümet Konağı A Blok Osmangazi/BURSA',
+                phone: '0224 445 16 00 - 147',
+                fax: '0224 445 18 10',
+                email: 'bursa@meb.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Osmangazi durağı (yanında)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Hükümet Konağı otoparkı' }
+                ],
+                services: ['Okul Kayıtları', 'Öğretmen Atama', 'Sınavlar', 'Hizmetiçi Eğitim', 'Özel Eğitim', 'Rehberlik'],
+                mapQuery: 'Bursa İl Milli Eğitim Müdürlüğü, Osmangazi, Bursa'
+            },
+            'uludag': {
+                name: 'Uludağ Üniversitesi',
+                category: 'Eğitim',
+                address: 'Görükle Kampüsü 16059 Nilüfer/BURSA',
+                phone: '0224 294 00 00',
+                fax: '0224 294 00 01',
+                email: 'rektorluk@uludag.edu.tr',
+                transport: [
+                    { icon: 'subway', text: 'M2 Hattı - Üniversite durağı (kampüs içi)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Kampüs içi otoparklar' }
+                ],
+                services: ['Lisans Eğitimi', 'Lisansüstü Eğitim', 'Araştırma', 'Sağlık Hizmetleri', 'Kütüphane', 'Yurtlar'],
+                mapQuery: 'Uludağ Üniversitesi, Görükle, Nilüfer, Bursa'
+            },
+            'sgk': {
+                name: 'SGK Bursa İl Müdürlüğü',
+                category: 'Diğer',
+                address: 'İnönü Cad. No:114/3 Osmangazi/BURSA',
+                phone: '0224 600 10 00',
+                fax: '0224 273 16 77',
+                email: 'osmangazisgm@sgk.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Sigortalı İşlemleri', 'Emeklilik', 'Genel Sağlık Sigortası', 'Prim Ödeme', 'Malulen Emeklilik', 'İş Kazası'],
+                mapQuery: 'SGK Bursa İl Müdürlüğü, Osmangazi, Bursa'
+            },
+            'iskur': {
+                name: 'Bursa Çalışma ve İş Kurumu (İŞKUR)',
+                category: 'Diğer',
+                address: 'Üçevler Mahallesi Esra Sokak No:1 Nilüfer/BURSA',
+                phone: '0224 225 15 15 - 444 75 87',
+                fax: '0224 225 15 16',
+                email: 'bursa@iskur.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Ataevler/23 Nisan durağı (yakınında)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 5B, 38, 48 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['İş Arama', 'İşveren Hizmetleri', 'Kurslar', 'Mesleki Eğitim', 'İşsizlik Maaşı', 'Danışmanlık'],
+                mapQuery: 'Bursa Çalışma ve İş Kurumu, Nilüfer, Bursa'
+            },
+            'muftuluk': {
+                name: 'Bursa İl Müftülüğü',
+                category: 'Diğer',
+                address: 'Altınova Mah. İstanbul Caddesi No:394 Osmangazi/BURSA',
+                phone: '0224 220 21 66-67-69',
+                fax: '0224 222 56 06',
+                email: 'bursa@diyanet.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 3, 4, 5A, 6 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Dini Hizmetler', 'Vakıf İşlemleri', 'Cenaze İşlemleri', 'Evlendirme', 'Dini Eğitim', 'Hutbe ve Vaaz'],
+                mapQuery: 'Bursa İl Müftülüğü, Osmangazi, Bursa'
+            },
+            'tarim': {
+                name: 'Bursa İl Tarım ve Orman Müdürlüğü',
+                category: 'Diğer',
+                address: 'Adalet Mahallesi 1. Hürriyet Caddesi Osmangazi/BURSA',
+                phone: '0224 246 42 30',
+                fax: '0224 247 43 24',
+                email: 'bursa@tarimorman.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - İhsaniye durağına 5 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1, 3, 4, 38 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Tarımsal Destekler', 'Hayvancılık', 'Bitki Sağlığı', 'Gıda Kontrol', 'Orman İşlemleri', 'Su Ürünleri'],
+                mapQuery: 'Bursa İl Tarım ve Orman Müdürlüğü, Osmangazi, Bursa'
+            },
+            'kultur': {
+                name: 'Bursa İl Kültür ve Turizm Müdürlüğü',
+                category: 'Diğer',
+                address: 'Kavaklı Mah. 2. Osmangazi Cad. No:18 Osmangazi/BURSA',
+                phone: '0224 220 99 26 - 0224 220 70 19',
+                fax: '0224 220 42 51',
+                email: 'iktm16@kulturturizm.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'BursaRay Şehreküstü durağına 8 dk yürüme' },
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Müzeler', 'Kültürel Miras', 'Turizm Belgelendirme', 'Etkinlikler', 'Arşiv', 'Tanıtım'],
+                mapQuery: 'Bursa İl Kültür ve Turizm Müdürlüğü, Osmangazi, Bursa'
+            },
+            'ticaret': {
+                name: 'Bursa Ticaret İl Müdürlüğü',
+                category: 'Diğer',
+                address: 'Fethiye Organize Sanayi Mahallesi Sarı Cadde No:2/1 Nilüfer/BURSA',
+                phone: '0224 503 73 06 - 0224 271 00 65',
+                fax: '0224 271 00 24',
+                email: 'bursa.tim@ticaret.gov.tr',
+                transport: [
+                    { icon: 'subway', text: 'M1 Hattı - Hamitler/Fethiye durağı (yakınında)' },
+                    { icon: 'directions_bus', text: 'Otobüs: 1/A, 2/A, 38 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Ticaret Sicili', 'İş Yeri Açma', 'Tüketici Hakları', 'Piyasa Denetimi', 'Fuar ve Organizasyon', 'Esnaf'],
+                mapQuery: 'Bursa Ticaret İl Müdürlüğü, Nilüfer, Bursa'
+            },
+            'aile': {
+                name: 'Bursa Aile ve Sosyal Hizmetler İl Müdürlüğü',
+                category: 'Diğer',
+                address: 'Kükürtlü Mah. Mudanya Cd. No:141 Osmangazi/BURSA',
+                phone: '0224 223 19 26',
+                fax: '0224 223 14 18',
+                email: 'bursa@ailevecalisma.gov.tr',
+                transport: [
+                    { icon: 'directions_bus', text: 'Otobüs: 38, 60, 94 hatları' },
+                    { icon: 'local_parking', text: 'Kurum otoparkı mevcut' }
+                ],
+                services: ['Sosyal Yardım', 'Engelli Hizmetleri', 'Yaşlı Bakımı', 'Koruma ve Bakım', 'Aile Danışma', 'Şiddet Önleme'],
+                mapQuery: 'Bursa Aile ve Sosyal Hizmetler İl Müdürlüğü, Osmangazi, Bursa'
+            }
+        };
+
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // Category Filter
+        let currentCategory = 'all';
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            // Update buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + category).classList.add('active');
+
+            // Filter sections
+            const sections = document.querySelectorAll('.category-section');
+            sections.forEach(section => {
+                if (category === 'all' || section.dataset.category === category) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Search Institution
+        function searchInstitution() {
+            const searchTerm = document.getElementById('institutionSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.institution-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Open Institution Detail Modal
+        function openInstitutionDetail(institutionId) {
+            const institution = institutionData[institutionId];
+            if (!institution) return;
+
+            document.getElementById('modalInstitutionName').textContent = institution.name;
+            document.getElementById('modalCategory').textContent = institution.category;
+            document.getElementById('modalAddress').textContent = institution.address;
+            document.getElementById('modalPhone').textContent = institution.phone;
+            document.getElementById('modalFax').textContent = institution.fax || 'Belirtilmemiş';
+            document.getElementById('modalEmail').textContent = institution.email || 'Belirtilmemiş';
+
+            // Ulaşım bilgilerini doldur
+            const transportContainer = document.getElementById('modalTransport');
+            transportContainer.innerHTML = '';
+            institution.transport.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-3 bg-white/5 rounded-xl';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-gold shrink-0">${item.icon}</span>
+                    <p class="text-sm text-white">${item.text}</p>
+                `;
+                transportContainer.appendChild(div);
+            });
+
+            // Hizmetleri doldur
+            const servicesContainer = document.getElementById('modalServices');
+            servicesContainer.innerHTML = '';
+            institution.services.forEach(service => {
+                const div = document.createElement('div');
+                div.className = 'bg-white/5 rounded-xl p-3 text-center';
+                div.innerHTML = `
+                    <span class="material-symbols-outlined text-institution-indigo text-lg mb-1">check_circle</span>
+                    <p class="text-xs text-gray-text">${service}</p>
+                `;
+                servicesContainer.appendChild(div);
+            });
+
+            // Butonları güncelle
+            const phoneNumber = institution.phone.split('-')[0].trim().replace(/\s/g, '');
+            document.getElementById('modalCallBtn').setAttribute('onclick', `callNumber('${phoneNumber}')`);
+            document.getElementById('modalMapBtn').setAttribute('onclick', `showMap('${institution.mapQuery}')`);
+
+            document.getElementById('institutionDetailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close Institution Detail Modal
+        function closeInstitutionDetail() {
+            document.getElementById('institutionDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Call Number
+        function callNumber(number) {
+            window.location.href = 'tel:' + number;
+        }
+
+        // Show Map
+        function showMap(location) {
+            const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+            window.open(url, '_blank');
+        }
+
+        // Emergency Modal
+        function openEmergencyModal() {
+            document.getElementById('emergencyModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak FAQ açık
+            document.getElementById('faqSection').classList.add('open');
+            document.getElementById('faqIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>

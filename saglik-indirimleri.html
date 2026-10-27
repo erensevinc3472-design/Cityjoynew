@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Sağlık İndirimleri - Bursa</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "darkest": "#081F24",
+                        "main-bg": "#0D3238",
+                        "card-bg": "#17464B",
+                        "card-glow": "#1F5055",
+                        "gold-primary": "#E0B07A",
+                        "gold-nav": "#F0B36F",
+                        "nav-bg": "#0A2A2F",
+                        "nav-passive": "#6E8C8E",
+                        "text-secondary": "#C7D8DA",
+                        "text-desc": "#9FB6B8",
+                        "border-subtle": "#3F6E70",
+                        "accent-blue": "#4A90A4",
+                        "accent-teal": "#2D8A8A",
+                        "warning": "#f97316",
+                        "success": "#22c55e",
+                        "info": "#3b82f6",
+                        "danger": "#ef4444",
+                        "health-green": "#10b981",
+                        "health-cyan": "#06b6d4",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-glow': 'pulseGlow 3s infinite',
+                        'shimmer': 'shimmer 2.5s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 10px rgba(224, 176, 122, 0.3)' },
+                            '50%': { boxShadow: '0 0 20px rgba(224, 176, 122, 0.6)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                    }
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                background: rgba(13, 50, 56, 0.6);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+            }
+            .glass-panel-hover:hover {
+                background: rgba(23, 70, 75, 0.8);
+                border-color: rgba(224, 176, 122, 0.3);
+            }
+            .text-glow {
+                text-shadow: 0 0 10px rgba(224, 176, 122, 0.3);
+            }
+            .deal-card {
+                background: linear-gradient(135deg, rgba(23, 70, 75, 0.4) 0%, rgba(8, 31, 36, 0.6) 100%);
+                border: 1px solid rgba(224, 176, 122, 0.15);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .deal-card:active {
+                transform: scale(0.98);
+            }
+            .tab-active {
+                background: linear-gradient(135deg, rgba(224, 176, 122, 0.9) 0%, rgba(224, 176, 122, 0.7) 100%);
+                color: #081F24;
+                box-shadow: 0 2px 10px rgba(224, 176, 122, 0.3);
+            }
+            .tab-passive {
+                background: rgba(23, 70, 75, 0.3);
+                color: #9FB6B8;
+                border: 1px solid rgba(63, 110, 112, 0.2);
+            }
+            .category-pill {
+                background: rgba(224, 176, 122, 0.1);
+                border: 1px solid rgba(224, 176, 122, 0.2);
+                color: #E0B07A;
+            }
+            .category-pill.active {
+                background: rgba(224, 176, 122, 0.9);
+                color: #081F24;
+            }
+            .district-pill {
+                background: rgba(74, 144, 164, 0.1);
+                border: 1px solid rgba(74, 144, 164, 0.2);
+                color: #4A90A4;
+            }
+            .district-pill.active {
+                background: rgba(74, 144, 164, 0.9);
+                color: #081F24;
+            }
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            
+            .hero-slide {
+                position: absolute;
+                inset: 0;
+                opacity: 0;
+                transition: opacity 0.8s ease-in-out;
+            }
+            .hero-slide.active {
+                opacity: 1;
+            }
+            
+            .hero-progress-container {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: rgba(255, 255, 255, 0.1);
+                z-index: 20;
+            }
+            .hero-progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, #E0B07A, #D4A574);
+                width: 0%;
+                transition: width 0.1s linear;
+                box-shadow: 0 0 10px rgba(224, 176, 122, 0.5);
+            }
+            
+            .open-badge {
+                background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+                border: 1px solid rgba(34, 197, 94, 0.4);
+                color: #22c55e;
+            }
+            
+            .closed-badge {
+                background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
+                border: 1px solid rgba(239, 68, 68, 0.4);
+                color: #ef4444;
+            }
+            
+            .discount-badge {
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            }
+            
+            .health-badge {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+                border: 1px solid rgba(16, 185, 129, 0.4);
+                color: #10b981;
+            }
+            
+            .service-card {
+                background: linear-gradient(135deg, rgba(23, 70, 75, 0.6) 0%, rgba(8, 31, 36, 0.8) 100%);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            .service-card:hover {
+                border-color: rgba(16, 185, 129, 0.5);
+                transform: translateY(-2px);
+            }
+            .service-card.featured {
+                border-color: rgba(16, 185, 129, 0.6);
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            }
+            .service-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #10b981, #06b6d4);
+            }
+            
+            .amenity-icon {
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .doctor-avatar {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+                border: 2px solid rgba(16, 185, 129, 0.4);
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="bg-darkest font-display text-white overflow-x-hidden max-w-md mx-auto min-h-screen relative shadow-2xl">
+
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 max-w-md mx-auto flex items-center justify-between px-4 py-3 bg-darkest/95 backdrop-blur-md border-b border-border-subtle/20">
+    <div class="flex items-center gap-3">
+        <button onclick="goBack()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+            <span class="material-symbols-outlined text-base text-white">arrow_back</span>
+        </button>
+        <div class="flex flex-col">
+            <span class="text-[9px] text-gold-primary tracking-wider uppercase">Bursa</span>
+            <h1 class="text-base font-bold tracking-tight text-white leading-none">Sağlık İndirimleri</h1>
+        </div>
+    </div>
+    <button class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 active:bg-white/10 transition-all">
+        <span class="material-symbols-outlined text-gold-primary text-base">notifications</span>
+    </button>
+</header>
+
+<!-- Hero Slider -->
+<section class="relative h-[26vh] min-h-[200px] w-full overflow-hidden mt-[52px]">
+    <div class="hero-slide active" data-index="0">
+        <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=600" class="w-full h-full object-cover" alt="Hastane"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/40 to-transparent"></div>
+        <div class="absolute bottom-4 left-4 right-4">
+            <span class="px-2 py-1 bg-health-green/20 border border-health-green/40 rounded text-health-green text-[9px] font-bold uppercase">Özel Hastane</span>
+            <h2 class="text-lg font-bold text-white mt-1">Medical Park</h2>
+            <p class="text-[10px] text-text-secondary">%30 indirim • Osmangazi</p>
+        </div>
+    </div>
+    <div class="hero-slide" data-index="1">
+        <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600" class="w-full h-full object-cover" alt="Diş"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/40 to-transparent"></div>
+        <div class="absolute bottom-4 left-4 right-4">
+            <span class="px-2 py-1 bg-health-cyan/20 border border-health-cyan/40 rounded text-health-cyan text-[9px] font-bold uppercase">Diş Kliniği</span>
+            <h2 class="text-lg font-bold text-white mt-1">Dentist Bursa</h2>
+            <p class="text-[10px] text-text-secondary">%40 indirim • Nilüfer</p>
+        </div>
+    </div>
+    <div class="hero-slide" data-index="2">
+        <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600" class="w-full h-full object-cover" alt="Estetik"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/40 to-transparent"></div>
+        <div class="absolute bottom-4 left-4 right-4">
+            <span class="px-2 py-1 bg-health-green/20 border border-health-green/40 rounded text-health-green text-[9px] font-bold uppercase">Estetik</span>
+            <h2 class="text-lg font-bold text-white mt-1">Beauty Center</h2>
+            <p class="text-[10px] text-text-secondary">%50 indirim • Yıldırım</p>
+        </div>
+    </div>
+    
+    <div class="hero-progress-container">
+        <div class="hero-progress-bar" id="hero-progress"></div>
+    </div>
+    
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+        <button onclick="goToSlide(0)" class="slide-dot w-1.5 h-1.5 rounded-full bg-gold-primary transition-all" data-index="0"></button>
+        <button onclick="goToSlide(1)" class="slide-dot w-1.5 h-1.5 rounded-full bg-white/30 transition-all" data-index="1"></button>
+        <button onclick="goToSlide(2)" class="slide-dot w-1.5 h-1.5 rounded-full bg-white/30 transition-all" data-index="2"></button>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="relative z-10 bg-darkest min-h-screen pb-24 -mt-4 rounded-t-3xl">
+    <div class="px-4 pt-5">
+        
+        <!-- Verification Banner -->
+        <div class="glass-panel rounded-xl p-3 mb-4 border-l-4 border-health-green">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-health-green/20 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-health-green text-lg">verified</span>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-xs font-bold text-health-green flex items-center gap-1">
+                        Sertifikalı Sağlık Kuruluşları
+                    </h3>
+                    <p class="text-[9px] text-text-desc">Tüm kuruluşlar Sağlık Bakanlığı onaylı ve denetimlidir.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Info -->
+        <div class="grid grid-cols-3 gap-2 mb-4">
+            <div class="glass-panel rounded-lg p-2 text-center">
+                <span class="material-symbols-outlined text-health-green text-lg">emergency</span>
+                <p class="text-[9px] text-text-desc mt-1">Acil</p>
+                <p class="text-[10px] font-bold text-white">7/24</p>
+            </div>
+            <div class="glass-panel rounded-lg p-2 text-center">
+                <span class="material-symbols-outlined text-health-cyan text-lg">local_hospital</span>
+                <p class="text-[9px] text-text-desc mt-1">Anlaşmalı</p>
+                <p class="text-[10px] font-bold text-white">25+</p>
+            </div>
+            <div class="glass-panel rounded-lg p-2 text-center">
+                <span class="material-symbols-outlined text-gold-primary text-lg">medical_services</span>
+                <p class="text-[9px] text-text-desc mt-1">Hizmet</p>
+                <p class="text-[10px] font-bold text-white">100+</p>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="mb-3">
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2" id="category-tabs">
+                <button onclick="filterCategory('all')" class="category-pill active px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="all">
+                    <span class="material-symbols-outlined text-xs">medical_services</span> Tümü
+                </button>
+                <button onclick="filterCategory('hospital')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="hospital">
+                    <span class="material-symbols-outlined text-xs">local_hospital</span> Hastane
+                </button>
+                <button onclick="filterCategory('dental')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="dental">
+                    <span class="material-symbols-outlined text-xs">dentistry</span> Diş
+                </button>
+                <button onclick="filterCategory('aesthetic')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="aesthetic">
+                    <span class="material-symbols-outlined text-xs">spa</span> Estetik
+                </button>
+                <button onclick="filterCategory('lab')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="lab">
+                    <span class="material-symbols-outlined text-xs">biotech</span> Laboratuvar
+                </button>
+                <button onclick="filterCategory('psychology')" class="category-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap flex items-center gap-1" data-category="psychology">
+                    <span class="material-symbols-outlined text-xs">psychology</span> Psikoloji
+                </button>
+            </div>
+        </div>
+
+        <!-- District Filter -->
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-gold-primary text-sm">location_on</span>
+                    İlçe Seçimi
+                </h3>
+                <button onclick="resetDistrictFilter()" id="reset-district-btn" class="text-[9px] text-gold-primary hidden flex items-center gap-0.5">
+                    <span class="material-symbols-outlined text-xs">refresh</span> Tümü
+                </button>
+            </div>
+            <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-2" id="district-tabs">
+                <button onclick="filterDistrict('all')" class="district-pill active px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-district="all">Tümü</button>
+                <button onclick="filterDistrict('osmangazi')" class="district-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-district="osmangazi">Osmangazi</button>
+                <button onclick="filterDistrict('nilufer')" class="district-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-district="nilufer">Nilüfer</button>
+                <button onclick="filterDistrict('yildirim')" class="district-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-district="yildirim">Yıldırım</button>
+                <button onclick="filterDistrict('gursu')" class="district-pill px-3 py-1.5 rounded-full text-[10px] font-bold uppercase whitespace-nowrap" data-district="gursu">Gürsu</button>
+            </div>
+        </div>
+
+        <!-- Deals Count Info -->
+        <div class="flex items-center justify-between mb-3">
+            <p class="text-[11px] text-text-desc">
+                <span id="deals-count" class="text-gold-primary font-bold">6</span> sağlık kuruluşu bulundu
+            </p>
+            <div class="flex items-center gap-2">
+                <span class="text-[9px] text-text-desc">Sırala:</span>
+                <select onchange="sortDeals(this.value)" class="bg-white/5 border border-white/10 rounded-lg text-[9px] text-white px-2 py-1 outline-none">
+                    <option value="discount">En Yüksek İndirim</option>
+                    <option value="rating">En Çok Puan</option>
+                    <option value="nearest">En Yakın</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Deals Container -->
+        <div id="deals-container" class="space-y-3">
+            <!-- Deals injected by JS -->
+        </div>
+
+        <!-- Load More -->
+        <div class="mt-6 text-center">
+            <button class="px-6 py-2.5 glass-panel rounded-full text-text-desc text-[10px] font-bold uppercase tracking-wider active:scale-95 transition-all">
+                Daha Fazla
+            </button>
+        </div>
+    </div>
+</main>
+
+<!-- Services Modal -->
+<div id="services-modal" class="fixed inset-0 z-[70] hidden items-end">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeServicesModal()"></div>
+    <div class="relative bg-darkest rounded-t-3xl w-full max-h-[85vh] overflow-hidden transform translate-y-full transition-transform duration-300" id="services-modal-content">
+        
+        <div class="w-12 h-1 bg-white/20 rounded-full mx-auto mt-3 mb-4"></div>
+        
+        <!-- Header -->
+        <div class="px-4 pb-3 border-b border-white/10">
+            <div class="flex items-center justify-between mb-3">
+                <div>
+                    <h3 class="text-lg font-bold text-white" id="services-modal-title">Hizmetler</h3>
+                    <p class="text-[10px] text-text-desc" id="services-modal-subtitle">İndirimli sağlık hizmetleri</p>
+                </div>
+                <button onclick="closeServicesModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center active:bg-white/10">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+            
+            <!-- Working Hours & Status -->
+            <div class="glass-panel rounded-lg p-3 flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold-primary text-lg">schedule</span>
+                    <div>
+                        <p class="text-[9px] text-text-desc">Çalışma Saatleri</p>
+                        <p class="text-xs font-bold text-white" id="services-modal-hours">08:00 - 20:00</p>
+                    </div>
+                </div>
+                <span class="px-2 py-1 rounded-full text-[9px] font-bold open-badge" id="services-modal-status">
+                    Açık
+                </span>
+            </div>
+            
+            <!-- Doctors Preview -->
+            <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-2" id="doctors-container">
+                <!-- Doctors injected by JS -->
+            </div>
+        </div>
+        
+        <!-- Services List -->
+        <div class="p-4 overflow-y-auto max-h-[45vh]" id="services-list-container">
+            <!-- Services injected by JS -->
+        </div>
+        
+        <!-- Footer -->
+        <div class="p-4 border-t border-white/10 bg-darkest">
+            <div class="glass-panel rounded-lg p-3 mb-3">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="material-symbols-outlined text-health-green text-sm">info</span>
+                    <span class="text-[10px] text-text-secondary">Seçtiğiniz hizmetler için randevu alın</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-text-desc">Seçilen Hizmetler</span>
+                        <p class="text-sm font-bold text-white" id="selected-services-count">0 adet</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-text-desc">Toplam</span>
+                        <div class="flex items-center gap-2 justify-end">
+                            <span class="text-xs text-danger line-through" id="services-original-total">0₺</span>
+                            <p class="text-lg font-bold text-success" id="services-total">0₺</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="shareServices()" class="flex-1 py-3 bg-white/10 border border-white/20 rounded-xl text-white text-xs font-bold uppercase active:scale-95 transition-all flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-sm">share</span>
+                    Paylaş
+                </button>
+                <button onclick="bookAppointment()" class="flex-[2] py-3 bg-health-green text-white rounded-xl font-bold text-xs uppercase active:scale-95 transition-all flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-sm">calendar_add_on</span>
+                    Randevu Al
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+<div id="review-modal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeReviewModal()"></div>
+    <div class="relative bg-darkest rounded-2xl w-full max-w-sm overflow-hidden border border-gold-primary/30">
+        
+        <div class="p-4 border-b border-white/10">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-white">Yorum Yap</h3>
+                <button onclick="closeReviewModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center active:bg-white/10">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+        </div>
+        
+        <form id="review-form" class="p-4 space-y-4">
+            <div>
+                <label class="text-[10px] text-text-desc block mb-2">Puanınız</label>
+                <div class="flex gap-2" id="star-rating">
+                    <button type="button" onclick="setRating(1)" class="star-btn text-2xl text-white/20 transition-colors">★</button>
+                    <button type="button" onclick="setRating(2)" class="star-btn text-2xl text-white/20 transition-colors">★</button>
+                    <button type="button" onclick="setRating(3)" class="star-btn text-2xl text-white/20 transition-colors">★</button>
+                    <button type="button" onclick="setRating(4)" class="star-btn text-2xl text-white/20 transition-colors">★</button>
+                    <button type="button" onclick="setRating(5)" class="star-btn text-2xl text-white/20 transition-colors">★</button>
+                </div>
+            </div>
+            
+            <div>
+                <label class="text-[10px] text-text-desc block mb-2">Adınız</label>
+                <input type="text" class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-text-desc outline-none focus:border-gold-primary" placeholder="Adınızı girin" required>
+            </div>
+            
+            <div>
+                <label class="text-[10px] text-text-desc block mb-2">Yorumunuz</label>
+                <textarea class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-text-desc outline-none focus:border-gold-primary resize-none" rows="3" placeholder="Deneyiminizi paylaşın..." required></textarea>
+            </div>
+            
+            <button type="submit" class="w-full py-3 bg-gold-primary text-darkest rounded-xl font-bold text-sm uppercase active:scale-95 transition-all">
+                Gönder
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto flex items-center justify-around px-6 py-2 bg-nav-bg/95 backdrop-blur-md border-t border-border-subtle/30 pb-5 z-50">
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="anasayfa.html">
+        <span class="material-symbols-outlined text-xl">home</span>
+        <span class="text-[8px] font-medium">Ana sayfa</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-gold-primary nav-glow-gold" href="kesfet-genel.html">
+        <span class="material-symbols-outlined text-xl">explore</span>
+        <span class="text-[8px] font-medium">Keşfet</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="ara.html">
+        <span class="material-symbols-outlined text-xl">search</span>
+        <span class="text-[8px] font-medium">Ara</span>
+    </a>
+    <a class="flex flex-col items-center gap-0.5 text-nav-passive active:text-text-secondary" href="profil.html">
+        <span class="material-symbols-outlined text-xl">person</span>
+        <span class="text-[8px] font-medium">Profil</span>
+    </a>
+</nav>
+
+<script>
+// Hero Slider
+let currentSlide = 0;
+const slides = document.querySelectorAll('.hero-slide');
+const dots = document.querySelectorAll('.slide-dot');
+const progressBar = document.getElementById('hero-progress');
+const slideInterval = 5000;
+let slideTimer;
+let progressTimer;
+
+function goToSlide(index) {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('bg-gold-primary');
+    dots[currentSlide].classList.add('bg-white/30');
+    
+    currentSlide = index;
+    
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.remove('bg-white/30');
+    dots[currentSlide].classList.add('bg-gold-primary');
+    
+    resetProgress();
+}
+
+function nextSlide() {
+    goToSlide((currentSlide + 1) % slides.length);
+}
+
+function resetProgress() {
+    clearInterval(progressTimer);
+    progressBar.style.width = '0%';
+    let progress = 0;
+    const increment = 100 / (slideInterval / 50);
+    
+    progressTimer = setInterval(() => {
+        progress += increment;
+        if (progress >= 100) {
+            progress = 0;
+        }
+        progressBar.style.width = progress + '%';
+    }, 50);
+}
+
+function startSlider() {
+    slideTimer = setInterval(nextSlide, slideInterval);
+    resetProgress();
+}
+
+startSlider();
+
+function goBack() {
+    if (window.history.length > 1) window.history.back();
+    else window.location.href = 'bursa.html';
+}
+
+// Health Centers Data
+const healthData = [
+    {
+        id: 1,
+        name: "Medical Park Bursa",
+        category: "hospital",
+        categoryName: "Özel Hastane",
+        district: "osmangazi",
+        districtName: "Osmangazi",
+        image: "https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=400",
+        openTime: "08:00",
+        closeTime: "20:00",
+        isOpen: true,
+        phone: "+90 224 123 45 67",
+        address: "Çekirge Cad. No:15, Osmangazi",
+        coordinates: "40.1833,29.0667",
+        rating: 4.8,
+        reviews: [
+            { name: "Ahmet K.", date: "2 gün önce", text: "Doktorlar çok ilgili, modern cihazlar.", rating: 5 },
+            { name: "Selin Y.", date: "1 hafta önce", text: "Randevu sistemi çok pratik, teşekkürler.", rating: 5 }
+        ],
+        amenities: [
+            { icon: "local_hospital", name: "Acil Servis" },
+            { icon: "biotech", name: "Laboratuvar" },
+            { icon: "air", name: "Görüntüleme" },
+            { icon: "local_parking", name: "Otopark" },
+            { icon: "wifi", name: "WiFi" }
+        ],
+        doctors: [
+            { name: "Dr. Ahmet Yılmaz", specialty: "Kardiyoloji", image: "https://randomuser.me/api/portraits/men/1.jpg" },
+            { name: "Dr. Ayşe Demir", specialty: "Dahiliye", image: "https://randomuser.me/api/portraits/women/2.jpg" },
+            { name: "Dr. Mehmet Kaya", specialty: "Ortopedi", image: "https://randomuser.me/api/portraits/men/3.jpg" }
+        ],
+        services: [
+            { name: "Genel Muayene", category: "checkup", originalPrice: 400, discountedPrice: 280, discount: "30%", duration: "30 dk", features: ["Uzman doktor", "Detaylı inceleme", "Reçete"], featured: false },
+            { name: "Tam Kan Sayımı", category: "lab", originalPrice: 300, discountedPrice: 210, discount: "30%", duration: "15 dk", features: ["Hızlı sonuç", "Detaylı rapor", "Uzman yorumu"], featured: false },
+            { name: "Check-up Paketi (Kadın)", category: "checkup", originalPrice: 2500, discountedPrice: 1750, discount: "30%", duration: "3-4 saat", features: ["40+ test", "Görüntüleme", "Diyetisyen"], featured: true },
+            { name: "Check-up Paketi (Erkek)", category: "checkup", originalPrice: 2200, discountedPrice: 1540, discount: "30%", duration: "3-4 saat", features: ["35+ test", "Görüntüleme", "Psikolog"], featured: false },
+            { name: "MR Çekimi", category: "imaging", originalPrice: 1500, discountedPrice: 1050, discount: "30%", duration: "45 dk", features: ["3 Tesla", "Radyolog raporu", "CD çıktı"], featured: false },
+            { name: "Tomografi", category: "imaging", originalPrice: 800, discountedPrice: 560, discount: "30%", duration: "20 dk", features: ["128 kesit", "Kontrastlı", "Rapor"], featured: false }
+        ]
+    },
+    {
+        id: 2,
+        name: "Dentist Bursa Kliniği",
+        category: "dental",
+        categoryName: "Diş Kliniği",
+        district: "nilufer",
+        districtName: "Nilüfer",
+        image: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=400",
+        openTime: "09:00",
+        closeTime: "21:00",
+        isOpen: true,
+        phone: "+90 224 234 56 78",
+        address: "Atatürk Cad. No:42, Nilüfer",
+        coordinates: "40.2143,28.9706",
+        rating: 4.9,
+        reviews: [
+            { name: "Mehmet T.", date: "3 gün önce", text: "Ağrısız işlem, çok memnun kaldım.", rating: 5 }
+        ],
+        amenities: [
+            { icon: "dentistry", name: "İmplant" },
+            { icon: "auto_fix", name: "Ortodonti" },
+            { icon: "whitening", name: "Beyazlatma" },
+            { icon: "child_care", name: "Çocuk Dişi" }
+        ],
+        doctors: [
+            { name: "Dr. Zeynep Aydın", specialty: "Ortodonti", image: "https://randomuser.me/api/portraits/women/4.jpg" },
+            { name: "Dr. Can Yıldız", specialty: "İmplant", image: "https://randomuser.me/api/portraits/men/5.jpg" }
+        ],
+        services: [
+            { name: "Diş Beyazlatma", category: "cosmetic", originalPrice: 1500, discountedPrice: 900, discount: "40%", duration: "1 saat", features: ["Laser", "Anında sonuç", "3 yıl garanti"], featured: true },
+            { name: "İmplant (Tek Diş)", category: "surgical", originalPrice: 8000, discountedPrice: 4800, discount: "40%", duration: "3-6 ay", features: ["Titanium", "Ömür boyu garanti", "Kemik grefti dahil"], featured: false },
+            { name: "Ortodonti (Tam Set)", category: "orthodontic", originalPrice: 12000, discountedPrice: 7200, discount: "40%", duration: "12-24 ay", features: ["Şeffaf plak", "Kontroller dahil", "Retainer hediye"], featured: false },
+            { name: "Kanal Tedavisi", category: "treatment", originalPrice: 1500, discountedPrice: 900, discount: "40%", duration: "2 seans", features: ["Mikroskoplu", "Ağrısız", "Kron dahil"], featured: false },
+            { name: "Dolgu (Kompozit)", category: "treatment", originalPrice: 600, discountedPrice: 360, discount: "40%", duration: "30 dk", features: ["Estetik", "Dayanıklı", "5 yıl garanti"], featured: false },
+            { name: "Diş Taşı Temizliği", category: "cleaning", originalPrice: 500, discountedPrice: 300, discount: "40%", duration: "45 dk", features: ["Ultrasonik", "Parlatma", "Flor uygulama"], featured: false }
+        ]
+    },
+    {
+        id: 3,
+        name: "Beauty Estetik Center",
+        category: "aesthetic",
+        categoryName: "Estetik Merkezi",
+        district: "yildirim",
+        districtName: "Yıldırım",
+        image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400",
+        openTime: "10:00",
+        closeTime: "20:00",
+        isOpen: false,
+        phone: "+90 224 345 67 89",
+        address: "İnönü Cad. No:23, Yıldırım",
+        coordinates: "40.1889,29.0825",
+        rating: 4.6,
+        reviews: [
+            { name: "Zeynep A.", date: "5 gün önce", text: "Doğal sonuç, profesyonel ekip.", rating: 5 }
+        ],
+        amenities: [
+            { icon: "spa", name: "Cilt Bakımı" },
+            { icon: "face", name: "Botoks" },
+            { icon: "lipstick", name: "Dolgu" },
+            { icon: "laser", name: "Lazer" }
+        ],
+        doctors: [
+            { name: "Dr. Elif Şahin", specialty: "Dermatoloji", image: "https://randomuser.me/api/portraits/women/6.jpg" },
+            { name: "Op. Dr. Burak Özdemir", specialty: "Plastik Cerrahi", image: "https://randomuser.me/api/portraits/men/7.jpg" }
+        ],
+        services: [
+            { name: "Botoks (3 Bölge)", category: "injection", originalPrice: 3000, discountedPrice: 1500, discount: "50%", duration: "30 dk", features: ["Allergan", "Doğal görünüm", "6 ay etki"], featured: true },
+            { name: "Dolgu (1 cc)", category: "injection", originalPrice: 2500, discountedPrice: 1250, discount: "50%", duration: "30 dk", features: ["Juvederm", "Anında sonuç", "12 ay etki"], featured: false },
+            { name: "Cilt Gençleştirme", category: "skin", originalPrice: 2000, discountedPrice: 1000, discount: "50%", duration: "1 saat", features: ["PRP + Mezoterapi", "4 seans", "Yıllık bakım"], featured: false },
+            { name: "Lazer Epilasyon (Tam Vücut)", category: "laser", originalPrice: 5000, discountedPrice: 2500, discount: "50%", duration: "8 seans", features: ["Alexandrite", "Ağrısız", "Ömür boyu"], featured: false },
+            { name: "Hydrafacial", category: "skin", originalPrice: 800, discountedPrice: 400, discount: "50%", duration: "45 dk", features: ["Derin temizlik", "Nemlendirme", "Anti-aging"], featured: false },
+            { name: "Kirpik Lifting", category: "eye", originalPrice: 600, discountedPrice: 300, discount: "50%", duration: "1 saat", features: ["Keratin", "2 ay dayanıklı", "Maskara etkisi"], featured: false }
+        ]
+    },
+    {
+        id: 4,
+        name: "Medilab Tıp Merkezi",
+        category: "lab",
+        categoryName: "Laboratuvar",
+        district: "osmangazi",
+        districtName: "Osmangazi",
+        image: "https://images.unsplash.com/photo-1579154204601-01588f351e67?w=400",
+        openTime: "07:00",
+        closeTime: "19:00",
+        isOpen: true,
+        phone: "+90 224 456 78 90",
+        address: "Sanayi Cad. No:8, Osmangazi",
+        coordinates: "40.1775,29.0556",
+        rating: 4.7,
+        reviews: [
+            { name: "Kemal S.", date: "1 gün önce", text: "Sonuçlar çok hızlı geldi, teşekkürler.", rating: 5 }
+        ],
+        amenities: [
+            { icon: "biotech", name: "Tam Donanımlı" },
+            { icon: "timer", name: "Hızlı Sonuç" },
+            { icon: "home", name: "Evde Kan Alma" },
+            { icon: "verified", name: "Akredite" }
+        ],
+        doctors: [
+            { name: "Dr. Selin Koç", specialty: "Biyokimya", image: "https://randomuser.me/api/portraits/women/8.jpg" }
+        ],
+        services: [
+            { name: "Check-up Basic", category: "checkup", originalPrice: 800, discountedPrice: 560, discount: "30%", duration: "1 saat", features: ["20 test", "Kolesterol", "Şeker", "Tiroid"], featured: false },
+            { name: "Check-up Comprehensive", category: "checkup", originalPrice: 1500, discountedPrice: 1050, discount: "30%", duration: "2 saat", features: ["40 test", "Hepatit", "Tümör belirteçleri", "Vitamin"], featured: true },
+            { name: "Covid-19 PCR Testi", category: "test", originalPrice: 400, discountedPrice: 280, discount: "30%", duration: "15 dk", features: ["Sonuç 6 saat", "İngilizce rapor", "HES kodu"], featured: false },
+            { name: "Genetik Test", category: "genetic", originalPrice: 3000, discountedPrice: 2100, discount: "30%", duration: "2 hafta", features: ["Kanser riski", "Besin intoleransı", "Spor genetiği"], featured: false },
+            { name: "Alerji Paneli", category: "test", originalPrice: 1200, discountedPrice: 840, discount: "30%", duration: "3 gün", features: ["40 alerjen", "Gıda + Çevre", "Detaylı rapor"], featured: false },
+            { name: "Hormon Paneli", category: "test", originalPrice: 900, discountedPrice: 630, discount: "30%", duration: "1 gün", features: ["Tüm hormonlar", "Tiroid detaylı", "Kortizol"], featured: false }
+        ]
+    },
+    {
+        id: 5,
+        name: "Psikoterapi Merkezi",
+        category: "psychology",
+        categoryName: "Psikoloji",
+        district: "nilufer",
+        districtName: "Nilüfer",
+        image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400",
+        openTime: "09:00",
+        closeTime: "21:00",
+        isOpen: true,
+        phone: "+90 224 567 89 01",
+        address: "Kent Meydanı No:12, Nilüfer",
+        coordinates: "40.1825,29.0678",
+        rating: 4.9,
+        reviews: [],
+        amenities: [
+            { icon: "psychology", name: "Bireysel Terapi" },
+            { icon: "groups", name: "Aile Terapisi" },
+            { icon: "child_care", name: "Çocuk Psikolojisi" },
+            { icon: "online", name: "Online Seans" }
+        ],
+        doctors: [
+            { name: "Psk. Dr. Merve Yıldız", specialty: "Klinik Psikoloji", image: "https://randomuser.me/api/portraits/women/9.jpg" },
+            { name: "Psk. Ali Kaya", specialty: "Aile Danışmanı", image: "https://randomuser.me/api/portraits/men/10.jpg" }
+        ],
+        services: [
+            { name: "Bireysel Terapi (Seans)", category: "individual", originalPrice: 600, discountedPrice: 360, discount: "40%", duration: "50 dk", features: ["Uzman psikolog", "Gizlilik", "Online seçeneği"], featured: false },
+            { name: "Aile Terapisi (Seans)", category: "family", originalPrice: 800, discountedPrice: 480, discount: "40%", duration: "60 dk", features: ["Aile danışmanı", "İletişim teknikleri", "Ev ödevleri"], featured: false },
+            { name: "Çift Terapisi (Seans)", category: "couple", originalPrice: 700, discountedPrice: 420, discount: "40%", duration: "60 dk", features: ["İlişki uzmanı", "Çatışma çözümü", "Empati çalışması"], featured: false },
+            { name: "Oyun Terapisi (Çocuk)", category: "child", originalPrice: 500, discountedPrice: 300, discount: "40%", duration: "45 dk", features: ["Oyun terapisti", "Gözlem", "Veli görüşmesi"], featured: true },
+            { name: "10 Seans Paketi", category: "package", originalPrice: 5500, discountedPrice: 3300, discount: "40%", duration: "3 ay", features: ["10 seans", "Raporlama", "Acil destek hattı"], featured: false },
+            { name: "Kurumsal Eğitim", category: "corporate", originalPrice: 5000, discountedPrice: 3000, discount: "40%", duration: "1 gün", features: ["Stres yönetimi", "20 kişi", "Sertifika"], featured: false }
+        ]
+    },
+    {
+        id: 6,
+        name: "Göz Sağlığı Merkezi",
+        category: "hospital",
+        categoryName: "Göz Kliniği",
+        district: "gursu",
+        districtName: "Gürsu",
+        image: "https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=400",
+        openTime: "08:30",
+        closeTime: "18:00",
+        isOpen: true,
+        phone: "+90 224 678 90 12",
+        address: "Mudanya Cad. No:35, Gürsu",
+        coordinates: "40.2156,29.0123",
+        rating: 4.5,
+        reviews: [
+            { name: "Ayşe N.", date: "4 gün önce", text: "Smile lazer için geldim, harika sonuç.", rating: 5 }
+        ],
+        amenities: [
+            { icon: "visibility", name: "Smile Lazer" },
+            { icon: "glasses", name: "Göz İçi Lens" },
+            { icon: "colorize", name: "Renkli Lens" },
+            { icon: "biotech", name: "OCT" }
+        ],
+        doctors: [
+            { name: "Op. Dr. Serhat Demir", specialty: "Göz Hastalıkları", image: "https://randomuser.me/api/portraits/men/11.jpg" }
+        ],
+        services: [
+            { name: "Smile Lazer (2 Göz)", category: "surgery", originalPrice: 25000, discountedPrice: 17500, discount: "30%", duration: "15 dk", features: ["Ağrısız", "Hızlı iyileşme", "Ömür boyu"], featured: true },
+            { name: "Göz İçi Lens (2 Göz)", category: "surgery", originalPrice: 30000, discountedPrice: 21000, discount: "30%", duration: "30 dk", features: ["Multifokal", "Astigmat düzeltme", "Garanti"], featured: false },
+            { name: "Katarakt Ameliyatı", category: "surgery", originalPrice: 15000, discountedPrice: 10500, discount: "30%", duration: "20 dk", features: ["Akıllı lens", "Tek göz", "Anestezi dahil"], featured: false },
+            { name: "Detaylı Göz Muayenesi", category: "exam", originalPrice: 500, discountedPrice: 350, discount: "30%", duration: "45 dk", features: ["OCT", "Görme alanı", "Tonomeri"], featured: false },
+            { name: "Glokom Taraması", category: "screening", originalPrice: 400, discountedPrice: 280, discount: "30%", duration: "30 dk", features: ["Göz tansiyonu", "Sinir tomografi", "Rapor"], featured: false },
+            { name: "Çocuk Göz Muayenesi", category: "pediatric", originalPrice: 400, discountedPrice: 280, discount: "30%", duration: "30 dk", features: ["Oyunla muayene", "Şaşılık testi", "Gözlük reçetesi"], featured: false }
+        ]
+    }
+];
+
+let currentCategory = 'all';
+let currentDistrict = 'all';
+let currentHealthId = null;
+let selectedServices = {};
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    renderHealth();
+});
+
+// Filter Functions
+function filterCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.category === category);
+    });
+    renderHealth();
+}
+
+function filterDistrict(district) {
+    currentDistrict = district;
+    document.querySelectorAll('.district-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.district === district);
+    });
+    
+    const resetBtn = document.getElementById('reset-district-btn');
+    if (district !== 'all') {
+        resetBtn.classList.remove('hidden');
+    } else {
+        resetBtn.classList.add('hidden');
+    }
+    
+    renderHealth();
+}
+
+function resetDistrictFilter() {
+    filterDistrict('all');
+}
+
+function sortDeals(sortType) {
+    renderHealth(sortType);
+}
+
+// Check if open
+function checkIsOpen(openTime, closeTime) {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentTime = currentHour * 60 + currentMinute;
+    
+    const [openHour, openMinute] = openTime.split(':').map(Number);
+    const [closeHour, closeMinute] = closeTime.split(':').map(Number);
+    
+    const openMinutes = openHour * 60 + openMinute;
+    const closeMinutes = closeHour * 60 + closeMinute;
+    
+    if (closeMinutes < openMinutes) {
+        return currentTime >= openMinutes || currentTime <= closeMinutes;
+    }
+    
+    return currentTime >= openMinutes && currentTime <= closeMinutes;
+}
+
+// Render Health Centers
+function renderHealth(sortType = 'discount') {
+    const container = document.getElementById('deals-container');
+    
+    let filtered = healthData;
+    
+    if (currentCategory !== 'all') {
+        filtered = filtered.filter(h => h.category === currentCategory);
+    }
+    
+    if (currentDistrict !== 'all') {
+        filtered = filtered.filter(h => h.district === currentDistrict);
+    }
+    
+    if (sortType === 'discount') {
+        filtered.sort((a, b) => parseInt(b.services[0].discount) - parseInt(a.services[0].discount));
+    } else if (sortType === 'rating') {
+        filtered.sort((a, b) => b.rating - a.rating);
+    }
+    
+    document.getElementById('deals-count').textContent = filtered.length;
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8">
+                <span class="material-symbols-outlined text-4xl text-text-desc mb-2">medical_services</span>
+                <p class="text-sm text-text-desc">Bu kriterlere uygun sağlık kuruluşu bulunamadı</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filtered.map((health, index) => {
+        const isOpen = checkIsOpen(health.openTime, health.closeTime);
+        const bestService = health.services.reduce((prev, current) => (parseInt(current.discount) > parseInt(prev.discount)) ? current : prev);
+        
+        return `
+            <article class="deal-card rounded-xl overflow-hidden relative" style="animation: fadeIn 0.5s ease ${index * 0.1}s both">
+                <div class="flex">
+                    <div class="w-28 h-28 shrink-0 relative">
+                        <img src="${health.image}" alt="${health.name}" class="w-full h-full object-cover">
+                        <div class="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-health-green rounded text-[8px] text-white font-bold">
+                            %${bestService.discount}
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 p-3 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="px-1.5 py-0.5 bg-health-green/20 rounded text-[8px] text-health-green font-bold">${health.categoryName}</span>
+                                <span class="text-[8px] text-text-desc flex items-center gap-0.5">
+                                    <span class="material-symbols-outlined text-[10px]">location_on</span>
+                                    ${health.districtName}
+                                </span>
+                            </div>
+                            <h3 class="text-sm font-bold text-white leading-tight mb-1">${health.name}</h3>
+                            
+                            <!-- Working Hours -->
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[9px] text-text-desc flex items-center gap-0.5">
+                                    <span class="material-symbols-outlined text-[10px]">schedule</span>
+                                    ${health.openTime} - ${health.closeTime}
+                                </span>
+                                <span class="px-1.5 py-0.5 rounded text-[8px] font-bold ${isOpen ? 'open-badge' : 'closed-badge'}">
+                                    ${isOpen ? 'Açık' : 'Kapalı'}
+                                </span>
+                            </div>
+                            
+                            <!-- Best Price Preview -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] text-danger line-through">${bestService.originalPrice}₺</span>
+                                <span class="text-sm font-bold text-success">${bestService.discountedPrice}₺</span>
+                                <span class="text-[9px] text-health-green">/ ${bestService.name}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Doctors Preview -->
+                <div class="px-3 py-2 border-t border-white/10 flex gap-2 overflow-x-auto scrollbar-hide">
+                    ${health.doctors.slice(0, 3).map(d => `
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <img src="${d.image}" alt="${d.name}" class="w-6 h-6 rounded-full object-cover border border-health-green/40">
+                            <div class="flex flex-col">
+                                <span class="text-[8px] font-bold text-white">${d.name}</span>
+                                <span class="text-[7px] text-text-desc">${d.specialty}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-4 gap-2 p-3 border-t border-white/10">
+                    <a href="tel:${health.phone}" class="flex flex-col items-center gap-1 py-2 bg-white/5 rounded-lg active:bg-white/10 transition-all">
+                        <span class="material-symbols-outlined text-gold-primary text-base">phone</span>
+                        <span class="text-[8px] text-text-desc">Ara</span>
+                    </a>
+                    <a href="https://wa.me/${health.phone.replace(/\D/g, '')}" target="_blank" class="flex flex-col items-center gap-1 py-2 bg-white/5 rounded-lg active:bg-white/10 transition-all">
+                        <span class="material-symbols-outlined text-success text-base">chat</span>
+                        <span class="text-[8px] text-text-desc">WhatsApp</span>
+                    </a>
+                    <button onclick="openServicesModal(${health.id})" class="flex flex-col items-center gap-1 py-2 bg-white/5 rounded-lg active:bg-white/10 transition-all">
+                        <span class="material-symbols-outlined text-health-green text-base">medical_services</span>
+                        <span class="text-[8px] text-text-desc">Hizmetler</span>
+                    </button>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${health.coordinates}" target="_blank" class="flex flex-col items-center gap-1 py-2 bg-white/5 rounded-lg active:bg-white/10 transition-all">
+                        <span class="material-symbols-outlined text-info text-base">directions</span>
+                        <span class="text-[8px] text-text-desc">Yol Tarifi</span>
+                    </a>
+                </div>
+                
+                <!-- Reviews Preview -->
+                <div class="px-3 pb-3">
+                    <div class="glass-panel rounded-lg p-2">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-gold-primary text-sm">star</span>
+                                <span class="text-xs font-bold text-white">${health.rating}</span>
+                                <span class="text-[9px] text-text-desc">(${health.reviews.length} yorum)</span>
+                            </div>
+                            <button onclick="openReviewModal(${health.id})" class="text-[9px] text-gold-primary font-medium">
+                                + Yorum Yap
+                            </button>
+                        </div>
+                        ${health.reviews.length > 0 ? `
+                            <div class="space-y-1.5">
+                                ${health.reviews.slice(0, 2).map(review => `
+                                    <div class="text-[9px] text-text-secondary bg-white/5 rounded p-1.5">
+                                        <span class="text-gold-primary font-bold">${review.name}</span> • ${review.text}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<p class="text-[9px] text-text-desc">Henüz yorum yok.</p>'}
+                    </div>
+                </div>
+            </article>
+        `;
+    }).join('');
+}
+
+// Services Modal
+function openServicesModal(healthId) {
+    const health = healthData.find(h => h.id === healthId);
+    if (!health) return;
+    
+    currentHealthId = healthId;
+    selectedServices = {};
+    
+    document.getElementById('services-modal-title').textContent = health.name;
+    document.getElementById('services-modal-subtitle').textContent = `${health.services.length} hizmet mevcut`;
+    document.getElementById('services-modal-hours').textContent = `${health.openTime} - ${health.closeTime}`;
+    
+    const isOpen = checkIsOpen(health.openTime, health.closeTime);
+    const statusEl = document.getElementById('services-modal-status');
+    statusEl.textContent = isOpen ? 'Açık' : 'Kapalı';
+    statusEl.className = `px-2 py-1 rounded-full text-[9px] font-bold ${isOpen ? 'open-badge' : 'closed-badge'}`;
+    
+    // Render doctors
+    document.getElementById('doctors-container').innerHTML = health.doctors.map(d => `
+        <div class="doctor-avatar rounded-xl p-2 flex items-center gap-2 shrink-0">
+            <img src="${d.image}" alt="${d.name}" class="w-10 h-10 rounded-full object-cover">
+            <div>
+                <p class="text-[10px] font-bold text-white">${d.name}</p>
+                <p class="text-[8px] text-health-green">${d.specialty}</p>
+            </div>
+        </div>
+    `).join('');
+    
+    // Render services
+    document.getElementById('services-list-container').innerHTML = health.services.map((service, idx) => `
+        <div class="service-card rounded-xl p-4 mb-3" id="service-${idx}">
+            ${service.featured ? '<div class="absolute -top-2 left-4 px-2 py-0.5 bg-health-green rounded text-[8px] text-white font-bold">En Çok Tercih Edilen</div>' : ''}
+            <div class="flex items-start justify-between mb-2">
+                <div>
+                    <h4 class="text-sm font-bold text-white">${service.name}</h4>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-[9px] text-health-cyan bg-health-cyan/10 px-1.5 py-0.5 rounded">${service.category}</span>
+                        <span class="text-[9px] text-text-desc flex items-center gap-0.5">
+                            <span class="material-symbols-outlined text-[10px]">schedule</span>
+                            ${service.duration}
+                        </span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-lg font-bold text-success">${service.discountedPrice}₺</span>
+                    <div class="flex items-center gap-1 justify-end">
+                        <span class="text-[10px] text-danger line-through">${service.originalPrice}₺</span>
+                        <span class="px-1 py-0.5 bg-danger/20 rounded text-[8px] text-danger font-bold">%${service.discount}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-1 mb-3">
+                ${service.features.map(f => `
+                    <div class="flex items-center gap-1.5 text-[9px] text-text-secondary">
+                        <span class="material-symbols-outlined text-health-green text-xs">check_circle</span>
+                        ${f}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-white/10">
+                <span class="text-[9px] text-text-desc">Tasarruf: ${service.originalPrice - service.discountedPrice}₺</span>
+                <div class="flex items-center gap-2">
+                    <button onclick="updateServiceQty(${idx}, -1)" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white active:bg-white/20">
+                        <span class="material-symbols-outlined text-sm">remove</span>
+                    </button>
+                    <span class="text-sm font-bold w-4 text-center" id="service-qty-${idx}">0</span>
+                    <button onclick="updateServiceQty(${idx}, 1)" class="w-8 h-8 rounded-full bg-health-green flex items-center justify-center text-white active:scale-95">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    updateServicesTotal();
+    
+    const modal = document.getElementById('services-modal');
+    const content = document.getElementById('services-modal-content');
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => content.classList.remove('translate-y-full'), 10);
+}
+
+function closeServicesModal() {
+    const content = document.getElementById('services-modal-content');
+    content.classList.add('translate-y-full');
+    setTimeout(() => {
+        document.getElementById('services-modal').classList.add('hidden');
+        document.getElementById('services-modal').classList.remove('flex');
+    }, 300);
+}
+
+function updateServiceQty(idx, delta) {
+    if (!selectedServices[idx]) selectedServices[idx] = 0;
+    selectedServices[idx] = Math.max(0, selectedServices[idx] + delta);
+    if (selectedServices[idx] === 0) delete selectedServices[idx];
+    
+    document.getElementById(`service-qty-${idx}`).textContent = selectedServices[idx] || 0;
+    updateServicesTotal();
+}
+
+function updateServicesTotal() {
+    const health = healthData.find(h => h.id === currentHealthId);
+    if (!health) return;
+    
+    let total = 0;
+    let originalTotal = 0;
+    let count = 0;
+    
+    Object.entries(selectedServices).forEach(([idx, qty]) => {
+        const service = health.services[idx];
+        if (service) {
+            total += qty * service.discountedPrice;
+            originalTotal += qty * service.originalPrice;
+            count += qty;
+        }
+    });
+    
+    document.getElementById('selected-services-count').textContent = count + ' adet';
+    document.getElementById('services-original-total').textContent = originalTotal + '₺';
+    document.getElementById('services-total').textContent = total + '₺';
+}
+
+function shareServices() {
+    if (Object.keys(selectedServices).length === 0) {
+        alert('Lütfen en az bir hizmet seçin');
+        return;
+    }
+    
+    const health = healthData.find(h => h.id === currentHealthId);
+    let text = `${health.name} - Hizmetlerim:\n\n`;
+    
+    Object.entries(selectedServices).forEach(([idx, qty]) => {
+        const service = health.services[idx];
+        if (service && qty > 0) {
+            text += `• ${service.name} (${qty}x) - ${(qty * service.discountedPrice)}₺\n`;
+        }
+    });
+    
+    const total = document.getElementById('services-total').textContent;
+    text += `\nToplam: ${total}\n\nBursa'da sağlık indirimleri için CityJoy!`;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function bookAppointment() {
+    if (Object.keys(selectedServices).length === 0) {
+        alert('Lütfen en az bir hizmet seçin');
+        return;
+    }
+    
+    const health = healthData.find(h => h.id === currentHealthId);
+    alert(`${health.name} için randevu talebiniz alındı! En kısa sürede size dönüş yapılacaktır.`);
+    closeServicesModal();
+}
+
+// Review Modal
+function openReviewModal(healthId) {
+    currentHealthId = healthId;
+    currentRating = 0;
+    updateStarDisplay();
+    
+    const modal = document.getElementById('review-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeReviewModal() {
+    document.getElementById('review-modal').classList.add('hidden');
+    document.getElementById('review-modal').classList.remove('flex');
+    document.getElementById('review-form').reset();
+    currentRating = 0;
+    updateStarDisplay();
+}
+
+function setRating(rating) {
+    currentRating = rating;
+    updateStarDisplay();
+}
+
+function updateStarDisplay() {
+    const stars = document.querySelectorAll('.star-btn');
+    stars.forEach((star, idx) => {
+        if (idx < currentRating) {
+            star.classList.remove('text-white/20');
+            star.classList.add('text-gold-primary');
+        } else {
+            star.classList.add('text-white/20');
+            star.classList.remove('text-gold-primary');
+        }
+    });
+}
+
+document.getElementById('review-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (currentRating === 0) {
+        alert('Lütfen puan verin');
+        return;
+    }
+    
+    alert('Yorumunuz için teşekkürler! Onaylandıktan sonra yayınlanacaktır.');
+    closeReviewModal();
+});
+</script>
+
+</body>
+</html>

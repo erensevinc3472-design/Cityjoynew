@@ -1,0 +1,702 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="description" content="Bursa Ulaşım ve Harita - BursaRay, otobüs, teleferik ve toplu taşıma bilgileri"/>
+    <meta name="theme-color" content="#081F24"/>
+    <title>Bursa Ulaşım & Harita</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "card-teal": "#0A2529",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "metro-blue": "#3B82F6",
+                        "bus-orange": "#F97316",
+                        "tram-green": "#10B981"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-live {
+            animation: pulseLive 2s infinite;
+        }
+        @keyframes pulseLive {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(255, 68, 68, 0); }
+        }
+        .pulse-gold {
+            animation: pulseGold 2s infinite;
+        }
+        @keyframes pulseGold {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(224, 176, 122, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(224, 176, 122, 0); }
+        }
+        .expandable-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .expandable-section.open {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon.open {
+            transform: rotate(180deg);
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(224, 176, 122, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .route-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(13, 50, 56, 0.4) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .transport-btn {
+            transition: all 0.3s ease;
+        }
+        .transport-btn.active {
+            background: linear-gradient(135deg, #E0B07A 0%, #C09060 100%);
+            color: #081F24;
+            border-color: transparent;
+        }
+        .transport-btn:not(.active):hover {
+            border-color: rgba(224, 176, 122, 0.5);
+            transform: translateY(-2px);
+        }
+        .map-container {
+            background: linear-gradient(135deg, #0A2529 0%, #0D3238 100%);
+            border: 1px solid rgba(224, 176, 122, 0.2);
+        }
+        .station-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #E0B07A;
+            border: 2px solid #081F24;
+            box-shadow: 0 0 0 2px #E0B07A;
+        }
+        .station-line {
+            height: 2px;
+            background: linear-gradient(90deg, #3B82F6 0%, #E0B07A 100%);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="anasayfa.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg font-bold gold-gradient-text truncate">BURSA ULAŞIM</h1>
+                <p class="text-xs text-gray-text truncate">BursaRay, Otobüs, Teleferik & Toplu Taşıma</p>
+            </div>
+            <button onclick="openLiveMap()" class="w-10 h-10 flex items-center justify-center rounded-full bg-live-red/20 hover:bg-live-red/30 transition-colors shrink-0 pulse-live">
+                <span class="material-symbols-outlined text-live-red">my_location</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-4 sm:space-y-6 mt-4">
+
+        <!-- HERO - Canlı Durum -->
+        <section class="animate-fade-in">
+            <div class="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-green-600/10 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-green-400 text-xl">online_prediction</span>
+                        </div>
+                        <div>
+                            <h2 class="text-base sm:text-lg font-bold">Canlı Ulaşım Durumu</h2>
+                            <p class="text-xs text-gray-text">Tüm sistemler aktif</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/30">
+                        <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                        <span class="text-xs text-green-400 font-medium">CANLI</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                    <div class="stat-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-metro-blue">40</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Metro İstasyonu</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-bus-orange">250K</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Günlük Yolcu</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-gold">39 km</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Raylı Sistem</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-3 text-center">
+                        <p class="text-xl sm:text-2xl font-bold text-tram-green">8.8 km</p>
+                        <p class="text-[10px] sm:text-xs text-gray-text">Teleferik</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rota Planlayıcı -->
+        <section class="animate-slide-up" style="animation-delay: 0.1s">
+            <div class="glass-card rounded-2xl p-4 sm:p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/30 to-gold/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gold">route</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-base sm:text-lg font-bold gold-gradient-text">Rota Planlayıcı</h3>
+                        <p class="text-xs text-gray-text truncate">Başlangıç ve varış noktanızı seçin</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3 relative">
+                    <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-gold shrink-0">my_location</span>
+                        <input type="text" id="startPoint" placeholder="Başlangıç Noktası" value="Heykel, Osmangazi" 
+                            class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"/>
+                    </div>
+
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 z-10">
+                        <button onclick="swapLocations()" class="w-8 h-8 bg-gold/20 hover:bg-gold/30 rounded-full flex items-center justify-center border border-gold/30 transition-colors">
+                            <span class="material-symbols-outlined text-gold text-sm">swap_vert</span>
+                        </button>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-metro-blue shrink-0">location_on</span>
+                        <input type="text" id="endPoint" placeholder="Varış Noktası" value="Uludağ Üniversitesi" 
+                            class="bg-transparent flex-1 text-sm text-off-white placeholder-gray-text focus:outline-none min-w-0"/>
+                    </div>
+                </div>
+
+                <button onclick="findRoute()" class="w-full mt-4 bg-gradient-to-r from-gold/30 to-gold/10 hover:from-gold/40 hover:to-gold/20 border border-gold/50 text-gold py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">search</span>
+                    Rota Bul
+                </button>
+            </div>
+        </section>
+
+        <!-- Ulaşım Modları -->
+        <section class="animate-slide-up" style="animation-delay: 0.2s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Ulaşım Modu Seçin</h3>
+            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                <button onclick="setTransportMode('bus')" id="btn-bus" class="transport-btn active flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                    <span class="material-symbols-outlined text-[20px]">directions_bus</span>
+                    <span class="text-sm">Otobüs</span>
+                </button>
+                <button onclick="setTransportMode('metro')" id="btn-metro" class="transport-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                    <span class="material-symbols-outlined text-[20px]">subway</span>
+                    <span class="text-sm">Metro</span>
+                </button>
+                <button onclick="setTransportMode('taxi')" id="btn-taxi" class="transport-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                    <span class="material-symbols-outlined text-[20px]">local_taxi</span>
+                    <span class="text-sm">Taksi</span>
+                </button>
+                <button onclick="setTransportMode('car')" id="btn-car" class="transport-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                    <span class="material-symbols-outlined text-[20px]">directions_car</span>
+                    <span class="text-sm">Özel Araç</span>
+                </button>
+                <button onclick="setTransportMode('walk')" id="btn-walk" class="transport-btn flex items-center gap-2 px-4 py-2.5 rounded-xl shrink-0 font-medium border border-white/10 bg-card-teal text-white">
+                    <span class="material-symbols-outlined text-[20px]">directions_walk</span>
+                    <span class="text-sm">Yürüyüş</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Önerilen Rotalar -->
+        <section class="animate-slide-up" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase">Önerilen Rotalar</h3>
+                <button onclick="toggleSection('routesSection', 'routesIcon')" class="text-gray-text hover:text-gold transition-colors">
+                    <span id="routesIcon" class="material-symbols-outlined rotate-icon">expand_more</span>
+                </button>
+            </div>
+
+            <div id="routesSection" class="expandable-section open space-y-3">
+                <!-- En Hızlı Rota -->
+                <div class="route-card rounded-xl p-4 border-l-4 border-metro-blue">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-bold text-base flex items-center gap-2">
+                                <span class="material-symbols-outlined text-metro-blue text-sm">bolt</span>
+                                En Hızlı Rota
+                            </h4>
+                            <p class="text-white/60 text-xs">M2 Hattı • 28 dk • Aktarmasız</p>
+                        </div>
+                        <span class="bg-metro-blue/20 text-metro-blue text-[10px] font-bold px-2 py-1 rounded uppercase">Metro</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="flex -space-x-1">
+                            <div class="w-6 h-6 rounded-full bg-metro-blue flex items-center justify-center border-2 border-card-teal">
+                                <span class="material-symbols-outlined text-[12px] text-white">subway</span>
+                            </div>
+                        </div>
+                        <div class="h-[2px] flex-1 bg-white/10 relative">
+                            <div class="absolute inset-0 bg-metro-blue w-full"></div>
+                        </div>
+                        <span class="text-[10px] text-white/60">14:28</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-text">
+                        <span>Heykel → Üniversite</span>
+                        <span class="text-gold">7 durak</span>
+                    </div>
+                </div>
+
+                <!-- Ekonomik Rota -->
+                <div class="glass-card rounded-xl p-4 border-l-4 border-bus-orange">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-bold text-base flex items-center gap-2">
+                                <span class="material-symbols-outlined text-bus-orange text-sm">payments</span>
+                                Ekonomik Rota
+                            </h4>
+                            <p class="text-white/60 text-xs">B/43 Otobüs • 35 dk • 1 Aktarma</p>
+                        </div>
+                        <span class="bg-bus-orange/20 text-bus-orange text-[10px] font-bold px-2 py-1 rounded uppercase">Otobüs</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="flex -space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-bus-orange flex items-center justify-center border-2 border-card-teal">
+                                <span class="material-symbols-outlined text-[12px] text-white">directions_bus</span>
+                            </div>
+                            <div class="w-6 h-6 rounded-full bg-metro-blue flex items-center justify-center border-2 border-card-teal">
+                                <span class="material-symbols-outlined text-[12px] text-white">subway</span>
+                            </div>
+                        </div>
+                        <div class="h-[2px] flex-1 bg-white/10 relative">
+                            <div class="absolute inset-0 bg-bus-orange w-2/3"></div>
+                        </div>
+                        <span class="text-[10px] text-white/60">14:35</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-text">
+                        <span>Heykel → Acemler → Üniversite</span>
+                        <span class="text-gold">12 TL</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BursaRay Hatları -->
+        <section class="animate-slide-up" style="animation-delay: 0.4s">
+            <button onclick="toggleSection('metroSection', 'metroIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-metro-blue/30 to-metro-blue/10 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-metro-blue">subway</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-medium block truncate">BursaRay Metro Hatları</span>
+                        <span class="text-[10px] text-gray-text block truncate">M1 & M2 Hatları • 40 İstasyon</span>
+                    </div>
+                </div>
+                <span id="metroIcon" class="material-symbols-outlined text-gray-text rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="metroSection" class="expandable-section mt-3 space-y-3">
+                <!-- M1 Hattı -->
+                <div class="glass-card rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-metro-blue flex items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-white">M1</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-bold">Geçit/Balat ↔ Arabayatağı</p>
+                            <p class="text-[10px] text-gray-text truncate">~40 dk • 23 istasyon</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar py-2">
+                        <div class="station-dot shrink-0"></div>
+                        <div class="station-line w-4 shrink-0"></div>
+                        <span class="text-[10px] text-gray-text whitespace-nowrap">Geçit</span>
+                        <div class="station-line w-8 shrink-0"></div>
+                        <span class="text-[10px] text-gray-text whitespace-nowrap">Emek</span>
+                        <div class="station-line w-8 shrink-0"></div>
+                        <span class="text-[10px] text-gray-text whitespace-nowrap">Acemler</span>
+                        <div class="station-line w-8 shrink-0"></div>
+                        <span class="text-[10px] text-gold whitespace-nowrap">Şehreküstü</span>
+                        <div class="station-line w-8 shrink-0"></div>
+                        <span class="text-[10px] text-gray-text whitespace-nowrap">Arabayatağı</span>
+                        <div class="station-dot shrink-0"></div>
+                    </div>
+                </div>
+
+                <!-- M2 Hattı -->
+                <div class="glass-card rounded-xl p-4">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center shrink-0">
+                            <span class="text-xs font-bold text-white">M2</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-bold">Üniversite ↔ Kestel</p>
+                            <p class="text-[10px] text-gray-text truncate">~51 dk • 17 istasyon</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar py-2">
+                        <div class="station-dot shrink-0"></div>
+                        <div class="station-line w-4 shrink-0" style="background: linear-gradient(90deg, #10B981 0%, #E0B07A 100%);"></div>
+                        <span class="text-[10px] text-gray-text whitespace-nowrap">Üniversite</span>
+                        <div class="station-line w-8 shrink-0" style="background: linear-gradient(90deg, #10B981 0%, #E0B07A 100%);"></div>
+                        <span class="text-[10px] text-gray-text whitespace-nowrap">Nilüfer</span>
+                        <div class="station-line w-8 shrink-0" style="background: linear-gradient(90deg, #10B981 0%, #E0B07A 100%);"></div>
+                        <span class="text-[10px] text-gold whitespace-nowrap">Acemler</span>
+                        <div class="station-line w-8 shrink-0" style="background: linear-gradient(90deg, #10B981 0%, #E0B07A 100%);"></div>
+                        <span class="text-[10px] text-gray-text whitespace-nowrap">Kestel</span>
+                        <div class="station-dot shrink-0"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Teleferik -->
+        <section class="animate-slide-up" style="animation-delay: 0.5s">
+            <button onclick="toggleSection('teleferikSection', 'teleferikIcon')" class="w-full glass-card rounded-2xl p-4 flex items-center justify-between hover:border-gold/30 transition-all border-2 border-gold/20">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/40 to-gold/20 flex items-center justify-center shrink-0 pulse-gold">
+                        <span class="material-symbols-outlined text-gold">cable</span>
+                    </div>
+                    <div class="text-left min-w-0">
+                        <span class="text-sm font-bold text-gold block truncate">Uludağ Teleferik</span>
+                        <span class="text-[10px] text-gray-text block truncate">Teferrüç ↔ Oteller Bölgesi • 8.8 km</span>
+                    </div>
+                </div>
+                <span id="teleferikIcon" class="material-symbols-outlined text-gold rotate-icon shrink-0">expand_more</span>
+            </button>
+
+            <div id="teleferikSection" class="expandable-section mt-3">
+                <div class="glass-card rounded-xl p-4 border border-gold/20">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gold">schedule</span>
+                            <span class="text-sm font-medium">Çalışma Saatleri</span>
+                        </div>
+                        <span class="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">Aktif</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="bg-white/5 rounded-lg p-3 text-center">
+                            <p class="text-lg font-bold text-gold">10:00</p>
+                            <p class="text-[10px] text-gray-text">İlk Sefer</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3 text-center">
+                            <p class="text-lg font-bold text-gold">20:00</p>
+                            <p class="text-[10px] text-gray-text">Son Sefer</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                            <span class="text-xs">Tam Bilet (G/D)</span>
+                            <span class="text-sm font-bold text-gold">400 ₺</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                            <span class="text-xs">Öğrenci (G/D)</span>
+                            <span class="text-sm font-bold text-gold">200 ₺</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-2 text-[10px] text-gray-text">
+                        <span class="material-symbols-outlined text-xs">info</span>
+                        <span>2019 öncesi doğanlar için ücretsiz • E-Devlet öğrenci belgesi gerekli</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hızlı Erişim -->
+        <section class="animate-slide-up" style="animation-delay: 0.6s">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gold uppercase mb-3">Hızlı Erişim</h3>
+            <div class="grid grid-cols-4 gap-2">
+                <a href="bursakart.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-gold text-xl">credit_card</span>
+                    <span class="text-[10px] text-center">BursaKart</span>
+                </a>
+                <a href="durak-saatleri.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-metro-blue text-xl">schedule</span>
+                    <span class="text-[10px] text-center">Saatler</span>
+                </a>
+                <a href="otopark.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-bus-orange text-xl">local_parking</span>
+                    <span class="text-[10px] text-center">Otopark</span>
+                </a>
+                <a href="bisiklet.html" class="glass-card rounded-xl p-3 flex flex-col items-center gap-1 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-tram-green text-xl">pedal_bike</span>
+                    <span class="text-[10px] text-center">Bisiklet</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Duyurular -->
+        <section class="animate-slide-up" style="animation-delay: 0.7s">
+            <div class="glass-card rounded-xl p-4 border-l-4 border-live-red">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-live-red shrink-0">campaign</span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-live-red mb-1">Önemli Duyuru</p>
+                        <p class="text-xs text-gray-text leading-relaxed">
+                            Bursaray Üniversite hattında bakım çalışması nedeniyle 22:00'dan sonra seferler 30 dk aralıklı olacaktır. 
+                            <a href="#" class="text-gold hover:underline">Detaylar →</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="anasayfa.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ulasim-harita.html" class="flex flex-col items-center gap-1 text-gold">
+                <div class="bg-gold/20 p-2 rounded-xl mb-0.5">
+                    <span class="material-symbols-outlined text-2xl">map</span>
+                </div>
+                <span class="text-[10px] font-bold">Ulaşım</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">search</span>
+                <span class="text-[10px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Canlı Harita Modal -->
+    <div id="liveMapModal" class="fixed inset-0 z-[80] bg-deep-teal hidden">
+        <div class="sticky top-0 z-10 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="closeLiveMap()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors shrink-0">
+                        <span class="material-symbols-outlined text-gold">arrow_back</span>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Canlı Harita</h1>
+                        <p class="text-xs text-gray-text truncate">Gerçek zamanlı otobüs ve metro takibi</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/30 shrink-0">
+                    <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                    <span class="text-xs text-green-400 font-medium">CANLI</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
+            <!-- Harita Görseli -->
+            <div class="map-container rounded-2xl sm:rounded-3xl overflow-hidden relative aspect-[4/3]">
+                <div class="absolute inset-0 bg-gradient-to-br from-dark-teal to-medium-teal">
+                    <!-- Simüle edilmiş harita elementleri -->
+                    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 300">
+                        <!-- M1 Hattı -->
+                        <path d="M 50 150 Q 100 150 150 140 T 250 130 T 350 120" 
+                              stroke="#3B82F6" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <!-- M2 Hattı -->
+                        <path d="M 80 200 Q 120 180 150 140 T 200 100 T 280 80" 
+                              stroke="#10B981" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        <!-- İstasyonlar -->
+                        <circle cx="50" cy="150" r="6" fill="#E0B07A" stroke="#081F24" stroke-width="2"/>
+                        <circle cx="150" cy="140" r="6" fill="#E0B07A" stroke="#081F24" stroke-width="2"/>
+                        <circle cx="250" cy="130" r="6" fill="#E0B07A" stroke="#081F24" stroke-width="2"/>
+                        <circle cx="350" cy="120" r="6" fill="#E0B07A" stroke="#081F24" stroke-width="2"/>
+                        <circle cx="80" cy="200" r="6" fill="#E0B07A" stroke="#081F24" stroke-width="2"/>
+                        <circle cx="280" cy="80" r="6" fill="#E0B07A" stroke="#081F24" stroke-width="2"/>
+                        <!-- Hareket eden otobüsler -->
+                        <circle cx="180" cy="135" r="4" fill="#F97316" class="animate-pulse"/>
+                        <circle cx="220" cy="125" r="4" fill="#F97316" class="animate-pulse"/>
+                    </svg>
+
+                    <!-- Etiketler -->
+                    <div class="absolute top-4 left-4 bg-black/50 backdrop-blur px-3 py-1.5 rounded-lg">
+                        <span class="text-xs text-white font-medium">Geçit/Balat</span>
+                    </div>
+                    <div class="absolute top-1/3 right-4 bg-black/50 backdrop-blur px-3 py-1.5 rounded-lg">
+                        <span class="text-xs text-white font-medium">Arabayatağı</span>
+                    </div>
+                    <div class="absolute bottom-4 left-4 bg-black/50 backdrop-blur px-3 py-1.5 rounded-lg">
+                        <span class="text-xs text-white font-medium">Üniversite</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yakındaki Duraklar -->
+            <div>
+                <h3 class="text-sm font-bold text-gold mb-3">Yakındaki Duraklar</h3>
+                <div class="space-y-2">
+                    <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-metro-blue/20 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-metro-blue">subway</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-bold">Şehreküstü</p>
+                            <p class="text-[10px] text-gray-text">M1 & M2 Hattı • 450m</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <p class="text-xs text-green-400">2 dk</p>
+                            <p class="text-[10px] text-gray-text">Kestel yönü</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-bus-orange/20 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-bus-orange">directions_bus</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-bold">Heykel Durağı</p>
+                            <p class="text-[10px] text-gray-text">B/43, B/52 • 280m</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <p class="text-xs text-green-400">5 dk</p>
+                            <p class="text-[10px] text-gray-text">Acemler yönü</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Section Toggle
+        function toggleSection(sectionId, iconId) {
+            const section = document.getElementById(sectionId);
+            const icon = document.getElementById(iconId);
+            section.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // Transport Mode Selection
+        let currentMode = 'bus';
+        function setTransportMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.transport-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + mode).classList.add('active');
+        }
+
+        // Swap Locations
+        function swapLocations() {
+            const start = document.getElementById('startPoint');
+            const end = document.getElementById('endPoint');
+            const temp = start.value;
+            start.value = end.value;
+            end.value = temp;
+        }
+
+        // Find Route
+        function findRoute() {
+            const start = document.getElementById('startPoint').value;
+            const end = document.getElementById('endPoint').value;
+
+            if (!start || !end) {
+                alert('Lütfen başlangıç ve varış noktalarını girin');
+                return;
+            }
+
+            // Rota hesaplama simülasyonu
+            alert('Rota hesaplanıyor...\n' + start + ' → ' + end + '\nMod: ' + currentMode);
+        }
+
+        // Live Map Modal
+        function openLiveMap() {
+            document.getElementById('liveMapModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLiveMap() {
+            document.getElementById('liveMapModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Varsayılan olarak bazı sectionları açık bırak
+            document.getElementById('routesSection').classList.add('open');
+            document.getElementById('routesIcon').classList.add('open');
+        });
+    </script>
+
+</body>
+</html>
+

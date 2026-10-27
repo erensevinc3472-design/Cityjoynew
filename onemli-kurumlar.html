@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+    <title>Önemli Kurumlar - CityJoy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-teal": "#081F24",
+                        "dark-teal": "#0D3238",
+                        "medium-teal": "#133D43",
+                        "gold": "#E0B07A",
+                        "gold-light": "#F0C090",
+                        "off-white": "#F5F5F5",
+                        "gray-text": "#A0B0B5",
+                        "live-red": "#FF4444",
+                        "health-green": "#10B981",
+                        "health-blue": "#3B82F6",
+                        "ambulance-orange": "#F97316",
+                        "institution-purple": "#8B5CF6",
+                        "institution-indigo": "#6366F1"
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(180deg, #081F24 0%, #0D3238 50%, #133D43 100%);
+            min-height: 100dvh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-card {
+            background: rgba(13, 50, 56, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-heavy {
+            background: rgba(19, 61, 67, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 176, 122, 0.25);
+        }
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(8, 31, 36, 0.95);
+            border-top: 1px solid rgba(224, 176, 122, 0.1);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #F0C090 0%, #E0B07A 50%, #C09060 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .kurum-card {
+            transition: all 0.3s ease;
+        }
+        .kurum-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(224, 176, 122, 0.4);
+        }
+        .kurum-card:active {
+            transform: scale(0.98);
+        }
+    </style>
+<script type="module" src="./auth-check.js"></script>
+<script src="./sehir-init.js"></script>
+</head>
+<body class="text-off-white min-h-screen pb-24">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-card-heavy px-4 sm:px-6 pt-12 pb-4">
+        <div class="flex items-center gap-3">
+            <a href="benim-sehrim.html" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors active:scale-95 shrink-0">
+                <span class="material-symbols-outlined text-gold">arrow_back</span>
+            </a>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-lg sm:text-xl font-bold gold-gradient-text truncate">Önemli Kurumlar</h1>
+                <p class="text-xs text-gray-text truncate">Muhtarlıklar, kamu kurumları ve sağlık</p>
+            </div>
+            <div class="w-10 shrink-0"></div>
+        </div>
+    </header>
+
+    <main class="px-4 sm:px-6 space-y-3 mt-4 animate-fade-in">
+        
+        <!-- Muhtarlıklar -->
+        <a href="muhtarlik.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-gold/10 rounded-xl shrink-0 border border-gold/20">
+                    <span class="material-symbols-outlined text-gold text-2xl sm:text-3xl">location_city</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Muhtarlıklar</h3>
+                    <p class="text-xs text-gray-text truncate">Mahalle muhtarlıkları ve iletişim</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Kamu Kurumları -->
+        <a href="kamu-kurumlari.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-institution-indigo/10 rounded-xl shrink-0 border border-institution-indigo/20">
+                    <span class="material-symbols-outlined text-institution-indigo text-2xl sm:text-3xl">account_balance</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Kamu Kurumları</h3>
+                    <p class="text-xs text-gray-text truncate">Valilik, belediye, resmi kurumlar</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Hastaneler -->
+        <a href="hastaneler.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-live-red/10 rounded-xl shrink-0 border border-live-red/20">
+                    <span class="material-symbols-outlined text-live-red text-2xl sm:text-3xl">medical_services</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Hastaneler</h3>
+                    <p class="text-xs text-gray-text truncate">Devlet ve özel hastaneler</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Eczaneler - YENİ -->
+        <a href="eczaneler.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-health-green/10 rounded-xl shrink-0 border border-health-green/20">
+                    <span class="material-symbols-outlined text-health-green text-2xl sm:text-3xl">local_pharmacy</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Eczaneler</h3>
+                    <p class="text-xs text-gray-text truncate">Nöbetçi eczaneler ve ilaç bilgisi</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Emniyet & Polis - YENİ -->
+        <a href="emniyet.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-institution-purple/10 rounded-xl shrink-0 border border-institution-purple/20">
+                    <span class="material-symbols-outlined text-institution-purple text-2xl sm:text-3xl">local_police</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Emniyet & Polis</h3>
+                    <p class="text-xs text-gray-text truncate">Karakollar ve polis merkezleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- İtfaiye - YENİ -->
+        <a href="itfaiye.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-ambulance-orange/10 rounded-xl shrink-0 border border-ambulance-orange/20">
+                    <span class="material-symbols-outlined text-ambulance-orange text-2xl sm:text-3xl">fire_truck</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">İtfaiye</h3>
+                    <p class="text-xs text-gray-text truncate">Yangın istasyonları ve acil müdahale</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Nüfus Müdürlükleri - YENİ -->
+        <a href="nufus-mudurlukleri.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-health-blue/10 rounded-xl shrink-0 border border-health-blue/20">
+                    <span class="material-symbols-outlined text-health-blue text-2xl sm:text-3xl">badge</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Nüfus Müdürlükleri</h3>
+                    <p class="text-xs text-gray-text truncate">Kimlik, pasaport ve nüfus işlemleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Noterler -->
+        <a href="noterler.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-gold/10 rounded-xl shrink-0 border border-gold/20">
+                    <span class="material-symbols-outlined text-gold text-2xl sm:text-3xl">gavel</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Noterler</h3>
+                    <p class="text-xs text-gray-text truncate">Noter müdürlükleri ve işlemler</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- PTT Şubeleri -->
+        <a href="ptt-subeleri.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-gold/10 rounded-xl shrink-0 border border-gold/20">
+                    <span class="material-symbols-outlined text-gold text-2xl sm:text-3xl">mail</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">PTT Şubeleri</h3>
+                    <p class="text-xs text-gray-text truncate">Posta ve kargo işlemleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Vergi Daireleri - YENİ -->
+        <a href="vergi-daireleri.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-ambulance-orange/10 rounded-xl shrink-0 border border-ambulance-orange/20">
+                    <span class="material-symbols-outlined text-ambulance-orange text-2xl sm:text-3xl">receipt_long</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Vergi Daireleri</h3>
+                    <p class="text-xs text-gray-text truncate">Maliye ve vergi işlemleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- SGK Şubeleri - YENİ -->
+        <a href="sgk-subeleri.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-health-green/10 rounded-xl shrink-0 border border-health-green/20">
+                    <span class="material-symbols-outlined text-health-green text-2xl sm:text-3xl">health_and_safety</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">SGK Şubeleri</h3>
+                    <p class="text-xs text-gray-text truncate">Sosyal güvenlik ve sigorta işlemleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Sağlık Kabinleri -->
+        <a href="saglik-kabinleri.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-health-green/10 rounded-xl shrink-0 border border-health-green/20">
+                    <span class="material-symbols-outlined text-health-green text-2xl sm:text-3xl">home_health</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Sağlık Kabinleri</h3>
+                    <p class="text-xs text-gray-text truncate">Mobil sağlık hizmetleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Sağlık Ocakları -->
+        <a href="saglik-ocaklari.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-health-blue/10 rounded-xl shrink-0 border border-health-blue/20">
+                    <span class="material-symbols-outlined text-health-blue text-2xl sm:text-3xl">local_hospital</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Sağlık Ocakları</h3>
+                    <p class="text-xs text-gray-text truncate">Aile sağlığı merkezleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Eğitim Kurumları - YENİ -->
+        <a href="egitim-kurumlari.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-gold/10 rounded-xl shrink-0 border border-gold/20">
+                    <span class="material-symbols-outlined text-gold text-2xl sm:text-3xl">school</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Eğitim Kurumları</h3>
+                    <p class="text-xs text-gray-text truncate">Okullar ve eğitim merkezleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Kütüphaneler - YENİ -->
+        <a href="kutuphaneler.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-institution-indigo/10 rounded-xl shrink-0 border border-institution-indigo/20">
+                    <span class="material-symbols-outlined text-institution-indigo text-2xl sm:text-3xl">menu_book</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Kütüphaneler</h3>
+                    <p class="text-xs text-gray-text truncate">Halk kütüphaneleri ve arşivler</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+        <!-- Bankalar - YENİ -->
+        <a href="bankalar.html" class="kurum-card glass-card flex items-center justify-between p-4 sm:p-5 rounded-2xl block">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center bg-health-blue/10 rounded-xl shrink-0 border border-health-blue/20">
+                    <span class="material-symbols-outlined text-health-blue text-2xl sm:text-3xl">account_balance_wallet</span>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-off-white font-medium text-base sm:text-lg truncate">Bankalar</h3>
+                    <p class="text-xs text-gray-text truncate">Kamu ve özel banka şubeleri</p>
+                </div>
+            </div>
+            <div class="text-gold p-2 shrink-0">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_forward</span>
+            </div>
+        </a>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 nav-blur pt-3 pb-8 px-4 z-50">
+        <div class="flex justify-around items-center max-w-lg mx-auto">
+            <a href="benim-sehrim.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">home</span>
+                <span class="text-[10px]">Ana Sayfa</span>
+            </a>
+            <a href="kesfet-genel.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">explore</span>
+                <span class="text-[10px]">Keşfet</span>
+            </a>
+            <a href="ara.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">search</span>
+                <span class="text-[10px]">Ara</span>
+            </a>
+            <a href="profil.html" class="flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity">
+                <span class="material-symbols-outlined text-xl sm:text-2xl">person</span>
+                <span class="text-[10px]">Profil</span>
+            </a>
+        </div>
+    </nav>
+
+</body>
+</html>
