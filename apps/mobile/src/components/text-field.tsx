@@ -26,6 +26,7 @@ export function TextField({ label, error, hint, ...input }: Props) {
         placeholderTextColor={c.textMuted}
         style={[
           styles.input,
+          input.multiline && styles.multiline,
           {
             color: c.textStrong,
             backgroundColor: c.surfaceStrong,
@@ -55,4 +56,6 @@ export function TextField({ label, error, hint, ...input }: Props) {
 const styles = StyleSheet.create({
   wrap: { gap: spacing.xs },
   input: { minHeight: MIN_TOUCH, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md, fontFamily: fonts.body, fontSize: 16 },
+  // Çok satırlı alan (tanıtım, değerlendirme): birkaç satır görünür, yazı üstten başlar.
+  multiline: { minHeight: 112, paddingTop: spacing.sm, paddingBottom: spacing.sm, textAlignVertical: 'top' },
 });

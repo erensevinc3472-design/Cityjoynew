@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState, type ComponentProps } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '@cityjoy/shared';
 
@@ -33,7 +33,7 @@ function greetingKey(now = new Date()) {
   return 'home.greetingEvening';
 }
 
-/** Ana sayfa. Modüller sonraki aşamalarda bağlanacak. */
+/** Ana sayfa. Acil İhtiyaçlar bağlı; diğer modüller sonraki aşamalarda bağlanacak. */
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -83,19 +83,25 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <VerifyEmailBanner />
         <View style={styles.grid}>
-          {MODULES.map((m) => (
-            <View
-              key={m.key}
-              accessible
-              accessibilityLabel={`${t(`modules.${m.key}`)}. ${t('home.comingSoon')}`}
-              style={[styles.module, { backgroundColor: c.surface, borderColor: c.border, shadowColor: c.shadow }]}>
-              <View style={[styles.icon, { backgroundColor: m.urgent ? c.dangerSoft : c.accentSoft }]}>
-                <MaterialIcons name={m.icon} size={22} color={m.urgent ? c.danger : c.icon} />
-              </View>
-              <AppText style={[styles.moduleTitle, { color: c.textStrong }]}>{t(`modules.${m.key}`)}</AppText>
-              <AppText variant="caption" muted>{t(`modules.${m.key}Hint`)}</AppText>
-            </View>
-          ))}
+          {MODULES.map((m) => {
+            // Şimdilik yalnızca Acil İhtiyaçlar hazır; diğerleri sonraki aşamalarda bağlanacak.
+            const href = m.key === 'urgent' ? '/urgent' : undefined;
+            return (
+              <Pressable
+                key={m.key}
+                accessibilityRole={href ? 'button' : undefined}
+                disabled={!href}
+                accessibilityLabel={href ? t(`modules.${m.key}`) : `${t(`modules.${m.key}`)}. ${t('home.comingSoon')}`}
+                onPress={href ? () => router.push(href) : undefined}
+                style={({ pressed }) => [styles.module, { backgroundColor: c.surface, borderColor: m.urgent ? c.danger : c.border, shadowColor: c.shadow, opacity: pressed ? 0.85 : 1 }]}>
+                <View style={[styles.icon, { backgroundColor: m.urgent ? c.dangerSoft : c.accentSoft }]}>
+                  <MaterialIcons name={m.icon} size={22} color={m.urgent ? c.danger : c.icon} />
+                </View>
+                <AppText style={[styles.moduleTitle, { color: c.textStrong }]}>{t(`modules.${m.key}`)}</AppText>
+                <AppText variant="caption" muted>{t(`modules.${m.key}Hint`)}</AppText>
+              </Pressable>
+            );
+          })}
         </View>
         <AppText variant="caption" muted style={styles.center}>{t('home.comingSoon')}</AppText>
         <AppButton variant="ghost" title={`${t('home.changeLanguage')} · ${languageName}`} onPress={() => router.push('/language')} />

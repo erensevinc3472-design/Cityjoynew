@@ -110,6 +110,393 @@ service cloud.firestore {
       allow delete: if false; // Silmek yerine pasifleştirilir; seçmiş kullanıcıların kaydı bozulmaz.
     }
 
+    function validLocalized(t) {
+      return t is map && t.keys().hasOnly(['tr', 'en', 'de', 'ar', 'ru'])
+        && t.tr is string && t.tr.size() >= 1 && t.tr.size() <= 80;
+    }
+
+    // Acil numaralar (ülke geneli): herkes okur, girişsiz de (acil durumda hesap şartı olmaz).
+    // Yalnızca admin yönetir; silinmez, pasifleştirilir.
+    match /emergencyNumbers/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['number', 'names', 'notes', 'icon', 'order', 'active', 'updatedAt', 'updatedBy'])
+        && request.resource.data.number is string && request.resource.data.number.matches('^[0-9]{3,15}$')
+        && validLocalized(request.resource.data.names)
+        && (!('notes' in request.resource.data) || validLocalized(request.resource.data.notes))
+        && request.resource.data.icon is string && request.resource.data.icon.size() <= 40
+        && request.resource.data.order is int && request.resource.data.active is bool
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // Hizmet kategorileri (ülke geneli, iki seviye): herkes okur, yalnızca admin yönetir; silinmez.
+    // Alt kategorinin üstü var olan bir ana kategori olmalı (üç seviye kurulamaz).
+    match /serviceCategories/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['parentId', 'names', 'icon', 'order', 'active', 'urgent', 'updatedAt', 'updatedBy'])
+        && validLocalized(request.resource.data.names)
+        && request.resource.data.icon is string && request.resource.data.icon.size() <= 40
+        && request.resource.data.order is int && request.resource.data.active is bool
+        && (!('urgent' in request.resource.data) || request.resource.data.urgent is bool)
+        && (request.resource.data.parentId == null
+            || (request.resource.data.parentId is string && request.resource.data.parentId != id
+                && existsAfter(/databases/$(database)/documents/serviceCategories/$(request.resource.data.parentId))
+                && getAfter(/databases/$(database)/documents/serviceCategories/$(request.resource.data.parentId)).data.parentId == null))
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // Liste sürüm damgaları: uygulama tek okumayla listenin değişip değişmediğine bakar (maliyet ilkesi).
+    match /catalogVersions/{id} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.data.keys().hasOnly(['updatedAt', 'updatedBy'])
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    // "Eksik hizmet mi var? Bildir": giriş yapmış kullanıcı gönderir, admin okur ve "incelendi" yapar.
+    match /serviceSuggestions/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'text', 'provinceCode', 'status', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() >= 3 && request.resource.data.text.size() <= 300
+        && (!('provinceCode' in request.resource.data)
+            || (request.resource.data.provinceCode is string && request.resource.data.provinceCode.matches('^[0-8][0-9]$')))
+        && request.resource.data.status == 'yeni'
+        && request.resource.data.createdAt == request.time;
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedBy', 'reviewedAt'])
+        && request.resource.data.status == 'incelendi'
+        && request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.reviewedAt == request.time;
+      allow delete: if false;
+    }
+
+    // İşletmeler (PROJE.md 5.6-5.7). Sahibi bilgilerini yazar; doğrulama, üyelik kademesi, puan ve öne çıkma
+    // yalnızca yönetimce (ve ileride sunucu işlevleriyle) değişir.
+    function validBusinessContent(d) {
+      return d.type in ['hizmet', 'esnaf', 'evden-uretim', 'yeme-icme', 'konaklama', 'yol-ustu', 'emlak']
+        && d.name is string && d.name.size() >= 2 && d.name.size() <= 80
+        && d.categoryIds is list && d.categoryIds.size() >= 1 && d.categoryIds.size() <= 5
+        && validLocation(d.location) && 'districtId' in d.location
+        && (!('address' in d) || (d.address is string && d.address.size() <= 200 && d.type != 'evden-uretim'))
+        && d.phone is string && d.phone.matches('^[0-9]{10,13}$')
+        && d.whatsapp is bool && d.is24h is bool
+        && (!('hoursNote' in d) || (d.hoursNote is string && d.hoursNote.size() <= 120))
+        && (!('description' in d) || (d.description is string && d.description.size() <= 500))
+        && d.priceList is list && d.priceList.size() <= 30;
+    }
+
+    function businessContentKeys() {
+      return ['type', 'name', 'categoryIds', 'location', 'address', 'phone', 'whatsapp', 'is24h', 'hoursNote',
+              'description', 'priceList'];
+    }
+
+    function businessPath(id) {
+      return /databases/$(database)/documents/businesses/$(id);
+    }
+
+    function phoneClaimedBy(phone, id) {
+      return existsAfter(/databases/$(database)/documents/businessPhones/$(phone))
+        && getAfter(/databases/$(database)/documents/businessPhones/$(phone)).data.businessId == id;
+    }
+
+    function myReviewPath(bid) {
+      return /databases/$(database)/documents/businesses/$(bid)/reviews/$(request.auth.uid);
+    }
+
+    // Yayındaki değerlendirmenin yıldızı ve sayısı (gizlenen sayılmaz), yazımdan önce ve sonra.
+    function starsBefore(bid) {
+      return exists(myReviewPath(bid)) && get(myReviewPath(bid)).data.status == 'yayinda' ? get(myReviewPath(bid)).data.stars : 0;
+    }
+    function countBefore(bid) {
+      return exists(myReviewPath(bid)) && get(myReviewPath(bid)).data.status == 'yayinda' ? 1 : 0;
+    }
+    function starsAfter(bid) {
+      return existsAfter(myReviewPath(bid)) && getAfter(myReviewPath(bid)).data.status == 'yayinda' ? getAfter(myReviewPath(bid)).data.stars : 0;
+    }
+    function countAfter(bid) {
+      return existsAfter(myReviewPath(bid)) && getAfter(myReviewPath(bid)).data.status == 'yayinda' ? 1 : 0;
+    }
+
+    function ratingChangeValid(bid) {
+      return request.resource.data.rating.keys().hasOnly(['sum', 'count'])
+        && request.resource.data.rating.sum == resource.data.rating.sum - starsBefore(bid) + starsAfter(bid)
+        && request.resource.data.rating.count == resource.data.rating.count - countBefore(bid) + countAfter(bid);
+    }
+
+    match /businesses/{id} {
+      // Olmayan belgeyi okumak ("var mı?" sorusu) reddedilmez; içerik yoksa sızacak bilgi de yoktur.
+      allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(resource.data.ownerUid) || isAdmin();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(businessContentKeys().concat(
+             ['ownerUid', 'status', 'verification', 'membership', 'rating', 'createdAt', 'updatedAt']))
+        && validBusinessContent(request.resource.data)
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'yayinda'
+        && request.resource.data.verification == {'status': 'dogrulanmadi'}
+        && request.resource.data.membership == {'tier': 'ucretsiz'}
+        && request.resource.data.rating == {'sum': 0, 'count': 0}
+        // Aynı telefonla ikinci işletme açılamaz: telefon kaydı aynı toplu yazımda bu işletmeye bağlanır.
+        && phoneClaimedBy(request.resource.data.phone, id)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      // Sahibi: yalnızca kendi bilgileri ve gizle/yayınla. Yönetimin kaldırdığı işletmeyi açamaz.
+      allow update: if isSelf(resource.data.ownerUid)
+        && resource.data.status != 'kaldirildi'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(businessContentKeys().concat(['status', 'updatedAt']))
+        && validBusinessContent(request.resource.data)
+        && request.resource.data.status in ['yayinda', 'gizli']
+        && (request.resource.data.phone == resource.data.phone || phoneClaimedBy(request.resource.data.phone, id))
+        && request.resource.data.updatedAt == request.time;
+      // Değerlendirme yazan kişi: yalnızca yıldız toplamı, tam olarak kendi değerlendirmesi kadar değişir.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating'])
+        && ratingChangeValid(id);
+      // Yönetim (admin): doğrulama, kaldırma, kademe, öne çıkma. İşletmenin bilgilerini değiştiremez.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'verification', 'membership', 'featuredUntil', 'rating'])
+        && request.resource.data.status in ['yayinda', 'gizli', 'kaldirildi']
+        && request.resource.data.verification.status in ['dogrulanmadi', 'inceleniyor', 'dogrulandi']
+        && request.resource.data.membership.tier in ['ucretsiz', 'standart', 'pro', 'premium'];
+      // Sahibi silebilir (hesap silmede de kullanılır, KVKK).
+      allow delete: if isSelf(resource.data.ownerUid);
+    }
+
+    // Telefon kaydı: bir telefon tek işletmeye bağlıdır. Kart zaten telefonu gösterdiği için okunabilir (tekil).
+    match /businessPhones/{phone} {
+      allow get: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['businessId', 'ownerUid'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && existsAfter(businessPath(request.resource.data.businessId))
+        && getAfter(businessPath(request.resource.data.businessId)).data.ownerUid == request.auth.uid
+        && getAfter(businessPath(request.resource.data.businessId)).data.phone == phone;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid
+        && (!existsAfter(businessPath(resource.data.businessId))
+            || getAfter(businessPath(resource.data.businessId)).data.phone != phone);
+      allow update: if false;
+    }
+
+    // Uygulamadan arama / WhatsApp kaydı: değerlendirme yazabilmenin şartı. Yalnızca sahibi görür.
+    match /contacts/{id} {
+      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'businessId', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && id == request.resource.data.businessId + '_' + request.auth.uid
+        && request.resource.data.at == request.time;
+      allow update: if false;
+    }
+
+    // İşletme değerlendirmeleri (belge kimliği = yazanın kimliği: kişi başına bir değerlendirme).
+    match /businesses/{bid}/reviews/{uid} {
+      function biz() {
+        return get(businessPath(bid)).data;
+      }
+      function validReview(d) {
+        return d.stars is int && d.stars >= 1 && d.stars <= 5
+          && d.text is string && d.text.size() >= 10 && d.text.size() <= 500;
+      }
+      function ratingWrittenTogether() {
+        return existsAfter(businessPath(bid)) && getAfter(businessPath(bid)).data.rating != biz().rating;
+      }
+
+      allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(uid) || isAdmin()
+        || (signedIn() && biz().ownerUid == request.auth.uid);
+      allow create: if isSelf(uid)
+        && biz().status == 'yayinda' && biz().ownerUid != uid
+        && exists(/databases/$(database)/documents/contacts/$(bid + '_' + uid))
+        && request.resource.data.keys().hasOnly(['uid', 'stars', 'text', 'authorName', 'status', 'createdAt', 'updatedAt'])
+        && request.resource.data.uid == uid
+        && validReview(request.resource.data)
+        && request.resource.data.authorName is string && request.resource.data.authorName.size() <= 40
+        && request.resource.data.status == 'yayinda'
+        && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time
+        && ratingWrittenTogether();
+      // Yazan: yıldız ve metni değiştirir (gizlenen yorumu değiştiremez); puan toplamı birlikte güncellenir.
+      allow update: if isSelf(uid) && resource.data.status == 'yayinda'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stars', 'text', 'updatedAt'])
+        && validReview(request.resource.data)
+        && request.resource.data.updatedAt == request.time
+        && (request.resource.data.stars == resource.data.stars || ratingWrittenTogether());
+      // İşletme sahibinin cevabı.
+      allow update: if signedIn() && biz().ownerUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reply'])
+        && request.resource.data.reply.keys().hasOnly(['text', 'at'])
+        && request.resource.data.reply.text is string
+        && request.resource.data.reply.text.size() >= 2 && request.resource.data.reply.text.size() <= 500
+        && request.resource.data.reply.at == request.time;
+      // Yönetim: gizle / geri aç (puan aynı işlemde düzeltilir).
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'moderatedBy', 'moderatedAt'])
+        && request.resource.data.status in ['yayinda', 'gizlendi'];
+      // Yazan siler (yayındaysa puan birlikte düşer); işletme silinirken sahibi tüm yorumları siler.
+      allow delete: if (isSelf(uid)
+            && (!exists(businessPath(bid)) || resource.data.status != 'yayinda' || !existsAfter(businessPath(bid))
+                || getAfter(businessPath(bid)).data.rating.count == biz().rating.count - 1))
+        || (signedIn() && exists(businessPath(bid)) && biz().ownerUid == request.auth.uid && !existsAfter(businessPath(bid)));
+    }
+
+    // Hesap silmede kullanıcının tüm değerlendirmelerini bulmak için (yalnızca kendi yorumları).
+    match /{path=**}/reviews/{rid} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // Değerlendirme şikâyetleri: kişi başına yorum başına bir şikâyet; admin inceler.
+    match /reviewReports/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['businessId', 'reviewUid', 'reporterUid', 'reason', 'status', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.reviewUid != request.auth.uid
+        && id == request.resource.data.businessId + '_' + request.resource.data.reviewUid + '_' + request.auth.uid
+        && request.resource.data.reason in ['hakaret', 'sahte', 'kisisel-veri', 'alakasiz', 'diger']
+        && request.resource.data.status == 'yeni'
+        && request.resource.data.createdAt == request.time;
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'incelendi';
+      allow delete: if false;
+    }
+
+    // ---- SOS - Aileme haber ver (PROJE.md 5.4) ----
+    function familyLinkPath(a, b) {
+      return /databases/$(database)/documents/familyLinks/$(a < b ? a + '_' + b : b + '_' + a);
+    }
+    function isFamily(other) {
+      return exists(familyLinkPath(request.auth.uid, other));
+    }
+    // Alıcıların hepsi gönderenin aile listesinde olmalı (en çok 10 kişi; kurallar döngü kuramadığı için tek tek).
+    function recipientOk(r, i) {
+      return r.size() <= i || (r[i] is string && r[i] != request.auth.uid && isFamily(r[i]));
+    }
+    function recipientsAreFamily(r) {
+      return r is list && r.size() >= 1 && r.size() <= 10
+        && recipientOk(r, 0) && recipientOk(r, 1) && recipientOk(r, 2) && recipientOk(r, 3) && recipientOk(r, 4)
+        && recipientOk(r, 5) && recipientOk(r, 6) && recipientOk(r, 7) && recipientOk(r, 8) && recipientOk(r, 9);
+    }
+    function validSosLocation(l) {
+      return l is map && l.keys().hasOnly(['lat', 'lng', 'accuracy', 'at'])
+        && l.lat is number && l.lat >= -90 && l.lat <= 90 && l.lng is number && l.lng >= -180 && l.lng <= 180
+        && (!('accuracy' in l) || l.accuracy is number)
+        && l.at == request.time;
+    }
+
+    // Davet kodu: tek kullanımlık, 24 saat. Kod gizli anahtar gibidir; tekil okunur, listelenmez (yalnızca sahibi).
+    match /familyInvites/{code} {
+      allow get: if signedIn();
+      allow list: if signedIn() && resource.data.fromUid == request.auth.uid;
+      allow create: if signedIn()
+        && code.matches('^[A-HJKMNP-Z2-9]{8}$')
+        && request.resource.data.keys().hasOnly(['fromUid', 'fromName', 'createdAt', 'expiresAt'])
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.fromName is string && request.resource.data.fromName.size() <= 60
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt <= request.time + duration.value(24, 'h');
+      // Kabul: başkası, süresi dolmadan, bir kez; aile bağı aynı toplu yazımda kurulur.
+      allow update: if signedIn()
+        && request.auth.uid != resource.data.fromUid
+        && !('usedBy' in resource.data)
+        && request.time < resource.data.expiresAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usedBy', 'usedAt'])
+        && request.resource.data.usedBy == request.auth.uid
+        && request.resource.data.usedAt == request.time
+        && existsAfter(familyLinkPath(request.auth.uid, resource.data.fromUid));
+      allow delete: if signedIn() && resource.data.fromUid == request.auth.uid;
+    }
+
+    // Aile bağı (iki kişi, karşılıklı). Yalnızca iki taraf görür; her biri istediği an siler (ayrılır).
+    match /familyLinks/{id} {
+      function inviteAfter() {
+        return getAfter(/databases/$(database)/documents/familyInvites/$(request.resource.data.inviteCode)).data;
+      }
+      function inviteBefore() {
+        return get(/databases/$(database)/documents/familyInvites/$(request.resource.data.inviteCode)).data;
+      }
+      allow read: if signedIn() && (resource == null || request.auth.uid in resource.data.members);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['members', 'names', 'inviteCode', 'createdAt'])
+        && request.resource.data.members is list && request.resource.data.members.size() == 2
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.members[0] < request.resource.data.members[1]
+        && id == request.resource.data.members[0] + '_' + request.resource.data.members[1]
+        && request.resource.data.names is map && request.resource.data.names.keys().hasOnly(request.resource.data.members)
+        && request.resource.data.createdAt == request.time
+        // Davet geçerli: karşı tarafın daveti, kullanılmamış, süresi dolmamış; bu yazımda bana kullanıldı.
+        && !('usedBy' in inviteBefore())
+        && request.time < inviteBefore().expiresAt
+        && inviteBefore().fromUid in request.resource.data.members
+        && inviteBefore().fromUid != request.auth.uid
+        && inviteAfter().usedBy == request.auth.uid;
+      allow update: if false;
+      allow delete: if signedIn() && request.auth.uid in resource.data.members;
+    }
+
+    // SOS kaydı: yalnızca gönderen ve alıcılar görür; panel/admin göremez (gizlilik).
+    match /sosAlerts/{id} {
+      allow read: if signedIn() && (resource == null || resource.data.fromUid == request.auth.uid
+        || request.auth.uid in resource.data.recipients);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['fromUid', 'fromName', 'recipients', 'test', 'status', 'location',
+             'createdAt', 'liveUntil', 'deleteAt', 'deliveredTo', 'seenBy'])
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.fromName is string && request.resource.data.fromName.size() <= 60
+        && recipientsAreFamily(request.resource.data.recipients)
+        && request.resource.data.test is bool
+        && request.resource.data.status == 'aktif'
+        && (!('location' in request.resource.data) || validSosLocation(request.resource.data.location))
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.liveUntil is timestamp
+        && request.resource.data.liveUntil <= request.time + duration.value(121, 'm')
+        && request.resource.data.deleteAt is timestamp
+        && request.resource.data.deliveredTo == {} && request.resource.data.seenBy == {};
+      // Gönderen: canlı konum ve durum (Güvendeyim / Yardım gerek / bitir).
+      allow update: if signedIn() && resource.data.fromUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['location', 'status'])
+        && request.resource.data.status in ['aktif', 'guvende', 'bitti']
+        && (!('location' in request.resource.data.diff(resource.data).affectedKeys()) || validSosLocation(request.resource.data.location));
+      // Alıcı: yalnızca kendi "teslim edildi" ve "görüldü" işareti.
+      allow update: if signedIn() && request.auth.uid in resource.data.recipients
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deliveredTo', 'seenBy'])
+        && request.resource.data.deliveredTo.diff(resource.data.deliveredTo).affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data.seenBy.diff(resource.data.seenBy).affectedKeys().hasOnly([request.auth.uid]);
+      allow delete: if signedIn() && resource.data.fromUid == request.auth.uid;
+    }
+
+    // Bildirim adresleri (telefon başına, en çok 5): SOS bildirimini aile üyesinin telefonu gönderir.
+    // Yalnızca sahibi ve aile üyeleri okur (yabancı bildirim gönderemesin diye).
+    match /pushTokens/{uid} {
+      allow read: if isSelf(uid) || (signedIn() && isFamily(uid));
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['tokens', 'language', 'updatedAt'])
+        && request.resource.data.tokens is list && request.resource.data.tokens.size() <= 5
+        && request.resource.data.language in ['tr', 'en', 'de', 'ar', 'ru']
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isSelf(uid);
+    }
+
+    // Uygulama ayarları (SOS süreleri): herkes okur, admin yazar.
+    match /config/{id} {
+      allow read: if true;
+      allow write: if isAdmin() && id == 'sos'
+        && request.resource.data.keys().hasOnly(['liveMinutes', 'countdownSeconds', 'updatedBy', 'updatedAt'])
+        && request.resource.data.liveMinutes is int && request.resource.data.liveMinutes >= 10 && request.resource.data.liveMinutes <= 120
+        && request.resource.data.countdownSeconds is int && request.resource.data.countdownSeconds >= 3 && request.resource.data.countdownSeconds <= 10
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+    }
+
     match /admins/{uid} {
       allow read: if isSelf(uid);
       allow write: if false;

@@ -9,6 +9,9 @@ import { t } from '../lib/t';
 export const MENU: { module: Module; path?: string }[] = [
   { module: 'konumlar', path: '/konumlar' },
   { module: 'meslekler', path: '/meslekler' },
+  { module: 'acil-numaralar', path: '/acil-numaralar' },
+  { module: 'hizmet-kategorileri', path: '/hizmet-kategorileri' },
+  { module: 'sos', path: '/sos-ayarlari' },
   { module: 'onaylar' },
   { module: 'yetkiler' },
   { module: 'islem-kayitlari' },
@@ -16,8 +19,8 @@ export const MENU: { module: Module; path?: string }[] = [
   { module: 'gonderiler' },
   { module: 'etkinlikler' },
   { module: 'hizmetler' },
-  { module: 'moderasyon' },
-  { module: 'isletme-dogrulama' },
+  { module: 'moderasyon', path: '/moderasyon' },
+  { module: 'isletme-dogrulama', path: '/isletmeler' },
 ];
 
 export function Shell() {

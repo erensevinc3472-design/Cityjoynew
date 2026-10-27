@@ -11,7 +11,8 @@ import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
-import { authService, profileRepository } from '@/lib/services';
+import { unregisterPush } from '@/lib/push';
+import { authService, businessRepository, familyRepository, profileRepository, reviewRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings, type ThemeMode } from '@/lib/settings';
 import { restartFlow } from '@/lib/navigation';
@@ -36,6 +37,8 @@ export default function AccountScreen() {
   const [busy, setBusy] = useState(false);
 
   const signOut = async () => {
+    // Bu telefona artık bu hesabın aile SOS bildirimleri gelmesin.
+    if (user) await unregisterPush(user.uid);
     await authService.signOut();
     await adopt(null);
     restartFlow(router);
@@ -45,7 +48,13 @@ export default function AccountScreen() {
     setError(undefined);
     setBusy(true);
     try {
-      await authService.deleteAccountAndData(password || undefined, (uid) => profileRepository.delete(uid));
+      // Kullanıcının aile bağları, SOS kayıtları, değerlendirmeleri ve işletmeleri de silinir (KVKK); sonra profil, en son hesap.
+      await authService.deleteAccountAndData(password || undefined, async (uid) => {
+        await familyRepository.deleteAllOf(uid);
+        await reviewRepository.deleteAllBy(uid);
+        await businessRepository.deleteAllOf(uid);
+        await profileRepository.delete(uid);
+      });
       await adopt(null);
       restartFlow(router);
     } catch (e) {
@@ -62,6 +71,8 @@ export default function AccountScreen() {
         <AppText muted>{user?.email}</AppText>
       </View>
 
+      <OptionRow title={t('family.title')} subtitle={t('family.hint')} showChevron onPress={() => router.push('/family')} />
+      <OptionRow title={t('business.myTitle')} subtitle={t('business.myHint')} showChevron onPress={() => router.push('/business')} />
       <OptionRow title={t('home.changeLanguage')} subtitle={LANGUAGES.find((l) => l.code === language)?.nativeName} showChevron onPress={() => router.push('/language')} />
       <OptionRow title={t('home.changeLocation')} showChevron onPress={() => router.push('/location?edit=1')} />
 

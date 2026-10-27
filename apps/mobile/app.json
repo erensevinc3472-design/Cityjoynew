@@ -54,6 +54,22 @@
             ]
           }
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "CityJoy, SOS gönderdiğinizde konumunuzu yalnızca aile listenizdeki kişilere iletmek için kullanır.",
+          "locationAlwaysAndWhenInUsePermission": "SOS gönderdiğinizde ekran kilitlense ya da uygulama kapansa da konumunuz aile listenizdeki kişilere iletilmeye devam eder. Yalnızca SOS süresince (en çok 2 saat) kullanılır; başka zaman arka planda konum alınmaz.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true,
+          "isIosBackgroundLocationEnabled": true
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#C0392B"
+        }
       ]
     ],
     "experiments": {
