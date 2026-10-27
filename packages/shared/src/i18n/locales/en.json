@@ -41,12 +41,96 @@
     "noLocation": "No location selected",
     "changeLocation": "Change location",
     "changeLanguage": "Change language",
-    "comingSoon": "This section will be added in the next stage."
+    "comingSoon": "This section will be added in the next stage.",
+    "account": "My account"
   },
   "modules": {
     "myCity": "My City",
     "travel": "Travel",
     "social": "Social Harmony",
     "urgent": "Urgent Needs"
+  },
+  "auth": {
+    "welcomeTitle": "Welcome to CityJoy",
+    "welcomeSubtitle": "Information, announcements and services for your province, district and neighbourhood in one place.",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "passwordRepeat": "Password (again)",
+    "fullName": "Full name",
+    "birthYear": "Year of birth",
+    "birthYearHint": "Your year of birth can't be changed after sign-up and is never shown to others.",
+    "passwordHint": "At least {{count}} characters.",
+    "forgotPassword": "Forgot password",
+    "noAccount": "No account? Sign up",
+    "haveAccount": "Already have an account? Sign in",
+    "google": "Continue with Google",
+    "or": "or",
+    "acceptTerms": "I have read and accept the terms of use.",
+    "readPrivacy": "I have read the privacy notice on the processing of personal data.",
+    "read": "Read"
+  },
+  "errors": {
+    "required": "This field is required.",
+    "invalidEmail": "Enter a valid email address.",
+    "passwordTooShort": "Password must be at least {{count}} characters.",
+    "passwordsDontMatch": "Passwords don't match.",
+    "invalidBirthYear": "Enter a valid year of birth.",
+    "tooYoung": "You must be at least 13 to sign up for CityJoy.",
+    "mustAccept": "You need to confirm both texts to continue.",
+    "emailInUse": "An account with this email already exists. Try signing in.",
+    "wrongCredentials": "Email or password is incorrect.",
+    "tooManyRequests": "Too many attempts. Try again in a little while.",
+    "network": "Check your internet connection and try again.",
+    "weakPassword": "Choose a stronger password.",
+    "requiresRecentLogin": "For your security, please enter your password again.",
+    "unknown": "Something went wrong. Please try again.",
+    "notConfigured": "The app isn't connected to the server yet."
+  },
+  "reset": {
+    "title": "Reset your password",
+    "subtitle": "Enter your email and we'll send you a link to reset your password.",
+    "send": "Send link",
+    "sent": "If an account exists for this address, a reset link has been sent. Check your inbox and spam folder."
+  },
+  "verify": {
+    "banner": "Verify your email. We sent a link to {{email}}.",
+    "resend": "Resend",
+    "done": "I've verified",
+    "sent": "Link sent again.",
+    "stillNot": "Your email doesn't seem to be verified yet."
+  },
+  "profile": {
+    "title": "Tell us a bit about you",
+    "subtitle": "This information is never shown to others. It's only used to send you relevant announcements and notifications.",
+    "gender": "Gender (optional)",
+    "genderKadin": "Woman",
+    "genderErkek": "Man",
+    "genderNone": "Prefer not to say",
+    "occupation": "Occupation",
+    "occupationHint": "Used so that announcements about your profession only reach the people they're useful to.",
+    "selectOccupation": "Select occupation",
+    "searchOccupation": "Search occupation",
+    "targetingConsent": "Send me notifications suited to my age, gender and occupation. (Optional, you can turn this off at any time.)",
+    "commercialConsent": "I'd like to receive campaign and discount notifications. (Optional)",
+    "save": "Save and continue"
+  },
+  "account": {
+    "title": "My account",
+    "signOut": "Sign out",
+    "deleteAccount": "Delete account",
+    "deleteTitle": "Are you sure you want to delete your account?",
+    "deleteWarning": "Your profile and settings will be permanently deleted. This can't be undone.",
+    "deletePasswordHint": "Enter your password to confirm.",
+    "deleteConfirm": "Permanently delete my account",
+    "cancel": "Cancel",
+    "legal": "Legal",
+    "terms": "Terms of use",
+    "privacy": "Privacy notice",
+    "neighbourhoodLocked": "Your neighbourhood can be changed once a month. Next change: {{date}}."
+  },
+  "legal": {
+    "draftNotice": "This text is being prepared and will be reviewed by a lawyer before launch."
   }
 }

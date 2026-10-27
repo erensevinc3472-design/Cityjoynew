@@ -9,6 +9,7 @@ import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import '@/lib/i18n';
+import { SessionProvider, useSession } from '@/lib/session';
 import { SettingsProvider, useSettings } from '@/lib/settings';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -16,6 +17,7 @@ SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { ready, rtl } = useSettings();
+  const session = useSession();
   const c = useThemeColors();
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
@@ -25,7 +27,7 @@ function RootNavigator() {
     PlusJakartaSans_700Bold,
   });
   // Yazı tipi yüklenemezse sistem yazı tipiyle devam edilir.
-  const loaded = ready && (fontsLoaded || !!fontError);
+  const loaded = ready && session.ready && (fontsLoaded || !!fontError);
 
   useEffect(() => {
     if (loaded) SplashScreen.hideAsync();
@@ -47,7 +49,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <SettingsProvider>
-        <RootNavigator />
+        <SessionProvider>
+          <RootNavigator />
+        </SessionProvider>
       </SettingsProvider>
     </SafeAreaProvider>
   );

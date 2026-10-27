@@ -1,18 +1,23 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { filterByName, type Neighbourhood } from '@cityjoy/shared';
+import { filterByName, nextNeighbourhoodChange, type Neighbourhood, type UserLocation } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { OptionRow } from '@/components/option-row';
 import { Screen } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
+import { FormMessage } from '@/components/form-message';
 import { StateMessage } from '@/components/state-message';
 import { locationRepository as repo } from '@/lib/locations';
+import { profileRepository } from '@/lib/services';
+import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
+import { useUserLocation } from '@/lib/user-location';
+import { restartFlow } from '@/lib/navigation';
 import { MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -20,10 +25,15 @@ type Step = 'province' | 'district' | 'neighbourhood';
 type Row = { id: string; name: string; subtitle?: string };
 
 export default function LocationScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
+  // Ana sayfa ya da hesap ekranından açıldıysa iş bitince geri dönülür; ilk kurulumda açılış akışı sürer.
+  const editing = useLocalSearchParams<{ edit?: string }>().edit === '1';
   const c = useThemeColors();
-  const { location, setLocation, rtl } = useSettings();
+  const { setLocation, rtl } = useSettings();
+  const { location } = useUserLocation();
+  const { user, profile, refreshProfile } = useSession();
+  const [saveError, setSaveError] = useState<string>();
 
   const [provinceCode, setProvinceCode] = useState(location?.provinceCode);
   const [districtId, setDistrictId] = useState(location?.districtId);
@@ -62,11 +72,34 @@ export default function LocationScreen() {
   const visible = useMemo(() => (rows ? filterByName(rows, query) : null), [rows, query]);
 
   const finish = async (neighbourhoodId?: string) => {
-    setSaving(true);
-    await setLocation(provinceCode ? { provinceCode, districtId, neighbourhoodId } : null);
+    const next: UserLocation | null = provinceCode ? { provinceCode, districtId, neighbourhoodId } : null;
+    setSaveError(undefined);
+
+    if (user && profile) {
+      const changed = JSON.stringify(next ?? null) !== JSON.stringify(profile.location ?? null);
+      const neighbourhoodChanged = (next?.neighbourhoodId ?? null) !== (profile.location?.neighbourhoodId ?? null);
+      const nextAllowed = nextNeighbourhoodChange(profile);
+      // Mahalle ayda bir kez değişir; aynı kural veritabanında da denetlenir.
+      if (neighbourhoodChanged && nextAllowed && nextAllowed > new Date()) {
+        setSaveError(t('account.neighbourhoodLocked', { date: nextAllowed.toLocaleDateString(i18n.language) }));
+        return;
+      }
+      setSaving(true);
+      try {
+        if (changed) await profileRepository.update(user.uid, { location: next }, profile);
+        await refreshProfile();
+      } catch {
+        setSaveError(t('common.errorGeneric'));
+        setSaving(false);
+        return;
+      }
+    } else {
+      setSaving(true);
+    }
+    await setLocation(next);
     setSaving(false);
-    if (router.canGoBack()) router.back();
-    else router.replace('/home');
+    if (editing && router.canGoBack()) router.back();
+    else restartFlow(router);
   };
 
   const goTo = (next: Step) => {
@@ -90,7 +123,7 @@ export default function LocationScreen() {
   const goBack = () => {
     if (step === 'neighbourhood') goTo('district');
     else if (step === 'district') goTo('province');
-    else if (router.canGoBack()) router.back();
+    else if (editing && router.canGoBack()) router.back();
   };
 
   const province = provinceCode ? repo.getProvince(provinceCode) : undefined;
@@ -99,7 +132,7 @@ export default function LocationScreen() {
 
   const titleKey = { province: 'selectProvince', district: 'selectDistrict', neighbourhood: 'selectNeighbourhood' } as const;
   const searchKey = { province: 'searchProvince', district: 'searchDistrict', neighbourhood: 'searchNeighbourhood' } as const;
-  const canGoBack = step !== 'province' || router.canGoBack();
+  const canGoBack = step !== 'province' || (editing && router.canGoBack());
 
   return (
     <Screen>
@@ -119,6 +152,8 @@ export default function LocationScreen() {
         <MaterialIcons name="info-outline" size={20} color={c.primary} />
         <AppText variant="caption" style={styles.noticeText}>{t('location.fullCapacityWarning')}</AppText>
       </View>
+
+      {saveError ? <FormMessage kind="error" text={saveError} /> : null}
 
       <SearchField value={query} onChangeText={setQuery} placeholder={t(`location.${searchKey[step]}`)} />
 

@@ -8,13 +8,17 @@ import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { OptionRow } from '@/components/option-row';
 import { Screen } from '@/components/screen';
+import { profileRepository } from '@/lib/services';
+import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
+import { restartFlow } from '@/lib/navigation';
 import { spacing } from '@/theme/tokens';
 
 export default function LanguageScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const { language, suggestedLanguage, setLanguage, locationStepDone } = useSettings();
+  const { language, suggestedLanguage, setLanguage } = useSettings();
+  const { user, profile, refreshProfile } = useSession();
   const [choice, setChoice] = useState<LanguageCode>(language ?? suggestedLanguage);
   const [saving, setSaving] = useState(false);
   const confirmed = useRef(false);
@@ -40,9 +44,13 @@ export default function LanguageScreen() {
     setSaving(true);
     confirmed.current = true;
     await setLanguage(choice);
+    if (user && profile && profile.language !== choice) {
+      // Profil kaydı başarısız olsa da dil telefonda değişmiş olur; sonraki değişiklikte tekrar denenir.
+      await profileRepository.update(user.uid, { language: choice }, profile).then(refreshProfile, () => {});
+    }
     setSaving(false);
     if (router.canGoBack()) router.back();
-    else router.replace(locationStepDone ? '/home' : '/location');
+    else restartFlow(router);
   };
 
   return (

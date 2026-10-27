@@ -8,6 +8,9 @@ import { LANGUAGES } from '@cityjoy/shared';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { Screen } from '@/components/screen';
+import { VerifyEmailBanner } from '@/components/verify-email-banner';
+import { useSession } from '@/lib/session';
+import { useUserLocation } from '@/lib/user-location';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { radius, spacing } from '@/theme/tokens';
@@ -25,7 +28,9 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { location, language } = useSettings();
+  const { language } = useSettings();
+  const { location } = useUserLocation();
+  const { user } = useSession();
   const [neighbourhoodName, setNeighbourhoodName] = useState<string>();
 
   useEffect(() => {
@@ -52,6 +57,8 @@ export default function HomeScreen() {
           <AppText variant="title">{t('home.slogan')}</AppText>
         </View>
 
+        <VerifyEmailBanner />
+
         <View style={[styles.card, { backgroundColor: c.surface, borderColor: c.border }]}>
           <View style={styles.cardRow}>
             <MaterialIcons name="place" size={22} color={c.accent} />
@@ -60,7 +67,7 @@ export default function HomeScreen() {
               <AppText variant="label">{locationText}</AppText>
             </View>
           </View>
-          <AppButton variant="secondary" title={t('home.changeLocation')} onPress={() => router.push('/location')} />
+          <AppButton variant="secondary" title={t('home.changeLocation')} onPress={() => router.push('/location?edit=1')} />
         </View>
 
         <View style={styles.grid}>
@@ -77,6 +84,7 @@ export default function HomeScreen() {
         </View>
         <AppText variant="caption" muted style={styles.center}>{t('home.comingSoon')}</AppText>
 
+        {user ? <AppButton variant="secondary" title={t('home.account')} onPress={() => router.push('/account')} /> : null}
         <AppButton variant="ghost" title={`${t('home.changeLanguage')} · ${languageName}`} onPress={() => router.push('/language')} />
       </ScrollView>
     </Screen>

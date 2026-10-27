@@ -41,12 +41,96 @@
     "noLocation": "Konum seçilmedi",
     "changeLocation": "Konum değiştir",
     "changeLanguage": "Dili değiştir",
-    "comingSoon": "Bu bölüm sonraki aşamada eklenecek."
+    "comingSoon": "Bu bölüm sonraki aşamada eklenecek.",
+    "account": "Hesabım"
   },
   "modules": {
     "myCity": "Benim Şehrim",
     "travel": "Seyahat",
     "social": "Sosyal Harmoni",
     "urgent": "Acil İhtiyaçlar"
+  },
+  "auth": {
+    "welcomeTitle": "CityJoy'a hoş geldin",
+    "welcomeSubtitle": "İlin, ilçen ve mahallen için bilgi, duyuru ve hizmetler tek yerde.",
+    "signIn": "Giriş yap",
+    "signUp": "Kayıt ol",
+    "email": "E-posta",
+    "password": "Şifre",
+    "passwordRepeat": "Şifre (tekrar)",
+    "fullName": "Ad soyad",
+    "birthYear": "Doğum yılı",
+    "birthYearHint": "Doğum yılın kayıttan sonra değiştirilemez ve başkalarına gösterilmez.",
+    "passwordHint": "En az {{count}} karakter.",
+    "forgotPassword": "Şifremi unuttum",
+    "noAccount": "Hesabın yok mu? Kayıt ol",
+    "haveAccount": "Zaten hesabın var mı? Giriş yap",
+    "google": "Google ile devam et",
+    "or": "veya",
+    "acceptTerms": "Kullanım şartlarını okudum ve kabul ediyorum.",
+    "readPrivacy": "Kişisel verilerin işlenmesine ilişkin aydınlatma metnini okudum.",
+    "read": "Metni oku"
+  },
+  "errors": {
+    "required": "Bu alan zorunlu.",
+    "invalidEmail": "Geçerli bir e-posta adresi gir.",
+    "passwordTooShort": "Şifre en az {{count}} karakter olmalı.",
+    "passwordsDontMatch": "Şifreler aynı değil.",
+    "invalidBirthYear": "Geçerli bir doğum yılı gir.",
+    "tooYoung": "CityJoy'a kayıt olmak için en az 13 yaşında olmalısın.",
+    "mustAccept": "Devam etmek için bu iki metni onaylaman gerekiyor.",
+    "emailInUse": "Bu e-posta ile zaten bir hesap var. Giriş yapmayı dene.",
+    "wrongCredentials": "E-posta ya da şifre hatalı.",
+    "tooManyRequests": "Çok fazla deneme yapıldı. Biraz sonra tekrar dene.",
+    "network": "İnternet bağlantını kontrol edip tekrar dene.",
+    "weakPassword": "Daha güçlü bir şifre seç.",
+    "requiresRecentLogin": "Güvenliğin için şifreni tekrar girmen gerekiyor.",
+    "unknown": "Bir sorun oluştu. Lütfen tekrar dene.",
+    "notConfigured": "Uygulama henüz sunucuya bağlı değil."
+  },
+  "reset": {
+    "title": "Şifreni sıfırla",
+    "subtitle": "E-posta adresini yaz, sana şifre sıfırlama bağlantısı gönderelim.",
+    "send": "Bağlantıyı gönder",
+    "sent": "Bu adrese kayıtlı bir hesap varsa sıfırlama bağlantısı gönderildi. Gelen kutunu ve gereksiz klasörünü kontrol et."
+  },
+  "verify": {
+    "banner": "E-posta adresini doğrula. {{email}} adresine bir bağlantı gönderdik.",
+    "resend": "Tekrar gönder",
+    "done": "Doğruladım",
+    "sent": "Bağlantı tekrar gönderildi.",
+    "stillNot": "E-posta henüz doğrulanmamış görünüyor."
+  },
+  "profile": {
+    "title": "Seni biraz tanıyalım",
+    "subtitle": "Bu bilgiler başkalarına gösterilmez. Yalnızca sana uygun duyuru ve bildirimleri göndermek için kullanılır.",
+    "gender": "Cinsiyet (isteğe bağlı)",
+    "genderKadin": "Kadın",
+    "genderErkek": "Erkek",
+    "genderNone": "Belirtmek istemiyorum",
+    "occupation": "Meslek",
+    "occupationHint": "Mesleğinle ilgili duyuruların yalnızca işine yarayacak kişilere gitmesi için kullanılır.",
+    "selectOccupation": "Meslek seç",
+    "searchOccupation": "Meslek ara",
+    "targetingConsent": "Yaşıma, cinsiyetime ve mesleğime göre bana uygun bildirimler gönderilsin. (İsteğe bağlı, istediğin zaman kapatabilirsin.)",
+    "commercialConsent": "Kampanya ve indirim bildirimleri almak istiyorum. (İsteğe bağlı)",
+    "save": "Kaydet ve devam et"
+  },
+  "account": {
+    "title": "Hesabım",
+    "signOut": "Çıkış yap",
+    "deleteAccount": "Hesabı sil",
+    "deleteTitle": "Hesabını silmek istediğine emin misin?",
+    "deleteWarning": "Profilin ve ayarların kalıcı olarak silinir. Bu işlem geri alınamaz.",
+    "deletePasswordHint": "Onaylamak için şifreni gir.",
+    "deleteConfirm": "Hesabımı kalıcı olarak sil",
+    "cancel": "Vazgeç",
+    "legal": "Yasal metinler",
+    "terms": "Kullanım şartları",
+    "privacy": "Aydınlatma metni",
+    "neighbourhoodLocked": "Mahalle ayda bir kez değiştirilebilir. Bir sonraki değişiklik: {{date}}."
+  },
+  "legal": {
+    "draftNotice": "Bu metin hazırlanıyor. Yayından önce avukat tarafından kontrol edilecek."
   }
 }

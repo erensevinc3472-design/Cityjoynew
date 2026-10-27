@@ -41,12 +41,96 @@
     "noLocation": "Kein Standort ausgewählt",
     "changeLocation": "Standort ändern",
     "changeLanguage": "Sprache ändern",
-    "comingSoon": "Dieser Bereich wird in der nächsten Phase hinzugefügt."
+    "comingSoon": "Dieser Bereich wird in der nächsten Phase hinzugefügt.",
+    "account": "Mein Konto"
   },
   "modules": {
     "myCity": "Meine Stadt",
     "travel": "Reisen",
     "social": "Soziale Harmonie",
     "urgent": "Dringende Hilfe"
+  },
+  "auth": {
+    "welcomeTitle": "Willkommen bei CityJoy",
+    "welcomeSubtitle": "Informationen, Ankündigungen und Dienste für deine Provinz, deinen Bezirk und dein Viertel an einem Ort.",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "passwordRepeat": "Passwort (wiederholen)",
+    "fullName": "Vor- und Nachname",
+    "birthYear": "Geburtsjahr",
+    "birthYearHint": "Dein Geburtsjahr kann nach der Registrierung nicht geändert werden und wird anderen nie angezeigt.",
+    "passwordHint": "Mindestens {{count}} Zeichen.",
+    "forgotPassword": "Passwort vergessen",
+    "noAccount": "Noch kein Konto? Registrieren",
+    "haveAccount": "Schon ein Konto? Anmelden",
+    "google": "Mit Google fortfahren",
+    "or": "oder",
+    "acceptTerms": "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie.",
+    "readPrivacy": "Ich habe die Datenschutzhinweise zur Verarbeitung personenbezogener Daten gelesen.",
+    "read": "Lesen"
+  },
+  "errors": {
+    "required": "Dieses Feld ist erforderlich.",
+    "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
+    "passwordTooShort": "Das Passwort muss mindestens {{count}} Zeichen haben.",
+    "passwordsDontMatch": "Die Passwörter stimmen nicht überein.",
+    "invalidBirthYear": "Gib ein gültiges Geburtsjahr ein.",
+    "tooYoung": "Für CityJoy musst du mindestens 13 Jahre alt sein.",
+    "mustAccept": "Um fortzufahren, musst du beide Texte bestätigen.",
+    "emailInUse": "Mit dieser E-Mail gibt es bereits ein Konto. Versuche dich anzumelden.",
+    "wrongCredentials": "E-Mail oder Passwort ist falsch.",
+    "tooManyRequests": "Zu viele Versuche. Versuche es gleich noch einmal.",
+    "network": "Prüfe deine Internetverbindung und versuche es erneut.",
+    "weakPassword": "Wähle ein stärkeres Passwort.",
+    "requiresRecentLogin": "Zu deiner Sicherheit gib bitte dein Passwort erneut ein.",
+    "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "notConfigured": "Die App ist noch nicht mit dem Server verbunden."
+  },
+  "reset": {
+    "title": "Passwort zurücksetzen",
+    "subtitle": "Gib deine E-Mail-Adresse ein, und wir senden dir einen Link zum Zurücksetzen.",
+    "send": "Link senden",
+    "sent": "Falls für diese Adresse ein Konto existiert, wurde ein Link gesendet. Prüfe deinen Posteingang und Spam-Ordner."
+  },
+  "verify": {
+    "banner": "Bestätige deine E-Mail-Adresse. Wir haben einen Link an {{email}} gesendet.",
+    "resend": "Erneut senden",
+    "done": "Ich habe bestätigt",
+    "sent": "Link erneut gesendet.",
+    "stillNot": "Deine E-Mail-Adresse scheint noch nicht bestätigt zu sein."
+  },
+  "profile": {
+    "title": "Erzähl uns ein wenig über dich",
+    "subtitle": "Diese Angaben werden anderen nie angezeigt. Sie dienen nur dazu, dir passende Ankündigungen und Benachrichtigungen zu senden.",
+    "gender": "Geschlecht (optional)",
+    "genderKadin": "Frau",
+    "genderErkek": "Mann",
+    "genderNone": "Keine Angabe",
+    "occupation": "Beruf",
+    "occupationHint": "Damit Ankündigungen zu deinem Beruf nur die Menschen erreichen, für die sie nützlich sind.",
+    "selectOccupation": "Beruf wählen",
+    "searchOccupation": "Beruf suchen",
+    "targetingConsent": "Sende mir Benachrichtigungen passend zu Alter, Geschlecht und Beruf. (Optional, jederzeit abschaltbar.)",
+    "commercialConsent": "Ich möchte Benachrichtigungen zu Aktionen und Rabatten erhalten. (Optional)",
+    "save": "Speichern und weiter"
+  },
+  "account": {
+    "title": "Mein Konto",
+    "signOut": "Abmelden",
+    "deleteAccount": "Konto löschen",
+    "deleteTitle": "Möchtest du dein Konto wirklich löschen?",
+    "deleteWarning": "Dein Profil und deine Einstellungen werden dauerhaft gelöscht. Das kann nicht rückgängig gemacht werden.",
+    "deletePasswordHint": "Gib zur Bestätigung dein Passwort ein.",
+    "deleteConfirm": "Mein Konto dauerhaft löschen",
+    "cancel": "Abbrechen",
+    "legal": "Rechtliches",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzhinweise",
+    "neighbourhoodLocked": "Das Viertel kann einmal im Monat geändert werden. Nächste Änderung: {{date}}."
+  },
+  "legal": {
+    "draftNotice": "Dieser Text wird vorbereitet und vor dem Start von einem Anwalt geprüft."
   }
 }
