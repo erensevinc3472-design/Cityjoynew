@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 27 Ekim 2026 (yetki zinciri, kurumlar, kilitli adlar).
+Son güncelleme: 27 Ekim 2026 (yetki zinciri, kurumlar, kilitli adlar; kurallar ve dizinler yüklendi).
 
 ## Depo ve ortam
 
@@ -167,18 +167,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   İl bazlı şikâyet kuyruğu ve il yöneticisinin işletme doğrulaması onay merkeziyle gelecek. Kurum içeriği (gönderi,
   etkinlik, bildirim) bölümleri henüz yok; personel görevleri hazır, bölümler yapılınca çalışır. Yeni admin yalnızca Firebase
   konsolundan (`admins/<uid>`). Belde belediyeleri konum listesinde yok (gerekirse "kurum" olarak açılır). Panel metinleri
-  şimdilik yalnızca Türkçe. Gerçek projede e-posta gönderen adres ve şablon (Firebase konsolu > Authentication > Templates)
-  Türkçe ve CityJoy adıyla ayarlanmalı.
-- **Güncel güvenlik kuralları Firebase'e yüklenmedi (Eren bilgisayardan yapacak; her oturum başında ona hatırlat):** `firebase/firestore.rules` değişti (acil numaralar, işletmeler, SOS, yetkiler). Konsola
-  yüklenene kadar gerçek projede panelden acil numara kaydedilemez, yetki verilemez (uygulama gömülü listeyi gösterir).
+  şimdilik yalnızca Türkçe. **Yapılacak (Eren, konsoldan):** e-posta şablonları (Firebase konsolu > Authentication >
+  Templates) Türkçe ve CityJoy adıyla ayarlanmalı; kurumlara giden "şifrenizi belirleyin" e-postası bunu kullanır.
+- **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
+  `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
+  dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
 - Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, SOS (aile listesi, QR; bildirim için geliştirme derlemesi gerekir), asistan,
   taksi durağı. Hizmetlerde işletme listesi İşletmem (5.7) ile gelecek.
 - Hizmet önerileri: şimdilik yalnızca admin görür (il yöneticisi yetki kayıtları gelince kendi ilini görecek). Günlük gönderim
   sınırı ve hesap silinince kullanıcının önerilerinin silinmesi sunucu işleviyle eklenecek (Blaze plan gerektirir).
-- **Dizinler Firebase'e yüklenmedi:** `firebase/firestore.indexes.json` (işletme listesi, değerlendirme listesi, hesap
-  silmede kullanıcının yorumlarını bulma). Gerçek projede
-  kurallarla birlikte yüklenmeli; yüklenmezse hizmet listesi açılmaz. Konsoldan yüklemek zahmetli: `firebase deploy` için
-  dağıtım anahtarı ya da Eren'in bilgisayarından tek komut gerekir (Eren'e sade anlatılacak).
 - **SOS bildirimi ve arka plan konumu telefonda denenmedi:** kod hazır, ama Expo push adresi için `app.json` içinde EAS proje
   kimliği (`extra.eas.projectId`) gerekir; `eas init` ile gelir. Telefonda denenecekler: kilitli ekranda bildirim sesi,
   uygulama kapalıyken konum güncellemesi, bildirime dokununca SOS ekranı. Expo push güvenliği: bildirim adresleri yalnızca aile
