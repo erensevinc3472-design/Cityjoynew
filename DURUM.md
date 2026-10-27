@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 27 Ekim 2026 (yetkiler kutucuklarla seçiliyor, "Onaysız yayınla" yetkisi eklendi).
+Son güncelleme: 27 Ekim 2026 (resmî duyurular ve acil duyurular; yetkiler kutucuklarla, "Onaysız yayınla").
 
 ## Depo ve ortam
 
@@ -37,8 +37,8 @@ Son güncelleme: 27 Ekim 2026 (yetkiler kutucuklarla seçiliyor, "Onaysız yayı
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (63)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (47; Java gerekir)
+npm test                      # ortak paket testleri (67)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (52; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -183,6 +183,23 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    il yöneticisinin varsayılan yetkisinde gönderi ve etkinlikte "onaysız yayınla" var, bildirimde yok (il geneli bildirim
    admin onayına gider); admin isterse il yöneticisinin yetkisinde işaretler. Emülatörde tarayıcıyla denendi.
 
+18. **Resmî duyurular ve acil duyurular** (PROJE.md 6.2 madde 1, 4, 6, 18; 6.6; 6.7). Ortak yapı
+   `packages/shared/src/announcements`. **Panel > Duyurular** (menüde eski "Gönderiler" yeri): kurum personeli, muhtar ve il
+   yöneticisi duyuru yazar (tür: duyuru / acil duyuru, başlık, metin, hedef: il geneli / ilçe / mahalle, yalnızca kendi
+   bölgesi; bitiş tarihi, acilde zorunlu ve en çok 7 gün). "Ekle" olan taslak kaydeder ve onaya gönderir; "Onaysız yayınla"
+   ya da "Onayla" olan doğrudan yayınlar. Onay bekleyenler: kurumda "Onayla" olan personelde, muhtar duyurularında il
+   yöneticisinde, admin'de hepsi; onay ya da gerekçeli geri gönderme (hazırlayan düzeltip yeniden gönderir). Yayından
+   kaldırma: onaylayan, admin ya da "Sil" yetkisi olan hazırlayan. Birden çok hesabı olan "Yayınlayan hesap" seçer. Admin il
+   seçip yayındakileri görür ve kaldırır. **Uygulama:** ana sayfada yayındaki acil duyurular en üstte kırmızı kartla, modüllerin
+   altında son 3 duyuru ve "Tüm duyurular"; liste (`/announcements`, acil önce) ve ayrıntı (yayınlayan, "Resmî hesap", bölge,
+   yayın / bitiş, acilde 112 hatırlatması). Kullanıcı il genelini, kendi ilçesini ve mahallesini görür. Maliyet: il başına tek
+   sorgu (en çok 50), 5 dakika telefonda tutulur. Veritabanı: `announcements` (yayındakini herkes okur, silinmez). Kurallar:
+   yazan hesabın yetkisi, bölge sınırı, kurum adı kurumun gerçek adı, yayındaki değiştirilemez; işlem kaydı kurum personeli ve
+   muhtar için de açıldı. Emülatörde tarayıcıyla baştan sona denendi (basın > özel kalem onayı, fen işleri acil duyuru, muhtar
+   > il yöneticisi onayı, uygulamada Türkçe ve Arapça). Yok (sonra): fotoğraf (Storage, Blaze), planlı yayın, acil duyuruda
+   telefona bildirim (sunucu işlevi, Blaze), Keşfet akışıyla birleşme, otomatik çeviri (SORULACAK, PROJE.md 2).
+   Not: panel denemesinde `npm run build` kullan (mahalle dosyalarını kopyalar); `npx vite build` kopyalamaz.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Yetkiler kutucuklarla (6.6, 27 Ekim 2026): kurum yöneticisi ve il yöneticisi kişiye verdiği her eylemi işaretler,
@@ -215,7 +232,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
-- **Kurallar ve dizinler yeniden değişti (şehir rehberi, onay merkezi), yeniden yüklenmeli:** aynı komut, Eren'in bilgisayarından (güncel ZIP indirip).
+- **Kurallar ve dizinler yeniden değişti (kutucuklu görevler, "onaysız yayınla", duyurular), yeniden yüklenmeli:** bu dal
+  `main`'e birleşince aynı komut, Eren'in bilgisayarından (güncel ZIP indirip, `firebase.json` olan klasörde). Şehir rehberi
+  ve onay merkezi kuralları 27 Ekim'de yüklendi.
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
@@ -242,7 +261,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
 - Panel ve web sürümü internette yayında değil (Firebase Hosting için dağıtım anahtarı gerekir).
-- Ana sayfadaki arama kutusu ve "Bugün" bölümü (duyuru, hava durumu) ilgili özelliklerle gelecek.
+- Ana sayfadaki arama kutusu ve hava durumu ilgili özelliklerle gelecek (duyurular ana sayfada).
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin
   bağlantı bilgilerini içeriyor; Eren'e o projeyi kapatması önerildi.
 
@@ -250,9 +269,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0b. Kurum içerikleri (Eren onayladı, sıradaki iş): duyuru, resmî gönderi, acil duyuru. Personel hazırlar, "Onayla" yetkisi
-   olan onaylar, "Onaysız yayınla" yetkisi olan doğrudan yayınlar; acil duyuru onaysız gider; uygulamada kendi il / ilçe /
-   mahallesinde görünür. Muhtarın içeriği "onaysız yayınla" yoksa il yöneticisinin onayına gider.
+0b. Kurum içeriklerinin devamı: etkinlikler (takvim, kontenjan; etkinlik yetkisi onay merkezine bağlanır), belediye profili
+   (rozet, logo, iletişim, çalışma saatleri; 6.2 madde 2), Mahalle Meydanı sayfası (muhtar bilgisi, sabit duyurular).
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"

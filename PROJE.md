@@ -390,6 +390,8 @@ Aşağıdaki 24 madde belediye panelinin kapsamıdır. Her biri 6.1'deki ilkeye 
 24. Talep kutusu raporu
 25. Keşif rotası ve tanıtım videosu girme (ilçe tanıtımı: Seyahat > Keşfet ve Öğren > Başkanlarla Keşif)
 
+**Yapıldı (27 Ekim 2026):** 1 (yazılı resmî duyuru, hedef il / ilçe / mahalle; fotoğraf sonra), 4 (taslak; planlı yayın sonra), 6 (acil duyuru: en üstte, bitiş tarihli, il / admin onayına girmez), 17 ve 18 (kutucuklu görevler, hazırla > onayla > yayınla), 19 (işlem kaydı). Muhtar duyurusu "Onaysız yayınla" yoksa il yöneticisinin onayına gider (6.7).
+
 **İlk sürüm önerisi (Eren onayladı):** 1, 2, 3, 4, 6, 8, 12, 14, 15, 17, 18, 19. (18. madde, Eren'in kurum içi onay kararıyla ilk sürüme eklendi, bölüm 6.6.) Talep kutusu (11) ikinci aşamaya: cevap beklentisi doğurur, belediyenin hazır olması gerekir. Geri kalanı sonraki aşamalarda.
 - Onay kuyruğu (14): **Karar (Eren): önce il yöneticisi, sonra admin** (iki aşamalı onay, bölüm 6.5).
 
