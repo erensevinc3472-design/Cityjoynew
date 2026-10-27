@@ -117,12 +117,6 @@
           "queryScope": "COLLECTION_GROUP"
         }
       ]
-    },
-    {
-      "collectionGroup": "sosAlerts",
-      "fieldPath": "deleteAt",
-      "ttl": true,
-      "indexes": []
     }
   ]
 }

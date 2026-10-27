@@ -184,7 +184,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   uygulama kapalıyken konum güncellemesi, bildirime dokununca SOS ekranı. Expo push güvenliği: bildirim adresleri yalnızca aile
   üyelerine açık; ileride Expo erişim anahtarıyla sunucudan gönderime geçilebilir (Blaze). Sonra: QR'ı kamerayla okutma
   (expo-camera), fotoğraf/ses ekleme (Storage, Blaze), "ID ile istek" yöntemi, iOS "kritik uyarı" başvurusu (isteğe bağlı).
-- **Firestore TTL politikası** (`sosAlerts.deleteAt`, 30 gün) konsolda açılmalı; indexes dosyasında tanımlı.
+- **SOS kayıtlarının 30 gün sonra kendiliğinden silinmesi (TTL `sosAlerts.deleteAt`) ücretsiz planda yok:** 27 Ekim'de
+  yüklerken Firebase "billing disabled" dedi, ayar indexes dosyasından çıkarıldı. `deleteAt` alanı yazılmaya devam ediyor;
+  Blaze plana geçilince `firestore.indexes.json` > `fieldOverrides` içine TTL geri eklenecek (ya da gönderen kendi eski
+  kayıtlarını uygulamadan silecek). Gizlilik metninde "30 gün" sözü buna göre yazılmalı.
 - Değerlendirme: şikâyet sayısı eşiğinde otomatik geçici gizleme ve il yöneticisi kuyruğu, yasaklı kelime süzgeci, yorum
   bildirimi (işletmeye "yeni değerlendirme") sonraki adımlarda. "Arama kaydı" kişisel veridir: aydınlatma metnine eklenecek
   (avukat kontrolü). Aynı telefonla kayıtlı işletmenin "sahiplik talebi" akışı henüz yok (mesaj CityJoy ile iletişime yönlendiriyor).
