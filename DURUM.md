@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 27 Ekim 2026.
+Son güncelleme: 27 Ekim 2026 (yetki verme).
 
 ## Depo ve ortam
 
@@ -35,8 +35,8 @@ Son güncelleme: 27 Ekim 2026.
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (43)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (26; Java gerekir)
+npm test                      # ortak paket testleri (47)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (35; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -124,6 +124,21 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    ekranı, "Güvendeyim" bildirimi, SOS hazırlığı bölümü (bildirim + "her zaman" konum izni), çıkışta bildirim adresi silinir.
    Web'de bu kısımlar sessizce atlanır ve ekranda uyarı görünür; **gerçek telefonda henüz denenmedi** (EAS gerekir).
 
+14. **Panelde yetki verme** (PROJE.md 6, 6.4 madde 2). Panel > Yetkiler (admin): kişiye rol (il yöneticisi, belediye,
+   başkan, muhtar, kurum, kulüp, moderatör, yayıncı) + bölge (ülke/il/ilçe/mahalle; rol düzeyine uygun) + bölüm × eylem
+   tablosu (rol seçilince önerilen yetkiler gelir) + isteğe bağlı bitiş tarihi ve not. Düzenle, geri al, yeniden ver;
+   etkin / süresi doldu / geri alındı süzgeci, il ve ad araması. **Yetki talebi:** yetkisi olmayan kişi panele girince
+   ad + kurum/görev yazıp talep gönderir (kendi e-postasıyla, günde bir), admin "Bekleyen yetki talepleri"nden tek
+   tıkla yetki verir ya da reddeder. Diğer yöneticiler "Yetkilerim"i görür. **İşlem kayıtları** sayfası: admin hepsini
+   (yapanın adıyla), diğerleri kendi işlemlerini görür. Veritabanı: `grants/{uid}__{bölge}` (kişi başına bölge başına bir;
+   silinmez), `accessRequests/{uid}`. **Güvenlik:** yetkiyi yalnızca admin verir; admin rolü panelden verilemez (yalnızca
+   konsol); kendine yetki verilemez; ülke geneli listeler (meslek, acil numara, kategori ağacı, SOS ayarı) ve yetki verme
+   admin dışına açılamaz (kurallar aynı sınırı denetler); geri alınan ya da süresi dolan yetki sunucuda hemen geçersiz.
+   **İl yöneticisi şimdi:** kendi ilinin konumlarını, işletmelerini (gizli/kaldırılmış dahil, salt okunur) ve eksik hizmet
+   önerilerini görür, önerileri "incelendi" yapar (kayda geçer). İşletme doğrulama, kaldırma ve şikâyetler admin'de kalır
+   (iki aşamalı onay merkezi gelince açılacak). Hesap silinince yetki talebi de silinir. Emülatörde tarayıcıyla baştan sona
+   denendi (talep > yetki ver > il yöneticisi Bursa'yı görür, İstanbul'u görmez > geri al > yeniden yetkisiz).
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Yetkiyi yalnızca admin verir; il yöneticisi talep açar (6, 6.5).
@@ -143,9 +158,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
 - Yasal metinler boş (yalnızca "avukat kontrolünden geçecek" notu).
 - Misafir gezinti, telefon doğrulaması: `PROJE.md` 3.1'de onay bekleyen öneriler.
-- Panelde onay merkezi, yetki atama ve personel ekranları yok (veri yapıları hazır).
-- **Güncel güvenlik kuralları Firebase'e yüklenmedi (Eren bilgisayardan yapacak; her oturum başında ona hatırlat):** `firebase/firestore.rules` değişti (acil numaralar eklendi). Konsola
-  yüklenene kadar gerçek projede panelden acil numara kaydedilemez (uygulama gömülü listeyi gösterir).
+- Panelde onay merkezi ("Bekleyen onaylar", il yöneticisinin yetki talebi açması, güvenilir yöneticiler) ve kurum içi
+  personel ekranları yok. Yetki verme hazır. İl bazlı şikâyet kuyruğu ve il yöneticisinin işletme doğrulaması onay
+  merkeziyle gelecek. Yeni admin şimdilik yalnızca Firebase konsolundan (`admins/<uid>`) eklenir.
+- **Güncel güvenlik kuralları Firebase'e yüklenmedi (Eren bilgisayardan yapacak; her oturum başında ona hatırlat):** `firebase/firestore.rules` değişti (acil numaralar, işletmeler, SOS, yetkiler). Konsola
+  yüklenene kadar gerçek projede panelden acil numara kaydedilemez, yetki verilemez (uygulama gömülü listeyi gösterir).
 - Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, SOS (aile listesi, QR; bildirim için geliştirme derlemesi gerekir), asistan,
   taksi durağı. Hizmetlerde işletme listesi İşletmem (5.7) ile gelecek.
 - Hizmet önerileri: şimdilik yalnızca admin görür (il yöneticisi yetki kayıtları gelince kendi ilini görecek). Günlük gönderim
@@ -177,6 +194,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
+0. Onay merkezi (PROJE.md 6.5): "Bekleyen onaylar", il yöneticisinin ilk aşama onayı (işletme doğrulama, yetki talebi),
+   "Tümünü onayla" / "Güvenli olanları onayla", güvenilir yöneticiler listesi. Yetki verme bitti; bunun üstüne kurulur.
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"

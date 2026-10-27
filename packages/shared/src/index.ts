@@ -14,6 +14,7 @@ export const LOCATION_DATA_SOURCE: string = locationMeta.source;
 export * from './permissions/types';
 export * from './permissions/can';
 export * from './permissions/role-templates';
+export * from './permissions/grants';
 export * from './organizations/types';
 export * from './organizations/staff';
 export * from './services/types';

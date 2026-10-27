@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { AuthError } from '@cityjoy/shared';
 
+import { AccessRequestBox } from '../components/access-request';
 import { ScopeLabel } from '../components/scope-label';
 import { isFirebaseConfigured } from '../lib/firebase';
 import { authService } from '../lib/services';
@@ -17,7 +18,7 @@ function message(e: unknown): string {
 }
 
 export function LoginPage() {
-  const { user, noAccess, signInDemo, signOut } = useSession();
+  const { user, noAccess, signInDemo } = useSession();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,11 +53,7 @@ export function LoginPage() {
         <h1>{t('login.title')}</h1>
 
         {noAccess ? (
-          <div className="note" role="alert">
-            <strong>{t('login.noAccessTitle')}</strong>
-            <p>{t('login.noAccessBody')}</p>
-            <button className="btn secondary" onClick={() => signOut()}>{t('login.logout')}</button>
-          </div>
+          <AccessRequestBox />
         ) : isFirebaseConfigured ? (
           <form className="form" onSubmit={submit} noValidate>
             <label htmlFor="login-email">{t('login.email')}</label>

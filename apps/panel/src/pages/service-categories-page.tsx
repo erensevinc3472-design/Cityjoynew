@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import {
   can,
   DEFAULT_SERVICE_CATEGORIES,
+  isGrantActive,
   LANGUAGES,
   SERVICE_ICONS,
   type LanguageCode,
@@ -33,6 +34,13 @@ export function ServiceCategoriesPage() {
   const { user } = useSession();
   const canEdit = !!user && !user.isDemo && can(user.grants, { module: 'hizmet-kategorileri', action: 'duzenle' });
   const admin = user ? createServiceCategoryAdmin(firestore, user.uid) : null;
+  const suggestionScopes = (user?.grants ?? [])
+    .filter((g) => isGrantActive(g, new Date()) && g.modules['hizmet-kategorileri']?.includes('goruntule'))
+    .map((g) => g.scope);
+  const national = suggestionScopes.some((s) => s.level === 'ulke');
+  const suggestionProvinces = [...new Set(suggestionScopes.flatMap((s) => (s.level === 'il' ? [s.provinceCode] : [])))].sort();
+  const canReview = (provinceCode?: string) =>
+    !!user && !user.isDemo && can(user.grants, { module: 'hizmet-kategorileri', action: 'onayla', region: provinceCode ? { provinceCode } : undefined });
 
   const [list, setList] = useState<ServiceCategory[] | null>(null);
   const [suggestions, setSuggestions] = useState<ServiceSuggestion[] | null>(null);
@@ -54,9 +62,15 @@ export function ServiceCategoriesPage() {
     } catch {
       setLoadError(true);
     }
-    // Öneriler yalnızca admin'e açık; okunamazsa bölüm boş görünür.
-    setSuggestions(await reader.listSuggestions().catch(() => null));
-  }, [user]);
+    // Admin tüm önerileri, il yöneticisi yalnızca kendi ilinin önerilerini görür; okunamazsa bölüm boş görünür.
+    if (national) setSuggestions(await reader.listSuggestions().catch(() => null));
+    else if (suggestionProvinces.length) {
+      const lists = await Promise.all(suggestionProvinces.map((provinceCode) => reader.listSuggestions({ provinceCode }).catch(() => null)));
+      setSuggestions(
+        lists.some((l) => l === null) ? null : lists.flatMap((l) => l ?? []).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+      );
+    } else setSuggestions(null);
+  }, [user, national, suggestionProvinces.join()]);
 
   useEffect(() => {
     load();
@@ -68,6 +82,7 @@ export function ServiceCategoriesPage() {
   const mains = all.filter((c) => c.parentId === null).sort(byOrder);
   const childrenOf = (id: string) => all.filter((c) => c.parentId === id).sort(byOrder);
   const showActions = canEdit && !usingDefaults;
+  const anyReview = canReview() || suggestionProvinces.some((p) => canReview(p));
 
   const act = async (fn: () => Promise<string>) => {
     setBusy(true);
@@ -192,7 +207,7 @@ export function ServiceCategoriesPage() {
                 <th scope="col">{t('services.province')}</th>
                 <th scope="col">{t('services.suggestion')}</th>
                 <th scope="col">{t('services.status')}</th>
-                {canEdit ? <th scope="col"><span className="sr-only">{t('services.markReviewed')}</span></th> : null}
+                {anyReview ? <th scope="col"><span className="sr-only">{t('services.markReviewed')}</span></th> : null}
               </tr>
             </thead>
             <tbody>
@@ -202,9 +217,9 @@ export function ServiceCategoriesPage() {
                   <td>{provinceName(s.provinceCode)}</td>
                   <td dir="auto">{s.text}</td>
                   <td><span className={s.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`services.suggestionStatus.${s.status}`)}</span></td>
-                  {canEdit ? (
+                  {anyReview ? (
                     <td>
-                      {s.status === 'yeni' ? (
+                      {s.status === 'yeni' && canReview(s.provinceCode) ? (
                         <button className="link" disabled={busy} onClick={() => act(async () => {
                           await admin!.markReviewed(s);
                           return t('services.saved');

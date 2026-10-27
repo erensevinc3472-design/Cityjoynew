@@ -26,3 +26,12 @@ export {
   createSosSettingsAdmin,
   SosSendTimeoutError,
 } from './sos';
+export {
+  createGrantAdmin,
+  deleteOwnAccessRequest,
+  getOwnAccessRequest,
+  listAuditLog,
+  loadOwnGrants,
+  submitAccessRequest,
+  type GrantInput,
+} from './grants';

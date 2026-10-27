@@ -424,6 +424,9 @@ Eren'in onayıyla ilk sürüm seçimi Claude'a bırakıldı. Tam liste ve ilk s�
 |---|---|---|
 | 1 | 81 il, ilçe ve mahalle verisini yönetme ve içe aktarma | Evet |
 | 2 | Rol ve yetki matrisi tanımlama; il yöneticisi atama ve geri alma | Evet |
+
+**Yapıldı (27 Ekim 2026), 2. madde:** Panel > Yetkiler: rol × bölge × bölüm × eylem, süreli yetki, düzenle / geri al / yeniden ver, panelden yetki talebi (kişi kendi hesabıyla gönderir, admin onaylar ya da reddeder), İşlem kayıtları sayfası. Güvenlik (Claude, standart): admin rolü panelden verilmez (yalnızca Firebase konsolu); ülke geneli listeler ve yetki verme yalnızca admin'de; kurallar sunucuda aynı sınırı denetler. İl yöneticisi şimdilik kendi ilinin işletmelerini görür ve eksik hizmet önerilerini inceler; doğrulama ve şikâyet işlemleri onay merkeziyle (6.5) açılacak.
+
 | 3 | İl bazında modül/özellik açıp kapatma | Evet |
 | 4 | Çeviri dosyaları ve uygulama metinleri (5 dil) | Evet |
 | 5 | Zorunlu uygulama güncelleme uyarıları | Sonra |

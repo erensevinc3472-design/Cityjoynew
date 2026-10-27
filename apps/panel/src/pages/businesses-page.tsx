@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   can,
   DEFAULT_SERVICE_CATEGORIES,
+  isGrantActive,
   isFeatured,
   type Business,
   type MembershipTier,
@@ -25,9 +26,16 @@ export function BusinessesPage() {
   const { user } = useSession();
   const canEdit = !!user && !user.isDemo && can(user.grants, { module: 'isletme-dogrulama', action: 'onayla' }) && user.grants.some((g) => g.role === 'admin');
   const admin = user ? createBusinessAdmin(firestore, user.uid) : null;
-  const provinces = useMemo(() => locationRepository.getProvinces(), []);
+  // Ülke yetkisi yoksa yalnızca yetkili olunan iller (kurallar da başka ili okutmaz).
+  const viewScopes = (user?.grants ?? []).filter((g) => isGrantActive(g, new Date()) && g.modules['isletme-dogrulama']?.includes('goruntule')).map((g) => g.scope);
+  const national = viewScopes.some((s) => s.level === 'ulke');
+  const allowedKey = viewScopes.flatMap((s) => (s.level === 'il' ? [s.provinceCode] : [])).sort().join();
+  const provinces = useMemo(
+    () => locationRepository.getProvinces().filter((p) => national || allowedKey.split(',').includes(p.code)),
+    [national, allowedKey],
+  );
 
-  const [provinceCode, setProvinceCode] = useState('');
+  const [provinceCode, setProvinceCode] = useState(() => (national ? '' : (provinces[0]?.code ?? '')));
   const [list, setList] = useState<Business[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
@@ -36,12 +44,13 @@ export function BusinessesPage() {
   const load = useCallback(async () => {
     setLoadError(false);
     if (user?.isDemo) return setList([]);
+    if (!national && !provinceCode) return setList([]);
     try {
       setList(await createBusinessAdmin(firestore, 'okuma').list(provinceCode ? { provinceCode } : {}));
     } catch {
       setLoadError(true);
     }
-  }, [user, provinceCode]);
+  }, [user, provinceCode, national]);
 
   useEffect(() => {
     load();
@@ -79,8 +88,8 @@ export function BusinessesPage() {
 
       <div className="toolbar">
         <label htmlFor="biz-province" className="sr-only">{t('businesses.province')}</label>
-        <select id="biz-province" value={provinceCode} onChange={(e) => setProvinceCode(e.target.value)}>
-          <option value="">{t('businesses.allProvinces')}</option>
+        <select id="biz-province" value={provinceCode} onChange={(e) => setProvinceCode(e.target.value)} disabled={!national && provinces.length < 2}>
+          {national ? <option value="">{t('businesses.allProvinces')}</option> : null}
           {provinces.map((p) => (
             <option key={p.code} value={p.code}>{p.name}</option>
           ))}

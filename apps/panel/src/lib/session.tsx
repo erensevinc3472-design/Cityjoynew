@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type PropsWithChildren } from 'react';
-import { ROLE_TEMPLATES, type PermissionGrant, type RegionScope, type Role } from '@cityjoy/shared';
-import { isAdminAccount } from '@cityjoy/shared/firebase';
+import { isGrantActive, ROLE_TEMPLATES, type PermissionGrant, type RegionScope, type Role } from '@cityjoy/shared';
+import { isAdminAccount, loadOwnGrants } from '@cityjoy/shared/firebase';
 
 import { firestore, isFirebaseConfigured } from './firebase';
 import { authService } from './services';
@@ -17,8 +17,8 @@ export interface PanelUser {
 interface SessionValue {
   ready: boolean;
   user: PanelUser | null;
-  /** Giriş yapılmış ama hiç panel yetkisi yok. */
-  noAccess: boolean;
+  /** Giriş yapılmış ama hiç panel yetkisi yok (yetki talebi gönderebilir). */
+  noAccess: { uid: string; displayName: string; email: string } | null;
   signInDemo(user: PanelUser): void;
   signOut(): Promise<void>;
 }
@@ -29,25 +29,32 @@ function adminGrant(uid: string): PermissionGrant {
   return { id: `${uid}-admin`, uid, role: 'admin', scope: { level: 'ulke' }, modules: ROLE_TEMPLATES.admin, grantedBy: 'konsol', grantedAt: '' };
 }
 
+/** Admin listesi (admins, konsoldan) ve panelden verilen yetki kayıtları (grants). Geçersiz olanlar atılır. */
+async function loadGrants(uid: string): Promise<PermissionGrant[]> {
+  const [isAdmin, own] = await Promise.all([isAdminAccount(firestore, uid), loadOwnGrants(firestore, uid).catch(() => [])]);
+  const now = new Date();
+  return [...(isAdmin ? [adminGrant(uid)] : []), ...own.filter((g) => isGrantActive(g, now))];
+}
+
 /**
- * Panel oturumu. Yetkiler sunucudan okunur: şimdilik admin listesi (admins koleksiyonu).
- * Diğer roller (il yöneticisi, belediye...) yetki kayıtlarıyla birlikte eklenecek.
+ * Panel oturumu. Yetkiler sunucudan okunur; menü bunlara göre süzülür, asıl denetimi veritabanı kuralları yapar.
  */
 export function SessionProvider({ children }: PropsWithChildren) {
   const [ready, setReady] = useState(!isFirebaseConfigured);
   const [user, setUser] = useState<PanelUser | null>(null);
-  const [noAccess, setNoAccess] = useState(false);
+  const [noAccess, setNoAccess] = useState<SessionValue['noAccess']>(null);
 
   useEffect(() => {
     if (!isFirebaseConfigured) return;
     return authService.onChange(async (u) => {
       if (!u) {
         setUser((current) => (current?.isDemo ? current : null));
-        setNoAccess(false);
+        setNoAccess(null);
       } else {
-        const grants = (await isAdminAccount(firestore, u.uid)) ? [adminGrant(u.uid)] : [];
-        setNoAccess(grants.length === 0);
-        setUser(grants.length ? { uid: u.uid, displayName: u.displayName ?? u.email ?? '', email: u.email, grants } : null);
+        const grants = await loadGrants(u.uid);
+        const displayName = u.displayName ?? u.email ?? '';
+        setNoAccess(grants.length ? null : { uid: u.uid, displayName, email: u.email ?? '' });
+        setUser(grants.length ? { uid: u.uid, displayName, email: u.email, grants } : null);
       }
       setReady(true);
     });
@@ -55,7 +62,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   const signOut = useCallback(async () => {
     setUser(null);
-    setNoAccess(false);
+    setNoAccess(null);
     if (isFirebaseConfigured) await authService.signOut();
   }, []);
 

@@ -12,7 +12,7 @@ import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
 import { unregisterPush } from '@/lib/push';
-import { authService, businessRepository, familyRepository, profileRepository, reviewRepository } from '@/lib/services';
+import { authService, businessRepository, deleteAccessRequest, familyRepository, profileRepository, reviewRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings, type ThemeMode } from '@/lib/settings';
 import { restartFlow } from '@/lib/navigation';
@@ -53,6 +53,7 @@ export default function AccountScreen() {
         await familyRepository.deleteAllOf(uid);
         await reviewRepository.deleteAllBy(uid);
         await businessRepository.deleteAllOf(uid);
+        await deleteAccessRequest(uid);
         await profileRepository.delete(uid);
       });
       await adopt(null);
