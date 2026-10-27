@@ -1504,18 +1504,18 @@
    "ru": "Вход"
   },
   "tam_ucret_tl": {
-   "tr": "Tam bilet (TL)",
-   "en": "Full price (TRY)",
-   "de": "Normalpreis (TRY)",
-   "ar": "السعر الكامل (ليرة)",
-   "ru": "Полный билет (TRY)"
+   "tr": "Tam bilet",
+   "en": "Full price",
+   "de": "Normalpreis",
+   "ar": "السعر الكامل",
+   "ru": "Полный билет"
   },
   "indirimli_ucret_tl": {
-   "tr": "İndirimli (TL)",
-   "en": "Reduced (TRY)",
-   "de": "Ermäßigt (TRY)",
-   "ar": "مخفض (ليرة)",
-   "ru": "Льготный (TRY)"
+   "tr": "İndirimli",
+   "en": "Reduced",
+   "de": "Ermäßigt",
+   "ar": "مخفض",
+   "ru": "Льготный"
   },
   "muzekart_gecerli": {
    "tr": "Müzekart geçerli",
@@ -1539,32 +1539,32 @@
    "ru": "Вместимость (машин)"
   },
   "ilk_saat_tl": {
-   "tr": "İlk saat (TL)",
-   "en": "First hour (TRY)",
-   "de": "Erste Stunde (TRY)",
-   "ar": "الساعة الأولى (ليرة)",
-   "ru": "Первый час (TRY)"
+   "tr": "İlk saat",
+   "en": "First hour",
+   "de": "Erste Stunde",
+   "ar": "الساعة الأولى",
+   "ru": "Первый час"
   },
   "ek_saat_tl": {
-   "tr": "Ek saat (TL)",
-   "en": "Extra hour (TRY)",
-   "de": "Jede weitere Stunde (TRY)",
-   "ar": "ساعة إضافية (ليرة)",
-   "ru": "Доп. час (TRY)"
+   "tr": "Ek saat",
+   "en": "Extra hour",
+   "de": "Jede weitere Stunde",
+   "ar": "ساعة إضافية",
+   "ru": "Доп. час"
   },
   "gunluk_en_fazla_tl": {
-   "tr": "Günlük en fazla (TL)",
-   "en": "Daily maximum (TRY)",
-   "de": "Tagesmaximum (TRY)",
-   "ar": "الحد اليومي (ليرة)",
-   "ru": "Максимум в день (TRY)"
+   "tr": "Günlük en fazla",
+   "en": "Daily maximum",
+   "de": "Tagesmaximum",
+   "ar": "الحد اليومي",
+   "ru": "Максимум в день"
   },
   "aylik_abonelik_tl": {
-   "tr": "Aylık abonelik (TL)",
-   "en": "Monthly pass (TRY)",
-   "de": "Monatsabo (TRY)",
-   "ar": "اشتراك شهري (ليرة)",
-   "ru": "Абонемент на месяц (TRY)"
+   "tr": "Aylık abonelik",
+   "en": "Monthly pass",
+   "de": "Monatsabo",
+   "ar": "اشتراك شهري",
+   "ru": "Абонемент на месяц"
   },
   "odeme_yontemleri": {
    "tr": "Ödeme yöntemleri",
@@ -1679,11 +1679,11 @@
    "ru": "Интервал"
   },
   "ogrenci_ucret_tl": {
-   "tr": "Öğrenci (TL)",
-   "en": "Student (TRY)",
-   "de": "Studierende (TRY)",
-   "ar": "طالب (ليرة)",
-   "ru": "Студенческий (TRY)"
+   "tr": "Öğrenci",
+   "en": "Student",
+   "de": "Studierende",
+   "ar": "طالب",
+   "ru": "Студенческий"
   },
   "kart_adi": {
    "tr": "Ulaşım kartı",

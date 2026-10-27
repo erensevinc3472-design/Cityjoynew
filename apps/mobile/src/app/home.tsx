@@ -33,7 +33,7 @@ function greetingKey(now = new Date()) {
   return 'home.greetingEvening';
 }
 
-/** Ana sayfa. Acil İhtiyaçlar bağlı; diğer modüller sonraki aşamalarda bağlanacak. */
+/** Ana sayfa. Benim Şehrim ve Acil İhtiyaçlar bağlı; diğer modüller sonraki aşamalarda bağlanacak. */
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -84,8 +84,8 @@ export default function HomeScreen() {
         <VerifyEmailBanner />
         <View style={styles.grid}>
           {MODULES.map((m) => {
-            // Şimdilik yalnızca Acil İhtiyaçlar hazır; diğerleri sonraki aşamalarda bağlanacak.
-            const href = m.key === 'urgent' ? '/urgent' : undefined;
+            // Benim Şehrim ve Acil İhtiyaçlar hazır; diğerleri sonraki aşamalarda bağlanacak.
+            const href = m.key === 'urgent' ? '/urgent' : m.key === 'myCity' ? '/city' : undefined;
             return (
               <Pressable
                 key={m.key}

@@ -1,6 +1,7 @@
-import { createEmergencyNumberStore, createServiceCategoryStore } from '@cityjoy/shared';
+import { createCityGuideStore, createEmergencyNumberStore, createServiceCategoryStore } from '@cityjoy/shared';
 import {
   createFirebaseAuthService,
+  createFirestoreCityGuideRepository,
   createFirestoreBusinessRepository,
   createFirestoreFamilyRepository,
   createFirestorePushTokenRepository,
@@ -29,6 +30,8 @@ export const reviewRepository = createFirestoreReviewRepository(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);
 export const sosRepository = createFirestoreSosRepository(firestore);
 export const pushTokenRepository = createFirestorePushTokenRepository(firestore);
+/** Benim Şehrim sabit bilgileri: il başına özet tek okuma, bölüm yalnızca değişince indirilir. */
+export const cityGuide = createCityGuideStore(createFirestoreCityGuideRepository(firestore), deviceStorage);
 export const serviceCategories = createServiceCategoryStore(createFirestoreServiceCategoryRepository(firestore), deviceStorage);
 export const sendServiceSuggestion = (uid: string, text: string, provinceCode?: string) => submitServiceSuggestion(firestore, uid, text, provinceCode);
 

@@ -416,5 +416,28 @@
     "backgroundOff": "Keine Hintergrund-Standortberechtigung: Ihr Standort wird nur aktualisiert, solange dieser Bildschirm offen ist.",
     "fgTitle": "SOS: Ihr Standort wird mit Ihrer Familie geteilt",
     "fgBody": "Wenn Sie sicher sind, tippen Sie in der App auf \"Ich bin sicher\"."
+  },
+  "city": {
+    "needLocation": "Wähle zuerst deine Provinz, um die Informationen deiner Stadt zu sehen.",
+    "staleNote": "Keine Verbindung; es werden auf dem Telefon gespeicherte Informationen angezeigt, die veraltet sein können.",
+    "loadError": "Die Informationen konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "comingSoon": "Für diese Provinz noch keine Informationen",
+    "count": "{{count}} Einträge",
+    "otherSections": "Notdienstapotheken, Veranstaltungen, Cafés und Restaurants, Anzeigen und der Viertelplatz folgen in den nächsten Schritten.",
+    "search": "Nach Name, Art oder Bezirk suchen",
+    "allDistricts": "Alle Bezirke",
+    "contentLanguage": "Die Informationen in diesem Bereich sind auf Türkisch erfasst.",
+    "empty": "In diesem Bereich gibt es noch keine Informationen.",
+    "unverified": "Nicht bestätigt",
+    "unverifiedNote": "Diese Information wurde noch nicht von einer berechtigten Person bestätigt und kann sich geändert haben. Ruf vorher an oder prüfe die offizielle Webseite.",
+    "notFound": "Dieser Eintrag wurde nicht gefunden; er wurde vielleicht entfernt.",
+    "call": "Anrufen: {{number}}",
+    "openMap": "In Karten öffnen",
+    "website": "Webseite",
+    "apply": "Antragsseite",
+    "moreInfo": "Weitere Informationen",
+    "source": "Quelle: {{source}}, {{date}}",
+    "verifiedOn": "Bestätigt: {{date}}",
+    "firstHour": "Erste Stunde {{price}} TRY"
   }
 }

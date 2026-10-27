@@ -416,5 +416,28 @@
     "backgroundOff": "No background location permission: your location only updates while this screen is open.",
     "fgTitle": "SOS: sharing your location with your family",
     "fgBody": "If you are safe, tap \"I'm safe\" in the app."
+  },
+  "city": {
+    "needLocation": "Choose your province first to see your city's information.",
+    "staleNote": "Could not connect; showing information saved on your phone, which may be out of date.",
+    "loadError": "Could not load the information. Check your connection and try again.",
+    "comingSoon": "No information yet for this province",
+    "count": "{{count}} entries",
+    "otherSections": "Pharmacies on duty, events, cafés and restaurants, listings and Neighbourhood Square are coming next.",
+    "search": "Search by name, type or district",
+    "allDistricts": "All districts",
+    "contentLanguage": "The information in this section is provided in Turkish.",
+    "empty": "No information in this section yet.",
+    "unverified": "Not verified",
+    "unverifiedNote": "This information has not yet been confirmed by an authorised person and may have changed. Call or check the official website before you go.",
+    "notFound": "This entry was not found; it may have been removed.",
+    "call": "Call: {{number}}",
+    "openMap": "Open in maps",
+    "website": "Website",
+    "apply": "Application page",
+    "moreInfo": "More information",
+    "source": "Source: {{source}}, {{date}}",
+    "verifiedOn": "Verified: {{date}}",
+    "firstHour": "First hour {{price}} TRY"
   }
 }

@@ -416,5 +416,28 @@
     "backgroundOff": "Arka plan konum izni yok: konumunuz yalnızca bu ekran açıkken güncellenir.",
     "fgTitle": "SOS: konumunuz ailenizle paylaşılıyor",
     "fgBody": "Güvendeyseniz uygulamada \"Güvendeyim\"e dokunun."
+  },
+  "city": {
+    "needLocation": "Şehrinin bilgilerini görmek için önce ilini seç.",
+    "staleNote": "İnternete bağlanılamadı; telefonda saklı bilgiler gösteriliyor, güncel olmayabilir.",
+    "loadError": "Bilgiler yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.",
+    "comingSoon": "Bu ilde henüz bilgi yok",
+    "count": "{{count}} kayıt",
+    "otherSections": "Nöbetçi eczane, etkinlikler, kafe ve restoranlar, ilanlar ve Mahalle Meydanı sonraki adımlarda eklenecek.",
+    "search": "Ad, tür ya da ilçe ara",
+    "allDistricts": "Tüm ilçeler",
+    "contentLanguage": "Bu bölümdeki bilgiler Türkçe girilmiştir.",
+    "empty": "Bu bölümde henüz bilgi yok.",
+    "unverified": "Doğrulanmadı",
+    "unverifiedNote": "Bu bilgi henüz yetkili bir kişi tarafından teyit edilmedi; değişmiş olabilir. Gitmeden önce arayarak ya da resmî sitesinden kontrol et.",
+    "notFound": "Bu kayıt bulunamadı; kaldırılmış olabilir.",
+    "call": "Ara: {{number}}",
+    "openMap": "Haritada aç",
+    "website": "Web sitesi",
+    "apply": "Başvuru sayfası",
+    "moreInfo": "Ayrıntılı bilgi",
+    "source": "Kaynak: {{source}}, {{date}}",
+    "verifiedOn": "Doğrulandı: {{date}}",
+    "firstHour": "İlk saat {{price}} ₺"
   }
 }
