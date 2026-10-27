@@ -448,5 +448,24 @@
     "source": "Quelle: {{source}}, {{date}}",
     "verifiedOn": "Bestätigt: {{date}}",
     "firstHour": "Erste Stunde {{price}} TRY"
+  },
+  "announcements": {
+    "title": "Bekanntmachungen",
+    "one": "Bekanntmachung",
+    "urgent": "Dringende Bekanntmachung",
+    "seeAll": "Alle Bekanntmachungen",
+    "empty": "In Ihrer Gegend gibt es derzeit keine Bekanntmachungen.",
+    "loadError": "Bekanntmachungen konnten nicht geladen werden.",
+    "needLocation": "Wählen Sie Ihren Standort, um Bekanntmachungen zu sehen.",
+    "scopeNote": "Hier erscheinen offizielle Bekanntmachungen für Ihre Provinz, Ihren Bezirk und Ihr Viertel.",
+    "muhtarOf": "Ortsvorsteheramt {{place}}",
+    "cityjoyOf": "CityJoy {{place}}",
+    "wholeProvince": "Ganz {{place}}",
+    "official": "Offizielles Konto",
+    "forRegion": "Gebiet: {{region}}",
+    "publishedAt": "Veröffentlicht: {{date}}",
+    "until": "Bis: {{date}}",
+    "urgentNote": "Bei Lebensgefahr rufen Sie 112 an.",
+    "gone": "Diese Bekanntmachung ist nicht mehr veröffentlicht."
   }
 }

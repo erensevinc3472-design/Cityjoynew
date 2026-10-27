@@ -448,5 +448,24 @@
     "source": "المصدر: {{source}}، {{date}}",
     "verifiedOn": "تم التوثيق: {{date}}",
     "firstHour": "الساعة الأولى {{price}} ليرة"
+  },
+  "announcements": {
+    "title": "الإعلانات",
+    "one": "إعلان",
+    "urgent": "إعلان عاجل",
+    "seeAll": "كل الإعلانات",
+    "empty": "لا توجد إعلانات في منطقتك حاليًا.",
+    "loadError": "تعذّر تحميل الإعلانات.",
+    "needLocation": "اختر موقعك لرؤية الإعلانات.",
+    "scopeNote": "تظهر هنا الإعلانات الرسمية الموجّهة لولايتك ومنطقتك وحيّك.",
+    "muhtarOf": "مختارية {{place}}",
+    "cityjoyOf": "CityJoy {{place}}",
+    "wholeProvince": "كامل {{place}}",
+    "official": "حساب رسمي",
+    "forRegion": "المنطقة: {{region}}",
+    "publishedAt": "النشر: {{date}}",
+    "until": "حتى: {{date}}",
+    "urgentNote": "إذا كان هناك خطر على الحياة فاتصل بالرقم 112.",
+    "gone": "هذا الإعلان لم يعد منشورًا."
   }
 }

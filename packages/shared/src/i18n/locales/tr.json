@@ -448,5 +448,24 @@
     "source": "Kaynak: {{source}}, {{date}}",
     "verifiedOn": "Doğrulandı: {{date}}",
     "firstHour": "İlk saat {{price}} ₺"
+  },
+  "announcements": {
+    "title": "Duyurular",
+    "one": "Duyuru",
+    "urgent": "Acil duyuru",
+    "seeAll": "Tüm duyurular",
+    "empty": "Bölgenizde şu an duyuru yok.",
+    "loadError": "Duyurular yüklenemedi.",
+    "needLocation": "Duyuruları görmek için konumunuzu seçin.",
+    "scopeNote": "İlinizin geneline, ilçenize ve mahallenize yönelik resmî duyurular burada görünür.",
+    "muhtarOf": "{{place}} Muhtarlığı",
+    "cityjoyOf": "CityJoy {{place}}",
+    "wholeProvince": "{{place}} geneli",
+    "official": "Resmî hesap",
+    "forRegion": "Bölge: {{region}}",
+    "publishedAt": "Yayın: {{date}}",
+    "until": "Bitiş: {{date}}",
+    "urgentNote": "Acil durumda hayati tehlike varsa 112'yi arayın.",
+    "gone": "Bu duyuru artık yayında değil."
   }
 }
