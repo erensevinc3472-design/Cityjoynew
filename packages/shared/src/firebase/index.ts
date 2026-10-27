@@ -10,3 +10,4 @@ export interface FirebaseWebConfig {
   messagingSenderId: string;
   appId: string;
 }
+export { createOccupationAdmin, isAdminAccount, occupationIdFromName } from './admin';

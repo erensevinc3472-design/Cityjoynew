@@ -23,6 +23,15 @@ npm test             # testler
 npm run typecheck    # tür kontrolü
 ```
 
+## Firebase
+
+- Bağlantı bilgileri `.env.local` dosyalarındadır ve GitHub'a gönderilmez. `FIREBASE_WEB_CONFIG` ortam
+  değişkenine Firebase konsolundaki `firebaseConfig` bloğu konursa `npm run env:write` dosyaları üretir.
+- Veritabanı güvenlik kuralları: `firebase/firestore.rules` (testler: `npm run test:rules`, Java gerekir).
+- Panel admini: Firestore'da `admins/<kullanıcı UID>` belgesi (yalnızca konsoldan eklenir).
+- Yerel deneme: `EXPO_PUBLIC_FIREBASE_EMULATOR=1` (mobil) ve `VITE_FIREBASE_EMULATOR=1` (panel) ile
+  `npx firebase emulators:start --only auth,firestore` emülatörüne bağlanılır.
+
 ## Konum verisi
 
 `packages/shared/data/locations` PTT posta kodu listesinden üretilir (81 il, 973 ilçe, 73.305 mahalle/köy).

@@ -6,11 +6,13 @@ import { Shell } from './components/shell';
 import { SessionProvider, useSession } from './lib/session';
 import { LocationsPage } from './pages/locations-page';
 import { LoginPage } from './pages/login-page';
+import { OccupationsPage } from './pages/occupations-page';
 import { OverviewPage } from './pages/overview-page';
 import './styles.css';
 
 function RequireUser({ children }: { children: React.ReactNode }) {
-  const { user } = useSession();
+  const { ready, user } = useSession();
+  if (!ready) return null;
   return user ? children : <Navigate to="/giris" replace />;
 }
 
@@ -27,6 +29,7 @@ const router = createHashRouter([
     children: [
       { index: true, element: <OverviewPage /> },
       { path: 'konumlar', element: <LocationsPage /> },
+      { path: 'meslekler', element: <OccupationsPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },

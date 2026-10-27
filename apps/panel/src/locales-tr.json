@@ -11,7 +11,8 @@
     "etkinlikler": "Etkinlikler",
     "hizmetler": "Hizmetler",
     "moderasyon": "Moderasyon",
-    "isletme-dogrulama": "İşletme doğrulama"
+    "isletme-dogrulama": "İşletme doğrulama",
+    "meslekler": "Meslekler"
   },
   "roles": {
     "admin": "Admin",
@@ -34,10 +35,24 @@
   },
   "login": {
     "title": "Panele giriş",
-    "notConnected": "Giriş sistemi henüz bağlanmadı. Firebase kurulunca e-posta, şifre ve iki aşamalı doğrulama ile giriş yapılacak.",
+    "notConnected": "Giriş sistemi bağlı değil (.env.local dosyası eksik).",
     "demoTitle": "Örnek hesapla dene",
     "demoNote": "Geliştirme modu. Bu hesaplar gerçek değildir, yetki yapısını denemek içindir.",
-    "logout": "Çıkış yap"
+    "logout": "Çıkış yap",
+    "email": "E-posta",
+    "password": "Şifre",
+    "submit": "Giriş yap",
+    "google": "Google ile giriş yap",
+    "or": "veya",
+    "forgot": "Şifremi unuttum",
+    "resetSent": "Bu adrese kayıtlı bir hesap varsa şifre sıfırlama bağlantısı gönderildi.",
+    "wrong": "E-posta ya da şifre hatalı.",
+    "tooMany": "Çok fazla deneme yapıldı. Biraz sonra tekrar deneyin.",
+    "network": "İnternet bağlantısını kontrol edin.",
+    "unknown": "Bir sorun oluştu. Tekrar deneyin.",
+    "noAccessTitle": "Bu hesabın panel yetkisi yok",
+    "noAccessBody": "Panele yalnızca yetki verilmiş hesaplar girebilir. Yetki için CityJoy yönetimiyle iletişime geçin.",
+    "mfaPending": "Yönetici hesapları için iki aşamalı doğrulama, Firebase ücretli plana geçince açılacak."
   },
   "overview": {
     "title": "Hoş geldiniz",
@@ -80,5 +95,39 @@
     "loading": "Yükleniyor…",
     "empty": "Sonuç yok.",
     "all": "Tümü"
+  },
+  "occupations": {
+    "title": "Meslekler",
+    "intro": "Kayıtta kullanıcıların seçtiği meslek listesi. Liste bildirimlerin yalnızca ilgili kişilere gitmesi için kullanılır.",
+    "usingDefaults": "Veritabanında henüz meslek yok; uygulama başlangıç listesini gösteriyor.",
+    "seed": "Başlangıç listesini yükle",
+    "seeded": "{{count}} meslek yüklendi.",
+    "add": "Yeni meslek",
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "deactivate": "Pasifleştir",
+    "activate": "Etkinleştir",
+    "active": "Etkin",
+    "inactive": "Pasif",
+    "order": "Sıra",
+    "status": "Durum",
+    "name": "Ad",
+    "nameTr": "Türkçe ad (zorunlu)",
+    "nameEn": "İngilizce",
+    "nameDe": "Almanca",
+    "nameAr": "Arapça",
+    "nameRu": "Rusça",
+    "missingTranslations": "{{count}} dil eksik",
+    "allTranslations": "5 dil tamam",
+    "nameRequired": "Türkçe ad zorunlu.",
+    "duplicate": "Bu adla bir meslek zaten var.",
+    "saved": "Kaydedildi.",
+    "error": "Kaydedilemedi. Yetkinizi ve bağlantınızı kontrol edin.",
+    "demoReadOnly": "Örnek hesapla değişiklik yapılamaz.",
+    "noDelete": "Meslekler silinmez, pasifleştirilir; böylece daha önce seçmiş kullanıcıların kaydı bozulmaz.",
+    "loading": "Yükleniyor…",
+    "loadError": "Liste yüklenemedi.",
+    "retry": "Tekrar dene"
   }
 }

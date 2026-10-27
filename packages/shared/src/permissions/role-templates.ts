@@ -11,6 +11,7 @@ const WRITE: Action[] = ['goruntule', 'ekle', 'duzenle'];
 export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
   admin: {
     konumlar: ALL,
+    meslekler: ALL,
     yetkiler: ALL,
     onaylar: ALL,
     'islem-kayitlari': READ,

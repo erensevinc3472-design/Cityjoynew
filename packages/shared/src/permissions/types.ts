@@ -13,6 +13,7 @@ export type Role =
 /** Panelde yetki verilebilen bölümler. Yeni özellik eklendikçe buraya eklenir. */
 export type Module =
   | 'konumlar'
+  | 'meslekler'
   | 'yetkiler'
   | 'onaylar'
   | 'islem-kayitlari'

@@ -4,7 +4,13 @@ import { fileURLToPath } from 'node:url';
 
 import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { LEGAL_TEXT_VERSION } from '@cityjoy/shared';
-import { createFirestoreOccupationRepository, createFirestoreProfileRepository } from '@cityjoy/shared/firebase';
+import {
+  createFirestoreOccupationRepository,
+  createFirestoreProfileRepository,
+  createOccupationAdmin,
+  isAdminAccount,
+} from '@cityjoy/shared/firebase';
+import { doc, getDocs, collection, setDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
@@ -60,5 +66,37 @@ describe('profil deposu kurallarla uyumlu', () => {
     const list = await createFirestoreOccupationRepository(db).listActive();
     expect(list.length).toBeGreaterThan(20);
     expect(list.map((o) => o.id)).toContain('belirtmek-istemiyorum');
+  });
+});
+
+describe('meslek yönetimi (admin)', () => {
+  it('admin listeyi yükler, ekler, pasifleştirir; her işlem kayda geçer; admin olmayan yapamaz', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'admins/eren'), { addedAt: 'konsol' });
+    });
+    const adminDb = env.authenticatedContext('eren').firestore() as unknown as Firestore;
+    const userDb = env.authenticatedContext('ali').firestore() as unknown as Firestore;
+    expect(await isAdminAccount(adminDb, 'eren')).toBe(true);
+    expect(await isAdminAccount(userDb, 'ali')).toBe(false);
+
+    const admin = createOccupationAdmin(adminDb, 'eren');
+    const added = await admin.seedDefaults(new Set());
+    expect(added).toBeGreaterThan(20);
+    expect(await admin.seedDefaults(new Set((await admin.listAll()).map((o) => o.id)))).toBe(0);
+
+    await admin.save({ id: 'avukat', names: { tr: 'Avukat', en: 'Lawyer' }, order: 100, active: true }, true);
+    const emekli = (await admin.listAll()).find((o) => o.id === 'emekli')!;
+    await admin.setActive(emekli, false);
+
+    const active = await createFirestoreOccupationRepository(userDb).listActive();
+    expect(active.map((o) => o.id)).toContain('avukat');
+    expect(active.map((o) => o.id)).not.toContain('emekli');
+
+    await expect(createOccupationAdmin(userDb, 'ali').save({ id: 'x', names: { tr: 'X' }, order: 1, active: true }, true)).rejects.toThrow();
+
+    const log = await getDocs(collection(adminDb, 'auditLog'));
+    expect(log.docs.map((d) => d.data().summary)).toEqual(
+      expect.arrayContaining(['Eklendi: Avukat', 'Pasifleştirildi: Emekli', expect.stringMatching(/^Başlangıç meslek listesi yüklendi/)]),
+    );
   });
 });

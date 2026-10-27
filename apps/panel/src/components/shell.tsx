@@ -8,6 +8,7 @@ import { t } from '../lib/t';
 /** Menüde sırasıyla gösterilen bölümler ve hazır olup olmadıkları. */
 export const MENU: { module: Module; path?: string }[] = [
   { module: 'konumlar', path: '/konumlar' },
+  { module: 'meslekler', path: '/meslekler' },
   { module: 'onaylar' },
   { module: 'yetkiler' },
   { module: 'islem-kayitlari' },
@@ -46,7 +47,7 @@ export function Shell() {
           {user.grants.map((g) => (
             <span key={g.id}>{t(`roles.${g.role}`)} · <ScopeLabel scope={g.scope} /></span>
           ))}
-          <button className="btn ghost" onClick={signOut}>{t('login.logout')}</button>
+          <button className="btn ghost" onClick={() => signOut()}>{t('login.logout')}</button>
         </div>
       </aside>
       <main className="content">
