@@ -1,27 +1,17 @@
 {
-  "hosting": {
-    "public": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "cityjoy-react/**",
-      "cityjoy-yeni/**",
-      "cityjoy/**",
-      "y/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/404.html"
-      }
-    ]
-  },
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+    "rules": "firebase/firestore.rules"
   },
-  "storage": {
-    "rules": "storage.rules"
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "singleProjectMode": true,
+    "ui": {
+      "enabled": false
+    },
+    "auth": {
+      "port": 9099
+    }
   }
 }
