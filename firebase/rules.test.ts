@@ -121,6 +121,21 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(deleteDoc(doc(db('eren'), 'occupations/ogretmen')));
   });
 
+  it('acil numaraları girişsiz herkes okur, yalnızca admin geçerli kayıt yazar, kimse silemez', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    const entry = (uid: string, over: Record<string, unknown> = {}) => ({
+      number: '112', names: { tr: 'Acil', en: 'Emergency' }, icon: 'emergency', order: 1, active: true,
+      updatedBy: uid, updatedAt: serverTimestamp(), ...over,
+    });
+    await assertSucceeds(getDoc(doc(db(), 'emergencyNumbers/112')));
+    await assertFails(setDoc(doc(db('ali'), 'emergencyNumbers/112'), entry('ali')));
+    await assertSucceeds(setDoc(doc(db('eren'), 'emergencyNumbers/112'), entry('eren')));
+    await assertFails(setDoc(doc(db('eren'), 'emergencyNumbers/112'), entry('eren', { number: '11a2' })));
+    await assertFails(setDoc(doc(db('eren'), 'emergencyNumbers/112'), entry('eren', { names: { en: 'No Turkish' } })));
+    await assertFails(setDoc(doc(db('eren'), 'emergencyNumbers/112'), entry('eren', { extra: 1 })));
+    await assertFails(deleteDoc(doc(db('eren'), 'emergencyNumbers/112')));
+  });
+
   it('admin listesine istemciden yazılamaz', async () => {
     await assertFails(setDoc(doc(db('ali'), 'admins/ali'), { addedAt: 'x' }));
   });

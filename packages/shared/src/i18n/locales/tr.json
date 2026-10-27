@@ -143,5 +143,22 @@
   },
   "legal": {
     "draftNotice": "Bu metin hazırlanıyor. Yayından önce avukat tarafından kontrol edilecek."
+  },
+  "urgent": {
+    "title": "Acil İhtiyaçlar",
+    "disclaimerTitle": "Hayati tehlikede 112'yi arayın",
+    "disclaimer": "CityJoy resmi bir acil çağrı hizmeti değildir ve hiçbir numarayı kendiliğinden aramaz. Numaraya dokununca telefonunuzun arama ekranı açılır.",
+    "numbersTitle": "Hayati acil · Dokun ve ara",
+    "call": "{{name}}, {{number}} numarasını ara",
+    "callFailed": "Arama açılamadı. Numarayı telefonunuzdan arayın: {{number}}",
+    "cachedNote": "Güncel liste alınamadı; telefonda saklı liste gösteriliyor.",
+    "comingTitle": "Yakında",
+    "comingSoon": "Yakında",
+    "sos": "SOS - Aileme haber ver",
+    "sosHint": "Konumunuzu kayıtlı aile üyelerinize gönderir",
+    "pharmacy": "Nöbetçi eczane",
+    "pharmacyHint": "Her gün güncellenen liste",
+    "services": "Hizmetler",
+    "servicesHint": "Çilingir, tesisat, çekici ve daha fazlası"
   }
 }

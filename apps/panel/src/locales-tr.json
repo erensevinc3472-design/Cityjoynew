@@ -12,7 +12,8 @@
     "hizmetler": "Hizmetler",
     "moderasyon": "Moderasyon",
     "isletme-dogrulama": "İşletme doğrulama",
-    "meslekler": "Meslekler"
+    "meslekler": "Meslekler",
+    "acil-numaralar": "Acil numaralar"
   },
   "roles": {
     "admin": "Admin",
@@ -129,5 +130,63 @@
     "loading": "Yükleniyor…",
     "loadError": "Liste yüklenemedi.",
     "retry": "Tekrar dene"
+  },
+  "emergency": {
+    "title": "Acil numaralar",
+    "intro": "Uygulamadaki Acil İhtiyaçlar ekranında gösterilen, dokununca aramayı açan numaralar. Liste tüm Türkiye için ortaktır. Uygulama bu numaraları kendiliğinden aramaz.",
+    "usingDefaults": "Veritabanında henüz numara yok; uygulama gömülü başlangıç listesini gösteriyor.",
+    "seed": "Başlangıç listesini yükle",
+    "seeded": "{{count}} numara yüklendi.",
+    "add": "Yeni numara",
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "deactivate": "Pasifleştir",
+    "activate": "Etkinleştir",
+    "active": "Etkin",
+    "inactive": "Pasif",
+    "order": "Sıra",
+    "status": "Durum",
+    "number": "Numara",
+    "name": "Ad",
+    "icon": "Simge",
+    "names": "Ad (Türkçe zorunlu)",
+    "notes": "Kısa açıklama (isteğe bağlı, örn. \"112'ye bağlanır\")",
+    "invalidNumber": "Numara yalnızca rakamlardan oluşmalı (3-15 hane).",
+    "nameRequired": "Türkçe ad zorunlu.",
+    "duplicate": "Bu numara zaten listede.",
+    "saved": "Kaydedildi.",
+    "error": "Kaydedilemedi. Yetkinizi ve bağlantınızı kontrol edin.",
+    "loadError": "Liste yüklenemedi.",
+    "retry": "Tekrar dene",
+    "loading": "Yükleniyor…",
+    "demoReadOnly": "Örnek hesapla yalnızca görüntüleyebilirsiniz.",
+    "readOnly": "Bu listeyi yalnızca admin değiştirebilir.",
+    "missingTranslations": "{{count}} dilde çeviri eksik (Türkçe gösterilir)",
+    "allTranslations": "Beş dilde hazır",
+    "noDelete": "Numaralar silinmez, pasifleştirilir. Her değişiklik işlem kaydına yazılır.",
+    "verifyWarning": "Numarayı kaydetmeden önce resmi kaynaktan doğrulayın; yanlış numara can güvenliğini etkiler.",
+    "icons": {
+      "emergency": "Acil",
+      "local-police": "Polis",
+      "fire-truck": "İtfaiye",
+      "security": "Jandarma / güvenlik",
+      "support-agent": "Destek hattı",
+      "water-drop": "Su",
+      "electric-bolt": "Elektrik",
+      "local-fire-department": "Doğalgaz / yangın",
+      "local-hospital": "Hastane",
+      "forest": "Orman",
+      "directions-boat": "Deniz",
+      "warning": "Uyarı",
+      "call": "Telefon"
+    },
+    "lang": {
+      "tr": "Türkçe",
+      "en": "İngilizce",
+      "de": "Almanca",
+      "ar": "Arapça",
+      "ru": "Rusça"
+    }
   }
 }

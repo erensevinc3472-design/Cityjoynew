@@ -3,8 +3,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { LEGAL_TEXT_VERSION } from '@cityjoy/shared';
+import { activeEmergencyNumbers, LEGAL_TEXT_VERSION } from '@cityjoy/shared';
 import {
+  createEmergencyNumberAdmin,
+  createFirestoreEmergencyNumberRepository,
   createFirestoreOccupationRepository,
   createFirestoreProfileRepository,
   createOccupationAdmin,
@@ -97,6 +99,36 @@ describe('meslek yönetimi (admin)', () => {
     const log = await getDocs(collection(adminDb, 'auditLog'));
     expect(log.docs.map((d) => d.data().summary)).toEqual(
       expect.arrayContaining(['Eklendi: Avukat', 'Pasifleştirildi: Emekli', expect.stringMatching(/^Başlangıç meslek listesi yüklendi/)]),
+    );
+  });
+});
+
+describe('acil numara yönetimi (admin)', () => {
+  it('admin yükler, ekler, pasifleştirir; girişsiz kullanıcı okur; işlemler kayda geçer', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'admins/eren'), { addedAt: 'konsol' });
+    });
+    const adminDb = env.authenticatedContext('eren').firestore() as unknown as Firestore;
+    const guestDb = env.unauthenticatedContext().firestore() as unknown as Firestore;
+    const guest = createFirestoreEmergencyNumberRepository(guestDb);
+    expect(await guest.listAll()).toEqual([]);
+
+    const admin = createEmergencyNumberAdmin(adminDb, 'eren');
+    expect(await admin.seedDefaults(new Set())).toBe(8);
+    await admin.save({ id: '177', number: '177', names: { tr: ' Orman yangını ', en: '' }, icon: 'forest', order: 9, active: true }, true);
+    const n155 = (await admin.listAll()).find((n) => n.id === '155')!;
+    await admin.setActive(n155, false);
+
+    const active = activeEmergencyNumbers(await guest.listAll());
+    expect(active.map((n) => n.number)).toEqual(['112', '110', '156', '183', '185', '186', '187', '177']);
+    expect(active.at(-1)!.names).toEqual({ tr: 'Orman yangını' });
+
+    const userDb = env.authenticatedContext('ali').firestore() as unknown as Firestore;
+    await expect(createEmergencyNumberAdmin(userDb, 'ali').setActive(n155, true)).rejects.toThrow();
+
+    const log = await getDocs(collection(adminDb, 'auditLog'));
+    expect(log.docs.map((d) => d.data().summary)).toEqual(
+      expect.arrayContaining(['Eklendi: 177 Orman yangını', 'Pasifleştirildi: 155 Polis', expect.stringMatching(/^Başlangıç acil numara listesi/)]),
     );
   });
 });

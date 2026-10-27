@@ -110,6 +110,27 @@ service cloud.firestore {
       allow delete: if false; // Silmek yerine pasifleştirilir; seçmiş kullanıcıların kaydı bozulmaz.
     }
 
+    function validLocalized(t) {
+      return t is map && t.keys().hasOnly(['tr', 'en', 'de', 'ar', 'ru'])
+        && t.tr is string && t.tr.size() >= 1 && t.tr.size() <= 80;
+    }
+
+    // Acil numaralar (ülke geneli): herkes okur, girişsiz de (acil durumda hesap şartı olmaz).
+    // Yalnızca admin yönetir; silinmez, pasifleştirilir.
+    match /emergencyNumbers/{id} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['number', 'names', 'notes', 'icon', 'order', 'active', 'updatedAt', 'updatedBy'])
+        && request.resource.data.number is string && request.resource.data.number.matches('^[0-9]{3,15}$')
+        && validLocalized(request.resource.data.names)
+        && (!('notes' in request.resource.data) || validLocalized(request.resource.data.notes))
+        && request.resource.data.icon is string && request.resource.data.icon.size() <= 40
+        && request.resource.data.order is int && request.resource.data.active is bool
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
     match /admins/{uid} {
       allow read: if isSelf(uid);
       allow write: if false;

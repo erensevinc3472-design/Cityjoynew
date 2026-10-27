@@ -28,6 +28,8 @@ export const colors = {
     success: '#4FD1A5',
     successSoft: 'rgba(79, 209, 165, 0.12)',
     danger: '#F87171',
+    /** Dolu kırmızı zemin üstündeki yazı (okunaklılık için koyu). */
+    onDanger: '#2B0B0B',
     dangerSoft: 'rgba(248, 113, 113, 0.12)',
     notice: 'rgba(226, 178, 119, 0.10)',
     noticeBorder: 'rgba(226, 178, 119, 0.35)',
@@ -58,6 +60,7 @@ export const colors = {
     success: '#16855F',
     successSoft: '#E2F3EB',
     danger: '#C0392B',
+    onDanger: '#FFFFFF',
     dangerSoft: '#FBE9E7',
     notice: '#FFF6E8',
     noticeBorder: '#F0D2A2',

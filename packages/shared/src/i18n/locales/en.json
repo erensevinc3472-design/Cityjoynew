@@ -143,5 +143,22 @@
   },
   "legal": {
     "draftNotice": "This text is being prepared and will be reviewed by a lawyer before launch."
+  },
+  "urgent": {
+    "title": "Urgent Needs",
+    "disclaimerTitle": "In a life-threatening emergency, call 112",
+    "disclaimer": "CityJoy is not an official emergency service and never calls any number on its own. Tapping a number opens your phone's dialer.",
+    "numbersTitle": "Emergency · Tap to call",
+    "call": "Call {{name}}, {{number}}",
+    "callFailed": "Could not start the call. Please dial {{number}} from your phone.",
+    "cachedNote": "Could not get the latest list; showing the list saved on this phone.",
+    "comingTitle": "Coming soon",
+    "comingSoon": "Soon",
+    "sos": "SOS - Alert my family",
+    "sosHint": "Sends your location to your registered family members",
+    "pharmacy": "Pharmacy on duty",
+    "pharmacyHint": "List updated every day",
+    "services": "Services",
+    "servicesHint": "Locksmith, plumbing, towing and more"
   }
 }

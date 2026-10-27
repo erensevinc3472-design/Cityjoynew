@@ -14,6 +14,7 @@ export type Role =
 export type Module =
   | 'konumlar'
   | 'meslekler'
+  | 'acil-numaralar'
   | 'yetkiler'
   | 'onaylar'
   | 'islem-kayitlari'

@@ -104,10 +104,11 @@ tbody tr:last-child td { border-bottom: 0; }
 
 .form { display: flex; flex-direction: column; gap: 0.6rem; }
 .form label { font-weight: 600; font-size: 0.9rem; }
-.form input { min-height: 44px; padding: 0 0.9rem; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--fg); font: inherit; }
+.form input, .form select { min-height: 44px; padding: 0 0.9rem; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--fg); font: inherit; }
 .panel-form { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem 1rem; }
 .panel-form .field { display: flex; flex-direction: column; gap: 0.3rem; }
-.panel-form .actions { grid-column: 1 / -1; }
+.panel-form .actions, .panel-form .form-section { grid-column: 1 / -1; }
+.panel-form .form-section { margin: 0.5rem 0 0; font-size: 0.95rem; }
 .error { color: var(--danger); margin: 0; }
 .center { text-align: center; }
 .note p { margin: 0.25rem 0 0.5rem; }

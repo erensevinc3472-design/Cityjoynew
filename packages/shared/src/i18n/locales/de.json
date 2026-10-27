@@ -143,5 +143,22 @@
   },
   "legal": {
     "draftNotice": "Dieser Text wird vorbereitet und vor dem Start von einem Anwalt geprüft."
+  },
+  "urgent": {
+    "title": "Notfälle",
+    "disclaimerTitle": "Bei Lebensgefahr 112 anrufen",
+    "disclaimer": "CityJoy ist kein offizieller Notrufdienst und ruft keine Nummer selbstständig an. Tippen Sie auf eine Nummer, öffnet sich die Telefon-App.",
+    "numbersTitle": "Notruf · Tippen zum Anrufen",
+    "call": "{{name}} anrufen, {{number}}",
+    "callFailed": "Der Anruf konnte nicht gestartet werden. Bitte wählen Sie {{number}} selbst.",
+    "cachedNote": "Die aktuelle Liste konnte nicht geladen werden; die auf dem Telefon gespeicherte Liste wird angezeigt.",
+    "comingTitle": "Demnächst",
+    "comingSoon": "Demnächst",
+    "sos": "SOS - Familie benachrichtigen",
+    "sosHint": "Sendet Ihren Standort an Ihre eingetragenen Familienmitglieder",
+    "pharmacy": "Notdienstapotheke",
+    "pharmacyHint": "Täglich aktualisierte Liste",
+    "services": "Dienstleistungen",
+    "servicesHint": "Schlüsseldienst, Installateur, Abschleppdienst und mehr"
   }
 }

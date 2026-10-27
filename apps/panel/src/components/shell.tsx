@@ -9,6 +9,7 @@ import { t } from '../lib/t';
 export const MENU: { module: Module; path?: string }[] = [
   { module: 'konumlar', path: '/konumlar' },
   { module: 'meslekler', path: '/meslekler' },
+  { module: 'acil-numaralar', path: '/acil-numaralar' },
   { module: 'onaylar' },
   { module: 'yetkiler' },
   { module: 'islem-kayitlari' },

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "112", "number": "112", "icon": "emergency",
+    "names": { "tr": "Ambulans ve acil çağrı", "en": "Ambulance & emergency", "de": "Rettungsdienst & Notruf", "ar": "الإسعاف والطوارئ", "ru": "Скорая и экстренный вызов" },
+    "notes": { "tr": "Tüm acil durumlar için", "en": "For all emergencies", "de": "Für alle Notfälle", "ar": "لجميع حالات الطوارئ", "ru": "Для всех экстренных случаев" }
+  },
+  {
+    "id": "155", "number": "155", "icon": "local-police",
+    "names": { "tr": "Polis", "en": "Police", "de": "Polizei", "ar": "الشرطة", "ru": "Полиция" },
+    "notes": { "tr": "112'ye bağlanır", "en": "Connects to 112", "de": "Wird mit 112 verbunden", "ar": "يتم التحويل إلى 112", "ru": "Соединяет со 112" }
+  },
+  {
+    "id": "110", "number": "110", "icon": "fire-truck",
+    "names": { "tr": "İtfaiye", "en": "Fire brigade", "de": "Feuerwehr", "ar": "الإطفاء", "ru": "Пожарная служба" },
+    "notes": { "tr": "112'ye bağlanır", "en": "Connects to 112", "de": "Wird mit 112 verbunden", "ar": "يتم التحويل إلى 112", "ru": "Соединяет со 112" }
+  },
+  {
+    "id": "156", "number": "156", "icon": "security",
+    "names": { "tr": "Jandarma", "en": "Gendarmerie", "de": "Gendarmerie", "ar": "الدرك", "ru": "Жандармерия" },
+    "notes": { "tr": "112'ye bağlanır", "en": "Connects to 112", "de": "Wird mit 112 verbunden", "ar": "يتم التحويل إلى 112", "ru": "Соединяет со 112" }
+  },
+  {
+    "id": "183", "number": "183", "icon": "support-agent",
+    "names": { "tr": "Sosyal destek (aile, kadın, çocuk)", "en": "Social support (family, women, children)", "de": "Sozialhilfe (Familie, Frauen, Kinder)", "ar": "الدعم الاجتماعي (الأسرة، المرأة، الطفل)", "ru": "Социальная поддержка (семья, женщины, дети)" }
+  },
+  {
+    "id": "185", "number": "185", "icon": "water-drop",
+    "names": { "tr": "Su arızası", "en": "Water outage", "de": "Wasserstörung", "ar": "أعطال المياه", "ru": "Аварии водоснабжения" }
+  },
+  {
+    "id": "186", "number": "186", "icon": "electric-bolt",
+    "names": { "tr": "Elektrik arızası", "en": "Power outage", "de": "Stromstörung", "ar": "أعطال الكهرباء", "ru": "Аварии электроснабжения" }
+  },
+  {
+    "id": "187", "number": "187", "icon": "local-fire-department",
+    "names": { "tr": "Doğalgaz acil", "en": "Natural gas emergency", "de": "Gas-Notdienst", "ar": "طوارئ الغاز الطبيعي", "ru": "Аварийная газовая служба" }
+  }
+]

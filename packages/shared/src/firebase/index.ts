@@ -11,3 +11,4 @@ export interface FirebaseWebConfig {
   appId: string;
 }
 export { createOccupationAdmin, isAdminAccount, occupationIdFromName } from './admin';
+export { createEmergencyNumberAdmin, createFirestoreEmergencyNumberRepository } from './emergency';
