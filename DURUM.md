@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 27 Ekim 2026 (yetki zinciri, kurumlar, kilitli adlar; kurallar ve dizinler yüklendi).
+Son güncelleme: 27 Ekim 2026 (şehir rehberi: Excel şablonu, panelden yükleme, Benim Şehrim ekranları).
 
 ## Depo ve ortam
 
@@ -25,7 +25,7 @@ Son güncelleme: 27 Ekim 2026 (yetki zinciri, kurumlar, kilitli adlar; kurallar 
 |---|---|
 | `apps/mobile` | Expo SDK 58 + Expo Router (TypeScript). Ekranlar `src/app`, bileşenler `src/components`, tema `src/theme` |
 | `apps/panel` | React 19 + Vite + React Router (hash yönlendirme). Tek panel, menü yetkiye göre süzülür |
-| `packages/shared` | Ortak: kilitli belediye adları ve kurumlar (`src/organizations`), 5 dil metinleri (`src/i18n/locales`), konum verisi, acil numaralar (`src/emergency`), hizmet kategorileri (`src/categories`), işletmeler ve sıralama (`src/business`), SOS ve aile (`src/sos`), yetki, veri yapıları, hizmet arayüzleri, Firebase uygulaması (`src/firebase`, `@cityjoy/shared/firebase` olarak alınır) |
+| `packages/shared` | Ortak: şehir rehberi şeması ve Excel denetimi (`data/city-guide-schema.json`, `src/city-guide`), kilitli belediye adları ve kurumlar (`src/organizations`), 5 dil metinleri (`src/i18n/locales`), konum verisi, acil numaralar (`src/emergency`), hizmet kategorileri (`src/categories`), işletmeler ve sıralama (`src/business`), SOS ve aile (`src/sos`), yetki, veri yapıları, hizmet arayüzleri, Firebase uygulaması (`src/firebase`, `@cityjoy/shared/firebase` olarak alınır) |
 | `firebase/` | `firestore.rules` ve emülatör testleri |
 | `tasarim/` | Eren'in 135 tasarım HTML dosyası. İçerikleri değiştirilmez (`CLAUDE.md`) |
 | `docs/stil-rehberi.md` | Renk, yazı tipi, bileşen kuralları (görsel yön kararı) |
@@ -35,8 +35,8 @@ Son güncelleme: 27 Ekim 2026 (yetki zinciri, kurumlar, kilitli adlar; kurallar 
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (50)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (37; Java gerekir)
+npm test                      # ortak paket testleri (57)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (40; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -142,14 +142,21 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Emülatörde tarayıcıyla baştan sona denendi (kurum aç > şifre bağlantısı > kurum yöneticisi personel ekler > il
    yöneticisi muhtar atar > muhtar ve personel paneli > doğrulanmamış e-posta).
 
-15. **Benim Şehrim sabit bilgi şablonu (Excel)**: `docs/veri-sablonlari/benim-sehrim-sablon.xlsx` (üreten betik
-   `scripts/build-data-templates.py`). Sekmeler: Önemli Kurumlar, Müzeler, Otoparklar, Parklar, Pazarlar, Ulaşım, Toplanma
-   Alanları, Muhtarlıklar, Belediye Hizmetleri, Nasıl Yapılır, İlçeler (doğru yazım). Her satırda kaynak + tarih zorunlu,
-   bilinmeyen boş bırakılır, açılır listeler, başka yapay zekâya verilecek hazır metin. **Eren dolduracak (başka yapay
-   zekâyla ya da ekibiyle); bulamazsa Claude açık kaynaklardan (OpenStreetMap vb., "doğrulanmadı") hazırlayacak.** Sırada:
-   veritabanı yapısı + panelde "Excel'den yükle" (hatalı satır listesi, kaynak denetimi) + uygulama ekranları; sonra aynısı
-   Seyahat için.
- (PROJE.md'ye işlendi)
+15. **Benim Şehrim sabit bilgileri (şehir rehberi).** Tek kaynak: `packages/shared/data/city-guide-schema.json` (10 bölüm,
+   sütunlar, seçenekler, 5 dilde adlar). Excel şablonu bundan üretilir (`scripts/build-data-templates.py` >
+   `docs/veri-sablonlari/benim-sehrim-sablon.xlsx` ve panelde indirilebilir kopya). **Panel > Şehir rehberi:** il seç, "Excel'den
+   yükle" > önizleme (geçerli / hatalı satır, nedeni ve satır numarası; örnek satırlar atlanır; yetkisi olmayan il reddedilir) >
+   yükle. Aynı yer yeniden yüklenince güncellenir (kimlik bölüm + ilçe + ad), içerik değişirse doğrulama düşer, dosyada olmayan
+   eskiler kalır. Tek tek doğrula / düzenle (Excel ile aynı denetim) / kaldır; işlem kaydı. Admin her ili ve ülke geneli ("tr",
+   Nasıl yapılır) içeriği, il yöneticisi kendi ilini yönetir (yeni yetki bölümü `sehir-rehberi`). **Veritabanı:**
+   `cityGuide/{il}` özet (bölüm başına sürüm, sayı, parça) + `cityGuidePacks/{il}__{bölüm}__{n}` (en çok 400 öğe/parça); herkes
+   okur. **Uygulama:** ana sayfada Benim Şehrim açıldı (`apps/mobile/src/app/city/`): bölümler (kayıt sayısı, boş olanlar
+   "henüz bilgi yok"), liste (arama, ilçe süzgeci, kendi ilçesi önce), ayrıntı (Ara, Haritada aç, web/başvuru, bölüme özgü
+   bilgiler, kaynak ve tarih, doğrulanmamışsa uyarı). Açılışta tek okuma, bölüm yalnızca değişince indirilir, internetsizken
+   telefondaki gösterilir. Emülatörde panel + uygulama (web) baştan sona denendi. **Eren veri dosyası hazırlıyor** (başka yapay
+   zekâyla ya da ekibiyle); gelmezse Claude açık kaynaklardan "doğrulanmadı" olarak hazırlayacak.
+
+## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Yetki zinciri (6.7, 27 Ekim 2026): admin herkese ve kurumlara; il yöneticisi kendi ilinde muhtar ve moderatöre; kurum
   kendi personeline. Form yok, e-postayla verilir. Belediye adları kilitli; kurum hesabı resmî e-postayla, şifreyi kurum koyar.
@@ -178,6 +185,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
+- **Kurallar yeniden değişti (şehir rehberi), yeniden yüklenmeli:** aynı komut, Eren'in bilgisayarından (güncel ZIP indirip).
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
@@ -211,7 +219,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
-0. Benim Şehrim sabit bilgiler: Eren'in Excel'i gelince (ya da açık kaynakla) yükleme + ekranlar. Seyahat şablonu sonra.
+0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
+   (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
 0b. Onay merkezi (PROJE.md 6.5, 6.7): "Bekleyen onaylar", personel > kurum/il yöneticisi > admin zinciri, önemli konularda
    admin'e de gitme, "Tümünü onayla" / "Güvenli olanları onayla", güvenilir yöneticiler listesi. Yetki zinciri bitti; bunun
    üstüne kurulur.
