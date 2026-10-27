@@ -793,6 +793,119 @@ service cloud.firestore {
       allow delete: if canEditGuide(resource.data.provinceCode);
     }
 
+    // ---- Onay merkezi (PROJE.md 6.5, 6.7): onay gereken iş önce il yöneticisinin (1. aşama), sonra admin'in onayından
+    // geçer. approvals/{tür}__{hedef}: aynı iş için tek istek. Şimdilik yalnızca işletme doğrulaması açık.
+    function validApproval(id, d) {
+      return d.keys().hasOnly(['kind', 'module', 'targetId', 'title', 'region', 'status', 'requestedBy', 'requestedAt',
+             'note', 'firstApproval', 'decision', 'updatedAt'])
+        && d.kind == 'isletme-dogrulama' && d.module == 'isletme-dogrulama'
+        && d.targetId is string && id == d.kind + '__' + d.targetId
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 120
+        && validLocation(d.region) && 'districtId' in d.region && !('neighbourhoodId' in d.region)
+        && (!('note' in d) || (d.note is string && d.note.size() <= 300))
+        && d.requestedAt == request.time
+        && d.updatedAt == request.time;
+    }
+    // Hedef işletme var, adı ve yeri istekteki gibi, henüz doğrulanmamış.
+    function businessTargetOk(d) {
+      return exists(businessPath(d.targetId))
+        && get(businessPath(d.targetId)).data.name == d.title
+        && get(businessPath(d.targetId)).data.location.provinceCode == d.region.provinceCode
+        && get(businessPath(d.targetId)).data.location.districtId == d.region.districtId
+        && get(businessPath(d.targetId)).data.verification.status != 'dogrulandi';
+    }
+    function isBusinessOwner(bid) {
+      return signedIn() && exists(businessPath(bid)) && get(businessPath(bid)).data.ownerUid == request.auth.uid;
+    }
+    // İlk aşama onayı: onaylayan kendisi, e-postası (güvenilir yönetici listesiyle eşleşir) ve şimdiki zaman.
+    function myStep(f) {
+      return f is map && f.keys().hasOnly(['uid', 'email', 'name', 'at'])
+        && f.uid == request.auth.uid && f.email == request.auth.token.get('email', '')
+        && f.name is string && f.name.size() >= 1 && f.name.size() <= 80
+        && f.at == request.time;
+    }
+    function myDecision(dec, stage, rejected) {
+      return dec is map && dec.keys().hasOnly(['uid', 'at', 'stage', 'reason'])
+        && dec.uid == request.auth.uid && dec.at == request.time && dec.stage == stage
+        && (rejected ? (dec.reason is string && dec.reason.size() >= 5 && dec.reason.size() <= 300) : !('reason' in dec));
+    }
+
+    match /approvals/{id} {
+      // İsteyen ve işletme sahibi kendi isteğini; onay yetkisi olan il yöneticisi kendi ilindekileri; admin hepsini görür.
+      allow read: if resource == null || isAdmin()
+        || (signedIn() && resource.data.requestedBy == request.auth.uid)
+        || regionAllows('onaylar', 'goruntule', resource.data.region.provinceCode, null)
+        || (resource.data.kind == 'isletme-dogrulama' && isBusinessOwner(resource.data.targetId));
+      // İşletme sahibi doğrulama ister; reddedilen ya da sonradan doğrulaması kaldırılan istek yeniden gönderilir.
+      // (Ucuz denetimler önce: kuralların hesap sınırı aşılmasın.)
+      allow create, update: if request.resource.data.status == 'il-onayi-bekliyor'
+        && request.resource.data.requestedBy == request.auth.uid
+        && !('firstApproval' in request.resource.data) && !('decision' in request.resource.data)
+        && (resource == null || !(resource.data.status in ['il-onayi-bekliyor', 'admin-onayi-bekliyor']))
+        && validApproval(id, request.resource.data)
+        && isBusinessOwner(request.resource.data.targetId)
+        && businessTargetOk(request.resource.data);
+      // İl yöneticisi istek gelmemiş bir işletmeyi kendisi önerir: 1. aşama onaylı olarak admin'e gider. Kendi işletmesini öneremez.
+      allow create, update: if request.resource.data.status == 'admin-onayi-bekliyor'
+        && request.resource.data.requestedBy == request.auth.uid
+        && !('decision' in request.resource.data)
+        && (resource == null || !(resource.data.status in ['il-onayi-bekliyor', 'admin-onayi-bekliyor']))
+        && myStep(request.resource.data.firstApproval)
+        && validApproval(id, request.resource.data)
+        && regionAllows(request.resource.data.module, 'onayla', request.resource.data.region.provinceCode, request.resource.data.region.districtId)
+        && !isBusinessOwner(request.resource.data.targetId)
+        && businessTargetOk(request.resource.data);
+      // 1. aşama: il yöneticisi kendi ilinde onaylar (admin'e gider) ya da gerekçeyle reddeder. Kendi isteğine karar veremez.
+      allow update: if resource.data.status == 'il-onayi-bekliyor'
+        && request.resource.data.status in ['admin-onayi-bekliyor', 'reddedildi']
+        && resource.data.requestedBy != request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && ((request.resource.data.status == 'admin-onayi-bekliyor'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'firstApproval', 'updatedAt'])
+              && myStep(request.resource.data.firstApproval))
+            || (request.resource.data.status == 'reddedildi'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decision', 'updatedAt'])
+              && myDecision(request.resource.data.decision, 1, true)))
+        && regionAllows(resource.data.module, 'onayla', resource.data.region.provinceCode, resource.data.region.districtId);
+      // 2. aşama: admin bekleyen işi onaylar ya da gerekçeyle reddeder (il yöneticisi yoksa 1. aşamayı da atlayabilir).
+      allow update: if resource.data.status in ['il-onayi-bekliyor', 'admin-onayi-bekliyor']
+        && request.resource.data.status in ['onaylandi', 'reddedildi']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decision', 'updatedAt'])
+        && isAdmin()
+        && myDecision(request.resource.data.decision, 2, request.resource.data.status == 'reddedildi')
+        && request.resource.data.updatedAt == request.time;
+      // İsteyen geri çeker; işletme silinince istek de silinir (hesap silmede de). Kararlar işlem kaydında kalır.
+      allow delete: if signedIn() && (resource.data.requestedBy == request.auth.uid
+        || (resource.data.kind == 'isletme-dogrulama' && isBusinessOwner(resource.data.targetId)));
+    }
+
+    // Güvenilir yöneticiler (PROJE.md 6.5): yalnızca admin görür ve yönetir. Silinmez, listeden çıkarılır.
+    match /trustedApprovers/{id} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'provinceCode', 'districtId', 'modules',
+             'addedBy', 'addedAt', 'updatedAt'])
+        && validEmail(request.resource.data.email)
+        && request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 80
+        && request.resource.data.provinceCode is string && request.resource.data.provinceCode.matches('^[0-8][0-9]$')
+        && (!('districtId' in request.resource.data) || (request.resource.data.districtId is string
+            && request.resource.data.districtId.matches('^' + request.resource.data.provinceCode + '-[a-z0-9-]+$')))
+        && id == request.resource.data.email + '__' + ('districtId' in request.resource.data
+            ? 'ilce-' + request.resource.data.districtId : 'il-' + request.resource.data.provinceCode)
+        && request.resource.data.modules is list
+        && request.resource.data.modules.hasOnly(['isletme-dogrulama', 'bildirimler', 'etkinlikler', 'kurumlar', 'moderasyon'])
+        && request.resource.data.addedBy == request.auth.uid
+        && request.resource.data.addedAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isAdmin() && resource.data.get('removedAt', null) == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['removedAt', 'removedBy', 'updatedAt'])
+        && request.resource.data.removedAt == request.time
+        && request.resource.data.removedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
     // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez. Admin hepsini, her yönetici kendi
     // kayıtlarını görür. Admin olmayan yönetici yalnızca yetkisi olan bölgede ve bölümde kayıt ekler.
     match /auditLog/{id} {

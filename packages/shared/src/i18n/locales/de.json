@@ -266,7 +266,7 @@
     "notFound": "Dieser Betrieb wurde nicht gefunden oder ist nicht veröffentlicht.",
     "listError": "Betriebe konnten nicht geladen werden.",
     "unverifiedWarning": "Seien Sie bei nicht geprüften Betrieben vorsichtig; klären Sie Identität und Preis vorher.",
-    "myVerifyNote": "Die Dokumentenprüfung startet bald. Bis dahin wird Ihr Betrieb als \"Nicht geprüft\" angezeigt.",
+    "myVerifyNote": "Nach dem Speichern können Sie im Bearbeitungsbildschirm eine Prüfung anfordern. Bis dahin wird Ihr Betrieb als \"Nicht geprüft\" angezeigt.",
     "servicesLabel": "Dienste",
     "hoursLabel": "Öffnungszeiten",
     "addressLabel": "Adresse",
@@ -275,7 +275,16 @@
     "removedNote": "Dieser Betrieb wurde von CityJoy entfernt. Wenden Sie sich für Details an CityJoy.",
     "priceListTitle": "Preisliste",
     "removeService": "Entfernen",
-    "duplicatePhone": "Mit dieser Telefonnummer ist bereits ein Betrieb eingetragen. Wenn es Ihrer ist, wenden Sie sich an CityJoy."
+    "duplicatePhone": "Mit dieser Telefonnummer ist bereits ein Betrieb eingetragen. Wenn es Ihrer ist, wenden Sie sich an CityJoy.",
+    "verifyTitle": "Prüfung",
+    "verifyIntro": "Geprüfte Betriebe stehen in Listen weiter oben und erhalten das Label \"Dokumente geprüft\". Ihre Anfrage geht zuerst an die Provinzverwaltung, dann an CityJoy; Sie werden eventuell telefonisch oder per Videoanruf kontaktiert.",
+    "verifyRequest": "Prüfung anfordern",
+    "verifyPendingFirst": "Anfrage erhalten, wartet auf die Prüfung durch die Provinzverwaltung.",
+    "verifyPendingAdmin": "Von der Provinzverwaltung bestätigt, wartet auf die endgültige Freigabe durch CityJoy.",
+    "verifyRejected": "Ihre Anfrage wurde abgelehnt. Grund: {{reason}}",
+    "verifyAgain": "Erneut anfordern",
+    "verifyCancel": "Anfrage zurückziehen",
+    "verifyDone": "Ihr Betrieb ist geprüft."
   },
   "reviews": {
     "title": "Bewertungen",

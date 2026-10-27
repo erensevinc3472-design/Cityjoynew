@@ -266,7 +266,7 @@
     "notFound": "Bu işletme bulunamadı ya da yayında değil.",
     "listError": "İşletmeler yüklenemedi.",
     "unverifiedWarning": "Doğrulanmamış işletmelerle çalışırken dikkatli olun; kimliği ve fiyatı önceden teyit edin.",
-    "myVerifyNote": "Belge doğrulaması yakında açılacak. O zamana kadar işletmeniz \"Doğrulanmadı\" etiketiyle listelenir.",
+    "myVerifyNote": "İşletmenizi kaydettikten sonra düzenleme ekranından doğrulama isteyebilirsiniz. Doğrulanana kadar \"Doğrulanmadı\" etiketiyle listelenir.",
     "servicesLabel": "Hizmetler",
     "hoursLabel": "Çalışma saatleri",
     "addressLabel": "Adres",
@@ -275,7 +275,16 @@
     "removedNote": "Bu işletme yönetim tarafından yayından kaldırıldı. Bilgi için CityJoy ile iletişime geçin.",
     "priceListTitle": "Fiyat listesi",
     "removeService": "Kaldır",
-    "duplicatePhone": "Bu telefon numarasıyla kayıtlı bir işletme zaten var. İşletme sizinse CityJoy ile iletişime geçin."
+    "duplicatePhone": "Bu telefon numarasıyla kayıtlı bir işletme zaten var. İşletme sizinse CityJoy ile iletişime geçin.",
+    "verifyTitle": "Doğrulama",
+    "verifyIntro": "Doğrulanmış işletmeler listede önce gelir ve \"Belgeleri doğrulandı\" etiketi alır. İsteğiniz önce ilinizin yöneticisine, sonra CityJoy'a gider; sizinle telefonla ya da görüntülü görüşmeyle iletişime geçilebilir.",
+    "verifyRequest": "Doğrulama iste",
+    "verifyPendingFirst": "İsteğiniz alındı, il yöneticisinin incelemesini bekliyor.",
+    "verifyPendingAdmin": "İl yöneticisi onayladı, CityJoy'un son onayını bekliyor.",
+    "verifyRejected": "İsteğiniz reddedildi. Gerekçe: {{reason}}",
+    "verifyAgain": "Yeniden iste",
+    "verifyCancel": "İsteği geri çek",
+    "verifyDone": "İşletmeniz doğrulandı."
   },
   "reviews": {
     "title": "Değerlendirmeler",

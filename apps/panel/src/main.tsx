@@ -4,6 +4,7 @@ import { createHashRouter, Navigate, RouterProvider } from 'react-router';
 
 import { Shell } from './components/shell';
 import { SessionProvider, useSession } from './lib/session';
+import { ApprovalsPage } from './pages/approvals-page';
 import { AuditLogPage } from './pages/audit-log-page';
 import { BusinessesPage } from './pages/businesses-page';
 import { CityGuidePage } from './pages/city-guide-page';
@@ -44,6 +45,7 @@ const router = createHashRouter([
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
+      { path: 'onaylar', element: <ApprovalsPage /> },
       { path: 'sehir-rehberi', element: <CityGuidePage /> },
       { path: 'kurumlar', element: <OrganizationsPage /> },
       { path: 'yetkiler', element: <GrantsPage /> },

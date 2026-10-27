@@ -11,6 +11,7 @@ import {
   createFirestoreProfileRepository,
   createFirestoreReviewRepository,
   createFirestoreServiceCategoryRepository,
+  createVerificationRequests,
   submitServiceSuggestion,
 } from '@cityjoy/shared/firebase';
 import { Platform } from 'react-native';
@@ -27,6 +28,8 @@ export const occupationRepository = createFirestoreOccupationRepository(firestor
 export const emergencyNumbers = createEmergencyNumberStore(createFirestoreEmergencyNumberRepository(firestore), deviceStorage);
 export const businessRepository = createFirestoreBusinessRepository(firestore);
 export const reviewRepository = createFirestoreReviewRepository(firestore);
+/** İşletme doğrulama isteği: önce il yöneticisi, sonra admin onaylar (PROJE.md 6.5). */
+export const verificationRequests = createVerificationRequests(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);
 export const sosRepository = createFirestoreSosRepository(firestore);
 export const pushTokenRepository = createFirestorePushTokenRepository(firestore);

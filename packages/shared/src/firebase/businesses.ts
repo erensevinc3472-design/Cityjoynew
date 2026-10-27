@@ -26,6 +26,7 @@ import {
 } from '../business/business';
 import type { MembershipTier } from '../models/membership';
 import type { Action, Module } from '../permissions/types';
+import { deleteVerificationRequest } from './approvals';
 
 const COLLECTION = 'businesses';
 
@@ -129,7 +130,7 @@ export class DuplicateBusinessError extends Error {
   }
 }
 
-/** İşletme, telefon kaydı ve değerlendirmeleri birlikte silinir (KVKK; yorumlar sahipsiz kalmaz). */
+/** İşletme, telefon kaydı, değerlendirmeleri ve doğrulama isteği birlikte silinir (KVKK; yorumlar sahipsiz kalmaz). */
 async function deleteBusiness(db: Firestore, id: string) {
   const ref = doc(db, COLLECTION, id);
   const snap = await getDoc(ref);
@@ -142,6 +143,7 @@ async function deleteBusiness(db: Firestore, id: string) {
     const claim = await getDoc(phoneDoc(db, phone));
     if (claim.exists() && claim.get('businessId') === id) batch.delete(claim.ref);
   }
+  await deleteVerificationRequest(db, batch, id);
   batch.delete(ref);
   await batch.commit();
 }

@@ -12,7 +12,7 @@ export const MENU: { module: Module; path?: string }[] = [
   { module: 'acil-numaralar', path: '/acil-numaralar' },
   { module: 'hizmet-kategorileri', path: '/hizmet-kategorileri' },
   { module: 'sos', path: '/sos-ayarlari' },
-  { module: 'onaylar' },
+  { module: 'onaylar', path: '/onaylar' },
   { module: 'sehir-rehberi', path: '/sehir-rehberi' },
   { module: 'kurumlar', path: '/kurumlar' },
   { module: 'yetkiler', path: '/yetkiler' },

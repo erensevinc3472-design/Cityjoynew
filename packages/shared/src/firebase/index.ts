@@ -36,3 +36,9 @@ export {
   type OrganizationInput,
 } from './organizations';
 export { CITY_PACK_SIZE, createCityGuideAdmin, createFirestoreCityGuideRepository } from './city-guide';
+export {
+  createApprovalAdmin,
+  createVerificationRequests,
+  type ApprovalActor,
+  type TrustedApproverInput,
+} from './approvals';

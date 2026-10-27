@@ -266,7 +266,7 @@
     "notFound": "This business was not found or is not published.",
     "listError": "Could not load businesses.",
     "unverifiedWarning": "Be careful with unverified businesses; confirm identity and price in advance.",
-    "myVerifyNote": "Document verification will open soon. Until then your business is listed as \"Not verified\".",
+    "myVerifyNote": "After saving your business you can request verification from its edit screen. Until verified it is listed as \"Not verified\".",
     "servicesLabel": "Services",
     "hoursLabel": "Opening hours",
     "addressLabel": "Address",
@@ -275,7 +275,16 @@
     "removedNote": "This business was removed by CityJoy. Contact CityJoy for details.",
     "priceListTitle": "Price list",
     "removeService": "Remove",
-    "duplicatePhone": "A business with this phone number is already registered. If it's yours, contact CityJoy."
+    "duplicatePhone": "A business with this phone number is already registered. If it's yours, contact CityJoy.",
+    "verifyTitle": "Verification",
+    "verifyIntro": "Verified businesses come first in lists and get the \"Documents verified\" label. Your request goes to your province manager first, then to CityJoy; you may be contacted by phone or video call.",
+    "verifyRequest": "Request verification",
+    "verifyPendingFirst": "Request received, waiting for the province manager's review.",
+    "verifyPendingAdmin": "Approved by the province manager, waiting for CityJoy's final approval.",
+    "verifyRejected": "Your request was declined. Reason: {{reason}}",
+    "verifyAgain": "Request again",
+    "verifyCancel": "Withdraw request",
+    "verifyDone": "Your business is verified."
   },
   "reviews": {
     "title": "Reviews",
