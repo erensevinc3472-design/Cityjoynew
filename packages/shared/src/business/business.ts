@@ -44,7 +44,8 @@ export interface Business extends BusinessInput {
   membership: { tier: MembershipTier; endsAt?: string };
   /** Ücretli öne çıkma bitişi (ISO); kartta "Reklam" etiketi çıkar. */
   featuredUntil?: string;
-  rating: { avg: number; count: number };
+  /** Yayındaki değerlendirmelerin yıldız toplamı ve sayısı; ortalama hesaplanır (kurallar toplamı denetler). */
+  rating: { sum: number; count: number };
   /** ISO tarihler. */
   createdAt: string;
   updatedAt: string;
@@ -120,6 +121,11 @@ export function whatsappUrl(phone: string): string {
   return `https://wa.me/${internationalPhone(phone)}`;
 }
 
+/** Yıldız ortalaması (değerlendirme yoksa 0). */
+export function averageRating(r: { sum: number; count: number }): number {
+  return r.count ? Math.round((r.sum / r.count) * 10) / 10 : 0;
+}
+
 /** En fazla kaç "Reklam" etiketli kart üstte durur (Karar, Eren). */
 export const MAX_FEATURED = 2;
 /** Puan hesabında az yorumlu işletmeyi ortalamaya çeken ağırlık. */
@@ -130,8 +136,8 @@ const PRIOR_AVG = 4;
  * Yorum sayısını hesaba katan puan: 1 yorumla 5 yıldız, 200 yorumla 4,8'in önüne geçemez.
  * Sıralamada eşitlik oluşsun diye 0,1'e yuvarlanır (sonra yakınlık ve güncellik devreye girer).
  */
-export function weightedRating(r: { avg: number; count: number }): number {
-  const score = (PRIOR_AVG * PRIOR_COUNT + r.avg * r.count) / (PRIOR_COUNT + r.count);
+export function weightedRating(r: { sum: number; count: number }): number {
+  const score = (PRIOR_AVG * PRIOR_COUNT + r.sum) / (PRIOR_COUNT + r.count);
   return Math.round(score * 10) / 10;
 }
 

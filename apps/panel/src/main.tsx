@@ -8,6 +8,7 @@ import { BusinessesPage } from './pages/businesses-page';
 import { EmergencyNumbersPage } from './pages/emergency-numbers-page';
 import { LocationsPage } from './pages/locations-page';
 import { LoginPage } from './pages/login-page';
+import { ModerationPage } from './pages/moderation-page';
 import { OccupationsPage } from './pages/occupations-page';
 import { ServiceCategoriesPage } from './pages/service-categories-page';
 import { OverviewPage } from './pages/overview-page';
@@ -36,6 +37,7 @@ const router = createHashRouter([
       { path: 'acil-numaralar', element: <EmergencyNumbersPage /> },
       { path: 'hizmet-kategorileri', element: <ServiceCategoriesPage /> },
       { path: 'isletmeler', element: <BusinessesPage /> },
+      { path: 'moderasyon', element: <ModerationPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },

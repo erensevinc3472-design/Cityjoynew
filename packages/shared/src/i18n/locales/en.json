@@ -272,6 +272,43 @@
     "chooseLocation": "Choose location",
     "removedNote": "This business was removed by CityJoy. Contact CityJoy for details.",
     "priceListTitle": "Price list",
-    "removeService": "Remove"
+    "removeService": "Remove",
+    "duplicatePhone": "A business with this phone number is already registered. If it's yours, contact CityJoy."
+  },
+  "reviews": {
+    "title": "Reviews",
+    "write": "Write a review",
+    "edit": "Edit your review",
+    "needContact": "To write a review, first call the business or message it on WhatsApp from the app.",
+    "signIn": "Sign in to write a review.",
+    "ownBusiness": "You can't review your own business.",
+    "none": "No reviews yet.",
+    "starsLabel": "Your rating",
+    "star": "{{count}} stars",
+    "textLabel": "Your experience",
+    "textHint": "10-500 characters. Describe what happened; don't accuse people or include personal details such as phone numbers or addresses.",
+    "send": "Send",
+    "saved": "Your review has been saved.",
+    "delete": "Delete my review",
+    "error": "Could not save. Check your connection and try again.",
+    "starsRequired": "Choose a rating.",
+    "textInvalid": "Describe your experience in 10-500 characters.",
+    "reply": "Reply",
+    "replyFrom": "Reply from the business",
+    "replySend": "Send reply",
+    "replyLabel": "Your reply (2-500 characters)",
+    "report": "Report",
+    "reportTitle": "Why are you reporting this?",
+    "reasons": {
+      "hakaret": "Insult or defamation",
+      "sahte": "Fake review",
+      "kisisel-veri": "Contains personal information",
+      "alakasiz": "Not about this business",
+      "diger": "Other"
+    },
+    "reported": "Your report has been sent. Thank you.",
+    "hiddenNote": "This review of yours was hidden by CityJoy.",
+    "cancel": "Cancel",
+    "rules": "Only people who called the business or messaged it on WhatsApp from the app can review it. One review per person."
   }
 }

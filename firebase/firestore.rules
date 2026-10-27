@@ -199,8 +199,42 @@ service cloud.firestore {
               'description', 'priceList'];
     }
 
+    function businessPath(id) {
+      return /databases/$(database)/documents/businesses/$(id);
+    }
+
+    function phoneClaimedBy(phone, id) {
+      return existsAfter(/databases/$(database)/documents/businessPhones/$(phone))
+        && getAfter(/databases/$(database)/documents/businessPhones/$(phone)).data.businessId == id;
+    }
+
+    function myReviewPath(bid) {
+      return /databases/$(database)/documents/businesses/$(bid)/reviews/$(request.auth.uid);
+    }
+
+    // Yayındaki değerlendirmenin yıldızı ve sayısı (gizlenen sayılmaz), yazımdan önce ve sonra.
+    function starsBefore(bid) {
+      return exists(myReviewPath(bid)) && get(myReviewPath(bid)).data.status == 'yayinda' ? get(myReviewPath(bid)).data.stars : 0;
+    }
+    function countBefore(bid) {
+      return exists(myReviewPath(bid)) && get(myReviewPath(bid)).data.status == 'yayinda' ? 1 : 0;
+    }
+    function starsAfter(bid) {
+      return existsAfter(myReviewPath(bid)) && getAfter(myReviewPath(bid)).data.status == 'yayinda' ? getAfter(myReviewPath(bid)).data.stars : 0;
+    }
+    function countAfter(bid) {
+      return existsAfter(myReviewPath(bid)) && getAfter(myReviewPath(bid)).data.status == 'yayinda' ? 1 : 0;
+    }
+
+    function ratingChangeValid(bid) {
+      return request.resource.data.rating.keys().hasOnly(['sum', 'count'])
+        && request.resource.data.rating.sum == resource.data.rating.sum - starsBefore(bid) + starsAfter(bid)
+        && request.resource.data.rating.count == resource.data.rating.count - countBefore(bid) + countAfter(bid);
+    }
+
     match /businesses/{id} {
-      allow read: if resource.data.status == 'yayinda' || isSelf(resource.data.ownerUid) || isAdmin();
+      // Olmayan belgeyi okumak ("var mı?" sorusu) reddedilmez; içerik yoksa sızacak bilgi de yoktur.
+      allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(resource.data.ownerUid) || isAdmin();
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(businessContentKeys().concat(
              ['ownerUid', 'status', 'verification', 'membership', 'rating', 'createdAt', 'updatedAt']))
@@ -209,7 +243,9 @@ service cloud.firestore {
         && request.resource.data.status == 'yayinda'
         && request.resource.data.verification == {'status': 'dogrulanmadi'}
         && request.resource.data.membership == {'tier': 'ucretsiz'}
-        && request.resource.data.rating == {'avg': 0, 'count': 0}
+        && request.resource.data.rating == {'sum': 0, 'count': 0}
+        // Aynı telefonla ikinci işletme açılamaz: telefon kaydı aynı toplu yazımda bu işletmeye bağlanır.
+        && phoneClaimedBy(request.resource.data.phone, id)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
       // Sahibi: yalnızca kendi bilgileri ve gizle/yayınla. Yönetimin kaldırdığı işletmeyi açamaz.
@@ -218,15 +254,118 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(businessContentKeys().concat(['status', 'updatedAt']))
         && validBusinessContent(request.resource.data)
         && request.resource.data.status in ['yayinda', 'gizli']
+        && (request.resource.data.phone == resource.data.phone || phoneClaimedBy(request.resource.data.phone, id))
         && request.resource.data.updatedAt == request.time;
+      // Değerlendirme yazan kişi: yalnızca yıldız toplamı, tam olarak kendi değerlendirmesi kadar değişir.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating'])
+        && ratingChangeValid(id);
       // Yönetim (admin): doğrulama, kaldırma, kademe, öne çıkma. İşletmenin bilgilerini değiştiremez.
       allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'verification', 'membership', 'featuredUntil'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'verification', 'membership', 'featuredUntil', 'rating'])
         && request.resource.data.status in ['yayinda', 'gizli', 'kaldirildi']
         && request.resource.data.verification.status in ['dogrulanmadi', 'inceleniyor', 'dogrulandi']
         && request.resource.data.membership.tier in ['ucretsiz', 'standart', 'pro', 'premium'];
       // Sahibi silebilir (hesap silmede de kullanılır, KVKK).
       allow delete: if isSelf(resource.data.ownerUid);
+    }
+
+    // Telefon kaydı: bir telefon tek işletmeye bağlıdır. Kart zaten telefonu gösterdiği için okunabilir (tekil).
+    match /businessPhones/{phone} {
+      allow get: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['businessId', 'ownerUid'])
+        && request.resource.data.ownerUid == request.auth.uid
+        && existsAfter(businessPath(request.resource.data.businessId))
+        && getAfter(businessPath(request.resource.data.businessId)).data.ownerUid == request.auth.uid
+        && getAfter(businessPath(request.resource.data.businessId)).data.phone == phone;
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid
+        && (!existsAfter(businessPath(resource.data.businessId))
+            || getAfter(businessPath(resource.data.businessId)).data.phone != phone);
+      allow update: if false;
+    }
+
+    // Uygulamadan arama / WhatsApp kaydı: değerlendirme yazabilmenin şartı. Yalnızca sahibi görür.
+    match /contacts/{id} {
+      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'businessId', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && id == request.resource.data.businessId + '_' + request.auth.uid
+        && request.resource.data.at == request.time;
+      allow update: if false;
+    }
+
+    // İşletme değerlendirmeleri (belge kimliği = yazanın kimliği: kişi başına bir değerlendirme).
+    match /businesses/{bid}/reviews/{uid} {
+      function biz() {
+        return get(businessPath(bid)).data;
+      }
+      function validReview(d) {
+        return d.stars is int && d.stars >= 1 && d.stars <= 5
+          && d.text is string && d.text.size() >= 10 && d.text.size() <= 500;
+      }
+      function ratingWrittenTogether() {
+        return existsAfter(businessPath(bid)) && getAfter(businessPath(bid)).data.rating != biz().rating;
+      }
+
+      allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(uid) || isAdmin()
+        || (signedIn() && biz().ownerUid == request.auth.uid);
+      allow create: if isSelf(uid)
+        && biz().status == 'yayinda' && biz().ownerUid != uid
+        && exists(/databases/$(database)/documents/contacts/$(bid + '_' + uid))
+        && request.resource.data.keys().hasOnly(['uid', 'stars', 'text', 'authorName', 'status', 'createdAt', 'updatedAt'])
+        && request.resource.data.uid == uid
+        && validReview(request.resource.data)
+        && request.resource.data.authorName is string && request.resource.data.authorName.size() <= 40
+        && request.resource.data.status == 'yayinda'
+        && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time
+        && ratingWrittenTogether();
+      // Yazan: yıldız ve metni değiştirir (gizlenen yorumu değiştiremez); puan toplamı birlikte güncellenir.
+      allow update: if isSelf(uid) && resource.data.status == 'yayinda'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stars', 'text', 'updatedAt'])
+        && validReview(request.resource.data)
+        && request.resource.data.updatedAt == request.time
+        && (request.resource.data.stars == resource.data.stars || ratingWrittenTogether());
+      // İşletme sahibinin cevabı.
+      allow update: if signedIn() && biz().ownerUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reply'])
+        && request.resource.data.reply.keys().hasOnly(['text', 'at'])
+        && request.resource.data.reply.text is string
+        && request.resource.data.reply.text.size() >= 2 && request.resource.data.reply.text.size() <= 500
+        && request.resource.data.reply.at == request.time;
+      // Yönetim: gizle / geri aç (puan aynı işlemde düzeltilir).
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'moderatedBy', 'moderatedAt'])
+        && request.resource.data.status in ['yayinda', 'gizlendi'];
+      // Yazan siler (yayındaysa puan birlikte düşer); işletme silinirken sahibi tüm yorumları siler.
+      allow delete: if (isSelf(uid)
+            && (!exists(businessPath(bid)) || resource.data.status != 'yayinda' || !existsAfter(businessPath(bid))
+                || getAfter(businessPath(bid)).data.rating.count == biz().rating.count - 1))
+        || (signedIn() && exists(businessPath(bid)) && biz().ownerUid == request.auth.uid && !existsAfter(businessPath(bid)));
+    }
+
+    // Hesap silmede kullanıcının tüm değerlendirmelerini bulmak için (yalnızca kendi yorumları).
+    match /{path=**}/reviews/{rid} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // Değerlendirme şikâyetleri: kişi başına yorum başına bir şikâyet; admin inceler.
+    match /reviewReports/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['businessId', 'reviewUid', 'reporterUid', 'reason', 'status', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.reviewUid != request.auth.uid
+        && id == request.resource.data.businessId + '_' + request.resource.data.reviewUid + '_' + request.auth.uid
+        && request.resource.data.reason in ['hakaret', 'sahte', 'kisisel-veri', 'alakasiz', 'diger']
+        && request.resource.data.status == 'yeni'
+        && request.resource.data.createdAt == request.time;
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'incelendi';
+      allow delete: if false;
     }
 
     match /admins/{uid} {

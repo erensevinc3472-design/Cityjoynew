@@ -20,8 +20,9 @@ import { OptionRow } from '@/components/option-row';
 import { CategoryPicker, RegionPicker } from '@/components/pickers';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
+import { goBackOr } from '@/lib/navigation';
 import { useServiceCategories } from '@/lib/service-categories';
-import { businessRepository } from '@/lib/services';
+import { businessRepository, DuplicateBusinessError } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useUserLocation } from '@/lib/user-location';
 import { spacing } from '@/theme/tokens';
@@ -115,9 +116,9 @@ export default function EditBusinessScreen() {
     try {
       if (existing) await businessRepository.update(existing.id, input);
       else await businessRepository.create(user.uid, input);
-      router.back();
-    } catch {
-      setMessage({ kind: 'error', text: t('business.saveError') });
+      goBackOr(router, '/business');
+    } catch (e) {
+      setMessage({ kind: 'error', text: e instanceof DuplicateBusinessError ? t('business.duplicatePhone') : t('business.saveError') });
     } finally {
       setBusy(false);
     }
@@ -195,14 +196,14 @@ export default function EditBusinessScreen() {
           variant="secondary"
           title={existing.status === 'gizli' ? t('business.show') : t('business.hide')}
           disabled={busy}
-          onPress={() => run(() => businessRepository.setHidden(existing.id, existing.status !== 'gizli'), () => router.back())}
+          onPress={() => run(() => businessRepository.setHidden(existing.id, existing.status !== 'gizli'), () => goBackOr(router, '/business'))}
         />
       ) : null}
       {existing ? (
         confirmDelete ? (
           <View style={styles.confirm}>
             <FormMessage kind="error" text={t('business.deleteConfirm')} />
-            <AppButton title={t('business.deleteYes')} disabled={busy} onPress={() => run(() => businessRepository.delete(existing.id), () => router.back())} />
+            <AppButton title={t('business.deleteYes')} disabled={busy} onPress={() => run(() => businessRepository.delete(existing.id), () => goBackOr(router, '/business'))} />
           </View>
         ) : (
           <AppButton variant="ghost" title={t('business.delete')} onPress={() => setConfirmDelete(true)} />

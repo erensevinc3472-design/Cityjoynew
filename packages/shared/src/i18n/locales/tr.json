@@ -272,6 +272,43 @@
     "chooseLocation": "Konum seç",
     "removedNote": "Bu işletme yönetim tarafından yayından kaldırıldı. Bilgi için CityJoy ile iletişime geçin.",
     "priceListTitle": "Fiyat listesi",
-    "removeService": "Kaldır"
+    "removeService": "Kaldır",
+    "duplicatePhone": "Bu telefon numarasıyla kayıtlı bir işletme zaten var. İşletme sizinse CityJoy ile iletişime geçin."
+  },
+  "reviews": {
+    "title": "Değerlendirmeler",
+    "write": "Değerlendir",
+    "edit": "Değerlendirmeni düzenle",
+    "needContact": "Değerlendirme yazmak için önce işletmeyi uygulamadan arayın ya da WhatsApp'tan yazın.",
+    "signIn": "Değerlendirme yazmak için giriş yapın.",
+    "ownBusiness": "Kendi işletmenizi değerlendiremezsiniz.",
+    "none": "Henüz değerlendirme yok.",
+    "starsLabel": "Puanınız",
+    "star": "{{count}} yıldız",
+    "textLabel": "Deneyiminiz",
+    "textHint": "10-500 karakter. Yaşadığınızı anlatın; kişileri suçlamayın, telefon ve adres gibi kişisel bilgi yazmayın.",
+    "send": "Gönder",
+    "saved": "Değerlendirmeniz kaydedildi.",
+    "delete": "Değerlendirmemi sil",
+    "error": "Kaydedilemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "starsRequired": "Bir puan seçin.",
+    "textInvalid": "Deneyiminizi 10-500 karakterle anlatın.",
+    "reply": "Cevap yaz",
+    "replyFrom": "İşletmenin cevabı",
+    "replySend": "Cevabı gönder",
+    "replyLabel": "Cevabınız (2-500 karakter)",
+    "report": "Şikâyet et",
+    "reportTitle": "Neden şikâyet ediyorsunuz?",
+    "reasons": {
+      "hakaret": "Hakaret veya iftira",
+      "sahte": "Sahte değerlendirme",
+      "kisisel-veri": "Kişisel bilgi içeriyor",
+      "alakasiz": "İşletmeyle ilgisi yok",
+      "diger": "Diğer"
+    },
+    "reported": "Şikâyetiniz iletildi. Teşekkürler.",
+    "hiddenNote": "Bu değerlendirmeniz yönetim tarafından gizlendi.",
+    "cancel": "Vazgeç",
+    "rules": "Değerlendirmeyi yalnızca işletmeyi uygulamadan arayan ya da WhatsApp'tan yazan kişiler yazabilir. Kişi başına bir değerlendirme."
   }
 }

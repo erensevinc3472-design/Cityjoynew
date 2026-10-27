@@ -272,6 +272,43 @@
     "chooseLocation": "Standort wählen",
     "removedNote": "Dieser Betrieb wurde von CityJoy entfernt. Wenden Sie sich für Details an CityJoy.",
     "priceListTitle": "Preisliste",
-    "removeService": "Entfernen"
+    "removeService": "Entfernen",
+    "duplicatePhone": "Mit dieser Telefonnummer ist bereits ein Betrieb eingetragen. Wenn es Ihrer ist, wenden Sie sich an CityJoy."
+  },
+  "reviews": {
+    "title": "Bewertungen",
+    "write": "Bewerten",
+    "edit": "Bewertung bearbeiten",
+    "needContact": "Um zu bewerten, rufen Sie den Betrieb zuerst über die App an oder schreiben Sie per WhatsApp.",
+    "signIn": "Melden Sie sich an, um zu bewerten.",
+    "ownBusiness": "Sie können Ihren eigenen Betrieb nicht bewerten.",
+    "none": "Noch keine Bewertungen.",
+    "starsLabel": "Ihre Bewertung",
+    "star": "{{count}} Sterne",
+    "textLabel": "Ihre Erfahrung",
+    "textHint": "10-500 Zeichen. Beschreiben Sie, was passiert ist; keine Beschuldigungen und keine persönlichen Daten wie Telefon oder Adresse.",
+    "send": "Senden",
+    "saved": "Ihre Bewertung wurde gespeichert.",
+    "delete": "Meine Bewertung löschen",
+    "error": "Speichern fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "starsRequired": "Wählen Sie eine Bewertung.",
+    "textInvalid": "Beschreiben Sie Ihre Erfahrung in 10-500 Zeichen.",
+    "reply": "Antworten",
+    "replyFrom": "Antwort des Betriebs",
+    "replySend": "Antwort senden",
+    "replyLabel": "Ihre Antwort (2-500 Zeichen)",
+    "report": "Melden",
+    "reportTitle": "Warum melden Sie das?",
+    "reasons": {
+      "hakaret": "Beleidigung oder Verleumdung",
+      "sahte": "Gefälschte Bewertung",
+      "kisisel-veri": "Enthält persönliche Daten",
+      "alakasiz": "Betrifft nicht diesen Betrieb",
+      "diger": "Sonstiges"
+    },
+    "reported": "Ihre Meldung wurde gesendet. Danke.",
+    "hiddenNote": "Diese Bewertung wurde von CityJoy ausgeblendet.",
+    "cancel": "Abbrechen",
+    "rules": "Nur wer den Betrieb über die App angerufen oder per WhatsApp angeschrieben hat, kann bewerten. Eine Bewertung pro Person."
   }
 }

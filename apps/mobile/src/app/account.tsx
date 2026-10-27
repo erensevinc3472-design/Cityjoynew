@@ -11,7 +11,7 @@ import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
-import { authService, businessRepository, profileRepository } from '@/lib/services';
+import { authService, businessRepository, profileRepository, reviewRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings, type ThemeMode } from '@/lib/settings';
 import { restartFlow } from '@/lib/navigation';
@@ -45,8 +45,9 @@ export default function AccountScreen() {
     setError(undefined);
     setBusy(true);
     try {
-      // Kullanıcının işletmeleri de silinir (KVKK); sonra profil, en son hesap.
+      // Kullanıcının değerlendirmeleri ve işletmeleri de silinir (KVKK); sonra profil, en son hesap.
       await authService.deleteAccountAndData(password || undefined, async (uid) => {
+        await reviewRepository.deleteAllBy(uid);
         await businessRepository.deleteAllOf(uid);
         await profileRepository.delete(uid);
       });

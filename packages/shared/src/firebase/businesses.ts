@@ -1,7 +1,5 @@
 import {
-  addDoc,
   collection,
-  deleteDoc,
   deleteField,
   doc,
   getDoc,
@@ -40,7 +38,7 @@ function fromDoc(id: string, d: DocumentData): Business {
     verification: { status: d.verification?.status ?? 'dogrulanmadi', ...(iso(d.verification?.verifiedAt) ? { verifiedAt: iso(d.verification.verifiedAt) } : {}) },
     membership: { tier: d.membership?.tier ?? 'ucretsiz', ...(iso(d.membership?.endsAt) ? { endsAt: iso(d.membership.endsAt) } : {}) },
     featuredUntil: iso(d.featuredUntil),
-    rating: d.rating ?? { avg: 0, count: 0 },
+    rating: { sum: d.rating?.sum ?? 0, count: d.rating?.count ?? 0 },
     createdAt: iso(d.createdAt) ?? '',
     // Sunucu zaman damgası henüz yazılmadıysa (yerel önbellek) şimdiki zaman sayılır.
     updatedAt: iso(d.updatedAt) ?? new Date().toISOString(),
@@ -63,40 +61,89 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
 
     listMine: (uid) => list(where('ownerUid', '==', uid)),
 
+    // İşletme ve telefon kaydı aynı toplu yazımda: aynı telefonla ikinci işletme açılamaz (PROJE.md 5.7).
     async create(uid, input) {
-      const ref = await addDoc(collection(db, COLLECTION), {
-        ...cleanBusinessInput(input),
+      const clean = cleanBusinessInput(input);
+      const ref = doc(collection(db, COLLECTION));
+      const batch = writeBatch(db);
+      batch.set(ref, {
+        ...clean,
         ownerUid: uid,
         status: 'yayinda',
         verification: { status: 'dogrulanmadi' },
         membership: { tier: 'ucretsiz' },
-        rating: { avg: 0, count: 0 },
+        rating: { sum: 0, count: 0 },
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+      batch.set(phoneDoc(db, clean.phone), { businessId: ref.id, ownerUid: uid });
+      await commitOrDuplicate(db, batch, clean.phone, ref.id);
       return ref.id;
     },
 
     async update(id, input) {
       const clean = cleanBusinessInput(input);
+      const before = await getDoc(doc(db, COLLECTION, id));
+      const oldPhone = before.get('phone') as string | undefined;
       // Boşaltılan isteğe bağlı alanlar silinir.
       const removed = Object.fromEntries((['address', 'hoursNote', 'description'] as const).filter((k) => !(k in clean)).map((k) => [k, deleteField()]));
-      await updateDoc(doc(db, COLLECTION, id), { ...clean, location: clean.location, ...removed, updatedAt: serverTimestamp() });
+      const batch = writeBatch(db);
+      batch.update(doc(db, COLLECTION, id), { ...clean, location: clean.location, ...removed, updatedAt: serverTimestamp() });
+      if (oldPhone !== clean.phone) {
+        batch.set(phoneDoc(db, clean.phone), { businessId: id, ownerUid: before.get('ownerUid') });
+        if (oldPhone) batch.delete(phoneDoc(db, oldPhone));
+      }
+      await commitOrDuplicate(db, batch, clean.phone, id);
     },
 
     async setHidden(id, hidden) {
       await updateDoc(doc(db, COLLECTION, id), { status: hidden ? 'gizli' : 'yayinda', updatedAt: serverTimestamp() });
     },
 
-    async delete(id) {
-      await deleteDoc(doc(db, COLLECTION, id));
-    },
+    delete: (id) => deleteBusiness(db, id),
 
     async deleteAllOf(uid) {
       const snap = await getDocs(query(collection(db, COLLECTION), where('ownerUid', '==', uid)));
-      await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+      for (const d of snap.docs) await deleteBusiness(db, d.id);
     },
   };
+}
+
+const phoneDoc = (db: Firestore, phone: string) => doc(db, 'businessPhones', phone);
+
+/** Telefon başka bir işletmeye kayıtlıysa anlaşılır hata verir. */
+async function commitOrDuplicate(db: Firestore, batch: ReturnType<typeof writeBatch>, phone: string, businessId: string) {
+  try {
+    await batch.commit();
+  } catch (e) {
+    const claim = await getDoc(phoneDoc(db, phone)).catch(() => null);
+    if (claim?.exists() && claim.get('businessId') !== businessId) throw new DuplicateBusinessError();
+    throw e;
+  }
+}
+
+export class DuplicateBusinessError extends Error {
+  constructor() {
+    super('duplicate-phone');
+    this.name = 'DuplicateBusinessError';
+  }
+}
+
+/** İşletme, telefon kaydı ve değerlendirmeleri birlikte silinir (KVKK; yorumlar sahipsiz kalmaz). */
+async function deleteBusiness(db: Firestore, id: string) {
+  const ref = doc(db, COLLECTION, id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+  const reviews = await getDocs(collection(ref, 'reviews'));
+  const batch = writeBatch(db);
+  reviews.docs.forEach((r) => batch.delete(r.ref));
+  const phone = snap.get('phone') as string | undefined;
+  if (phone) {
+    const claim = await getDoc(phoneDoc(db, phone));
+    if (claim.exists() && claim.get('businessId') === id) batch.delete(claim.ref);
+  }
+  batch.delete(ref);
+  await batch.commit();
 }
 
 /**

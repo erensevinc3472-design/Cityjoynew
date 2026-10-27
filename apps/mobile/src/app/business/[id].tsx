@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState, type ComponentProps } from 'react';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useState, type ComponentProps } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { findCategory, localized, type Business } from '@cityjoy/shared';
@@ -8,6 +8,7 @@ import { findCategory, localized, type Business } from '@cityjoy/shared';
 import { AppText } from '@/components/app-text';
 import { ContactButtons, ratingText, verificationText } from '@/components/business-card';
 import { HeroHeader } from '@/components/hero-header';
+import { ReviewsSection } from '@/components/reviews-section';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { locationRepository } from '@/lib/locations';
@@ -34,11 +35,12 @@ export default function BusinessScreen() {
   const [b, setB] = useState<Business | null | undefined>(undefined);
   const [error, setError] = useState(false);
 
-  const load = () => {
+  const load = useCallback(() => {
     setError(false);
     businessRepository.get(id).then(setB).catch(() => setError(true));
-  };
-  useEffect(load, [id]);
+  }, [id]);
+  // Değerlendirme yazıp dönünce puan tazelenir.
+  useFocusEffect(load);
 
   const header = <HeroHeader title={b?.name ?? ''} onBack={() => (router.canGoBack() ? router.back() : router.replace('/urgent'))} />;
   if (error || b === null || (b && b.status !== 'yayinda')) {
@@ -101,6 +103,8 @@ export default function BusinessScreen() {
             <AppText variant="caption" muted>{t('business.priceNote')}</AppText>
           </View>
         ) : null}
+
+        <ReviewsSection business={b} />
 
         {!verified ? <AppText variant="caption" muted>{t('business.unverifiedWarning')}</AppText> : null}
         <AppText variant="caption" muted>{t('business.updated', { date: date(b.updatedAt) })}</AppText>

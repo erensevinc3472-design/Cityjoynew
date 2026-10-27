@@ -8,7 +8,7 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -175,15 +175,25 @@ describe('occupations, admins, auditLog', () => {
     };
     const fresh = (uid: string, over: Record<string, unknown> = {}) => ({
       ...content, ownerUid: uid, status: 'yayinda', verification: { status: 'dogrulanmadi' }, membership: { tier: 'ucretsiz' },
-      rating: { avg: 0, count: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...over,
+      rating: { sum: 0, count: 0 }, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...over,
     });
     await assertFails(setDoc(doc(db(), 'businesses/b1'), fresh('misafir')));
     await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('veli')));
     await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { verification: { status: 'dogrulandi' } })));
     await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { membership: { tier: 'premium' } })));
-    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { rating: { avg: 5, count: 100 } })));
+    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { rating: { sum: 500, count: 100 } })));
     await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { type: 'evden-uretim', address: 'Ev adresim' })));
-    await assertSucceeds(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali')));
+    // Telefon kaydı olmadan işletme açılamaz; telefon başkasınınsa da açılamaz.
+    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali')));
+    const create = (uid: string, id: string) => {
+      const f = db(uid);
+      const b = writeBatch(f);
+      b.set(doc(f, `businesses/${id}`), fresh(uid));
+      b.set(doc(f, 'businessPhones/05321234567'), { businessId: id, ownerUid: uid });
+      return b.commit();
+    };
+    await assertSucceeds(create('ali', 'b1'));
+    await assertFails(create('veli', 'b2'));
 
     await assertSucceeds(getDoc(doc(db(), 'businesses/b1')));
     await assertSucceeds(updateDoc(doc(db('ali'), 'businesses/b1'), { name: 'Ali Usta Tesisat', updatedAt: serverTimestamp() }));
@@ -202,7 +212,59 @@ describe('occupations, admins, auditLog', () => {
     await assertSucceeds(updateDoc(doc(db('eren'), 'businesses/b1'), { status: 'kaldirildi' }));
     await assertFails(updateDoc(doc(db('ali'), 'businesses/b1'), { status: 'yayinda', updatedAt: serverTimestamp() }));
     await assertFails(deleteDoc(doc(db('veli'), 'businesses/b1')));
-    await assertSucceeds(deleteDoc(doc(db('ali'), 'businesses/b1')));
+    const aliDb = db('ali');
+    const del = writeBatch(aliDb);
+    del.delete(doc(aliDb, 'businesses/b1'));
+    del.delete(doc(aliDb, 'businessPhones/05321234567'));
+    await assertSucceeds(del.commit());
+  });
+
+  it('değerlendirme: arama şartı, kişi başına bir, puan toplamı elle şişirilemez, sahibi kendine yazamaz', async () => {
+    await seed('businesses/b1', {
+      type: 'hizmet', name: 'Ali Tesisat', categoryIds: ['tesisatci'], location: { provinceCode: '16', districtId: '16-nilufer' },
+      phone: '05321234567', whatsapp: true, is24h: false, priceList: [], ownerUid: 'ali', status: 'yayinda',
+      verification: { status: 'dogrulanmadi' }, membership: { tier: 'ucretsiz' }, rating: { sum: 8, count: 2 },
+      createdAt: Timestamp.now(), updatedAt: Timestamp.now(),
+    });
+    const review = (stars: number) => ({ uid: 'ayse', stars, text: 'Zamanında geldi, temiz çalıştı.', authorName: 'Ayşe K.', status: 'yayinda', createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    const write = (uid: string, stars: number, rating: { sum: number; count: number }) => {
+      const f = db(uid);
+      const b = writeBatch(f);
+      b.set(doc(f, `businesses/b1/reviews/${uid}`), { ...review(stars), uid });
+      b.update(doc(f, 'businesses/b1'), { rating });
+      return b.commit();
+    };
+    // Henüz yorum yokken "var mı?" okuması reddedilmez.
+    await assertSucceeds(getDoc(doc(db('ayse'), 'businesses/b1/reviews/ayse')));
+    // Arama kaydı yoksa yazamaz.
+    await assertFails(write('ayse', 5, { sum: 13, count: 3 }));
+    await assertSucceeds(setDoc(doc(db('ayse'), 'contacts/b1_ayse'), { uid: 'ayse', businessId: 'b1', at: serverTimestamp() }));
+    await assertFails(setDoc(doc(db('ayse'), 'contacts/b1_veli'), { uid: 'ayse', businessId: 'b1', at: serverTimestamp() }));
+    // Puan toplamı yanlışsa ya da hiç güncellenmezse yazamaz.
+    await assertFails(write('ayse', 5, { sum: 50, count: 3 }));
+    await assertFails(setDoc(doc(db('ayse'), 'businesses/b1/reviews/ayse'), review(5)));
+    await assertSucceeds(write('ayse', 5, { sum: 13, count: 3 }));
+    // Puanı tek başına şişiremez.
+    await assertFails(updateDoc(doc(db('ayse'), 'businesses/b1'), { rating: { sum: 100, count: 3 } }));
+    // Sahibi kendine yazamaz (arama kaydı olsa bile).
+    await seed('contacts/b1_ali', { uid: 'ali', businessId: 'b1', at: Timestamp.now() });
+    await assertFails(write('ali', 5, { sum: 18, count: 4 }));
+    // Sahibi cevap yazar ama yıldızı değiştiremez.
+    await assertSucceeds(updateDoc(doc(db('ali'), 'businesses/b1/reviews/ayse'), { reply: { text: 'Teşekkürler!', at: serverTimestamp() } }));
+    await assertFails(updateDoc(doc(db('ali'), 'businesses/b1/reviews/ayse'), { stars: 1 }));
+    // Yazan siler, puan birlikte düşer.
+    const ayseDb = db('ayse');
+    const del = writeBatch(ayseDb);
+    del.delete(doc(ayseDb, 'businesses/b1/reviews/ayse'));
+    del.update(doc(ayseDb, 'businesses/b1'), { rating: { sum: 8, count: 2 } });
+    await assertFails(deleteDoc(doc(db('ayse'), 'businesses/b1/reviews/ayse')));
+    await assertSucceeds(del.commit());
+    // Şikâyet: kişi başına bir, kendi yorumunu şikâyet edemez.
+    const rep = (reporter: string, over: Record<string, unknown> = {}) => ({ businessId: 'b1', reviewUid: 'ayse', reporterUid: reporter, reason: 'hakaret', status: 'yeni', createdAt: serverTimestamp(), ...over });
+    await assertSucceeds(setDoc(doc(db('veli'), 'reviewReports/b1_ayse_veli'), rep('veli')));
+    await assertFails(setDoc(doc(db('veli'), 'reviewReports/baska'), rep('veli')));
+    await assertFails(setDoc(doc(db('ayse'), 'reviewReports/b1_ayse_ayse'), rep('ayse')));
+    await assertFails(getDoc(doc(db('veli'), 'reviewReports/b1_ayse_veli')));
   });
 
   it('admin listesine istemciden yazılamaz', async () => {

@@ -302,5 +302,41 @@
     "count": "{{count}} işletme (en yeni güncellenen 200).",
     "rankingNote": "Uygulamadaki sıralama: en çok 2 Reklam kartı, sonra doğrulanmış, puan (yorum sayısıyla), ilçe, güncellik.",
     "featureNeedsVerification": "Yalnızca doğrulanmış işletme öne çıkarılabilir."
+  },
+  "moderation": {
+    "title": "Moderasyon",
+    "intro": "Kullanıcıların \"Şikâyet et\" düğmesiyle bildirdiği işletme değerlendirmeleri (son 100). Gizlenen değerlendirme uygulamada görünmez ve işletme puanından düşer.",
+    "readOnly": "Bu sayfada değişikliği şimdilik yalnızca admin yapabilir.",
+    "demoReadOnly": "Örnek hesapla yalnızca görüntüleyebilirsiniz.",
+    "date": "Tarih",
+    "business": "İşletme",
+    "review": "Değerlendirme",
+    "reason": "Şikâyet nedeni",
+    "status": "Durum",
+    "actions": "İşlemler",
+    "reasons": {
+      "hakaret": "Hakaret veya iftira",
+      "sahte": "Sahte değerlendirme",
+      "kisisel-veri": "Kişisel bilgi içeriyor",
+      "alakasiz": "İşletmeyle ilgisi yok",
+      "diger": "Diğer"
+    },
+    "statuses": {
+      "yeni": "Yeni",
+      "incelendi": "İncelendi"
+    },
+    "hide": "Değerlendirmeyi gizle",
+    "unhide": "Yeniden yayınla",
+    "dismiss": "Şikâyeti reddet",
+    "hidden": "Gizlendi",
+    "deletedBusiness": "(işletme silinmiş)",
+    "deletedReview": "(değerlendirme silinmiş)",
+    "saved": "Kaydedildi.",
+    "error": "Kaydedilemedi. Yetkinizi ve bağlantınızı kontrol edin.",
+    "loadError": "Liste yüklenemedi.",
+    "retry": "Tekrar dene",
+    "loading": "Yükleniyor…",
+    "empty": "Şikâyet yok.",
+    "note": "Hakaret ve iftira şikâyetlerinde değerlendirmeyi gizlemeden önce metni okuyun: deneyim anlatımı serbest, kişiyi suçlama ve kişisel bilgi yasak. Her işlem işlem kaydına yazılır."
   }
 }

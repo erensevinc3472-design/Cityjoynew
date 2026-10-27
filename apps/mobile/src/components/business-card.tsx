@@ -3,9 +3,11 @@ import { useRouter } from 'expo-router';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { telUrl, whatsappUrl, type Business } from '@cityjoy/shared';
+import { averageRating, telUrl, whatsappUrl, type Business } from '@cityjoy/shared';
 
 import { locationRepository } from '@/lib/locations';
+import { reviewRepository } from '@/lib/services';
+import { useSession } from '@/lib/session';
 import { MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
@@ -23,7 +25,7 @@ export function verificationText(b: Business, t: TFunction, language: string): s
 
 export function ratingText(b: Business, t: TFunction, language: string): string {
   return b.rating.count
-    ? t('business.rating', { avg: b.rating.avg.toLocaleString(language, { maximumFractionDigits: 1 }), count: b.rating.count })
+    ? t('business.rating', { avg: averageRating(b.rating).toLocaleString(language, { maximumFractionDigits: 1 }), count: b.rating.count })
     : t('business.noReviews');
 }
 
@@ -70,7 +72,12 @@ export function BusinessCard({ business: b, featured }: { business: Business; fe
 export function ContactButtons({ business: b }: { business: Business }) {
   const { t } = useTranslation();
   const c = useThemeColors();
-  const open = (url: string) => Linking.openURL(url).catch(() => {});
+  const { user } = useSession();
+  // Giriş yapmış kişinin araması kaydedilir: değerlendirme yazabilmenin şartı (PROJE.md 13 madde 17).
+  const open = (url: string) => {
+    if (user && user.uid !== b.ownerUid) reviewRepository.recordContact(b.id, user.uid).catch(() => {});
+    Linking.openURL(url).catch(() => {});
+  };
   const buttons = [
     { key: 'call', icon: 'call' as const, label: t('business.call'), a11y: t('business.callLabel', { name: b.name }), url: telUrl(b.phone) },
     ...(b.whatsapp

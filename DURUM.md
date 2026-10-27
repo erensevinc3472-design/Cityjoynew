@@ -34,8 +34,8 @@ Son güncelleme: 27 Ekim 2026.
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (34)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (20; Java gerekir)
+npm test                      # ortak paket testleri (37)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (22; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -96,6 +96,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    öne çıkmayı değiştiremez; admin işletme bilgisini değiştiremez. Hesap silinince işletmeler de silinir. Firestore bileşik
    dizinleri `firebase/firestore.indexes.json` içinde. Emülatörde baştan sona denendi (açık, koyu, Arapça).
 
+12. **İşletme ekle, 2. parça: değerlendirmeler ve tekrar kaydı engeli.** İşletme sayfasında Değerlendirmeler: ortalama,
+   son 30 yorum ("Ayşe K." biçiminde ad), işletmenin cevabı, "Şikâyet et" (5 neden). Değerlendirmeyi yalnızca giriş yapmış ve
+   işletmeyi uygulamadan arayan / WhatsApp'tan yazan kişi yazar (`contacts` kaydı), kişi başına bir (düzenle/sil), sahibi
+   kendine yazamaz. Puan `rating {sum, count}` olarak tutulur; değerlendirmeyle aynı işlemde güncellenir ve kurallar toplamın
+   tam o yorum kadar değiştiğini denetler (Blaze/sunucu işlevi gerekmeden puan şişirilemez). Panel > Moderasyon: şikâyetler,
+   "Değerlendirmeyi gizle / yeniden yayınla" (puan birlikte düzelir), "Şikâyeti reddet", işlem kaydı. Aynı telefonla ikinci
+   işletme açılamaz (`businessPhones`). İşletme silinince yorumları, hesap silinince kullanıcının yorumları ve arama kayıtları
+   silinir. Çok satırlı metin kutuları büyütüldü; doğrudan açılan ekranlarda "Kaydet" sonrası geri dönüş düzeltildi.
+   Emülatörde baştan sona denendi.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Yetkiyi yalnızca admin verir; il yöneticisi talep açar (6, 6.5).
@@ -106,6 +116,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Kurum kendi personeline sınırlar içinde görev verir (kurum yöneticisi); belediye paneli 18. madde ilk sürümde (6.6).
 - Görsel yön: koyu A, açık C (17).
 - Hizmet listesi sıralaması (5.6): Reklam en çok 2 ve yalnızca doğrulanmış; sonra doğrulanmış, puan, ilçe, güncellik.
+- Değerlendirme kuralları (5.6, Eren "gerekeni yap" dedi): uygulamadan arama şartı, kişi başına bir, cevap hakkı, şikâyet ve gizleme.
 
 ## Açık işler ve bilinen eksikler
 
@@ -120,9 +131,13 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   taksi durağı. Hizmetlerde işletme listesi İşletmem (5.7) ile gelecek.
 - Hizmet önerileri: şimdilik yalnızca admin görür (il yöneticisi yetki kayıtları gelince kendi ilini görecek). Günlük gönderim
   sınırı ve hesap silinince kullanıcının önerilerinin silinmesi sunucu işleviyle eklenecek (Blaze plan gerektirir).
-- **Dizinler Firebase'e yüklenmedi:** `firebase/firestore.indexes.json` (işletme listesi sorguları için). Gerçek projede
+- **Dizinler Firebase'e yüklenmedi:** `firebase/firestore.indexes.json` (işletme listesi, değerlendirme listesi, hesap
+  silmede kullanıcının yorumlarını bulma). Gerçek projede
   kurallarla birlikte yüklenmeli; yüklenmezse hizmet listesi açılmaz. Konsoldan yüklemek zahmetli: `firebase deploy` için
   dağıtım anahtarı ya da Eren'in bilgisayarından tek komut gerekir (Eren'e sade anlatılacak).
+- Değerlendirme: şikâyet sayısı eşiğinde otomatik geçici gizleme ve il yöneticisi kuyruğu, yasaklı kelime süzgeci, yorum
+  bildirimi (işletmeye "yeni değerlendirme") sonraki adımlarda. "Arama kaydı" kişisel veridir: aydınlatma metnine eklenecek
+  (avukat kontrolü). Aynı telefonla kayıtlı işletmenin "sahiplik talebi" akışı henüz yok (mesaj CityJoy ile iletişime yönlendiriyor).
 - İşletme: fotoğraf/video vitrini (kademeye göre kapasite; Firebase Storage Blaze ister), yorum ve puan verme, telefonla
   sahiplik doğrulaması (SMS, Blaze), belge yükleme ve ücretli doğrulama, aynı işletmenin ikinci kaydını engelleme, kategoriye
   özel alanlar (konaklama, yeme-içme...), mobil ustalar için hizmet verdiği ilçeler, "bilgileriniz hâlâ doğru mu?" hatırlatması,
@@ -136,10 +151,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
-1. İşletme ekle, 2. parça: yorum ve puan verme (kurallarıyla: kim yorum yazabilir, şikâyet, işletmenin cevabı) ve
-   aynı işletmenin ikinci kaydını engelleme.
-2. Nöbetçi eczane: Claude veri kaynağı ve günlük güncelleme için sade bir öneri hazırlayacak, Eren onaylayacak.
-3. SOS - Aileme haber ver: aile listesi (QR / davet bağlantısı / ID ile istek, karşılıklı onay).
+1. Nöbetçi eczane: Claude veri kaynağı ve günlük güncelleme için sade bir öneri hazırlayacak, Eren onaylayacak.
+2. SOS - Aileme haber ver: aile listesi (QR / davet bağlantısı / ID ile istek, karşılıklı onay).
+3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu ve fotoğraf vitrini (Firebase Storage; Blaze plan gerekir).
 4. Telefonda deneme sürümü (Expo hesabı, EAS) / paneli internete koyma (Firebase Hosting).
 
 ## PROJE.md bölümleri (gerektiğinde ilgili bölümü oku)

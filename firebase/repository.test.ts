@@ -6,6 +6,9 @@ import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/
 import { activeEmergencyNumbers, buildCategoryTree, rankBusinesses, createServiceCategoryStore, LEGAL_TEXT_VERSION } from '@cityjoy/shared';
 import {
   createBusinessAdmin,
+  createFirestoreReviewRepository,
+  createReviewModeration,
+  DuplicateBusinessError,
   createEmergencyNumberAdmin,
   createFirestoreBusinessRepository,
   createFirestoreServiceCategoryRepository,
@@ -192,8 +195,8 @@ describe('işletmeler', () => {
       phone: '0532 123 45 67', whatsapp: true, is24h: true, description: '  ', priceList: [{ name: 'Keşif', price: 'Ücretsiz' }],
     });
     const a = await ali.create('ali', input('Ali Tesisat'));
-    const v = await veli.create('veli', input('Veli Tesisat', '16-osmangazi'));
-    await veli.create('veli', { ...input('İstanbul Tesisat', '34-kadikoy'), location: { provinceCode: '34', districtId: '34-kadikoy' } });
+    const v = await veli.create('veli', { ...input('Veli Tesisat', '16-osmangazi'), phone: '02241112233' });
+    await veli.create('veli', { ...input('İstanbul Tesisat', '34-kadikoy'), phone: '02161112233', location: { provinceCode: '34', districtId: '34-kadikoy' } });
 
     const list = await guest.listByCategory('16', 'tesisatci');
     expect(list.map((b) => b.name).sort()).toEqual(['Ali Tesisat', 'Veli Tesisat']);
@@ -209,6 +212,8 @@ describe('işletmeler', () => {
     expect(ranked.featured.map((b) => b.id)).toEqual([v]);
     expect(ranked.featured[0].verification.status).toBe('dogrulandi');
     expect(ranked.featured[0].membership.tier).toBe('pro');
+    // Aynı telefonla ikinci işletme açılamaz.
+    await expect(ali.create('ali', input('Kopya Tesisat'))).rejects.toBeInstanceOf(DuplicateBusinessError);
 
     await ali.update(a, { ...input('Ali Usta'), description: 'Tesisat işleri' });
     await ali.setHidden(a, true);
@@ -219,5 +224,58 @@ describe('işletmeler', () => {
     expect(await veli.listMine('veli')).toEqual([]);
     const log = await getDocs(collection(env.authenticatedContext('eren').firestore(), 'auditLog'));
     expect(log.docs.map((d) => d.data().summary)).toEqual(expect.arrayContaining(['Doğrulandı: Veli Tesisat', 'Üyelik kademesi: pro: Veli Tesisat']));
+  });
+});
+
+describe('değerlendirmeler', () => {
+  it('ara > değerlendir > düzenle; sahibi cevaplar; şikâyet; admin gizler; hesap silinince yorumlar silinir ve puan düşer', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'admins/eren'), { addedAt: 'konsol' });
+    });
+    const fs = (uid: string) => env.authenticatedContext(uid).firestore() as unknown as Firestore;
+    const id = await createFirestoreBusinessRepository(fs('ali')).create('ali', {
+      type: 'hizmet', name: 'Ali Tesisat', categoryIds: ['tesisatci'], location: { provinceCode: '16', districtId: '16-nilufer' },
+      phone: '05321234567', whatsapp: true, is24h: false, priceList: [],
+    });
+    const ayse = createFirestoreReviewRepository(fs('ayse'));
+    const veli = createFirestoreReviewRepository(fs('veli'));
+    const rating = async () => (await createFirestoreBusinessRepository(fs('x')).get(id))!.rating;
+
+    expect(await ayse.getMine(id, 'ayse')).toBeNull();
+    expect(await ayse.hasContacted(id, 'ayse')).toBe(false);
+    await expect(ayse.save(id, 'ayse', { stars: 5, text: 'Çok hızlı geldi, sorunu çözdü.' }, 'Ayşe K.')).rejects.toThrow();
+    await ayse.recordContact(id, 'ayse');
+    await ayse.recordContact(id, 'ayse');
+    await ayse.save(id, 'ayse', { stars: 5, text: 'Çok hızlı geldi, sorunu çözdü.' }, 'Ayşe K.');
+    await veli.recordContact(id, 'veli');
+    await veli.save(id, 'veli', { stars: 2, text: 'Geç geldi ama işi yaptı.' }, 'Veli D.');
+    expect(await rating()).toEqual({ sum: 7, count: 2 });
+    await veli.save(id, 'veli', { stars: 3, text: 'Geç geldi ama işi düzgün yaptı.' }, 'Veli D.');
+    expect(await rating()).toEqual({ sum: 8, count: 2 });
+
+    await createFirestoreReviewRepository(fs('ali')).reply(id, 'veli', 'Gecikme için özür dileriz.');
+    const list = await createFirestoreReviewRepository(fs('misafir')).list(id);
+    expect(list.map((r) => r.authorName).sort()).toEqual(['Ayşe K.', 'Veli D.']);
+    expect(list.find((r) => r.uid === 'veli')!.reply!.text).toBe('Gecikme için özür dileriz.');
+
+    await ayse.report(id, 'veli', 'ayse', 'hakaret');
+    const mod = createReviewModeration(fs('eren'), 'eren');
+    const [report] = await mod.listReports();
+    expect(report).toMatchObject({ businessName: 'Ali Tesisat', reason: 'hakaret', review: { stars: 3 } });
+    await mod.setHidden(report, true);
+    expect(await rating()).toEqual({ sum: 5, count: 1 });
+    expect((await createFirestoreReviewRepository(fs('misafir')).list(id)).map((r) => r.uid)).toEqual(['ayse']);
+
+    // Hesap silme: Ayşe'nin yorumu silinir, puan düşer; gizlenen yorumu olan Veli de silebilir.
+    await ayse.deleteAllBy('ayse');
+    expect(await rating()).toEqual({ sum: 0, count: 0 });
+    await veli.deleteAllBy('veli');
+    expect(await veli.getMine(id, 'veli')).toBeNull();
+
+    // İşletme silinince yorumları da silinir.
+    await ayse.recordContact(id, 'ayse');
+    await ayse.save(id, 'ayse', { stars: 4, text: 'İkinci kez çağırdım, yine iyiydi.' }, 'Ayşe K.');
+    await createFirestoreBusinessRepository(fs('ali')).delete(id);
+    expect(await ayse.getMine(id, 'ayse')).toBeNull();
   });
 });

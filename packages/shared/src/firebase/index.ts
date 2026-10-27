@@ -17,4 +17,5 @@ export {
   createServiceCategoryAdmin,
   submitServiceSuggestion,
 } from './service-categories';
-export { createBusinessAdmin, createFirestoreBusinessRepository } from './businesses';
+export { createBusinessAdmin, createFirestoreBusinessRepository, DuplicateBusinessError } from './businesses';
+export { createFirestoreReviewRepository, createReviewModeration, type ReviewReport } from './reviews';
