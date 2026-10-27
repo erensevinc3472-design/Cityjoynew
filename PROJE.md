@@ -175,7 +175,7 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
   - **Aktivite:** Her kullanıcı kendisi oluşturabilir (insanların bir araya gelmesi için, + düğmesiyle).
   - **Adres:** Tam adres yalnızca "Katılıyorum" diyenlere görünür. Herkese yalnızca genel konum (mahalle/yaklaşık nokta) gösterilir. **Karar (Eren onayladı):** Bu kural yalnızca kullanıcıların kendi açtığı aktivitelerde geçerlidir. Yetkili organizatörün halka açık etkinliklerinde adres herkese açıktır.
   - **Bildirim:** Etkinlik veya aktivitede olası her değişiklikte (tarih, saat, yer, ücret, iptal vb.) "Katılıyorum" diyenlere bildirim gider.
-  - **Öneriler (Eren onayladı):** (1) Yetki türleri: kurum bazlı ve kişi bazlı, bölge kapsamlı (il/ilçe), isteğe bağlı süreli, her atama kayıt altında. (2) "Etkinlik düzenleme yetkisi iste" başvuru formu, admin onaylar. İl yöneticisi kendi ilinde yetki verebilir (ölçek için). (3) Yalnızca açıklama metni gibi küçük düzenlemelerde bildirim gitmez, bildirim spam'i önlenir. (4) Organizatör katılımcı sayısını görür, isim listesini yalnızca katılımcının rızasıyla. (5) Aktivitede 18 yaş altı ve yabancılarla buluşma güvenliği için ilk buluşma ipuçları, şikâyet ve engelleme. (6) Siyasi parti etkinlikleri, miting ve gösteri duyuruları kapalı (tarafsızlık, hukuk teyidi). (7) Bilet satılmaz, resmi bilet bağlantısı verilir.
+  - **Öneriler (Eren onayladı):** (1) Yetki türleri: kurum bazlı ve kişi bazlı, bölge kapsamlı (il/ilçe), isteğe bağlı süreli, her atama kayıt altında. (2) "Etkinlik düzenleme yetkisi iste" başvuru formu, admin onaylar. ~~İl yöneticisi kendi ilinde yetki verebilir.~~ **Karar (Eren): yetkiyi yalnızca admin verir ve geri alır** (bölüm 6.5). (3) Yalnızca açıklama metni gibi küçük düzenlemelerde bildirim gitmez, bildirim spam'i önlenir. (4) Organizatör katılımcı sayısını görür, isim listesini yalnızca katılımcının rızasıyla. (5) Aktivitede 18 yaş altı ve yabancılarla buluşma güvenliği için ilk buluşma ipuçları, şikâyet ve engelleme. (6) Siyasi parti etkinlikleri, miting ve gösteri duyuruları kapalı (tarafsızlık, hukuk teyidi). (7) Bilet satılmaz, resmi bilet bağlantısı verilir.
 - **Haberler (Eren'in kararı): Bundle benzeri haber toplayıcı.** Haber sitelerinle anlaşma şu an zor. Amaç, insanların kendi bölgelerindeki ve genel haberlere kolay ve kullanışlı ulaşması. `haberler.html` örneği: "Son Dakika" şeridi, Bölgesel/Genel anahtarı, kategoriler (Tümü, Son Dakika, Siyaset, Ekonomi, Spor, Kültür), liste görünümü, haber detayında kaynak adı ve süre, paylaş, kaydet, yazı boyutu, haber özeti, ilgili haberler.
   - **Karar (Eren onayladı): izne dayalı kademeli model, anlaşma müzakeresi gerektirmeden.**
     1. *Birinci kaynak: resmi duyurular.* Belediye, valilik, kaymakamlık ve kurum duyuruları doğrudan panellerden gelir (hukuki risk en düşük). Her bölge için dolu bir "Kurum Haberleri" akışı baştan olur.
@@ -328,7 +328,9 @@ Bildirim merkezi, kategorilere göre (duyuru, etkinlik, mesaj, takip, yarışma,
 
 Eren'in kuralı: **herkes yalnızca kendi panelinden, kendine yetkilendirilen kadarını** uygulamaya etki ettirebilir.
 - Yetki iki eksenlidir: **bölge** (il/ilçe/mahalle) ve **modül** (hangi bölüme yazabilir).
-- SORULACAK: Yetkileri kim verir ve geri alır? Bir ilde birden çok belediye/kurum olduğunda çakışma nasıl çözülür? İşletmeler için ayrı bir panel olacak mı?
+- **Karar (Eren): yetkiyi yalnızca admin verir ve geri alır.** İl yöneticisi yetki veremez. Öneri: il yöneticisi yetki *talebi* açabilir, talep admin'in "Bekleyen onaylar" ekranına düşer (bölüm 6.5).
+- **Karar (Eren): herkes kendi alanında.** Büyükşehir belediyesi il geneli içerik girer, ilçe belediyesi yalnızca kendi ilçesine. İkisi aynı yere içerik girerse her içerikte kimin girdiği yazar. Kimse diğerinin içeriğini düzenleyemez.
+- **Karar (Eren): işletmeler için ayrı panel yok (ilk sürüm).** İşletme sahipleri her şeyi mobil uygulamadaki Profil > İşletmem bölümünden yapar. İhtiyaç olursa sonra eklenir.
 
 ### 6.1 Panel mimarisi (Eren'in "panel her özellikle birlikte büyür" ilkesi)
 
@@ -380,7 +382,7 @@ Aşağıdaki 24 madde belediye panelinin kapsamıdır. Her biri 6.1'deki ilkeye 
 25. Keşif rotası ve tanıtım videosu girme (ilçe tanıtımı: Seyahat > Keşfet ve Öğren > Başkanlarla Keşif)
 
 **İlk sürüm önerisi (Eren onayladı):** 1, 2, 3, 4, 6, 8, 12, 14, 15, 17, 19. Talep kutusu (11) ikinci aşamaya: cevap beklentisi doğurur, belediyenin hazır olması gerekir. Geri kalanı sonraki aşamalarda.
-- Onay kuyruğuna (14) kimin bakacağı SORULACAK (Eren'in ekibi mi, il yöneticisi mi).
+- Onay kuyruğu (14): **Karar (Eren): önce il yöneticisi, sonra admin** (iki aşamalı onay, bölüm 6.5).
 
 ### 6.3 İl yöneticisi paneli (kapsam: kendi ili)
 
@@ -388,7 +390,7 @@ Eren'in onayıyla ilk sürüm seçimi Claude'a bırakıldı. Tam liste ve ilk s�
 
 | # | Özellik | İlk sürüm |
 |---|---|---|
-| 1 | İlçe/mahalle yapısını görme; belediye, kurum, muhtar hesaplarını açma/kapatma ve yetki verme | Evet |
+| 1 | İlçe/mahalle yapısını görme; belediye, kurum, muhtar hesabı açma ve yetki **talebi** oluşturma (yetkiyi admin verir, bölüm 6.5) | Evet |
 | 2 | İldeki belediye hesaplarının faaliyetlerini izleme | Sonra |
 | 3 | Moderasyon kuyruğu (şikâyet edilen gönderiler, onay bekleyen etkinlikler) | Evet |
 | 4 | İşletme doğrulama: evrak inceleme, görüntülü görüşme planı, onay/ret ve gerekçe | Evet |
@@ -433,6 +435,16 @@ Eren'in onayıyla ilk sürüm seçimi Claude'a bırakıldı. Tam liste ve ilk s�
 
 Not: 9 ve 10 numaralı güvenlik ve KVKK maddeleri mağaza onayı ve yasal uyum için ilk sürümden çıkarılmaz.
 
+### 6.5 Onay merkezi: iki aşamalı onay (Karar, Eren)
+
+- **İki aşama:** Onay gerektiren her işlem önce il yöneticisinin, sonra admin'in onayından geçer. Örnekler: kampanya ve tanıtım bildirimleri, işletme doğrulamaları, etkinlik yetkisi talepleri, kulüp ve yayıncı başvuruları, kurum yarışma talepleri. Acil duyurular onaysız, doğrudan gider.
+- **"Bekleyen onaylar" ekranı (admin paneli):** Bütün bekleyen işler türüne bakılmaksızın tek ekranda listelenir. Filtreler: il, ilçe, kategori. Her satırda talep eden, bölge, kategori, il yöneticisinin onay tarihi ve kimin onayladığı görünür. Satır satır onay ve ret (ret gerekçesi zorunlu).
+- **Toplu onay düğmeleri:**
+  - **"Tümünü onayla":** O an listede görünen (filtrelenmiş) işlerin hepsini onaylar.
+  - **"Güvenli olanları onayla":** Yalnızca *güvenilir yöneticilerin* ilk aşamada onayladığı işleri onaylar.
+- **Güvenilir yöneticiler listesi:** Admin bu listeye yönetici ekler ve listeden çıkarır. Her kayıt bir yönetici ile bir kapsamdan oluşur. Kapsam şehir, ilçe ve kategoriye göre seçilir. Örnek: "Ahmet Bey, Bursa, yalnızca bildirimler." Bir iş, onu ilk aşamada onaylayan yönetici bu listede o iş için uygun şehir, ilçe ve kategoriyle kayıtlıysa "güvenli" sayılır.
+- **Öneri (standart güvenlik):** Toplu onaydan önce "X iş onaylanacak" özeti gösterilir ve onay istenir. Toplu onaylar da tek tek işlem kaydına yazılır. Yüksek riskli işler (hesap kapatma, ücret/iade, il geneli bildirim) "Güvenli olanları onayla" kapsamına girmez, her seferinde tek tek onaylanır.
+
 ## 7. Filtreli bildirim
 
 Paneller şu filtrelerle bildirim gönderebilecek: **il, ilçe, mahalle, yaş, cinsiyet, ilgi alanı**.
@@ -444,7 +456,7 @@ Paneller şu filtrelerle bildirim gönderebilecek: **il, ilçe, mahalle, yaş, c
 - Bir bildirim kampanyası şunlardan oluşur: başlık ve metin (5 dilde, çeviri yoksa varsayılan dil), tür (acil kamu duyurusu, hizmet, etkinlik, kampanya), hedef (il, ilçe, mahalle, yaş aralığı, cinsiyet, ilgi alanı, meslek), zamanlama.
 - **Hedef seçimi yetkiye bağlıdır:** panel sahibi yalnızca kendi bölgesi içinde hedef seçebilir (örn. ilçe belediyesi sadece kendi ilçesine gönderir).
 - Göndermeden önce tahmini ulaşılacak kişi sayısı gösterilir. Çok küçük gruplarda (örn. 50 kişiden az) bir kişiyi tanıtmayı önlemek için hedef sınırlanır.
-- **Karar (Eren onayladı):** Acil duyurular (su kesintisi gibi) doğrudan gider. Kampanya ve tanıtım türü bildirimler önce onaya düşer. Onayı kimin vereceği (Eren/admin ya da il yöneticisi) rol tanımında netleştirilecek (SORULACAK).
+- **Karar (Eren onayladı):** Acil duyurular (su kesintisi gibi) doğrudan gider. Kampanya ve tanıtım türü bildirimler önce onaya düşer. **Karar (Eren): önce il yöneticisi, sonra admin onaylar** (bölüm 6.5).
 - Günlük ve haftalık gönderim sınırı vardır. Kullanıcı türlere göre bildirimleri kapatabilir. Acil kamu duyuruları ayrı sınıftır.
 - Kayıtta/profilde istenecekler: doğum yılı (yaş için), cinsiyet (isteğe bağlı), ilgi alanları, bildirim izni. Hedefleme için gereken bilgilere **ayrı açık rıza** alınır. 18 yaş altı kullanıcılara kampanya türü bildirim gönderilmez (öneri).
 - Modüller bildirimi otomatik tetikleyebilir: yeni etkinlik (mahalleye), muhtar duyurusu (su kesintisi gibi), yeni belediye hizmeti, takip edilen hesabın gönderisi. Her tetikleyici panelde açılıp kapatılabilir.
@@ -629,14 +641,14 @@ Eren'in kararı: bunlar tartışmasız eklenir. Güncel kurallar yayından önce
 - Kullanıcı → şikâyet → gönüllü moderatör → il yöneticisi → admin.
 - Kurum yarışma ve anket talebi → admin onayı ve yayın.
 - Bildirim: acil duyuru doğrudan, kampanya bildirimi onay kuyruğundan geçer.
-- Etkinlik yetkisi: admin verir (il yöneticisi kendi ilinde verebilir).
+- Etkinlik yetkisi: yalnızca admin verir (il yöneticisi talep açabilir).
 
 **D. Şemada boş bırakılıp karara bağlanacak yerler (?)**
 1. Doğrulanmış hesap kimlere verilir, süreci kim yürütür.
 2. Muhtar hesapları nasıl açılır (ilçe belediyesi mi il yöneticisi mi doğrular).
-3. Yetkiyi kim verir ve geri alır (yalnızca admin mi, il yöneticisi de mi).
-4. Bir ilde birden çok belediye varsa çakışma kuralı.
-5. Kampanya bildirim onay kuyruğuna kim bakar (admin mi il yöneticisi mi).
+3. ~~Yetkiyi kim verir ve geri alır.~~ Karar: yalnızca admin.
+4. ~~Bir ilde birden çok belediye varsa çakışma kuralı.~~ Karar: herkes kendi alanında.
+5. ~~Kampanya bildirim onay kuyruğuna kim bakar.~~ Karar: önce il yöneticisi, sonra admin.
 6. Haber yayıncısı ve kulüp başvurularını kim onaylar.
 7. İl yöneticisinin geliri (pay) ve ayrı il yöneticisi uygulaması.
 8. İlçe temsilcisi gibi il yöneticisi altında ek bir kademe olacak mı.

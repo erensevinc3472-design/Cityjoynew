@@ -8,6 +8,7 @@ import { t } from '../lib/t';
 /** Menüde sırasıyla gösterilen bölümler ve hazır olup olmadıkları. */
 export const MENU: { module: Module; path?: string }[] = [
   { module: 'konumlar', path: '/konumlar' },
+  { module: 'onaylar' },
   { module: 'yetkiler' },
   { module: 'islem-kayitlari' },
   { module: 'bildirimler' },

@@ -12,6 +12,7 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
   admin: {
     konumlar: ALL,
     yetkiler: ALL,
+    onaylar: ALL,
     'islem-kayitlari': READ,
     bildirimler: ALL,
     gonderiler: ALL,
@@ -22,7 +23,10 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
   },
   'il-yoneticisi': {
     konumlar: READ,
-    yetkiler: ['goruntule', 'ekle', 'sil'],
+    // Yetkiyi yalnızca admin verir; il yöneticisi görür ve talep açar (talep onay merkezine düşer).
+    yetkiler: ['goruntule'],
+    // İki aşamalı onayın ilk aşaması (PROJE.md 6.5).
+    onaylar: ['goruntule', 'onayla'],
     'islem-kayitlari': READ,
     bildirimler: ['goruntule', 'ekle', 'bildirim-gonder'],
     etkinlikler: [...WRITE, 'onayla'],
