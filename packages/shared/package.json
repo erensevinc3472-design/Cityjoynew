@@ -11,6 +11,14 @@
   "devDependencies": {
     "turkey-neighbourhoods": "4.0.3",
     "typescript": "~6.0.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "firebase": "13.1.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./firebase": "./src/firebase/index.ts"
+  },
+  "peerDependencies": {
+    "firebase": "^13.1.0"
   }
 }

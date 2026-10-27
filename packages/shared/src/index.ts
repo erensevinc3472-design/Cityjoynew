@@ -16,3 +16,5 @@ export * from './permissions/can';
 export * from './permissions/role-templates';
 export * from './organizations/types';
 export * from './organizations/staff';
+export * from './services/types';
+export * from './services/occupations';
