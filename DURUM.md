@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (Bildirim merkezi; önceki: Mesajlar, Ara).
+Son güncelleme: 28 Ekim 2026 (OSM şehir rehberi iskeleti, tasarım yönü; önceki: Bildirim merkezi).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -50,6 +50,10 @@ npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
 # Mobil web sürümü: cd apps/mobile && EXPO_OFFLINE=1 CI=1 npm run export:web  (dist/)
+# Telefonda (Expo Go, iPhone): bilgisayar ve Expo Go "cityjoy" hesabıyla girişli olmalı (npx expo login --no-browser -u cityjoy,
+#   şifreyi Eren yazar); cd apps/mobile && npx expo start --lan --go, telefonda Safari > exp://<bilgisayar IP>:8081.
+#   İlk derleme ~1 dk sürer, telefon zaman aşımına düşerse "Reload JS". Expo paketleri Expo Go sürümüyle uyumlu olmalı
+#   (npx expo install --check), yoksa "Cannot find native module" hatası çıkar.
 # Panel: cd apps/panel && npm run build   (dist/)
 # Emülatör: npx firebase emulators:start --only auth,firestore --project cityjoynew
 #   mobil EXPO_PUBLIC_FIREBASE_EMULATOR=1, panel VITE_FIREBASE_EMULATOR=1 ile derlenince ona bağlanır
@@ -394,9 +398,21 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    panelden gruba bildirim (bölüm 7: hedef, onay, günlük sınır), yarışma bildirimi (yarışmalar gelince), takip isteği
    bildirimi (istekler profil ekranında).
 
+31. **OpenStreetMap ile şehir rehberi iskeleti** (PROJE.md 5.1). `scripts/osm-city-guide.ts` bir il için önemli kurumları,
+   müzeleri, otoparkları, parkları, pazar yerlerini ve toplanma alanlarını Overpass'ten ilçe ilçe çeker, Benim Şehrim
+   şablonunun sütunlarına çevirir, panelin Excel denetiminden geçirir ve `veri-denemesi/osm-<il>-<ad>.xlsx` yazar
+   (klasör repoya girmez; yarıda kalırsa önbellekten devam eder). Çalıştırma: `npx vite-node scripts/osm-city-guide.ts -- 16`.
+   Bursa denemesi (28 Ekim): kurumlar 311, parklar 228, otoparklar 47, pazarlar 35, müzeler 28, toplanma alanı 1. Ad ve
+   konum iyi; telefon, saat, müze ücreti, pazar günü çoğunlukla boş (pazarların 33'ü, müzelerin 15'i, otoparkların 16'sı
+   eksik alan yüzünden panelde "düzeltilecek"). Adsız 508 otopark, lojmanlar ve oto yıkama gibi işletmeler alınmaz.
+   **Karar (Claude, Eren bıraktı):** OSM "ad + konum" iskeleti olarak kullanılır, ayrıntıları ekip/yapay zekâ kaynakla
+   tamamlar. Toplanma alanları için AFAD / e-Devlet gerekir. Uygulamada "© OpenStreetMap katkıda bulunanlar" yazılmalı
+   (ODbL; birleşik veritabanının paylaşımı avukata sorulacak).
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Keşfet'te gönderi birden çok hedefe paylaşılabilir (Eren, 28 Ekim 2026; PROJE.md 5.5).
+- Ana sayfa ve Benim Şehrim için yeni tasarım yönü onaylandı (Eren, 28 Ekim 2026; PROJE.md 13. madde 29).
 
 - STK ve kulüpler için ayrı "etkinlik yetkisi iste" başvurusu şimdilik yok (Eren, 28 Ekim 2026): gerekirse admin Panel >
   Kurumlar'dan "kurum" ya da "kulüp" olarak açar, etkinlik bölümünü verir (6.4 madde 18).
@@ -465,7 +481,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
-0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
+0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). OSM iskeleti (31. madde) başlangıç
+   olarak kullanılabilir. Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
 0a. 30. madde (Bildirim merkezi): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli (1 yeni dizin). Admin Panel >
    Moderasyon'dan yasaklı kelime listesini (26. madde) ve isterse önerilen aramaları (28. madde) doldurmalı.
