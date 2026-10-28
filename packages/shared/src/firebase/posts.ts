@@ -1,6 +1,7 @@
 import {
   collection,
   collectionGroup,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -29,6 +30,7 @@ import {
   type PostTarget,
 } from '../posts/posts';
 import { PROFILE_LIMITS } from '../posts/social';
+import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
 
 const COLLECTION = 'posts';
@@ -124,6 +126,23 @@ export function createFirestorePostRepository(db: Firestore) {
       return { posts, cursor: posts.length === POST_LIMITS.pageSize ? posts[posts.length - 1].createdAt : null };
     },
 
+    /**
+     * Ara > Gönderiler: kişinin görebileceği akışlarda (Genel, ilindeki Bölgesel, mahallesindeki Mahallem) anahtarı
+     * taşıyan son gönderiler. Her akış ayrı sorgudur; kurallar her birini ayrı doğrular.
+     */
+    async search(key: string, at: { provinceCode?: string; neighbourhoodId?: string }): Promise<Post[]> {
+      const run = (...c: QueryConstraint[]) =>
+        getDocs(query(collection(db, COLLECTION), where('searchKeys', 'array-contains', key), where('status', '==', 'aktif'), ...c, orderBy('createdAt', 'desc'), limit(POST_LIMITS.pageSize)))
+          .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())));
+      const lists = await Promise.all([
+        run(where('targets.genel', '==', true)),
+        at.provinceCode ? run(where('targets.bolgesel', '==', true), where('region.provinceCode', '==', at.provinceCode)) : [],
+        at.neighbourhoodId ? run(where('targets.mahallem', '==', true), where('region.neighbourhoodId', '==', at.neighbourhoodId)) : [],
+      ]);
+      const byId = new Map(lists.flat().map((p) => [p.id, p]));
+      return [...byId.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
+
     /** Profil sayfası: kişinin Genel gönderileri, takip ediyorsam Takip gönderileri de (son 20). */
     async byAuthor(uid: string, following: boolean): Promise<Post[]> {
       const q = (target: 'genel' | 'takip') =>
@@ -160,6 +179,7 @@ export function createFirestorePostRepository(db: Firestore) {
         likeCount: 0,
         commentCount: 0,
         reportCount: 0,
+        searchKeys: searchKeys(input.text, SEARCH_LIMITS.postKeys, SEARCH_LIMITS.minPost),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -170,7 +190,7 @@ export function createFirestorePostRepository(db: Firestore) {
     /** Sahibi siler: yazı ve ad boşaltılır, gönderi akıştan çıkar (şikâyet kaydı varsa moderatör "silindi" görür). */
     async remove(id: string): Promise<void> {
       const batch = writeBatch(db);
-      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', updatedAt: serverTimestamp() });
+      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), updatedAt: serverTimestamp() });
       await batch.commit();
     },
 
@@ -305,7 +325,7 @@ export function createFirestorePostRepository(db: Firestore) {
       for (const d of mine.docs) {
         if (d.get('status') === 'kaldirildi' && !d.get('text')) continue;
         const batch = writeBatch(db);
-        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', updatedAt: serverTimestamp() });
+        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), updatedAt: serverTimestamp() });
         await batch.commit();
       }
       const likes = await getDocs(query(collectionGroup(db, 'likes'), where('uid', '==', uid), limit(500)));

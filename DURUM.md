@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (sabit duyuru; önceki: kullanıcı aktiviteleri, resmî profil, Mahalle Meydanı).
+Son güncelleme: 28 Ekim 2026 (Ara; önceki: Kurum Haberleri, Keşfet 4. aşama).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -44,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (sabit duyuru; önceki: kullanıcı aktiviteleri, 
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (89)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (84; Java 21 gerekir)
+npm test                      # ortak paket testleri (94)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (88; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -336,9 +336,27 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    (1 yeni) geçti; tarayıcıda denendi (ana sayfada haber yok, Haberler'de var, okuyucu ve yazı boyu). Panel derlendi,
    panel formu tarayıcıda açılmadı. Sonraki adım (Haberler): yayıncı başvurusu (RSS, alan adı doğrulama, avukat
    teyidi; PROJE.md 5.3 madde 2) ve Keşfet > Genel'e haber akışı; "Son Dakika" yalnızca kaynağın işaretiyle.
-   Sonraki aşamalar:
-   fotoğraf/video (Storage, Blaze), Genel sekmesine haber akışı (5.3 Haberler), resmî hesap gönderileri (muhtar/belediye
-   rozetli) ve "Taziye yalnızca muhtar ya da yakını", yasaklı kelime süzgeci, alt gezinme çubuğu.
+   PR #13 birleşti, kurallar yüklendi (Eren, 28 Ekim).
+
+28. **Ara** (PROJE.md 5.10). Ana sayfada arama kutusu > Ara ekranı (`apps/mobile/src/app/search.tsx`). Sekmeler: Tümü,
+   Kişiler, İşletmeler, Yerler, Etkinlikler, Gönderiler (Tümü'nde her bölümden 3 sonuç + "Tümünü gör"). Boşken son
+   aramalar (telefonda, tek tek ya da topluca silinir, en çok 10), önerilen aramalar, hızlı erişim (Hizmetler, Acil
+   İhtiyaçlar, Etkinlikler, Benim Şehrim ve acil hizmet kategorileri). **Nasıl arıyor:** Firestore metin içinde arama
+   yapamadığı ve ücretli arama hizmeti kullanılmadığı için kişi adı, işletme adı ve gönderi yazısından "arama
+   anahtarları" (kelime başları, Türkçe karakter ve büyük harf farkı yok) yazılır (`searchKeys`, `packages/shared/src/search`).
+   Sorgunun en uzun kelimesi veritabanına sorulur, öteki kelimeler telefonda süzülür; sonuç yoksa kelime kısaltılarak
+   yeniden denenir ve 5+ harfli kelimelerde bir yanlış ya da eksik harf kabul edilir ("berbr" > berber). Kişiler yalnızca adla bulunur
+   (gizli hesapta yalnızca ad, tanıtım görünmez), engellenenler ve kişinin kendisi çıkmaz. İşletmeler kişinin ilinden,
+   doğrulanmışlar önce (`rankBusinesses`); eşleşen hizmet kategorileri de ("berber" > Berberler listesi) çıkar. Gönderiler
+   yalnızca görebildiği akışlardan (Genel, ilindeki Bölgesel, mahallesindeki Mahallem; her biri ayrı sorgu, kurallar
+   doğrular), en az 3 harfli kelimeyle. Yerler (Benim Şehrim bölümleri, "Nasıl yapılır?" hariç) ve etkinlikler telefondaki
+   listelerden aranır (ek okuma yok ya da bölüm değiştiyse bir kez). Aynı arama 5 dakika yeniden okunmaz. Eski profillere
+   anahtar ilk Keşfet açılışında eklenir; **Ara'dan önce eklenmiş işletmeler ve gönderiler, işletme düzenlenene kadar /
+   aramada çıkmaz** (gerçek veride neredeyse yok). Silinen gönderinin anahtarları da silinir. **Panel > Moderasyon >
+   Önerilen aramalar** (yalnızca admin): dil başına en çok 12 öneri, boş dilde uygulamanın varsayılan listesi; kayıt
+   işlem kaydına yazılır (`config/searchSuggestions`). Kurallar: anahtar sayısı sınırlı (profil 40, işletme 60, gönderi
+   300), 4 yeni bileşik dizin. Testler: ortak 94 (5 yeni), kurallar 88 (4 yeni). Panel derlendi, panel bölümü tarayıcıda
+   açılmadı. Sonra: kullanıcı adı (şimdilik yok), etiket (#) araması, beş dilde içerik çevirisiyle arama (içerik Türkçe girilir).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -413,11 +431,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 27. madde (Kurum Haberleri): Eren PR'ı birleştirince kurallar yüklenmeli. Admin Panel > Moderasyon'dan yasaklı
-   kelime listesini doldurmalı (26. madde).
+0a. 28. madde (Ara): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli (4 yeni dizin; Firebase'in dizinleri
+   hazırlaması birkaç dakika sürebilir). Admin Panel > Moderasyon'dan yasaklı kelime listesini (26. madde) ve isterse
+   önerilen aramaları doldurmalı.
 0b. Keşfet'in kalanı: fotoğraf/video (Storage, Blaze), alt gezinme çubuğu (Ana Sayfa, Keşfet, Ara, Profil; görünümü
-   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Sıradaki adaylar (Blaze istemeyen): Ara (5.10:
-   kişiler, işletmeler, gönderiler), haber yayıncısı başvurusu (avukat teyidi gerekir). Blaze isteyenler:
+   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Sıradaki adaylar (Blaze istemeyen): Mesajlar (5.11; birebir
+   mesaj, istekler, engel ve şikâyet), haber yayıncısı başvurusu (avukat teyidi gerekir). Blaze isteyenler:
    aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.

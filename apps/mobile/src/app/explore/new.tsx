@@ -23,6 +23,7 @@ import { FormScreen } from '@/components/form-screen';
 import { TextField } from '@/components/text-field';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { forgetFeeds } from '@/lib/posts';
+import { forgetSearches } from '@/lib/search';
 import { postRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useUserLocation } from '@/lib/user-location';
@@ -76,6 +77,7 @@ export default function NewPostScreen() {
     try {
       const id = await postRepository.create(user.uid, authorNameOf(profile.displayName), input);
       forgetFeeds();
+      forgetSearches();
       router.replace({ pathname: '/explore/[id]', params: { id } });
     } catch {
       setFailed(true);

@@ -45,7 +45,8 @@
     "account": "حسابي",
     "greetingMorning": "صباح الخير، {{name}}",
     "greetingDay": "نهارك سعيد، {{name}}",
-    "greetingEvening": "مساء الخير، {{name}}"
+    "greetingEvening": "مساء الخير، {{name}}",
+    "search": "ابحث عن أشخاص وأعمال وأماكن وفعاليات"
   },
   "modules": {
     "myCity": "مدينتي",
@@ -813,5 +814,45 @@
       "cevre": "البيئة",
       "ekonomi": "الاقتصاد"
     }
+  },
+  "search": {
+    "title": "بحث",
+    "placeholder": "أشخاص أو أعمال أو أماكن أو فعاليات أو منشورات",
+    "tabs": {
+      "tumu": "الكل",
+      "kisiler": "الأشخاص",
+      "isletmeler": "الأعمال",
+      "yerler": "الأماكن",
+      "etkinlikler": "الفعاليات",
+      "gonderiler": "المنشورات"
+    },
+    "recent": "عمليات البحث الأخيرة",
+    "clearRecent": "مسح",
+    "removeRecent": "حذف البحث {{q}}",
+    "suggested": "عمليات بحث مقترحة",
+    "quick": "وصول سريع",
+    "quickServices": "الخدمات",
+    "quickUrgent": "الاحتياجات العاجلة",
+    "quickEvents": "الفعاليات",
+    "quickCity": "مدينتي",
+    "defaults": [
+      "صيدلية مناوبة",
+      "حلاق",
+      "سبّاك",
+      "حديقة",
+      "متحف",
+      "موقف سيارات",
+      "سوق",
+      "كهربائي"
+    ],
+    "services": "الخدمات",
+    "serviceCategory": "فئة الخدمة",
+    "seeAll": "عرض الكل ({{count}})",
+    "noResults": "لا توجد نتائج لـ «{{q}}».",
+    "tooShort": "اكتب حرفين على الأقل للبحث.",
+    "postsTooShort": "اكتب كلمة من 3 أحرف على الأقل للبحث في المنشورات.",
+    "needLocation": "اختر موقعك لعرض هذه النتائج.",
+    "loadError": "تعذّر تحميل النتائج.",
+    "privateAccount": "حساب خاص"
   }
 }

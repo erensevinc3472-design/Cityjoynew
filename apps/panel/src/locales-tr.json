@@ -436,6 +436,13 @@
       "hint": "Büyük-küçük harf, Türkçe karakter (ı/i, ğ/g), rakamla yazım (s4l4k) ve harf tekrarı (salaaak) fark etmez. 4 harf ve üstü kelimeler ekli hâlleriyle de yakalanır. Kısa kelimelerde (3 harf ve altı) yalnızca tam eşleşme aranır.",
       "save": "Listeyi kaydet",
       "saved": "Kaydedildi: {{count}} kelime. Uygulama yeni listeyi bir sonraki açılışta kullanır."
+    },
+    "suggestions": {
+      "title": "Önerilen aramalar",
+      "intro": "Uygulamadaki Ara ekranında, arama kutusu boşken görünür. Dil başına en çok {{max}} öneri, her biri en çok {{length}} harf.",
+      "hint": "Her satıra bir arama. Bir dili boş bırakırsanız uygulama kendi varsayılan önerilerini gösterir (nöbetçi eczane, berber, park gibi).",
+      "save": "Önerileri kaydet",
+      "saved": "Kaydedildi. Uygulama yeni önerileri bir sonraki açılışta gösterir."
     }
   },
   "sosSettings": {

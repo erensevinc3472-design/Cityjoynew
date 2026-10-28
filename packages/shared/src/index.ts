@@ -36,3 +36,4 @@ export * from './activities/activities';
 export * from './posts/posts';
 export * from './posts/social';
 export * from './posts/word-filter';
+export * from './search/search';

@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
-import { BANNED_WORD_LIMITS, can, isGrantActive } from '@cityjoy/shared';
+import { BANNED_WORD_LIMITS, can, isGrantActive, LANGUAGES, SEARCH_LIMITS, type SearchSuggestions } from '@cityjoy/shared';
 import {
   createActivityModeration,
   createBannedWords,
   createPostModeration,
   createProfileModeration,
   createReviewModeration,
+  createSearchSuggestions,
   type ActivityReport,
   type CommentReport,
   type PostReport,
@@ -140,6 +141,7 @@ export function ModerationPage() {
       {user ? <CommentReports user={user} /> : null}
       {user ? <ProfileReports user={user} /> : null}
       {user && isAdminUser(user) ? <BannedWords user={user} /> : null}
+      {user && isAdminUser(user) ? <SearchSuggestionsSection user={user} /> : null}
     </section>
   );
 }
@@ -668,6 +670,90 @@ function BannedWords({ user }: { user: PanelUser }) {
           {user.isDemo ? null : (
             <div className="actions">
               <button className="btn" type="submit" disabled={busy}>{t('moderation.words.save')}</button>
+            </div>
+          )}
+        </form>
+      )}
+    </>
+  );
+}
+
+/**
+ * Ara ekranındaki önerilen aramalar (PROJE.md 5.10), dil başına. Bir dil boş bırakılırsa uygulama kendi varsayılan
+ * listesini gösterir. Yalnızca admin; kaydetme işlem kaydına yazılır.
+ */
+function SearchSuggestionsSection({ user }: { user: PanelUser }) {
+  const [draft, setDraft] = useState<Record<string, string> | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
+  const [busy, setBusy] = useState(false);
+  const store = useMemo(() => createSearchSuggestions(firestore), []);
+  const toDraft = (s: SearchSuggestions) => Object.fromEntries(LANGUAGES.map((l) => [l.code, (s[l.code] ?? []).join('\n')]));
+
+  const load = useCallback(async () => {
+    setLoadError(false);
+    try {
+      setDraft(toDraft(await store.get()));
+    } catch {
+      setLoadError(true);
+    }
+  }, [store]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!draft) return;
+    setBusy(true);
+    setMessage(undefined);
+    try {
+      const saved = await store.save(user.uid, Object.fromEntries(LANGUAGES.map((l) => [l.code, (draft[l.code] ?? '').split('\n')])));
+      setDraft(toDraft(saved));
+      setMessage({ kind: 'ok', text: t('moderation.suggestions.saved') });
+    } catch {
+      setMessage({ kind: 'error', text: t('moderation.error') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <header className="page-head">
+        <div>
+          <h2>{t('moderation.suggestions.title')}</h2>
+          <p className="meta">{t('moderation.suggestions.intro', { max: SEARCH_LIMITS.suggestions, length: SEARCH_LIMITS.suggestionLength })}</p>
+        </div>
+      </header>
+      {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {loadError ? (
+        <div className="state" role="alert">
+          <p>{t('moderation.loadError')}</p>
+          <button className="btn secondary" onClick={load}>{t('moderation.retry')}</button>
+        </div>
+      ) : draft === null ? (
+        <div className="state" aria-live="polite">{t('moderation.loading')}</div>
+      ) : (
+        <form className="form panel-form" onSubmit={submit}>
+          {LANGUAGES.map((l) => (
+            <div key={l.code} className="field">
+              <label htmlFor={`suggest-${l.code}`}>{l.nativeName}</label>
+              <textarea
+                id={`suggest-${l.code}`}
+                dir={l.rtl ? 'rtl' : 'ltr'}
+                rows={4}
+                value={draft[l.code] ?? ''}
+                disabled={user.isDemo}
+                onChange={(e) => setDraft({ ...draft, [l.code]: e.target.value })}
+              />
+            </div>
+          ))}
+          <span className="meta">{t('moderation.suggestions.hint')}</span>
+          {user.isDemo ? null : (
+            <div className="actions">
+              <button className="btn" type="submit" disabled={busy}>{t('moderation.suggestions.save')}</button>
             </div>
           )}
         </form>

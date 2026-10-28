@@ -26,9 +26,13 @@ import {
 } from '../business/business';
 import type { MembershipTier } from '../models/membership';
 import type { Action, Module } from '../permissions/types';
+import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { deleteVerificationRequest } from './approvals';
 
 const COLLECTION = 'businesses';
+
+/** İşletme adının arama anahtarları (Ara, PROJE.md 5.10); ad her değiştiğinde yeniden yazılır. */
+const nameKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.businessKeys);
 
 const iso = (v: unknown): string | undefined => (v instanceof Timestamp ? v.toDate().toISOString() : undefined);
 
@@ -55,6 +59,9 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
     listByCategory: (provinceCode, categoryId) =>
       list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), where('categoryIds', 'array-contains', categoryId), limit(100)),
 
+    searchByName: (provinceCode, key) =>
+      list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), where('searchKeys', 'array-contains', key), limit(30)),
+
     async get(id) {
       const snap = await getDoc(doc(db, COLLECTION, id));
       return snap.exists() ? fromDoc(snap.id, snap.data()) : null;
@@ -69,6 +76,7 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
       const batch = writeBatch(db);
       batch.set(ref, {
         ...clean,
+        searchKeys: nameKeys(clean.name),
         ownerUid: uid,
         status: 'yayinda',
         verification: { status: 'dogrulanmadi' },
@@ -89,7 +97,7 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
       // Boşaltılan isteğe bağlı alanlar silinir.
       const removed = Object.fromEntries((['address', 'hoursNote', 'description'] as const).filter((k) => !(k in clean)).map((k) => [k, deleteField()]));
       const batch = writeBatch(db);
-      batch.update(doc(db, COLLECTION, id), { ...clean, location: clean.location, ...removed, updatedAt: serverTimestamp() });
+      batch.update(doc(db, COLLECTION, id), { ...clean, location: clean.location, ...removed, searchKeys: nameKeys(clean.name), updatedAt: serverTimestamp() });
       if (oldPhone !== clean.phone) {
         batch.set(phoneDoc(db, clean.phone), { businessId: id, ownerUid: before.get('ownerUid') });
         if (oldPhone) batch.delete(phoneDoc(db, oldPhone));
