@@ -4,7 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useState, type ComponentProps } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { isUnread } from '@cityjoy/shared';
+import { isUnread, videoEmbedUrl } from '@cityjoy/shared';
 
 import { UrgentStrip } from '@/components/announcement-card';
 import { AppText } from '@/components/app-text';
@@ -13,6 +13,7 @@ import { HeroHeader, LocationChip } from '@/components/hero-header';
 import { SceneArt, sceneRim, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
 import { SideMenu } from '@/components/side-menu';
+import { VideoModal } from '@/components/video-modal';
 import { VerifyEmailBanner } from '@/components/verify-email-banner';
 import { useAnnouncements } from '@/lib/announcements';
 import { useIntroVideoUrl } from '@/lib/intro-video';
@@ -54,6 +55,7 @@ export default function HomeScreen() {
   const { location } = useUserLocation();
   const { user, profile } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [playing, setPlaying] = useState<string | null>(null);
   const [neighbourhoodName, setNeighbourhoodName] = useState<string>();
   const { list: announcements } = useAnnouncements(location);
   const urgent = (announcements ?? []).filter((a) => a.kind === 'acil');
@@ -130,7 +132,12 @@ export default function HomeScreen() {
           accessibilityRole="button"
           accessibilityLabel={videoUrl ? t('home.introVideo') : `${t('home.introVideo')}. ${t('home.comingSoon')}`}
           disabled={!videoUrl}
-          onPress={() => WebBrowser.openBrowserAsync(videoUrl).catch(() => {})}
+          onPress={() => {
+            // YouTube / Vimeo uygulama içinde, ortada açılır; tanınmayan bağlantı tarayıcıda.
+            const embed = videoEmbedUrl(videoUrl);
+            if (embed) setPlaying(embed);
+            else WebBrowser.openBrowserAsync(videoUrl).catch(() => {});
+          }}
           style={({ pressed }) => [styles.video, { backgroundColor: c.surface, borderColor: c.accentBorder, opacity: !videoUrl ? 0.6 : pressed ? 0.85 : 1 }]}>
           <View style={[styles.play, { backgroundColor: c.primary }]}>
             <MaterialIcons name="play-arrow" size={24} color={c.onPrimary} />
@@ -143,6 +150,7 @@ export default function HomeScreen() {
         </Pressable>
       </ScrollView>
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <VideoModal src={playing} title={t('home.introVideo')} onClose={() => setPlaying(null)} />
     </Screen>
   );
 }

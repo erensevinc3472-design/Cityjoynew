@@ -9,7 +9,8 @@
     "offline": "You seem to be offline.",
     "noResults": "No results found.",
     "change": "Change",
-    "selected": "Selected"
+    "selected": "Selected",
+    "close": "Close"
   },
   "language": {
     "title": "Choose your language",

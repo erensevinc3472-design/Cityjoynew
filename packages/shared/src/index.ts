@@ -37,5 +37,6 @@ export * from './posts/posts';
 export * from './posts/social';
 export * from './posts/word-filter';
 export * from './search/search';
+export * from './media/video';
 export * from './messages/messages';
 export * from './notifications/notifications';
