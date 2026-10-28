@@ -50,6 +50,10 @@ npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
 # Mobil web sürümü: cd apps/mobile && EXPO_OFFLINE=1 CI=1 npm run export:web  (dist/)
+# Telefonda (Expo Go, iPhone): bilgisayar ve Expo Go "cityjoy" hesabıyla girişli olmalı (npx expo login --no-browser -u cityjoy,
+#   şifreyi Eren yazar); cd apps/mobile && npx expo start --lan --go, telefonda Safari > exp://<bilgisayar IP>:8081.
+#   İlk derleme ~1 dk sürer, telefon zaman aşımına düşerse "Reload JS". Expo paketleri Expo Go sürümüyle uyumlu olmalı
+#   (npx expo install --check), yoksa "Cannot find native module" hatası çıkar.
 # Panel: cd apps/panel && npm run build   (dist/)
 # Emülatör: npx firebase emulators:start --only auth,firestore --project cityjoynew
 #   mobil EXPO_PUBLIC_FIREBASE_EMULATOR=1, panel VITE_FIREBASE_EMULATOR=1 ile derlenince ona bağlanır
