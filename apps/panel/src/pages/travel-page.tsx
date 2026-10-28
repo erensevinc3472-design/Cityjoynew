@@ -15,17 +15,20 @@ import {
   type TravelPlace,
   type TravelPlaceInput,
   type TravelRegionContent,
+  type TravelReviewStatus,
   type TravelStatus,
 } from '@cityjoy/shared';
-import { createTravelAdmin } from '@cityjoy/shared/firebase';
+import { createTravelAdmin, type TravelAdminKind } from '@cityjoy/shared/firebase';
 
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
 
-type Tab = 'bolge' | 'sehir' | 'yer';
-type Data = { regions: TravelRegionContent[]; cities: TravelCityContent[]; places: TravelPlace[] };
+type Tab = TravelAdminKind;
+type Data = Awaited<ReturnType<ReturnType<typeof createTravelAdmin>['listAll']>>;
+const TABS: Tab[] = ['bolge', 'sehir', 'yer', 'rota', 'yoresel', 'belediye'];
 type RegionDraft = { id: string; tagline: string; description: string; videoUrl: string; isNew: boolean; status: TravelStatus };
 type CityDraft = { id: string; regionId: string; tagline: string; description: string; videoUrl: string; categories: TravelCategory[]; highlights: string; facts: string; isNew: boolean; status: TravelStatus };
 type PlaceDraft = Omit<TravelPlaceInput, 'howToGet' | 'nearby' | 'tips'> & { id: string | null; howToGet: string; nearby: string; tips: string };
@@ -43,10 +46,19 @@ const pairs = <K extends string>(s: string, keys: readonly K[]) =>
     .filter((x): x is { k: K; text: string } => !!x && !!x.text);
 
 /**
- * Seyahat > Keşfet ve Öğren içeriği (admin, ülke geneli; PROJE.md 5.2). Bölge ve şehir tanıtımları, gezilecek yerler.
- * Her içerik önce taslak kaydedilir; doğruluğu kontrol edilince yayına alınır. Uygulama yalnızca yayındakini gösterir.
+ * Seyahat > Keşfet ve Öğren içeriği (admin, ülke geneli; PROJE.md 5.2). Bölge ve şehir tanıtımları, gezilecek yerler,
+ * hazır rotalar, yöresel, Başkanlarla Keşif (belediye tanıtımları). Her içerik önce taslak kaydedilir; doğruluğu kontrol
+ * edilince yayına alınır. Uygulama yalnızca yayındakini gösterir. Belediye personeli bu sayfada yalnızca kendi
+ * tanıtımını ve rotalarını görür (MunicipalTravelPage).
  */
 export function TravelPage() {
+  const { user } = useSession();
+  const isAdmin = !!user?.grants.some((g) => g.role === 'admin');
+  if (user && !isAdmin && user.memberships.some(({ org }) => org.modules.includes('seyahat'))) return <MunicipalTravelPage user={user} />;
+  return <AdminTravelPage />;
+}
+
+function AdminTravelPage() {
   const { user } = useSession();
   const canEdit = !!user && !user.isDemo && can(user.grants, { module: 'seyahat', action: 'duzenle' });
   const admin = user ? createTravelAdmin(firestore, user.uid) : null;
@@ -64,7 +76,7 @@ export function TravelPage() {
   const load = useCallback(async () => {
     setLoadError(false);
     try {
-      setData(user?.isDemo ? { regions: [], cities: [], places: [] } : await createTravelAdmin(firestore, 'okuma').listAll());
+      setData(user?.isDemo ? { regions: [], cities: [], places: [], routes: [], local: [], municipal: [] } : await createTravelAdmin(firestore, 'okuma').listAll());
     } catch {
       setLoadError(true);
     }
@@ -86,8 +98,8 @@ export function TravelPage() {
       setBusy(false);
     }
   };
-  const statusPill = (s?: TravelStatus) => <span className={s === 'yayinda' ? 'pill ok' : 'pill'}>{s ? t(`travel.status.${s}`) : t('travel.status.yok')}</span>;
-  const toggle = (kind: Tab, id: string, s: TravelStatus, label: string) =>
+  const statusPill = (s?: TravelReviewStatus) => <StatusPill status={s} />;
+  const toggle = (kind: Tab, id: string, s: TravelReviewStatus, label: string) =>
     canEdit ? (
       <button className="link" disabled={busy} onClick={() => act(async () => (await admin!.setStatus(kind, id, s === 'yayinda' ? 'taslak' : 'yayinda', label), t(s === 'yayinda' ? 'travel.unpublished' : 'travel.published')))}>
         {s === 'yayinda' ? t('travel.unpublish') : t('travel.publish')}
@@ -197,6 +209,17 @@ export function TravelPage() {
   const regionCities = TR_REGIONS.find((r) => r.id === regionId)?.provinceCodes ?? [];
   const allProvinces = TR_REGIONS.flatMap((r) => r.provinceCodes).sort((a, b) => provinceName(a).localeCompare(provinceName(b), 'tr'));
   const cityPlaces = (data?.places ?? []).filter((p) => p.cityId === cityId);
+  const onError = (text: string) => setMessage({ kind: 'error', text });
+  const citySelect = (
+    <div className="field">
+      <label htmlFor="t-city2">{t('travel.city')}</label>
+      <select id="t-city2" value={cityId} onChange={(e) => setCityId(e.target.value)}>
+        {allProvinces.map((p) => (
+          <option key={p} value={p}>{provinceName(p)}</option>
+        ))}
+      </select>
+    </div>
+  );
 
   return (
     <section className="page">
@@ -218,7 +241,7 @@ export function TravelPage() {
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
 
       <div className="tabs" role="tablist">
-        {(['bolge', 'sehir', 'yer'] as Tab[]).map((x) => (
+        {TABS.map((x) => (
           <button key={x} role="tab" aria-selected={tab === x} className={tab === x ? 'btn' : 'btn ghost'} onClick={() => setTab(x)}>
             {t(`travel.tabs.${x}`)}
           </button>
@@ -368,6 +391,17 @@ export function TravelPage() {
             </table>
           </div>
         </>
+      ) : tab !== 'yer' ? (
+        <>
+          {citySelect}
+          {tab === 'rota' ? (
+            <RoutesTab cityId={cityId} routes={data.routes} places={data.places} canEdit={canEdit} admin={admin} busy={busy} act={act} toggle={(id, s, label) => toggle('rota', id, s, label)} onError={onError} />
+          ) : tab === 'yoresel' ? (
+            <LocalTab cityId={cityId} items={data.local} canEdit={canEdit} admin={admin} busy={busy} act={act} toggle={(id, s, label) => toggle('yoresel', id, s, label)} onError={onError} />
+          ) : (
+            <MunicipalTab cityId={cityId} items={data.municipal} canEdit={canEdit} admin={admin} busy={busy} act={act} toggle={(id, s, label) => toggle('belediye', id, s, label)} onError={onError} />
+          )}
+        </>
       ) : (
         <>
           <div className="field">
@@ -382,7 +416,7 @@ export function TravelPage() {
           {data && data.cities.find((x) => x.id === cityId)?.status !== 'yayinda' && cityPlaces.some((p) => p.status === 'yayinda') ? (
             <p className="pill warn" role="status">{t('travel.cityNotPublished', { city: provinceName(cityId) })}</p>
           ) : null}
-          {canEdit && !P ?<button className="btn" onClick={() => editPlace()}>{t('travel.addPlace')}</button> : null}
+          {canEdit && !P ? <button className="btn" onClick={() => editPlace()}>{t('travel.addPlace')}</button> : null}
           {P ? (
             <form className="form panel-form" onSubmit={savePlace}>
               <h2 className="form-section">{P.id ? P.name : t('travel.addPlace')}</h2>

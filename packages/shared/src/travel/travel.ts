@@ -197,3 +197,155 @@ export const TRAVEL_COUNTRIES: { code: string; flag: string; open: boolean }[] =
   { code: 'JP', flag: '🇯🇵', open: false },
   { code: 'ES', flag: '🇪🇸', open: false },
 ];
+
+// ---- 2. aşama: Hazır Rotalar, Yöresel, Başkanlarla Keşif (PROJE.md 5.2) ----
+
+/**
+ * Belediyenin hazırladığı içerik CityJoy onayından geçer (siyasi mesaj ve parti işareti yasak): belediye "onaya gönder"ir,
+ * admin yayına alır. CityJoy'un kendi içeriği taslak / yayında.
+ */
+export type TravelReviewStatus = TravelStatus | 'onay-bekliyor';
+
+/** Rota temaları (Eren, 29 Ekim 2026: "Bursa'da 1 gün" yerine temalı rotalar, süre ayrıca yazılır). */
+export const ROUTE_THEMES = ['tarih', 'manevi', 'lezzet', 'doga', 'alisveris', 'kultur', 'aile', 'aksam'] as const;
+export type RouteTheme = (typeof ROUTE_THEMES)[number];
+
+/** Süre filtresi: 2-3 saat, yarım gün, 1 gün. */
+export const ROUTE_LENGTHS = ['kisa', 'yarim', 'tam'] as const;
+export type RouteLength = (typeof ROUTE_LENGTHS)[number];
+
+export interface TravelRouteStop {
+  /** Gezilecek yerlerden biriyse kimliği: durak ekranında yerin saat, ücret, ulaşım ve ipucu bilgisi de gösterilir. */
+  placeId?: string;
+  name: string;
+  /** Bu durakta ne yapılır (bir iki cümle). */
+  note: string;
+  /** Önerilen kalış (dakika). */
+  stayMinutes?: number;
+  /** Bir sonraki durağa nasıl gidilir. */
+  next?: TravelStep;
+}
+
+/** Hazır rota. Puan ve "keşfeden" sayısı yoktur (Karar, Eren). */
+export interface TravelRoute {
+  id: string;
+  cityId: string;
+  /** Belediyenin hazırladığı rota: kurum kimliği ("bld-16-nilufer"). Kartta "Belediye tanıtımı" yazar. */
+  municipalityId?: string;
+  theme: RouteTheme;
+  length: RouteLength;
+  title: string;
+  summary: string;
+  /** Toplam süre (dakika). */
+  durationMinutes: number;
+  stops: TravelRouteStop[];
+  tips: string[];
+  order: number;
+  status: TravelReviewStatus;
+  updatedAt: string;
+}
+
+export type TravelRouteInput = Omit<TravelRoute, 'id' | 'updatedAt'>;
+
+/** Yöresel: kültürel miras, el sanatları, lezzetler, gelenekler. */
+export const LOCAL_KINDS = ['miras', 'el-sanati', 'lezzet', 'gelenek'] as const;
+export type LocalKind = (typeof LOCAL_KINDS)[number];
+
+export interface TravelLocalItem {
+  id: string;
+  cityId: string;
+  kind: LocalKind;
+  title: string;
+  /** "Dünyanın tek müziksiz halk oyunu" gibi kısa alt başlık. */
+  subtitle: string;
+  body: string;
+  /** "UNESCO", "Coğrafi işaret" gibi rozetler (en çok 4). */
+  badges: string[];
+  facts: TravelFact[];
+  source?: string;
+  order: number;
+  status: TravelStatus;
+  updatedAt: string;
+}
+
+export type TravelLocalInput = Omit<TravelLocalItem, 'id' | 'updatedAt'>;
+
+/** Başkanlarla Keşif bölge filtresi (küçük ilçelerin bulunmasına yardım eder). */
+export const DISTRICT_ZONES = ['merkez', 'sahil', 'dag', 'ova'] as const;
+export type DistrictZone = (typeof DISTRICT_ZONES)[number];
+
+/**
+ * Başkanlarla Keşif: belediyenin kendi tanıtımı (belge kimliği = kurum kimliği, "bld-16" il, "bld-16-nilufer" ilçe).
+ * Kurallar (Eren onayladı, PROJE.md 5.2): puan yok, bütün ilçeler eşit kart, sıralama nüfusa göre, "Belediye tanıtımı"
+ * etiketi, siyasi mesaj yok; seçim döneminde başkan adı gizlenir (showMayor). Nüfus, bölge ve başkan adının
+ * gösterilmesini yalnızca CityJoy (admin) belirler; belediye yazıyı, sloganı ve videoyu girer.
+ */
+export interface TravelMunicipal {
+  id: string;
+  cityId: string;
+  districtId?: string;
+  slogan: string;
+  description: string;
+  videoUrl?: string;
+  mayorName?: string;
+  /** Admin: seçim döneminde false (yalnızca "Belediye" görünür). */
+  showMayor: boolean;
+  zone?: DistrictZone;
+  /** Admin: TÜİK ADNKS nüfusu ve yılı (sıralama için). */
+  population?: number;
+  populationYear?: string;
+  status: TravelReviewStatus;
+  updatedAt: string;
+}
+
+/** Belediyenin değiştirebildiği alanlar. */
+export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'mayorName'>;
+
+export const ROUTE_LIMITS = { title: 60, summary: 300, stops: 12, note: 300, tips: 6 } as const;
+
+export function validateTravelRoute(r: TravelRouteInput): TravelError[] {
+  const e: TravelError[] = [];
+  if (len(r.title) < 2 || len(r.title) > ROUTE_LIMITS.title) e.push('name');
+  if (len(r.summary) < 10 || len(r.summary) > ROUTE_LIMITS.summary) e.push('summary');
+  if (
+    r.stops.length < 2 ||
+    r.stops.length > ROUTE_LIMITS.stops ||
+    r.stops.some((s) => len(s.name) < 2 || len(s.name) > TRAVEL_LIMITS.name || len(s.note) > ROUTE_LIMITS.note || (s.next && (!len(s.next.text) || len(s.next.text) > TRAVEL_LIMITS.shortText))) ||
+    r.tips.length > ROUTE_LIMITS.tips ||
+    r.tips.some((x) => !len(x) || len(x) > TRAVEL_LIMITS.shortText) ||
+    !(r.durationMinutes > 0 && r.durationMinutes <= 24 * 60)
+  )
+    e.push('lists');
+  return e;
+}
+
+export function validateTravelLocal(x: TravelLocalInput): TravelError[] {
+  const e: TravelError[] = [];
+  if (len(x.title) < 2 || len(x.title) > TRAVEL_LIMITS.name) e.push('name');
+  if (len(x.subtitle) > TRAVEL_LIMITS.shortText) e.push('summary');
+  if (len(x.body) < 10 || len(x.body) > TRAVEL_LIMITS.longText) e.push('about');
+  if (x.badges.length > 4 || x.badges.some((b) => !len(b) || len(b) > 30) || x.facts.length > TRAVEL_LIMITS.facts) e.push('lists');
+  return e;
+}
+
+export function validateTravelMunicipal(m: TravelMunicipalText): TravelError[] {
+  const e: TravelError[] = [];
+  if (len(m.slogan) < 2 || len(m.slogan) > TRAVEL_LIMITS.tagline) e.push('tagline');
+  if (len(m.description) < 10 || len(m.description) > TRAVEL_LIMITS.description) e.push('description');
+  if (len(m.mayorName) > TRAVEL_LIMITS.name) e.push('name');
+  if (!httpsOk(m.videoUrl)) e.push('video');
+  return e;
+}
+
+/** Rotanın süresi: "4,5 saat", "45 dk". */
+export function routeHours(minutes: number): { hours?: number; minutes?: number } {
+  return minutes >= 60 ? { hours: Math.round((minutes / 60) * 2) / 2 } : { minutes };
+}
+
+/** Başkanlarla Keşif sıralaması: nüfusa göre büyükten küçüğe; nüfusu girilmemiş olanlar adla sonda (Karar, Eren). */
+export function byPopulation<T extends { name: string; population?: number }>(a: T, b: T): number {
+  if (a.population != null && b.population != null) return b.population - a.population;
+  if (a.population != null) return -1;
+  if (b.population != null) return 1;
+  return a.name.localeCompare(b.name, 'tr');
+}

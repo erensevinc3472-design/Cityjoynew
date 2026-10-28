@@ -842,7 +842,9 @@ service cloud.firestore {
         && (d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi']) == id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
         && (id.matches('^bld-.+') || id.matches('^krm-[a-z0-9-]{2,80}$'))
         && validScope(d.scope)
-        && d.modules is list && d.modules.hasOnly(['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler'])
+        && d.modules is list && d.modules.hasOnly(['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat'])
+        // Seyahat (Başkanlarla Keşif) yalnızca belediyelere.
+        && (!d.modules.hasAny(['seyahat']) || d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi'])
         && validEmail(d.officialEmail)
         && d.status in ['aktif', 'pasif']
         && (!('contractEndsAt' in d) || d.contractEndsAt is timestamp)
@@ -879,6 +881,7 @@ service cloud.firestore {
         && d.assignments is map && d.assignments.keys().hasOnly(getAfter(orgPath(d.orgId)).data.modules)
         && validAssignment(d.assignments, 'gonderiler') && validAssignment(d.assignments, 'etkinlikler')
         && validAssignment(d.assignments, 'bildirimler') && validAssignment(d.assignments, 'hizmetler')
+        && validAssignment(d.assignments, 'seyahat')
         && (!('expiresAt' in d) || d.expiresAt is timestamp)
         && d.addedBy == request.auth.uid
         && d.updatedAt == request.time;
@@ -2002,6 +2005,87 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ---- Seyahat 2. aşama (PROJE.md 5.2): Hazır Rotalar, Yöresel, Başkanlarla Keşif. Rota ve yöreseli CityJoy (admin)
+    // girer. Belediye personeli (kurumda Seyahat bölümü işaretli) kendi tanıtımını ve rotalarını hazırlar, en çok "onaya
+    // gönderir"; yayına admin alır. Nüfus, bölge ve başkan adının gösterilmesi yalnızca admin'de (Karar, Eren).
+    function travelStaff(orgId) {
+      return orgId is string && orgId.matches('^bld-.+') && isMemberOf(orgId) && get(orgPath(orgId)).data.modules.hasAny(['seyahat']);
+    }
+    function travelStaffCan(orgId, actions) {
+      return orgId is string && orgId.matches('^bld-.+') && isMemberOf(orgId)
+        && get(orgPath(orgId)).data.modules.hasAny(['seyahat'])
+        && get(memberPath(orgId)).data.assignments.get('seyahat', []).hasAny(actions);
+    }
+    function orgProvince(orgId) {
+      return get(orgPath(orgId)).data.scope.provinceCode;
+    }
+    function validTravelRoute(d) {
+      return d.keys().hasOnly(['cityId', 'municipalityId', 'theme', 'length', 'title', 'summary', 'durationMinutes', 'stops', 'tips',
+             'order', 'status', 'updatedAt'])
+        && d.cityId is string && d.cityId.matches('^[0-8][0-9]$')
+        && d.theme in ['tarih', 'manevi', 'lezzet', 'doga', 'alisveris', 'kultur', 'aile', 'aksam']
+        && d.length in ['kisa', 'yarim', 'tam']
+        && d.title is string && d.title.size() >= 2 && d.title.size() <= 60
+        && d.summary is string && d.summary.size() <= 300
+        && d.durationMinutes is int && d.durationMinutes > 0 && d.durationMinutes <= 1440
+        && d.stops is list && d.stops.size() >= 2 && d.stops.size() <= 12
+        && d.get('tips', []) is list && d.get('tips', []).size() <= 6
+        && d.order is int
+        && d.status in ['taslak', 'onay-bekliyor', 'yayinda']
+        && d.updatedAt == request.time;
+    }
+    match /travelRoutes/{id} {
+      allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin()
+        || travelStaff(resource.data.get('municipalityId', null));
+      allow create, update: if validTravelRoute(request.resource.data)
+        && (isAdmin()
+            || (travelStaffCan(request.resource.data.get('municipalityId', null), resource == null ? ['ekle'] : ['ekle', 'duzenle'])
+                && request.resource.data.status in ['taslak', 'onay-bekliyor']
+                && request.resource.data.cityId == orgProvince(request.resource.data.municipalityId)
+                && (resource == null || resource.data.get('municipalityId', null) == request.resource.data.municipalityId)));
+      allow delete: if isAdmin() || travelStaffCan(resource.data.get('municipalityId', null), ['sil']);
+    }
+    match /travelLocal/{id} {
+      allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
+      allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
+        && request.resource.data.keys().hasOnly(['cityId', 'kind', 'title', 'subtitle', 'body', 'badges', 'facts', 'source', 'order', 'status', 'updatedAt'])
+        && request.resource.data.cityId is string && request.resource.data.cityId.matches('^[0-8][0-9]$')
+        && request.resource.data.kind in ['miras', 'el-sanati', 'lezzet', 'gelenek']
+        && request.resource.data.title is string && request.resource.data.title.size() >= 2 && request.resource.data.title.size() <= 80
+        && request.resource.data.body is string && request.resource.data.body.size() <= 2000
+        && request.resource.data.get('badges', []) is list && request.resource.data.get('badges', []).size() <= 4
+        && request.resource.data.get('facts', []) is list && request.resource.data.get('facts', []).size() <= 8;
+      allow delete: if isAdmin();
+    }
+    function validMunicipal(id, d) {
+      return id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
+        && d.keys().hasOnly(['cityId', 'districtId', 'slogan', 'description', 'videoUrl', 'mayorName', 'showMayor', 'zone',
+             'population', 'populationYear', 'status', 'updatedAt'])
+        && d.cityId is string && d.cityId.matches('^[0-8][0-9]$')
+        && d.slogan is string && d.slogan.size() >= 2 && d.slogan.size() <= 60
+        && d.description is string && d.description.size() <= 600
+        && (!('mayorName' in d) || (d.mayorName is string && d.mayorName.size() <= 80))
+        && (!('showMayor' in d) || d.showMayor is bool)
+        && (!('zone' in d) || d.zone in ['merkez', 'sahil', 'dag', 'ova'])
+        && (!('population' in d) || (d.population is int && d.population >= 0))
+        && (!('populationYear' in d) || (d.populationYear is string && d.populationYear.size() <= 10))
+        && travelUrlOk(d, 'videoUrl')
+        && d.status in ['taslak', 'onay-bekliyor', 'yayinda']
+        && d.updatedAt == request.time;
+    }
+    match /travelMunicipal/{id} {
+      allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin() || travelStaff(id);
+      allow create, update: if validMunicipal(id, request.resource.data)
+        && (isAdmin()
+            || (travelStaffCan(id, ['ekle', 'duzenle'])
+                && request.resource.data.status in ['taslak', 'onay-bekliyor']
+                && request.resource.data.cityId == orgProvince(id)
+                && (resource == null
+                    ? !request.resource.data.keys().hasAny(['showMayor', 'zone', 'population', 'populationYear'])
+                    : !request.resource.data.diff(resource.data).affectedKeys().hasAny(['showMayor', 'zone', 'population', 'populationYear']))));
+      allow delete: if isAdmin();
+    }
+
     match /auditLog/{id} {
       allow read: if isAdmin() || (signedIn() && resource.data.actorUid == request.auth.uid);
       allow create: if signedIn()
@@ -2025,7 +2109,7 @@ service cloud.firestore {
                 && request.resource.data.targetId is string && request.resource.data.targetId.matches('^mahalle-.+')
                 && isMuhtarOf(request.resource.data.targetId))
             // Kurum personeli kurumun bölümlerinde (duyuru hazırlama, onay).
-            || (request.resource.data.get('orgId', null) is string && request.resource.data.module in ['gonderiler', 'etkinlikler']
+            || (request.resource.data.get('orgId', null) is string && request.resource.data.module in ['gonderiler', 'etkinlikler', 'seyahat']
                 && staffCan(request.resource.data.orgId, request.resource.data.module, request.resource.data.action)));
       allow update, delete: if false;
     }

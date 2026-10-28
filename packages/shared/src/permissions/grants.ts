@@ -152,7 +152,12 @@ export interface GrantRecord extends PermissionGrant {
 // ---- Kurumlar ----
 
 /** Kuruma verilebilecek bölümler (kurumun içerik bölümleri). */
-export const ORG_MODULES: Module[] = ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler'];
+export const ORG_MODULES: Module[] = ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat'];
+
+/** Seyahat (Başkanlarla Keşif tanıtımı ve rotaları) yalnızca belediyelere verilir. */
+export function orgModulesFor(kind: Organization['kind']): Module[] {
+  return ORG_MODULES.filter((m) => m !== 'seyahat' || orgRole(kind) === 'belediye');
+}
 
 /**
  * Kurum yöneticisinin personele işaretleyebileceği eylemler (Karar, Eren, 27 Ekim 2026: görev hazır kalıptan değil,

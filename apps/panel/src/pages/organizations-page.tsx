@@ -6,6 +6,7 @@ import {
   isValidEmail,
   listMunicipalities,
   ORG_MODULES,
+  orgModulesFor,
   type Module,
   type Organization,
   type OrganizationKind,
@@ -332,7 +333,7 @@ function CreateOrgForm({ user, existingIds, onCancel, onDone }: { user: PanelUse
       <h3 className="form-section">{t('orgs.modulesAndContract')}</h3>
       <fieldset className="form-section checkbox-group">
         <legend className="sr-only">{t('orgs.modules')}</legend>
-        {ORG_MODULES.map((m) => (
+        {(kind === 'belediye' ? ORG_MODULES : ORG_MODULES.filter((m) => m !== 'seyahat')).map((m) => (
           <label key={m}>
             <input type="checkbox" checked={modules.includes(m)} onChange={(e) => setModules(e.target.checked ? [...modules, m] : modules.filter((x) => x !== m))} />
             {t(`nav.${m}`)}
@@ -484,7 +485,7 @@ function OrgDetail({
           <h2 className="form-section">{t('orgs.settings')}</h2>
           <fieldset className="form-section checkbox-group">
             <legend>{t('orgs.modules')}</legend>
-            {ORG_MODULES.map((m) => (
+            {orgModulesFor(org.kind).map((m) => (
               <label key={m}>
                 <input type="checkbox" checked={modules.includes(m)} onChange={(e) => setModules(e.target.checked ? [...modules, m] : modules.filter((x) => x !== m))} />
                 {t(`nav.${m}`)}
