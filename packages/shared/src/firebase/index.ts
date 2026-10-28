@@ -43,3 +43,4 @@ export {
   type TrustedApproverInput,
 } from './approvals';
 export { createAnnouncementPanel, createFirestoreAnnouncementRepository, type SaveMode } from './announcements';
+export { createEventPanel, createFirestoreEventRepository } from './events';

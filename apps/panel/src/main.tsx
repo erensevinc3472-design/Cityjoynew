@@ -10,6 +10,7 @@ import { AuditLogPage } from './pages/audit-log-page';
 import { BusinessesPage } from './pages/businesses-page';
 import { CityGuidePage } from './pages/city-guide-page';
 import { EmergencyNumbersPage } from './pages/emergency-numbers-page';
+import { EventsPage } from './pages/events-page';
 import { GrantsPage } from './pages/grants-page';
 import { LocationsPage } from './pages/locations-page';
 import { LoginPage } from './pages/login-page';
@@ -48,6 +49,7 @@ const router = createHashRouter([
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
       { path: 'onaylar', element: <ApprovalsPage /> },
       { path: 'duyurular', element: <AnnouncementsPage /> },
+      { path: 'etkinlikler', element: <EventsPage /> },
       { path: 'sehir-rehberi', element: <CityGuidePage /> },
       { path: 'kurumlar', element: <OrganizationsPage /> },
       { path: 'yetkiler', element: <GrantsPage /> },

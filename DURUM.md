@@ -4,13 +4,13 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 27 Ekim 2026 (resmî duyurular ve acil duyurular; yetkiler kutucuklarla, "Onaysız yayınla").
+Son güncelleme: 28 Ekim 2026 (etkinlikler, Sosyal Harmoni girişi; önceki: resmî duyurular, kutucuklu yetkiler).
 
 ## Depo ve ortam
 
 - GitHub: `erensevinc3472-design/Cityjoynew` (gizli), ana dal `main`. Eski `cityjoy` deposu kullanılmıyor.
-- Yetki zinciri, şehir rehberi ve onay merkezi 27 Ekim 2026'da `main`'e birleştirildi (PR #3). Sonraki işler
-  `claude/durum-md-continuation-82b1wf` dalında; `main`'e birleştirilmediyse yeni oturum o daldan başlamalı.
+- Yetki zinciri, şehir rehberi ve onay merkezi (PR #3), resmî duyurular ve kutucuklu yetkiler (PR #4) `main`'de. Sonraki
+  işler `claude/durum-md-continuation-82b1wf` dalında; `main`'e birleştirilmediyse yeni oturum o daldan başlamalı.
 - Firebase projesi: `cityjoynew` (Spark, ücretsiz plan). Firestore bölgesi eur3. Giriş yöntemleri: e-posta/şifre ve Google.
 - Bağlantı bilgileri koda konmaz. `.env.local` dosyaları GitHub'a gitmez ve oturum kapanınca silinir.
   Yeni oturumda yeniden üretmek için ortam değişkeni `FIREBASE_WEB_CONFIG` (konsoldaki `firebaseConfig` bloğu)
@@ -37,8 +37,8 @@ Son güncelleme: 27 Ekim 2026 (resmî duyurular ve acil duyurular; yetkiler kutu
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (67)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (52; Java gerekir)
+npm test                      # ortak paket testleri (70)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (57; Java gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -200,6 +200,23 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    telefona bildirim (sunucu işlevi, Blaze), Keşfet akışıyla birleşme, otomatik çeviri (SORULACAK, PROJE.md 2).
    Not: panel denemesinde `npm run build` kullan (mahalle dosyalarını kopyalar); `npx vite build` kopyalamaz.
 
+19. **Etkinlikler** (PROJE.md 5.3, 6.2 madde 3). Ortak yapı `packages/shared/src/events`. Yetki ve akış duyurularla aynı
+   (bölüm "etkinlikler": Ekle / Onayla / Onaysız yayınla / Sil; muhtar etkinliği il yöneticisinin onayına gider).
+   **Panel > Etkinlikler:** başlık, kategori (10), başlangıç-bitiş (en çok 60 gün), açıklama, mekân ve açık adres (halka açık
+   etkinlikte herkese görünür), hedef bölge, ücretsiz / ücretli (ücret bilgisi), resmî bilet bağlantısı (yalnızca https;
+   CityJoy bilet satmaz), kontenjan, "siyasi parti etkinliği, miting ya da gösteri değildir" onayı. Onay / geri gönderme,
+   **İptal et** ("İptal edildi" etiketiyle bitişine kadar görünür), yayından kaldırma, katılım sayısı ve adını paylaşan
+   katılanların listesi. **Uygulama:** ana sayfada "Sosyal Harmoni" açıldı (`/social`: Etkinlikler hazır; aktiviteler,
+   haberler, yarışmalar, anketler, forum, şehir kulüpleri, fırsatlar "yakında"). Etkinlikler listesi (il geneli / yalnızca
+   ilçem, başlama sırasıyla, iptaller sonda), ayrıntı (tarih, yer, haritada aç, ücret, bilet bağlantısı, kontenjan) ve
+   **Katılıyorum** (giriş gerekir; "adım düzenleyenle paylaşılsın" isteğe bağlı; kontenjan dolunca kapanır; vazgeçilebilir).
+   Hesap silinince katılımlar silinir. Veritabanı: `events`, `events/{id}/attendees/{uid}`; sayaç yalnızca katılım kaydıyla
+   birlikte tam bir değişir (kurallar denetler). Maliyet: il başına tek sorgu (en çok 100), 5 dakika telefonda. Kurallar
+   yeniden düzenlendi: yayınlayan hesabın yetkileri bir kez hesaplanıyor (dolu bir etkinlikte "1000 işlem" sınırı aşılıyordu).
+   Emülatörde tarayıcıyla denendi. Yok (sonra): değişiklik / iptal bildirimi katılanlara (Blaze), etkinlik görseli (Storage),
+   takvime ekleme, "Etkinlik düzenleme yetkisi iste" başvurusu (onay merkezine `etkinlik-yetkisi` türü), kullanıcı
+   aktiviteleri (5.3: herkes açar, tam adres yalnızca katılana).
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Yetkiler kutucuklarla (6.6, 27 Ekim 2026): kurum yöneticisi ve il yöneticisi kişiye verdiği her eylemi işaretler,
@@ -232,9 +249,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
-- **Kurallar ve dizinler yeniden değişti (kutucuklu görevler, "onaysız yayınla", duyurular), yeniden yüklenmeli:** bu dal
-  `main`'e birleşince aynı komut, Eren'in bilgisayarından (güncel ZIP indirip, `firebase.json` olan klasörde). Şehir rehberi
-  ve onay merkezi kuralları 27 Ekim'de yüklendi.
+- **Kurallar ve dizinler yeniden değişti (etkinlikler), yeniden yüklenmeli:** bu dal `main`'e birleşince aynı komut, Eren'in
+  bilgisayarından (güncel ZIP indirip, `firebase.json` olan klasörde). Duyurular dahil önceki kurallar 28 Ekim'de yüklendi.
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
@@ -269,8 +285,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0b. Kurum içeriklerinin devamı: etkinlikler (takvim, kontenjan; etkinlik yetkisi onay merkezine bağlanır), belediye profili
-   (rozet, logo, iletişim, çalışma saatleri; 6.2 madde 2), Mahalle Meydanı sayfası (muhtar bilgisi, sabit duyurular).
+0b. Kurum içeriklerinin devamı: belediye / kurum profili (rozet, iletişim, çalışma saatleri; 6.2 madde 2; logo Storage
+   ister), Mahalle Meydanı sayfası (muhtar bilgisi, sabit duyurular, yaklaşan etkinlikler), "Etkinlik düzenleme yetkisi iste"
+   başvurusu, kullanıcı aktiviteleri.
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"

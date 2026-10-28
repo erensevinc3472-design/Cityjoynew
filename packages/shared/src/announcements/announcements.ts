@@ -2,7 +2,7 @@ import { isMemberActive, isOrganizationActive } from '../organizations/staff';
 import type { Organization, OrganizationMember } from '../organizations/types';
 import { scopeKey } from '../permissions/grants';
 import { isGrantActive } from '../permissions/can';
-import type { Action, PermissionGrant, RegionScope } from '../permissions/types';
+import type { Action, Module, PermissionGrant, RegionScope } from '../permissions/types';
 
 /**
  * Resmî duyurular (PROJE.md 6.2 madde 1, 4, 6; 6.6): kurum (belediye, kurum), muhtar ve il yöneticisi yayınlar.
@@ -113,22 +113,24 @@ export interface Publisher {
 
 export const canPublishDirectly = (p: Pick<Publisher, 'actions'>) => p.actions.includes('yayinla') || p.actions.includes('onayla');
 
+/** Kişinin bir içerik bölümünde (duyurular: gonderiler, etkinlikler) yazabildiği her kurum ve yetki. */
 export function publishersFor(
   grants: readonly PermissionGrant[],
   memberships: readonly { org: Organization; member: OrganizationMember }[],
   now = new Date(),
+  module: Extract<Module, 'gonderiler' | 'etkinlikler'> = 'gonderiler',
 ): Publisher[] {
   const out: Publisher[] = [];
   for (const { org, member } of memberships) {
-    if (!isOrganizationActive(org, now) || !isMemberActive(member, now) || !org.modules.includes('gonderiler')) continue;
-    const actions = member.assignments.gonderiler ?? [];
+    if (!isOrganizationActive(org, now) || !isMemberActive(member, now) || !org.modules.includes(module)) continue;
+    const actions = member.assignments[module] ?? [];
     if (actions.includes('ekle') || actions.includes('onayla')) {
       out.push({ key: org.id, author: { type: 'kurum', orgId: org.id, name: org.name }, scope: org.scope, actions });
     }
   }
   for (const g of grants) {
     if (g.orgId || (g.role !== 'muhtar' && g.role !== 'il-yoneticisi') || !isGrantActive(g, now)) continue;
-    const actions = g.modules.gonderiler ?? [];
+    const actions = g.modules[module] ?? [];
     if (actions.includes('ekle')) {
       const key = scopeKey(g.scope);
       out.push({ key, author: { type: 'kisi', role: g.role, grantKey: key }, scope: g.scope, actions });

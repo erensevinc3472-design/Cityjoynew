@@ -919,31 +919,46 @@ service cloud.firestore {
                 || (r.get('districtId', null) == sc.districtId
                     && (sc.level == 'ilce' || r.get('neighbourhoodId', null) == sc.neighbourhoodId))));
     }
-    // Kurum personelinin duyuru bölümündeki işaretli eylemleri (görev listesi; eski biçimde boş sayılır).
-    function staffCan(orgId, action) {
-      return isMemberOf(orgId) && 'gonderiler' in get(orgPath(orgId)).data.modules
-        && get(memberPath(orgId)).data.assignments.get('gonderiler', []) is list
-        && get(memberPath(orgId)).data.assignments.get('gonderiler', []).hasAny([action]);
+    // Kurum personelinin bir bölümdeki işaretli eylemleri (görev listesi; eski biçimde boş sayılır).
+    function staffCan(orgId, module, action) {
+      return isMemberOf(orgId) && module in get(orgPath(orgId)).data.modules
+        && get(memberPath(orgId)).data.assignments.get(module, []) is list
+        && get(memberPath(orgId)).data.assignments.get(module, []).hasAny([action]);
     }
-    // Yayınlayan hesapta bu eylem var ve hedef bölge hesabın bölgesinin içinde.
-    function authorCan(d, action) {
-      return d.author.type == 'kurum'
-        ? (d.author.keys().hasOnly(['type', 'orgId', 'name']) && d.author.orgId is string
-            && staffCan(d.author.orgId, action)
-            && d.author.name == get(orgPath(d.author.orgId)).data.name
-            && regionWithin(d.region, get(orgPath(d.author.orgId)).data.scope))
-        : (d.author.type == 'kisi' && d.author.keys().hasOnly(['type', 'role', 'grantKey']) && d.author.grantKey is string
-            && grantAllows(d.author.grantKey, 'gonderiler', action)
-            && get(grantPath(d.author.grantKey)).data.role == d.author.role
-            && d.author.role in ['muhtar', 'il-yoneticisi']
-            && regionWithin(d.region, get(grantPath(d.author.grantKey)).data.scope));
+    // Yayınlayan hesabın (kurum ya da kişi yetkisi) bu bölümdeki işaretli eylemleri. Hesap geçersizse, kurum adı tutmuyorsa
+    // ya da hedef bölge hesabın bölgesinin dışındaysa boş liste. (Bir kez hesaplanır: kuralların hesap sınırı aşılmasın.)
+    function orgAuthorActions(d, module) {
+      let ok = d.author.keys().hasOnly(['type', 'orgId', 'name']) && d.author.orgId is string && isMemberOf(d.author.orgId);
+      let org = ok ? get(orgPath(d.author.orgId)).data : null;
+      let acts = ok ? get(memberPath(d.author.orgId)).data.assignments.get(module, []) : [];
+      return ok && module in org.modules && d.author.name == org.name && regionWithin(d.region, org.scope) && acts is list ? acts : [];
     }
-    // Başkasının hazırladığını onaylayan / yayından kaldıran: kurumda "Onayla" işaretli personel; kişi duyurusunda
-    // o ilde duyuru onayı olan il yöneticisi; admin.
-    function canReview(d) {
+    function personAuthorActions(d, module) {
+      let ok = d.author.keys().hasOnly(['type', 'role', 'grantKey']) && d.author.grantKey is string
+        && d.author.role in ['muhtar', 'il-yoneticisi'] && verified() && exists(grantPath(d.author.grantKey));
+      let g = ok ? get(grantPath(d.author.grantKey)).data : null;
+      return ok && g.get('revokedAt', null) == null && (g.get('expiresAt', null) == null || g.expiresAt > request.time)
+        && g.role == d.author.role && regionWithin(d.region, g.scope) ? g.modules.get(module, []) : [];
+    }
+    function authorActions(d, module) {
+      return d.author.type == 'kurum' ? orgAuthorActions(d, module) : d.author.type == 'kisi' ? personAuthorActions(d, module) : [];
+    }
+    function authorCan(d, module, action) {
+      return authorActions(d, module).hasAny([action]);
+    }
+    // Hazırlayanın yazabileceği durum: "Ekle" ile taslak / onaya gönder; "Onaysız yayınla" ya da "Onayla" ile doğrudan yayınla.
+    function authorWriteOk(d, module) {
+      let acts = authorActions(d, module);
+      return acts.hasAny(['ekle'])
+        && ((d.status in ['taslak', 'onay-bekliyor'] && !('publishedAt' in d))
+            || (d.status == 'yayinda' && d.publishedAt == request.time && acts.hasAny(['yayinla', 'onayla'])));
+    }
+    // Başkasının hazırladığını onaylayan / yayından kaldıran: kurumda "Onayla" işaretli personel; kişi içeriğinde
+    // o ilde onay yetkisi olan il yöneticisi; admin.
+    function canReview(d, module) {
       return isAdmin()
-        || (d.author.type == 'kurum' ? staffCan(d.author.orgId, 'onayla')
-            : grantAllows('il-' + d.region.provinceCode, 'gonderiler', 'onayla'));
+        || (d.author.type == 'kurum' ? staffCan(d.author.orgId, module, 'onayla')
+            : grantAllows('il-' + d.region.provinceCode, module, 'onayla'));
     }
     function validAnnouncement(d) {
       return d.keys().hasOnly(['kind', 'title', 'body', 'region', 'endsAt', 'author', 'status', 'preparedBy', 'preparedByName',
@@ -961,11 +976,6 @@ service cloud.firestore {
         && d.updatedAt == request.time;
     }
     // Hazırlayanın seçebileceği durum: taslak, onaya gönder ya da (yetkisi varsa) doğrudan yayınla.
-    function authorStatusOk(d) {
-      return (d.status in ['taslak', 'onay-bekliyor'] && !('publishedAt' in d))
-        || (d.status == 'yayinda' && d.publishedAt == request.time
-            && (authorCan(d, 'yayinla') || authorCan(d, 'onayla')));
-    }
 
     match /announcements/{id} {
       allow read: if resource.data.status == 'yayinda'
@@ -978,8 +988,7 @@ service cloud.firestore {
         && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
         && request.resource.data.createdAt == request.time
         && validAnnouncement(request.resource.data)
-        && authorStatusOk(request.resource.data)
-        && authorCan(request.resource.data, 'ekle');
+        && authorWriteOk(request.resource.data, 'gonderiler');
       // Hazırlayan: yayında olmayanı düzenler / yeniden gönderir. Yayınlayan hesap ve oluşturma tarihi değişmez.
       allow update: if resource.data.preparedBy == request.auth.uid
         && resource.data.status in ['taslak', 'onay-bekliyor', 'reddedildi']
@@ -987,8 +996,7 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt
         && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
         && validAnnouncement(request.resource.data)
-        && authorStatusOk(request.resource.data)
-        && authorCan(request.resource.data, 'ekle');
+        && authorWriteOk(request.resource.data, 'gonderiler');
       // Onay ya da gerekçeli ret (yalnızca durum ve inceleme bilgisi değişir).
       allow update: if resource.data.status == 'onay-bekliyor'
         && request.resource.data.reviewedBy == request.auth.uid
@@ -999,17 +1007,134 @@ service cloud.firestore {
               && request.resource.data.reviewNote is string && request.resource.data.reviewNote.size() >= 5
               && request.resource.data.reviewNote.size() <= 300
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewNote', 'reviewedBy', 'updatedAt'])))
-        && canReview(resource.data);
+        && canReview(resource.data, 'gonderiler');
       // Yayından kaldırma: onaylayan, admin ya da "Sil" yetkisi olan hazırlayan.
       allow update: if resource.data.status == 'yayinda'
         && request.resource.data.status == 'kaldirildi'
         && request.resource.data.reviewedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedBy', 'updatedAt'])
-        && (canReview(resource.data)
-            || (resource.data.preparedBy == request.auth.uid && authorCan(resource.data, 'sil')));
+        && (canReview(resource.data, 'gonderiler')
+            || (resource.data.preparedBy == request.auth.uid && authorCan(resource.data, 'gonderiler', 'sil')));
       // Silinmez: kayıt için kalır.
       allow delete: if false;
+    }
+
+    // ---- Etkinlikler (PROJE.md 5.3, 6.2 madde 3): duyurularla aynı hazırla > onayla > yayınla akışı, bölüm "etkinlikler".
+    // Bilet satılmaz (yalnızca https bağlantı), en çok 60 gün sürer. Katılım sayacı yalnızca katılım kaydıyla birlikte
+    // tam bir artar / azalır, kontenjan aşılamaz.
+    function validEvent(d) {
+      return d.keys().hasOnly(['title', 'description', 'category', 'startsAt', 'endsAt', 'venueName', 'address', 'region', 'free',
+             'priceNote', 'ticketUrl', 'capacity', 'author', 'status', 'preparedBy', 'preparedByName', 'createdAt', 'updatedAt',
+             'publishedAt', 'reviewedBy', 'reviewNote', 'attendeeCount'])
+        && d.title is string && d.title.size() >= 3 && d.title.size() <= 100
+        && d.description is string && d.description.size() >= 10 && d.description.size() <= 3000
+        && d.category in ['kultur-sanat', 'muzik', 'tiyatro-sinema', 'spor', 'cocuk-aile', 'egitim-seminer', 'festival-senlik',
+                          'saglik', 'gonulluluk', 'diger']
+        && d.startsAt is timestamp && d.endsAt is timestamp && d.startsAt <= d.endsAt && d.endsAt > request.time
+        && d.endsAt <= d.startsAt + duration.value(60, 'd')
+        && d.venueName is string && d.venueName.size() >= 2 && d.venueName.size() <= 120
+        && (!('address' in d) || (d.address is string && d.address.size() <= 200))
+        && validLocation(d.region)
+        && d.free is bool
+        && (d.free ? !('priceNote' in d) : (d.priceNote is string && d.priceNote.size() >= 1 && d.priceNote.size() <= 80))
+        && (!('ticketUrl' in d) || (d.ticketUrl is string && d.ticketUrl.size() <= 300 && d.ticketUrl.matches('^https://[^ ]+[.][^ ]+$')))
+        && (!('capacity' in d) || (d.capacity is int && d.capacity >= 1 && d.capacity <= 100000))
+        && d.attendeeCount is int
+        && d.author is map
+        && d.preparedBy == request.auth.uid
+        && d.preparedByName is string && d.preparedByName.size() <= 80
+        && d.updatedAt == request.time;
+    }
+    function eventPath(id) {
+      return /databases/$(database)/documents/events/$(id);
+    }
+    function myAttendancePath(id) {
+      return /databases/$(database)/documents/events/$(id)/attendees/$(request.auth.uid);
+    }
+    // Organizatör tarafı: hazırlayan, kurumda etkinlik bölümünü gören personel, kişi yetkisinin sahibi, onaylayan, admin.
+    function managesEvent(e) {
+      return isAdmin() || (signedIn() && e.preparedBy == request.auth.uid)
+        || (e.author.type == 'kurum' ? staffCan(e.author.orgId, 'etkinlikler', 'goruntule')
+            : grantAllows(e.author.grantKey, 'etkinlikler', 'goruntule'))
+        || canReview(e, 'etkinlikler');
+    }
+
+    match /events/{id} {
+      allow read: if resource.data.status in ['yayinda', 'iptal']
+        || (signedIn() && resource.data.preparedBy == request.auth.uid)
+        || isAdmin()
+        || (resource.data.author.type == 'kurum' && isMemberOf(resource.data.author.orgId))
+        || (resource.data.author.type == 'kisi' && grantAllows('il-' + resource.data.region.provinceCode, 'etkinlikler', 'onayla'));
+      allow create: if request.resource.data.preparedBy == request.auth.uid
+        && request.resource.data.attendeeCount == 0
+        && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && validEvent(request.resource.data)
+        && authorWriteOk(request.resource.data, 'etkinlikler');
+      // Hazırlayan: yayında olmayanı düzenler / yeniden gönderir.
+      allow update: if resource.data.preparedBy == request.auth.uid
+        && resource.data.status in ['taslak', 'onay-bekliyor', 'reddedildi']
+        && request.resource.data.author == resource.data.author
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.attendeeCount == resource.data.attendeeCount
+        && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
+        && validEvent(request.resource.data)
+        && authorWriteOk(request.resource.data, 'etkinlikler');
+      // Onay ya da gerekçeli ret.
+      allow update: if resource.data.status == 'onay-bekliyor'
+        && request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && ((request.resource.data.status == 'yayinda' && request.resource.data.publishedAt == request.time
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'publishedAt', 'reviewedBy', 'updatedAt']))
+            || (request.resource.data.status == 'reddedildi'
+              && request.resource.data.reviewNote is string && request.resource.data.reviewNote.size() >= 5
+              && request.resource.data.reviewNote.size() <= 300
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewNote', 'reviewedBy', 'updatedAt'])))
+        && canReview(resource.data, 'etkinlikler');
+      // İptal (görünür kalır) ve yayından kaldırma: onaylayan, admin ya da hazırlayan (iptal için "Ekle", kaldırma için "Sil").
+      allow update: if request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedBy', 'updatedAt'])
+        && ((resource.data.status == 'yayinda' && request.resource.data.status == 'iptal'
+              && (canReview(resource.data, 'etkinlikler')
+                  || (resource.data.preparedBy == request.auth.uid && authorCan(resource.data, 'etkinlikler', 'ekle'))))
+            || (resource.data.status in ['yayinda', 'iptal'] && request.resource.data.status == 'kaldirildi'
+              && (canReview(resource.data, 'etkinlikler')
+                  || (resource.data.preparedBy == request.auth.uid && authorCan(resource.data, 'etkinlikler', 'sil')))));
+      // "Katılıyorum" sayacı: yalnızca kendi katılım kaydıyla birlikte tam bir artar (yayındaki, bitmemiş etkinlikte,
+      // kontenjan içinde) ya da azalır.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeCount'])
+        && ((request.resource.data.attendeeCount == resource.data.attendeeCount + 1
+              && !exists(myAttendancePath(id)) && existsAfter(myAttendancePath(id))
+              && resource.data.status == 'yayinda' && resource.data.endsAt > request.time
+              && (!('capacity' in resource.data) || request.resource.data.attendeeCount <= resource.data.capacity))
+            || (request.resource.data.attendeeCount == resource.data.attendeeCount - 1
+              && exists(myAttendancePath(id)) && !existsAfter(myAttendancePath(id))));
+      allow delete: if false;
+
+      // Katılım: kişi kendisi ekler ve siler. Ad yalnızca izin verilirse yazılır; organizatör yalnızca adını paylaşanları görür.
+      match /attendees/{uid} {
+        allow read: if isSelf(uid) || (resource.data.shareName == true && managesEvent(get(eventPath(id)).data));
+        allow create: if isSelf(uid)
+          && request.resource.data.keys().hasOnly(['uid', 'shareName', 'displayName', 'createdAt'])
+          && request.resource.data.uid == uid
+          && request.resource.data.shareName is bool
+          && (request.resource.data.shareName
+              ? (request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
+                  && request.resource.data.displayName.size() <= 60)
+              : !('displayName' in request.resource.data))
+          && request.resource.data.createdAt == request.time
+          && getAfter(eventPath(id)).data.attendeeCount == get(eventPath(id)).data.attendeeCount + 1;
+        allow delete: if isSelf(uid)
+          && getAfter(eventPath(id)).data.attendeeCount == get(eventPath(id)).data.attendeeCount - 1;
+        allow update: if false;
+      }
+    }
+    // Hesap silmede kişinin bütün katılımları bulunur.
+    match /{path=**}/attendees/{uid} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
     // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez. Admin hepsini, her yönetici kendi
@@ -1033,8 +1158,8 @@ service cloud.firestore {
             || (request.resource.data.get('orgId', null) is string && request.resource.data.module == 'kurumlar'
                 && isOrgAdminOf(request.resource.data.orgId))
             // Kurum personeli kurumun bölümlerinde (duyuru hazırlama, onay).
-            || (request.resource.data.get('orgId', null) is string && request.resource.data.module == 'gonderiler'
-                && staffCan(request.resource.data.orgId, request.resource.data.action)));
+            || (request.resource.data.get('orgId', null) is string && request.resource.data.module in ['gonderiler', 'etkinlikler']
+                && staffCan(request.resource.data.orgId, request.resource.data.module, request.resource.data.action)));
       allow update, delete: if false;
     }
   }

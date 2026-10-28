@@ -467,5 +467,60 @@
     "until": "Until: {{date}}",
     "urgentNote": "If there is a danger to life, call 112.",
     "gone": "This announcement is no longer published."
+  },
+  "events": {
+    "title": "Events",
+    "one": "Event",
+    "empty": "No upcoming events.",
+    "loadError": "Events could not be loaded.",
+    "needLocation": "Choose your location to see events.",
+    "wholeProvince": "All of {{place}}",
+    "onlyDistrict": "Only {{place}}",
+    "note": "Events are added by municipalities, institutions and authorised accounts.",
+    "gone": "This event is no longer published.",
+    "cancelled": "Cancelled",
+    "cancelledNote": "This event has been cancelled.",
+    "when": "When",
+    "where": "Where",
+    "openMap": "Open in maps",
+    "price": "Price",
+    "free": "Free",
+    "ticket": "Official ticket / registration page",
+    "ticketNote": "CityJoy does not sell tickets; the link goes to the organiser's page.",
+    "attendance": "Attendance",
+    "attending": "{{count}} people attending",
+    "seatsLeft": "{{count}} of {{capacity}} places left",
+    "signIn": "Sign in to say \"I'm going\".",
+    "attend": "I'm going",
+    "leave": "Not going any more",
+    "youAttend": "You are going. Your name was not shared with the organiser.",
+    "youAttendNamed": "You are going. Your name was shared with the organiser.",
+    "shareName": "Share my name with the organiser (optional)",
+    "full": "No places left.",
+    "attendError": "Could not complete. Check your connection.",
+    "categories": {
+      "kultur-sanat": "Culture and arts",
+      "muzik": "Music",
+      "tiyatro-sinema": "Theatre and cinema",
+      "spor": "Sports",
+      "cocuk-aile": "Children and family",
+      "egitim-seminer": "Education and seminars",
+      "festival-senlik": "Festivals",
+      "saglik": "Health",
+      "gonulluluk": "Volunteering",
+      "diger": "Other"
+    }
+  },
+  "social": {
+    "sections": {
+      "events": "Events",
+      "activities": "Activities",
+      "news": "News",
+      "contests": "Contests",
+      "polls": "Polls",
+      "forum": "Forum",
+      "clubs": "City Clubs",
+      "deals": "Deals"
+    }
   }
 }

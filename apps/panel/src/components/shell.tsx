@@ -19,7 +19,7 @@ export const MENU: { module: Module; path?: string }[] = [
   { module: 'islem-kayitlari', path: '/islem-kayitlari' },
   { module: 'bildirimler' },
   { module: 'gonderiler', path: '/duyurular' },
-  { module: 'etkinlikler' },
+  { module: 'etkinlikler', path: '/etkinlikler' },
   { module: 'hizmetler' },
   { module: 'moderasyon', path: '/moderasyon' },
   { module: 'isletme-dogrulama', path: '/isletmeler' },
