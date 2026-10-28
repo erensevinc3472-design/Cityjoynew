@@ -332,6 +332,8 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
 
 Bildirim merkezi, kategorilere göre (duyuru, etkinlik, mesaj, takip, yarışma, güvenlik/SOS), okundu/okunmadı. Kategori bazında açma-kapama ve sessiz saatler. Acil kamu duyuruları ve SOS bildirimleri varsayılan olarak açıktır, kapatılırsa kullanıcı uyarılır. Kampanya bildirimleri için ayrı izin (bölüm 3.1).
 
+- **Yapıldı (28 Ekim 2026):** uygulama içi bildirim merkezi (ana sayfada zil, son 14 gün, okundu/okunmadı), tür başına aç/kapa (acil ve SOS kapatılırken uyarı), sessiz saatler; Panel > Bildirimler'de admin bildirim üreten olayları seçer (acil ve SOS kapatılamaz). Sunucu işlevi olmadan: liste uygulamanın okuduğu kaynaklardan toplanır. Telefona anlık bildirim ve panelden gruba bildirim (bölüm 7) sonra. Yarışma türü yarışmalarla gelecek. Ayrıntı DURUM.md 30. madde.
+
 ## 6. Roller ve yönetim panelleri
 
 | Rol | Kapsam | Ne yapabilir (öneri taslağı) |

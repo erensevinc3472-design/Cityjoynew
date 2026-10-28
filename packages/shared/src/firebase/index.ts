@@ -51,3 +51,4 @@ export { createFirestoreSocialRepository, createProfileModeration, type ProfileR
 export { createBannedWords } from './word-filter';
 export { createSearchSuggestions } from './search';
 export { createFirestoreMessageRepository, createMessageModeration, type MessageReport } from './messages';
+export { createNotificationSettings, createNotificationTriggers } from './notifications';

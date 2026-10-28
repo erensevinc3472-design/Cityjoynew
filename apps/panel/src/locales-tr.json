@@ -461,6 +461,23 @@
       "saved": "Kaydedildi. Uygulama yeni önerileri bir sonraki açılışta gösterir."
     }
   },
+  "notifications": {
+    "title": "Bildirimler",
+    "intro": "Kullanıcının uygulamadaki bildirim merkezine hangi olayların düşeceği. Kullanıcı kendi türlerini ayrıca açıp kapatabilir.",
+    "sendingSoon": "Gruba bildirim gönderme (il, ilçe, mahalle ve ilgi alanına göre; onaylı kampanyalar) telefona bildirim altyapısıyla birlikte gelecek.",
+    "triggers": "Bildirim üreten olaylar",
+    "categories": { "acil": "Acil duyuru", "sos": "SOS (aile)", "mesaj": "Yeni mesaj ve mesaj isteği", "takip": "Yeni takipçi", "duyuru": "Duyuru", "haber": "Kurum haberi", "etkinlik": "Yeni etkinlik" },
+    "alwaysOn": "her zaman açık",
+    "hint": "Kapatılan tür hiçbir kullanıcının bildirim merkezinde görünmez. Acil duyuru ve SOS kapatılamaz. Her değişiklik işlem kaydına yazılır.",
+    "save": "Kaydet",
+    "saved": "Kaydedildi. Uygulama yeni ayarı bir sonraki açılışta kullanır.",
+    "error": "Kaydedilemedi. Yeniden deneyin.",
+    "loadError": "Ayarlar yüklenemedi.",
+    "retry": "Yeniden dene",
+    "loading": "Yükleniyor…",
+    "adminOnly": "Bu ayarları yalnızca admin değiştirebilir.",
+    "demoReadOnly": "Örnek hesapta yalnızca görüntülenir."
+  },
   "sosSettings": {
     "title": "SOS ayarları",
     "intro": "Uygulamadaki \"SOS - Aileme haber ver\" özelliğinin süreleri. Değişiklik uygulamada bir sonraki SOS ekranı açılışında geçerli olur.",

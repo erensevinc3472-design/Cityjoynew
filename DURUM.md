@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (Mesajlar; önceki: Ara, Kurum Haberleri).
+Son güncelleme: 28 Ekim 2026 (Bildirim merkezi; önceki: Mesajlar, Ara).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -44,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (Mesajlar; önceki: Ara, Kurum Haberleri).
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (99)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (94; Java 21 gerekir)
+npm test                      # ortak paket testleri (104)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (97; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -376,7 +376,23 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    (sohbette "kaldırıldı" görünür) ya da "İşlem gerekmiyor"; işlem kaydına yazılır. Testler: ortak 99 (5 yeni), kurallar
    94 (6 yeni). Panel derlendi, panel bölümü tarayıcıda açılmadı. **Açık:** mesaj bildirimi (push; Blaze ya da EAS),
    mesaj saklama süresi (TTL Blaze ister; kullanım şartlarında yazılacak, avukat), ilan kartıyla başlayan sohbet (ilan
-   platformu gelince), sohbeti kendinden silme.
+   platformu gelince), sohbeti kendinden silme. PR #15 birleşti, kurallar ve dizinler yüklendi (Eren, 28 Ekim).
+
+30. **Bildirim merkezi** (PROJE.md 5.12, 7). Ana sayfanın üst bandında zil (okunmamış varsa altın nokta) > Bildirimler
+   (`apps/mobile/src/app/notifications/`). Son 14 günün olayları, en yeni üstte, okunmamışlar vurgulu, "Tümünü okundu
+   say": acil duyuru, duyuru, kurum haberi, yeni etkinlik (ilindeki), mesaj ve mesaj isteği, yeni takipçi, gelen SOS.
+   **Nasıl çalışıyor:** sunucu işlevi olmadığı için her olaya ayrı bildirim belgesi yazılmaz; liste uygulamanın zaten
+   okuduğu kaynaklardan telefonda toplanır (duyurular ve sohbetler ana sayfada da okunuyor; etkinlik ve takipçiler yalnızca
+   bildirim ekranı açılınca). Okundu bilgisi telefonda. **Ayarlar** (`notifications/settings`): yedi tür için aç/kapa;
+   acil duyuru ve SOS kapatılırken uyarı ve onay, kapalıyken kırmızı uyarı; sessiz saatler (başlangıç / bitiş, gece
+   yarısını aşabilir). Tercihler kişinin özel belgesinde (`users/{uid}/settings/notifications`, yalnızca kendisi okur
+   ve yazar; telefona bildirim gelince sunucu da bunu kullanacak). Hesap silinince silinir. **Panel > Bildirimler**
+   (menüde artık "yakında" değil): admin hangi olayların bildirim ürettiğini seçer (`config/notificationTriggers`;
+   acil ve SOS kapatılamaz, kurallar da zorlar), işlem kaydına yazılır; gruba bildirim gönderme (kampanya) notu.
+   Testler: ortak 104 (5 yeni), kurallar 97 (3 yeni). Panel derlendi, panel sayfası tarayıcıda açılmadı. **Açık:**
+   telefona anlık bildirim (EAS geliştirme derlemesi + Expo push; olay anında göndermek için Blaze sunucu işlevi),
+   panelden gruba bildirim (bölüm 7: hedef, onay, günlük sınır), yarışma bildirimi (yarışmalar gelince), takip isteği
+   bildirimi (istekler profil ekranında).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -451,11 +467,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 29. madde (Mesajlar): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli (2 yeni dizin). Admin Panel >
+0a. 30. madde (Bildirim merkezi): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli (1 yeni dizin). Admin Panel >
    Moderasyon'dan yasaklı kelime listesini (26. madde) ve isterse önerilen aramaları (28. madde) doldurmalı.
 0b. Keşfet'in kalanı: fotoğraf/video (Storage, Blaze), alt gezinme çubuğu (Ana Sayfa, Keşfet, Ara, Profil; görünümü
-   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Sıradaki adaylar (Blaze istemeyen): Bildirim merkezi (5.12;
-   uygulama içi liste, kategori ayarları; telefona bildirim EAS ister), haber yayıncısı başvurusu (avukat teyidi gerekir). Blaze isteyenler:
+   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Blaze ve Eren gerektirmeyen büyük iş kalmadı: sıradakiler
+   Eren'e bağlı (Benim Şehrim Excel'i, nöbetçi eczane onayı, Expo hesabı / EAS ile telefon sürümü, Blaze plana geçiş)
+   ya da avukat teyidi isteyen haber yayıncısı başvurusu. Blaze isteyenler:
    aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.

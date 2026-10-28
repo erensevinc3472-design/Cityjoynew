@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useState, type ComponentProps } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { LANGUAGES } from '@cityjoy/shared';
+import { isUnread, LANGUAGES } from '@cityjoy/shared';
 
 import { AnnouncementCard } from '@/components/announcement-card';
 import { AppButton } from '@/components/app-button';
@@ -13,6 +13,7 @@ import { Screen } from '@/components/screen';
 import { VerifyEmailBanner } from '@/components/verify-email-banner';
 import { useAnnouncements } from '@/lib/announcements';
 import { locationRepository as repo } from '@/lib/locations';
+import { useNotificationFeed, useReadState } from '@/lib/notifications';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
@@ -49,6 +50,9 @@ export default function HomeScreen() {
   const { list: announcements } = useAnnouncements(location);
   const urgent = (announcements ?? []).filter((a) => a.kind === 'acil');
   const latest = (announcements ?? []).filter((a) => a.kind !== 'acil').slice(0, 3);
+  const feed = useNotificationFeed(false);
+  const [read] = useReadState();
+  const hasUnread = (feed ?? []).some((n) => isUnread(n, read));
   const openAnnouncement = (id: string) => router.push({ pathname: '/announcements/[id]', params: { id } });
 
   useEffect(() => {
@@ -73,7 +77,15 @@ export default function HomeScreen() {
   const header = (
     <HeroHeader
       title="CityJoy"
-      right={user ? { icon: 'person-outline', label: t('home.account'), onPress: () => router.push('/account') } : undefined}>
+      right={
+        user
+          ? [
+              // Bildirim merkezi (PROJE.md 5.12); okunmamış varsa altın nokta.
+              { icon: 'notifications-none', label: hasUnread ? t('notifications.titleUnread') : t('notifications.title'), onPress: () => router.push('/notifications'), badge: hasUnread },
+              { icon: 'person-outline', label: t('home.account'), onPress: () => router.push('/account') },
+            ]
+          : undefined
+      }>
       <View style={styles.heroText}>
         {firstName ? <AppText style={{ color: c.heroMuted }}>{t(greetingKey(), { name: firstName })}</AppText> : null}
         <AppText accessibilityRole="header" style={[styles.slogan, { color: c.heroText }]}>

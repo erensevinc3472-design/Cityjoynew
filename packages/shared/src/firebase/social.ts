@@ -104,6 +104,21 @@ export function createFirestoreSocialRepository(db: Firestore) {
       await batch.commit();
     },
 
+    /**
+     * Bildirim merkezi: beni son takip etmeye başlayanlar (en çok 20, en yeni üstte). Ad için profil de okunur; bu
+     * yüzden yalnızca bildirim ekranı açılınca çağrılır.
+     */
+    async recentFollowers(me: string): Promise<{ uid: string; displayName: string; at: string }[]> {
+      const snap = await getDocs(query(collection(db, FOLLOWS), where('followeeUid', '==', me), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(20)));
+      return Promise.all(
+        snap.docs.map(async (d) => {
+          const uid = d.get('followerUid') as string;
+          const p = await getDoc(profileRef(uid)).catch(() => null);
+          return { uid, displayName: (p?.exists() && p.get('displayName')) || '?', at: iso(d.get('createdAt')) ?? new Date().toISOString() };
+        }),
+      );
+    },
+
     /** Bana gelen takip istekleri (gizli hesap). */
     async requests(me: string): Promise<{ uid: string; displayName: string }[]> {
       const snap = await getDocs(query(collection(db, FOLLOWS), where('followeeUid', '==', me), where('status', '==', 'istek'), limit(100)));

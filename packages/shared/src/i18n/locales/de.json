@@ -908,5 +908,59 @@
     "actionError": "Aktion fehlgeschlagen. Versuche es erneut.",
     "youBlocked": "Du hast diese Person blockiert. Hebe die Blockierung im Profil auf, um zu schreiben.",
     "cannotWrite": "Du kannst dieser Person nicht schreiben."
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "titleUnread": "Benachrichtigungen, ungelesene vorhanden",
+    "settings": "Benachrichtigungseinstellungen",
+    "markAll": "Alle als gelesen markieren",
+    "empty": "Keine Benachrichtigungen in den letzten 14 Tagen.",
+    "unread": "Ungelesen",
+    "pushNote": "Benachrichtigungen erscheinen vorerst in der App. Sofortbenachrichtigungen aufs Handy kommen mit der Handy-Version; diese Einstellungen gelten dann ebenfalls.",
+    "message_one": "{{name}} hat dir eine Nachricht gesendet",
+    "message_other": "{{name}} hat dir {{count}} Nachrichten gesendet",
+    "messageRequest": "{{name}} hat dir eine Nachrichtenanfrage gesendet",
+    "event": "Neue Veranstaltung: {{title}}",
+    "follower": "{{name}} folgt dir jetzt",
+    "categories": {
+      "acil": "Dringende Meldungen",
+      "sos": "SOS (Familie)",
+      "mesaj": "Nachrichten",
+      "takip": "Folgen",
+      "duyuru": "Bekanntmachungen",
+      "haber": "Behördennachrichten",
+      "etkinlik": "Veranstaltungen"
+    },
+    "hints": {
+      "acil": "Dringende öffentliche Meldungen für deine Gegend, z. B. Wasserausfall oder Katastrophen.",
+      "sos": "Wenn jemand aus deiner Familie um Hilfe bittet.",
+      "mesaj": "Neue Nachrichten und Nachrichtenanfragen.",
+      "takip": "Personen, die dir neu folgen.",
+      "duyuru": "Bekanntmachungen von Gemeinden, Ortsvorstehern und Behörden.",
+      "haber": "Nachrichten, die Behörden für deine Gegend veröffentlichen.",
+      "etkinlik": "Neue Veranstaltungen in deiner Provinz."
+    },
+    "offByCityJoy": "Diese Art ist derzeit von CityJoy ausgeschaltet.",
+    "criticalWarning": {
+      "acil": "Wenn du dringende Meldungen ausschaltest, verpasst du womöglich wichtige Warnungen wie Wasserausfall, Katastrophen oder Evakuierungen. Trotzdem ausschalten?",
+      "sos": "Wenn du SOS ausschaltest, erfährst du womöglich nicht, wenn jemand aus deiner Familie um Hilfe bittet. Trotzdem ausschalten?"
+    },
+    "criticalOff": {
+      "acil": "Dringende Meldungen sind aus: du könntest wichtige öffentliche Warnungen verpassen.",
+      "sos": "SOS ist aus: du könntest Hilferufe deiner Familie verpassen."
+    },
+    "keepOn": "Eingeschaltet lassen",
+    "turnOffAnyway": "Trotzdem ausschalten",
+    "typesTitle": "Welche Benachrichtigungen möchtest du?",
+    "quietTitle": "Ruhezeiten",
+    "quietOn": "Ruhezeiten verwenden",
+    "quiet": {
+      "start": "Beginn",
+      "end": "Ende"
+    },
+    "earlier": "Eine Stunde früher",
+    "later": "Eine Stunde später",
+    "quietNote": "Während der Ruhezeiten gibt dein Handy keinen Benachrichtigungston aus. Dringende Meldungen und SOS kommen trotzdem an.",
+    "saveError": "Einstellung konnte nicht gespeichert werden. Prüfe deine Verbindung und versuche es erneut."
   }
 }
