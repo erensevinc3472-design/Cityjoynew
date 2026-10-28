@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (kullanıcı aktiviteleri; önceki: resmî profil, Mahalle Meydanı).
+Son güncelleme: 28 Ekim 2026 (sabit duyuru; önceki: kullanıcı aktiviteleri, resmî profil, Mahalle Meydanı).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -44,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (kullanıcı aktiviteleri; önceki: resmî profil,
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (78)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (66; Java 21 gerekir)
+npm test                      # ortak paket testleri (79)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (67; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -262,6 +262,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Yok (sonra): değişiklik / iptal bildirimi katılanlara (Blaze), günlük açma sınırı (sunucu işlevi), kullanıcı engelleme,
    ilçe düzeyi moderatörün kuyruğu, aktiviteye yorum / mesaj.
 
+22. **Sabit duyuru** (PROJE.md 5.1 Mahalle Meydanı). Panel > Duyurular formunda, hedef mahalle seçili ve tür "duyuru"
+   iken "Mahalle Meydanı'nda sabitle" kutusu. Sabit duyuru acil duyurulardan sonra en üstte (Mahalle Meydanı, Tüm
+   duyurular, ana sayfa) ve "Sabit" etiketi / iğne simgesiyle görünür; düzenleyip işaret kaldırılır ya da yayından
+   kaldırılır. Kurallar: `pinned` yalnızca mahalleye yönelik, acil olmayan duyuruda. Testler: ortak 79, kurallar 67 geçti;
+   panel derlendi. Ekranlar tarayıcıda denenmedi (küçük değişiklik: kutucuk, etiket, sıralama).
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - STK ve kulüpler için ayrı "etkinlik yetkisi iste" başvurusu şimdilik yok (Eren, 28 Ekim 2026): gerekirse admin Panel >
@@ -333,10 +339,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 21. madde (aktiviteler): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli.
-0b. Kurum içeriklerinin devamı (profil, Mahalle Meydanı ve kullanıcı aktiviteleri yapıldı): muhtarın sabitlenmiş duyurusu.
-   ("Etkinlik düzenleme yetkisi iste" başvurusu şimdilik yok, Karar Eren 28 Ekim: STK ve kulüpleri admin Kurumlar
-   sayfasından açar.)
+0a. 22. madde (sabit duyuru): Eren PR'ı birleştirince kurallar yüklenmeli (21. madde PR #7 ve kuralları 28 Ekim'de yüklendi).
+0b. Kurum içerikleri tamam (profil, Mahalle Meydanı, kullanıcı aktiviteleri, sabit duyuru). ("Etkinlik düzenleme yetkisi
+   iste" başvurusu şimdilik yok, Karar Eren 28 Ekim: STK ve kulüpleri admin Kurumlar sayfasından açar.) Sıradaki
+   adaylar: aktivite/etkinlik değişiklik bildirimleri ve günlük sınırlar (Blaze ister), Keşfet (5.5), Haberler (resmî
+   duyurulardan "Kurum Haberleri" akışı, 5.3).
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"

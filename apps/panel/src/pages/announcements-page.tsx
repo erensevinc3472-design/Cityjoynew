@@ -122,6 +122,7 @@ function Announcements({ user }: { user: PanelUser }) {
       <td>
         <strong>{a.title}</strong>
         {a.kind === 'acil' ? <> <span className="pill warn">{t('announcements.kinds.acil')}</span></> : null}
+        {a.pinned ? <> <span className="pill">{t('announcements.pinned')}</span></> : null}
         <details>
           <summary>{t('announcements.showBody')}</summary>
           <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{a.body}</p>
@@ -252,7 +253,7 @@ function Announcements({ user }: { user: PanelUser }) {
                       live ? (
                         <div className="row-actions">
                           {a.preparedBy === user.uid && ['taslak', 'onay-bekliyor', 'reddedildi'].includes(a.status) ? (
-                            <button className="link" disabled={busy} onClick={() => setDraft({ input: { kind: a.kind, title: a.title, body: a.body, region: a.region, ...(a.endsAt ? { endsAt: a.endsAt } : {}) }, existing: a })}>
+                            <button className="link" disabled={busy} onClick={() => setDraft({ input: { kind: a.kind, title: a.title, body: a.body, region: a.region, ...(a.endsAt ? { endsAt: a.endsAt } : {}), ...(a.pinned ? { pinned: true } : {}) }, existing: a })}>
                               {t('announcements.edit')}
                             </button>
                           ) : null}
@@ -330,7 +331,10 @@ function AnnouncementForm({
 
   const submit = (mode: SaveMode) => (e?: FormEvent) => {
     e?.preventDefault();
-    const clean: AnnouncementInput = { ...input, region: cleanRegion(input.region) };
+    const region = cleanRegion(input.region);
+    // Mahalle düzeyinden çıkılınca ya da acil seçilince sabitleme düşer.
+    const pinned = input.pinned && input.kind === 'duyuru' && !!region.neighbourhoodId;
+    const clean: AnnouncementInput = { ...input, region, ...(pinned ? { pinned: true } : { pinned: undefined }) };
     const problems = validateAnnouncement(clean, sc);
     // Seçilmemiş ilçe / mahalle de bölge hatasıdır.
     if (!regionComplete(input.region)) problems.push('region');
@@ -378,6 +382,16 @@ function AnnouncementForm({
         />
         {err('endsAt')}
       </div>
+      {input.kind === 'duyuru' && input.region.neighbourhoodId !== undefined ? (
+        <div className="field checkbox form-section">
+          <label>
+            <input type="checkbox" checked={!!input.pinned} onChange={(e) => set({ pinned: e.target.checked || undefined })} />
+            {t('announcements.pinLabel')}
+          </label>
+          <span className="meta">{t('announcements.pinHint')}</span>
+          {err('pinned')}
+        </div>
+      ) : null}
       {errors.includes('region') ? <p className="form-section error" role="alert">{t('announcements.errors.region')}</p> : null}
       <p className="form-section meta">{t('announcements.languageNote')}</p>
 

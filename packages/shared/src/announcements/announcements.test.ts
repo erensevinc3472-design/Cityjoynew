@@ -57,6 +57,16 @@ describe('resmî duyurular', () => {
       { id: 'yeni', kind: 'duyuru' as const, publishedAt: '2026-10-26' },
     ]);
     expect(feed.map((a) => a.id)).toEqual(['acil', 'yeni', 'eski']);
+    // Sabitlenen: acilden sonra, diğerlerinden önce.
+    const withPinned = sortForFeed([...feed, { id: 'sabit', kind: 'duyuru' as const, publishedAt: '2026-09-01', pinned: true }]);
+    expect(withPinned.map((a) => a.id)).toEqual(['acil', 'sabit', 'yeni', 'eski']);
+  });
+
+  it('sabitleme yalnızca mahalleye yönelik, acil olmayan duyuruda', () => {
+    const mahalle = { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-ataevler' };
+    expect(validateAnnouncement(input({ region: mahalle, pinned: true }), ataevler, now)).toEqual([]);
+    expect(validateAnnouncement(input({ pinned: true }), nilufer, now)).toEqual(['pinned']);
+    expect(validateAnnouncement(input({ region: mahalle, kind: 'acil', endsAt: '2026-10-28T12:00:00Z', pinned: true }), ataevler, now)).toEqual(['pinned']);
   });
 
   it('yayınlayan hesaplar: kurum görevi ve muhtar / il yöneticisi yetkisi; onaysız yayınlama işaretten gelir', () => {

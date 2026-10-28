@@ -152,6 +152,18 @@ describe('resmî duyurular', () => {
     expect(await live()).toHaveLength(1);
   });
 
+  it('sabitleme: muhtar mahalle duyurusunu sabitler; ilçe geneli ya da acil duyuru sabitlenemez', async () => {
+    const mahalle = { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-ataevler' };
+    const p2 = await publisher('muhtar2');
+    const baska = { ...mahalle, neighbourhoodId: '16-nilufer-baska' };
+    const id = await panel('muhtar2').save(p2, input({ region: baska, pinned: true }), 'yayinla');
+    expect((await live()).find((a) => a.id === id)?.pinned).toBe(true);
+    const fen = await publisher('fen');
+    await expect(panel('fen').save(fen, input({ pinned: true }), 'yayinla')).rejects.toThrow();
+    const soon = new Date(Date.now() + 86400000).toISOString();
+    await expect(panel('fen').save(fen, input({ kind: 'acil', endsAt: soon, region: { ...mahalle }, pinned: true }), 'yayinla')).rejects.toThrow();
+  });
+
   it('yayındaki duyuru değiştirilemez; hazırlayan yalnızca kendi taslağını düzenler', async () => {
     const p = await publisher('fen');
     const id = await panel('fen').save(p, input(), 'yayinla');

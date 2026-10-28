@@ -466,7 +466,8 @@
     "publishedAt": "Veröffentlicht: {{date}}",
     "until": "Bis: {{date}}",
     "urgentNote": "Bei Lebensgefahr rufen Sie 112 an.",
-    "gone": "Diese Bekanntmachung ist nicht mehr veröffentlicht."
+    "gone": "Diese Bekanntmachung ist nicht mehr veröffentlicht.",
+    "pinned": "Angeheftet"
   },
   "events": {
     "title": "Veranstaltungen",

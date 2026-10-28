@@ -799,7 +799,8 @@
       "title": "Başlık 3-100 karakter olmalı.",
       "body": "Metin 10-2000 karakter olmalı.",
       "region": "Bölge seçin; yalnızca yetkili olduğunuz bölge seçilebilir.",
-      "endsAt": "Bitiş tarihi ileri bir tarih olmalı; acil duyuruda zorunlu ve en çok 7 gün."
+      "endsAt": "Bitiş tarihi ileri bir tarih olmalı; acil duyuruda zorunlu ve en çok 7 gün.",
+      "pinned": "Yalnızca mahalleye yönelik, acil olmayan duyuru sabitlenebilir."
     },
     "publish": "Yayınla",
     "send": "Onaya gönder",
@@ -844,7 +845,10 @@
     "noteRequired": "Gerekçe yazın (en az {{min}} karakter).",
     "edit": "Düzenle",
     "unpublish": "Yayından kaldır",
-    "unpublishConfirm": "\"{{title}}\" yayından kaldırılsın mı? Uygulamada artık görünmez."
+    "unpublishConfirm": "\"{{title}}\" yayından kaldırılsın mı? Uygulamada artık görünmez.",
+    "pinned": "Sabit",
+    "pinLabel": "Mahalle Meydanı'nda sabitle",
+    "pinHint": "Muhtarlık saatleri, pazar günü gibi kalıcı bilgiler için. Sabit duyuru, acil duyurulardan sonra en üstte durur; kaldırmak için düzenleyip işareti kaldırın ya da yayından kaldırın."
   },
   "events": {
     "title": "Etkinlikler",

@@ -961,8 +961,10 @@ service cloud.firestore {
             : grantAllows('il-' + d.region.provinceCode, module, 'onayla'));
     }
     function validAnnouncement(d) {
-      return d.keys().hasOnly(['kind', 'title', 'body', 'region', 'endsAt', 'author', 'status', 'preparedBy', 'preparedByName',
+      return d.keys().hasOnly(['kind', 'title', 'body', 'region', 'endsAt', 'pinned', 'author', 'status', 'preparedBy', 'preparedByName',
              'createdAt', 'updatedAt', 'publishedAt', 'reviewedBy', 'reviewNote'])
+        // Sabitleme yalnızca mahalleye yönelik, acil olmayan duyuruda (Mahalle Meydanı).
+        && (!('pinned' in d) || (d.pinned == true && d.kind == 'duyuru' && 'neighbourhoodId' in d.region))
         && d.kind in ['duyuru', 'acil']
         && d.title is string && d.title.size() >= 3 && d.title.size() <= 100
         && d.body is string && d.body.size() >= 10 && d.body.size() <= 2000
