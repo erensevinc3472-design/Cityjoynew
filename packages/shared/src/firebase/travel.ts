@@ -229,6 +229,17 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
       await batch.commit();
     },
 
+    /** Sürükleyerek verilen yeni sıra (gezilecek yerler, rotalar, yöresel; 1'den başlar). Döner: değişen sayısı. */
+    async reorder(kind: 'yer' | 'rota' | 'yoresel', list: { id: string; order: number }[], label: string): Promise<number> {
+      const changed = list.map((x, i) => ({ id: x.id, order: i + 1, before: x.order })).filter((x) => x.order !== x.before);
+      if (!changed.length) return 0;
+      const batch = writeBatch(db);
+      for (const x of changed) batch.update(doc(db, colOf[kind], x.id), { order: x.order, updatedAt: serverTimestamp() });
+      audit(batch, `siralama-${kind}`, 'duzenle', `Sıralama değiştirildi: ${label} (${changed.length} kayıt)`);
+      await batch.commit();
+      return changed.length;
+    },
+
     async remove(kind: 'rota' | 'yoresel', id: string, label: string) {
       const batch = writeBatch(db);
       batch.delete(doc(db, colOf[kind], id));

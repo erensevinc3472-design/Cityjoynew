@@ -5,6 +5,7 @@ import { createOccupationAdmin, occupationIdFromName } from '@cityjoy/shared/fir
 import { firestore } from '../lib/firebase';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 
 const NAME_LABEL: Record<LanguageCode, string> = {
   tr: 'occupations.nameTr',
@@ -43,6 +44,8 @@ export function OccupationsPage() {
 
   const usingDefaults = list !== null && list.length === 0;
   const rows = usingDefaults ? DEFAULT_OCCUPATIONS : (list ?? []);
+  const canSort = canEdit && !usingDefaults && rows.length > 1;
+  const sort = useSortableList(rows);
 
   const act = async (fn: () => Promise<string>) => {
     setBusy(true);
@@ -138,21 +141,37 @@ export function OccupationsPage() {
         <div className="state" aria-live="polite">{t('occupations.loading')}</div>
       ) : (
         <div className="table-wrap">
+          {canSort ? (
+            <SortBar
+              dirty={sort.dirty}
+              busy={busy}
+              onCancel={sort.reset}
+              onSave={() => act(async () => t('sort.saved', { count: await admin!.reorder(sort.list) }))}
+            />
+          ) : null}
           <table>
             <thead>
               <tr>
+                {canSort ? <th scope="col"><span className="sr-only">{t('sort.column')}</span></th> : null}
                 <th scope="col">{t('occupations.order')}</th>
                 <th scope="col">{t('occupations.name')}</th>
                 <th scope="col">{t('occupations.status')}</th>
                 {canEdit && !usingDefaults ? <th scope="col"><span className="sr-only">{t('occupations.edit')}</span></th> : null}
               </tr>
             </thead>
-            <tbody>
-              {rows.map((o) => {
+            <tbody ref={sort.containerRef}>
+              {sort.list.map((o, i) => {
                 const missing = LANGUAGES.filter((l) => !o.names[l.code]).length;
                 return (
-                  <tr key={o.id}>
-                    <td className="num">{o.order}</td>
+                  <tr key={o.id} {...sort.itemProps(o.id)}>
+                    {canSort ? (
+                      <td className="handle-cell">
+                        <button {...sort.handleProps(o.id, o.names.tr)}>
+                          <GripIcon />
+                        </button>
+                      </td>
+                    ) : null}
+                    <td className="num">{i + 1}</td>
                     <td>
                       {o.names.tr}
                       <div className="meta">{missing ? t('occupations.missingTranslations', { count: missing }) : t('occupations.allTranslations')}</div>

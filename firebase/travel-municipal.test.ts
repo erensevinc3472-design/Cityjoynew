@@ -71,6 +71,14 @@ describe('seyahat 2. aşama', () => {
     expect((await app.listRoutes('16')).map((r) => r.id)).toEqual([SEED_ROUTES[0].id]);
     expect((await app.getRoute(SEED_ROUTES[0].id))?.stops.length).toBeGreaterThan(1);
     expect((await app.listLocal('16')).map((x) => x.badges)).toEqual([['UNESCO']]);
+    // Sürükleyerek sıralama: yalnızca sıra ve tarih yazılır, kurallardan geçer; uygulama yeni sırayı gösterir.
+    await admin.setStatus('rota', SEED_ROUTES[1].id, 'yayinda', 'rota 2');
+    const [r1, r2] = (await admin.listAll()).routes.filter((r) => r.status === 'yayinda');
+    expect(await admin.reorder('rota', [r2!, r1!], 'Bursa rotaları')).toBe(2);
+    expect((await app.listRoutes('16')).map((r) => r.id)).toEqual([r2!.id, r1!.id]);
+    const places = (await admin.listAll()).places.filter((p) => p.cityId === '16');
+    expect(await admin.reorder('yer', [...places].reverse(), 'Bursa yerleri')).toBeGreaterThan(0);
+    await expect(createTravelAdmin(fs('ali'), 'ali').reorder('rota', [r2!, r1!], 'x')).rejects.toThrow();
     // Kullanıcı rota yazamaz.
     await expect(createTravelAdmin(fs('ali'), 'ali').saveRoute(null, { ...route, cityId: '16', status: 'yayinda' })).rejects.toThrow();
   }, 30000);

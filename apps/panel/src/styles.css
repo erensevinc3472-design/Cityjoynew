@@ -132,3 +132,14 @@ td input[type='checkbox'] { width: 20px; height: 20px; }
 .check { display: inline-flex; align-items: center; gap: 6px; margin-inline-end: 16px; }
 .stop-row { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-block: 10px; display: grid; gap: 4px; }
 .stop-row .field input + input { margin-top: 6px; }
+
+/* Sürükleyerek sıralama. */
+.drag-handle { display: inline-flex; align-items: center; justify-content: center; width: 36px; min-height: 44px; border: 0; background: transparent; color: var(--muted, #6b7c82); cursor: grab; touch-action: none; border-radius: 8px; }
+.drag-handle:hover, .drag-handle:focus-visible { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.drag-handle:active { cursor: grabbing; }
+[data-sort-id].dragging { background: color-mix(in srgb, var(--accent) 10%, transparent); outline: 2px dashed var(--accent); outline-offset: -2px; }
+td.handle-cell { width: 40px; padding-inline: 4px; }
+.sort-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 14px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--border); color: var(--muted); }
+.sort-bar.dirty { background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: var(--accent); color: inherit; }
+.stop-head { display: flex; align-items: center; gap: 6px; }
+.sorter { margin: 8px 0 16px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; }

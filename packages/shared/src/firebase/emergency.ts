@@ -60,6 +60,17 @@ export function createEmergencyNumberAdmin(db: Firestore, actorUid: string) {
       await batch.commit();
     },
 
+    /** Sürükleyerek verilen yeni sıra (1'den başlar); yalnızca yeri değişenler yazılır. Döner: değişen sayısı. */
+    async reorder(list: EmergencyNumber[]): Promise<number> {
+      const changed = list.map((n, i) => ({ ...n, order: i + 1 })).filter((n, i) => list[i]!.order !== n.order);
+      if (!changed.length) return 0;
+      const batch = writeBatch(db);
+      for (const n of changed) batch.set(doc(db, COLLECTION, n.id), toData(n));
+      audit(batch, 'duzenle', 'siralama', `Acil numara sıralaması değiştirildi (${changed.length} kayıt)`);
+      await batch.commit();
+      return changed.length;
+    },
+
     async setActive(n: EmergencyNumber, active: boolean) {
       const batch = writeBatch(db);
       batch.set(doc(db, COLLECTION, n.id), toData({ ...n, active }));

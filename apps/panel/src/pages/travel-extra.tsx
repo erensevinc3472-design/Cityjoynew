@@ -31,6 +31,7 @@ import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import type { PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { GripIcon, moveId, SortBar, useDragSort, useSortableList } from '../components/sortable';
 
 type Admin = ReturnType<typeof createTravelAdmin>;
 type Act = (fn: () => Promise<string>, after?: () => void) => void;
@@ -63,7 +64,9 @@ function Field(props: { id: string; label: string; value: string; onChange(v: st
 
 // ---- Rota düzenleyici (admin ve belediye ortak) ----
 
-type StopDraft = { placeId: string; name: string; note: string; stay: string; mode: TravelMode | ''; next: string };
+type StopDraft = { key: string; placeId: string; name: string; note: string; stay: string; mode: TravelMode | ''; next: string };
+let stopSeq = 0;
+const stopKey = () => `durak-${++stopSeq}`;
 export type RouteDraft = {
   id: string | null;
   title: string;
@@ -76,7 +79,7 @@ export type RouteDraft = {
   order: number;
 };
 
-const emptyStop = (): StopDraft => ({ placeId: '', name: '', note: '', stay: '', mode: '', next: '' });
+const emptyStop = (): StopDraft => ({ key: stopKey(), placeId: '', name: '', note: '', stay: '', mode: '', next: '' });
 
 export function routeDraftOf(r?: TravelRoute, order = 1): RouteDraft {
   return r
@@ -87,7 +90,7 @@ export function routeDraftOf(r?: TravelRoute, order = 1): RouteDraft {
         length: r.length,
         hours: String(Math.round((r.durationMinutes / 60) * 10) / 10),
         summary: r.summary,
-        stops: r.stops.map((s) => ({ placeId: s.placeId ?? '', name: s.name, note: s.note, stay: s.stayMinutes ? String(s.stayMinutes) : '', mode: s.next?.mode ?? '', next: s.next?.text ?? '' })),
+        stops: r.stops.map((s) => ({ key: stopKey(), placeId: s.placeId ?? '', name: s.name, note: s.note, stay: s.stayMinutes ? String(s.stayMinutes) : '', mode: s.next?.mode ?? '', next: s.next?.text ?? '' })),
         tips: r.tips.join('\n'),
         order: r.order,
       }
@@ -139,12 +142,8 @@ export function RouteEditor({
   const D = draft;
   const set = (patch: Partial<RouteDraft>) => setDraft({ ...D, ...patch });
   const setStop = (i: number, patch: Partial<StopDraft>) => set({ stops: D.stops.map((s, j) => (j === i ? { ...s, ...patch } : s)) });
-  const move = (i: number, by: number) => {
-    const next = [...D.stops];
-    const [x] = next.splice(i, 1);
-    next.splice(i + by, 0, x!);
-    set({ stops: next });
-  };
+  const keys = D.stops.map((s) => s.key);
+  const stopSort = useDragSort(keys, (key, to) => set({ stops: moveId(keys, key, to).map((k) => D.stops.find((s) => s.key === k)!) }));
   return (
     <form className="form panel-form" onSubmit={onSave}>
       <h2 className="form-section">{D.id ? D.title : t('travel.addRoute')}</h2>
@@ -170,10 +169,16 @@ export function RouteEditor({
 
       <fieldset className="form-section">
         <legend>{t('travel.stopsLegend')}</legend>
-        <p className="meta">{t('travel.stopsHint')}</p>
+        <p className="meta">{t('travel.stopsHint')} {t('sort.hint')}</p>
+        <div ref={stopSort.containerRef}>
         {D.stops.map((s, i) => (
-          <div key={i} className="stop-row">
-            <strong>{t('travel.stopN', { n: i + 1 })}</strong>
+          <div key={s.key} {...stopSort.itemProps(s.key)} className={`stop-row${stopSort.dragging === s.key ? ' dragging' : ''}`}>
+            <div className="stop-head">
+              <button {...stopSort.handleProps(s.key, s.name || t('travel.stopN', { n: i + 1 }))}>
+                <GripIcon />
+              </button>
+              <strong>{t('travel.stopN', { n: i + 1 })}</strong>
+            </div>
             <div className="field">
               <label htmlFor={`s-place-${i}`}>{t('travel.stopPlace')}</label>
               <select
@@ -205,12 +210,11 @@ export function RouteEditor({
               </div>
             ) : null}
             <div className="actions">
-              <button type="button" className="link" disabled={i === 0} onClick={() => move(i, -1)}>{t('travel.moveUp')}</button>
-              <button type="button" className="link" disabled={i === D.stops.length - 1} onClick={() => move(i, 1)}>{t('travel.moveDown')}</button>
               <button type="button" className="link" disabled={D.stops.length <= 2} onClick={() => set({ stops: D.stops.filter((_, j) => j !== i) })}>{t('travel.removeStop')}</button>
             </div>
           </div>
         ))}
+        </div>
         {D.stops.length < 12 ? (
           <button type="button" className="btn secondary" onClick={() => set({ stops: [...D.stops, emptyStop()] })}>{t('travel.addStop')}</button>
         ) : null}
@@ -230,22 +234,33 @@ export function RouteEditor({
   );
 }
 
-function RouteTable({ routes, actions }: { routes: TravelRoute[]; actions(r: TravelRoute): ReactNode }) {
+function RouteTable({ routes, actions, onReorder, busy }: { routes: TravelRoute[]; actions(r: TravelRoute): ReactNode; onReorder?(list: TravelRoute[]): void; busy?: boolean }) {
+  const sort = useSortableList(routes);
   return (
+    <>
+    {onReorder && routes.length > 1 ? <SortBar dirty={sort.dirty} busy={busy} onCancel={sort.reset} onSave={() => onReorder(sort.list)} /> : null}
     <div className="table-wrap">
       <table>
         <thead>
           <tr>
+            {onReorder ? <th scope="col"><span className="sr-only">{t('sort.column')}</span></th> : null}
             <th scope="col">{t('travel.order')}</th>
             <th scope="col">{t('travel.routeTitle')}</th>
             <th scope="col">{t('travel.statusLabel')}</th>
             <th scope="col"><span className="sr-only">{t('travel.edit')}</span></th>
           </tr>
         </thead>
-        <tbody>
-          {routes.map((r) => (
-            <tr key={r.id}>
-              <td className="num">{r.order}</td>
+        <tbody ref={sort.containerRef}>
+          {sort.list.map((r, i) => (
+            <tr key={r.id} {...sort.itemProps(r.id)}>
+              {onReorder ? (
+                <td className="handle-cell">
+                  <button {...sort.handleProps(r.id, r.title)}>
+                    <GripIcon />
+                  </button>
+                </td>
+              ) : null}
+              <td className="num">{i + 1}</td>
               <td>
                 <strong>{r.title}</strong>
                 <div className="meta">
@@ -261,6 +276,7 @@ function RouteTable({ routes, actions }: { routes: TravelRoute[]; actions(r: Tra
       </table>
       {!routes.length ? <p className="count">{t('travel.noRoutes')}</p> : null}
     </div>
+    </>
   );
 }
 
@@ -313,6 +329,8 @@ export function RoutesTab({
       ) : null}
       <RouteTable
         routes={own}
+        busy={busy}
+        onReorder={canEdit ? (list) => act(async () => t('sort.saved', { count: await admin!.reorder('rota', list, `${provinceName(cityId)} rotaları`) })) : undefined}
         actions={(r) => (
           <>
             {r.municipalityId ? <span className="meta">{names[r.municipalityId] ?? r.municipalityId}</span> : null}
@@ -364,6 +382,7 @@ export function LocalTab({
 }) {
   const [draft, setDraft] = useState<LocalDraft | null>(null);
   const own = items.filter((x) => x.cityId === cityId);
+  const sort = useSortableList(own);
   const D = draft;
   const set = (patch: Partial<LocalDraft>) => setDraft((d) => (d ? { ...d, ...patch } : d));
   const edit = (x?: TravelLocalItem) =>
@@ -413,20 +432,36 @@ export function LocalTab({
           </div>
         </form>
       ) : null}
+      {canEdit && own.length > 1 ? (
+        <SortBar
+          dirty={sort.dirty}
+          busy={busy}
+          onCancel={sort.reset}
+          onSave={() => act(async () => t('sort.saved', { count: await admin!.reorder('yoresel', sort.list, `Yöresel ${provinceName(cityId)}`) }))}
+        />
+      ) : null}
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
+              {canEdit ? <th scope="col"><span className="sr-only">{t('sort.column')}</span></th> : null}
               <th scope="col">{t('travel.order')}</th>
               <th scope="col">{t('travel.localTitle')}</th>
               <th scope="col">{t('travel.statusLabel')}</th>
               <th scope="col"><span className="sr-only">{t('travel.edit')}</span></th>
             </tr>
           </thead>
-          <tbody>
-            {own.map((x) => (
-              <tr key={x.id}>
-                <td className="num">{x.order}</td>
+          <tbody ref={sort.containerRef}>
+            {sort.list.map((x, i) => (
+              <tr key={x.id} {...sort.itemProps(x.id)}>
+                {canEdit ? (
+                  <td className="handle-cell">
+                    <button {...sort.handleProps(x.id, x.title)}>
+                      <GripIcon />
+                    </button>
+                  </td>
+                ) : null}
+                <td className="num">{i + 1}</td>
                 <td>
                   <strong>{x.title}</strong>
                   <div className="meta">{[t(`travel.localKinds.${x.kind}`), ...x.badges].join(' · ')}</div>

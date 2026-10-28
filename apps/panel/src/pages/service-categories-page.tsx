@@ -15,6 +15,7 @@ import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 
 type Draft = {
   id?: string;
@@ -307,6 +308,16 @@ export function ServiceCategoriesPage() {
         <div className="state" aria-live="polite">{t('services.loading')}</div>
       ) : (
         <div className="table-wrap">
+          {showActions ? (
+            <CategorySorter
+              groups={[
+                { id: '', label: t('services.sortMains'), items: mains },
+                ...mains.map((m) => ({ id: m.id, label: t('services.sortChildrenOf', { name: m.names.tr }), items: childrenOf(m.id) })),
+              ].filter((g) => g.items.length > 1)}
+              busy={busy}
+              onSave={(list) => act(async () => t('sort.saved', { count: await admin!.reorder(list) }))}
+            />
+          ) : null}
           <table>
             <thead>
               <tr>
@@ -325,5 +336,45 @@ export function ServiceCategoriesPage() {
       )}
 
     </section>
+  );
+}
+
+/**
+ * Hizmet kategorilerini sürükleyerek sıralama: ana kategoriler ya da bir ana kategorinin alt kategorileri seçilir
+ * (sıra yalnızca aynı üst kategori içinde anlamlıdır).
+ */
+function CategorySorter({ groups, busy, onSave }: { groups: { id: string; label: string; items: ServiceCategory[] }[]; busy: boolean; onSave(list: ServiceCategory[]): void }) {
+  const [groupId, setGroupId] = useState(groups[0]?.id ?? '');
+  const group = groups.find((g) => g.id === groupId) ?? groups[0];
+  const sort = useSortableList(group?.items ?? []);
+  if (!group) return null;
+  return (
+    <details className="sorter">
+      <summary>{t('services.sortTitle')}</summary>
+      <div className="field">
+        <label htmlFor="sc-sort-group">{t('services.sortGroup')}</label>
+        <select id="sc-sort-group" value={group.id} onChange={(e) => setGroupId(e.target.value)}>
+          {groups.map((g) => (
+            <option key={g.id} value={g.id}>{g.label}</option>
+          ))}
+        </select>
+      </div>
+      <SortBar dirty={sort.dirty} busy={busy} onCancel={sort.reset} onSave={() => onSave(sort.list)} />
+      <table>
+        <tbody ref={sort.containerRef}>
+          {sort.list.map((c, i) => (
+            <tr key={c.id} {...sort.itemProps(c.id)}>
+              <td className="handle-cell">
+                <button {...sort.handleProps(c.id, c.names.tr)}>
+                  <GripIcon />
+                </button>
+              </td>
+              <td className="num">{i + 1}</td>
+              <td>{c.names.tr}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
   );
 }
