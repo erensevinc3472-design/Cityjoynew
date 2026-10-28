@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isPostListed, looksLikeRealEstate, normalizeTargets, validatePost, type PostInput } from '../index';
+import { isCommentListed, isPostListed, looksLikeRealEstate, normalizeTargets, validateComment, validatePost, type PostInput } from '../index';
 
 const input = (patch: Partial<PostInput> = {}): PostInput => ({
   text: 'Parktaki banklar yenilenmiş, teşekkürler!',
@@ -39,6 +39,14 @@ describe('Keşfet gönderileri', () => {
     expect(isPostListed({ status: 'aktif', reportCount: 3, cleared: false })).toBe(false);
     expect(isPostListed({ status: 'aktif', reportCount: 5, cleared: true })).toBe(true);
     expect(isPostListed({ status: 'kaldirildi', reportCount: 0, cleared: true })).toBe(false);
+  });
+
+  it('yorum: 1-500 karakter, şikâyetle gizlenir', () => {
+    expect(validateComment('Harika!')).toBe(true);
+    expect(validateComment('  ')).toBe(false);
+    expect(validateComment('a'.repeat(501))).toBe(false);
+    expect(isCommentListed({ reportCount: 3, cleared: false })).toBe(false);
+    expect(isCommentListed({ reportCount: 3, cleared: true })).toBe(true);
   });
 
   it('hedefler sabit sırada', () => {

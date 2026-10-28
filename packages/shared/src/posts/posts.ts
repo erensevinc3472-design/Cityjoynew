@@ -35,6 +35,9 @@ export interface Post extends PostInput {
   /** "Ayşe K." biçiminde. */
   authorName: string;
   likeCount: number;
+  commentCount: number;
+  /** Sahibi yorumları kapattı (Keşfet kuralları madde 3). */
+  commentsOff: boolean;
   reportCount: number;
   /** Moderatör şikâyetleri inceleyip "yerinde kalsın" dedi. */
   cleared: boolean;
@@ -79,6 +82,35 @@ export function validatePost(p: PostInput): PostError[] {
 export function isPostListed(p: Pick<Post, 'status' | 'reportCount' | 'cleared'>): boolean {
   return p.status === 'aktif' && (p.cleared || p.reportCount < POST_LIMITS.reportThreshold);
 }
+
+/**
+ * Yorumlar (madde 3): gönderiyi görebilen yazar, sahibi yorumları kapatabilir. Yorumu yazan ve gönderi sahibi siler;
+ * yorum da şikâyet edilir, üç şikâyette moderatör inceleyene kadar gizlenir.
+ */
+export interface PostComment {
+  id: string;
+  postId: string;
+  authorUid: string;
+  /** "Ayşe K." biçiminde. */
+  authorName: string;
+  text: string;
+  reportCount: number;
+  cleared: boolean;
+  createdAt: string;
+}
+
+export const COMMENT_LIMITS = {
+  text: [1, 500],
+  /** Gönderi başına bir seferde okunan yorum. */
+  pageSize: 50,
+} as const;
+
+export const validateComment = (text: string) => {
+  const len = text.trim().length;
+  return len >= COMMENT_LIMITS.text[0] && len <= COMMENT_LIMITS.text[1];
+};
+
+export const isCommentListed = (c: Pick<PostComment, 'reportCount' | 'cleared'>) => c.cleared || c.reportCount < POST_LIMITS.reportThreshold;
 
 /** Hedefler sabit sırada saklanır (aynı seçim aynı veri). */
 export const normalizeTargets = (targets: PostTarget[]) => POST_TARGETS.filter((x) => targets.includes(x));

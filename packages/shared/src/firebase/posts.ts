@@ -18,7 +18,16 @@ import {
   type QueryConstraint,
 } from 'firebase/firestore';
 
-import { POST_LIMITS, POST_TARGETS, type Post, type PostInput, type PostReportReason, type PostTarget } from '../posts/posts';
+import {
+  COMMENT_LIMITS,
+  POST_LIMITS,
+  POST_TARGETS,
+  type Post,
+  type PostComment,
+  type PostInput,
+  type PostReportReason,
+  type PostTarget,
+} from '../posts/posts';
 import { addAudit, iso } from './grants';
 
 const COLLECTION = 'posts';
@@ -40,6 +49,8 @@ function fromDoc(id: string, d: DocumentData): Post {
     authorUid: d.authorUid,
     authorName: d.authorName ?? '',
     likeCount: d.likeCount ?? 0,
+    commentCount: d.commentCount ?? 0,
+    commentsOff: d.commentsOff === true,
     reportCount: d.reportCount ?? 0,
     cleared: d.cleared === true,
     createdAt: iso(d.createdAt) ?? '',
@@ -48,6 +59,22 @@ function fromDoc(id: string, d: DocumentData): Post {
 
 const postRef = (db: Firestore, id: string) => doc(db, COLLECTION, id);
 const likeRef = (db: Firestore, id: string, uid: string) => doc(db, COLLECTION, id, 'likes', uid);
+const commentRef = (db: Firestore, postId: string, id: string) => doc(db, COLLECTION, postId, 'comments', id);
+const savedRef = (db: Firestore, uid: string, postId: string) => doc(db, 'users', uid, 'savedPosts', postId);
+const COMMENT_REPORTS = 'commentReports';
+
+function commentFromDoc(postId: string, id: string, d: DocumentData): PostComment {
+  return {
+    id,
+    postId,
+    authorUid: d.authorUid,
+    authorName: d.authorName ?? '',
+    text: d.text ?? '',
+    reportCount: d.reportCount ?? 0,
+    cleared: d.cleared === true,
+    createdAt: iso(d.createdAt) ?? '',
+  };
+}
 
 /** Akış süzgeci: Mahallem kendi mahallesi, Bölgesel kendi ili (istenirse bir ilçesi), Genel herkes. */
 export type FeedFilter =
@@ -107,6 +134,7 @@ export function createFirestorePostRepository(db: Firestore) {
         authorUid: uid,
         authorName: authorName.slice(0, 40),
         likeCount: 0,
+        commentCount: 0,
         reportCount: 0,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -162,8 +190,93 @@ export function createFirestorePostRepository(db: Firestore) {
       return getDoc(doc(db, REPORTS, `${id}_${uid}`)).then((s) => s.exists(), () => false);
     },
 
-    /** Hesap silmede (KVKK): kişinin gönderileri boşaltılır, beğenileri geri alınır. */
+    /** Yorumlar eskiden yeniye (ilk 50; kurallar yalnızca gönderiyi görebilene okutur). */
+    async comments(postId: string): Promise<PostComment[]> {
+      const snap = await getDocs(query(collection(db, COLLECTION, postId, 'comments'), orderBy('createdAt', 'asc'), limit(COMMENT_LIMITS.pageSize)));
+      return snap.docs.map((d) => commentFromDoc(postId, d.id, d.data()));
+    },
+
+    /** Yorum ve sayaç aynı toplu yazımda. Döner: yeni yorum. */
+    async addComment(postId: string, uid: string, authorName: string, text: string): Promise<PostComment> {
+      const ref = doc(collection(db, COLLECTION, postId, 'comments'));
+      const batch = writeBatch(db);
+      batch.set(ref, { authorUid: uid, authorName: authorName.slice(0, 40), text: text.trim(), reportCount: 0, createdAt: serverTimestamp() });
+      batch.update(postRef(db, postId), { commentCount: increment(1), lastComment: ref.id });
+      await batch.commit();
+      return { id: ref.id, postId, authorUid: uid, authorName: authorName.slice(0, 40), text: text.trim(), reportCount: 0, cleared: false, createdAt: new Date().toISOString() };
+    },
+
+    /** Yorumu yazan ya da gönderi sahibi siler; sayaç birlikte azalır. */
+    async deleteComment(postId: string, commentId: string): Promise<void> {
+      const batch = writeBatch(db);
+      batch.delete(commentRef(db, postId, commentId));
+      batch.update(postRef(db, postId), { commentCount: increment(-1), lastComment: commentId });
+      await batch.commit();
+    },
+
+    /** Sahibi yorumları kapatır ya da açar (var olan yorumlar kalır). */
+    async setCommentsOff(id: string, off: boolean): Promise<void> {
+      const batch = writeBatch(db);
+      batch.update(postRef(db, id), { commentsOff: off, updatedAt: serverTimestamp() });
+      await batch.commit();
+    },
+
+    /** Kişi başına yorum başına bir şikâyet; moderatör yorum silinse de yazıyı görsün diye kopyası şikâyette durur. */
+    async reportComment(post: Pick<Post, 'id' | 'region'>, c: Pick<PostComment, 'id' | 'text'>, uid: string, reason: PostReportReason): Promise<void> {
+      const batch = writeBatch(db);
+      batch.set(doc(db, COMMENT_REPORTS, `${post.id}_${c.id}_${uid}`), {
+        postId: post.id,
+        commentId: c.id,
+        reporterUid: uid,
+        reason,
+        text: c.text.slice(0, COMMENT_LIMITS.text[1]),
+        provinceCode: post.region.provinceCode,
+        status: 'yeni',
+        createdAt: serverTimestamp(),
+      });
+      batch.update(commentRef(db, post.id, c.id), { reportCount: increment(1) });
+      await batch.commit();
+    },
+
+    /** Kaydedilenler kişiye özeldir (users/{uid}/savedPosts). */
+    async isSaved(uid: string, postId: string): Promise<boolean> {
+      return getDoc(savedRef(db, uid, postId)).then((s) => s.exists(), () => false);
+    },
+
+    async save(uid: string, postId: string): Promise<void> {
+      const batch = writeBatch(db);
+      batch.set(savedRef(db, uid, postId), { createdAt: serverTimestamp() });
+      await batch.commit();
+    },
+
+    async unsave(uid: string, postId: string): Promise<void> {
+      const batch = writeBatch(db);
+      batch.delete(savedRef(db, uid, postId));
+      await batch.commit();
+    },
+
+    /** Kaydedilenler (yeniden eskiye, en çok 50). Kaldırılan ya da artık görülemeyen gönderi listede yer almaz. */
+    async listSaved(uid: string): Promise<Post[]> {
+      const snap = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), orderBy('createdAt', 'desc'), limit(50)));
+      const posts = await Promise.all(snap.docs.map((d) => getDoc(postRef(db, d.id)).then((p) => (p.exists() ? fromDoc(p.id, p.data()) : null), () => null)));
+      return posts.filter((p): p is Post => !!p && p.status === 'aktif');
+    },
+
+    /** Hesap silmede (KVKK): kişinin gönderileri boşaltılır, beğenileri ve yorumları geri alınır, kaydettikleri silinir. */
     async deleteAllOf(uid: string): Promise<void> {
+      const comments = await getDocs(query(collectionGroup(db, 'comments'), where('authorUid', '==', uid), limit(500)));
+      for (const c of comments.docs) {
+        const batch = writeBatch(db);
+        batch.delete(c.ref);
+        batch.update(c.ref.parent.parent!, { commentCount: increment(-1), lastComment: c.id });
+        await batch.commit();
+      }
+      const saved = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), limit(500)));
+      for (const s of saved.docs) {
+        const batch = writeBatch(db);
+        batch.delete(s.ref);
+        await batch.commit();
+      }
       const mine = await getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), limit(500)));
       for (const d of mine.docs) {
         if (d.get('status') === 'kaldirildi' && !d.get('text')) continue;
@@ -241,5 +354,79 @@ export function createPostModeration(db: Firestore, actorUid: string) {
 
     remove: (r: PostReport) => decide(r, { status: 'kaldirildi' }, 'Gönderi kaldırıldı (şikâyet)'),
     keep: (r: PostReport) => decide(r, { cleared: true }, 'Şikâyet incelendi, gönderi yerinde kaldı'),
+
+    async listCommentReports(scope: 'admin' | { provinceCode: string }): Promise<CommentReport[]> {
+      const q =
+        scope === 'admin'
+          ? query(collection(db, COMMENT_REPORTS), orderBy('createdAt', 'desc'), limit(100))
+          : query(collection(db, COMMENT_REPORTS), where('provinceCode', '==', scope.provinceCode), orderBy('createdAt', 'desc'), limit(100));
+      const snap = await getDocs(q);
+      return Promise.all(
+        snap.docs.map(async (d) => {
+          const data = d.data();
+          const c = await getDoc(commentRef(db, data.postId, data.commentId)).catch(() => null);
+          return {
+            id: d.id,
+            postId: data.postId,
+            commentId: data.commentId,
+            reporterUid: data.reporterUid,
+            reason: data.reason,
+            text: data.text ?? '',
+            provinceCode: data.provinceCode,
+            status: data.status,
+            createdAt: iso(data.createdAt) ?? '',
+            comment: c?.exists() ? commentFromDoc(data.postId, c.id, c.data()) : null,
+          };
+        }),
+      );
+    },
+
+    /** Yorumu siler (sayaç birlikte azalır) ve şikâyeti kapatır; işlem kayda geçer. */
+    async removeComment(r: CommentReport): Promise<void> {
+      const batch = writeBatch(db);
+      if (r.comment) {
+        batch.delete(commentRef(db, r.postId, r.commentId));
+        batch.update(postRef(db, r.postId), { commentCount: increment(-1), lastComment: r.commentId });
+      }
+      batch.update(doc(db, COMMENT_REPORTS, r.id), { status: 'incelendi' });
+      addAudit(db, batch, {
+        actorUid,
+        module: 'moderasyon',
+        action: 'sil',
+        targetId: `${r.postId}/${r.commentId}`,
+        scope: { level: 'il', provinceCode: r.provinceCode },
+        summary: `Yorum silindi (şikâyet): ${r.text.slice(0, 60)}`,
+      });
+      await batch.commit();
+    },
+
+    async keepComment(r: CommentReport): Promise<void> {
+      const batch = writeBatch(db);
+      if (r.comment) batch.update(commentRef(db, r.postId, r.commentId), { cleared: true, moderatedBy: actorUid });
+      batch.update(doc(db, COMMENT_REPORTS, r.id), { status: 'incelendi' });
+      addAudit(db, batch, {
+        actorUid,
+        module: 'moderasyon',
+        action: 'duzenle',
+        targetId: `${r.postId}/${r.commentId}`,
+        scope: { level: 'il', provinceCode: r.provinceCode },
+        summary: `Şikâyet incelendi, yorum yerinde kaldı: ${r.text.slice(0, 60)}`,
+      });
+      await batch.commit();
+    },
   };
+}
+
+export interface CommentReport {
+  id: string;
+  postId: string;
+  commentId: string;
+  reporterUid: string;
+  reason: PostReportReason;
+  /** Şikâyet anındaki yorum yazısı. */
+  text: string;
+  provinceCode: string;
+  status: 'yeni' | 'incelendi';
+  createdAt: string;
+  comment: PostComment | null;
 }
