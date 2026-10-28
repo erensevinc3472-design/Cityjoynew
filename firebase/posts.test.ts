@@ -165,6 +165,8 @@ describe('Keşfet gönderileri', () => {
     await assertSucceeds(repo('ali').save('ali', id));
     expect(await repo('ali').isSaved('ali', id)).toBe(true);
     expect((await repo('ali').listSaved('ali')).map((p) => p.id)).toEqual([id]);
+    expect([...(await repo('ali').savedIds('ali'))]).toEqual([id]);
+    await assertFails(repo('veli').savedIds('ali'));
     await assertFails(getDoc(doc(fs('veli'), 'users', 'ali', 'savedPosts', id)));
     await assertFails(repo('veli').save('ali', id));
     await assertSucceeds(repo('ali').unsave('ali', id));

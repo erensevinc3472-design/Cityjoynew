@@ -299,6 +299,12 @@ export function createFirestorePostRepository(db: Firestore) {
       await batch.commit();
     },
 
+    /** Kaydettiğim gönderilerin kimlikleri (akıştaki kaydet işareti için; oturumda bir kez, en çok 200). */
+    async savedIds(uid: string): Promise<Set<string>> {
+      const snap = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), orderBy('createdAt', 'desc'), limit(200)));
+      return new Set(snap.docs.map((d) => d.id));
+    },
+
     /** Kaydedilenler (yeniden eskiye, en çok 50). Kaldırılan ya da artık görülemeyen gönderi listede yer almaz. */
     async listSaved(uid: string): Promise<Post[]> {
       const snap = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), orderBy('createdAt', 'desc'), limit(50)));

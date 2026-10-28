@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +40,9 @@ export default function NewPostScreen() {
   const { location } = useUserLocation();
   const [text, setText] = useState('');
   const [category, setCategory] = useState<PostCategory>('genel');
-  const [targets, setTargets] = useState<PostTarget[]>(['mahallem']);
+  // Keşfet'te hangi sekmedeyken + düğmesine basıldıysa o hedef seçili gelir; kişi istediği yerleri işaretler.
+  const { target } = useLocalSearchParams<{ target?: string }>();
+  const [targets, setTargets] = useState<PostTarget[]>([POST_TARGETS.includes(target as PostTarget) ? (target as PostTarget) : 'mahallem']);
   const [relative, setRelative] = useState(false);
   const [errors, setErrors] = useState<(PostError | 'relative' | 'banned')[]>([]);
   const hasBanned = useBannedWordCheck();

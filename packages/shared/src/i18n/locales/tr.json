@@ -832,11 +832,25 @@
       },
       "statPosts": "Gönderi",
       "statFollowers": "Takipçi",
-      "statFollowing": "Takip"
+      "statFollowing": "Takip",
+      "following": "Takiptesin",
+      "requestedShort": "İstek gitti"
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
     "share": "Paylaş",
-    "doubleTapHint": "Beğenmek için iki kez dokun"
+    "doubleTapHint": "Beğenmek için iki kez dokun",
+    "tagsLabel": "Etiketler",
+    "tagEmpty": "Bu etikette henüz gönderi yok.",
+    "tags": {
+      "all": "Tümü",
+      "genel": "Genel",
+      "duyuru": "Duyuru",
+      "etkinlik": "Etkinlik",
+      "firsat": "Fırsat",
+      "soru-yardim": "Yardım",
+      "kayip-buluntu": "Kayıp",
+      "taziye": "Taziye"
+    }
   },
   "news": {
     "title": "Haberler",
