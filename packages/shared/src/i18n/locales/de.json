@@ -134,7 +134,7 @@
     "save": "Speichern und weiter"
   },
   "account": {
-    "title": "Mein Konto",
+    "title": "Einstellungen",
     "signOut": "Abmelden",
     "deleteAccount": "Konto löschen",
     "deleteTitle": "Möchtest du dein Konto wirklich löschen?",
@@ -874,7 +874,26 @@
       "statFollowers": "Follower",
       "statFollowing": "Folgt",
       "following": "Folgst du",
-      "requestedShort": "Angefragt"
+      "requestedShort": "Angefragt",
+      "editShort": "Bearbeiten",
+      "share": "Profil teilen",
+      "shareText": "Finde {{name}} auf CityJoy.",
+      "findPeople": "Personen finden",
+      "more": "Weitere Optionen",
+      "familyHint": "Werden bei SOS benachrichtigt",
+      "businessHint": "Betrieb hinzufügen und verwalten",
+      "bioHint": "Wenn du möchtest, kannst du hier auch deinen Wohnort angeben.",
+      "tabs": {
+        "gonderiler": "Beiträge",
+        "kaydedilenler": "Gespeichert",
+        "katildiklarim": "Teilgenommen"
+      },
+      "noPostsOwn": "Noch keine Beiträge. Mit der +-Taste in Entdecken teilst du deinen ersten Beitrag.",
+      "noSaved": "Gespeicherte Beiträge erscheinen hier. Nur du siehst sie.",
+      "noJoined": "Veranstaltungen und Aktivitäten, an denen du teilnimmst, erscheinen hier.",
+      "joinedEvent": "Veranstaltung",
+      "joinedActivity": "Aktivität",
+      "cancelled": "Abgesagt"
     },
     "takipFeedHint": "Beiträge von Personen, denen du folgst, nur für Follower",
     "share": "Teilen",
@@ -1013,7 +1032,14 @@
     "startError": "Du kannst dieser Person gerade nicht schreiben (Blockierung, Altersregel oder Tageslimit für neue Chats).",
     "actionError": "Aktion fehlgeschlagen. Versuche es erneut.",
     "youBlocked": "Du hast diese Person blockiert. Hebe die Blockierung im Profil auf, um zu schreiben.",
-    "cannotWrite": "Du kannst dieser Person nicht schreiben."
+    "cannotWrite": "Du kannst dieser Person nicht schreiben.",
+    "newMessage": "Neue Nachricht",
+    "searchChats": "Chats durchsuchen",
+    "searchPeople": "Personen suchen",
+    "followingTitle": "Personen, denen du folgst",
+    "noFollowing": "Du folgst noch niemandem. Oben kannst du Personen nach Namen suchen.",
+    "writeTo": "{{name}} schreiben",
+    "noMatch": "Kein Chat mit diesem Namen."
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -1073,7 +1099,8 @@
     "home": "Start",
     "explore": "Entdecken",
     "search": "Suche",
-    "profile": "Profil"
+    "profile": "Profil",
+    "messages": "Nachrichten"
   },
   "menu": {
     "open": "Menü öffnen",

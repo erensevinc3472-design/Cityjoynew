@@ -134,7 +134,7 @@
     "save": "Save and continue"
   },
   "account": {
-    "title": "My account",
+    "title": "Settings",
     "signOut": "Sign out",
     "deleteAccount": "Delete account",
     "deleteTitle": "Are you sure you want to delete your account?",
@@ -874,7 +874,26 @@
       "statFollowers": "Followers",
       "statFollowing": "Following",
       "following": "Following",
-      "requestedShort": "Requested"
+      "requestedShort": "Requested",
+      "editShort": "Edit",
+      "share": "Share profile",
+      "shareText": "Find {{name}} on CityJoy.",
+      "findPeople": "Find people",
+      "more": "More options",
+      "familyHint": "Notified when you send SOS",
+      "businessHint": "Add and manage your business",
+      "bioHint": "You can also mention where you live here, if you like.",
+      "tabs": {
+        "gonderiler": "Posts",
+        "kaydedilenler": "Saved",
+        "katildiklarim": "Joined"
+      },
+      "noPostsOwn": "No posts yet. Use the + button in Explore to share your first post.",
+      "noSaved": "Posts you save appear here. Only you can see them.",
+      "noJoined": "Events and activities you join appear here.",
+      "joinedEvent": "Event",
+      "joinedActivity": "Activity",
+      "cancelled": "Cancelled"
     },
     "takipFeedHint": "posts shared only with followers by people you follow",
     "share": "Share",
@@ -1013,7 +1032,14 @@
     "startError": "You can't message this person right now (a block, the age rule or the daily new-chat limit may apply).",
     "actionError": "Could not complete. Try again.",
     "youBlocked": "You blocked this person. Unblock them on their profile to write.",
-    "cannotWrite": "You can't message this person."
+    "cannotWrite": "You can't message this person.",
+    "newMessage": "New message",
+    "searchChats": "Search chats",
+    "searchPeople": "Search people",
+    "followingTitle": "People you follow",
+    "noFollowing": "You don't follow anyone yet. You can search people by name above.",
+    "writeTo": "Write to {{name}}",
+    "noMatch": "No chat with this name."
   },
   "notifications": {
     "title": "Notifications",
@@ -1073,7 +1099,8 @@
     "home": "Home",
     "explore": "Explore",
     "search": "Search",
-    "profile": "Profile"
+    "profile": "Profile",
+    "messages": "Messages"
   },
   "menu": {
     "open": "Open menu",

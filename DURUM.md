@@ -429,6 +429,18 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Yeni paket: react-native-svg. Testler: ortak 104, kurallar 98 (1 yeni). Telefonda ana sayfa ve yan menü görüldü;
    Keşfet, profil, Sosyal Harmoni, karşılama, Acil web önizlemede / tip denetiminde kontrol edildi, telefonda bakılmadı.
 
+33. **Profil ve Mesajlar sekmesi** (PROJE.md 13. madde 31). Alt gezinme beş sekme: Ana Sayfa, Keşfet, **Mesajlar**,
+   Ara, Profil. **Profil** (`/me`, başkasınınki `/u/[uid]`, ortak `components/profile-view.tsx`): Instagram düzeni;
+   üstte ad, zil ve ☰ (Ayarlar = eski Hesabım sayfası, artık geri düğmeli, bildirim ayarları da orada). Halkalı harf,
+   gönderi/takipçi/takip, ad ve tanıtım (il gösterilmez, isteyen tanıtıma yazar). Kendi profilinde Düzenle, Profili
+   paylaş, Kişi bul (Ara'yı Kişiler sekmesiyle açar; arama tek yerde); Ailem (SOS) ve İşletmem kısayol kartları; takip
+   istekleri. Sekmeler: Gönderiler (üçlü ızgara, fotoğraf gelene kadar kategoriye göre renkli yazı kareleri),
+   Kaydedilenler, Katıldıklarım (etkinlik + aktivite; `eventRepository.listJoined`, kişinin kendi katılım kayıtları,
+   mevcut kural ve dizinle). Başkasının profilinde Takip et ve Mesaj; paylaş, şikâyet ve engelle "…" alt menüsünde.
+   Paylaşım yalnızca Keşfet'ten. **Mesajlar:** üstte kullanıcının adı, sağda yeni mesaj, altında sohbetlerde arama;
+   yeni mesaj ekranı (`/messages/new`) takip ettiklerini listeler ve adla kişi arar. Başarımlar ve banner yok (Eren).
+   Testler: kurallar +1 doğrulama (events). Telefonda bakılmadı.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Keşfet'te gönderi birden çok hedefe paylaşılabilir (Eren, 28 Ekim 2026; PROJE.md 5.5).

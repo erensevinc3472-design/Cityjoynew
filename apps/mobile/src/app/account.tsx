@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
-import { BottomNav } from '@/components/bottom-nav';
 import { AppText } from '@/components/app-text';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
@@ -27,6 +26,7 @@ const APPEARANCE: { mode: ThemeMode; key: string }[] = [
   { mode: 'dark', key: 'account.appearanceDark' },
 ];
 
+/** Ayarlar (Profil > ☰; Instagram düzeni): hesap, dil, konum, görünüm, bildirimler, Ailem (SOS), işletme, yasal metinler, çıkış ve hesap silme. */
 export default function AccountScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -69,12 +69,13 @@ export default function AccountScreen() {
   };
 
   return (
-    <FormScreen title={t('account.title')} showBack={false} footer={<BottomNav active="profile" />}>
+    <FormScreen title={t('account.title')}>
       <View style={{ gap: spacing.xs }}>
         <AppText variant="subtitle">{profile?.displayName ?? user?.displayName}</AppText>
         <AppText muted>{user?.email}</AppText>
       </View>
 
+      <OptionRow title={t('notifications.settings')} showChevron onPress={() => router.push('/notifications/settings')} />
       <OptionRow title={t('family.title')} subtitle={t('family.hint')} showChevron onPress={() => router.push('/family')} />
       <OptionRow title={t('business.myTitle')} subtitle={t('business.myHint')} showChevron onPress={() => router.push('/business')} />
       <OptionRow title={t('home.changeLanguage')} subtitle={LANGUAGES.find((l) => l.code === language)?.nativeName} showChevron onPress={() => router.push('/language')} />

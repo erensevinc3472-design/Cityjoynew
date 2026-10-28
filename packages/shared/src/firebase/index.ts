@@ -43,7 +43,7 @@ export {
   type TrustedApproverInput,
 } from './approvals';
 export { createAnnouncementPanel, createFirestoreAnnouncementRepository, type SaveMode } from './announcements';
-export { createEventPanel, createFirestoreEventRepository } from './events';
+export { createEventPanel, createFirestoreEventRepository, type JoinedItem } from './events';
 export { createFirestoreOfficialProfileRepository, createOfficialProfileAdmin } from './official-profiles';
 export { createActivityModeration, createFirestoreActivityRepository, type ActivityReport } from './activities';
 export { createFirestorePostRepository, createPostModeration, type CommentReport, type FeedFilter, type FeedPage, type PostReport } from './posts';
