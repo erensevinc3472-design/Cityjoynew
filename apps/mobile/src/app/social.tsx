@@ -15,10 +15,10 @@ import { useThemeColors } from '@/theme/use-theme';
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
 /** Sosyal Harmoni bölümleri (PROJE.md 5.3). Hazır olanlar açılır, diğerleri "yakında". */
-const SECTIONS: { key: string; icon: IconName; href?: '/events' | '/activities' }[] = [
+const SECTIONS: { key: string; icon: IconName; href?: '/events' | '/activities' | '/news' }[] = [
   { key: 'events', icon: 'event', href: '/events' },
   { key: 'activities', icon: 'groups', href: '/activities' },
-  { key: 'news', icon: 'newspaper' },
+  { key: 'news', icon: 'newspaper', href: '/news' },
   { key: 'contests', icon: 'emoji-events' },
   { key: 'polls', icon: 'poll' },
   { key: 'forum', icon: 'forum' },

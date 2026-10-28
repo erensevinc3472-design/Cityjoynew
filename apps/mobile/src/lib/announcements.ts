@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isAnnouncementLive, isForLocation, sortForFeed, type Announcement, type UserLocation } from '@cityjoy/shared';
+import { isAnnouncementLive, isForLocation, isNotice, sortForFeed, type Announcement, type UserLocation } from '@cityjoy/shared';
 
 import { locationRepository as repo } from './locations';
 import { announcementRepository } from './services';
@@ -10,7 +10,7 @@ const cache = new Map<string, { at: number; list: Announcement[] }>();
 const TTL = 5 * 60 * 1000;
 
 /** Kullanıcının konumuna yönelik yayındaki duyurular: il geneli, kendi ilçesi, kendi mahallesi; acil en üstte. */
-export function useAnnouncements(location: UserLocation | null) {
+export function useAnnouncements(location: UserLocation | null, which: 'duyurular' | 'haberler' | 'hepsi' = 'duyurular') {
   const provinceCode = location?.provinceCode;
   const [all, setAll] = useState<Announcement[] | null>(() => (provinceCode ? (cache.get(provinceCode)?.list ?? null) : []));
   const [failed, setFailed] = useState(false);
@@ -38,7 +38,9 @@ export function useAnnouncements(location: UserLocation | null) {
   }, [load]);
 
   const now = new Date();
-  const list = all && location ? sortForFeed(all.filter((a) => isAnnouncementLive(a, now) && isForLocation(a, location))) : all;
+  // Kurum haberleri duyuru listelerinde görünmez, Haberler sayfasında görünür; Keşfet ikisini de alır.
+  const kindOk = (a: Announcement) => which === 'hepsi' || (which === 'haberler') === !isNotice(a);
+  const list = all && location ? sortForFeed(all.filter((a) => kindOk(a) && isAnnouncementLive(a, now) && isForLocation(a, location))) : all;
   return { list, failed, reload: () => load(true) };
 }
 

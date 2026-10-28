@@ -38,6 +38,7 @@ function fromDoc(id: string, d: DocumentData): Announcement {
     region: d.region,
     ...(d.endsAt ? { endsAt: iso(d.endsAt) } : {}),
     ...(d.pinned === true ? { pinned: true } : {}),
+    ...(d.category ? { category: d.category } : {}),
     author: d.author,
     status: d.status,
     preparedBy: d.preparedBy,
@@ -131,6 +132,7 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
         region: cleanRegion(input.region),
         ...(input.endsAt ? { endsAt: Timestamp.fromDate(new Date(input.endsAt)) } : {}),
         ...(input.pinned ? { pinned: true } : {}),
+        ...(input.kind === 'haber' && input.category ? { category: input.category } : {}),
         author: p.author,
         status,
         preparedBy: actor.uid,
@@ -145,6 +147,7 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
           ...data,
           ...(input.endsAt ? {} : { endsAt: deleteField() }),
           ...(input.pinned ? {} : { pinned: deleteField() }),
+          ...(input.kind === 'haber' ? {} : { category: deleteField() }),
           reviewNote: deleteField(),
           reviewedBy: deleteField(),
         });

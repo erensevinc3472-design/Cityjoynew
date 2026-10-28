@@ -846,7 +846,8 @@
     "kind": "Tür",
     "kinds": {
       "duyuru": "Duyuru",
-      "acil": "Acil duyuru"
+      "acil": "Acil duyuru",
+      "haber": "Kurum haberi"
     },
     "urgentHint": "Acil duyuru en üstte sabit görünür. Bitiş tarihi zorunludur, en çok {{days}} gün olabilir.",
     "titleLabel": "Başlık",
@@ -870,7 +871,8 @@
       "body": "Metin 10-2000 karakter olmalı.",
       "region": "Bölge seçin; yalnızca yetkili olduğunuz bölge seçilebilir.",
       "endsAt": "Bitiş tarihi ileri bir tarih olmalı; acil duyuruda zorunlu ve en çok 7 gün.",
-      "pinned": "Yalnızca mahalleye yönelik, acil olmayan duyuru sabitlenebilir."
+      "pinned": "Yalnızca mahalleye yönelik, acil olmayan duyuru sabitlenebilir.",
+      "category": "Kurum haberi için kategori seçin."
     },
     "publish": "Yayınla",
     "send": "Onaya gönder",
@@ -918,7 +920,21 @@
     "unpublishConfirm": "\"{{title}}\" yayından kaldırılsın mı? Uygulamada artık görünmez.",
     "pinned": "Sabit",
     "pinLabel": "Mahalle Meydanı'nda sabitle",
-    "pinHint": "Muhtarlık saatleri, pazar günü gibi kalıcı bilgiler için. Sabit duyuru, acil duyurulardan sonra en üstte durur; kaldırmak için düzenleyip işareti kaldırın ya da yayından kaldırın."
+    "pinHint": "Muhtarlık saatleri, pazar günü gibi kalıcı bilgiler için. Sabit duyuru, acil duyurulardan sonra en üstte durur; kaldırmak için düzenleyip işareti kaldırın ya da yayından kaldırın.",
+    "newsHint": "Kurum haberi uygulamada Sosyal Harmoni > Haberler'de ve Keşfet akışında görünür; duyuru listelerinde görünmez. Başlık ve kısa metin yazın, kategori seçin.",
+    "category": "Haber kategorisi",
+    "chooseCategory": "Kategori seçin",
+    "categories": {
+      "gundem": "Gündem",
+      "hizmet": "Belediye hizmetleri",
+      "ulasim": "Ulaşım",
+      "kultur-sanat": "Kültür sanat",
+      "spor": "Spor",
+      "egitim": "Eğitim",
+      "saglik": "Sağlık",
+      "cevre": "Çevre",
+      "ekonomi": "Ekonomi"
+    }
   },
   "events": {
     "title": "Etkinlikler",
