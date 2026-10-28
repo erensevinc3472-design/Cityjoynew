@@ -978,7 +978,14 @@
     "postsTooShort": "Gönderilerde aramak için en az 3 harfli bir kelime yazın.",
     "needLocation": "Bu sonuçlar için konumunu seç.",
     "loadError": "Sonuçlar yüklenemedi.",
-    "privateAccount": "Gizli hesap"
+    "privateAccount": "Gizli hesap",
+    "heroLine1": "Ne aramak",
+    "heroLine2": "istersin?",
+    "heroSub": "Kişiler, işletmeler, yerler, etkinlikler ve gönderiler tek yerde.",
+    "clear": "Aramayı temizle",
+    "masters": "Bölgendeki ustalar",
+    "upcoming": "Yaklaşan etkinlikler",
+    "seeAllShort": "Tümünü gör"
   },
   "messages": {
     "title": "Mesajlar",
@@ -1039,7 +1046,8 @@
     "followingTitle": "Takip ettiklerin",
     "noFollowing": "Henüz kimseyi takip etmiyorsun. Yukarıdan adıyla kişi arayabilirsin.",
     "writeTo": "{{name}} kişisine mesaj yaz",
-    "noMatch": "Bu adla bir sohbet yok."
+    "noMatch": "Bu adla bir sohbet yok.",
+    "titleUnread": "Mesajlar, okunmamış var"
   },
   "notifications": {
     "title": "Bildirimler",

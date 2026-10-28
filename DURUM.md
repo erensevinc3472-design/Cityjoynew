@@ -429,17 +429,20 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Yeni paket: react-native-svg. Testler: ortak 104, kurallar 98 (1 yeni). Telefonda ana sayfa ve yan menü görüldü;
    Keşfet, profil, Sosyal Harmoni, karşılama, Acil web önizlemede / tip denetiminde kontrol edildi, telefonda bakılmadı.
 
-33. **Profil ve Mesajlar sekmesi** (PROJE.md 13. madde 31). Alt gezinme beş sekme: Ana Sayfa, Keşfet, **Mesajlar**,
-   Ara, Profil. **Profil** (`/me`, başkasınınki `/u/[uid]`, ortak `components/profile-view.tsx`): Instagram düzeni;
-   üstte ad, zil ve ☰ (Ayarlar = eski Hesabım sayfası, artık geri düğmeli, bildirim ayarları da orada). Halkalı harf,
+33. **Profil, Mesajlar ve Ara** (PROJE.md 13. madde 31-32). Alt gezinme dört sekme (Ana Sayfa, Keşfet, Ara, Profil);
+   **Mesajlar profilin sağ üstünde** (okunmamışta nokta), Mesajlar ekranında geri düğmesi. **Profil** (`/me`, başkasınınki `/u/[uid]`, ortak `components/profile-view.tsx`): Instagram düzeni;
+   üstte solda geri (ana sayfaya), ortada ad (Plus Jakarta 800), sağda Mesajlar ve ☰ (Ayarlar = eski Hesabım sayfası, artık geri düğmeli, bildirim ayarları da orada). Halkalı harf,
    gönderi/takipçi/takip, ad ve tanıtım (il gösterilmez, isteyen tanıtıma yazar). Kendi profilinde Düzenle, Profili
-   paylaş, Kişi bul (Ara'yı Kişiler sekmesiyle açar; arama tek yerde); Ailem (SOS) ve İşletmem kısayol kartları; takip
+   paylaş, Kişi bul (Ara'yı Kişiler sekmesiyle açar, ekran açıksa da geçer; arama tek yerde); Ailem (SOS) ve İşletmem kısayol kartları; takip
    istekleri. Sekmeler: Gönderiler (üçlü ızgara, fotoğraf gelene kadar kategoriye göre renkli yazı kareleri),
    Kaydedilenler, Katıldıklarım (etkinlik + aktivite; `eventRepository.listJoined`, kişinin kendi katılım kayıtları,
    mevcut kural ve dizinle). Başkasının profilinde Takip et ve Mesaj; paylaş, şikâyet ve engelle "…" alt menüsünde.
    Paylaşım yalnızca Keşfet'ten. **Mesajlar:** üstte kullanıcının adı, sağda yeni mesaj, altında sohbetlerde arama;
    yeni mesaj ekranı (`/messages/new`) takip ettiklerini listeler ve adla kişi arar. Başarımlar ve banner yok (Eren).
-   Testler: kurallar +1 doğrulama (events). Telefonda bakılmadı.
+   **Ara** (tasarım ara.html, sadeleştirildi): üstte "Ne aramak istersin?", büyük arama kutusu ve altın ara düğmesi,
+   altın seçili sekmeler; yazınca başlık küçülür. Boşken son aramalar, #önerilen aramalar, bölgendeki ustalar (hizmet
+   kategorileri, acil olanlar önce), yaklaşan etkinlikler, hızlı erişim. Yapay zekâ asistanı, sesli arama, rotalar ve
+   örnek sayılar konmadı (altyapısı yok / sahte veri olurdu). Testler: kurallar +1 doğrulama (events). Telefonda bakılmadı.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

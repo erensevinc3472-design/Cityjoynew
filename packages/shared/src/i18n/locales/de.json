@@ -978,7 +978,14 @@
     "postsTooShort": "Für Beiträge ein Wort mit mindestens 3 Buchstaben eingeben.",
     "needLocation": "Wähle deinen Standort für diese Ergebnisse.",
     "loadError": "Ergebnisse konnten nicht geladen werden.",
-    "privateAccount": "Privates Konto"
+    "privateAccount": "Privates Konto",
+    "heroLine1": "Wonach",
+    "heroLine2": "suchst du?",
+    "heroSub": "Personen, Betriebe, Orte, Veranstaltungen und Beiträge an einem Ort.",
+    "clear": "Suche löschen",
+    "masters": "Handwerker in deiner Nähe",
+    "upcoming": "Kommende Veranstaltungen",
+    "seeAllShort": "Alle ansehen"
   },
   "messages": {
     "title": "Nachrichten",
@@ -1039,7 +1046,8 @@
     "followingTitle": "Personen, denen du folgst",
     "noFollowing": "Du folgst noch niemandem. Oben kannst du Personen nach Namen suchen.",
     "writeTo": "{{name}} schreiben",
-    "noMatch": "Kein Chat mit diesem Namen."
+    "noMatch": "Kein Chat mit diesem Namen.",
+    "titleUnread": "Nachrichten, ungelesen"
   },
   "notifications": {
     "title": "Benachrichtigungen",

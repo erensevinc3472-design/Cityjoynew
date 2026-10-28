@@ -77,6 +77,8 @@ export const GUTTER = 16;
 export const radius = { sm: 10, md: 12, lg: 16, xl: 20, pill: 999 } as const;
 
 export const fonts = {
+  /** Profil adı gibi öne çıkan tek satırlık başlıklar. */
+  display: 'PlusJakartaSans_800ExtraBold',
   heading: 'PlusJakartaSans_700Bold',
   headingSemi: 'PlusJakartaSans_600SemiBold',
   body: 'Inter_400Regular',

@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   isPostListed,
-  isUnread,
   POST_CATEGORIES,
   PROFILE_LIMITS,
   PROFILE_REPORT_REASONS,
@@ -29,7 +28,7 @@ import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { TopBar } from '@/components/top-bar';
 import { useBannedWordCheck } from '@/lib/banned-words';
-import { useNotificationFeed, useReadState } from '@/lib/notifications';
+import { useChats } from '@/lib/messages';
 import { eventRepository, postRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
@@ -80,9 +79,9 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const [error, setError] = useState<string>();
   const iBlocked = blocked.has(uid);
   const hasBanned = useBannedWordCheck();
-  const feed = useNotificationFeed(false);
-  const [read] = useReadState();
-  const hasUnread = (feed ?? []).some((n) => isUnread(n, read));
+  // Mesajlar profilin sağ üstünde (alt menüde değil); okunmamış varsa nokta.
+  const { chats } = useChats(own ? uid : undefined);
+  const unreadChats = (chats ?? []).some((x) => (x.unread[uid] ?? 0) > 0);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -114,10 +113,10 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     if (tab === 'katildiklarim' && joined === null) eventRepository.listJoined(user.uid).then(setJoined, () => setJoined([]));
   }, [tab, own, user, saved, joined]);
 
-  const back = () => (router.canGoBack() ? router.back() : router.replace('/explore'));
+  const back = () => (asTab ? router.dismissTo('/home') : router.canGoBack() ? router.back() : router.replace('/explore'));
   const footer = asTab ? <BottomNav active="profile" /> : null;
   const top = (title: string, right?: ReactNode) => (
-    <TopBar title={title} left={asTab ? undefined : <RoundButton icon="arrow-back" label={t('common.back')} onPress={back} />} right={right} />
+    <TopBar centered title={title} left={<RoundButton icon="arrow-back" label={t('common.back')} onPress={back} />} right={right} />
   );
 
   if (!user || !profile) {
@@ -286,7 +285,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
 
   const right = own ? (
     <>
-      <RoundButton icon="notifications-none" label={hasUnread ? t('notifications.titleUnread') : t('notifications.title')} onPress={() => router.push('/notifications')} badge={hasUnread} />
+      <RoundButton icon="chat-bubble-outline" label={unreadChats ? t('messages.titleUnread') : t('messages.title')} onPress={() => router.push('/messages')} badge={unreadChats} />
       <RoundButton icon="menu" label={t('menu.settings')} onPress={() => router.push('/account')} />
     </>
   ) : blockedMe ? null : (

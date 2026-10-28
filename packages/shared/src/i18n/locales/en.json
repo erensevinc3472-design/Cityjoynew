@@ -978,7 +978,14 @@
     "postsTooShort": "Type a word of at least 3 letters to search posts.",
     "needLocation": "Choose your location for these results.",
     "loadError": "Results could not be loaded.",
-    "privateAccount": "Private account"
+    "privateAccount": "Private account",
+    "heroLine1": "What are you",
+    "heroLine2": "looking for?",
+    "heroSub": "People, businesses, places, events and posts in one place.",
+    "clear": "Clear search",
+    "masters": "Tradespeople near you",
+    "upcoming": "Upcoming events",
+    "seeAllShort": "See all"
   },
   "messages": {
     "title": "Messages",
@@ -1039,7 +1046,8 @@
     "followingTitle": "People you follow",
     "noFollowing": "You don't follow anyone yet. You can search people by name above.",
     "writeTo": "Write to {{name}}",
-    "noMatch": "No chat with this name."
+    "noMatch": "No chat with this name.",
+    "titleUnread": "Messages, unread"
   },
   "notifications": {
     "title": "Notifications",
