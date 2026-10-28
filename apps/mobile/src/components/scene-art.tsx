@@ -6,7 +6,9 @@ import Svg, { Circle, Path } from 'react-native-svg';
  * Kartların arkasındaki çizim sahneleri (13. madde 29). Gerçek fotoğraflar panelden yüklenebilir olunca (Storage,
  * Blaze) yerlerini fotoğraflar alacak; o zamana kadar her modülün kendi renginde sade bir çizim yavaşça kayar.
  */
-export type SceneKind = 'city' | 'travel' | 'social' | 'urgent' | 'townhall' | 'neighbourhood' | 'showcase' | 'cover';
+export type SceneKind =
+  | 'city' | 'travel' | 'social' | 'urgent' | 'townhall' | 'neighbourhood' | 'showcase' | 'cover'
+  | 'events' | 'activities' | 'news' | 'contests' | 'polls' | 'clubs' | 'deals';
 
 interface Scene {
   sky: string;
@@ -20,7 +22,7 @@ interface Scene {
 }
 
 // Hepsi 180x200 çizim alanında; kart boyutuna göre "slice" ile doldurulur.
-const SCENES: Record<SceneKind, Scene> = {
+const BASE_SCENES = {
   city: {
     sky: '#174A50', sun: '#E2B277', sunX: 130, farFill: '#22666B', nearFill: '#0F343A',
     far: 'M0 130 L40 96 L78 118 L120 74 L180 110 L180 200 L0 200 Z',
@@ -69,6 +71,53 @@ const SCENES: Record<SceneKind, Scene> = {
     detail: 'M108 124 v-26',
   },
 };
+
+/** Sosyal Harmoni bölümleri. */
+const SOCIAL_SCENES = {
+  events: {
+    sky: '#3B1F4F', sun: '#F5C77E', sunX: 90, farFill: '#5B2E73', nearFill: '#1F1030',
+    far: 'M20 40 L60 150 L0 150 Z M160 40 L180 150 L120 150 Z',
+    near: 'M0 150 H180 V200 H0 Z M30 150 a10 10 0 1 1 0.1 0 M60 152 a12 12 0 1 1 0.1 0 M96 150 a10 10 0 1 1 0.1 0 M130 152 a12 12 0 1 1 0.1 0 M160 150 a10 10 0 1 1 0.1 0',
+    detail: 'M40 112 h100 M50 100 v12 M130 100 v12',
+  },
+  activities: {
+    sky: '#1E4D3A', sun: '#F5C77E', sunX: 140, farFill: '#2F6B4F', nearFill: '#143326',
+    far: 'M0 140 L40 80 L80 130 L120 70 L180 140 V200 H0 Z',
+    near: 'M0 170 C40 150 90 180 180 160 V200 H0 Z M30 160 l10 -30 l10 30 Z M140 156 l12 -36 l12 36 Z',
+    detail: 'M70 150 l8 -14 l8 14 M78 136 v-8',
+  },
+  news: {
+    sky: '#1F3A4F', sun: '#9CC9F5', sunX: 140, farFill: '#2C5470', nearFill: '#122636',
+    far: 'M24 60 H150 V170 H24 Z',
+    near: 'M0 170 H180 V200 H0 Z',
+    detail: 'M36 76 H138 M36 92 H96 M36 104 H96 M36 116 H96 M36 128 H96 M106 92 H138 V128 H106 Z M36 146 H138',
+  },
+  contests: {
+    sky: '#4A3A15', sun: '#F5C77E', sunX: 140, farFill: '#6B5520', nearFill: '#2A200A',
+    far: 'M60 70 H120 V96 C120 120 104 132 90 132 C76 132 60 120 60 96 Z',
+    near: 'M76 160 H104 V146 H76 Z M64 172 H116 V160 H64 Z M0 172 H180 V200 H0 Z',
+    detail: 'M60 80 C44 80 44 104 62 106 M120 80 C136 80 136 104 118 106 M90 132 V146',
+  },
+  polls: {
+    sky: '#1D3E63', sun: '#9CC9F5', sunX: 146, farFill: '#2D5C8A', nearFill: '#15304D',
+    far: 'M30 150 V110 H54 V150 Z M66 150 V70 H90 V150 Z M102 150 V96 H126 V150 Z',
+    near: 'M0 150 H180 V200 H0 Z',
+    detail: 'M138 130 l6 6 l12 -16',
+  },
+  clubs: {
+    sky: '#173F2A', sun: '#E2B277', sunX: 150, farFill: '#235C3D', nearFill: '#0E2A1B',
+    far: 'M0 120 C40 96 140 96 180 120 V200 H0 Z',
+    near: 'M10 160 C50 140 130 140 170 160 V200 H10 Z',
+    detail: 'M90 140 V176 M70 158 a20 8 0 1 0 40 0 a20 8 0 1 0 -40 0',
+  },
+  deals: {
+    sky: '#4A2A1F', sun: '#F2A47C', sunX: 140, farFill: '#6B3D2C', nearFill: '#2A150E',
+    far: 'M40 80 L110 80 L150 120 L110 160 L40 160 Z',
+    near: 'M0 176 H180 V200 H0 Z',
+    detail: 'M58 120 a6 6 0 1 0 0.1 0 M80 110 L100 132 M82 132 l0 0',
+  },
+} satisfies Record<string, Scene>;
+const SCENES: Record<SceneKind, Scene> = { ...BASE_SCENES, ...SOCIAL_SCENES };
 
 /** Telefonun "hareketi azalt" ayarı açık mı? */
 export function useReduceMotion() {

@@ -538,6 +538,37 @@
       "forum": "Forum",
       "clubs": "Şehir Kulüpleri",
       "deals": "Fırsatlar"
+    },
+    "tapToExplore": "Keşfetmek için dokun",
+    "cards": {
+      "events": {
+        "tag": "Konser ve tiyatro",
+        "desc": "Şehrindeki konserler, tiyatrolar, sergiler ve festivaller."
+      },
+      "activities": {
+        "tag": "Spor ve doğa",
+        "desc": "Yürüyüş, bisiklet, oyun: bir aktivite aç ya da katıl."
+      },
+      "news": {
+        "tag": "Şehrin gündemi",
+        "desc": "Belediye ve kurumlardan şehrine dair haberler."
+      },
+      "contests": {
+        "tag": "Ödüllü",
+        "desc": "Fotoğraf ve bilgi yarışmaları yakında."
+      },
+      "polls": {
+        "tag": "Oylama",
+        "desc": "Şehrin hakkında fikrini söyle; anketler yakında."
+      },
+      "clubs": {
+        "tag": "Takımını takip et",
+        "desc": "Şehrinin kulüpleri, maçları ve haberleri yakında."
+      },
+      "deals": {
+        "tag": "İndirim",
+        "desc": "Doğrulanmış işletmelerden indirimler yakında."
+      }
     }
   },
   "official": {
@@ -795,7 +826,10 @@
         "spam": "Spam ya da reklam",
         "uygunsuz": "Uygunsuz içerik",
         "diger": "Diğer"
-      }
+      },
+      "statPosts": "Gönderi",
+      "statFollowers": "Takipçi",
+      "statFollowing": "Takip"
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
     "share": "Paylaş",
