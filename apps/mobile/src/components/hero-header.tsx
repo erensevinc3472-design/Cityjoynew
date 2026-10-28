@@ -21,7 +21,8 @@ interface Props {
   /** Başlığın altında küçük açıklama (ör. "Bursa › Nilüfer"). */
   subtitle?: string;
   onBack?(): void;
-  right?: HeaderAction;
+  /** Sağdaki işlem; iki işlem de olabilir (ör. Keşfet: Mesajlar ve yeni gönderi). */
+  right?: HeaderAction | HeaderAction[];
 }
 
 /** Üst bant: geri düğmesi, ortada başlık, sağda işlem; altında isteğe bağlı içerik (konum çipi vb.). */
@@ -42,7 +43,17 @@ export function HeroHeader({ title, subtitle, onBack, right, children }: PropsWi
         ) : (
           <View style={styles.flex} />
         )}
-        {right ? <RoundButton {...right} /> : <View style={styles.spacer} />}
+        {Array.isArray(right) ? (
+          <View style={styles.row}>
+            {right.map((r) => (
+              <RoundButton key={r.label} {...r} />
+            ))}
+          </View>
+        ) : right ? (
+          <RoundButton {...right} />
+        ) : (
+          <View style={styles.spacer} />
+        )}
       </View>
       {subtitle ? <AppText style={[styles.subtitle, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
       {children}
@@ -78,6 +89,7 @@ const styles = StyleSheet.create({
   title: { flex: 1, textAlign: 'center', fontFamily: fonts.heading, fontSize: 17, lineHeight: 24 },
   subtitle: { fontSize: 14, lineHeight: 20, marginTop: -spacing.xs },
   spacer: { width: 44 },
+  row: { flexDirection: 'row', gap: spacing.xs },
   flex: { flex: 1 },
   round: { width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   chip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start', maxWidth: '100%', minHeight: 40, paddingHorizontal: 12, borderRadius: radius.pill },

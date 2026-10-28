@@ -3,12 +3,14 @@ import { BANNED_WORD_LIMITS, can, isGrantActive, LANGUAGES, SEARCH_LIMITS, type 
 import {
   createActivityModeration,
   createBannedWords,
+  createMessageModeration,
   createPostModeration,
   createProfileModeration,
   createReviewModeration,
   createSearchSuggestions,
   type ActivityReport,
   type CommentReport,
+  type MessageReport,
   type PostReport,
   type ProfileReport,
   type ReviewReport,
@@ -140,6 +142,7 @@ export function ModerationPage() {
       {user ? <PostReports user={user} /> : null}
       {user ? <CommentReports user={user} /> : null}
       {user ? <ProfileReports user={user} /> : null}
+      {user ? <MessageReports user={user} /> : null}
       {user && isAdminUser(user) ? <BannedWords user={user} /> : null}
       {user && isAdminUser(user) ? <SearchSuggestionsSection user={user} /> : null}
     </section>
@@ -598,6 +601,104 @@ function ProfileReports({ user }: { user: PanelUser }) {
             </tbody>
           </table>
           <p className="count">{t('moderation.profiles.note')}</p>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Mesaj şikâyetleri (PROJE.md 5.11): yalnızca admin, yalnızca şikâyet edilen mesajın kopyası (sohbetin tamamı
+ * görülmez, KVKK). "Mesajı kaldır" mesajı sohbette "kaldırıldı" yapar; her işlem işlem kaydına yazılır.
+ */
+function MessageReports({ user }: { user: PanelUser }) {
+  const isAdmin = isAdminUser(user);
+  const [list, setList] = useState<MessageReport[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
+  const [busy, setBusy] = useState(false);
+  const mod = useMemo(() => createMessageModeration(firestore, user.uid), [user]);
+
+  const load = useCallback(async () => {
+    setLoadError(false);
+    if (user.isDemo || !isAdmin) return setList([]);
+    try {
+      setList(await mod.listReports());
+    } catch {
+      setLoadError(true);
+    }
+  }, [user, isAdmin, mod]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const act = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setMessage(undefined);
+    try {
+      await fn();
+      setMessage({ kind: 'ok', text: t('moderation.saved') });
+      await load();
+    } catch {
+      setMessage({ kind: 'error', text: t('moderation.error') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!isAdmin) return null;
+  return (
+    <>
+      <header className="page-head">
+        <div>
+          <h2>{t('moderation.messages.title')}</h2>
+          <p className="meta">{t('moderation.messages.intro')}</p>
+        </div>
+      </header>
+      {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {loadError ? (
+        <div className="state" role="alert">
+          <p>{t('moderation.loadError')}</p>
+          <button className="btn secondary" onClick={load}>{t('moderation.retry')}</button>
+        </div>
+      ) : list === null ? (
+        <div className="state" aria-live="polite">{t('moderation.loading')}</div>
+      ) : list.length === 0 ? (
+        <div className="state">{t('moderation.empty')}</div>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{t('moderation.date')}</th>
+                <th scope="col">{t('moderation.messages.message')}</th>
+                <th scope="col">{t('moderation.reason')}</th>
+                {user.isDemo ? null : <th scope="col"><span className="sr-only">{t('moderation.actions')}</span></th>}
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((r) => (
+                <tr key={r.id}>
+                  <td className="num">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
+                  <td>
+                    <p dir="auto" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{r.text}</p>
+                    <span className="meta">{t('moderation.messages.parties', { reporter: r.reporterUid.slice(0, 8), reported: r.reportedUid.slice(0, 8) })}</span>
+                  </td>
+                  <td>{t(`moderation.messages.reasons.${r.reason}`)}</td>
+                  {user.isDemo ? null : (
+                    <td>
+                      <div className="row-actions">
+                        <button className="link" disabled={busy} onClick={() => act(() => mod.remove(r))}>{t('moderation.messages.remove')}</button>
+                        <button className="link" disabled={busy} onClick={() => act(() => mod.dismiss(r))}>{t('moderation.messages.dismiss')}</button>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="count">{t('moderation.messages.note')}</p>
         </div>
       )}
     </>

@@ -326,6 +326,7 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
 - **Standart (sormadan eklenir):** birebir mesajlaşma, takipleşilmeyen kişilerden gelenler "mesaj isteği" olarak düşer, **yetişkinler küçük yaş gruplarına mesaj atamaz**, engelle ve şikâyet et, mesaj silme, okundu bilgisi kapatılabilir, yeni hesaplara günlük mesaj sınırı (spam), sohbette IBAN/kapora/dış bağlantı geçerse dolandırıcılık uyarısı, ilan kartıyla başlayan sohbetler (ilan platformu).
 - **Kapsam (Eren onayladı):** ilk sürümde metin ve fotoğraf, video ve ses mesajı yok. **Grup sohbeti ilk sürümde yok** (moderasyon ve maliyet).
 - **KVKK ve güvenlik:** mesaj saklama süresi tanımlanır, şikâyet edilen mesajlar inceleme için görülebilir, bu kullanım şartlarında belirtilir.
+- **Yapıldı (28 Ekim 2026):** birebir yazılı sohbet, mesaj istekleri (takipleşmeyenler), yetişkin ile 13-17 yaş arası yazışma kapalı, engel, mesaj silme, şikâyet (admin yalnızca şikâyet edilen mesajın kopyasını görür), okundu bilgisini kapatma, günlük yeni sohbet sınırı (yeni hesapta 10, sonra 30), IBAN / kapora / bağlantı uyarısı. Kalan: mesaj bildirimi, saklama süresi (TTL, Blaze), ilan kartıyla başlayan sohbet. Ayrıntı DURUM.md 29. madde.
 
 ### 5.12 Bildirimler (standart)
 

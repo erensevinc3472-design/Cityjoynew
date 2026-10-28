@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (Ara; önceki: Kurum Haberleri, Keşfet 4. aşama).
+Son güncelleme: 28 Ekim 2026 (Mesajlar; önceki: Ara, Kurum Haberleri).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -44,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (Ara; önceki: Kurum Haberleri, Keşfet 4. aşama)
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (94)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (88; Java 21 gerekir)
+npm test                      # ortak paket testleri (99)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (94; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -357,6 +357,26 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    işlem kaydına yazılır (`config/searchSuggestions`). Kurallar: anahtar sayısı sınırlı (profil 40, işletme 60, gönderi
    300), 4 yeni bileşik dizin. Testler: ortak 94 (5 yeni), kurallar 88 (4 yeni). Panel derlendi, panel bölümü tarayıcıda
    açılmadı. Sonra: kullanıcı adı (şimdilik yok), etiket (#) araması, beş dilde içerik çevirisiyle arama (içerik Türkçe girilir).
+   PR #14 birleşti, kurallar ve dizinler yüklendi (Eren, 28 Ekim).
+
+29. **Mesajlar** (PROJE.md 5.11). Birebir, yalnızca yazı (fotoğraf, ses, video, grup yok; Eren onayladı). Giriş: Keşfet
+   üst bandında sohbet simgesi > Mesajlar (`apps/mobile/src/app/messages/`), profilde "Mesaj gönder". Sohbetler ve
+   **İstekler**: takipleşmeyen kişiden gelen ilk mesaj alıcıda istektir; "Kabul et" ya da cevap yazınca sohbete geçer,
+   o zamana kadar gönderen "görüldü" bilgisini almaz. Takipleşenlerde sohbet baştan açık. Okunmamış sayısı, "Görüldü"
+   (okundu bilgisi kapatılabilir; kapatan "görüldü" yazmaz, karşı tarafınkini de görmez; ayar telefonda). Mesaja
+   dokununca kendi mesajında "Sil" ("Bu mesaj silindi"), karşı tarafınkinde "Şikâyet et" (5 neden; mesajın o anki kopyası
+   saklanır). IBAN, kapora / ön ödeme ya da bağlantı geçen gelen mesajın altında dolandırıcılık uyarısı. Yasaklı kelime
+   süzgeci mesajda da çalışır. İstek ekranından engelleme; engel iki yönde de yazmayı kapatır. **Kurallar (sunucuda):**
+   sohbeti yalnızca iki taraf okur (admin dahil kimse okuyamaz); yetişkin ile 13-17 yaş arası arasında sohbet açılamaz;
+   engelliyken mesaj yazılamaz; mesaj ile sohbet özeti (son mesaj, okunmamış) aynı yazımda değişir ve birbirini tutmak
+   zorunda; adlar herkese açık Keşfet adından alınır; "kabul edilmiş" sohbet yalnızca karşılıklı takipte baştan açılır.
+   **Spam sınırı (sunucu işlevi olmadan):** 24 saatte en çok 30 yeni sohbet, ilk 7 günlük hesapta 10 (`chatQuota`
+   sayacı yalnızca +1 artar ya da 24 saat dolunca sıfırlanır, silinemez). Hesap silinince yazdığı mesajlar ve sohbetleri
+   silinir. **Panel > Moderasyon > Mesaj şikâyetleri** (yalnızca admin): şikâyet edilen mesajın kopyası, "Mesajı kaldır"
+   (sohbette "kaldırıldı" görünür) ya da "İşlem gerekmiyor"; işlem kaydına yazılır. Testler: ortak 99 (5 yeni), kurallar
+   94 (6 yeni). Panel derlendi, panel bölümü tarayıcıda açılmadı. **Açık:** mesaj bildirimi (push; Blaze ya da EAS),
+   mesaj saklama süresi (TTL Blaze ister; kullanım şartlarında yazılacak, avukat), ilan kartıyla başlayan sohbet (ilan
+   platformu gelince), sohbeti kendinden silme.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -431,12 +451,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 28. madde (Ara): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli (4 yeni dizin; Firebase'in dizinleri
-   hazırlaması birkaç dakika sürebilir). Admin Panel > Moderasyon'dan yasaklı kelime listesini (26. madde) ve isterse
-   önerilen aramaları doldurmalı.
+0a. 29. madde (Mesajlar): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli (2 yeni dizin). Admin Panel >
+   Moderasyon'dan yasaklı kelime listesini (26. madde) ve isterse önerilen aramaları (28. madde) doldurmalı.
 0b. Keşfet'in kalanı: fotoğraf/video (Storage, Blaze), alt gezinme çubuğu (Ana Sayfa, Keşfet, Ara, Profil; görünümü
-   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Sıradaki adaylar (Blaze istemeyen): Mesajlar (5.11; birebir
-   mesaj, istekler, engel ve şikâyet), haber yayıncısı başvurusu (avukat teyidi gerekir). Blaze isteyenler:
+   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Sıradaki adaylar (Blaze istemeyen): Bildirim merkezi (5.12;
+   uygulama içi liste, kategori ayarları; telefona bildirim EAS ister), haber yayıncısı başvurusu (avukat teyidi gerekir). Blaze isteyenler:
    aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.

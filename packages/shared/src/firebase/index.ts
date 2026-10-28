@@ -50,3 +50,4 @@ export { createFirestorePostRepository, createPostModeration, type CommentReport
 export { createFirestoreSocialRepository, createProfileModeration, type ProfileReport } from './social';
 export { createBannedWords } from './word-filter';
 export { createSearchSuggestions } from './search';
+export { createFirestoreMessageRepository, createMessageModeration, type MessageReport } from './messages';

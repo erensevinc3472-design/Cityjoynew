@@ -197,13 +197,17 @@ export default function ProfileScreen() {
         ) : blockedMe ? (
           <FormMessage kind="info" text={t('explore.profile.unavailable')} />
         ) : iBlocked ? null : (
-          <AppButton
-            variant={follow ? 'secondary' : 'primary'}
-            title={follow === 'aktif' ? t('explore.profile.unfollow') : follow === 'istek' ? t('explore.profile.requested') : profile.isPrivate ? t('explore.profile.request') : t('explore.profile.follow')}
-            loading={busy}
-            disabled={busy || follow === undefined}
-            onPress={toggleFollow}
-          />
+          <>
+            <AppButton
+              variant={follow ? 'secondary' : 'primary'}
+              title={follow === 'aktif' ? t('explore.profile.unfollow') : follow === 'istek' ? t('explore.profile.requested') : profile.isPrivate ? t('explore.profile.request') : t('explore.profile.follow')}
+              loading={busy}
+              disabled={busy || follow === undefined}
+              onPress={toggleFollow}
+            />
+            {/* Mesaj (PROJE.md 5.11): takipleşmiyorlarsa karşı tarafa istek olarak düşer. */}
+            <AppButton variant="secondary" title={t('messages.write')} onPress={() => router.push({ pathname: '/messages/[uid]', params: { uid } })} />
+          </>
         )}
 
         {own && requests.length ? (

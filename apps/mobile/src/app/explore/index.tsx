@@ -83,7 +83,14 @@ export default function ExploreScreen() {
     <HeroHeader
       title={t('explore.title')}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
-      right={user && location ? { icon: 'add', label: t('explore.newPost'), onPress: () => router.push('/explore/new') } : undefined}>
+      right={
+        user
+          ? [
+              { icon: 'chat-bubble-outline', label: t('messages.title'), onPress: () => router.push('/messages') },
+              ...(location ? [{ icon: 'add' as const, label: t('explore.newPost'), onPress: () => router.push('/explore/new') }] : []),
+            ]
+          : undefined
+      }>
       <LocationChip label={province ?? t('home.noLocation')} onPress={() => router.push('/location?edit=1')} />
     </HeroHeader>
   );
