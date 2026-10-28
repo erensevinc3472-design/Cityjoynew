@@ -27,6 +27,7 @@ export const ROLE_TEMPLATES: Record<Role, Partial<Record<Module, Action[]>>> = {
     hizmetler: ALL,
     moderasyon: ALL,
     'isletme-dogrulama': ALL,
+    seyahat: ALL,
   },
   'il-yoneticisi': {
     konumlar: READ,

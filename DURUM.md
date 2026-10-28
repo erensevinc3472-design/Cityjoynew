@@ -461,6 +461,24 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    yetkililikler bırakılır. Testler: kurallar +4 (business-page), ortak +2. **Eren yapacak:** birleştirince kuralları
    ve dizinleri yükle (3 yeni dizin). Telefonda bakılmadı.
 
+35. **Seyahat 1. aşama: Keşfet ve Öğren** (PROJE.md 5.2; 13. madde 34). Ana sayfa ve yan menüde Seyahat açıldı.
+   **Giriş** (`/travel`, seyahat.html): ekran çaprazlamasına ikiye bölünür (döndürülmüş kesme kutusu, ek paket yok);
+   "Keşfet ve Öğren" ve "Planla ve Navigasyon" (yakında). **Keşfet ve Öğren** (`/travel/explore`): solda ülke şeridi
+   (yalnızca Türkiye), 7 bölge kartı (coğrafya kodda: `TR_REGIONS`, 81 il); tanıtımı yayında olmayan bölge "Yakında".
+   **Bölge** (`/travel/region/[id]`): kapak, kısa etiket ve tanıtım, tanıtım videosu (uygulama içinde), il sayısı,
+   kategori süzgeci, şehir kartları; tanıtımı olmayan iller altta "yakında". **Şehir** (`/travel/city/[kod]`): kapak,
+   tanıtım, kaynaklı bilgiler (etiket / değer / kaynak / yıl), Kareler / Başkanlarla Keşif / Yöresel kutuları ve Hazır
+   Rotalar şeridi ("yakında", 2. ve 3. aşama), kategoriye göre gezilecek yerler. **Yer** (`/travel/place/[id]`):
+   hakkında, video, saat / ücret / adres / süre (yalnızca girilenler), "gitmeden kontrol et" notu, nasıl gidilir,
+   yakındaki hizmetler, ipuçları, tarihçe, mimari, erişilebilirlik, yol tarifi / ara / web, paylaş, kaynak ve son
+   güncelleme. Puan, "Premium", bütçe işareti, hava durumu, yapay zekâ rehberi yok. Görseller çizim (Storage gelince
+   fotoğraf). Veri: `travelRegions`, `travelCities` (kimlik = plaka), `travelPlaces`; uygulama yalnızca yayındakini okur,
+   oturumda bellekte tutar. **Panel > Seyahat** (admin): Bölgeler / Şehirler / Gezilecek yerler, taslak ↔ yayında,
+   yer ekle / düzenle / sil, "Başlangıç içeriğini yükle" (Marmara, Bursa ve 9 Bursa yeri; saat, ücret, telefon bilerek
+   boş), işlem kaydı (modül `seyahat`). Testler: kurallar +1 (travel), ortak +2. **Eren yapacak:** birleştirince
+   kuralları yükle; panelde "Başlangıç içeriğini yükle", içeriği kontrol edip Marmara, Bursa ve yerleri yayına al.
+   Telefonda bakılmadı (web önizlemede giriş ve bölge ekranları görüldü).
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Keşfet'te gönderi birden çok hedefe paylaşılabilir (Eren, 28 Ekim 2026; PROJE.md 5.5).

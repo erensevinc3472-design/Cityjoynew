@@ -126,3 +126,7 @@ details summary { cursor: pointer; color: var(--accent); }
 td input[type='checkbox'] { width: 20px; height: 20px; }
 .checkbox-group { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; border: 0; padding: 0; margin: 0; }
 .checkbox-group label { display: flex; align-items: center; gap: 0.4rem; font-weight: 400; min-height: 44px; }
+
+/* Sekmeler (Seyahat) ve onay kutusu satırı. */
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+.check { display: inline-flex; align-items: center; gap: 6px; margin-inline-end: 16px; }

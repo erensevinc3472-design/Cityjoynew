@@ -27,7 +27,9 @@ export type Module =
   | 'moderasyon'
   | 'isletme-dogrulama'
   | 'kurumlar'
-  | 'sehir-rehberi';
+  | 'sehir-rehberi'
+  /** Seyahat > Keşfet ve Öğren içeriği (admin, ülke geneli). */
+  | 'seyahat';
 
 /** yayinla: hazırladığını onay beklemeden yayınlar ("onaysız yayınla", PROJE.md 6.6). */
 export type Action = 'goruntule' | 'ekle' | 'duzenle' | 'sil' | 'onayla' | 'yayinla' | 'bildirim-gonder';

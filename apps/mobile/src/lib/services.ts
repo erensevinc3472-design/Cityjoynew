@@ -5,6 +5,7 @@ import {
   createFirestoreEventRepository,
   createFirestoreOfficialProfileRepository,
   createFirestoreActivityRepository,
+  createFirestoreTravelRepository,
   createFirestorePostRepository,
   createFirestoreSocialRepository,
   createFirestoreMessageRepository,
@@ -51,6 +52,7 @@ export const messageRepository = createFirestoreMessageRepository(firestore);
 export const verificationRequests = createVerificationRequests(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);
 export const sosRepository = createFirestoreSosRepository(firestore);
+export const travelRepository = createFirestoreTravelRepository(firestore);
 export const pushTokenRepository = createFirestorePushTokenRepository(firestore);
 /** Benim Şehrim sabit bilgileri: il başına özet tek okuma, bölüm yalnızca değişince indirilir. */
 export const cityGuide = createCityGuideStore(createFirestoreCityGuideRepository(firestore), deviceStorage);

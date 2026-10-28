@@ -52,7 +52,7 @@ export function SideMenu({ open, onClose }: { open: boolean; onClose(): void }) 
   };
   const modules: Item[] = [
     { key: 'myCity', label: t('modules.myCity'), icon: 'location-city', href: '/city' },
-    { key: 'travel', label: t('modules.travel'), icon: 'explore' },
+    { key: 'travel', label: t('modules.travel'), icon: 'explore', href: '/travel' as Href },
     { key: 'social', label: t('modules.social'), icon: 'groups', href: '/social' },
     { key: 'urgent', label: t('modules.urgent'), icon: 'emergency', href: '/urgent', danger: true },
     { key: 'explore', label: t('modules.explore'), icon: 'dynamic-feed', href: '/explore' },
