@@ -466,7 +466,8 @@
     "publishedAt": "Yayın: {{date}}",
     "until": "Bitiş: {{date}}",
     "urgentNote": "Acil durumda hayati tehlike varsa 112'yi arayın.",
-    "gone": "Bu duyuru artık yayında değil."
+    "gone": "Bu duyuru artık yayında değil.",
+    "pinned": "Sabit"
   },
   "events": {
     "title": "Etkinlikler",

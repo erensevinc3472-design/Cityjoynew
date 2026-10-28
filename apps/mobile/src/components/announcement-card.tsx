@@ -21,16 +21,16 @@ export function AnnouncementCard({ item, onPress }: { item: Announcement; onPres
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${urgent ? `${t('announcements.urgent')}. ` : ''}${item.title}. ${author}`}
+      accessibilityLabel={`${urgent ? `${t('announcements.urgent')}. ` : item.pinned ? `${t('announcements.pinned')}. ` : ''}${item.title}. ${author}`}
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: urgent ? c.dangerSoft : c.surface, borderColor: urgent ? c.danger : c.border, shadowColor: c.shadow, opacity: pressed ? 0.85 : 1 },
       ]}>
       <View style={styles.top}>
-        <MaterialIcons name={urgent ? 'warning-amber' : 'campaign'} size={20} color={urgent ? c.danger : c.icon} />
+        <MaterialIcons name={urgent ? 'warning-amber' : item.pinned ? 'push-pin' : 'campaign'} size={20} color={urgent ? c.danger : c.icon} />
         <AppText variant="caption" style={{ color: urgent ? c.danger : c.textMuted, flex: 1 }} numberOfLines={1}>
-          {urgent ? `${t('announcements.urgent')} · ` : ''}
+          {urgent ? `${t('announcements.urgent')} · ` : item.pinned ? `${t('announcements.pinned')} · ` : ''}
           {author}
         </AppText>
         <AppText variant="caption" muted>{date}</AppText>

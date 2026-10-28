@@ -35,6 +35,11 @@ export interface AnnouncementInput {
   region: AnnouncementRegion;
   /** Bu tarihten sonra gösterilmez (ISO). Acil duyuruda zorunlu. */
   endsAt?: string;
+  /**
+   * Mahalle Meydanı'nda ve listede sabit (acil duyurulardan sonra en üstte). Yalnızca mahalleye yönelik duyuruda:
+   * muhtarın "pazar günü", "muhtarlık saatleri" gibi kalıcı bilgisi için.
+   */
+  pinned?: boolean;
 }
 
 export interface Announcement extends AnnouncementInput {
@@ -56,7 +61,7 @@ export const ANNOUNCEMENT_LIMITS = { title: [3, 100], body: [10, 2000], reviewNo
 /** Acil duyuru en çok bu kadar gün açık kalır (unutulup sürekli en üstte kalmasın). */
 export const URGENT_MAX_DAYS = 7;
 
-export type AnnouncementError = 'title' | 'body' | 'region' | 'endsAt';
+export type AnnouncementError = 'title' | 'body' | 'region' | 'endsAt' | 'pinned';
 
 /** Bölge, yetki bölgesinin içinde mi (il > ilçe > mahalle)? */
 export function regionWithin(r: AnnouncementRegion, scope: RegionScope): boolean {
@@ -82,6 +87,8 @@ export function validateAnnouncement(a: AnnouncementInput, scope: RegionScope, n
     const max = now.getTime() + URGENT_MAX_DAYS * 86400000;
     if (!(end > now.getTime()) || (a.kind === 'acil' && end > max)) errors.push('endsAt');
   } else if (a.kind === 'acil') errors.push('endsAt');
+  // Sabitleme yalnızca mahalleye yönelik, acil olmayan duyuruda.
+  if (a.pinned && (!r.neighbourhoodId || a.kind === 'acil')) errors.push('pinned');
   return errors;
 }
 
@@ -96,9 +103,14 @@ export function isForLocation(a: Pick<Announcement, 'region'>, loc: Announcement
   return r.provinceCode === loc.provinceCode && (!r.districtId || r.districtId === loc.districtId) && (!r.neighbourhoodId || r.neighbourhoodId === loc.neighbourhoodId);
 }
 
-/** Akış: yayındaki acil duyurular en üstte (PROJE.md 5.5), sonra yeniden eskiye. */
-export function sortForFeed<T extends Pick<Announcement, 'kind' | 'publishedAt'>>(list: T[]): T[] {
-  return [...list].sort((a, b) => Number(b.kind === 'acil') - Number(a.kind === 'acil') || (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''));
+/** Akış: yayındaki acil duyurular en üstte (PROJE.md 5.5), sonra sabitlenenler, sonra yeniden eskiye. */
+export function sortForFeed<T extends Pick<Announcement, 'kind' | 'publishedAt' | 'pinned'>>(list: T[]): T[] {
+  return [...list].sort(
+    (a, b) =>
+      Number(b.kind === 'acil') - Number(a.kind === 'acil') ||
+      Number(!!b.pinned) - Number(!!a.pinned) ||
+      (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''),
+  );
 }
 
 /** Panelde "hangi hesapla yayınlıyorum?": kişinin duyuru yazabildiği her kurum ve yetki. */

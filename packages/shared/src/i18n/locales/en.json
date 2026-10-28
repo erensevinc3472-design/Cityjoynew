@@ -466,7 +466,8 @@
     "publishedAt": "Published: {{date}}",
     "until": "Until: {{date}}",
     "urgentNote": "If there is a danger to life, call 112.",
-    "gone": "This announcement is no longer published."
+    "gone": "This announcement is no longer published.",
+    "pinned": "Pinned"
   },
   "events": {
     "title": "Events",

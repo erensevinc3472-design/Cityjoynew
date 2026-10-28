@@ -37,6 +37,7 @@ function fromDoc(id: string, d: DocumentData): Announcement {
     body: d.body,
     region: d.region,
     ...(d.endsAt ? { endsAt: iso(d.endsAt) } : {}),
+    ...(d.pinned === true ? { pinned: true } : {}),
     author: d.author,
     status: d.status,
     preparedBy: d.preparedBy,
@@ -129,6 +130,7 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
         body: input.body.trim().slice(0, ANNOUNCEMENT_LIMITS.body[1]),
         region: cleanRegion(input.region),
         ...(input.endsAt ? { endsAt: Timestamp.fromDate(new Date(input.endsAt)) } : {}),
+        ...(input.pinned ? { pinned: true } : {}),
         author: p.author,
         status,
         preparedBy: actor.uid,
@@ -137,9 +139,16 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
         ...(status === 'yayinda' ? { publishedAt: serverTimestamp() } : {}),
       };
       const batch = writeBatch(db);
-      // Düzenlemede oluşturma tarihi korunur; boşaltılan bitiş ve önceki ret bilgisi silinir.
-      if (existing) batch.update(ref, { ...data, ...(input.endsAt ? {} : { endsAt: deleteField() }), reviewNote: deleteField(), reviewedBy: deleteField() });
-      else batch.set(ref, { ...data, createdAt: serverTimestamp() });
+      // Düzenlemede oluşturma tarihi korunur; boşaltılan bitiş, kaldırılan sabitleme ve önceki ret bilgisi silinir.
+      if (existing) {
+        batch.update(ref, {
+          ...data,
+          ...(input.endsAt ? {} : { endsAt: deleteField() }),
+          ...(input.pinned ? {} : { pinned: deleteField() }),
+          reviewNote: deleteField(),
+          reviewedBy: deleteField(),
+        });
+      } else batch.set(ref, { ...data, createdAt: serverTimestamp() });
       if (mode !== 'taslak') {
         audit(batch, { id: ref.id, author: p.author, region: data.region, title: data.title }, 'ekle', mode === 'yayinla' ? 'Duyuru yayınlandı (onaysız)' : 'Duyuru onaya gönderildi');
       }
