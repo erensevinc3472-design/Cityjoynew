@@ -721,7 +721,8 @@
       "targets": "Choose at least one place.",
       "region": "Choose your neighbourhood in your location.",
       "realEstate": "Listings for homes, land or shops for sale or rent can't be shared on Explore. Real estate listings will be posted in the Real Estate section with a licence.",
-      "relative": "Only relatives can share a condolence post."
+      "relative": "Only relatives can share a condolence post.",
+      "banned": "Your text contains a word that breaks the community rules. Please edit it and try again."
     },
     "save": "Save",
     "unsave": "Saved ✓",

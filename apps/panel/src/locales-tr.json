@@ -428,6 +428,14 @@
         "uygunsuz": "Uygunsuz içerik",
         "diger": "Diğer"
       }
+    },
+    "words": {
+      "title": "Yasaklı kelimeler",
+      "intro": "Uygulama, gönderi, yorum ve profil tanıtımında bu kelimeleri arar ve paylaşımı durdurur. En çok {{max}} kelime.",
+      "label": "Her satıra bir kelime ya da ifade",
+      "hint": "Büyük-küçük harf, Türkçe karakter (ı/i, ğ/g), rakamla yazım (s4l4k) ve harf tekrarı (salaaak) fark etmez. 4 harf ve üstü kelimeler ekli hâlleriyle de yakalanır. Kısa kelimelerde (3 harf ve altı) yalnızca tam eşleşme aranır.",
+      "save": "Listeyi kaydet",
+      "saved": "Kaydedildi: {{count}} kelime. Uygulama yeni listeyi bir sonraki açılışta kullanır."
     }
   },
   "sosSettings": {

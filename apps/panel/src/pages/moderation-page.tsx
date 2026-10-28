@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { can, isGrantActive } from '@cityjoy/shared';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { BANNED_WORD_LIMITS, can, isGrantActive } from '@cityjoy/shared';
 import {
   createActivityModeration,
+  createBannedWords,
   createPostModeration,
   createProfileModeration,
   createReviewModeration,
@@ -138,6 +139,7 @@ export function ModerationPage() {
       {user ? <PostReports user={user} /> : null}
       {user ? <CommentReports user={user} /> : null}
       {user ? <ProfileReports user={user} /> : null}
+      {user && isAdminUser(user) ? <BannedWords user={user} /> : null}
     </section>
   );
 }
@@ -595,6 +597,80 @@ function ProfileReports({ user }: { user: PanelUser }) {
           </table>
           <p className="count">{t('moderation.profiles.note')}</p>
         </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Yasaklı kelimeler (Keşfet kuralları madde 8): admin her satıra bir kelime ya da ifade yazar. Uygulama gönderi, yorum
+ * ve profil tanıtımında listeyi denetler, eşleşen paylaşımı durdurur. Kaydetme işlem kaydına yazılır.
+ */
+function BannedWords({ user }: { user: PanelUser }) {
+  const [text, setText] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
+  const [busy, setBusy] = useState(false);
+  const store = useMemo(() => createBannedWords(firestore), []);
+
+  const load = useCallback(async () => {
+    setLoadError(false);
+    try {
+      setText((await store.get()).join('\n'));
+    } catch {
+      setLoadError(true);
+    }
+  }, [store]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (text === null) return;
+    setBusy(true);
+    setMessage(undefined);
+    try {
+      const saved = await store.save(user.uid, text.split('\n'));
+      setText(saved.join('\n'));
+      setMessage({ kind: 'ok', text: t('moderation.words.saved', { count: saved.length }) });
+    } catch {
+      setMessage({ kind: 'error', text: t('moderation.error') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <header className="page-head">
+        <div>
+          <h2>{t('moderation.words.title')}</h2>
+          <p className="meta">{t('moderation.words.intro', { max: BANNED_WORD_LIMITS.count })}</p>
+        </div>
+      </header>
+      {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {loadError ? (
+        <div className="state" role="alert">
+          <p>{t('moderation.loadError')}</p>
+          <button className="btn secondary" onClick={load}>{t('moderation.retry')}</button>
+        </div>
+      ) : text === null ? (
+        <div className="state" aria-live="polite">{t('moderation.loading')}</div>
+      ) : (
+        <form className="form panel-form" onSubmit={submit}>
+          <div className="field">
+            <label htmlFor="banned-words">{t('moderation.words.label')}</label>
+            <textarea id="banned-words" rows={8} value={text} disabled={user.isDemo} onChange={(e) => setText(e.target.value)} />
+            <span className="meta">{t('moderation.words.hint')}</span>
+          </div>
+          {user.isDemo ? null : (
+            <div className="actions">
+              <button className="btn" type="submit" disabled={busy}>{t('moderation.words.save')}</button>
+            </div>
+          )}
+        </form>
       )}
     </>
   );

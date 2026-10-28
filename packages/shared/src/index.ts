@@ -35,3 +35,4 @@ export * from './events/events';
 export * from './activities/activities';
 export * from './posts/posts';
 export * from './posts/social';
+export * from './posts/word-filter';

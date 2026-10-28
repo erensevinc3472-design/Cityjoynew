@@ -721,7 +721,8 @@
       "targets": "En az bir yer seç.",
       "region": "Konumunda mahalleni seç.",
       "realEstate": "Satılık ya da kiralık ev, arsa, dükkân ilanları Keşfet'te paylaşılamaz. Emlak ilanları yetki belgesiyle Emlak bölümünden verilecek.",
-      "relative": "Taziye gönderisini yalnızca yakınları paylaşabilir."
+      "relative": "Taziye gönderisini yalnızca yakınları paylaşabilir.",
+      "banned": "Yazında topluluk kurallarına uymayan bir ifade var. Lütfen düzeltip tekrar dene."
     },
     "save": "Kaydet",
     "unsave": "Kaydedildi ✓",

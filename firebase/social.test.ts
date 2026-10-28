@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import type { PostInput } from '@cityjoy/shared';
-import { createFirestorePostRepository, createFirestoreSocialRepository, createProfileModeration } from '@cityjoy/shared/firebase';
+import { createBannedWords, createFirestorePostRepository, createFirestoreSocialRepository, createProfileModeration } from '@cityjoy/shared/firebase';
 import { doc, getDoc, serverTimestamp, setDoc, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
@@ -105,6 +105,12 @@ describe('Keşfet profili ve takip', () => {
     expect(await social('ali').getProfile('ayse')).toMatchObject({ bio: '', bioRemoved: true });
     await assertFails(social('ayse').updateProfile('ayse', { displayName: 'Ayşe K.', bio: 'Yine', isPrivate: false }));
     await assertFails(updateDoc(doc(fs('ayse'), 'publicProfiles', 'ayse'), { bioRemoved: false }));
+  });
+
+  it('yasaklı kelime listesi: herkes okur, yalnızca admin yazar (işlem kaydıyla)', async () => {
+    await assertFails(createBannedWords(fs('ali')).save('ali', ['salak']));
+    expect(await createBannedWords(fs('eren')).save('eren', [' Salak ', 'salak', 'aptal'])).toEqual(['salak', 'aptal']);
+    expect(await createBannedWords(fs('ali')).get()).toEqual(['salak', 'aptal']);
   });
 
   it('hesap silme: takipler, engeller ve profil silinir', async () => {

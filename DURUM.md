@@ -44,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (sabit duyuru; önceki: kullanıcı aktiviteleri, 
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (84)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (82; Java 21 gerekir)
+npm test                      # ortak paket testleri (88)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (83; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -311,7 +311,18 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    uygulama emülatörde tarayıcıda denendi (profil, takip, Takip sekmesi, engelleme, Profilim). Panel derlendi, panel
    bölümü tarayıcıda açılmadı. Bilinen sınırlar: gizli hesabın Genel'e paylaştığı gönderi Genel akışında yine görünür
    (kişi Genel'i kendisi seçer); takip edilen 30'dan fazla hesap varsa Takip akışı ilk 30'u okur; ad değişikliği eski
-   gönderilerdeki ada yansımaz.
+   gönderilerdeki ada yansımaz. PR #11 birleşti, kurallar yüklendi (Eren, 28 Ekim).
+
+26. **Keşfet, 4. aşama: resmî duyurular akışta ve yasaklı kelime süzgeci** (PROJE.md 5.5 akış sıralaması ve madde 8).
+   Mahallem'de mahalleye ve ilçeye yönelik, Bölgesel'de ildeki (ilçe süzgecine uyan) resmî duyurular (muhtar, belediye,
+   kurum) kullanıcı gönderileriyle tarih sırasına göre karışık akar; acil duyurular yine en üstte. Ek okuma yok (duyurular
+   zaten önbellekte). Yasaklı kelimeler: Panel > Moderasyon > "Yasaklı kelimeler" (yalnızca admin; her satıra bir kelime ya da
+   ifade, en çok 1000; kaydetme işlem kaydına yazılır; `config/bannedWords`). Uygulama listeyi oturum başına bir kez okur;
+   gönderi, yorum ve profil adı/tanıtımında eşleşme varsa paylaşımı durdurur. Büyük-küçük harf, ı/i, ğ/g, rakamla yazım
+   (s4l4k) ve harf tekrarı (salaaak) fark etmez; 4+ harfli kelimeler ekli hâlleriyle de yakalanır. Süzgeç uygulamada
+   çalışır (kurallarla zorlanmaz); atlatılan içerik şikâyetle moderasyona düşer. Testler: ortak 88 (4 yeni), kurallar 83
+   (1 yeni) geçti; tarayıcıda denendi (belediye duyurusu akışta, yasaklı kelimeli yorum durduruldu). Panel derlendi,
+   panel bölümü tarayıcıda açılmadı. Yasaklı kelime listesi boş başlar: admin doldurmalı.
    Sonraki aşamalar:
    fotoğraf/video (Storage, Blaze), Genel sekmesine haber akışı (5.3 Haberler), resmî hesap gönderileri (muhtar/belediye
    rozetli) ve "Taziye yalnızca muhtar ya da yakını", yasaklı kelime süzgeci, alt gezinme çubuğu.
@@ -389,11 +400,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 25. madde (Keşfet 3. aşama): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli.
-0b. Keşfet'in kalanı: resmî hesap gönderileri (muhtar/belediye rozetli, "Taziye yalnızca muhtar ya da yakını"), yasaklı
-   kelime süzgeci, alt gezinme çubuğu (Ana Sayfa, Keşfet, Ara, Profil); fotoğraf/video Storage (Blaze) ister. Diğer
-   adaylar: aktivite/etkinlik değişiklik bildirimleri ve günlük sınırlar (Blaze ister), Haberler (resmî duyurulardan
-   "Kurum Haberleri" akışı, 5.3). (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
+0a. 26. madde (Keşfet 4. aşama): Eren PR'ı birleştirince kurallar yüklenmeli; admin Panel > Moderasyon'dan yasaklı
+   kelime listesini doldurmalı.
+0b. Keşfet'in kalanı: fotoğraf/video (Storage, Blaze), alt gezinme çubuğu (Ana Sayfa, Keşfet, Ara, Profil; görünümü
+   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Sıradaki adaylar (Blaze istemeyen): Haberler (resmî
+   duyurulardan "Kurum Haberleri" akışı, 5.3), Ara (5.10: kişiler, işletmeler, gönderiler). Blaze isteyenler:
+   aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"
