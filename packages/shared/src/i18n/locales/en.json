@@ -784,5 +784,34 @@
       }
     },
     "takipFeedHint": "posts shared only with followers by people you follow"
+  },
+  "news": {
+    "title": "News",
+    "one": "News",
+    "regional": "Regional",
+    "general": "General",
+    "category": "Category",
+    "all": "All",
+    "regionalIntro": "Official news published by municipalities, governorships and institutions for your province, district and neighbourhood.",
+    "generalSoon": "Nationwide news will arrive here soon with publishers who give permission.",
+    "needLocation": "Choose your location to see local news.",
+    "empty": "There is no official news in your area yet.",
+    "loadError": "News could not be loaded.",
+    "readingTime_one": "{{count}} minute read",
+    "readingTime_other": "{{count}} minute read",
+    "smaller": "A− Smaller text",
+    "larger": "A+ Larger text",
+    "share": "Share",
+    "categories": {
+      "gundem": "Agenda",
+      "hizmet": "Municipal services",
+      "ulasim": "Transport",
+      "kultur-sanat": "Culture & arts",
+      "spor": "Sports",
+      "egitim": "Education",
+      "saglik": "Health",
+      "cevre": "Environment",
+      "ekonomi": "Economy"
+    }
   }
 }

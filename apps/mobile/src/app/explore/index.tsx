@@ -50,7 +50,7 @@ export default function ExploreScreen() {
   const posts = feed.posts?.filter((p) => !blocked.has(p.authorUid)) ?? (tab === 'takip' && following === null ? null : feed.posts);
   const isLiked = useLiked(user?.uid);
   const [, rerender] = useState(0);
-  const { list: announcements } = useAnnouncements(location);
+  const { list: announcements } = useAnnouncements(location, 'hepsi');
   const urgent = tab === 'genel' || tab === 'takip' ? [] : (announcements ?? []).filter((a) => a.kind === 'acil');
 
   // Resmî duyurular (muhtar, belediye, kurum) kullanıcı gönderileriyle zaman sırasına göre karışık akar (PROJE.md 5.5,

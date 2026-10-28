@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
+  ANNOUNCEMENT_KINDS,
   ANNOUNCEMENT_LIMITS,
+  NEWS_CATEGORIES,
+  type NewsCategory,
   canPublishDirectly,
   isFromPublisher,
   isGrantActive,
@@ -122,6 +125,7 @@ function Announcements({ user }: { user: PanelUser }) {
       <td>
         <strong>{a.title}</strong>
         {a.kind === 'acil' ? <> <span className="pill warn">{t('announcements.kinds.acil')}</span></> : null}
+        {a.kind === 'haber' ? <> <span className="pill">{t('announcements.kinds.haber')}{a.category ? ` · ${t(`announcements.categories.${a.category}`)}` : ''}</span></> : null}
         {a.pinned ? <> <span className="pill">{t('announcements.pinned')}</span></> : null}
         <details>
           <summary>{t('announcements.showBody')}</summary>
@@ -253,7 +257,7 @@ function Announcements({ user }: { user: PanelUser }) {
                       live ? (
                         <div className="row-actions">
                           {a.preparedBy === user.uid && ['taslak', 'onay-bekliyor', 'reddedildi'].includes(a.status) ? (
-                            <button className="link" disabled={busy} onClick={() => setDraft({ input: { kind: a.kind, title: a.title, body: a.body, region: a.region, ...(a.endsAt ? { endsAt: a.endsAt } : {}), ...(a.pinned ? { pinned: true } : {}) }, existing: a })}>
+                            <button className="link" disabled={busy} onClick={() => setDraft({ input: { kind: a.kind, title: a.title, body: a.body, region: a.region, ...(a.endsAt ? { endsAt: a.endsAt } : {}), ...(a.pinned ? { pinned: true } : {}), ...(a.category ? { category: a.category } : {}) }, existing: a })}>
                               {t('announcements.edit')}
                             </button>
                           ) : null}
@@ -334,7 +338,13 @@ function AnnouncementForm({
     const region = cleanRegion(input.region);
     // Mahalle düzeyinden çıkılınca ya da acil seçilince sabitleme düşer.
     const pinned = input.pinned && input.kind === 'duyuru' && !!region.neighbourhoodId;
-    const clean: AnnouncementInput = { ...input, region, ...(pinned ? { pinned: true } : { pinned: undefined }) };
+    const clean: AnnouncementInput = {
+      ...input,
+      region,
+      ...(pinned ? { pinned: true } : { pinned: undefined }),
+      // Kategori yalnızca haberde.
+      ...(input.kind === 'haber' ? {} : { category: undefined }),
+    };
     const problems = validateAnnouncement(clean, sc);
     // Seçilmemiş ilçe / mahalle de bölge hatasıdır.
     if (!regionComplete(input.region)) problems.push('region');
@@ -349,7 +359,7 @@ function AnnouncementForm({
       <h2 id="an-form-title" className="form-section">{draft.existing ? t('announcements.editTitle') : t('announcements.new')}</h2>
       <fieldset className="checkbox-group form-section">
         <legend>{t('announcements.kind')}</legend>
-        {(['duyuru', 'acil'] as AnnouncementKind[]).map((k) => (
+        {ANNOUNCEMENT_KINDS.map((k) => (
           <label key={k}>
             <input type="radio" name="an-kind" checked={input.kind === k} onChange={() => changeKind(k)} />
             {t(`announcements.kinds.${k}`)}
@@ -357,6 +367,19 @@ function AnnouncementForm({
         ))}
       </fieldset>
       {input.kind === 'acil' ? <p className="form-section meta">{t('announcements.urgentHint', { days: URGENT_MAX_DAYS })}</p> : null}
+      {input.kind === 'haber' ? (
+        <div className="field form-section">
+          <p className="meta">{t('announcements.newsHint')}</p>
+          <label htmlFor="an-category">{t('announcements.category')}</label>
+          <select id="an-category" value={input.category ?? ''} onChange={(e) => set({ category: (e.target.value || undefined) as NewsCategory | undefined })}>
+            <option value="">{t('announcements.chooseCategory')}</option>
+            {NEWS_CATEGORIES.map((c) => (
+              <option key={c} value={c}>{t(`announcements.categories.${c}`)}</option>
+            ))}
+          </select>
+          {err('category')}
+        </div>
+      ) : null}
       <div className="field form-section">
         <label htmlFor="an-title">{t('announcements.titleLabel')}</label>
         <input id="an-title" value={input.title} maxLength={ANNOUNCEMENT_LIMITS.title[1]} onChange={(e) => set({ title: e.target.value })} />

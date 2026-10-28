@@ -16,21 +16,24 @@ export function AnnouncementCard({ item, onPress }: { item: Announcement; onPres
   const { language } = useSettings();
   const author = useAuthorLabel(item);
   const urgent = item.kind === 'acil';
+  const news = item.kind === 'haber';
+  // Etiket: acil, sabit ya da kurum haberi (kategorisiyle).
+  const tag = urgent ? t('announcements.urgent') : item.pinned ? t('announcements.pinned') : news ? (item.category ? t(`news.categories.${item.category}`) : t('news.one')) : '';
   const date = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString(language ?? 'tr') : '';
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${urgent ? `${t('announcements.urgent')}. ` : item.pinned ? `${t('announcements.pinned')}. ` : ''}${item.title}. ${author}`}
+      accessibilityLabel={`${tag ? `${tag}. ` : ''}${item.title}. ${author}`}
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: urgent ? c.dangerSoft : c.surface, borderColor: urgent ? c.danger : c.border, shadowColor: c.shadow, opacity: pressed ? 0.85 : 1 },
       ]}>
       <View style={styles.top}>
-        <MaterialIcons name={urgent ? 'warning-amber' : item.pinned ? 'push-pin' : 'campaign'} size={20} color={urgent ? c.danger : c.icon} />
+        <MaterialIcons name={urgent ? 'warning-amber' : item.pinned ? 'push-pin' : news ? 'newspaper' : 'campaign'} size={20} color={urgent ? c.danger : c.icon} />
         <AppText variant="caption" style={{ color: urgent ? c.danger : c.textMuted, flex: 1 }} numberOfLines={1}>
-          {urgent ? `${t('announcements.urgent')} · ` : item.pinned ? `${t('announcements.pinned')} · ` : ''}
+          {tag ? `${tag} · ` : ''}
           {author}
         </AppText>
         <AppText variant="caption" muted>{date}</AppText>

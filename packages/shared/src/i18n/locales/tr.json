@@ -784,5 +784,34 @@
       }
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler"
+  },
+  "news": {
+    "title": "Haberler",
+    "one": "Haber",
+    "regional": "Bölgesel",
+    "general": "Genel",
+    "category": "Kategori",
+    "all": "Tümü",
+    "regionalIntro": "Belediye, valilik, kaymakamlık ve kurumların ilin, ilçen ve mahallen için yayınladığı kurum haberleri.",
+    "generalSoon": "Ülke geneli haberler, izin veren haber yayıncılarıyla yakında burada olacak.",
+    "needLocation": "Bölge haberlerini görmek için konumunu seç.",
+    "empty": "Bölgende henüz kurum haberi yok.",
+    "loadError": "Haberler yüklenemedi.",
+    "readingTime_one": "{{count}} dakikalık okuma",
+    "readingTime_other": "{{count}} dakikalık okuma",
+    "smaller": "A− Yazıyı küçült",
+    "larger": "A+ Yazıyı büyüt",
+    "share": "Paylaş",
+    "categories": {
+      "gundem": "Gündem",
+      "hizmet": "Belediye hizmetleri",
+      "ulasim": "Ulaşım",
+      "kultur-sanat": "Kültür sanat",
+      "spor": "Spor",
+      "egitim": "Eğitim",
+      "saglik": "Sağlık",
+      "cevre": "Çevre",
+      "ekonomi": "Ekonomi"
+    }
   }
 }

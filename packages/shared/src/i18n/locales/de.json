@@ -784,5 +784,34 @@
       }
     },
     "takipFeedHint": "Beiträge von Personen, denen du folgst, nur für Follower"
+  },
+  "news": {
+    "title": "Nachrichten",
+    "one": "Nachricht",
+    "regional": "Regional",
+    "general": "Allgemein",
+    "category": "Kategorie",
+    "all": "Alle",
+    "regionalIntro": "Offizielle Nachrichten von Stadtverwaltungen, Gouverneursämtern und Behörden für deine Provinz, deinen Bezirk und dein Viertel.",
+    "generalSoon": "Landesweite Nachrichten kommen bald mit Verlagen, die zustimmen.",
+    "needLocation": "Wähle deinen Standort, um lokale Nachrichten zu sehen.",
+    "empty": "In deiner Region gibt es noch keine offiziellen Nachrichten.",
+    "loadError": "Nachrichten konnten nicht geladen werden.",
+    "readingTime_one": "{{count}} Minute Lesezeit",
+    "readingTime_other": "{{count}} Minuten Lesezeit",
+    "smaller": "A− Kleinere Schrift",
+    "larger": "A+ Größere Schrift",
+    "share": "Teilen",
+    "categories": {
+      "gundem": "Aktuelles",
+      "hizmet": "Städtische Dienste",
+      "ulasim": "Verkehr",
+      "kultur-sanat": "Kultur & Kunst",
+      "spor": "Sport",
+      "egitim": "Bildung",
+      "saglik": "Gesundheit",
+      "cevre": "Umwelt",
+      "ekonomi": "Wirtschaft"
+    }
   }
 }

@@ -4,7 +4,9 @@ import {
   canPublishDirectly,
   isForLocation,
   isAnnouncementLive,
+  isNotice,
   publishersFor,
+  readingMinutes,
   regionWithin,
   sortForFeed,
   validateAnnouncement,
@@ -42,6 +44,17 @@ describe('resmî duyurular', () => {
     expect(validateAnnouncement(input({ kind: 'acil', endsAt: '2026-10-28T12:00:00Z' }), nilufer, now)).toEqual([]);
     expect(validateAnnouncement(input({ kind: 'acil', endsAt: '2026-11-10T12:00:00Z' }), nilufer, now)).toEqual(['endsAt']);
     expect(validateAnnouncement(input({ endsAt: '2026-10-01T00:00:00Z' }), nilufer, now)).toEqual(['endsAt']);
+  });
+
+  it('kurum haberi: kategori zorunlu, duyuruda kategori olmaz, haber sabitlenmez; okuma süresi', () => {
+    expect(validateAnnouncement(input({ kind: 'haber', category: 'kultur-sanat' }), nilufer, now)).toEqual([]);
+    expect(validateAnnouncement(input({ kind: 'haber' }), nilufer, now)).toEqual(['category']);
+    expect(validateAnnouncement(input({ category: 'spor' }), nilufer, now)).toEqual(['category']);
+    expect(validateAnnouncement(input({ kind: 'haber', category: 'spor', pinned: true, region: { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-ataevler' } }), nilufer, now)).toEqual(['pinned']);
+    expect(isNotice({ kind: 'haber' })).toBe(false);
+    expect(isNotice({ kind: 'acil' })).toBe(true);
+    expect(readingMinutes('kelime '.repeat(450))).toBe(2);
+    expect(readingMinutes('kısa')).toBe(1);
   });
 
   it('kullanıcı il genelini, kendi ilçesini ve mahallesini görür; acil en üstte; süresi geçen gösterilmez', () => {

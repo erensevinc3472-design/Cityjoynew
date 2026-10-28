@@ -11,8 +11,22 @@ import type { Action, Module, PermissionGrant, RegionScope } from '../permission
  * onayına girmez (6.5), en üstte sabit görünür ve bitiş tarihiyle kendiliğinden kalkar.
  */
 
-export const ANNOUNCEMENT_KINDS = ['duyuru', 'acil'] as const;
+/**
+ * "haber": kurum haberi (PROJE.md 5.3 Haberler, birinci kaynak resmî kurumlar). Duyurudan farkı: kategorisi vardır,
+ * Sosyal Harmoni > Haberler'de ve Keşfet akışında görünür; duyuru listelerinde (ana sayfa, Tüm duyurular, Mahalle
+ * Meydanı) görünmez. Onay akışı duyuruyla aynıdır.
+ */
+export const ANNOUNCEMENT_KINDS = ['duyuru', 'haber', 'acil'] as const;
 export type AnnouncementKind = (typeof ANNOUNCEMENT_KINDS)[number];
+
+export const NEWS_CATEGORIES = ['gundem', 'hizmet', 'ulasim', 'kultur-sanat', 'spor', 'egitim', 'saglik', 'cevre', 'ekonomi'] as const;
+export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
+
+/** Duyuru listelerinde görünür mü (haberler Haberler sayfasında). */
+export const isNotice = (a: Pick<Announcement, 'kind'>) => a.kind !== 'haber';
+
+/** Okuma süresi (dakika, en az 1): dakikada yaklaşık 200 sözcük. */
+export const readingMinutes = (text: string) => Math.max(1, Math.round(text.trim().split(/\s+/).filter(Boolean).length / 200));
 
 export type AnnouncementStatus = 'taslak' | 'onay-bekliyor' | 'reddedildi' | 'yayinda' | 'kaldirildi';
 
@@ -40,6 +54,8 @@ export interface AnnouncementInput {
    * muhtarın "pazar günü", "muhtarlık saatleri" gibi kalıcı bilgisi için.
    */
   pinned?: boolean;
+  /** Yalnızca haberde, zorunlu. */
+  category?: NewsCategory;
 }
 
 export interface Announcement extends AnnouncementInput {
@@ -61,7 +77,7 @@ export const ANNOUNCEMENT_LIMITS = { title: [3, 100], body: [10, 2000], reviewNo
 /** Acil duyuru en çok bu kadar gün açık kalır (unutulup sürekli en üstte kalmasın). */
 export const URGENT_MAX_DAYS = 7;
 
-export type AnnouncementError = 'title' | 'body' | 'region' | 'endsAt' | 'pinned';
+export type AnnouncementError = 'title' | 'body' | 'region' | 'endsAt' | 'pinned' | 'category';
 
 /** Bölge, yetki bölgesinin içinde mi (il > ilçe > mahalle)? */
 export function regionWithin(r: AnnouncementRegion, scope: RegionScope): boolean {
@@ -88,7 +104,9 @@ export function validateAnnouncement(a: AnnouncementInput, scope: RegionScope, n
     if (!(end > now.getTime()) || (a.kind === 'acil' && end > max)) errors.push('endsAt');
   } else if (a.kind === 'acil') errors.push('endsAt');
   // Sabitleme yalnızca mahalleye yönelik, acil olmayan duyuruda.
-  if (a.pinned && (!r.neighbourhoodId || a.kind === 'acil')) errors.push('pinned');
+  if (a.pinned && (!r.neighbourhoodId || a.kind !== 'duyuru')) errors.push('pinned');
+  // Kategori yalnızca haberde ve orada zorunlu.
+  if (a.kind === 'haber' ? !a.category || !NEWS_CATEGORIES.includes(a.category) : !!a.category) errors.push('category');
   return errors;
 }
 

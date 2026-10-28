@@ -44,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (sabit duyuru; önceki: kullanıcı aktiviteleri, 
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (88)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (83; Java 21 gerekir)
+npm test                      # ortak paket testleri (89)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (84; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -322,7 +322,20 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    (s4l4k) ve harf tekrarı (salaaak) fark etmez; 4+ harfli kelimeler ekli hâlleriyle de yakalanır. Süzgeç uygulamada
    çalışır (kurallarla zorlanmaz); atlatılan içerik şikâyetle moderasyona düşer. Testler: ortak 88 (4 yeni), kurallar 83
    (1 yeni) geçti; tarayıcıda denendi (belediye duyurusu akışta, yasaklı kelimeli yorum durduruldu). Panel derlendi,
-   panel bölümü tarayıcıda açılmadı. Yasaklı kelime listesi boş başlar: admin doldurmalı.
+   panel bölümü tarayıcıda açılmadı. Yasaklı kelime listesi boş başlar: admin doldurmalı. PR #12 birleşti, kurallar
+   yüklendi (Eren, 28 Ekim).
+
+27. **Haberler, 1. adım: Kurum Haberleri** (PROJE.md 5.3, birinci kaynak resmî kurumlar). Panel > Duyurular'da yeni tür
+   **"Kurum haberi"**: kategori zorunlu (Gündem, Belediye hizmetleri, Ulaşım, Kültür sanat, Spor, Eğitim, Sağlık, Çevre,
+   Ekonomi), onay akışı duyuruyla aynı, sabitlenemez. Uygulama: Sosyal Harmoni > **Haberler** açıldı. Bölgesel: ilin,
+   ilçen ve mahallen için kurum haberleri, kategoriye göre süzme (yalnızca haberi olan kategoriler). Genel: "izin veren
+   yayıncılarla yakında" (ülke geneli kaynak henüz yok). Haber okuyucusu: kategori, kaynak (resmî hesap, profile
+   bağlantı), okuma süresi, yazı boyu (A−/A+), paylaş. Haberler duyuru listelerinde (ana sayfa, Tüm duyurular, Mahalle
+   Meydanı) görünmez; Keşfet'te Mahallem/Bölgesel akışına karışır. Ek okuma yok (duyurularla aynı sorgu). Kurallar:
+   `kind` 'haber' eklendi, `category` yalnızca haberde ve orada zorunlu. Testler: ortak 89 (1 yeni), kurallar 84
+   (1 yeni) geçti; tarayıcıda denendi (ana sayfada haber yok, Haberler'de var, okuyucu ve yazı boyu). Panel derlendi,
+   panel formu tarayıcıda açılmadı. Sonraki adım (Haberler): yayıncı başvurusu (RSS, alan adı doğrulama, avukat
+   teyidi; PROJE.md 5.3 madde 2) ve Keşfet > Genel'e haber akışı; "Son Dakika" yalnızca kaynağın işaretiyle.
    Sonraki aşamalar:
    fotoğraf/video (Storage, Blaze), Genel sekmesine haber akışı (5.3 Haberler), resmî hesap gönderileri (muhtar/belediye
    rozetli) ve "Taziye yalnızca muhtar ya da yakını", yasaklı kelime süzgeci, alt gezinme çubuğu.
@@ -400,11 +413,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 26. madde (Keşfet 4. aşama): Eren PR'ı birleştirince kurallar yüklenmeli; admin Panel > Moderasyon'dan yasaklı
-   kelime listesini doldurmalı.
+0a. 27. madde (Kurum Haberleri): Eren PR'ı birleştirince kurallar yüklenmeli. Admin Panel > Moderasyon'dan yasaklı
+   kelime listesini doldurmalı (26. madde).
 0b. Keşfet'in kalanı: fotoğraf/video (Storage, Blaze), alt gezinme çubuğu (Ana Sayfa, Keşfet, Ara, Profil; görünümü
-   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Sıradaki adaylar (Blaze istemeyen): Haberler (resmî
-   duyurulardan "Kurum Haberleri" akışı, 5.3), Ara (5.10: kişiler, işletmeler, gönderiler). Blaze isteyenler:
+   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Sıradaki adaylar (Blaze istemeyen): Ara (5.10:
+   kişiler, işletmeler, gönderiler), haber yayıncısı başvurusu (avukat teyidi gerekir). Blaze isteyenler:
    aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.

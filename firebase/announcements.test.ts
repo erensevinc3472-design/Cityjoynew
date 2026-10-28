@@ -98,6 +98,17 @@ describe('resmî duyurular', () => {
     expect(log.filter((e) => e.module === 'gonderiler').map((e) => e.actorUid).sort()).toEqual(['basin', 'kalem']);
   });
 
+  it('kurum haberi: kategoriyle yayınlanır; kategorisiz haber ya da kategorili duyuru olmaz', async () => {
+    const p = await publisher('fen');
+    await panel('fen').save(p, input({ kind: 'haber', title: 'Yeni kütüphane açıldı', category: 'kultur-sanat' }), 'yayinla');
+    const [n] = await live();
+    expect(n).toMatchObject({ kind: 'haber', category: 'kultur-sanat' });
+    await expect(panel('fen').save(p, input({ kind: 'haber' }), 'yayinla')).rejects.toThrow();
+    // Duyuruya kategori yazılmaz (depo atar).
+    const id = await panel('fen').save(p, input({ category: 'spor' }), 'yayinla');
+    expect((await live()).find((a) => a.id === id)?.category).toBeUndefined();
+  });
+
   it('ret gerekçesiyle geri döner; hazırlayan düzeltip yeniden gönderir', async () => {
     const p = await publisher('basin');
     const id = await panel('basin').save(p, input(), 'onaya');
