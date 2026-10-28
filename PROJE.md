@@ -252,7 +252,7 @@ Sekmeler:
 **Görünürlük kuralları (Eren):**
 - Mahallem sekmesinde kullanıcı yalnızca kendi kayıtlı mahallesinin gönderilerini görür. Bölgesel sekmesinde yalnızca kendi ilini. Genel sekmesinde Türkiye ve dünya gündemini. Takip sekmesinde sadece takip ettiklerini.
 - Gönderi paylaşırken (sağ üstteki + düğmesi, `yeni-gonderi.html`): yazı, video, fotoğraf veya albüm eklenir, altta **"Nerede paylaşırsın?"** seçimi gelir: Mahallem, Bölgesel, Genel, Takip. Kullanıcı gönderisinin kime görüneceğini kendisi belirler.
-- Öneri: birden fazla hedef seçilebilsin (SORULACAK).
+- **Karar (Eren, 28 Ekim 2026): birden fazla hedef seçilebilir.** Aynı gönderi işaretlenen her sekmede (Mahallem, Bölgesel, Genel, Takip) görünür.
 - **Akış sıralaması (Eren onayladı):** Acil duyurular akışın en üstünde sabit görünür. Diğer resmi gönderiler (muhtar, belediye) kullanıcı gönderileriyle zaman sırasına göre karışık akar.
 
 **Keşfet kuralları (Eren onayladı):**
@@ -265,6 +265,8 @@ Sekmeler:
 7. **Anonim paylaşım yoktur.**
 8. **Moderasyon:** otomatik kelime filtresi, şikâyet düğmesi, birkaç şikâyette gönderi geçici gizlenir ve il yöneticisinin kuyruğuna düşer. Yasaklı içerik: nefret söylemi, taciz, dolandırıcılık, spam reklam, uygunsuz görsel.
 9. **Emlak ilanı (Eren onayladı):** Keşfet gönderilerinde satılık/kiralık taşınmaz ilanı verilemez. Algılanan gönderiler kullanıcıya Emlak bölümüne yönlendirilir (yetki doğrulaması orada yapılır). Gerekçe: bölüm 5.1'deki emlak ilanı yükümlülükleri.
+
+**Durum (28 Ekim 2026): 1. aşama yapıldı** (DURUM.md 23): yazılı gönderi, Mahallem/Bölgesel/Genel sekmeleri ve çoklu hedef, kategoriler, beğeni, şikâyet ve panel moderasyonu, emlak ilanı sezgisi, taziyede yakınlık beyanı. Sırada: yorumlar, kaydetme, takip ve Takip sekmesi, engelleme, fotoğraf/video (Storage, Blaze), resmî hesap gönderileri, haber akışı.
 
 Gönderi türleri (örneklerden): Kurumsal (belediye), Duyuru (muhtar), Yeni/Hoş geldin (işletme), Vefat/taziye, Fırsat (indirimli kampanya), kullanıcı paylaşımı (ruh hali etiketiyle, örn. "Keyifli"), yetkili hesaplar için "Başkan" etiketi. Beğeni, yorum, paylaş (WhatsApp, Telegram, Twitter, link), kaydet.
 Doğrulanmış hesap işareti (mavi tik) ve profil sayfaları var (profil-belediye, profil-muhtar, profil-baskan vb.).

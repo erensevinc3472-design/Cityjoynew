@@ -21,11 +21,13 @@ import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
-const MODULES: { key: string; icon: IconName; urgent?: boolean }[] = [
+const MODULES: { key: string; icon: IconName; urgent?: boolean; wide?: boolean }[] = [
   { key: 'myCity', icon: 'location-city' },
   { key: 'travel', icon: 'explore' },
   { key: 'social', icon: 'groups' },
   { key: 'urgent', icon: 'emergency', urgent: true },
+  // Keşfet: uygulamanın sosyal akışı (PROJE.md 5.5); alt gezinme gelene kadar ana sayfadan açılır.
+  { key: 'explore', icon: 'dynamic-feed', wide: true },
 ];
 
 function greetingKey(now = new Date()) {
@@ -95,7 +97,7 @@ export default function HomeScreen() {
         <View style={styles.grid}>
           {MODULES.map((m) => {
             // Benim Şehrim, Sosyal Harmoni (etkinlikler) ve Acil İhtiyaçlar hazır; Seyahat sonraki aşamada.
-            const href = m.key === 'urgent' ? '/urgent' : m.key === 'myCity' ? '/city' : m.key === 'social' ? '/social' : undefined;
+            const href = m.key === 'urgent' ? '/urgent' : m.key === 'myCity' ? '/city' : m.key === 'social' ? '/social' : m.key === 'explore' ? '/explore' : undefined;
             return (
               <Pressable
                 key={m.key}
@@ -103,7 +105,7 @@ export default function HomeScreen() {
                 disabled={!href}
                 accessibilityLabel={href ? t(`modules.${m.key}`) : `${t(`modules.${m.key}`)}. ${t('home.comingSoon')}`}
                 onPress={href ? () => router.push(href) : undefined}
-                style={({ pressed }) => [styles.module, { backgroundColor: c.surface, borderColor: m.urgent ? c.danger : c.border, shadowColor: c.shadow, opacity: pressed ? 0.85 : 1 }]}>
+                style={({ pressed }) => [styles.module, m.wide && styles.wide, { backgroundColor: c.surface, borderColor: m.urgent ? c.danger : c.border, shadowColor: c.shadow, opacity: pressed ? 0.85 : 1 }]}>
                 <View style={[styles.icon, { backgroundColor: m.urgent ? c.dangerSoft : c.accentSoft }]}>
                   <MaterialIcons name={m.icon} size={22} color={m.urgent ? c.danger : c.icon} />
                 </View>
@@ -150,6 +152,7 @@ const styles = StyleSheet.create({
   },
   icon: { width: 42, height: 42, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
   moduleTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 22 },
+  wide: { flexBasis: '100%', minHeight: 0 },
   center: { textAlign: 'center' },
   section: { gap: spacing.sm },
 });

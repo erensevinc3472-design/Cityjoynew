@@ -366,6 +366,41 @@
         "sahte": "Sahte ya da yanıltıcı",
         "diger": "Diğer"
       }
+    },
+    "posts": {
+      "title": "Keşfet şikâyetleri",
+      "intro": "Keşfet gönderilerinin şikâyetleri. 3 şikâyet alan gönderi siz karar verene kadar uygulamada akıştan düşer.",
+      "post": "Gönderi",
+      "counts": "{{reports}} şikâyet · {{likes}} beğeni",
+      "removed": "Kaldırıldı",
+      "kept": "Yerinde kaldı",
+      "missing": "(gönderi sahibi tarafından silinmiş)",
+      "remove": "Gönderiyi kaldır",
+      "keep": "Yerinde kalsın",
+      "note": "Nefret söylemi, taciz, dolandırıcılık, reklam, uygunsuz içerik ya da emlak ilanında kaldırın. Kaldırılan gönderi uygulamada görünmez. Her işlem işlem kaydına yazılır.",
+      "targets": {
+        "mahallem": "Mahallem",
+        "bolgesel": "Bölgesel",
+        "genel": "Genel"
+      },
+      "categories": {
+        "genel": "Genel",
+        "duyuru": "Duyuru",
+        "etkinlik": "Etkinlik",
+        "firsat": "Fırsat",
+        "soru-yardim": "Soru / Yardım",
+        "kayip-buluntu": "Kayıp - Buluntu",
+        "taziye": "Taziye"
+      },
+      "reasons": {
+        "nefret": "Nefret söylemi",
+        "taciz": "Taciz ya da zorbalık",
+        "dolandiricilik": "Dolandırıcılık",
+        "spam": "Spam ya da reklam",
+        "uygunsuz": "Uygunsuz içerik",
+        "emlak": "Emlak ilanı",
+        "diger": "Diğer"
+      }
     }
   },
   "sosSettings": {

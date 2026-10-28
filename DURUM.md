@@ -44,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (sabit duyuru; önceki: kullanıcı aktiviteleri, 
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (79)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (67; Java 21 gerekir)
+npm test                      # ortak paket testleri (83)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (73; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -266,9 +266,29 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    iken "Mahalle Meydanı'nda sabitle" kutusu. Sabit duyuru acil duyurulardan sonra en üstte (Mahalle Meydanı, Tüm
    duyurular, ana sayfa) ve "Sabit" etiketi / iğne simgesiyle görünür; düzenleyip işaret kaldırılır ya da yayından
    kaldırılır. Kurallar: `pinned` yalnızca mahalleye yönelik, acil olmayan duyuruda. Testler: ortak 79, kurallar 67 geçti;
-   panel derlendi. Ekranlar tarayıcıda denenmedi (küçük değişiklik: kutucuk, etiket, sıralama).
+   panel derlendi. Ekranlar tarayıcıda denenmedi (küçük değişiklik: kutucuk, etiket, sıralama). PR #8 birleşti.
+
+23. **Keşfet, 1. aşama** (PROJE.md 5.5). Ana sayfada geniş "Keşfet" kutusu (alt gezinme gelene kadar). Sekmeler:
+   Mahallem (yalnızca kendi mahallesi), Bölgesel (kendi ili, istenirse kendi ilçesi), Genel (herkes). Acil duyurular
+   Mahallem ve Bölgesel'in en üstünde. Akış 20'şer gönderiyle sayfalanır (aşağı kaydırdıkça), aşağı çekince yenilenir,
+   sekme başına 5 dk önbellek. Paylaşma: yazı (en çok 2000), kategori (madde 6), "Nerede paylaşırsın?" birden çok hedef
+   (Karar Eren 28 Ekim), Mahallem'de gizlilik notu, taziyede "yakınıyım" beyanı, emlak ilanı sezgisi (madde 9, paylaşmayı
+   durdurur ve Emlak bölümüne yönlendirir). Gönderi ayrıntısı: beğeni, şikâyet (7 neden, kişi başına bir), sahibi kaldırır.
+   3 şikâyette gönderi akıştan düşer; Panel > Moderasyon > "Keşfet şikâyetleri" (admin hepsi, il yöneticisi/moderatör kendi
+   ili): kaldır ya da yerinde kalsın, işlem kaydına yazılır. Hesap silmede gönderiler boşaltılır, beğeniler geri alınır.
+   Veritabanı: `posts/{id}` (hedefler `{mahallem, bolgesel, genel}: true/false` haritası; kurallar sorguları bununla
+   doğrular), `posts/{id}/likes/{uid}`, `postReports/{postId}_{uid}`; 4 yeni akış dizini. Kural: Mahallem gönderisini
+   yalnızca o mahallede kayıtlı kişi, Bölgesel'i o ildeki okur (sorgu dahil); paylaşım yalnızca kayıtlı konumla.
+   Testler: ortak 83 (4 yeni), kurallar 73 (6 yeni) geçti; uygulama ve panel derlendi. Uygulama emülatörde tarayıcıda
+   denendi (Mahallem/Bölgesel süzme, beğeni, emlak engeli, iki hedefe paylaşma, kaldırma, şikâyet). Panel bölümü
+   tarayıcıda açılmadı.
+   Sonraki aşamalar: yorumlar (sahibi kapatabilir), kaydetme, takip + Takip sekmesi + kullanıcı profili, engelleme,
+   fotoğraf/video (Storage, Blaze), Genel sekmesine haber akışı (5.3 Haberler), resmî hesap gönderileri (muhtar/belediye
+   rozetli) ve "Taziye yalnızca muhtar ya da yakını", yasaklı kelime süzgeci, alt gezinme çubuğu.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
+
+- Keşfet'te gönderi birden çok hedefe paylaşılabilir (Eren, 28 Ekim 2026; PROJE.md 5.5).
 
 - STK ve kulüpler için ayrı "etkinlik yetkisi iste" başvurusu şimdilik yok (Eren, 28 Ekim 2026): gerekirse admin Panel >
   Kurumlar'dan "kurum" ya da "kulüp" olarak açar, etkinlik bölümünü verir (6.4 madde 18).
@@ -339,11 +359,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 22. madde (sabit duyuru): Eren PR'ı birleştirince kurallar yüklenmeli (21. madde PR #7 ve kuralları 28 Ekim'de yüklendi).
-0b. Kurum içerikleri tamam (profil, Mahalle Meydanı, kullanıcı aktiviteleri, sabit duyuru). ("Etkinlik düzenleme yetkisi
-   iste" başvurusu şimdilik yok, Karar Eren 28 Ekim: STK ve kulüpleri admin Kurumlar sayfasından açar.) Sıradaki
-   adaylar: aktivite/etkinlik değişiklik bildirimleri ve günlük sınırlar (Blaze ister), Keşfet (5.5), Haberler (resmî
-   duyurulardan "Kurum Haberleri" akışı, 5.3).
+0a. 23. madde (Keşfet 1. aşama): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli. (22. madde sabit duyuru PR #8
+   birleşti; kurallarının yüklendiği Eren'den teyit edilmedi, bu yüklemeyle birlikte gider.)
+0b. Keşfet 2. aşama: yorumlar (sahibi kapatabilir) ve kaydetme; sonra takip + Takip sekmesi + profil, engelleme. Diğer
+   adaylar: aktivite/etkinlik değişiklik bildirimleri ve günlük sınırlar (Blaze ister), Haberler (resmî duyurulardan
+   "Kurum Haberleri" akışı, 5.3). (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"

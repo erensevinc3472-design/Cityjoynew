@@ -1277,6 +1277,125 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---- Keşfet gönderileri (PROJE.md 5.5): giriş yapmış kullanıcı kendi kayıtlı konumuyla paylaşır, bir ya da birden
+    // çok hedef seçer. Mahallem gönderisini yalnızca o mahallede kayıtlı olan, Bölgesel'i yalnızca o ilde kayıtlı olan,
+    // Genel'i her giriş yapmış kişi okur. Sayaçlar yalnızca kendi beğeni ya da şikâyet kaydıyla tam bir değişir. Sahibi
+    // gönderisini boşaltarak kaldırır; moderatör (admin, ildeki moderasyon yetkisi) kaldırır ya da bırakır.
+    function postPath(id) {
+      return /databases/$(database)/documents/posts/$(id);
+    }
+    function myLocation() {
+      return get(myUserPath()).data.get('location', {});
+    }
+    function validPost(d) {
+      return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'likeCount',
+             'reportCount', 'cleared', 'moderatedBy', 'createdAt', 'updatedAt'])
+        && d.text is string && d.text.size() <= 2000
+        && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
+        && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel'])
+        && d.targets.keys().hasAll(['mahallem', 'bolgesel', 'genel'])
+        && d.targets.mahallem is bool && d.targets.bolgesel is bool && d.targets.genel is bool
+        && (d.targets.mahallem || d.targets.bolgesel || d.targets.genel)
+        && validLocation(d.region) && 'neighbourhoodId' in d.region
+        && d.authorName is string && d.authorName.size() <= 40
+        && d.likeCount is int && d.reportCount is int
+        && d.updatedAt == request.time;
+    }
+    function canSeePost(d) {
+      // Hedefler sabit anahtarlı bir haritada durur ({mahallem, bolgesel, genel}: true/false): akış sorguları bunlarla
+      // süzülür ve kurallar sorguyu doğrulayabilir.
+      return d.targets.get('genel', false) == true
+        || (d.targets.get('bolgesel', false) == true && myLocation().get('provinceCode', '') == d.region.provinceCode)
+        || (d.targets.get('mahallem', false) == true && myLocation().get('neighbourhoodId', '') == d.region.neighbourhoodId);
+    }
+
+    match /posts/{id} {
+      allow read: if signedIn()
+        && ((resource.data.status == 'aktif' && canSeePost(resource.data))
+            || resource.data.authorUid == request.auth.uid
+            || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
+      // Paylaşma: kendi adına, kendi kayıtlı mahallesiyle.
+      allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.status == 'aktif'
+        && request.resource.data.likeCount == 0 && request.resource.data.reportCount == 0
+        && !('cleared' in request.resource.data) && !('moderatedBy' in request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && validPost(request.resource.data)
+        && request.resource.data.text.size() >= 1
+        && exists(myUserPath())
+        && myLocation().get('neighbourhoodId', '') == request.resource.data.region.neighbourhoodId
+        && myLocation().get('districtId', '') == request.resource.data.region.districtId
+        && myLocation().get('provinceCode', '') == request.resource.data.region.provinceCode;
+      // Sahibi kaldırır: yazı ve ad boşaltılır, başka bir şey değişmez.
+      allow update: if resource.data.authorUid == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.status == 'kaldirildi' && request.resource.data.text == '' && request.resource.data.authorName == ''
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'updatedAt']);
+      // Beğeni sayacı: yalnızca kendi beğeni kaydıyla tam bir artar (görebildiği, kaldırılmamış gönderide) ya da azalır.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount'])
+        && ((request.resource.data.likeCount == resource.data.likeCount + 1
+              && !exists(/databases/$(database)/documents/posts/$(id)/likes/$(request.auth.uid))
+              && existsAfter(/databases/$(database)/documents/posts/$(id)/likes/$(request.auth.uid))
+              && resource.data.status == 'aktif' && canSeePost(resource.data))
+            || (request.resource.data.likeCount == resource.data.likeCount - 1
+              && exists(/databases/$(database)/documents/posts/$(id)/likes/$(request.auth.uid))
+              && !existsAfter(/databases/$(database)/documents/posts/$(id)/likes/$(request.auth.uid))));
+      // Şikâyet sayacı: yalnızca kendi şikâyet kaydıyla tam bir artar.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])
+        && request.resource.data.reportCount == resource.data.reportCount + 1
+        && !exists(/databases/$(database)/documents/postReports/$(id + '_' + request.auth.uid))
+        && existsAfter(/databases/$(database)/documents/postReports/$(id + '_' + request.auth.uid));
+      // Moderasyon: kaldır ya da "yerinde kalsın".
+      allow update: if request.resource.data.moderatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cleared', 'moderatedBy', 'updatedAt'])
+        && (request.resource.data.status == 'kaldirildi'
+            || (request.resource.data.status == resource.data.status && request.resource.data.cleared == true))
+        && (isAdmin() || regionAllows('moderasyon', 'duzenle', resource.data.region.provinceCode, resource.data.region.districtId));
+      allow delete: if false;
+
+      // Beğeni: kişi kendisi ekler ve siler; yalnızca kendi beğenisini okur.
+      match /likes/{uid} {
+        allow read: if isSelf(uid);
+        allow create: if isSelf(uid)
+          && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+          && request.resource.data.uid == uid
+          && request.resource.data.createdAt == request.time
+          && getAfter(postPath(id)).data.likeCount == get(postPath(id)).data.likeCount + 1;
+        allow delete: if isSelf(uid)
+          && getAfter(postPath(id)).data.likeCount == get(postPath(id)).data.likeCount - 1;
+        allow update: if false;
+      }
+    }
+    // Kişinin bütün beğenileri (akıştaki kalpler ve hesap silme için).
+    match /{path=**}/likes/{uid} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // Gönderi şikâyetleri: kişi başına gönderi başına bir; kendi gönderisini şikâyet edemez. Admin hepsini, ildeki
+    // moderasyon yetkisi olan kendi ilini görür ve "incelendi" yapar.
+    match /postReports/{rid} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['postId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && rid == request.resource.data.postId + '_' + request.auth.uid
+        && request.resource.data.reason in ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger']
+        && request.resource.data.status == 'yeni'
+        && request.resource.data.createdAt == request.time
+        && get(postPath(request.resource.data.postId)).data.authorUid != request.auth.uid
+        && request.resource.data.provinceCode == get(postPath(request.resource.data.postId)).data.region.provinceCode
+        && getAfter(postPath(request.resource.data.postId)).data.reportCount
+           == get(postPath(request.resource.data.postId)).data.reportCount + 1;
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
+        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
+      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'incelendi';
+      allow delete: if false;
+    }
+
     // ---- Resmî profiller (PROJE.md 6.2 madde 2): kurumun ya da muhtarlığın herkese açık künyesi (tanıtım, iletişim,
     // çalışma saatleri). Kurumda kurum yöneticisi, muhtarlıkta muhtarın kendisi, ikisinde de admin yazar. Kurumun adı ve
     // bölgesi kurum kaydından gelir, değiştirilemez. Herkes okur (girişsiz de). Silinmez, alanlar boşaltılır.

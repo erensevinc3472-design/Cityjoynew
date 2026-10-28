@@ -5,6 +5,7 @@ import {
   createFirestoreEventRepository,
   createFirestoreOfficialProfileRepository,
   createFirestoreActivityRepository,
+  createFirestorePostRepository,
   createFirestoreCityGuideRepository,
   createFirestoreBusinessRepository,
   createFirestoreFamilyRepository,
@@ -38,6 +39,8 @@ export const eventRepository = createFirestoreEventRepository(firestore);
 export const officialProfileRepository = createFirestoreOfficialProfileRepository(firestore);
 /** Kullanıcı aktiviteleri (tam buluşma yeri yalnızca düzenleyene ve katılanlara). */
 export const activityRepository = createFirestoreActivityRepository(firestore);
+/** Keşfet gönderileri (Mahallem yalnızca o mahalleye, Bölgesel yalnızca o ile görünür). */
+export const postRepository = createFirestorePostRepository(firestore);
 /** İşletme doğrulama isteği: önce il yöneticisi, sonra admin onaylar (PROJE.md 6.5). */
 export const verificationRequests = createVerificationRequests(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);

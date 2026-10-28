@@ -55,7 +55,9 @@
     "myCityHint": "Hizmetler, kurumlar, ulaşım",
     "travelHint": "Rotalar ve yolculuk",
     "socialHint": "Etkinlik ve fırsatlar",
-    "urgentHint": "SOS, eczane, numaralar"
+    "urgentHint": "SOS, eczane, numaralar",
+    "explore": "Keşfet",
+    "exploreHint": "Mahallen ve şehrin neler paylaşıyor"
   },
   "auth": {
     "welcomeTitle": "CityJoy'a hoş geldin",
@@ -647,6 +649,77 @@
       "ogrenme": "Öğrenme",
       "gonullu": "Gönüllülük",
       "diger": "Diğer"
+    }
+  },
+  "explore": {
+    "title": "Keşfet",
+    "newPost": "Gönderi paylaş",
+    "post": "Gönderi",
+    "signIn": "Keşfet'i görmek ve paylaşmak için giriş yap.",
+    "needLocation": "Akışı görmek için konumunu seç.",
+    "needNeighbourhood": "Mahallem akışı ve paylaşım için konumunda mahalleni seç.",
+    "loadError": "Gönderiler yüklenemedi.",
+    "empty": "Burada henüz gönderi yok. İlk paylaşan sen ol!",
+    "end": "Hepsi bu kadar.",
+    "gone": "Bu gönderi artık yok ya da sana görünmüyor.",
+    "like": "Beğen",
+    "unlike": "Beğeniyi geri al",
+    "likeError": "Beğeni kaydedilemedi, tekrar dene.",
+    "saveError": "Kaydedilemedi, bağlantını kontrol edip tekrar dene.",
+    "reportError": "Şikâyet gönderilemedi, tekrar dene.",
+    "report": "Şikâyet et",
+    "reportTitle": "Neden şikâyet ediyorsun?",
+    "reportSend": "Şikâyeti gönder",
+    "reported": "Şikâyetin alındı, moderatörler inceleyecek.",
+    "remove": "Gönderiyi kaldır",
+    "removeConfirm": "Gönderin kalıcı olarak kaldırılacak. Emin misin?",
+    "hiddenForReview": "Gönderin birkaç şikâyet aldı; moderatör inceleyene kadar akışta görünmüyor.",
+    "newIntro": "Gönderin kayıtlı mahallenle paylaşılır. Adın “{{name}}” olarak görünür.",
+    "publish": "Paylaş",
+    "rules": "Nefret söylemi, taciz, dolandırıcılık, reklam ve uygunsuz içerik yasaktır. Birkaç şikâyet alan gönderi incelenene kadar gizlenir.",
+    "targets": {
+      "mahallem": "Mahallem",
+      "bolgesel": "Bölgesel",
+      "genel": "Genel"
+    },
+    "tabHints": {
+      "mahallem": "yalnızca mahallendekiler görür",
+      "bolgesel": "ilindeki herkes görür",
+      "genel": "uygulamadaki herkes görür"
+    },
+    "categories": {
+      "genel": "Genel",
+      "duyuru": "Duyuru",
+      "etkinlik": "Etkinlik",
+      "firsat": "Fırsat",
+      "soru-yardim": "Soru / Yardım",
+      "kayip-buluntu": "Kayıp - Buluntu",
+      "taziye": "Taziye"
+    },
+    "reasons": {
+      "nefret": "Nefret söylemi",
+      "taciz": "Taciz ya da zorbalık",
+      "dolandiricilik": "Dolandırıcılık",
+      "spam": "Spam ya da reklam",
+      "uygunsuz": "Uygunsuz içerik",
+      "emlak": "Emlak ilanı",
+      "diger": "Diğer"
+    },
+    "fields": {
+      "text": "Ne paylaşmak istersin?",
+      "textHint": "En çok 2000 karakter.",
+      "category": "Kategori",
+      "relative": "Vefat eden kişinin yakınıyım.",
+      "where": "Nerede paylaşırsın? (birden çok seçebilirsin)",
+      "mahallemNote": "Mahallem'de paylaştığında mahallendekiler o mahallede oturduğunu anlayabilir."
+    },
+    "errors": {
+      "text": "Bir şeyler yaz (en çok 2000 karakter).",
+      "category": "Bir kategori seç.",
+      "targets": "En az bir yer seç.",
+      "region": "Konumunda mahalleni seç.",
+      "realEstate": "Satılık ya da kiralık ev, arsa, dükkân ilanları Keşfet'te paylaşılamaz. Emlak ilanları yetki belgesiyle Emlak bölümünden verilecek.",
+      "relative": "Taziye gönderisini yalnızca yakınları paylaşabilir."
     }
   }
 }

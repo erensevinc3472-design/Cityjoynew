@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { can, isGrantActive } from '@cityjoy/shared';
-import { createActivityModeration, createReviewModeration, type ActivityReport, type ReviewReport } from '@cityjoy/shared/firebase';
+import {
+  createActivityModeration,
+  createPostModeration,
+  createReviewModeration,
+  type ActivityReport,
+  type PostReport,
+  type ReviewReport,
+} from '@cityjoy/shared/firebase';
 
 import { regionLabel } from '../components/content-common';
 import { firestore } from '../lib/firebase';
@@ -125,6 +132,7 @@ export function ModerationPage() {
         </div>
       )}
       {user ? <ActivityReports user={user} /> : null}
+      {user ? <PostReports user={user} /> : null}
     </section>
   );
 }
@@ -245,6 +253,128 @@ function ActivityReports({ user }: { user: PanelUser }) {
             </tbody>
           </table>
           <p className="count">{t('moderation.activities.note')}</p>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Keşfet şikâyetleri (PROJE.md 5.5 madde 8): admin hepsini, il yöneticisi ve il düzeyindeki gönüllü moderatör kendi
+ * ilini görür. Üç şikâyet alan gönderi uygulamada akıştan düşer; "Kaldır" tamamen kaldırır, "Yerinde kalsın" geri getirir.
+ */
+function PostReports({ user }: { user: PanelUser }) {
+  const isAdmin = isAdminUser(user);
+  const provinces = useMemo(
+    () => [...new Set(user.grants.filter((g) => g.scope.level === 'il' && isGrantActive(g, new Date()) && g.modules.moderasyon?.includes('goruntule')).map((g) => (g.scope.level === 'il' ? g.scope.provinceCode : '')))],
+    [user],
+  );
+  const canDecide = !user.isDemo && (isAdmin || user.grants.some((g) => g.scope.level === 'il' && g.modules.moderasyon?.includes('duzenle')));
+  const [list, setList] = useState<PostReport[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
+  const [busy, setBusy] = useState(false);
+  const mod = useMemo(() => createPostModeration(firestore, user.uid), [user]);
+
+  const load = useCallback(async () => {
+    setLoadError(false);
+    if (user.isDemo || (!isAdmin && !provinces.length)) return setList([]);
+    try {
+      const all = await Promise.all(isAdmin ? [mod.listReports('admin')] : provinces.map((p) => mod.listReports({ provinceCode: p })));
+      setList(all.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+    } catch {
+      setLoadError(true);
+    }
+  }, [user, isAdmin, provinces, mod]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const act = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setMessage(undefined);
+    try {
+      await fn();
+      setMessage({ kind: 'ok', text: t('moderation.saved') });
+      await load();
+    } catch {
+      setMessage({ kind: 'error', text: t('moderation.error') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!isAdmin && !provinces.length) return null;
+  return (
+    <>
+      <header className="page-head">
+        <div>
+          <h2>{t('moderation.posts.title')}</h2>
+          <p className="meta">{t('moderation.posts.intro')}</p>
+        </div>
+      </header>
+      {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {loadError ? (
+        <div className="state" role="alert">
+          <p>{t('moderation.loadError')}</p>
+          <button className="btn secondary" onClick={load}>{t('moderation.retry')}</button>
+        </div>
+      ) : list === null ? (
+        <div className="state" aria-live="polite">{t('moderation.loading')}</div>
+      ) : list.length === 0 ? (
+        <div className="state">{t('moderation.empty')}</div>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{t('moderation.date')}</th>
+                <th scope="col">{t('moderation.posts.post')}</th>
+                <th scope="col">{t('moderation.reason')}</th>
+                <th scope="col">{t('moderation.status')}</th>
+                {canDecide ? <th scope="col"><span className="sr-only">{t('moderation.actions')}</span></th> : null}
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((r) => (
+                <tr key={r.id}>
+                  <td className="num">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
+                  <td>
+                    {r.post && r.post.text ? (
+                      <>
+                        <strong>{r.post.authorName}</strong> <span className="meta">· {t(`moderation.posts.categories.${r.post.category}`)}</span>
+                        <div className="meta">{regionLabel(r.post.region)} · {r.post.targets.map((x) => t(`moderation.posts.targets.${x}`)).join(', ')}</div>
+                        <div className="meta">{t('moderation.posts.counts', { reports: r.post.reportCount, likes: r.post.likeCount })}</div>
+                        <details>
+                          <summary>{t('announcements.showBody')}</summary>
+                          <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.post.text}</p>
+                        </details>
+                        {r.post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : r.post.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
+                      </>
+                    ) : (
+                      <span className="meta">{t('moderation.posts.missing')}</span>
+                    )}
+                  </td>
+                  <td>{t(`moderation.posts.reasons.${r.reason}`)}</td>
+                  <td><span className={r.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`moderation.statuses.${r.status}`)}</span></td>
+                  {canDecide ? (
+                    <td>
+                      <div className="row-actions">
+                        {r.post && r.post.status !== 'kaldirildi' ? (
+                          <button className="link" disabled={busy} onClick={() => act(() => mod.remove(r))}>{t('moderation.posts.remove')}</button>
+                        ) : null}
+                        {r.post && r.post.status !== 'kaldirildi' && !r.post.cleared ? (
+                          <button className="link" disabled={busy} onClick={() => act(() => mod.keep(r))}>{t('moderation.posts.keep')}</button>
+                        ) : null}
+                      </div>
+                    </td>
+                  ) : null}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="count">{t('moderation.posts.note')}</p>
         </div>
       )}
     </>
