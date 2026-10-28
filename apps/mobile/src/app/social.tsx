@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/app-text';
-import { LocationChip, RoundButton } from '@/components/hero-header';
+import { RoundButton } from '@/components/hero-header';
 import { SceneArt, sceneRim, sceneSky, type SceneKind } from '@/components/scene-art';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
@@ -67,6 +67,14 @@ export default function SocialScreen() {
   const pager = useRef<ScrollViewInstance>(null);
   const [page, setPage] = useState(0);
 
+  // Şehir yalnızca bilgi olarak görünür; konum burada değiştirilmez (bölgesel / genel ayrımı ilgili ekranlarda).
+  const cityLine = province ? (
+    <View style={styles.city}>
+      <MaterialIcons name="place" size={13} color={c.heroAccent} />
+      <AppText numberOfLines={1} style={[styles.cityText, { color: c.heroAccent }]}>{province}</AppText>
+    </View>
+  ) : null;
+
   const goPage = (p: number) => {
     pager.current?.scrollTo({ y: p * height, animated: true });
     setPage(p);
@@ -88,11 +96,13 @@ export default function SocialScreen() {
             top={
               <View style={styles.bar}>
                 <RoundButton icon={rtl ? 'arrow-forward' : 'arrow-back'} label={t('common.back')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/home'))} />
-                <AppText accessibilityRole="header" numberOfLines={1} style={styles.title}>{t('modules.social')}</AppText>
+                <View style={styles.titleBox}>
+                  <AppText accessibilityRole="header" numberOfLines={1} style={styles.title}>{t('modules.social')}</AppText>
+                  {cityLine}
+                </View>
                 <View style={styles.spacer} />
               </View>
             }
-            chip={<LocationChip label={province ?? t('home.noLocation')} onPress={() => router.push('/location?edit=1')} />}
             footer={
               <Pressable accessibilityRole="button" accessibilityLabel={t('social.toDeals')} onPress={() => goPage(1)} hitSlop={8} style={({ pressed }) => [styles.hint, { opacity: pressed ? 0.7 : 1 }]}>
                 <AppText style={[styles.hintText, { color: c.heroAccent }]}>{t('social.toDeals')}</AppText>
@@ -111,7 +121,10 @@ export default function SocialScreen() {
             top={
               <View style={styles.bar}>
                 <RoundButton icon="arrow-upward" label={t('social.backToSocial')} onPress={() => goPage(0)} />
-                <AppText accessibilityRole="header" numberOfLines={1} style={styles.title}>{t('social.sections.deals')}</AppText>
+                <View style={styles.titleBox}>
+                  <AppText accessibilityRole="header" numberOfLines={1} style={styles.title}>{t('social.sections.deals')}</AppText>
+                  {cityLine}
+                </View>
                 <View style={styles.spacer} />
               </View>
             }
@@ -251,7 +264,10 @@ const styles = StyleSheet.create({
   dim: { backgroundColor: 'rgba(8, 26, 30, 0.62)' },
   top: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER, gap: spacing.sm },
   bar: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  title: { flex: 1, textAlign: 'center', fontFamily: fonts.heading, fontSize: 17, lineHeight: 24, color: white },
+  titleBox: { flex: 1, alignItems: 'center' },
+  title: { textAlign: 'center', fontFamily: fonts.heading, fontSize: 17, lineHeight: 22, color: white },
+  city: { flexDirection: 'row', alignItems: 'center', gap: 2, marginTop: 1 },
+  cityText: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 16 },
   spacer: { width: 40 },
   dealsNote: { fontSize: 12, lineHeight: 17, color: '#D5E2E3' },
   headline: { gap: 2, paddingTop: spacing.xs, minHeight: 100 },

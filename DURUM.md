@@ -422,7 +422,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    iki kez dokun beğen, yorum, paylaş, kaydet (kaydettiklerim oturumda bir kez okunur), #kategori. Kaydedilenler yan
    menüde. Takip akışının önbellek anahtarı düzeltildi (Genel ile karışıyordu). **Profil:**
    halkalı harf, gönderi/takipçi/takip sayıları, Takip et ve Mesaj yan yana. **Sosyal Harmoni:** yana kaydırılan kartlar,
-   arkada değişen sahne; forum kaldırıldı (madde 18). Yukarı kaydırınca ikinci sayfa **Fırsatlar** (yemek, market, spor,
+   arkada değişen sahne; forum kaldırıldı (madde 18). Başlığın altında il adı yalnızca bilgi olarak (konum burada değiştirilmez). Yukarı kaydırınca ikinci sayfa **Fırsatlar** (yemek, market, spor,
    eğlence, esnaf, sağlık, eğitim; indirim sistemi gelene kadar "yakında", örnek oran ve marka adı yok). **Karşılama:** beş sahne sırayla, "Kaydırarak başla" (dokunarak da),
    "Zaten hesabın var mı?". **Acil İhtiyaçlar:** nabız gibi atan büyük SOS kartı. Görseller şimdilik çizim
    (`components/scene-art.tsx`, "hareketi azalt" açıksa durur); gerçek fotoğraflar Storage (Blaze) ile panelden gelecek.
