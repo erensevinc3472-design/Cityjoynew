@@ -33,7 +33,7 @@ import { PostCard } from '@/components/post-card';
 import { StateMessage } from '@/components/state-message';
 import { useEvents } from '@/lib/events';
 import { locationRepository as repo } from '@/lib/locations';
-import { toggleLike, useLiked } from '@/lib/posts';
+import { authorHref, toggleLike, useLiked } from '@/lib/posts';
 import { searchBusinesses, searchPeople, searchPosts, useCityPlaces, useRecentSearches, useSearchSuggestions } from '@/lib/search';
 import { useServiceCategories } from '@/lib/service-categories';
 import { useSession } from '@/lib/session';
@@ -213,7 +213,7 @@ export default function SearchScreen() {
         liked={isLiked(p.id)}
         onPress={() => router.push({ pathname: '/explore/[id]', params: { id: p.id } })}
         onLike={() => like(p)}
-        onAuthor={() => router.push({ pathname: '/u/[uid]', params: { uid: p.authorUid } })}
+        onAuthor={() => router.push(authorHref(p))}
       />
     ), { failed: posts.failed, note: postsOk ? undefined : t('search.postsTooShort') }),
   ];

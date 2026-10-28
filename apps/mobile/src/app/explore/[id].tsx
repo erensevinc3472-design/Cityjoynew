@@ -13,7 +13,7 @@ import { PostCard } from '@/components/post-card';
 import { PostComments } from '@/components/post-comments';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
-import { cachedPost, patchCachedPost, toggleLike, useLiked } from '@/lib/posts';
+import { authorHref, cachedPost, patchCachedPost, toggleLike, useLiked } from '@/lib/posts';
 import { postRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { spacing } from '@/theme/tokens';
@@ -103,7 +103,7 @@ export default function PostScreen() {
   return (
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content}>
-        <PostCard item={item} liked={isLiked(item.id)} full onLike={busy ? undefined : like} onAuthor={() => router.push({ pathname: '/u/[uid]', params: { uid: item.authorUid } })} />
+        <PostCard item={item} liked={isLiked(item.id)} full onLike={busy ? undefined : like} onAuthor={() => router.push(authorHref(item))} />
         {mine && item.reportCount >= 3 && !item.cleared ? <FormMessage kind="info" text={t('explore.hiddenForReview')} /> : null}
         {error ? <FormMessage kind="error" text={error} /> : null}
         <View style={styles.row}>

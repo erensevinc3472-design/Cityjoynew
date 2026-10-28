@@ -1,9 +1,11 @@
 import {
   collection,
+  deleteDoc,
   deleteField,
   doc,
   getDoc,
   getDocs,
+  increment,
   limit,
   orderBy,
   query,
@@ -19,8 +21,10 @@ import {
 
 import {
   cleanBusinessInput,
+  BUSINESS_MANAGER_LIMIT,
   type Business,
   type BusinessInput,
+  type BusinessManager,
   type BusinessRepository,
   type VerificationStatus,
 } from '../business/business';
@@ -44,6 +48,9 @@ function fromDoc(id: string, d: DocumentData): Business {
     membership: { tier: d.membership?.tier ?? 'ucretsiz', ...(iso(d.membership?.endsAt) ? { endsAt: iso(d.membership.endsAt) } : {}) },
     featuredUntil: iso(d.featuredUntil),
     rating: { sum: d.rating?.sum ?? 0, count: d.rating?.count ?? 0 },
+    followerCount: d.followerCount ?? 0,
+    managers: ((d.managerUids ?? []) as string[]).map((uid) => ({ uid, ...(d.managers?.[uid] ?? { name: '', post: 'kapali', edit: false, reply: false }) })),
+    weeklyHours: Array.isArray(d.weeklyHours) ? (d.weeklyHours as ({ open: string; close: string } | null)[]).map((x) => (x ? { open: x.open, close: x.close } : null)) : undefined,
     createdAt: iso(d.createdAt) ?? '',
     // Sunucu zaman damgası henüz yazılmadıysa (yerel önbellek) şimdiki zaman sayılır.
     updatedAt: iso(d.updatedAt) ?? new Date().toISOString(),
@@ -68,6 +75,48 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
     },
 
     listMine: (uid) => list(where('ownerUid', '==', uid)),
+
+    listManaged: (uid) => list(where('managerUids', 'array-contains', uid)),
+
+    async setManagers(id, managers) {
+      const kept = managers.slice(0, BUSINESS_MANAGER_LIMIT);
+      await updateDoc(doc(db, COLLECTION, id), managerFields(kept));
+    },
+
+    async leaveManaged(id, uid) {
+      const b = await this.get(id);
+      if (!b) return;
+      await updateDoc(doc(db, COLLECTION, id), managerFields(b.managers.filter((m) => m.uid !== uid)));
+    },
+
+    // Takip kaydı ve sayaç aynı toplu yazımda (kurallar sayacın tam bir değiştiğini denetler).
+    async follow(id, uid) {
+      const batch = writeBatch(db);
+      batch.set(followDoc(db, id, uid), { uid, businessId: id, createdAt: serverTimestamp() });
+      batch.update(doc(db, COLLECTION, id), { followerCount: increment(1) });
+      await batch.commit();
+    },
+
+    async unfollow(id, uid) {
+      const batch = writeBatch(db);
+      batch.delete(followDoc(db, id, uid));
+      batch.update(doc(db, COLLECTION, id), { followerCount: increment(-1) });
+      await batch.commit();
+    },
+
+    async followedIds(uid) {
+      const snap = await getDocs(query(collection(db, FOLLOWS), where('uid', '==', uid), limit(200)));
+      return snap.docs.map((d) => d.get('businessId') as string);
+    },
+
+    async leaveAllOf(uid) {
+      for (const bid of await this.followedIds(uid)) {
+        const exists = (await getDoc(doc(db, COLLECTION, bid)).catch(() => null))?.exists();
+        if (exists) await this.unfollow(bid, uid).catch(() => deleteDoc(followDoc(db, bid, uid)));
+        else await deleteDoc(followDoc(db, bid, uid));
+      }
+      for (const b of await this.listManaged(uid)) await this.leaveManaged(b.id, uid);
+    },
 
     // İşletme ve telefon kaydı aynı toplu yazımda: aynı telefonla ikinci işletme açılamaz (PROJE.md 5.7).
     async create(uid, input) {
@@ -95,7 +144,7 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
       const before = await getDoc(doc(db, COLLECTION, id));
       const oldPhone = before.get('phone') as string | undefined;
       // Boşaltılan isteğe bağlı alanlar silinir.
-      const removed = Object.fromEntries((['address', 'hoursNote', 'description'] as const).filter((k) => !(k in clean)).map((k) => [k, deleteField()]));
+      const removed = Object.fromEntries((['address', 'hoursNote', 'description', 'weeklyHours'] as const).filter((k) => !(k in clean)).map((k) => [k, deleteField()]));
       const batch = writeBatch(db);
       batch.update(doc(db, COLLECTION, id), { ...clean, location: clean.location, ...removed, searchKeys: nameKeys(clean.name), updatedAt: serverTimestamp() });
       if (oldPhone !== clean.phone) {
@@ -119,6 +168,15 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
 }
 
 const phoneDoc = (db: Firestore, phone: string) => doc(db, 'businessPhones', phone);
+const FOLLOWS = 'businessFollows';
+const followDoc = (db: Firestore, id: string, uid: string) => doc(db, FOLLOWS, `${id}_${uid}`);
+
+/** Yetkililer belgede kimlik listesi + izin haritası olarak durur (liste sorgu, harita kural denetimi için). */
+const managerFields = (managers: BusinessManager[]) => ({
+  managerUids: managers.map((m) => m.uid),
+  managers: Object.fromEntries(managers.map((m) => [m.uid, { name: m.name.slice(0, 40), post: m.post, edit: m.edit, reply: m.reply }])),
+  updatedAt: serverTimestamp(),
+});
 
 /** Telefon başka bir işletmeye kayıtlıysa anlaşılır hata verir. */
 async function commitOrDuplicate(db: Firestore, batch: ReturnType<typeof writeBatch>, phone: string, businessId: string) {
@@ -197,6 +255,13 @@ export function createBusinessAdmin(db: Firestore, actorUid: string) {
 
     setTier: (b: Business, tier: MembershipTier, endsAt?: Date) =>
       change(b, { membership: endsAt && tier !== 'ucretsiz' ? { tier, endsAt: Timestamp.fromDate(endsAt) } : { tier } }, 'duzenle', `Üyelik kademesi: ${tier}`),
+
+    /** Yetkiliyi işletmeden çıkarır (kötüye kullanım, sahibinin talebi). */
+    removeManager: (b: Business, uid: string) => {
+      const rest = b.managers.filter((m) => m.uid !== uid);
+      const { updatedAt: _u, ...fields } = managerFields(rest);
+      return change(b, fields, 'duzenle', `Yetkili çıkarıldı (${b.managers.find((m) => m.uid === uid)?.name ?? uid})`);
+    },
 
     setFeatured: (b: Business, until: Date | null) =>
       change(b, { featuredUntil: until ? Timestamp.fromDate(until) : deleteField() }, 'duzenle', until ? `Öne çıkarıldı (${until.toISOString().slice(0, 10)} tarihine kadar)` : 'Öne çıkarma kaldırıldı'),

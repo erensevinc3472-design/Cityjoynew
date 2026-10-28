@@ -12,6 +12,7 @@ import {
   serverTimestamp,
   startAfter,
   Timestamp,
+  updateDoc,
   where,
   writeBatch,
   type DocumentData,
@@ -24,6 +25,7 @@ import {
   POST_LIMITS,
   POST_TARGETS,
   type Post,
+  type PostBusiness,
   type PostComment,
   type PostInput,
   type PostReportReason,
@@ -51,6 +53,7 @@ function fromDoc(id: string, d: DocumentData): Post {
     status: d.status,
     authorUid: d.authorUid,
     authorName: d.authorName ?? '',
+    ...(d.business ? { business: { id: d.business.id, name: d.business.name ?? '' } } : {}),
     likeCount: d.likeCount ?? 0,
     commentCount: d.commentCount ?? 0,
     commentsOff: d.commentsOff === true,
@@ -85,7 +88,7 @@ export type FeedFilter =
   | { target: 'bolgesel'; provinceCode: string; districtId?: string }
   | { target: 'genel' }
   /** Takip ettiklerimin "Takip" hedefli gönderileri (hesap başına bir sorgu; kurallar takibi her hesap için denetler). */
-  | { target: 'takip'; authorUids: string[] };
+  | { target: 'takip'; authorUids: string[]; businessIds?: string[] };
 
 export interface FeedPage {
   posts: Post[];
@@ -101,15 +104,24 @@ export function createFirestorePostRepository(db: Firestore) {
   return {
     async feed(filter: FeedFilter, cursor: string | null = null): Promise<FeedPage> {
       if (filter.target === 'takip') {
-        const pages = await Promise.all(
-          filter.authorUids.slice(0, PROFILE_LIMITS.feedAuthors).map((uid) =>
+        // Takip ettiğim işletmelerin Takip gönderileri de (işletme başına bir sorgu).
+        const businessPages = (filter.businessIds ?? []).slice(0, PROFILE_LIMITS.feedAuthors).map((bid) =>
+          getDocs(query(collection(db, COLLECTION), where('business.id', '==', bid), where('targets.takip', '==', true), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(PROFILE_LIMITS.perAuthor)))
+            .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())))
+            .catch(() => [] as Post[]),
+        );
+        const pages = await Promise.all([
+          ...businessPages,
+          ...filter.authorUids.slice(0, PROFILE_LIMITS.feedAuthors).map((uid) =>
             getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where('targets.takip', '==', true), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(PROFILE_LIMITS.perAuthor)))
               .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())))
               // Takip sonradan bittiyse o hesabın sorgusu reddedilir; diğerleri yine gelir.
               .catch(() => [] as Post[]),
           ),
-        );
-        return { posts: pages.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt)), cursor: null };
+        ]);
+        // Kişinin takip akışında işletme adına paylaşımları işletmenin takibi belirler.
+        const seen = new Set<string>();
+        return { posts: pages.flat().filter((p) => !seen.has(p.id) && !!seen.add(p.id)).sort((a, b) => b.createdAt.localeCompare(a.createdAt)), cursor: null };
       }
       const c: QueryConstraint[] = [where(`targets.${filter.target}`, '==', true), where('status', '==', 'aktif')];
       if (filter.target === 'mahallem') c.push(where('region.neighbourhoodId', '==', filter.neighbourhoodId));
@@ -153,6 +165,34 @@ export function createFirestorePostRepository(db: Firestore) {
       return lists.flat().filter((p) => !seen.has(p.id) && !!seen.add(p.id)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     },
 
+    /**
+     * İşletme sayfası: işletmenin Genel gönderileri, aynı ildeysem Bölgesel, takip ediyorsam Takip gönderileri de.
+     */
+    async byBusiness(bid: string, opts: { provinceCode?: string; following: boolean }): Promise<Post[]> {
+      const q = (...c: QueryConstraint[]) =>
+        getDocs(query(collection(db, COLLECTION), where('business.id', '==', bid), ...c, where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(30)))
+          .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())))
+          .catch(() => [] as Post[]);
+      const lists = await Promise.all([
+        q(where('targets.genel', '==', true)),
+        opts.provinceCode ? q(where('targets.bolgesel', '==', true), where('region.provinceCode', '==', opts.provinceCode)) : Promise.resolve([] as Post[]),
+        opts.following ? q(where('targets.takip', '==', true)) : Promise.resolve([] as Post[]),
+      ]);
+      const seen = new Set<string>();
+      return lists.flat().filter((p) => !seen.has(p.id) && !!seen.add(p.id)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
+
+    /** Sahibinin onayını bekleyen yetkili paylaşımları (sahibi ve yetkililer okur). */
+    async pendingOf(bid: string): Promise<Post[]> {
+      const snap = await getDocs(query(collection(db, COLLECTION), where('business.id', '==', bid), where('status', '==', 'onay-bekliyor'), limit(50)));
+      return snap.docs.map((d) => fromDoc(d.id, d.data())).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
+
+    /** İşletme sahibi yetkilinin paylaşımını onaylar (reddetmek: remove). */
+    async approve(id: string): Promise<void> {
+      await updateDoc(postRef(db, id), { status: 'aktif', updatedAt: serverTimestamp() });
+    },
+
     async listMine(uid: string): Promise<Post[]> {
       const snap = await getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), limit(200)));
       return snap.docs.map((d) => fromDoc(d.id, d.data())).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -164,7 +204,7 @@ export function createFirestorePostRepository(db: Firestore) {
     },
 
     /** Döner: yeni kimlik. Bölge, kuralların denetlediği kayıtlı konumdur. */
-    async create(uid: string, authorName: string, input: PostInput): Promise<string> {
+    async create(uid: string, authorName: string, input: PostInput, as?: { business: PostBusiness; pending: boolean }): Promise<string> {
       const ref = doc(collection(db, COLLECTION));
       const r = input.region;
       const batch = writeBatch(db);
@@ -173,9 +213,10 @@ export function createFirestorePostRepository(db: Firestore) {
         category: input.category,
         targets: targetsToMap(input.targets),
         region: { provinceCode: r.provinceCode, districtId: r.districtId, neighbourhoodId: r.neighbourhoodId },
-        status: 'aktif',
+        status: as?.pending ? 'onay-bekliyor' : 'aktif',
         authorUid: uid,
-        authorName: authorName.slice(0, 40),
+        authorName: (as ? as.business.name : authorName).slice(0, 40),
+        ...(as ? { business: { id: as.business.id, name: as.business.name.slice(0, 80) } } : {}),
         likeCount: 0,
         commentCount: 0,
         reportCount: 0,

@@ -24,7 +24,8 @@ export function ReviewsSection({ business: b }: { business: Business }) {
   const router = useRouter();
   const c = useThemeColors();
   const { user } = useSession();
-  const isOwner = user?.uid === b.ownerUid;
+  // Sahibi ya da cevap izni olan yetkili yorumlara işletme adına cevap verir; kendi işletmesine yorum yazamaz.
+  const isOwner = user?.uid === b.ownerUid || b.managers.some((m) => m.uid === user?.uid && m.reply);
 
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const [mine, setMine] = useState<Review | null>(null);

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { authorNameOf, type PublicProfile } from '@cityjoy/shared';
 
-import { socialRepository } from './services';
+import { businessRepository, socialRepository } from './services';
 import { useSession } from './session';
 
 /**
  * Oturum başına bir kez okunan Keşfet bilgileri: kendi herkese açık profilim (yoksa açılır), engellediklerim ve takip
  * ettiklerim. Değişince yerelde güncellenir; akışlar bunlara göre süzülür.
  */
-let state: { uid: string; profile: PublicProfile | null; blocked: Set<string>; following: string[] | null } | null = null;
+let state: { uid: string; profile: PublicProfile | null; blocked: Set<string>; following: string[] | null; businesses: string[] | null } | null = null;
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((f) => f());
 
@@ -27,7 +27,7 @@ export function useSocial() {
 
   useEffect(() => {
     if (!uid || !profile || state?.uid === uid) return;
-    state = { uid, profile: null, blocked: new Set(), following: null };
+    state = { uid, profile: null, blocked: new Set(), following: null, businesses: null };
     socialRepository.ensureProfile(uid, authorNameOf(profile.displayName), profile.isPrivate).then((p) => {
       if (state?.uid === uid) state.profile = p;
       notify();
@@ -37,6 +37,13 @@ export function useSocial() {
       notify();
     }, () => {});
     refreshFollowing(uid);
+    businessRepository.followedIds(uid).then((b) => {
+      if (state?.uid === uid) state.businesses = b;
+      notify();
+    }, () => {
+      if (state?.uid === uid) state.businesses = [];
+      notify();
+    });
   }, [uid, profile]);
 
   const mine = uid && state?.uid === uid ? state : null;
@@ -45,6 +52,8 @@ export function useSocial() {
     blocked: mine?.blocked ?? new Set<string>(),
     /** null: henüz okunmadı. */
     following: mine?.following ?? null,
+    /** Takip ettiğim işletmeler; null: henüz okunmadı. */
+    followingBusinesses: mine?.businesses ?? null,
   };
 }
 
@@ -88,4 +97,16 @@ export async function toggleFollowAuthor(me: string, other: string, following: b
   if (status === 'aktif' && state?.uid === me) state.following = [...(state.following ?? []), other];
   notify();
   return status;
+}
+
+/** İşletmeyi takip et / bırak (işletme sayfası ve akış). Takip listesi yerelde hemen güncellenir. */
+export async function toggleFollowBusiness(me: string, bid: string, following: boolean): Promise<boolean> {
+  if (following) await businessRepository.unfollow(bid, me);
+  else await businessRepository.follow(bid, me);
+  if (state?.uid === me) {
+    const list = state.businesses ?? [];
+    state.businesses = following ? list.filter((x) => x !== bid) : [...list, bid];
+  }
+  notify();
+  return !following;
 }

@@ -246,7 +246,8 @@
       "hoursNote": "Öffnungszeiten dürfen höchstens 120 Zeichen haben.",
       "description": "Die Beschreibung darf höchstens 500 Zeichen haben.",
       "priceList": "Jede Preiszeile braucht Leistung und Preis (höchstens 30 Zeilen).",
-      "reservedName": "Dieser Name ist offiziellen Einrichtungen vorbehalten (Gemeinde, Gouverneursamt, CityJoy usw.). Für ein Behördenkonto wenden Sie sich an CityJoy."
+      "reservedName": "Dieser Name ist offiziellen Einrichtungen vorbehalten (Gemeinde, Gouverneursamt, CityJoy usw.). Für ein Behördenkonto wenden Sie sich an CityJoy.",
+      "hours": "Uhrzeiten wie 09:00 eingeben; Öffnung und Schließung dürfen nicht gleich sein."
     },
     "hide": "Nicht mehr anzeigen",
     "show": "Wieder veröffentlichen",
@@ -293,7 +294,93 @@
     "verifyRejected": "Ihre Anfrage wurde abgelehnt. Grund: {{reason}}",
     "verifyAgain": "Erneut anfordern",
     "verifyCancel": "Anfrage zurückziehen",
-    "verifyDone": "Ihr Betrieb ist geprüft."
+    "verifyDone": "Ihr Betrieb ist geprüft.",
+    "neighbourhood": "Viertel",
+    "neighbourhoodHint": "Das Viertel wird niemandem angezeigt; es ist nötig, um als Betrieb in „Mein Viertel“ zu posten.",
+    "weekly": {
+      "toggle": "Öffnungszeiten nach Tagen eingeben",
+      "open": "Öffnet",
+      "close": "Schließt",
+      "isOpen": "geöffnet",
+      "hint": "Schließt du nach Mitternacht, gib die Uhrzeit des nächsten Tages ein (z. B. 18:00 – 02:00). „Jetzt geöffnet“ richtet sich danach.",
+      "copy": "Zeiten vom {{day}} für alle Tage übernehmen"
+    },
+    "payment": {
+      "nakit": "Bar",
+      "kart": "Kreditkarte",
+      "temassiz": "Kontaktlos",
+      "yemek-karti": "Essenskarte",
+      "havale": "Überweisung"
+    },
+    "amenity": {
+      "paket-servis": "Lieferservice",
+      "aile-alani": "Familienbereich",
+      "engelli-erisimi": "Barrierefrei",
+      "otopark": "Parkplatz",
+      "wifi": "WLAN",
+      "cocuk-dostu": "Kinderfreundlich",
+      "evcil-hayvan": "Haustierfreundlich",
+      "rezervasyon": "Reservierung"
+    },
+    "page": {
+      "shareText": "Schau dir {{name}} ({{place}}) auf CityJoy an.",
+      "manage": "Betrieb verwalten",
+      "share": "Seite teilen",
+      "statRating": "Bewertung",
+      "openNow": "Jetzt geöffnet",
+      "openUntil": "Jetzt geöffnet · schließt {{time}}",
+      "opensAt": "Jetzt geschlossen · öffnet {{time}}",
+      "closedNow": "Jetzt geschlossen",
+      "follow": "Folgen",
+      "following": "Folgst du",
+      "directions": "Route",
+      "postAs": "Als Betrieb posten",
+      "needsApproval": "mit Freigabe",
+      "noPostPermission": "Du darfst nicht als dieser Betrieb posten.",
+      "pendingTitle": "Beiträge zur Freigabe ({{count}})",
+      "approve": "Freigeben",
+      "reject": "Ablehnen",
+      "waitingOwner": "Wartet auf Freigabe des Inhabers",
+      "tabMenu": "Speisekarte",
+      "tabServices": "Leistungen und Preise",
+      "tabs": {
+        "gonderiler": "Beiträge",
+        "yorumlar": "Bewertungen",
+        "bilgiler": "Infos"
+      },
+      "noPosts": "Noch keine Beiträge.",
+      "noMenu": "Noch keine Speisekarte oder Preisliste.",
+      "trust": "Vertrauensinformationen",
+      "closed": "Geschlossen",
+      "payment": "Zahlungsarten",
+      "amenities": "Ausstattung"
+    },
+    "managers": {
+      "title": "Verwalter",
+      "intro": "Finde bis zu {{max}} Personen per Namen, die deinen Betrieb mitverwalten, und lege ihre Rechte fest. Die Telefonnummer bleibt nur bei dir.",
+      "postLabel": "Als Betrieb posten",
+      "post": {
+        "kapali": "Aus",
+        "onayla": "Mit meiner Freigabe",
+        "dogrudan": "Direkt"
+      },
+      "edit": "Darf Infos bearbeiten",
+      "reply": "Darf auf Bewertungen antworten",
+      "remove": "{{name}} als Verwalter entfernen",
+      "search": "Namen suchen, um Verwalter hinzuzufügen",
+      "add": "{{name}} als Verwalter hinzufügen",
+      "full": "Du kannst höchstens {{max}} Verwalter hinzufügen.",
+      "save": "Verwalter speichern",
+      "saved": "Verwalter gespeichert.",
+      "noEdit": "Du verwaltest diesen Betrieb, darfst aber keine Infos bearbeiten.",
+      "editingAs": "Du bearbeitest {{name}} als Verwalter.",
+      "phoneOwnerOnly": "Nur der Inhaber kann die Telefonnummer ändern.",
+      "leave": "Verwaltung beenden",
+      "leaveConfirm": "Wenn du die Verwaltung beendest, kannst du nicht mehr als dieser Betrieb posten.",
+      "leaveYes": "Beenden",
+      "mine": "Betriebe, die du verwaltest",
+      "youManage": "Verwalter"
+    }
   },
   "reviews": {
     "title": "Bewertungen",
@@ -909,6 +996,15 @@
       "soru-yardim": "Hilfe",
       "kayip-buluntu": "Fundsache",
       "taziye": "Beileid"
+    },
+    "businessTag": "Betrieb",
+    "business": {
+      "who": "Posten als",
+      "me": "Ich selbst",
+      "needHood": "Um als Betrieb zu posten, wähle zuerst das Viertel des Betriebs.",
+      "setHood": "Viertel des Betriebs wählen",
+      "pendingNote": "Dein Beitrag erscheint, sobald der Inhaber von {{name}} ihn freigibt.",
+      "sendForApproval": "Zur Freigabe senden"
     }
   },
   "news": {

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   cleanBusinessInput,
+  openState,
+  postModeFor,
   rankBusinesses,
   validateBusiness,
   weightedRating,
@@ -31,6 +33,8 @@ const biz = (over: Partial<Business> = {}): Business => ({
   verification: { status: 'dogrulanmadi' },
   membership: { tier: 'ucretsiz' },
   rating: { sum: 0, count: 0 },
+  followerCount: 0,
+  managers: [],
   createdAt: '2026-10-01T00:00:00Z',
   updatedAt: '2026-10-01T00:00:00Z',
   ...over,
@@ -88,5 +92,33 @@ describe('sıralama (Karar, Eren)', () => {
     // Doğrulanmamış işletme öne çıkarılamaz.
     const unverified = biz({ featuredUntil: '2026-11-01T00:00:00Z', rating: { sum: 2500, count: 500 } });
     expect(rankBusinesses([unverified], { now }).featured).toEqual([]);
+  });
+
+  it('şu an açık mı: 7/24, haftalık saat, gece yarısını geçen saat, saat yoksa bilinmiyor', () => {
+    const day = (open: string, close: string) => ({ open, close });
+    // Pazartesi 09-18, salı kapalı, cumartesi 18-02, diğer günler 10-22.
+    const week = [day('09:00', '18:00'), null, day('10:00', '22:00'), day('10:00', '22:00'), day('10:00', '22:00'), day('18:00', '02:00'), day('10:00', '22:00')];
+    const at = (iso: string) => new Date(iso);
+    expect(openState({ is24h: true }, at('2026-10-26T03:00:00'))).toEqual({ open: true });
+    expect(openState({ is24h: false }, at('2026-10-26T12:00:00'))).toBeNull();
+    // 26 Ekim 2026 pazartesi.
+    expect(openState({ is24h: false, weeklyHours: week }, at('2026-10-26T12:00:00'))).toEqual({ open: true, until: '18:00' });
+    expect(openState({ is24h: false, weeklyHours: week }, at('2026-10-26T08:00:00'))).toEqual({ open: false, until: '09:00' });
+    expect(openState({ is24h: false, weeklyHours: week }, at('2026-10-27T12:00:00'))).toEqual({ open: false });
+    // Cumartesi 23:30 açık, pazar 01:00 hâlâ cumartesinin açıklığı.
+    expect(openState({ is24h: false, weeklyHours: week }, at('2026-10-31T23:30:00'))).toEqual({ open: true, until: '02:00' });
+    expect(openState({ is24h: false, weeklyHours: week }, at('2026-11-01T01:00:00'))).toEqual({ open: true, until: '02:00' });
+    expect(validateBusiness(input({ weeklyHours: [day('9:00', '18:00'), null, null, null, null, null, null] }))).toContain('hours');
+  });
+
+  it('yetkili paylaşımı: sahibi doğrudan, yetkili izne göre, izni kapalı ya da yetkisiz paylaşamaz', () => {
+    const b = biz({ ownerUid: 'sahip', managers: [
+      { uid: 'ayse', name: 'Ayşe K.', post: 'onayla', edit: false, reply: false },
+      { uid: 'veli', name: 'Veli T.', post: 'kapali', edit: true, reply: true },
+    ] });
+    expect(postModeFor(b, 'sahip')).toBe('dogrudan');
+    expect(postModeFor(b, 'ayse')).toBe('onayla');
+    expect(postModeFor(b, 'veli')).toBeNull();
+    expect(postModeFor(b, 'yabanci')).toBeNull();
   });
 });

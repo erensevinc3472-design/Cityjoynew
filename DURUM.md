@@ -444,6 +444,23 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    kategorileri, acil olanlar önce), yaklaşan etkinlikler, hızlı erişim. Yapay zekâ asistanı, sesli arama, rotalar ve
    örnek sayılar konmadı (altyapısı yok / sahte veri olurdu). Testler: kurallar +1 doğrulama (events). Telefonda bakılmadı.
 
+34. **İşletme sayfası, takip, yetkililer, işletme adına paylaşım** (PROJE.md 13. madde 33). **İşletme sayfası**
+   (`/business/[id]`): profil iskeleti; halkalı harf, gönderi / takipçi / puan, ad + doğrulama rozeti, kategori ve
+   ilçe, "Şu an açık · kapanış 23:00" (`openState`, gece yarısını geçen saatler dahil). Takip et, Ara, WhatsApp,
+   Yol tarifi (Apple / Google Haritalar, adresle). Sekmeler: Gönderiler (ızgara, `components/post-grid.tsx`), Menü ya da
+   Hizmetler (fiyat listesi), Yorumlar, Bilgiler (saat tablosu, ödeme, olanaklar, güven bilgisi). **Takip:**
+   `businessFollows/{işletme_kişi}` + `followerCount` (kurallar sayacı tam bir değiştirir); takip edilen işletmenin
+   "Takip" hedefli gönderileri Takip akışına düşer. **İşletmem formu:** mahalle (isteğe bağlı, gizli), haftalık saat
+   (gün gün, ilk günü tüm haftaya kopyala), ödeme yöntemleri, olanaklar. **Yetkililer:** sahibi en çok 3 kişiyi adıyla
+   bulup ekler; izinler: paylaşım kapalı / sahibinin onayıyla (varsayılan) / doğrudan, bilgileri düzenleme (telefon
+   hariç), yorumlara cevap. Yetkili kendini çıkarabilir; İşletmem'de "Yetkili olduğun işletmeler". **İşletme adına
+   paylaşım:** Keşfet + ekranında "Kimin adına?"; gönderi işletmenin adı ve konumuyla, akışta "İşletme" etiketiyle;
+   adına dokununca işletme sayfası. Onaylı yetkilinin paylaşımı `onay-bekliyor` durumunda akışa düşmez; sahibi işletme
+   sayfasında onaylar ya da reddeder. Kişisel profilde işletme paylaşımları görünmez. **Panel:** İşletmeler tablosunda
+   takipçi sayısı ve yetkililer; admin yetkiliyi çıkarır (işlem kaydı). Hesap silmede işletme takipleri ve
+   yetkililikler bırakılır. Testler: kurallar +4 (business-page), ortak +2. **Eren yapacak:** birleştirince kuralları
+   ve dizinleri yükle (3 yeni dizin). Telefonda bakılmadı.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Keşfet'te gönderi birden çok hedefe paylaşılabilir (Eren, 28 Ekim 2026; PROJE.md 5.5).

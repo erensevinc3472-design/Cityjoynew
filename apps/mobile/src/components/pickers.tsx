@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
@@ -61,18 +61,34 @@ function ChoiceList<T extends { id: string; name: string }>({ items, selected, o
   );
 }
 
-/** İşletme konumu: il ve ilçe (mahalle ev işletmelerinde bile gösterilmez, PROJE.md 5.7). */
+/**
+ * İşletme konumu: il, ilçe ve isteğe bağlı mahalle. Mahalle herkese gösterilmez; işletme adına Mahallem paylaşımı ve
+ * mahalle sayfası için kullanılır (PROJE.md 5.7).
+ */
 export function RegionPicker({
   provinceCode,
   districtId,
+  neighbourhoodId,
+  withNeighbourhood,
   onChange,
 }: {
   provinceCode?: string;
   districtId?: string;
-  onChange(v: { provinceCode?: string; districtId?: string }): void;
+  neighbourhoodId?: string;
+  withNeighbourhood?: boolean;
+  onChange(v: { provinceCode?: string; districtId?: string; neighbourhoodId?: string }): void;
 }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState<'province' | 'district' | null>(null);
+  const [open, setOpen] = useState<'province' | 'district' | 'neighbourhood' | null>(null);
+  const [hoods, setHoods] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    if (!withNeighbourhood || !districtId) return setHoods([]);
+    let alive = true;
+    repo.getNeighbourhoods(districtId).then((l) => alive && setHoods(l.map((n) => ({ id: n.id, name: n.name }))), () => alive && setHoods([]));
+    return () => {
+      alive = false;
+    };
+  }, [withNeighbourhood, districtId]);
   const provinces = useMemo(() => repo.getProvinces().map((p) => ({ id: p.code, name: p.name })), []);
   const districts = useMemo(() => (provinceCode ? repo.getDistricts(provinceCode) : []), [provinceCode]);
   return (
@@ -83,7 +99,7 @@ export function RegionPicker({
           items={provinces}
           selected={provinceCode}
           onSelect={(p) => {
-            onChange({ provinceCode: p.id, districtId: p.id === provinceCode ? districtId : undefined });
+            onChange({ provinceCode: p.id, districtId: p.id === provinceCode ? districtId : undefined, neighbourhoodId: p.id === provinceCode ? neighbourhoodId : undefined });
             setOpen('district');
           }}
         />
@@ -96,7 +112,20 @@ export function RegionPicker({
           items={districts}
           selected={districtId}
           onSelect={(d) => {
-            onChange({ provinceCode, districtId: d.id });
+            onChange({ provinceCode, districtId: d.id, neighbourhoodId: d.id === districtId ? neighbourhoodId : undefined });
+            setOpen(withNeighbourhood ? 'neighbourhood' : null);
+          }}
+        />
+      ) : null}
+      {withNeighbourhood && districtId ? (
+        <Trigger label={t('business.neighbourhood')} value={hoods.find((h) => h.id === neighbourhoodId)?.name} open={open === 'neighbourhood'} onPress={() => setOpen(open === 'neighbourhood' ? null : 'neighbourhood')} />
+      ) : null}
+      {open === 'neighbourhood' && districtId ? (
+        <ChoiceList
+          items={hoods}
+          selected={neighbourhoodId}
+          onSelect={(n) => {
+            onChange({ provinceCode, districtId, neighbourhoodId: n.id });
             setOpen(null);
           }}
         />

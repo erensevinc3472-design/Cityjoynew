@@ -56,6 +56,7 @@ export default function AccountScreen() {
         await postRepository.deleteAllOf(uid);
         await socialRepository.deleteAllOf(uid);
         await reviewRepository.deleteAllBy(uid);
+        await businessRepository.leaveAllOf(uid);
         await businessRepository.deleteAllOf(uid);
         await profileRepository.delete(uid);
       });

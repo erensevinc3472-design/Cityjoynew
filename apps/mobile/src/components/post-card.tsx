@@ -123,7 +123,16 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
             </View>
           </View>
           <View style={styles.who}>
-            <AppText style={[styles.name, { color: c.textStrong }]} numberOfLines={1}>{item.authorName}</AppText>
+            <View style={styles.nameRow}>
+              <AppText style={[styles.name, styles.shrink, { color: c.textStrong }]} numberOfLines={1}>{item.authorName}</AppText>
+              {/* İşletme adına paylaşım: ad işletmenin, dokununca işletme sayfası açılır. */}
+              {item.business ? (
+                <View style={[styles.bizTag, { backgroundColor: c.accentSoft }]}>
+                  <MaterialIcons name="storefront" size={11} color={c.accent} />
+                  <AppText style={[styles.bizText, { color: c.accent }]}>{t('explore.businessTag')}</AppText>
+                </View>
+              ) : null}
+            </View>
             <AppText style={[styles.meta, { color: c.textMuted }]} numberOfLines={1}>{[district, ago(item.createdAt)].filter(Boolean).join(' · ')}</AppText>
           </View>
         </Pressable>
@@ -183,6 +192,10 @@ const styles = StyleSheet.create({
   initial: { fontFamily: fonts.heading, fontSize: 15 },
   who: { flex: 1 },
   name: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  shrink: { flexShrink: 1 },
+  bizTag: { flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 6, paddingVertical: 1, borderRadius: radius.pill },
+  bizText: { fontFamily: fonts.bodySemi, fontSize: 10, lineHeight: 14 },
   meta: { fontSize: 12, lineHeight: 16 },
   follow: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   followText: { fontFamily: fonts.bodySemi, fontSize: 13 },

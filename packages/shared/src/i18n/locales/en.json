@@ -246,7 +246,8 @@
       "hoursNote": "Opening hours can be at most 120 characters.",
       "description": "Description can be at most 500 characters.",
       "priceList": "Each price row needs both a service and a price (max 30 rows).",
-      "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Contact CityJoy for an institution account."
+      "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Contact CityJoy for an institution account.",
+      "hours": "Write hours like 09:00; opening and closing can't be the same."
     },
     "hide": "Unpublish (hide)",
     "show": "Publish again",
@@ -293,7 +294,93 @@
     "verifyRejected": "Your request was declined. Reason: {{reason}}",
     "verifyAgain": "Request again",
     "verifyCancel": "Withdraw request",
-    "verifyDone": "Your business is verified."
+    "verifyDone": "Your business is verified.",
+    "neighbourhood": "Neighbourhood",
+    "neighbourhoodHint": "The neighbourhood isn't shown to anyone; it's needed to post in My Neighbourhood as the business.",
+    "weekly": {
+      "toggle": "Enter opening hours by day",
+      "open": "Opens",
+      "close": "Closes",
+      "isOpen": "open",
+      "hint": "If you close after midnight, write the next day's time (e.g. 18:00 – 02:00). \"Open now\" on your page is based on this.",
+      "copy": "Apply {{day}} hours to every day"
+    },
+    "payment": {
+      "nakit": "Cash",
+      "kart": "Credit card",
+      "temassiz": "Contactless",
+      "yemek-karti": "Meal card",
+      "havale": "Bank transfer"
+    },
+    "amenity": {
+      "paket-servis": "Delivery",
+      "aile-alani": "Family area",
+      "engelli-erisimi": "Wheelchair access",
+      "otopark": "Parking",
+      "wifi": "Wi-Fi",
+      "cocuk-dostu": "Child friendly",
+      "evcil-hayvan": "Pet friendly",
+      "rezervasyon": "Reservations"
+    },
+    "page": {
+      "shareText": "Check out {{name}} ({{place}}) on CityJoy.",
+      "manage": "Manage business",
+      "share": "Share page",
+      "statRating": "Rating",
+      "openNow": "Open now",
+      "openUntil": "Open now · closes {{time}}",
+      "opensAt": "Closed now · opens {{time}}",
+      "closedNow": "Closed now",
+      "follow": "Follow",
+      "following": "Following",
+      "directions": "Directions",
+      "postAs": "Post as the business",
+      "needsApproval": "needs approval",
+      "noPostPermission": "You don't have permission to post as this business.",
+      "pendingTitle": "Posts awaiting approval ({{count}})",
+      "approve": "Approve",
+      "reject": "Reject",
+      "waitingOwner": "Waiting for the owner's approval",
+      "tabMenu": "Menu",
+      "tabServices": "Services and prices",
+      "tabs": {
+        "gonderiler": "Posts",
+        "yorumlar": "Reviews",
+        "bilgiler": "Info"
+      },
+      "noPosts": "No posts yet.",
+      "noMenu": "No menu or price list yet.",
+      "trust": "Trust information",
+      "closed": "Closed",
+      "payment": "Payment methods",
+      "amenities": "Amenities"
+    },
+    "managers": {
+      "title": "Managers",
+      "intro": "Find up to {{max}} people by name to help manage your business and choose what each can do. The phone number stays with you only.",
+      "postLabel": "Posting as the business",
+      "post": {
+        "kapali": "Off",
+        "onayla": "With my approval",
+        "dogrudan": "Directly"
+      },
+      "edit": "Can edit information",
+      "reply": "Can reply to reviews",
+      "remove": "Remove {{name}} from managers",
+      "search": "Search a name to add a manager",
+      "add": "Add {{name}} as manager",
+      "full": "You can add up to {{max}} managers.",
+      "save": "Save managers",
+      "saved": "Managers saved.",
+      "noEdit": "You manage this business but can't edit its information.",
+      "editingAs": "You're editing {{name}} as a manager.",
+      "phoneOwnerOnly": "Only the owner can change the phone number.",
+      "leave": "Stop managing",
+      "leaveConfirm": "If you stop managing this business you can no longer post as it.",
+      "leaveYes": "Stop managing",
+      "mine": "Businesses you manage",
+      "youManage": "Manager"
+    }
   },
   "reviews": {
     "title": "Reviews",
@@ -909,6 +996,15 @@
       "soru-yardim": "Help",
       "kayip-buluntu": "LostFound",
       "taziye": "Condolence"
+    },
+    "businessTag": "Business",
+    "business": {
+      "who": "Post as",
+      "me": "Myself",
+      "needHood": "To post as the business, first choose the business's neighbourhood.",
+      "setHood": "Choose the business's neighbourhood",
+      "pendingNote": "Your post will go live after the owner of {{name}} approves it.",
+      "sendForApproval": "Send for approval"
     }
   },
   "news": {

@@ -1,12 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState, type ComponentProps, type ReactNode } from 'react';
-import { Modal, Pressable, ScrollView, Share, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   isPostListed,
-  POST_CATEGORIES,
   PROFILE_LIMITS,
   PROFILE_REPORT_REASONS,
   validateBio,
@@ -23,6 +22,7 @@ import { BottomNav } from '@/components/bottom-nav';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
+import { PostGrid } from '@/components/post-grid';
 import { RoundButton } from '@/components/hero-header';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
@@ -39,9 +39,6 @@ import { useThemeColors } from '@/theme/use-theme';
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 type Tab = 'gonderiler' | 'kaydedilenler' | 'katildiklarim';
 const TAB_ICONS: Record<Tab, IconName> = { gonderiler: 'grid-on', kaydedilenler: 'bookmark-border', katildiklarim: 'event-available' };
-/** Izgara karelerinin zemini: kategoriye göre, iki modda da beyaz yazıyla okunur. Fotoğraf gelince resim olur. */
-const TILE_COLORS = ['#1F5C63', '#7A5A1E', '#5B3F6E', '#2F5D3A', '#7A3B3B', '#34506B', '#5E5A2A', '#3E4A57'];
-const tileColor = (p: Post) => TILE_COLORS[Math.max(0, POST_CATEGORIES.indexOf(p.category)) % TILE_COLORS.length];
 
 /**
  * Profil (Instagram düzeni; 13. madde 31). Paylaşım yalnızca Keşfet'ten yapılır, profil paylaşılanları gösterir.
@@ -55,7 +52,6 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const router = useRouter();
   const c = useThemeColors();
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
   const { language } = useSettings();
   const lang = language ?? 'tr';
   const { user } = useSession();
@@ -91,7 +87,8 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     socialRepository.counts(uid).then(setCounts, () => setCounts(null));
     if (own) {
       socialRepository.requests(uid).then(setRequests, () => setRequests([]));
-      postRepository.listMine(uid).then((l) => setPosts(l.filter((x) => x.status === 'aktif')), () => setPosts([]));
+      // İşletme adına paylaşımlar kişinin değil işletmenin sayfasında görünür.
+      postRepository.listMine(uid).then((l) => setPosts(l.filter((x) => x.status === 'aktif' && !x.business)), () => setPosts([]));
       return;
     }
     const [f, b] = await Promise.all([socialRepository.followState(user.uid, uid), socialRepository.isBlockedBy(user.uid, uid)]);
@@ -99,7 +96,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     setBlockedMe(b);
     socialRepository.hasReportedProfile(uid, user.uid).then(setReported);
     if (b || (p.isPrivate && f !== 'aktif')) return setPosts([]);
-    postRepository.byAuthor(uid, f === 'aktif').then((l) => setPosts(l.filter(isPostListed)), () => setPosts([]));
+    postRepository.byAuthor(uid, f === 'aktif').then((l) => setPosts(l.filter((x) => isPostListed(x) && !x.business)), () => setPosts([]));
   }, [uid, user, own]);
 
   useEffect(() => {
@@ -199,7 +196,6 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
 
   const hidden = !own && (blockedMe || iBlocked || (profile.isPrivate && follow !== 'aktif'));
   const tabs: Tab[] = own ? ['gonderiler', 'kaydedilenler', 'katildiklarim'] : ['gonderiler'];
-  const tileSize = Math.floor((Math.min(width, 640) - 4) / 3);
 
   const pill = (label: string, onPress: () => void, opts: { primary?: boolean; disabled?: boolean } = {}) => (
     <Pressable
@@ -226,30 +222,6 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
       </View>
     </Pressable>
   );
-
-  const grid = (list: Post[] | null, empty: string) =>
-    list === null ? (
-      <StateMessage kind="loading" />
-    ) : list.length === 0 ? (
-      <AppText variant="caption" muted style={styles.empty}>{empty}</AppText>
-    ) : (
-      <View style={styles.grid}>
-        {list.map((p) => (
-          <Pressable
-            key={p.id}
-            accessibilityRole="button"
-            accessibilityLabel={`${t(`explore.categories.${p.category}`)}. ${p.text.slice(0, 100)}`}
-            onPress={() => router.push({ pathname: '/explore/[id]', params: { id: p.id } })}
-            style={({ pressed }) => [styles.tile, { width: tileSize, height: tileSize, backgroundColor: tileColor(p), opacity: pressed ? 0.85 : 1 }]}>
-            <AppText numberOfLines={5} style={styles.tileText}>{p.text}</AppText>
-            <View style={styles.tileFoot}>
-              <MaterialIcons name="favorite" size={12} color="rgba(255,255,255,0.85)" />
-              <AppText style={styles.tileCount}>{p.likeCount}</AppText>
-            </View>
-          </Pressable>
-        ))}
-      </View>
-    );
 
   const joinedList = () =>
     joined === null ? (
@@ -406,10 +378,10 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
               <AppText muted style={styles.center}>{iBlocked ? t('explore.profile.youBlocked') : blockedMe ? '' : t('explore.profile.privateNote')}</AppText>
             </View>
           ) : (
-            grid(posts, own ? t('explore.profile.noPostsOwn') : t('explore.profile.noPosts'))
+            <PostGrid list={posts} empty={own ? t('explore.profile.noPostsOwn') : t('explore.profile.noPosts')} />
           )
         ) : tab === 'kaydedilenler' ? (
-          grid(saved, t('explore.profile.noSaved'))
+          <PostGrid list={saved} empty={t('explore.profile.noSaved')} />
         ) : (
           joinedList()
         )}
@@ -490,11 +462,6 @@ const styles = StyleSheet.create({
   tabs: { flexDirection: 'row', marginTop: spacing.md, borderBottomWidth: StyleSheet.hairlineWidth },
   tab: { flex: 1, minHeight: 46, alignItems: 'center', justifyContent: 'flex-end', gap: 9 },
   tabLine: { height: 1.5, alignSelf: 'stretch' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 2, paddingTop: 2 },
-  tile: { padding: 8, justifyContent: 'space-between', overflow: 'hidden' },
-  tileText: { color: '#FFFFFF', fontFamily: fonts.bodyMedium, fontSize: 12, lineHeight: 16 },
-  tileFoot: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  tileCount: { color: 'rgba(255,255,255,0.85)', fontSize: 11, lineHeight: 14 },
   empty: { textAlign: 'center', padding: spacing.xl },
   lockBox: { alignItems: 'center', gap: spacing.sm, padding: spacing.xl },
   center: { textAlign: 'center' },
