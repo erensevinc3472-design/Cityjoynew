@@ -24,6 +24,7 @@ import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 import { LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
 
 type Tab = TravelAdminKind;
@@ -209,6 +210,7 @@ function AdminTravelPage() {
   const regionCities = TR_REGIONS.find((r) => r.id === regionId)?.provinceCodes ?? [];
   const allProvinces = TR_REGIONS.flatMap((r) => r.provinceCodes).sort((a, b) => provinceName(a).localeCompare(provinceName(b), 'tr'));
   const cityPlaces = (data?.places ?? []).filter((p) => p.cityId === cityId);
+  const placeSort = useSortableList(cityPlaces);
   const onError = (text: string) => setMessage({ kind: 'error', text });
   const citySelect = (
     <div className="field">
@@ -468,20 +470,36 @@ function AdminTravelPage() {
               </div>
             </form>
           ) : null}
+          {canEdit && cityPlaces.length > 1 ? (
+            <SortBar
+              dirty={placeSort.dirty}
+              busy={busy}
+              onCancel={placeSort.reset}
+              onSave={() => act(async () => t('sort.saved', { count: await admin!.reorder('yer', placeSort.list, `${provinceName(cityId)} gezilecek yerler`) }))}
+            />
+          ) : null}
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
+                  {canEdit ? <th scope="col"><span className="sr-only">{t('sort.column')}</span></th> : null}
                   <th scope="col">{t('travel.order')}</th>
                   <th scope="col">{t('travel.placeName')}</th>
                   <th scope="col">{t('travel.statusLabel')}</th>
                   <th scope="col"><span className="sr-only">{t('travel.edit')}</span></th>
                 </tr>
               </thead>
-              <tbody>
-                {cityPlaces.map((p) => (
-                  <tr key={p.id}>
-                    <td className="num">{p.order}</td>
+              <tbody ref={placeSort.containerRef}>
+                {placeSort.list.map((p, i) => (
+                  <tr key={p.id} {...placeSort.itemProps(p.id)}>
+                    {canEdit ? (
+                      <td className="handle-cell">
+                        <button {...placeSort.handleProps(p.id, p.name)}>
+                          <GripIcon />
+                        </button>
+                      </td>
+                    ) : null}
+                    <td className="num">{i + 1}</td>
                     <td>
                       <strong>{p.name}</strong>
                       <div className="meta">{p.kind} · {t(`travel.cats.${p.category}`)}{p.mustSee ? ` · ${t('travel.mustSee')}` : ''}</div>

@@ -61,6 +61,17 @@ export function createOccupationAdmin(db: Firestore, actorUid: string) {
       await batch.commit();
     },
 
+    /** Sürükleyerek verilen yeni sıra (1'den başlar); yalnızca yeri değişenler yazılır. Döner: değişen sayısı. */
+    async reorder(list: Occupation[]): Promise<number> {
+      const changed = list.map((o, i) => ({ ...o, order: i + 1 })).filter((o, i) => list[i]!.order !== o.order);
+      if (!changed.length) return 0;
+      const batch = writeBatch(db);
+      for (const o of changed) batch.set(doc(db, 'occupations', o.id), toData(o));
+      audit(batch, 'duzenle', 'siralama', `Meslek sıralaması değiştirildi (${changed.length} kayıt)`);
+      await batch.commit();
+      return changed.length;
+    },
+
     /** Başlangıç listesini veritabanına yükler (yalnızca eksik olanları). */
     async seedDefaults(existingIds: Set<string>) {
       const missing = DEFAULT_OCCUPATIONS.filter((o) => !existingIds.has(o.id));

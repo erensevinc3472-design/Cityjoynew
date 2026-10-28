@@ -99,6 +99,18 @@ export function createServiceCategoryAdmin(db: Firestore, actorUid: string) {
       await batch.commit();
     },
 
+    /** Aynı üst kategorideki kategorilerin yeni sırası (1'den başlar); yalnızca yeri değişenler yazılır. */
+    async reorder(list: ServiceCategory[]): Promise<number> {
+      const changed = list.map((c, i) => ({ ...c, order: i + 1 })).filter((c, i) => list[i]!.order !== c.order);
+      if (!changed.length) return 0;
+      const batch = writeBatch(db);
+      for (const c of changed) batch.set(doc(db, COLLECTION, c.id), toData(c));
+      bumpVersion(batch);
+      audit(batch, 'duzenle', 'siralama', `Hizmet kategorisi sıralaması değiştirildi (${changed.length} kayıt)`);
+      await batch.commit();
+      return changed.length;
+    },
+
     async setActive(c: ServiceCategory, active: boolean) {
       const batch = writeBatch(db);
       batch.set(doc(db, COLLECTION, c.id), toData({ ...c, active }));

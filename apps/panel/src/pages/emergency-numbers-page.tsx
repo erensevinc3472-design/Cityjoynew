@@ -15,6 +15,7 @@ import { createEmergencyNumberAdmin } from '@cityjoy/shared/firebase';
 import { firestore } from '../lib/firebase';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 
 type Texts = Partial<Record<LanguageCode, string>>;
 type Draft = { id?: string; number: string; names: Texts; notes: Texts; icon: EmergencyIcon; order: number; active: boolean };
@@ -46,6 +47,8 @@ export function EmergencyNumbersPage() {
 
   const usingDefaults = list !== null && list.length === 0;
   const rows = usingDefaults ? DEFAULT_EMERGENCY_NUMBERS : (list ?? []);
+  const canSort = canEdit && !usingDefaults && rows.length > 1;
+  const sort = useSortableList(rows);
 
   const act = async (fn: () => Promise<string>) => {
     setBusy(true);
@@ -175,9 +178,18 @@ export function EmergencyNumbersPage() {
         <div className="state" aria-live="polite">{t('emergency.loading')}</div>
       ) : (
         <div className="table-wrap">
+          {canSort ? (
+            <SortBar
+              dirty={sort.dirty}
+              busy={busy}
+              onCancel={sort.reset}
+              onSave={() => act(async () => t('sort.saved', { count: await admin!.reorder(sort.list) }))}
+            />
+          ) : null}
           <table>
             <thead>
               <tr>
+                {canSort ? <th scope="col"><span className="sr-only">{t('sort.column')}</span></th> : null}
                 <th scope="col">{t('emergency.order')}</th>
                 <th scope="col">{t('emergency.number')}</th>
                 <th scope="col">{t('emergency.name')}</th>
@@ -185,12 +197,19 @@ export function EmergencyNumbersPage() {
                 {canEdit && !usingDefaults ? <th scope="col"><span className="sr-only">{t('emergency.edit')}</span></th> : null}
               </tr>
             </thead>
-            <tbody>
-              {rows.map((n) => {
+            <tbody ref={sort.containerRef}>
+              {sort.list.map((n, i) => {
                 const missing = LANGUAGES.filter((l) => !n.names[l.code]).length;
                 return (
-                  <tr key={n.id}>
-                    <td className="num">{n.order}</td>
+                  <tr key={n.id} {...sort.itemProps(n.id)}>
+                    {canSort ? (
+                      <td className="handle-cell">
+                        <button {...sort.handleProps(n.id, `${n.number} ${n.names.tr}`)}>
+                          <GripIcon />
+                        </button>
+                      </td>
+                    ) : null}
+                    <td className="num">{i + 1}</td>
                     <td className="num" dir="ltr"><strong>{n.number}</strong></td>
                     <td>
                       {n.names.tr}

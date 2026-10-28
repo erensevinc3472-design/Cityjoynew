@@ -246,7 +246,11 @@
       "yeni": "Yeni",
       "incelendi": "İncelendi"
     },
-    "categoriesTitle": "Kategoriler"
+    "categoriesTitle": "Kategoriler",
+    "sortTitle": "Sıralamayı değiştir",
+    "sortGroup": "Sıralanacak liste",
+    "sortMains": "Ana kategoriler",
+    "sortChildrenOf": "{{name}} alt kategorileri"
   },
   "businesses": {
     "title": "İşletmeler",
@@ -1289,8 +1293,6 @@
     "stopStay": "Önerilen kalış (dakika)",
     "stopNext": "Sonraki durağa nasıl gidilir",
     "stopNextText": "Örnek: 15 dakika yürüyüş",
-    "moveUp": "Yukarı",
-    "moveDown": "Aşağı",
     "removeStop": "Durağı sil",
     "addStop": "Durak ekle",
     "stopCount": "{{count}} durak",
@@ -1324,5 +1326,14 @@
     "submit": "Onaya gönder",
     "saveDraft": "Taslak kaydet",
     "submitted": "Onaya gönderildi. CityJoy kontrol edince yayına alınacak."
+  },
+  "sort": {
+    "column": "Sırala",
+    "handle": "{{name}}: sırasını değiştir (sürükleyin ya da ↑ ↓ tuşları)",
+    "hint": "Sırayı değiştirmek için satırın solundaki noktalı tutamaktan tutup sürükleyin.",
+    "changed": "Sıralama değişti. Kaydetmeden uygulamaya yansımaz.",
+    "save": "Yeni sıralamayı kaydet",
+    "cancel": "Vazgeç",
+    "saved": "Sıralama kaydedildi ({{count}} kayıt)."
   }
 }
