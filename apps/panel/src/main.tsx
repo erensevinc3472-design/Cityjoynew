@@ -9,6 +9,7 @@ import { ApprovalsPage } from './pages/approvals-page';
 import { AuditLogPage } from './pages/audit-log-page';
 import { BusinessesPage } from './pages/businesses-page';
 import { CityGuidePage } from './pages/city-guide-page';
+import { TravelPage } from './pages/travel-page';
 import { EmergencyNumbersPage } from './pages/emergency-numbers-page';
 import { EventsPage } from './pages/events-page';
 import { GrantsPage } from './pages/grants-page';
@@ -54,6 +55,7 @@ const router = createHashRouter([
       { path: 'duyurular', element: <AnnouncementsPage /> },
       { path: 'etkinlikler', element: <EventsPage /> },
       { path: 'sehir-rehberi', element: <CityGuidePage /> },
+      { path: 'seyahat', element: <TravelPage /> },
       { path: 'kurumlar', element: <OrganizationsPage /> },
       { path: 'profil', element: <ProfilePage /> },
       { path: 'yetkiler', element: <GrantsPage /> },

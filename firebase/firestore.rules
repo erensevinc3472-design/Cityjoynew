@@ -1957,6 +1957,51 @@ service cloud.firestore {
 
     // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez. Admin hepsini, her yönetici kendi
     // kayıtlarını görür. Admin olmayan yönetici yalnızca yetkisi olan bölgede ve bölümde kayıt ekler.
+    // ---- Seyahat > Keşfet ve Öğren (PROJE.md 5.2): içeriği admin girer; uygulama yalnızca yayındakini okur.
+    function validTravelStatus(d) {
+      return d.status in ['taslak', 'yayinda'] && d.updatedAt == request.time;
+    }
+    function travelUrlOk(d, k) {
+      return !(k in d) || (d[k] is string && d[k].size() <= 500 && d[k].matches('https://[^ ]+'));
+    }
+    match /travelRegions/{id} {
+      allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
+      allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
+        && request.resource.data.keys().hasOnly(['tagline', 'description', 'videoUrl', 'status', 'updatedAt'])
+        && request.resource.data.get('tagline', '') is string && request.resource.data.get('tagline', '').size() <= 60
+        && request.resource.data.description is string && request.resource.data.description.size() <= 600
+        && travelUrlOk(request.resource.data, 'videoUrl');
+      allow delete: if isAdmin();
+    }
+    match /travelCities/{id} {
+      allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
+      allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
+        && id.matches('^[0-8][0-9]$')
+        && request.resource.data.keys().hasOnly(['regionId', 'tagline', 'description', 'categories', 'highlights', 'facts', 'videoUrl', 'status', 'updatedAt'])
+        && request.resource.data.regionId is string
+        && request.resource.data.description is string && request.resource.data.description.size() <= 600
+        && request.resource.data.get('categories', []) is list && request.resource.data.get('categories', []).size() <= 6
+        && request.resource.data.get('highlights', []) is list && request.resource.data.get('highlights', []).size() <= 6
+        && request.resource.data.get('facts', []) is list && request.resource.data.get('facts', []).size() <= 8
+        && travelUrlOk(request.resource.data, 'videoUrl');
+      allow delete: if isAdmin();
+    }
+    match /travelPlaces/{id} {
+      allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
+      allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
+        && request.resource.data.keys().hasOnly(['cityId', 'districtId', 'name', 'kind', 'category', 'summary', 'about', 'history',
+             'architecture', 'visitingHours', 'entranceFee', 'suggestedDuration', 'address', 'howToGet', 'nearby', 'tips',
+             'accessibility', 'phone', 'website', 'videoUrl', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
+        && request.resource.data.cityId is string && request.resource.data.cityId.matches('^[0-8][0-9]$')
+        && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 80
+        && request.resource.data.category in ['tarih', 'doga', 'deniz', 'lezzet', 'kultur', 'alisveris']
+        && request.resource.data.about is string && request.resource.data.about.size() <= 2000
+        && request.resource.data.get('howToGet', []).size() <= 10 && request.resource.data.get('nearby', []).size() <= 10
+        && request.resource.data.get('tips', []).size() <= 10
+        && travelUrlOk(request.resource.data, 'website') && travelUrlOk(request.resource.data, 'videoUrl');
+      allow delete: if isAdmin();
+    }
+
     match /auditLog/{id} {
       allow read: if isAdmin() || (signedIn() && resource.data.actorUid == request.auth.uid);
       allow create: if signedIn()

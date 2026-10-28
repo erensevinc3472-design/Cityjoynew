@@ -29,8 +29,7 @@ type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
 const MODULES: { key: string; icon: IconName; scene: SceneKind; href?: Href }[] = [
   { key: 'myCity', icon: 'location-city', scene: 'city', href: '/city' },
-  // Seyahat sonraki aşamada bağlanacak.
-  { key: 'travel', icon: 'explore', scene: 'travel' },
+  { key: 'travel', icon: 'explore', scene: 'travel', href: '/travel' as Href },
   { key: 'social', icon: 'groups', scene: 'social', href: '/social' },
   { key: 'urgent', icon: 'emergency', scene: 'urgent', href: '/urgent' },
 ];

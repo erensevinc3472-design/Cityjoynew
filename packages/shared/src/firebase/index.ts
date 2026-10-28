@@ -53,3 +53,4 @@ export { createSearchSuggestions } from './search';
 export { cleanVideoUrl, createIntroVideo, INTRO_VIDEO_URL_MAX } from './intro';
 export { createFirestoreMessageRepository, createMessageModeration, type MessageReport } from './messages';
 export { createNotificationSettings, createNotificationTriggers } from './notifications';
+export { createFirestoreTravelRepository, createTravelAdmin } from './travel';
