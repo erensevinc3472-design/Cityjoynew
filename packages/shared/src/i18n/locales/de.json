@@ -572,6 +572,46 @@
         "tag": "Rabatte",
         "desc": "Rabatte geprüfter Betriebe kommen bald."
       }
+    },
+    "toDeals": "Angebote entdecken",
+    "backToSocial": "Zurück zu Soziale Harmonie",
+    "dealsNote": "Rabatte geprüfter Betriebe gibt es hier bald.",
+    "deals": {
+      "food": {
+        "name": "Essen",
+        "tag": "Restaurants und Cafés",
+        "desc": "Rabatte in Restaurants und Cafés."
+      },
+      "market": {
+        "name": "Markt",
+        "tag": "Täglicher Bedarf",
+        "desc": "Rabatte im Supermarkt und beim Einkauf."
+      },
+      "sport": {
+        "name": "Sport",
+        "tag": "Studios und Kurse",
+        "desc": "Rabatte in Fitnessstudios, Bädern und Kursen."
+      },
+      "fun": {
+        "name": "Freizeit",
+        "tag": "Kino und Spiel",
+        "desc": "Rabatte in Kino, Theater und Spielbereichen."
+      },
+      "craft": {
+        "name": "Läden",
+        "tag": "Deine Nachbarschaft",
+        "desc": "Rabatte von Läden in deiner Nachbarschaft."
+      },
+      "health": {
+        "name": "Gesundheit",
+        "tag": "Pflege und Gesundheit",
+        "desc": "Rabatte auf Gesundheits- und Pflegeleistungen."
+      },
+      "education": {
+        "name": "Bildung",
+        "tag": "Kurse und Bücher",
+        "desc": "Rabatte auf Kurse, Bücher und Schreibwaren."
+      }
     }
   },
   "official": {

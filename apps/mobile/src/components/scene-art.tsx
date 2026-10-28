@@ -8,7 +8,8 @@ import Svg, { Circle, Path } from 'react-native-svg';
  */
 export type SceneKind =
   | 'city' | 'travel' | 'social' | 'urgent' | 'townhall' | 'neighbourhood' | 'showcase' | 'cover'
-  | 'events' | 'activities' | 'news' | 'contests' | 'polls' | 'clubs' | 'deals';
+  | 'events' | 'activities' | 'news' | 'contests' | 'polls' | 'clubs' | 'deals'
+  | 'food' | 'market' | 'health' | 'education';
 
 interface Scene {
   sky: string;
@@ -115,6 +116,30 @@ const SOCIAL_SCENES = {
     far: 'M40 80 L110 80 L150 120 L110 160 L40 160 Z',
     near: 'M0 176 H180 V200 H0 Z',
     detail: 'M58 120 a6 6 0 1 0 0.1 0 M80 110 L100 132 M82 132 l0 0',
+  },
+  food: {
+    sky: '#4A2A1F', sun: '#F5C77E', sunX: 140, farFill: '#6B3D2C', nearFill: '#2A150E',
+    far: 'M30 130 a60 22 0 1 0 120 0 a60 22 0 1 0 -120 0 Z',
+    near: 'M0 168 H180 V200 H0 Z',
+    detail: 'M60 120 C70 104 110 104 120 120 M76 96 c-4 -8 4 -12 0 -20 M92 96 c-4 -8 4 -12 0 -20 M108 96 c-4 -8 4 -12 0 -20',
+  },
+  market: {
+    sky: '#1E4D3A', sun: '#F5C77E', sunX: 146, farFill: '#2F6B4F', nearFill: '#143326',
+    far: 'M30 90 H150 L140 140 H44 Z',
+    near: 'M0 172 H180 V200 H0 Z',
+    detail: 'M14 74 H30 L44 140 M52 160 a8 8 0 1 0 0.1 0 M128 160 a8 8 0 1 0 0.1 0 M60 106 H130 M64 122 H126',
+  },
+  health: {
+    sky: '#173F4A', sun: '#5FD3DA', sunX: 146, farFill: '#235C6B', nearFill: '#0E2A33',
+    far: 'M74 60 H106 V92 H138 V124 H106 V156 H74 V124 H42 V92 H74 Z',
+    near: 'M0 172 H180 V200 H0 Z',
+    detail: 'M20 150 h24 l8 -14 l10 26 l8 -12 h20',
+  },
+  education: {
+    sky: '#2A2F5A', sun: '#C4B5FD', sunX: 146, farFill: '#3D4380', nearFill: '#171A38',
+    far: 'M30 100 L90 76 L150 100 L90 124 Z',
+    near: 'M0 172 H180 V200 H0 Z M50 112 V146 C70 160 110 160 130 146 V112 L90 128 Z',
+    detail: 'M150 100 V136 M150 136 a4 4 0 1 0 0.1 0',
   },
 } satisfies Record<string, Scene>;
 const SCENES: Record<SceneKind, Scene> = { ...BASE_SCENES, ...SOCIAL_SCENES };

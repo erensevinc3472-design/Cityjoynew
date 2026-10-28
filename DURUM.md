@@ -418,7 +418,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    renkli kutucuklar (verisi olmayan "Yakında"), Mahalle Meydanı ve Şehir Vitrini (yakında). **Keşfet:** ince sekmeler,
    çerçevesiz gönderi, iki kez dokun beğen (kalp), paylaş, "5 dk" gibi süre; Kaydedilenler üst solda. **Profil:**
    halkalı harf, gönderi/takipçi/takip sayıları, Takip et ve Mesaj yan yana. **Sosyal Harmoni:** yana kaydırılan kartlar,
-   arkada değişen sahne; forum kaldırıldı (madde 18). **Karşılama:** beş sahne sırayla, "Kaydırarak başla" (dokunarak da),
+   arkada değişen sahne; forum kaldırıldı (madde 18). Yukarı kaydırınca ikinci sayfa **Fırsatlar** (yemek, market, spor,
+   eğlence, esnaf, sağlık, eğitim; indirim sistemi gelene kadar "yakında", örnek oran ve marka adı yok). **Karşılama:** beş sahne sırayla, "Kaydırarak başla" (dokunarak da),
    "Zaten hesabın var mı?". **Acil İhtiyaçlar:** nabız gibi atan büyük SOS kartı. Görseller şimdilik çizim
    (`components/scene-art.tsx`, "hareketi azalt" açıksa durur); gerçek fotoğraflar Storage (Blaze) ile panelden gelecek.
    Yeni paket: react-native-svg. Testler: ortak 104, kurallar 98 (1 yeni). Telefonda ana sayfa ve yan menü görüldü;

@@ -1,6 +1,6 @@
 import QRCode from 'qrcode';
 import { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 /**
  * QR kodu (siyah-beyaz; her iki temada da beyaz zemin, okunabilirlik için). Ek yerel paket gerektirmez:
@@ -31,6 +31,7 @@ export function QrCode({ value, size = 200, label }: { value: string; size?: num
 }
 
 const styles = StyleSheet.create({
-  box: { backgroundColor: '#FFFFFF', alignSelf: 'center', borderRadius: 12, direction: 'ltr' },
+  // Karekod Arapçada da aynalanmaz; web bu stili tanımaz (orada zaten aynalanmıyor).
+  box: { backgroundColor: '#FFFFFF', alignSelf: 'center', borderRadius: 12, ...(Platform.OS === 'web' ? {} : { direction: 'ltr' as const }) },
   row: { flexDirection: 'row' },
 });
