@@ -18,6 +18,7 @@ import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
+import { useBannedWordCheck } from '@/lib/banned-words';
 import { patchCachedPost } from '@/lib/posts';
 import { postRepository } from '@/lib/services';
 import { useSettings } from '@/lib/settings';
@@ -51,6 +52,7 @@ export function PostComments({ post, uid, displayName, onCount }: Props) {
   const [reported, setReported] = useState<Set<string>>(new Set());
   const owner = post.authorUid === uid;
   const { blocked } = useSocial();
+  const hasBanned = useBannedWordCheck();
 
   const load = () => {
     setFailed(false);
@@ -77,6 +79,7 @@ export function PostComments({ post, uid, displayName, onCount }: Props) {
 
   const send = () => {
     if (!validateComment(text)) return setError(t('explore.comments.tooLong'));
+    if (hasBanned(text)) return setError(t('explore.errors.banned'));
     run(async () => {
       const added = await postRepository.addComment(post.id, uid, authorNameOf(displayName), text);
       setList((l) => [...(l ?? []), added]);

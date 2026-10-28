@@ -21,6 +21,7 @@ import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
 import { TextField } from '@/components/text-field';
+import { useBannedWordCheck } from '@/lib/banned-words';
 import { forgetFeeds } from '@/lib/posts';
 import { postRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
@@ -40,7 +41,8 @@ export default function NewPostScreen() {
   const [category, setCategory] = useState<PostCategory>('genel');
   const [targets, setTargets] = useState<PostTarget[]>(['mahallem']);
   const [relative, setRelative] = useState(false);
-  const [errors, setErrors] = useState<(PostError | 'relative')[]>([]);
+  const [errors, setErrors] = useState<(PostError | 'relative' | 'banned')[]>([]);
+  const hasBanned = useBannedWordCheck();
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -62,7 +64,11 @@ export default function NewPostScreen() {
       targets,
       region: { provinceCode: location.provinceCode, districtId: location.districtId!, neighbourhoodId: location.neighbourhoodId! },
     };
-    const errs: (PostError | 'relative')[] = [...validatePost(input), ...(category === 'taziye' && !relative ? ['relative' as const] : [])];
+    const errs: (PostError | 'relative' | 'banned')[] = [
+      ...validatePost(input),
+      ...(category === 'taziye' && !relative ? ['relative' as const] : []),
+      ...(hasBanned(text) ? ['banned' as const] : []),
+    ];
     setErrors(errs);
     setFailed(false);
     if (errs.length) return;
@@ -84,6 +90,7 @@ export default function NewPostScreen() {
     <FormScreen title={t('explore.newPost')} subtitle={t('explore.newIntro', { name: ltr(authorNameOf(profile.displayName)) })}>
       <TextField label={t('explore.fields.text')} value={text} onChangeText={setText} maxLength={POST_LIMITS.text[1]} multiline error={err('text')} hint={t('explore.fields.textHint')} />
       {errors.includes('realEstate') ? <FormMessage kind="error" text={t('explore.errors.realEstate')} /> : null}
+      {errors.includes('banned') ? <FormMessage kind="error" text={t('explore.errors.banned')} /> : null}
       <View style={styles.block}>
         <AppText variant="label">{t('explore.fields.category')}</AppText>
         <Chips<PostCategory> label={t('explore.fields.category')} value={category} onChange={setCategory} options={POST_CATEGORIES.map((c) => ({ value: c, label: t(`explore.categories.${c}`) }))} />

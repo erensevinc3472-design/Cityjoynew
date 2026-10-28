@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { POST_TARGETS, type PostTarget } from '@cityjoy/shared';
+import { POST_TARGETS, type Announcement, type Post, type PostTarget } from '@cityjoy/shared';
 import type { FeedFilter } from '@cityjoy/shared/firebase';
 
 import { AnnouncementCard } from '@/components/announcement-card';
@@ -51,7 +51,26 @@ export default function ExploreScreen() {
   const isLiked = useLiked(user?.uid);
   const [, rerender] = useState(0);
   const { list: announcements } = useAnnouncements(location);
-  const urgent = tab === 'genel' ? [] : (announcements ?? []).filter((a) => a.kind === 'acil');
+  const urgent = tab === 'genel' || tab === 'takip' ? [] : (announcements ?? []).filter((a) => a.kind === 'acil');
+
+  // Resmî duyurular (muhtar, belediye, kurum) kullanıcı gönderileriyle zaman sırasına göre karışık akar (PROJE.md 5.5,
+  // Eren onayladı): Mahallem'de mahalleye ve ilçeye yönelik olanlar, Bölgesel'de hepsi. Akışın sonu henüz gelmediyse
+  // yalnızca okunan en eski gönderiden yeni olanlar girer (sayfa geldikçe sırası bozulmasın).
+  const oldest = hasMore && posts?.length ? posts[posts.length - 1].createdAt : '';
+  const official =
+    tab === 'mahallem' || tab === 'bolgesel'
+      ? (announcements ?? []).filter(
+          (a) =>
+            a.kind !== 'acil' && (a.publishedAt ?? '') >= oldest &&
+            (tab === 'bolgesel' ? !onlyDistrict || !district || a.region.districtId === district.id : !!a.region.districtId),
+        )
+      : [];
+  type Item = { kind: 'post'; post: Post; at: string } | { kind: 'ann'; ann: Announcement; at: string };
+  const items: Item[] | null = posts
+    ? [...posts.map((p) => ({ kind: 'post' as const, post: p, at: p.createdAt })), ...official.map((a) => ({ kind: 'ann' as const, ann: a, at: a.publishedAt ?? '' }))].sort(
+        (a, b) => b.at.localeCompare(a.at),
+      )
+    : null;
 
   const like = async (id: string) => {
     const p = posts?.find((x) => x.id === id);
@@ -121,21 +140,25 @@ export default function ExploreScreen() {
   return (
     <Screen header={header}>
       <FlatList
-        data={posts ?? []}
-        keyExtractor={(p) => p.id}
+        data={items ?? []}
+        keyExtractor={(i) => (i.kind === 'post' ? i.post.id : `a-${i.ann.id}`)}
         contentContainerStyle={styles.content}
         ListHeaderComponent={top}
-        renderItem={({ item }) => (
-          <PostCard
-            item={item}
-            liked={isLiked(item.id)}
-            onPress={() => router.push({ pathname: '/explore/[id]', params: { id: item.id } })}
-            onLike={() => like(item.id)}
-            onAuthor={() => router.push({ pathname: '/u/[uid]', params: { uid: item.authorUid } })}
-          />
-        )}
+        renderItem={({ item: i }) =>
+          i.kind === 'ann' ? (
+            <AnnouncementCard item={i.ann} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: i.ann.id } })} />
+          ) : (
+            <PostCard
+              item={i.post}
+              liked={isLiked(i.post.id)}
+              onPress={() => router.push({ pathname: '/explore/[id]', params: { id: i.post.id } })}
+              onLike={() => like(i.post.id)}
+              onAuthor={() => router.push({ pathname: '/u/[uid]', params: { uid: i.post.authorUid } })}
+            />
+          )
+        }
         ListEmptyComponent={
-          posts === null ? <StateMessage kind="loading" />
+          items === null ? <StateMessage kind="loading" />
           : failed ? <StateMessage kind="error" message={t('explore.loadError')} onRetry={reload} />
           : <StateMessage kind="empty" message={t('explore.empty')} />
         }

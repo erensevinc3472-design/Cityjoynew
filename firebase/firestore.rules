@@ -543,6 +543,12 @@ service cloud.firestore {
         && request.resource.data.countdownSeconds is int && request.resource.data.countdownSeconds >= 3 && request.resource.data.countdownSeconds <= 10
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
+      // Keşfet yasaklı kelime listesi (madde 8): admin yönetir, uygulama okur.
+      allow write: if isAdmin() && id == 'bannedWords'
+        && request.resource.data.keys().hasOnly(['words', 'updatedBy', 'updatedAt'])
+        && request.resource.data.words is list && request.resource.data.words.size() <= 1000
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
     }
 
     match /admins/{uid} {

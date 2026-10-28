@@ -721,7 +721,8 @@
       "targets": "Wähle mindestens einen Ort.",
       "region": "Wähle in deinem Standort dein Viertel.",
       "realEstate": "Anzeigen für Wohnungen, Grundstücke oder Läden zum Kauf oder zur Miete sind in Entdecken nicht erlaubt. Immobilienanzeigen kommen mit Lizenz in den Bereich Immobilien.",
-      "relative": "Nur Angehörige können einen Beileidsbeitrag teilen."
+      "relative": "Nur Angehörige können einen Beileidsbeitrag teilen.",
+      "banned": "Dein Text enthält ein Wort, das gegen die Gemeinschaftsregeln verstößt. Bitte ändere es und versuche es erneut."
     },
     "save": "Speichern",
     "unsave": "Gespeichert ✓",

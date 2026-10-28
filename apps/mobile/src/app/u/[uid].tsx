@@ -23,6 +23,7 @@ import { PostCard } from '@/components/post-card';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
+import { useBannedWordCheck } from '@/lib/banned-words';
 import { toggleLike, useLiked } from '@/lib/posts';
 import { postRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
@@ -57,6 +58,7 @@ export default function ProfileScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
   const iBlocked = blocked.has(uid);
+  const hasBanned = useBannedWordCheck();
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -126,6 +128,7 @@ export default function ProfileScreen() {
 
   const saveProfile = () => {
     if (!draft.displayName.trim() || !validateBio(draft.bio)) return setError(t('explore.profile.invalid'));
+    if (hasBanned(draft.displayName, draft.bio)) return setError(t('explore.errors.banned'));
     run(async () => {
       await socialRepository.updateProfile(uid, draft);
       const next = { ...profile, displayName: draft.displayName.trim().slice(0, 40), bio: draft.bio.trim(), isPrivate: draft.isPrivate };
