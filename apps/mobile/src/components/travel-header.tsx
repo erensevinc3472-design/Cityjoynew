@@ -10,7 +10,7 @@ import { RoundButton } from './hero-header';
 
 /** Seyahat ekranlarının üst şeridi (tasarım: kesfet-ogren.html): geri, aralıklı "TRAVELJOY" ve altında altın alt başlık. */
 export function TravelHeader({ subtitle, title, onBack, right }: { subtitle: string; title?: string; onBack(): void; right?: ReactNode }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const c = useThemeColors();
   const insets = useSafeAreaInsets();
   return (
@@ -18,9 +18,9 @@ export function TravelHeader({ subtitle, title, onBack, right }: { subtitle: str
       <View style={styles.bar}>
         <RoundButton icon="arrow-back" label={t('common.back')} onPress={onBack} />
         <View style={styles.titles}>
-          <AppText style={[styles.kicker, { color: c.heroAccent }]} numberOfLines={1}>{subtitle.toLocaleUpperCase()}</AppText>
+          <AppText style={[styles.kicker, { color: c.heroAccent }]} numberOfLines={1}>{subtitle.toLocaleUpperCase(i18n.language)}</AppText>
           <AppText accessibilityRole="header" style={[styles.title, { color: c.heroText }]} numberOfLines={1}>
-            {title ?? t('travel.brand').toLocaleUpperCase()}
+            {title ?? t('travel.brand').toLocaleUpperCase(i18n.language)}
           </AppText>
         </View>
         {right ?? <View style={styles.spacer} />}

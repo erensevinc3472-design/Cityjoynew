@@ -26,7 +26,7 @@ type Filter = 'all' | TravelCategory;
  * Puan, nüfus gibi kaynaksız sayılar yok; yapay zekâ rehberi bilgi tabanı dolunca gelecek.
  */
 export default function TravelCityScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { width } = useWindowDimensions();
@@ -77,7 +77,7 @@ export default function TravelCityScreen() {
           <View style={styles.heroText}>
             {city?.tagline ? (
               <View style={styles.badge}>
-                <AppText style={styles.badgeText}>{city.tagline.toLocaleUpperCase()}</AppText>
+                <AppText style={styles.badgeText}>{city.tagline.toLocaleUpperCase(i18n.language)}</AppText>
               </View>
             ) : null}
             <AppText accessibilityRole="header" style={styles.heroTitle}>{name}</AppText>
@@ -113,7 +113,7 @@ export default function TravelCityScreen() {
                     <View style={[styles.boxIcon, { backgroundColor: c.accentSoft }]}>
                       <MaterialIcons name={b.icon} size={16} color={c.accent} />
                     </View>
-                    <AppText style={[styles.soon, { color: c.accent }]}>{t('travel.soon').toLocaleUpperCase()}</AppText>
+                    <AppText style={[styles.soon, { color: c.accent }]}>{t('travel.soon').toLocaleUpperCase(i18n.language)}</AppText>
                   </View>
                   <AppText style={[styles.boxTitle, { color: c.textStrong }]} numberOfLines={2}>{b.title}</AppText>
                   <AppText style={[styles.boxHint, { color: c.textMuted }]} numberOfLines={2}>{b.hint}</AppText>
@@ -176,7 +176,7 @@ export default function TravelCityScreen() {
                 </View>
                 <View style={styles.placeBody}>
                   <View style={styles.placeTop}>
-                    <AppText style={[styles.kind, { color: c.accent }]} numberOfLines={1}>{p.kind.toLocaleUpperCase()}</AppText>
+                    <AppText style={[styles.kind, { color: c.accent }]} numberOfLines={1}>{p.kind.toLocaleUpperCase(i18n.language)}</AppText>
                     {p.mustSee ? (
                       <View style={[styles.must, { backgroundColor: c.accentSoft }]}>
                         <MaterialIcons name="star" size={10} color={c.accent} />

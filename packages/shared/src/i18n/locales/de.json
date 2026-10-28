@@ -1227,7 +1227,21 @@
     "soon": "Bald",
     "countries": "Länder",
     "country": {
-      "TR": "Türkei"
+      "TR": "Türkei",
+      "GR": "Griechenland",
+      "BG": "Bulgarien",
+      "RS": "Serbien",
+      "HR": "Kroatien",
+      "MK": "Nordmazedonien",
+      "ME": "Montenegro",
+      "BA": "Bosnien und Herzegowina",
+      "AL": "Albanien",
+      "SI": "Slowenien",
+      "FR": "Frankreich",
+      "DE": "Deutschland",
+      "IT": "Italien",
+      "JP": "Japan",
+      "ES": "Spanien"
     },
     "otherCountries": "Weitere Länder bald",
     "regionPick": "Region wählen",
@@ -1320,6 +1334,7 @@
     "architecture": "Architektur",
     "accessibility": "Barrierefreiheit",
     "source": "Quelle: {{source}}",
-    "updated": "Zuletzt aktualisiert: {{date}}"
+    "updated": "Zuletzt aktualisiert: {{date}}",
+    "countrySoon": "Der Reiseführer für {{country}} wird vorbereitet. Bald verfügbar."
   }
 }

@@ -25,7 +25,7 @@ type Filter = 'all' | TravelCategory;
  * (Karar, Eren).
  */
 export default function TravelRegionScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { width } = useWindowDimensions();
@@ -75,7 +75,7 @@ export default function TravelRegionScreen() {
           <View style={styles.heroText}>
             {content?.tagline ? (
               <View style={styles.badge}>
-                <AppText style={styles.badgeText}>{content.tagline.toLocaleUpperCase()}</AppText>
+                <AppText style={styles.badgeText}>{content.tagline.toLocaleUpperCase(i18n.language)}</AppText>
               </View>
             ) : null}
             <AppText accessibilityRole="header" style={styles.heroTitle}>{name}</AppText>
@@ -134,14 +134,14 @@ export default function TravelRegionScreen() {
                   <View style={styles.cats}>
                     {x.categories.slice(0, 2).map((k) => (
                       <View key={k} style={styles.catTag}>
-                        <AppText style={styles.catText}>{t(`travel.cats.${k}`).toLocaleUpperCase()}</AppText>
+                        <AppText style={styles.catText}>{t(`travel.cats.${k}`).toLocaleUpperCase(i18n.language)}</AppText>
                       </View>
                     ))}
                   </View>
                 </View>
                 <View style={styles.cardBody}>
                   <AppText style={[styles.cardTitle, { color: c.textStrong }]}>{cityName}</AppText>
-                  {x.tagline ? <AppText style={[styles.cardTag, { color: c.accent }]}>{x.tagline.toLocaleUpperCase()}</AppText> : null}
+                  {x.tagline ? <AppText style={[styles.cardTag, { color: c.accent }]}>{x.tagline.toLocaleUpperCase(i18n.language)}</AppText> : null}
                   <AppText numberOfLines={2} style={[styles.cardDesc, { color: c.textMuted }]}>{x.description}</AppText>
                   <View style={styles.highlights}>
                     {x.highlights.slice(0, 3).map((h) => (
