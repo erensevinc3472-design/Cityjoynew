@@ -1229,6 +1229,7 @@
       "lists": "Kısa alanlar en çok 200 karakter, listeler en çok 10 satır olmalı.",
       "website": "Web sitesi https ile başlamalı.",
       "video": "Video bağlantısı https ile başlamalı."
-    }
+    },
+    "cityNotPublished": "{{city}} şehir tanıtımı yayında değil. Bu yerler uygulamada görünmez: Şehirler sekmesinden {{city}} için \"Yayına al\"a basın."
   }
 }

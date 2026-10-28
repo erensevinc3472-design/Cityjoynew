@@ -378,7 +378,11 @@ export function TravelPage() {
               ))}
             </select>
           </div>
-          {canEdit && !P ? <button className="btn" onClick={() => editPlace()}>{t('travel.addPlace')}</button> : null}
+          {/* Şehir taslaktayken yerleri uygulamada açılamaz: yayına alan bunu atlamasın. */}
+          {data && data.cities.find((x) => x.id === cityId)?.status !== 'yayinda' && cityPlaces.some((p) => p.status === 'yayinda') ? (
+            <p className="pill warn" role="status">{t('travel.cityNotPublished', { city: provinceName(cityId) })}</p>
+          ) : null}
+          {canEdit && !P ?<button className="btn" onClick={() => editPlace()}>{t('travel.addPlace')}</button> : null}
           {P ? (
             <form className="form panel-form" onSubmit={savePlace}>
               <h2 className="form-section">{P.id ? P.name : t('travel.addPlace')}</h2>
