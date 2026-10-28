@@ -478,6 +478,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    boş), işlem kaydı (modül `seyahat`). Testler: kurallar +1 (travel), ortak +2. **Eren yapacak:** birleştirince
    kuralları yükle; panelde "Başlangıç içeriğini yükle", içeriği kontrol edip Marmara, Bursa ve yerleri yayına al.
    Telefonda bakılmadı (web önizlemede giriş ve bölge ekranları görüldü).
+   **Düzeltme (Eren):** ülke şeridinde 15 ülke yazılı (Türkiye açık, diğerleri seçilince "yakında"); bölgeler içerik
+   yayında olmasa da açılır (iller "yakında" listelenir). Büyük harf Türkçe kurala göre (TÜRKİYE).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

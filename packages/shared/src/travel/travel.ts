@@ -175,3 +175,25 @@ export function validateTravelText(c: { tagline: string; description: string; vi
   if (!httpsOk(c.videoUrl)) e.push('video');
   return e;
 }
+
+/**
+ * Ülke şeridi (tasarım: kesfet-ogren.html). Türkiye açık; diğerleri içerik girildikçe açılır, o zamana kadar "yakında".
+ * Adlar dil dosyalarından gelir (travel.country.<kod>).
+ */
+export const TRAVEL_COUNTRIES: { code: string; flag: string; open: boolean }[] = [
+  { code: 'TR', flag: '🇹🇷', open: true },
+  { code: 'GR', flag: '🇬🇷', open: false },
+  { code: 'BG', flag: '🇧🇬', open: false },
+  { code: 'RS', flag: '🇷🇸', open: false },
+  { code: 'HR', flag: '🇭🇷', open: false },
+  { code: 'MK', flag: '🇲🇰', open: false },
+  { code: 'ME', flag: '🇲🇪', open: false },
+  { code: 'BA', flag: '🇧🇦', open: false },
+  { code: 'AL', flag: '🇦🇱', open: false },
+  { code: 'SI', flag: '🇸🇮', open: false },
+  { code: 'FR', flag: '🇫🇷', open: false },
+  { code: 'DE', flag: '🇩🇪', open: false },
+  { code: 'IT', flag: '🇮🇹', open: false },
+  { code: 'JP', flag: '🇯🇵', open: false },
+  { code: 'ES', flag: '🇪🇸', open: false },
+];

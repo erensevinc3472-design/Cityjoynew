@@ -1227,7 +1227,21 @@
     "soon": "Coming soon",
     "countries": "Countries",
     "country": {
-      "TR": "Türkiye"
+      "TR": "Türkiye",
+      "GR": "Greece",
+      "BG": "Bulgaria",
+      "RS": "Serbia",
+      "HR": "Croatia",
+      "MK": "North Macedonia",
+      "ME": "Montenegro",
+      "BA": "Bosnia and Herzegovina",
+      "AL": "Albania",
+      "SI": "Slovenia",
+      "FR": "France",
+      "DE": "Germany",
+      "IT": "Italy",
+      "JP": "Japan",
+      "ES": "Spain"
     },
     "otherCountries": "More countries soon",
     "regionPick": "Choose a region",
@@ -1320,6 +1334,7 @@
     "architecture": "Architecture",
     "accessibility": "Accessibility",
     "source": "Source: {{source}}",
-    "updated": "Last updated: {{date}}"
+    "updated": "Last updated: {{date}}",
+    "countrySoon": "The {{country}} guide is being prepared. Coming soon."
   }
 }
