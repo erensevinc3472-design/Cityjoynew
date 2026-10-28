@@ -680,12 +680,14 @@
     "targets": {
       "mahallem": "Mahallem",
       "bolgesel": "Bölgesel",
-      "genel": "Genel"
+      "genel": "Genel",
+      "takip": "Takip"
     },
     "tabHints": {
       "mahallem": "yalnızca mahallendekiler görür",
       "bolgesel": "ilindeki herkes görür",
-      "genel": "uygulamadaki herkes görür"
+      "genel": "uygulamadaki herkes görür",
+      "takip": "yalnızca takipçilerin görür"
     },
     "categories": {
       "genel": "Genel",
@@ -737,6 +739,49 @@
       "send": "Gönder",
       "turnOff": "Yorumları kapat",
       "turnOn": "Yorumları aç"
-    }
+    },
+    "followHint": "Henüz kimseyi takip etmiyorsun. Bir gönderide paylaşanın adına dokunup profilinden takip edebilirsin.",
+    "profile": {
+      "title": "Profil",
+      "mine": "Profilim",
+      "open": "{{name}} profilini aç",
+      "missing": "Bu profil bulunamadı.",
+      "private": "Gizli hesap",
+      "counts": "{{followers}} takipçi · {{following}} takip",
+      "edit": "Profili düzenle",
+      "save": "Kaydet",
+      "name": "Görünen ad",
+      "nameHint": "Gönderilerinde ve yorumlarında bu ad görünür.",
+      "bio": "Kısa tanıtım (en çok 160 karakter)",
+      "privateToggle": "Gizli hesap: beni yalnızca onayladığım kişiler takip edebilir.",
+      "invalid": "Ad boş olamaz, tanıtım en çok 160 karakter.",
+      "bioRemoved": "Tanıtımın şikâyet üzerine moderatör tarafından kaldırıldı.",
+      "follow": "Takip et",
+      "request": "Takip isteği gönder",
+      "requested": "İstek gönderildi (geri al)",
+      "unfollow": "Takibi bırak",
+      "requests": "Takip istekleri",
+      "accept": "Kabul et",
+      "decline": "Reddet",
+      "posts": "Gönderiler",
+      "noPosts": "Henüz gönderi yok.",
+      "privateNote": "Bu hesap gizli. Gönderilerini görmek için takip isteği gönder.",
+      "ownNote": "Burada bütün gönderilerin görünür; başkaları yalnızca Genel ve (takipçiyse) Takip gönderilerini görür.",
+      "unavailable": "Bu profilde işlem yapamazsın.",
+      "youBlocked": "Bu kişiyi engelledin.",
+      "block": "Engelle",
+      "unblock": "Engeli kaldır",
+      "blockNote": "Engellediğin kişi seni takip edemez, gönderilerine yorum yazamaz; onun gönderilerini ve yorumlarını görmezsin.",
+      "report": "Profili şikâyet et",
+      "reasons": {
+        "taklit": "Başkasını taklit ediyor",
+        "nefret": "Nefret söylemi",
+        "taciz": "Taciz ya da zorbalık",
+        "spam": "Spam ya da reklam",
+        "uygunsuz": "Uygunsuz içerik",
+        "diger": "Diğer"
+      }
+    },
+    "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler"
   }
 }

@@ -45,7 +45,7 @@ Son güncelleme: 28 Ekim 2026 (sabit duyuru; önceki: kullanıcı aktiviteleri, 
 ```sh
 npm install
 npm test                      # ortak paket testleri (84)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (76; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (82; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -294,7 +294,25 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    `lastComment` (sayaç yalnızca adı geçen yorum eklenip silinirken değişir). Testler: ortak 84, kurallar 76 geçti;
    uygulama emülatörde tarayıcıda denendi (yorum yazma/silme, kaydet, Kaydettiklerim, yorumları kapatma). Panel derlendi,
    panel bölümü tarayıcıda açılmadı.
-   Sonraki aşamalar: takip + Takip sekmesi + kullanıcı profili, engelleme,
+   PR #10 birleşti, kurallar yüklendi (Eren, 28 Ekim).
+
+25. **Keşfet, 3. aşama: profil, takip, engelleme** (PROJE.md 5.5, 5.8). Herkese açık Keşfet profili (`publicProfiles/{uid}`:
+   "Ayşe K." biçiminde ad, 160 karakterlik tanıtım, gizli hesap); Keşfet'e ilk girişte açılır, gizlilik kayıttaki tercihle
+   başlar (13-17 yaş gizli). Yaş, cinsiyet, meslek, mahalle gösterilmez. Profil ekranı (`/u/<uid>`): takipçi / takip
+   sayısı (sayım sorgusu), gönderiler (Genel; takipçiyse Takip de), kendi profilinde düzenleme, gizli hesap ve takip
+   istekleri (kabul / reddet). Başkasının profilinde: Takip et (gizli hesapta istek), Takibi bırak, Engelle / Engeli kaldır,
+   Profili şikâyet et. Gönderi kartında paylaşanın adına dokununca profil açılır. Yeni hedef **Takip**: yalnızca onaylı
+   takipçiler görür; Keşfet'te dördüncü sekme (takip edilen her hesap için bir sorgu, en çok 30 hesap). Engelleme: iki
+   yöndeki takip biter, engellenen takip edemez ve yorum yazamaz (kurallarla); engelleyen onun gönderilerini ve yorumlarını
+   görmez (uygulamada süzülür). Panel > Moderasyon > "Keşfet profil şikâyetleri" (yalnızca admin, profilde bölge yok):
+   şikâyet anındaki ad ve tanıtım görünür, "Tanıtımı kaldır" (kişi yeniden yazamaz) ya da "İşlem gerekmiyor"; işlem
+   kaydına yazılır. Hesap silmede takipler, engeller ve profil silinir. Veritabanı: `publicProfiles`, `follows/{a}_{b}`,
+   `blocks/{a}_{b}`, `profileReports/{hedef}_{şikâyetçi}`; 2 yeni gönderi dizini. Testler: ortak 84, kurallar 82 geçti;
+   uygulama emülatörde tarayıcıda denendi (profil, takip, Takip sekmesi, engelleme, Profilim). Panel derlendi, panel
+   bölümü tarayıcıda açılmadı. Bilinen sınırlar: gizli hesabın Genel'e paylaştığı gönderi Genel akışında yine görünür
+   (kişi Genel'i kendisi seçer); takip edilen 30'dan fazla hesap varsa Takip akışı ilk 30'u okur; ad değişikliği eski
+   gönderilerdeki ada yansımaz.
+   Sonraki aşamalar:
    fotoğraf/video (Storage, Blaze), Genel sekmesine haber akışı (5.3 Haberler), resmî hesap gönderileri (muhtar/belediye
    rozetli) ve "Taziye yalnızca muhtar ya da yakını", yasaklı kelime süzgeci, alt gezinme çubuğu.
 
@@ -371,8 +389,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 24. madde (Keşfet 2. aşama): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli.
-0b. Keşfet 3. aşama: takip + Takip sekmesi + kullanıcı profili, engelleme. Diğer
+0a. 25. madde (Keşfet 3. aşama): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli.
+0b. Keşfet'in kalanı: resmî hesap gönderileri (muhtar/belediye rozetli, "Taziye yalnızca muhtar ya da yakını"), yasaklı
+   kelime süzgeci, alt gezinme çubuğu (Ana Sayfa, Keşfet, Ara, Profil); fotoğraf/video Storage (Blaze) ister. Diğer
    adaylar: aktivite/etkinlik değişiklik bildirimleri ve günlük sınırlar (Blaze ister), Haberler (resmî duyurulardan
    "Kurum Haberleri" akışı, 5.3). (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,

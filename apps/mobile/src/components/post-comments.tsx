@@ -21,6 +21,7 @@ import { TextField } from '@/components/text-field';
 import { patchCachedPost } from '@/lib/posts';
 import { postRepository } from '@/lib/services';
 import { useSettings } from '@/lib/settings';
+import { useSocial } from '@/lib/social';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -49,6 +50,7 @@ export function PostComments({ post, uid, displayName, onCount }: Props) {
   const [reporting, setReporting] = useState<{ id: string; reason: PostReportReason } | null>(null);
   const [reported, setReported] = useState<Set<string>>(new Set());
   const owner = post.authorUid === uid;
+  const { blocked } = useSocial();
 
   const load = () => {
     setFailed(false);
@@ -97,7 +99,8 @@ export function PostComments({ post, uid, displayName, onCount }: Props) {
       setReporting(null);
     }, 'explore.reportError');
 
-  const shown = (list ?? []).filter((x) => x.authorUid === uid || isCommentListed(x));
+  // Şikâyetle gizlenenler ve engellediklerimin yorumları görünmez.
+  const shown = (list ?? []).filter((x) => x.authorUid === uid || (isCommentListed(x) && !blocked.has(x.authorUid)));
 
   return (
     <View style={styles.wrap}>

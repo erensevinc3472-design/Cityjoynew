@@ -680,12 +680,14 @@
     "targets": {
       "mahallem": "My Neighbourhood",
       "bolgesel": "Regional",
-      "genel": "General"
+      "genel": "General",
+      "takip": "Following"
     },
     "tabHints": {
       "mahallem": "only people in your neighbourhood see it",
       "bolgesel": "everyone in your province sees it",
-      "genel": "everyone on the app sees it"
+      "genel": "everyone on the app sees it",
+      "takip": "only your followers see it"
     },
     "categories": {
       "genel": "General",
@@ -737,6 +739,49 @@
       "send": "Send",
       "turnOff": "Turn off comments",
       "turnOn": "Turn on comments"
-    }
+    },
+    "followHint": "You aren't following anyone yet. Tap a person's name on a post to follow them from their profile.",
+    "profile": {
+      "title": "Profile",
+      "mine": "My profile",
+      "open": "Open {{name}}'s profile",
+      "missing": "This profile wasn't found.",
+      "private": "Private account",
+      "counts": "{{followers}} followers · {{following}} following",
+      "edit": "Edit profile",
+      "save": "Save",
+      "name": "Display name",
+      "nameHint": "This name appears on your posts and comments.",
+      "bio": "Short bio (up to 160 characters)",
+      "privateToggle": "Private account: only people I approve can follow me.",
+      "invalid": "Name can't be empty; bio up to 160 characters.",
+      "bioRemoved": "Your bio was removed by a moderator after a report.",
+      "follow": "Follow",
+      "request": "Send follow request",
+      "requested": "Requested (undo)",
+      "unfollow": "Unfollow",
+      "requests": "Follow requests",
+      "accept": "Accept",
+      "decline": "Decline",
+      "posts": "Posts",
+      "noPosts": "No posts yet.",
+      "privateNote": "This account is private. Send a follow request to see their posts.",
+      "ownNote": "All your posts appear here; others only see your General and (if they follow you) Following posts.",
+      "unavailable": "You can't interact with this profile.",
+      "youBlocked": "You blocked this person.",
+      "block": "Block",
+      "unblock": "Unblock",
+      "blockNote": "A person you block can't follow you or comment on your posts, and you won't see their posts or comments.",
+      "report": "Report profile",
+      "reasons": {
+        "taklit": "Pretending to be someone else",
+        "nefret": "Hate speech",
+        "taciz": "Harassment or bullying",
+        "spam": "Spam or advertising",
+        "uygunsuz": "Inappropriate content",
+        "diger": "Other"
+      }
+    },
+    "takipFeedHint": "posts shared only with followers by people you follow"
   }
 }

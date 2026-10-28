@@ -16,10 +16,12 @@ interface Props {
   full?: boolean;
   onPress?(): void;
   onLike?(): void;
+  /** Paylaşanın Keşfet profili. */
+  onAuthor?(): void;
 }
 
 /** Keşfet gönderisi: paylaşan ("Ayşe K."), ilçe, zaman, kategori, yazı, beğeni. */
-export function PostCard({ item, liked, full, onPress, onLike }: Props) {
+export function PostCard({ item, liked, full, onPress, onLike, onAuthor }: Props) {
   const { t } = useTranslation();
   const c = useThemeColors();
   const { language } = useSettings();
@@ -36,13 +38,20 @@ export function PostCard({ item, liked, full, onPress, onLike }: Props) {
       onPress={onPress}
       style={({ pressed }) => [styles.card, { backgroundColor: c.surface, borderColor: c.border, shadowColor: c.shadow, opacity: pressed ? 0.9 : 1 }]}>
       <View style={styles.top}>
-        <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
-          <AppText style={[styles.initial, { color: c.icon }]}>{(item.authorName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
-        </View>
-        <View style={styles.who}>
-          <AppText style={[styles.name, { color: c.textStrong }]} numberOfLines={1}>{item.authorName}</AppText>
-          <AppText variant="caption" muted numberOfLines={1}>{[district, when].filter(Boolean).join(' · ')}</AppText>
-        </View>
+        <Pressable
+          accessibilityRole={onAuthor ? 'link' : undefined}
+          accessibilityLabel={onAuthor ? t('explore.profile.open', { name: item.authorName }) : undefined}
+          disabled={!onAuthor}
+          onPress={onAuthor}
+          style={styles.author}>
+          <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
+            <AppText style={[styles.initial, { color: c.icon }]}>{(item.authorName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+          </View>
+          <View style={styles.who}>
+            <AppText style={[styles.name, { color: c.textStrong }]} numberOfLines={1}>{item.authorName}</AppText>
+            <AppText variant="caption" muted numberOfLines={1}>{[district, when].filter(Boolean).join(' · ')}</AppText>
+          </View>
+        </Pressable>
         <View style={[styles.tag, { backgroundColor: c.accentSoft }]}>
           <AppText variant="caption" style={{ color: c.icon }}>{t(`explore.categories.${item.category}`)}</AppText>
         </View>
@@ -77,6 +86,7 @@ const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   avatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   initial: { fontFamily: fonts.heading, fontSize: 17 },
+  author: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   who: { flex: 1 },
   name: { fontFamily: fonts.heading, fontSize: 15, lineHeight: 20 },
   tag: { borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: 2 },

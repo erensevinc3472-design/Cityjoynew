@@ -28,6 +28,7 @@ import {
   type PostReportReason,
   type PostTarget,
 } from '../posts/posts';
+import { PROFILE_LIMITS } from '../posts/social';
 import { addAudit, iso } from './grants';
 
 const COLLECTION = 'posts';
@@ -80,7 +81,9 @@ function commentFromDoc(postId: string, id: string, d: DocumentData): PostCommen
 export type FeedFilter =
   | { target: 'mahallem'; neighbourhoodId: string }
   | { target: 'bolgesel'; provinceCode: string; districtId?: string }
-  | { target: 'genel' };
+  | { target: 'genel' }
+  /** Takip ettiklerimin "Takip" hedefli gönderileri (hesap başına bir sorgu; kurallar takibi her hesap için denetler). */
+  | { target: 'takip'; authorUids: string[] };
 
 export interface FeedPage {
   posts: Post[];
@@ -95,6 +98,17 @@ export interface FeedPage {
 export function createFirestorePostRepository(db: Firestore) {
   return {
     async feed(filter: FeedFilter, cursor: string | null = null): Promise<FeedPage> {
+      if (filter.target === 'takip') {
+        const pages = await Promise.all(
+          filter.authorUids.slice(0, PROFILE_LIMITS.feedAuthors).map((uid) =>
+            getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where('targets.takip', '==', true), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(PROFILE_LIMITS.perAuthor)))
+              .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())))
+              // Takip sonradan bittiyse o hesabın sorgusu reddedilir; diğerleri yine gelir.
+              .catch(() => [] as Post[]),
+          ),
+        );
+        return { posts: pages.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt)), cursor: null };
+      }
       const c: QueryConstraint[] = [where(`targets.${filter.target}`, '==', true), where('status', '==', 'aktif')];
       if (filter.target === 'mahallem') c.push(where('region.neighbourhoodId', '==', filter.neighbourhoodId));
       if (filter.target === 'bolgesel') {
@@ -108,6 +122,16 @@ export function createFirestorePostRepository(db: Firestore) {
       const docs = (await getDocs(query(collection(db, COLLECTION), ...c))).docs;
       const posts = docs.map((d) => fromDoc(d.id, d.data()));
       return { posts, cursor: posts.length === POST_LIMITS.pageSize ? posts[posts.length - 1].createdAt : null };
+    },
+
+    /** Profil sayfası: kişinin Genel gönderileri, takip ediyorsam Takip gönderileri de (son 20). */
+    async byAuthor(uid: string, following: boolean): Promise<Post[]> {
+      const q = (target: 'genel' | 'takip') =>
+        getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where(`targets.${target}`, '==', true), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(20)))
+          .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())));
+      const lists = await Promise.all([q('genel'), following ? q('takip').catch(() => [] as Post[]) : Promise.resolve([] as Post[])]);
+      const seen = new Set<string>();
+      return lists.flat().filter((p) => !seen.has(p.id) && !!seen.add(p.id)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     },
 
     async listMine(uid: string): Promise<Post[]> {
