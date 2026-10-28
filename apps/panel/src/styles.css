@@ -130,7 +130,10 @@ td input[type='checkbox'] { width: 20px; height: 20px; }
 /* Sekmeler (Seyahat) ve onay kutusu satırı. */
 .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
 .check { display: inline-flex; align-items: center; gap: 6px; margin-inline-end: 16px; }
-.stop-row { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-block: 10px; display: grid; gap: 4px; }
+.stop-row { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-block: 8px; display: grid; gap: 0 12px; grid-template-columns: 1fr; background: var(--surface, transparent); }
+.stop-row > .stop-head, .stop-row > .actions { grid-column: 1 / -1; }
+.stop-row .field { margin-block: 4px; }
+@media (min-width: 720px) { .stop-row { grid-template-columns: 1fr 1fr; } }
 .stop-row .field input + input { margin-top: 6px; }
 
 /* Sürükleyerek sıralama. */

@@ -24,15 +24,36 @@ export function useDragSort(ids: string[], onMove: (id: string, to: number) => v
   latest.current = { ids, onMove };
   useEffect(() => {
     if (!dragging) return;
-    const move = (e: globalThis.PointerEvent) => {
-      const to = targetIndex(dragging, e.clientY);
+    let y: number | null = null;
+    const place = () => {
+      if (y === null) return;
+      const to = targetIndex(dragging, y);
       if (to !== latest.current.ids.indexOf(dragging)) latest.current.onMove(dragging, to);
     };
+    const move = (e: globalThis.PointerEvent) => {
+      y = e.clientY;
+      place();
+    };
+    // Ekranın üst / alt kenarına yaklaşınca sayfa kendiliğinden kayar (uzun listeler, büyük durak kutuları).
+    let frame = 0;
+    const scroll = () => {
+      if (y !== null) {
+        const edge = 70;
+        const by = y < edge ? -(edge - y) / 4 : y > window.innerHeight - edge ? (y - (window.innerHeight - edge)) / 4 : 0;
+        if (by) {
+          window.scrollBy(0, by);
+          place();
+        }
+      }
+      frame = requestAnimationFrame(scroll);
+    };
+    frame = requestAnimationFrame(scroll);
     const end = () => setDragging(null);
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', end);
     window.addEventListener('pointercancel', end);
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', end);
       window.removeEventListener('pointercancel', end);

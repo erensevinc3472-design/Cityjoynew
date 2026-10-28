@@ -138,10 +138,38 @@ function demo(uid: string, displayName: string, role: Role, scope: RegionScope):
   };
 }
 
+/**
+ * Örnek belediye: Nilüfer Belediyesi kurum görevlisi (kurum yöneticisi). Kurumunda Seyahat bölümü açık; belediye
+ * panelinin (Başkanlarla Keşif tanıtımı ve rotaları) nasıl göründüğünü gösterir. Örnek hesap veritabanına yazamaz.
+ */
+function demoMunicipality(): PanelUser {
+  const user = demo('ornek-belediye', 'Örnek Nilüfer Belediyesi', 'belediye', { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' });
+  const org: Organization = {
+    id: 'bld-16-nilufer',
+    name: 'Nilüfer Belediyesi',
+    kind: 'ilce-belediyesi',
+    scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' },
+    modules: ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat'],
+    officialEmail: user.email!,
+    status: 'aktif',
+    createdBy: 'ornek',
+    createdAt: '2026-01-01T00:00:00Z',
+  };
+  const member: OrganizationMember = {
+    orgId: org.id,
+    email: user.email!,
+    displayName: user.displayName,
+    isOrgAdmin: true,
+    assignments: { seyahat: ['goruntule', 'ekle', 'duzenle', 'sil'] },
+  };
+  const g = user.grants[0]!;
+  return { ...user, memberships: [{ org, member }], grants: [{ ...g, modules: { ...g.modules, seyahat: ['goruntule', 'ekle', 'duzenle', 'sil'] } }] };
+}
+
 export const DEMO_USERS: PanelUser[] = [
   demo('ornek-admin', 'Örnek Admin', 'admin', { level: 'ulke' }),
   demo('ornek-il', 'Örnek Bursa İl Yöneticisi', 'il-yoneticisi', { level: 'il', provinceCode: '16' }),
-  demo('ornek-belediye', 'Örnek Nilüfer Belediyesi', 'belediye', { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' }),
+  demoMunicipality(),
   demo('ornek-muhtar', 'Örnek Ataevler Muhtarlığı', 'muhtar', {
     level: 'mahalle',
     provinceCode: '16',

@@ -654,8 +654,10 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
   const cityId = org.scope.level === 'ulke' ? '' : org.scope.provinceCode;
   const districtId = org.scope.level === 'ilce' || org.scope.level === 'mahalle' ? org.scope.districtId : undefined;
   const actions = user.memberships.find((m) => m.org.id === org.id)?.member.assignments.seyahat ?? [];
-  const canWrite = !user.isDemo && actions.some((a) => a === 'ekle' || a === 'duzenle');
-  const canDelete = !user.isDemo && actions.includes('sil');
+  // Örnek hesapta düğmeler görünür ama kapalıdır (yalnızca görünüm).
+  const demo = !!user.isDemo;
+  const canWrite = actions.some((a) => a === 'ekle' || a === 'duzenle');
+  const canDelete = !demo && actions.includes('sil');
   const api = createMunicipalTravel(firestore, user.uid, { id: org.id, name: org.name, cityId, ...(districtId ? { districtId } : {}) });
   const [intro, setIntro] = useState<TravelMunicipal | null>(null);
   const [text, setText] = useState({ slogan: '', description: '', videoUrl: '', mayorName: '' });
@@ -669,7 +671,8 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
   const load = useCallback(async () => {
     setLoadError(false);
     try {
-      const [m, r, p] = await Promise.all([api.get(), api.listRoutes(), createFirestoreTravelRepository(firestore).listPlaces(cityId).catch(() => [])]);
+      const places = createFirestoreTravelRepository(firestore).listPlaces(cityId).catch(() => []);
+      const [m, r, p] = demo ? [null, [], await places] : await Promise.all([api.get(), api.listRoutes(), places]);
       setIntro(m);
       setText({ slogan: m?.slogan ?? '', description: m?.description ?? '', videoUrl: m?.videoUrl ?? '', mayorName: m?.mayorName ?? '' });
       setRoutes(r);
@@ -721,6 +724,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
   return (
     <>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {demo ? <p className="note">{t('travel.municipalDemo')}</p> : null}
       <form
         className="form panel-form"
         onSubmit={(e) => {
@@ -736,8 +740,8 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
         <Field id="mi-mayor" label={t('travel.mayorName')} value={text.mayorName} onChange={(v) => setText({ ...text, mayorName: v })} max={80} hint={t('travel.mayorNameHint')} />
         {canWrite ? (
           <div className="actions">
-            <button className="btn" type="submit" disabled={busy}>{t('travel.submit')}</button>
-            <button className="btn secondary" type="button" disabled={busy} onClick={() => saveIntro(false)}>{t('travel.saveDraft')}</button>
+            <button className="btn" type="submit" disabled={busy || demo}>{t('travel.submit')}</button>
+            <button className="btn secondary" type="button" disabled={busy || demo} onClick={() => saveIntro(false)}>{t('travel.saveDraft')}</button>
           </div>
         ) : null}
       </form>
@@ -749,7 +753,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
           draft={draft}
           setDraft={setDraft}
           places={places}
-          busy={busy}
+          busy={busy || demo}
           onSave={(e) => {
             e.preventDefault();
             saveRoute(true);
@@ -757,7 +761,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
           onCancel={() => setDraft(null)}
           submitLabel={t('travel.submit')}
           extraAction={
-            <button className="btn secondary" type="button" disabled={busy} onClick={() => saveRoute(false)}>{t('travel.saveDraft')}</button>
+            <button className="btn secondary" type="button" disabled={busy || demo} onClick={() => saveRoute(false)}>{t('travel.saveDraft')}</button>
           }
         />
       ) : null}

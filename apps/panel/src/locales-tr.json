@@ -1325,7 +1325,8 @@
     "municipalRoutes": "Keşif rotaları",
     "submit": "Onaya gönder",
     "saveDraft": "Taslak kaydet",
-    "submitted": "Onaya gönderildi. CityJoy kontrol edince yayına alınacak."
+    "submitted": "Onaya gönderildi. CityJoy kontrol edince yayına alınacak.",
+    "municipalDemo": "Örnek hesap: belediye panelinin nasıl göründüğünü gösterir, kaydetme kapalı. Gerçek belediye hesabı Kurumlar sayfasından açılır."
   },
   "sort": {
     "column": "Sırala",

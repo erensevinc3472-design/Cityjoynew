@@ -496,6 +496,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
+- Panel girişindeki "Örnek Nilüfer Belediyesi" hesabı belediye panelini (Seyahat > Başkanlarla Keşif) gösterir; kaydetme kapalı (29 Ekim 2026).
 - Panelde sırası olan her liste sürükleyerek sıralanır (`apps/panel/src/components/sortable.tsx`; Eren, 29 Ekim 2026; PROJE.md 6.1).
 - Keşfet'te gönderi birden çok hedefe paylaşılabilir (Eren, 28 Ekim 2026; PROJE.md 5.5).
 - Ana sayfa ve Benim Şehrim için yeni tasarım yönü onaylandı (Eren, 28 Ekim 2026; PROJE.md 13. madde 29).
