@@ -55,7 +55,9 @@
     "myCityHint": "Dienste, Behörden, Verkehr",
     "travelHint": "Routen und Reisen",
     "socialHint": "Events und Angebote",
-    "urgentHint": "SOS, Apotheken, Nummern"
+    "urgentHint": "SOS, Apotheken, Nummern",
+    "explore": "Entdecken",
+    "exploreHint": "Was dein Viertel und deine Stadt teilen"
   },
   "auth": {
     "welcomeTitle": "Willkommen bei CityJoy",
@@ -647,6 +649,77 @@
       "ogrenme": "Lernen",
       "gonullu": "Ehrenamt",
       "diger": "Sonstiges"
+    }
+  },
+  "explore": {
+    "title": "Entdecken",
+    "newPost": "Beitrag teilen",
+    "post": "Beitrag",
+    "signIn": "Melde dich an, um Entdecken zu sehen und zu teilen.",
+    "needLocation": "Wähle deinen Standort, um den Feed zu sehen.",
+    "needNeighbourhood": "Wähle in deinem Standort dein Viertel, um Mein Viertel zu nutzen und zu teilen.",
+    "loadError": "Beiträge konnten nicht geladen werden.",
+    "empty": "Hier gibt es noch keine Beiträge. Teile als Erste:r!",
+    "end": "Das war alles.",
+    "gone": "Dieser Beitrag existiert nicht mehr oder ist für dich nicht sichtbar.",
+    "like": "Gefällt mir",
+    "unlike": "Gefällt mir entfernen",
+    "likeError": "Konnte nicht gespeichert werden, versuche es erneut.",
+    "saveError": "Speichern fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.",
+    "reportError": "Die Meldung konnte nicht gesendet werden, versuche es erneut.",
+    "report": "Melden",
+    "reportTitle": "Warum meldest du das?",
+    "reportSend": "Meldung senden",
+    "reported": "Deine Meldung ist eingegangen; Moderator:innen prüfen sie.",
+    "remove": "Beitrag entfernen",
+    "removeConfirm": "Dein Beitrag wird dauerhaft entfernt. Bist du sicher?",
+    "hiddenForReview": "Dein Beitrag wurde mehrfach gemeldet und ist bis zur Prüfung im Feed ausgeblendet.",
+    "newIntro": "Dein Beitrag wird mit deinem registrierten Viertel geteilt. Dein Name erscheint als „{{name}}“.",
+    "publish": "Teilen",
+    "rules": "Hassrede, Belästigung, Betrug, Werbung und unangemessene Inhalte sind verboten. Mehrfach gemeldete Beiträge werden bis zur Prüfung ausgeblendet.",
+    "targets": {
+      "mahallem": "Mein Viertel",
+      "bolgesel": "Regional",
+      "genel": "Allgemein"
+    },
+    "tabHints": {
+      "mahallem": "nur Menschen in deinem Viertel sehen es",
+      "bolgesel": "alle in deiner Provinz sehen es",
+      "genel": "alle in der App sehen es"
+    },
+    "categories": {
+      "genel": "Allgemein",
+      "duyuru": "Ankündigung",
+      "etkinlik": "Veranstaltung",
+      "firsat": "Angebot",
+      "soru-yardim": "Frage / Hilfe",
+      "kayip-buluntu": "Verloren & Gefunden",
+      "taziye": "Beileid"
+    },
+    "reasons": {
+      "nefret": "Hassrede",
+      "taciz": "Belästigung oder Mobbing",
+      "dolandiricilik": "Betrug",
+      "spam": "Spam oder Werbung",
+      "uygunsuz": "Unangemessener Inhalt",
+      "emlak": "Immobilienanzeige",
+      "diger": "Sonstiges"
+    },
+    "fields": {
+      "text": "Was möchtest du teilen?",
+      "textHint": "Bis zu 2000 Zeichen.",
+      "category": "Kategorie",
+      "relative": "Ich bin ein Angehöriger der verstorbenen Person.",
+      "where": "Wo möchtest du teilen? (Mehrfachauswahl möglich)",
+      "mahallemNote": "Wenn du in Mein Viertel teilst, können Nachbarn erkennen, dass du dort wohnst."
+    },
+    "errors": {
+      "text": "Schreib etwas (bis zu 2000 Zeichen).",
+      "category": "Wähle eine Kategorie.",
+      "targets": "Wähle mindestens einen Ort.",
+      "region": "Wähle in deinem Standort dein Viertel.",
+      "realEstate": "Anzeigen für Wohnungen, Grundstücke oder Läden zum Kauf oder zur Miete sind in Entdecken nicht erlaubt. Immobilienanzeigen kommen mit Lizenz in den Bereich Immobilien.",
+      "relative": "Nur Angehörige können einen Beileidsbeitrag teilen."
     }
   }
 }

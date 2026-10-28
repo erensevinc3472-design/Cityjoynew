@@ -1,0 +1,134 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
+import type { PostInput } from '@cityjoy/shared';
+import { createFirestorePostRepository, createPostModeration } from '@cityjoy/shared/firebase';
+import { doc, getDoc, increment, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+let env: RulesTestEnvironment;
+
+beforeAll(async () => {
+  env = await initializeTestEnvironment({
+    projectId: 'demo-cityjoy',
+    firestore: { rules: readFileSync(path.join(here, 'firestore.rules'), 'utf8') },
+  });
+});
+afterAll(() => env.cleanup());
+
+const fs = (uid: string, email = `${uid}@ornek.com`) =>
+  env.authenticatedContext(uid, { email, email_verified: true }).firestore() as unknown as Firestore;
+const guest = () => env.unauthenticatedContext().firestore() as unknown as Firestore;
+const repo = (uid: string) => createFirestorePostRepository(fs(uid));
+
+const ataevler = { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-ataevler' };
+const fethiye = { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-fethiye' };
+const moda = { provinceCode: '34', districtId: '34-kadikoy', neighbourhoodId: '34-kadikoy-moda' };
+const now = Timestamp.now();
+
+beforeEach(async () => {
+  await env.clearFirestore();
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, 'admins/eren'), { addedAt: 'konsol' });
+    const user = (uid: string, location: typeof ataevler) => setDoc(doc(db, 'users', uid), { uid, displayName: uid, birthYear: 1990, location });
+    await user('ayse', ataevler);
+    await user('ali', ataevler);
+    await user('veli', fethiye);
+    await user('istanbul', moda);
+    await setDoc(doc(db, 'grants', 'ahmet@ornek.com__il-16'), {
+      email: 'ahmet@ornek.com', displayName: 'Ahmet', role: 'il-yoneticisi', scope: { level: 'il', provinceCode: '16' },
+      modules: { moderasyon: ['goruntule', 'duzenle', 'sil'] }, grantedBy: 'eren', grantedAt: now, updatedAt: now,
+    });
+  });
+});
+
+const input = (patch: Partial<PostInput> = {}): PostInput => ({
+  text: 'Parktaki banklar yenilenmiş.',
+  category: 'genel',
+  targets: ['mahallem'],
+  region: ataevler,
+  ...patch,
+});
+
+describe('Keşfet gönderileri', () => {
+  it('kendi kayıtlı mahallesiyle paylaşır; başka mahalle, başkası adına, girişsiz, boş yazı olmaz', async () => {
+    await assertSucceeds(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['mahallem', 'bolgesel', 'genel'] })));
+    await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ region: fethiye })));
+    await assertFails(repo('ali').create('ayse', 'Ayşe K.', input()));
+    await assertFails(createFirestorePostRepository(guest()).create('x', 'X', input()));
+    await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ text: '   ' })));
+    await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['takip' as never] })));
+  });
+
+  it('görünürlük: Mahallem yalnızca o mahallede, Bölgesel yalnızca o ilde, Genel herkese (sorgular da)', async () => {
+    const m = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['mahallem'] }));
+    const b = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['bolgesel'] }));
+    const g = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
+    const read = (uid: string, id: string) => getDoc(doc(fs(uid), 'posts', id));
+    await assertSucceeds(read('ali', m));
+    await assertFails(read('veli', m));
+    await assertSucceeds(read('veli', b));
+    await assertFails(read('istanbul', b));
+    await assertSucceeds(read('istanbul', g));
+    await assertFails(getDoc(doc(guest(), 'posts', g)));
+
+    expect((await repo('ali').feed({ target: 'mahallem', neighbourhoodId: ataevler.neighbourhoodId })).posts.map((p) => p.id)).toEqual([m]);
+    await assertFails(repo('veli').feed({ target: 'mahallem', neighbourhoodId: ataevler.neighbourhoodId }));
+    expect((await repo('veli').feed({ target: 'bolgesel', provinceCode: '16' })).posts.map((p) => p.id)).toEqual([b]);
+    expect((await repo('veli').feed({ target: 'bolgesel', provinceCode: '16', districtId: '16-nilufer' })).posts.map((p) => p.id)).toEqual([b]);
+    await assertFails(repo('istanbul').feed({ target: 'bolgesel', provinceCode: '16' }));
+    expect((await repo('istanbul').feed({ target: 'genel' })).posts.map((p) => p.id)).toEqual([g]);
+  });
+
+  it('beğeni: sayaç kayıtla birlikte tam bir değişir, kişi başına bir; beğenilenler tek sorguyla gelir', async () => {
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['mahallem'] }));
+    await assertSucceeds(repo('ali').like(id, 'ali'));
+    await assertFails(repo('ali').like(id, 'ali'));
+    await assertFails(repo('veli').like(id, 'veli'));
+    await assertFails(updateDoc(doc(fs('ali'), 'posts', id), { likeCount: increment(1) }));
+    expect([...(await repo('ali').likedIds('ali'))]).toEqual([id]);
+    await assertSucceeds(repo('ali').unlike(id, 'ali'));
+    expect((await repo('ayse').get(id))?.likeCount).toBe(0);
+  });
+
+  it('sahibi kaldırır (yazı boşalır), başkası kaldıramaz ya da düzenleyemez', async () => {
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
+    await assertFails(repo('ali').remove(id));
+    await assertFails(updateDoc(doc(fs('ayse'), 'posts', id), { text: 'Başka', updatedAt: Timestamp.now() }));
+    await assertSucceeds(repo('ayse').remove(id));
+    expect(await repo('ayse').get(id)).toMatchObject({ status: 'kaldirildi', text: '', authorName: '' });
+    await assertFails(getDoc(doc(fs('ali'), 'posts', id)));
+  });
+
+  it('şikâyet: kişi başına bir, kendi gönderisine olmaz; il yöneticisi görür ve kaldırır', async () => {
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['bolgesel'] }));
+    const p = (await repo('ali').get(id))!;
+    await assertSucceeds(repo('ali').report(p, 'ali', 'spam'));
+    await assertFails(repo('ali').report(p, 'ali', 'spam'));
+    await assertFails(repo('ayse').report(p, 'ayse', 'diger'));
+    await assertFails(updateDoc(doc(fs('veli'), 'posts', id), { reportCount: increment(5) }));
+    expect(await repo('ali').hasReported(id, 'ali')).toBe(true);
+
+    await assertFails(createPostModeration(fs('veli'), 'veli').listReports({ provinceCode: '16' }));
+    await assertFails(createPostModeration(fs('ahmet'), 'ahmet').listReports({ provinceCode: '34' }));
+    const mod = createPostModeration(fs('ahmet'), 'ahmet');
+    const list = await mod.listReports({ provinceCode: '16' });
+    expect(list).toHaveLength(1);
+    await assertSucceeds(mod.remove(list[0]!));
+    expect((await repo('ayse').get(id))?.status).toBe('kaldirildi');
+    await assertFails(getDoc(doc(fs('veli'), 'posts', id)));
+  });
+
+  it('hesap silme: gönderiler boşaltılır, beğeniler geri alınır', async () => {
+    const mine = await repo('ali').create('ali', 'Ali', input({ targets: ['genel'] }));
+    const other = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
+    await repo('ali').like(other, 'ali');
+    await assertSucceeds(repo('ali').deleteAllOf('ali'));
+    expect(await repo('ali').get(mine)).toMatchObject({ status: 'kaldirildi', text: '' });
+    expect((await repo('ayse').get(other))?.likeCount).toBe(0);
+  });
+});

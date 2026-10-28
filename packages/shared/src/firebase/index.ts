@@ -46,3 +46,4 @@ export { createAnnouncementPanel, createFirestoreAnnouncementRepository, type Sa
 export { createEventPanel, createFirestoreEventRepository } from './events';
 export { createFirestoreOfficialProfileRepository, createOfficialProfileAdmin } from './official-profiles';
 export { createActivityModeration, createFirestoreActivityRepository, type ActivityReport } from './activities';
+export { createFirestorePostRepository, createPostModeration, type FeedFilter, type FeedPage, type PostReport } from './posts';

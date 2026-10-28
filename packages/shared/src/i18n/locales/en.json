@@ -55,7 +55,9 @@
     "myCityHint": "Services, institutions, transport",
     "travelHint": "Routes and trips",
     "socialHint": "Events and deals",
-    "urgentHint": "SOS, pharmacies, numbers"
+    "urgentHint": "SOS, pharmacies, numbers",
+    "explore": "Explore",
+    "exploreHint": "What your neighbourhood and city are sharing"
   },
   "auth": {
     "welcomeTitle": "Welcome to CityJoy",
@@ -647,6 +649,77 @@
       "ogrenme": "Learning",
       "gonullu": "Volunteering",
       "diger": "Other"
+    }
+  },
+  "explore": {
+    "title": "Explore",
+    "newPost": "Share a post",
+    "post": "Post",
+    "signIn": "Sign in to see and share on Explore.",
+    "needLocation": "Choose your location to see the feed.",
+    "needNeighbourhood": "Choose your neighbourhood in your location to use My Neighbourhood and to share.",
+    "loadError": "Posts could not be loaded.",
+    "empty": "No posts here yet. Be the first to share!",
+    "end": "That's everything.",
+    "gone": "This post no longer exists or isn't visible to you.",
+    "like": "Like",
+    "unlike": "Remove like",
+    "likeError": "Your like couldn't be saved, try again.",
+    "saveError": "Couldn't save. Check your connection and try again.",
+    "reportError": "The report couldn't be sent, try again.",
+    "report": "Report",
+    "reportTitle": "Why are you reporting this?",
+    "reportSend": "Send report",
+    "reported": "Your report was received; moderators will review it.",
+    "remove": "Remove post",
+    "removeConfirm": "Your post will be removed permanently. Are you sure?",
+    "hiddenForReview": "Your post received several reports; it is hidden from the feed until a moderator reviews it.",
+    "newIntro": "Your post is shared with your registered neighbourhood. Your name appears as “{{name}}”.",
+    "publish": "Share",
+    "rules": "Hate speech, harassment, fraud, advertising and inappropriate content are not allowed. Posts with several reports are hidden until reviewed.",
+    "targets": {
+      "mahallem": "My Neighbourhood",
+      "bolgesel": "Regional",
+      "genel": "General"
+    },
+    "tabHints": {
+      "mahallem": "only people in your neighbourhood see it",
+      "bolgesel": "everyone in your province sees it",
+      "genel": "everyone on the app sees it"
+    },
+    "categories": {
+      "genel": "General",
+      "duyuru": "Announcement",
+      "etkinlik": "Event",
+      "firsat": "Deal",
+      "soru-yardim": "Question / Help",
+      "kayip-buluntu": "Lost & Found",
+      "taziye": "Condolence"
+    },
+    "reasons": {
+      "nefret": "Hate speech",
+      "taciz": "Harassment or bullying",
+      "dolandiricilik": "Fraud",
+      "spam": "Spam or advertising",
+      "uygunsuz": "Inappropriate content",
+      "emlak": "Real estate listing",
+      "diger": "Other"
+    },
+    "fields": {
+      "text": "What would you like to share?",
+      "textHint": "Up to 2000 characters.",
+      "category": "Category",
+      "relative": "I am a relative of the deceased.",
+      "where": "Where do you want to share? (you can choose more than one)",
+      "mahallemNote": "When you share in My Neighbourhood, neighbours can tell that you live there."
+    },
+    "errors": {
+      "text": "Write something (up to 2000 characters).",
+      "category": "Choose a category.",
+      "targets": "Choose at least one place.",
+      "region": "Choose your neighbourhood in your location.",
+      "realEstate": "Listings for homes, land or shops for sale or rent can't be shared on Explore. Real estate listings will be posted in the Real Estate section with a licence.",
+      "relative": "Only relatives can share a condolence post."
     }
   }
 }
