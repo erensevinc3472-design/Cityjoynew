@@ -1,13 +1,14 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect, useState, type ComponentProps } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
+import { Animated, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { localized, telUrl, type EmergencyNumber, type LanguageCode } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
+import { SceneArt, useReduceMotion } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
 import { isFirebaseConfigured } from '@/lib/firebase-config';
 import { emergencyNumbers } from '@/lib/services';
@@ -60,6 +61,16 @@ export default function UrgentScreen() {
     }
   };
 
+  // SOS düğmesinin çevresindeki nabız; "hareketi azalt" açıksa durur.
+  const reduce = useReduceMotion();
+  const pulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (reduce) return;
+    const loop = Animated.loop(Animated.timing(pulse, { toValue: 1, duration: 1800, useNativeDriver: true }));
+    loop.start();
+    return () => loop.stop();
+  }, [reduce, pulse]);
+
   const header = <HeroHeader title={t('urgent.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))} />;
 
   return (
@@ -73,19 +84,26 @@ export default function UrgentScreen() {
           </View>
         </View>
 
+        {/* SOS: ekranın en belirgin düğmesi; arkada kalp atışı çizgisi, düğmenin çevresinde yavaş nabız. */}
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${t('urgent.sos')}. ${t('urgent.sosHint')}`}
           onPress={() => router.push('/sos')}
-          style={({ pressed }) => [styles.row, { backgroundColor: c.dangerSoft, borderColor: c.danger, opacity: pressed ? 0.8 : 1 }]}>
-          <View style={[styles.icon, { backgroundColor: c.danger }]}>
-            <MaterialIcons name="sensors" size={22} color={c.onDanger} />
+          style={({ pressed }) => [styles.sos, { borderColor: c.danger, opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+          <SceneArt kind="urgent" still />
+          <View style={styles.sosInner}>
+            <View style={styles.sosButton}>
+              <Animated.View style={[styles.pulse, { borderColor: c.danger, opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.7, 0] }), transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.6] }) }] }]} />
+              <View style={[styles.sosCircle, { backgroundColor: c.danger }]}>
+                <AppText style={[styles.sosText, { color: c.onDanger }]}>SOS</AppText>
+              </View>
+            </View>
+            <View style={styles.flex}>
+              <AppText style={styles.sosTitle}>{t('urgent.sos')}</AppText>
+              <AppText style={styles.sosHint}>{t('urgent.sosHint')}</AppText>
+            </View>
+            <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={24} color="#FFFFFF" />
           </View>
-          <View style={styles.flex}>
-            <AppText variant="label" style={{ color: c.danger }}>{t('urgent.sos')}</AppText>
-            <AppText variant="caption">{t('urgent.sosHint')}</AppText>
-          </View>
-          <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={24} color={c.danger} />
         </Pressable>
 
         <AppText variant="subtitle" accessibilityRole="header">{t('urgent.numbersTitle')}</AppText>
@@ -207,8 +225,16 @@ const styles = StyleSheet.create({
   cardWide: { flexBasis: '100%', flexDirection: 'row', alignItems: 'center' },
   cardSmall: { flexDirection: 'column' },
   cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  icon: { width: 42, height: 42, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  number: { fontFamily: fonts.heading, fontSize: 22, lineHeight: 28 },
+  icon: { width: 36, height: 36, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
+  number: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26 },
+  sos: { height: 116, borderRadius: radius.xl, borderWidth: 1.5, overflow: 'hidden' },
+  sosInner: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.md, backgroundColor: 'rgba(40, 8, 10, 0.55)' },
+  sosButton: { width: 72, height: 72, alignItems: 'center', justifyContent: 'center' },
+  pulse: { position: 'absolute', width: 64, height: 64, borderRadius: 32, borderWidth: 3 },
+  sosCircle: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center' },
+  sosText: { fontFamily: fonts.heading, fontSize: 20, letterSpacing: 1 },
+  sosTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 22, color: '#FFFFFF' },
+  sosHint: { fontSize: 12, lineHeight: 17, color: '#F3D6D6' },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   badge: { borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: 2 },
 });

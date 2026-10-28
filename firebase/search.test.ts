@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import type { PostInput } from '@cityjoy/shared';
-import { createFirestoreBusinessRepository, createFirestorePostRepository, createFirestoreSocialRepository, createSearchSuggestions } from '@cityjoy/shared/firebase';
+import { createFirestoreBusinessRepository, createFirestorePostRepository, createFirestoreSocialRepository, createIntroVideo, createSearchSuggestions } from '@cityjoy/shared/firebase';
 import { collection, doc, getDoc, getDocs, limit, query, serverTimestamp, setDoc, updateDoc, where, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
@@ -107,5 +107,14 @@ describe('Ara', () => {
     await assertFails(
       setDoc(doc(fs('eren'), 'config', 'searchSuggestions'), { terms: { tr: Array.from({ length: 13 }, (_, i) => `x${i}`) }, updatedBy: 'eren', updatedAt: serverTimestamp() }),
     );
+  });
+
+  it('tanıtım videosu: herkes okur, yalnızca admin yazar, yalnızca https, kayda geçer', async () => {
+    await assertFails(createIntroVideo(fs('ali')).save('ali', 'https://www.youtube.com/watch?v=abc'));
+    expect(await createIntroVideo(fs('eren')).save('eren', ' https://www.youtube.com/watch?v=abc ')).toBe('https://www.youtube.com/watch?v=abc');
+    expect(await createIntroVideo(fs('ayse')).get()).toBe('https://www.youtube.com/watch?v=abc');
+    await assertSucceeds(getDocs(query(collection(fs('eren'), 'auditLog'), where('targetId', '==', 'introVideo'))));
+    await assertFails(setDoc(doc(fs('eren'), 'config', 'introVideo'), { url: 'javascript:alert(1)', updatedBy: 'eren', updatedAt: serverTimestamp() }));
+    expect(await createIntroVideo(fs('eren')).save('eren', 'http://ornek.com/video')).toBe('');
   });
 });

@@ -46,7 +46,10 @@
     "greetingMorning": "Guten Morgen, {{name}}",
     "greetingDay": "Guten Tag, {{name}}",
     "greetingEvening": "Guten Abend, {{name}}",
-    "search": "Personen, Betriebe, Orte, Events suchen"
+    "search": "Personen, Betriebe, Orte, Events suchen",
+    "introVideo": "CityJoy in 1 Minute kennenlernen",
+    "introVideoHint": "Vorstellungsvideo",
+    "watch": "Ansehen"
   },
   "modules": {
     "myCity": "Meine Stadt",
@@ -79,7 +82,9 @@
     "or": "oder",
     "acceptTerms": "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie.",
     "readPrivacy": "Ich habe die Datenschutzhinweise zur Verarbeitung personenbezogener Daten gelesen.",
-    "read": "Lesen"
+    "read": "Lesen",
+    "slideToStart": "Zum Starten schieben",
+    "slideToStartHint": "Öffnet die Registrierung; du kannst auch tippen."
   },
   "errors": {
     "required": "Dieses Feld ist erforderlich.",
@@ -450,7 +455,17 @@
     "moreInfo": "Weitere Informationen",
     "source": "Quelle: {{source}}, {{date}}",
     "verifiedOn": "Bestätigt: {{date}}",
-    "firstHour": "Erste Stunde {{price}} TRY"
+    "firstHour": "Erste Stunde {{price}} TRY",
+    "soon": "Bald",
+    "showcase": "Stadtschaufenster",
+    "townhallHint": "Anträge, Unterlagen, Dienste",
+    "tiles": {
+      "cafe": "Cafés und Restaurants",
+      "events": "Veranstaltungen",
+      "pharmacy": "Notdienstapotheke",
+      "listings": "Kaufen und Mieten",
+      "volunteer": "Ehrenamt"
+    }
   },
   "announcements": {
     "title": "Bekanntmachungen",
@@ -525,6 +540,37 @@
       "forum": "Forum",
       "clubs": "Stadtvereine",
       "deals": "Angebote"
+    },
+    "tapToExplore": "Zum Entdecken tippen",
+    "cards": {
+      "events": {
+        "tag": "Konzerte und Theater",
+        "desc": "Konzerte, Theater, Ausstellungen und Festivals in deiner Stadt."
+      },
+      "activities": {
+        "tag": "Sport und Natur",
+        "desc": "Wandern, Radfahren, Spiele: starte eine Aktivität oder mach mit."
+      },
+      "news": {
+        "tag": "Stadtgeschehen",
+        "desc": "Nachrichten aus Stadtverwaltung und Einrichtungen."
+      },
+      "contests": {
+        "tag": "Mit Preisen",
+        "desc": "Foto- und Quizwettbewerbe kommen bald."
+      },
+      "polls": {
+        "tag": "Abstimmung",
+        "desc": "Sag deine Meinung zur Stadt; Umfragen kommen bald."
+      },
+      "clubs": {
+        "tag": "Folge deinem Team",
+        "desc": "Vereine, Spiele und Nachrichten deiner Stadt kommen bald."
+      },
+      "deals": {
+        "tag": "Rabatte",
+        "desc": "Rabatte geprüfter Betriebe kommen bald."
+      }
     }
   },
   "official": {
@@ -782,9 +828,14 @@
         "spam": "Spam oder Werbung",
         "uygunsuz": "Unangemessener Inhalt",
         "diger": "Sonstiges"
-      }
+      },
+      "statPosts": "Beiträge",
+      "statFollowers": "Follower",
+      "statFollowing": "Folgt"
     },
-    "takipFeedHint": "Beiträge von Personen, denen du folgst, nur für Follower"
+    "takipFeedHint": "Beiträge von Personen, denen du folgst, nur für Follower",
+    "share": "Teilen",
+    "doubleTapHint": "Zum Liken zweimal tippen"
   },
   "news": {
     "title": "Nachrichten",
@@ -962,5 +1013,26 @@
     "later": "Eine Stunde später",
     "quietNote": "Während der Ruhezeiten gibt dein Handy keinen Benachrichtigungston aus. Dringende Meldungen und SOS kommen trotzdem an.",
     "saveError": "Einstellung konnte nicht gespeichert werden. Prüfe deine Verbindung und versuche es erneut."
+  },
+  "nav": {
+    "home": "Start",
+    "explore": "Entdecken",
+    "search": "Suche",
+    "profile": "Profil"
+  },
+  "menu": {
+    "open": "Menü öffnen",
+    "close": "Menü schließen",
+    "modules": "Menü",
+    "account": "Konto",
+    "profile": "Mein Profil",
+    "settings": "Einstellungen",
+    "soon": "Bald"
+  },
+  "time": {
+    "now": "jetzt",
+    "minutes": "{{count}} Min.",
+    "hours": "{{count}} Std.",
+    "days": "{{count}} T."
   }
 }

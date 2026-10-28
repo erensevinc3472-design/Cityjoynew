@@ -46,7 +46,7 @@ export function EventCard({ item, onPress }: { item: CityEvent; onPress(): void 
 const styles = StyleSheet.create({
   card: { flexDirection: 'row', gap: spacing.md, borderWidth: 1, borderRadius: radius.lg, padding: spacing.md, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 10 },
   date: { width: 56, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xs },
-  day: { fontFamily: fonts.heading, fontSize: 22, lineHeight: 26 },
+  day: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 24 },
   body: { flex: 1, gap: 2 },
   title: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 22 },
 });

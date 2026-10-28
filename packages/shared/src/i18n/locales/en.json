@@ -46,7 +46,10 @@
     "greetingMorning": "Good morning, {{name}}",
     "greetingDay": "Good afternoon, {{name}}",
     "greetingEvening": "Good evening, {{name}}",
-    "search": "Search people, businesses, places, events"
+    "search": "Search people, businesses, places, events",
+    "introVideo": "Get to know CityJoy in 1 minute",
+    "introVideoHint": "Intro video",
+    "watch": "Watch"
   },
   "modules": {
     "myCity": "My City",
@@ -79,7 +82,9 @@
     "or": "or",
     "acceptTerms": "I have read and accept the terms of use.",
     "readPrivacy": "I have read the privacy notice on the processing of personal data.",
-    "read": "Read"
+    "read": "Read",
+    "slideToStart": "Slide to start",
+    "slideToStartHint": "Opens sign-up; you can also tap to start."
   },
   "errors": {
     "required": "This field is required.",
@@ -450,7 +455,17 @@
     "moreInfo": "More information",
     "source": "Source: {{source}}, {{date}}",
     "verifiedOn": "Verified: {{date}}",
-    "firstHour": "First hour {{price}} TRY"
+    "firstHour": "First hour {{price}} TRY",
+    "soon": "Soon",
+    "showcase": "City Showcase",
+    "townhallHint": "Applications, documents, services",
+    "tiles": {
+      "cafe": "Cafés and Restaurants",
+      "events": "Events",
+      "pharmacy": "On-duty Pharmacy",
+      "listings": "For Sale and Rent",
+      "volunteer": "Volunteering"
+    }
   },
   "announcements": {
     "title": "Announcements",
@@ -525,6 +540,37 @@
       "forum": "Forum",
       "clubs": "City Clubs",
       "deals": "Deals"
+    },
+    "tapToExplore": "Tap to explore",
+    "cards": {
+      "events": {
+        "tag": "Concerts and theatre",
+        "desc": "Concerts, plays, exhibitions and festivals in your city."
+      },
+      "activities": {
+        "tag": "Sports and outdoors",
+        "desc": "Walks, cycling, games: start an activity or join one."
+      },
+      "news": {
+        "tag": "City agenda",
+        "desc": "News about your city from municipalities and institutions."
+      },
+      "contests": {
+        "tag": "With prizes",
+        "desc": "Photo and quiz contests are coming soon."
+      },
+      "polls": {
+        "tag": "Voting",
+        "desc": "Share your opinion about your city; polls are coming soon."
+      },
+      "clubs": {
+        "tag": "Follow your team",
+        "desc": "Your city's clubs, matches and news are coming soon."
+      },
+      "deals": {
+        "tag": "Discounts",
+        "desc": "Discounts from verified businesses are coming soon."
+      }
     }
   },
   "official": {
@@ -782,9 +828,14 @@
         "spam": "Spam or advertising",
         "uygunsuz": "Inappropriate content",
         "diger": "Other"
-      }
+      },
+      "statPosts": "Posts",
+      "statFollowers": "Followers",
+      "statFollowing": "Following"
     },
-    "takipFeedHint": "posts shared only with followers by people you follow"
+    "takipFeedHint": "posts shared only with followers by people you follow",
+    "share": "Share",
+    "doubleTapHint": "Double-tap to like"
   },
   "news": {
     "title": "News",
@@ -962,5 +1013,26 @@
     "later": "One hour later",
     "quietNote": "During quiet hours your phone won't make notification sounds. Urgent announcements and SOS still come through.",
     "saveError": "Setting could not be saved. Check your connection and try again."
+  },
+  "nav": {
+    "home": "Home",
+    "explore": "Explore",
+    "search": "Search",
+    "profile": "Profile"
+  },
+  "menu": {
+    "open": "Open menu",
+    "close": "Close menu",
+    "modules": "Menu",
+    "account": "Account",
+    "profile": "My profile",
+    "settings": "Settings",
+    "soon": "Soon"
+  },
+  "time": {
+    "now": "now",
+    "minutes": "{{count}}m",
+    "hours": "{{count}}h",
+    "days": "{{count}}d"
   }
 }

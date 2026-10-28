@@ -10,6 +10,8 @@ import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
+import { BottomNav } from '@/components/bottom-nav';
+import { FeedTabs } from '@/components/feed-tabs';
 import { HeroHeader, LocationChip } from '@/components/hero-header';
 import { PostCard } from '@/components/post-card';
 import { Screen } from '@/components/screen';
@@ -34,7 +36,7 @@ export default function ExploreScreen() {
   const { location } = useUserLocation();
   const [tab, setTab] = useState<PostTarget>('mahallem');
   const [onlyDistrict, setOnlyDistrict] = useState(false);
-  const { me, blocked, following } = useSocial();
+  const { blocked, following } = useSocial();
   const district = location?.districtId ? repo.getDistrict(location.districtId) : undefined;
   const province = location ? repo.getProvince(location.provinceCode)?.name : undefined;
 
@@ -82,7 +84,7 @@ export default function ExploreScreen() {
   const header = (
     <HeroHeader
       title={t('explore.title')}
-      onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
+      left={user ? { icon: 'bookmark-border', label: t('explore.saved'), onPress: () => router.push('/explore/saved') } : undefined}
       right={
         user
           ? [
@@ -97,7 +99,7 @@ export default function ExploreScreen() {
 
   const top = (
     <View style={styles.top}>
-      <Chips<PostTarget>
+      <FeedTabs<PostTarget>
         label={t('explore.title')}
         value={tab}
         onChange={setTab}
@@ -115,20 +117,13 @@ export default function ExploreScreen() {
       {urgent.map((a) => (
         <AnnouncementCard key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />
       ))}
-      {user && location ? <AppButton title={t('explore.newPost')} onPress={() => router.push('/explore/new')} /> : null}
       {tab === 'takip' && following?.length === 0 ? <FormMessage kind="info" text={t('explore.followHint')} /> : null}
-      {user ? (
-        <View style={styles.row}>
-          {me ? <AppButton variant="ghost" title={t('explore.profile.mine')} onPress={() => router.push({ pathname: '/u/[uid]', params: { uid: me.uid } })} /> : null}
-          <AppButton variant="ghost" title={t('explore.saved')} onPress={() => router.push('/explore/saved')} />
-        </View>
-      ) : null}
     </View>
   );
 
   if (!user || !location || (tab === 'mahallem' && !location.neighbourhoodId)) {
     return (
-      <Screen header={header}>
+      <Screen header={header} footer={<BottomNav active="explore" />}>
         <View style={styles.top}>
           {user && location ? top : null}
           {!user ? (
@@ -145,7 +140,7 @@ export default function ExploreScreen() {
   }
 
   return (
-    <Screen header={header}>
+    <Screen header={header} footer={<BottomNav active="explore" />}>
       <FlatList
         data={items ?? []}
         keyExtractor={(i) => (i.kind === 'post' ? i.post.id : `a-${i.ann.id}`)}
@@ -153,7 +148,9 @@ export default function ExploreScreen() {
         ListHeaderComponent={top}
         renderItem={({ item: i }) =>
           i.kind === 'ann' ? (
-            <AnnouncementCard item={i.ann} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: i.ann.id } })} />
+            <View style={styles.ann}>
+              <AnnouncementCard item={i.ann} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: i.ann.id } })} />
+            </View>
           ) : (
             <PostCard
               item={i.post}
@@ -179,8 +176,8 @@ export default function ExploreScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xl },
-  top: { gap: spacing.sm },
-  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  content: { paddingBottom: spacing.xl },
+  top: { gap: spacing.sm, paddingBottom: spacing.xs },
+  ann: { paddingVertical: spacing.sm },
   center: { textAlign: 'center' },
 });

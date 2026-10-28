@@ -28,7 +28,7 @@ import { toggleLike, useLiked } from '@/lib/posts';
 import { postRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { refreshFollowing, setBlocked, setMyProfile, useSocial } from '@/lib/social';
-import { fonts, radius, spacing } from '@/theme/tokens';
+import { fonts, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 /**
@@ -163,18 +163,30 @@ export default function ProfileScreen() {
   return (
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={[styles.card, { backgroundColor: c.surface, borderColor: c.border }]}>
-          <View style={styles.head}>
-            <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
-              <AppText style={[styles.initial, { color: c.icon }]}>{(profile.displayName || '?').slice(0, 1).toLocaleUpperCase()}</AppText>
-            </View>
-            <View style={styles.who}>
-              <AppText accessibilityRole="header" style={[styles.name, { color: c.textStrong }]}>{profile.displayName}</AppText>
-              {profile.isPrivate ? <AppText variant="caption" muted>{t('explore.profile.private')}</AppText> : null}
+        {/* Profil başı (Instagram hissi): halkalı harf, yanında gönderi / takipçi / takip sayıları, altında ad ve tanıtım. */}
+        <View style={styles.head}>
+          <View style={[styles.ring, { borderColor: c.accent }]}>
+            <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
+              <AppText style={[styles.initial, { color: c.accent }]}>{(profile.displayName || '?').slice(0, 1).toLocaleUpperCase()}</AppText>
             </View>
           </View>
+          <View style={styles.stats}>
+            {[
+              { n: hidden || posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts') },
+              { n: counts ? String(counts.followers) : '–', label: t('explore.profile.statFollowers') },
+              { n: counts ? String(counts.following) : '–', label: t('explore.profile.statFollowing') },
+            ].map((x) => (
+              <View key={x.label} style={styles.stat} accessible accessibilityLabel={`${x.n} ${x.label}`}>
+                <AppText style={[styles.statN, { color: c.textStrong }]}>{x.n}</AppText>
+                <AppText style={[styles.statL, { color: c.textMuted }]}>{x.label}</AppText>
+              </View>
+            ))}
+          </View>
+        </View>
+        <View style={styles.bio}>
+          <AppText accessibilityRole="header" style={[styles.name, { color: c.textStrong }]}>{profile.displayName}</AppText>
+          {profile.isPrivate ? <AppText variant="caption" muted>{t('explore.profile.private')}</AppText> : null}
           {profile.bio ? <AppText selectable>{profile.bio}</AppText> : null}
-          {counts ? <AppText variant="caption" muted>{t('explore.profile.counts', counts)}</AppText> : null}
         </View>
         {error ? <FormMessage kind="error" text={error} /> : null}
 
@@ -197,7 +209,8 @@ export default function ProfileScreen() {
         ) : blockedMe ? (
           <FormMessage kind="info" text={t('explore.profile.unavailable')} />
         ) : iBlocked ? null : (
-          <>
+          <View style={styles.buttons}>
+            <View style={styles.grow}>
             <AppButton
               variant={follow ? 'secondary' : 'primary'}
               title={follow === 'aktif' ? t('explore.profile.unfollow') : follow === 'istek' ? t('explore.profile.requested') : profile.isPrivate ? t('explore.profile.request') : t('explore.profile.follow')}
@@ -205,9 +218,12 @@ export default function ProfileScreen() {
               disabled={busy || follow === undefined}
               onPress={toggleFollow}
             />
+            </View>
             {/* Mesaj (PROJE.md 5.11): takipleşmiyorlarsa karşı tarafa istek olarak düşer. */}
-            <AppButton variant="secondary" title={t('messages.write')} onPress={() => router.push({ pathname: '/messages/[uid]', params: { uid } })} />
-          </>
+            <View style={styles.grow}>
+              <AppButton variant="secondary" title={t('messages.write')} onPress={() => router.push({ pathname: '/messages/[uid]', params: { uid } })} />
+            </View>
+          </View>
         )}
 
         {own && requests.length ? (
@@ -259,12 +275,19 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
-  card: { borderWidth: 1, borderRadius: radius.lg, padding: spacing.md, gap: spacing.sm },
-  head: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  avatar: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  initial: { fontFamily: fonts.heading, fontSize: 24 },
+  head: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+  ring: { width: 84, height: 84, borderRadius: 42, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 74, height: 74, borderRadius: 37, alignItems: 'center', justifyContent: 'center' },
+  initial: { fontFamily: fonts.heading, fontSize: 30 },
+  stats: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
+  stat: { alignItems: 'center' },
+  statN: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 22 },
+  statL: { fontSize: 12, lineHeight: 16 },
+  buttons: { flexDirection: 'row', gap: spacing.sm },
+  grow: { flex: 1 },
   who: { flex: 1 },
-  name: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26 },
+  name: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21 },
   block: { gap: spacing.xs },
+  bio: { gap: 2 },
   request: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderTopWidth: 1, paddingTop: spacing.xs, flexWrap: 'wrap' },
 });

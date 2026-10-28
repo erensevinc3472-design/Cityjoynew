@@ -46,7 +46,10 @@
     "greetingMorning": "Günaydın, {{name}}",
     "greetingDay": "İyi günler, {{name}}",
     "greetingEvening": "İyi akşamlar, {{name}}",
-    "search": "Kişi, işletme, yer, etkinlik ara"
+    "search": "Kişi, işletme, yer, etkinlik ara",
+    "introVideo": "CityJoy'u 1 dakikada tanı",
+    "introVideoHint": "Tanıtım videosu",
+    "watch": "İzle"
   },
   "modules": {
     "myCity": "Benim Şehrim",
@@ -79,7 +82,9 @@
     "or": "veya",
     "acceptTerms": "Kullanım şartlarını okudum ve kabul ediyorum.",
     "readPrivacy": "Kişisel verilerin işlenmesine ilişkin aydınlatma metnini okudum.",
-    "read": "Metni oku"
+    "read": "Metni oku",
+    "slideToStart": "Kaydırarak başla",
+    "slideToStartHint": "Kayıt ekranını açar; dokunarak da başlayabilirsin."
   },
   "errors": {
     "required": "Bu alan zorunlu.",
@@ -450,7 +455,17 @@
     "moreInfo": "Ayrıntılı bilgi",
     "source": "Kaynak: {{source}}, {{date}}",
     "verifiedOn": "Doğrulandı: {{date}}",
-    "firstHour": "İlk saat {{price}} ₺"
+    "firstHour": "İlk saat {{price}} ₺",
+    "soon": "Yakında",
+    "showcase": "Şehir Vitrini",
+    "townhallHint": "Başvuru, evrak, hizmetler",
+    "tiles": {
+      "cafe": "Kafe ve Restoran",
+      "events": "Etkinlikler",
+      "pharmacy": "Nöbetçi Eczane",
+      "listings": "Satılık ve Kiralık",
+      "volunteer": "Gönüllülük"
+    }
   },
   "announcements": {
     "title": "Duyurular",
@@ -525,6 +540,37 @@
       "forum": "Forum",
       "clubs": "Şehir Kulüpleri",
       "deals": "Fırsatlar"
+    },
+    "tapToExplore": "Keşfetmek için dokun",
+    "cards": {
+      "events": {
+        "tag": "Konser ve tiyatro",
+        "desc": "Şehrindeki konserler, tiyatrolar, sergiler ve festivaller."
+      },
+      "activities": {
+        "tag": "Spor ve doğa",
+        "desc": "Yürüyüş, bisiklet, oyun: bir aktivite aç ya da katıl."
+      },
+      "news": {
+        "tag": "Şehrin gündemi",
+        "desc": "Belediye ve kurumlardan şehrine dair haberler."
+      },
+      "contests": {
+        "tag": "Ödüllü",
+        "desc": "Fotoğraf ve bilgi yarışmaları yakında."
+      },
+      "polls": {
+        "tag": "Oylama",
+        "desc": "Şehrin hakkında fikrini söyle; anketler yakında."
+      },
+      "clubs": {
+        "tag": "Takımını takip et",
+        "desc": "Şehrinin kulüpleri, maçları ve haberleri yakında."
+      },
+      "deals": {
+        "tag": "İndirim",
+        "desc": "Doğrulanmış işletmelerden indirimler yakında."
+      }
     }
   },
   "official": {
@@ -782,9 +828,14 @@
         "spam": "Spam ya da reklam",
         "uygunsuz": "Uygunsuz içerik",
         "diger": "Diğer"
-      }
+      },
+      "statPosts": "Gönderi",
+      "statFollowers": "Takipçi",
+      "statFollowing": "Takip"
     },
-    "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler"
+    "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
+    "share": "Paylaş",
+    "doubleTapHint": "Beğenmek için iki kez dokun"
   },
   "news": {
     "title": "Haberler",
@@ -962,5 +1013,26 @@
     "later": "Bir saat geç",
     "quietNote": "Sessiz saatlerde telefon bildirim sesi çıkarmaz. Acil duyurular ve SOS sessiz saatlerde de gelir.",
     "saveError": "Ayar kaydedilemedi. Bağlantını kontrol edip yeniden dene."
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "explore": "Keşfet",
+    "search": "Ara",
+    "profile": "Profil"
+  },
+  "menu": {
+    "open": "Menüyü aç",
+    "close": "Menüyü kapat",
+    "modules": "Menü",
+    "account": "Hesap",
+    "profile": "Profilim",
+    "settings": "Ayarlar",
+    "soon": "Yakında"
+  },
+  "time": {
+    "now": "şimdi",
+    "minutes": "{{count}} dk",
+    "hours": "{{count}} sa",
+    "days": "{{count}} g"
   }
 }

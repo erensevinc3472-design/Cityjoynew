@@ -50,5 +50,6 @@ export { createFirestorePostRepository, createPostModeration, type CommentReport
 export { createFirestoreSocialRepository, createProfileModeration, type ProfileReport } from './social';
 export { createBannedWords } from './word-filter';
 export { createSearchSuggestions } from './search';
+export { cleanVideoUrl, createIntroVideo, INTRO_VIDEO_URL_MAX } from './intro';
 export { createFirestoreMessageRepository, createMessageModeration, type MessageReport } from './messages';
 export { createNotificationSettings, createNotificationTriggers } from './notifications';

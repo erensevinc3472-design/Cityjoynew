@@ -7,6 +7,9 @@ import {
   createPostModeration,
   createProfileModeration,
   createReviewModeration,
+  cleanVideoUrl,
+  createIntroVideo,
+  INTRO_VIDEO_URL_MAX,
   createSearchSuggestions,
   type ActivityReport,
   type CommentReport,
@@ -145,6 +148,7 @@ export function ModerationPage() {
       {user ? <MessageReports user={user} /> : null}
       {user && isAdminUser(user) ? <BannedWords user={user} /> : null}
       {user && isAdminUser(user) ? <SearchSuggestionsSection user={user} /> : null}
+      {user && isAdminUser(user) ? <IntroVideoSection user={user} /> : null}
     </section>
   );
 }
@@ -855,6 +859,80 @@ function SearchSuggestionsSection({ user }: { user: PanelUser }) {
           {user.isDemo ? null : (
             <div className="actions">
               <button className="btn" type="submit" disabled={busy}>{t('moderation.suggestions.save')}</button>
+            </div>
+          )}
+        </form>
+      )}
+    </>
+  );
+}
+
+/** Ana sayfadaki "Tanıtım videosu" düğmesinin bağlantısı (13. madde 29). Boş bırakılırsa düğme "yakında" görünür. */
+function IntroVideoSection({ user }: { user: PanelUser }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
+  const [busy, setBusy] = useState(false);
+  const store = useMemo(() => createIntroVideo(firestore), []);
+
+  const load = useCallback(async () => {
+    setLoadError(false);
+    try {
+      setUrl(await store.get());
+    } catch {
+      setLoadError(true);
+    }
+  }, [store]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (url === null) return;
+    setMessage(undefined);
+    if (url.trim() && !cleanVideoUrl(url)) {
+      setMessage({ kind: 'error', text: t('moderation.introVideo.invalid') });
+      return;
+    }
+    setBusy(true);
+    try {
+      setUrl(await store.save(user.uid, url));
+      setMessage({ kind: 'ok', text: t('moderation.introVideo.saved') });
+    } catch {
+      setMessage({ kind: 'error', text: t('moderation.error') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <header className="page-head">
+        <div>
+          <h2>{t('moderation.introVideo.title')}</h2>
+          <p className="meta">{t('moderation.introVideo.intro')}</p>
+        </div>
+      </header>
+      {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {loadError ? (
+        <div className="state" role="alert">
+          <p>{t('moderation.loadError')}</p>
+          <button className="btn secondary" onClick={load}>{t('moderation.retry')}</button>
+        </div>
+      ) : url === null ? (
+        <div className="state" aria-live="polite">{t('moderation.loading')}</div>
+      ) : (
+        <form className="form panel-form" onSubmit={submit}>
+          <div className="field">
+            <label htmlFor="intro-video">{t('moderation.introVideo.label')}</label>
+            <input id="intro-video" type="url" dir="ltr" inputMode="url" maxLength={INTRO_VIDEO_URL_MAX} placeholder="https://" value={url} disabled={user.isDemo} onChange={(e) => setUrl(e.target.value)} />
+          </div>
+          <span className="meta">{t('moderation.introVideo.hint')}</span>
+          {user.isDemo ? null : (
+            <div className="actions">
+              <button className="btn" type="submit" disabled={busy}>{t('moderation.introVideo.save')}</button>
             </div>
           )}
         </form>

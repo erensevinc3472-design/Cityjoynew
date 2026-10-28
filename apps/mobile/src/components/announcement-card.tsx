@@ -49,3 +49,33 @@ const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   title: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 22 },
 });
+
+/** Ana sayfanın üstündeki ince acil şeridi: yalnızca acil duyuru varsa görünür; dokununca duyuru açılır. */
+export function UrgentStrip({ item, onPress }: { item: Announcement; onPress(): void }) {
+  const { t } = useTranslation();
+  const c = useThemeColors();
+  const author = useAuthorLabel(item);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${t('announcements.urgent')}. ${item.title}. ${author}`}
+      onPress={onPress}
+      style={({ pressed }) => [stripStyles.strip, { backgroundColor: c.dangerSoft, borderColor: c.danger, opacity: pressed ? 0.85 : 1 }]}>
+      <View style={[stripStyles.icon, { backgroundColor: c.dangerSoft }]}>
+        <MaterialIcons name="warning-amber" size={20} color={c.danger} />
+      </View>
+      <View style={stripStyles.text}>
+        <AppText numberOfLines={1} style={[stripStyles.label, { color: c.danger }]}>{`${t('announcements.urgent')} · ${author}`}</AppText>
+        <AppText numberOfLines={2} style={{ color: c.textStrong }}>{item.title}</AppText>
+      </View>
+      <MaterialIcons name="chevron-right" size={22} color={c.danger} />
+    </Pressable>
+  );
+}
+
+const stripStyles = StyleSheet.create({
+  strip: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: 12, borderRadius: radius.md, borderWidth: 1 },
+  icon: { width: 36, height: 36, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  text: { flex: 1, gap: 2 },
+  label: { fontFamily: fonts.bodySemi, fontSize: 13 },
+});
