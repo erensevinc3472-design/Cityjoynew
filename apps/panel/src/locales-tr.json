@@ -464,7 +464,7 @@
       "title": "Tanıtım videosu",
       "intro": "Uygulamanın ana sayfasındaki \"CityJoy'u tanı\" düğmesi bu bağlantıyı açar (ör. YouTube videosu).",
       "label": "Video bağlantısı",
-      "hint": "Yalnızca https ile başlayan bağlantı. Boş bırakırsanız düğme \"yakında\" görünür.",
+      "hint": "YouTube ve Vimeo bağlantıları uygulamanın içinde, ekranın ortasında oynar; başka bir bağlantı tarayıcıda açılır. Yalnızca https ile başlayan bağlantı. Boş bırakırsanız düğme \"yakında\" görünür.",
       "save": "Kaydet",
       "saved": "Kaydedildi. Uygulama yeni bağlantıyı bir sonraki açılışta kullanır.",
       "invalid": "Bağlantı https:// ile başlamalı ve boşluk içermemeli."

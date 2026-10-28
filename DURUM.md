@@ -44,7 +44,7 @@ Son güncelleme: 28 Ekim 2026 (tasarım uygulaması ilk dalga; önceki: OSM iske
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (104)
+npm test                      # ortak paket testleri (106)
 npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (98; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
@@ -413,7 +413,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    kenar boşluğu; dokunma alanı en az 44). **Alt gezinme** (Ana Sayfa, Keşfet, Ara, Profil = Hesabım) ve ana sayfada
    **yan menü** (modüller, Profilim, Mesajlar, Bildirimler, Ayarlar, Çıkış). **Ana sayfa:** tarih, selamlama, konum,
    acil şerit (varsa), dört modül resimli kartta, tanıtım videosu (bağlantı Panel > Moderasyon > Tanıtım videosu,
-   `config/introVideo`, yalnızca https, işlem kaydı; boşsa "yakında"). **Benim Şehrim:** kapak, Belediye büyük kart,
+   `config/introVideo`, yalnızca https, işlem kaydı; boşsa "yakında"). YouTube / Vimeo bağlantısı uygulama içinde,
+   ekranın ortasında açılan pencerede oynar (`videoEmbedUrl`, çerezsiz YouTube adresi; react-native-webview), başka bağlantı tarayıcıda. **Benim Şehrim:** kapak, Belediye büyük kart,
    renkli kutucuklar (verisi olmayan "Yakında"), Mahalle Meydanı ve Şehir Vitrini (yakında). **Keşfet:** ince sekmeler,
    çerçevesiz gönderi, iki kez dokun beğen (kalp), paylaş, "5 dk" gibi süre; Kaydedilenler üst solda. **Profil:**
    halkalı harf, gönderi/takipçi/takip sayıları, Takip et ve Mesaj yan yana. **Sosyal Harmoni:** yana kaydırılan kartlar,
