@@ -30,3 +30,4 @@ export * from './city-guide/items';
 export * from './models/sign-up';
 export * from './approvals/approvals';
 export * from './announcements/announcements';
+export * from './events/events';

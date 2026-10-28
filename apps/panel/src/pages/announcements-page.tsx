@@ -11,12 +11,11 @@ import {
   type AnnouncementError,
   type AnnouncementInput,
   type AnnouncementKind,
-  type AnnouncementRegion,
-  type Neighbourhood,
   type Publisher,
 } from '@cityjoy/shared';
 import { createAnnouncementPanel, createFirestoreAnnouncementRepository, type SaveMode } from '@cityjoy/shared/firebase';
 
+import { authorLabel, cleanRegion, dateTime, regionComplete, regionLabel, RegionFields, scopeRegion, toLocalInput, useNeighbourhoodNames } from '../components/content-common';
 import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
@@ -24,33 +23,6 @@ import { t } from '../lib/t';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
 const DAY = 86400000;
-const toLocalInput = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-const dateTime = (iso?: string) => (iso ? new Date(iso).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' }) : '');
-
-/** Yayınlayanın adı: kurum adı; muhtarlık ve il yöneticisinde bölgeden. */
-function authorLabel(a: Pick<Announcement, 'author' | 'region'>, neighbourhoodName?: string) {
-  if (a.author.type === 'kurum') return a.author.name;
-  if (a.author.role === 'muhtar') return t('announcements.muhtarOf', { place: neighbourhoodName ?? a.region.neighbourhoodId ?? '' });
-  return t('announcements.cityjoyOf', { place: repo.getProvince(a.region.provinceCode)?.name ?? a.region.provinceCode });
-}
-
-function regionLabel(r: AnnouncementRegion, neighbourhoodName?: string) {
-  const parts = [neighbourhoodName, r.districtId ? repo.getDistrict(r.districtId)?.name : null, repo.getProvince(r.provinceCode)?.name].filter(Boolean);
-  return r.districtId ? parts.join(', ') : t('announcements.wholeProvince', { place: parts.join(', ') });
-}
-
-/** Mahalle adları ilçe başına bir kez indirilir. */
-function useNeighbourhoodNames(list: Pick<Announcement, 'region'>[]) {
-  const [names, setNames] = useState<Record<string, string>>({});
-  const districts = [...new Set(list.flatMap((a) => (a.region.neighbourhoodId && a.region.districtId ? [a.region.districtId] : [])))].sort().join();
-  useEffect(() => {
-    if (!districts) return;
-    Promise.all(districts.split(',').map((d) => repo.getNeighbourhoods(d).catch(() => [] as Neighbourhood[]))).then((all) =>
-      setNames(Object.fromEntries(all.flat().map((n) => [n.id, n.name]))),
-    );
-  }, [districts]);
-  return (a: Pick<Announcement, 'region'>) => (a.region.neighbourhoodId ? names[a.region.neighbourhoodId] : undefined);
-}
 
 /**
  * Duyurular (PROJE.md 6.2 madde 1, 4, 6; 6.6): kurum personeli, muhtar ve il yöneticisi duyuru hazırlar. "Onaysız
@@ -128,10 +100,6 @@ function Announcements({ user }: { user: PanelUser }) {
     }
   };
 
-  const scopeRegion = (p: Publisher): AnnouncementRegion =>
-    p.scope.level === 'ulke'
-      ? { provinceCode: '' }
-      : { provinceCode: p.scope.provinceCode, ...(p.scope.level !== 'il' ? { districtId: p.scope.districtId } : {}), ...(p.scope.level === 'mahalle' ? { neighbourhoodId: p.scope.neighbourhoodId } : {}) };
   const nameOf = useNeighbourhoodNames([...(mine ?? []), ...pending, ...liveList, ...publishers.map((p) => ({ region: scopeRegion(p) }))]);
   const isReviewer = (a: Announcement) =>
     isAdmin || (a.author.type === 'kurum' ? a.author.orgId === orgReviewer : reviewProvinces.includes(a.region.provinceCode));
@@ -340,8 +308,6 @@ function Announcements({ user }: { user: PanelUser }) {
   );
 }
 
-type Level = 'il' | 'ilce' | 'mahalle';
-
 function AnnouncementForm({
   publisher,
   draft,
@@ -358,36 +324,16 @@ function AnnouncementForm({
   const sc = publisher.scope;
   const [input, setInput] = useState<AnnouncementInput>(draft.input);
   const [errors, setErrors] = useState<AnnouncementError[]>([]);
-  const [neighbourhoods, setNeighbourhoods] = useState<Neighbourhood[] | null>(null);
-  const r = input.region;
-  const level: Level = r.neighbourhoodId !== undefined ? 'mahalle' : r.districtId !== undefined ? 'ilce' : 'il';
-  // Yayınlayanın bölgesinden geniş düzey seçilemez.
-  const levels: Level[] = sc.level === 'mahalle' ? ['mahalle'] : sc.level === 'ilce' ? ['ilce', 'mahalle'] : ['il', 'ilce', 'mahalle'];
   const set = (patch: Partial<AnnouncementInput>) => setInput((x) => ({ ...x, ...patch }));
-  const setRegion = (region: AnnouncementRegion) => set({ region });
-
-  useEffect(() => {
-    setNeighbourhoods(null);
-    if (level === 'mahalle' && r.districtId) repo.getNeighbourhoods(r.districtId).then(setNeighbourhoods, () => setNeighbourhoods([]));
-  }, [level, r.districtId]);
-
-  const changeLevel = (l: Level) => {
-    const base = { provinceCode: r.provinceCode };
-    const districtId = sc.level === 'ilce' || sc.level === 'mahalle' ? sc.districtId : (r.districtId ?? '');
-    setRegion(l === 'il' ? base : l === 'ilce' ? { ...base, districtId } : { ...base, districtId, neighbourhoodId: sc.level === 'mahalle' ? sc.neighbourhoodId : '' });
-  };
   const changeKind = (kind: AnnouncementKind) =>
     set({ kind, ...(kind === 'acil' && !input.endsAt ? { endsAt: new Date(Date.now() + DAY).toISOString() } : {}) });
 
   const submit = (mode: SaveMode) => (e?: FormEvent) => {
     e?.preventDefault();
-    const clean: AnnouncementInput = {
-      ...input,
-      region: { provinceCode: r.provinceCode, ...(r.districtId ? { districtId: r.districtId } : {}), ...(r.districtId && r.neighbourhoodId ? { neighbourhoodId: r.neighbourhoodId } : {}) },
-    };
+    const clean: AnnouncementInput = { ...input, region: cleanRegion(input.region) };
     const problems = validateAnnouncement(clean, sc);
     // Seçilmemiş ilçe / mahalle de bölge hatasıdır.
-    if ((level !== 'il' && !r.districtId) || (level === 'mahalle' && !r.neighbourhoodId)) problems.push('region');
+    if (!regionComplete(input.region)) problems.push('region');
     setErrors(problems);
     if (!problems.length) onSave(clean, mode);
   };
@@ -420,36 +366,7 @@ function AnnouncementForm({
       </div>
 
       <h3 className="form-section">{t('announcements.target')}</h3>
-      <div className="field">
-        <label htmlFor="an-level">{t('announcements.level')}</label>
-        <select id="an-level" value={level} disabled={levels.length === 1} onChange={(e) => changeLevel(e.target.value as Level)}>
-          {levels.map((l) => (
-            <option key={l} value={l}>{t(`announcements.levels.${l}`)}</option>
-          ))}
-        </select>
-      </div>
-      {level !== 'il' ? (
-        <div className="field">
-          <label htmlFor="an-district">{t('announcements.district')}</label>
-          <select id="an-district" value={r.districtId ?? ''} disabled={sc.level !== 'il' && sc.level !== 'ulke'} onChange={(e) => setRegion({ provinceCode: r.provinceCode, districtId: e.target.value, ...(level === 'mahalle' ? { neighbourhoodId: '' } : {}) })}>
-            <option value="">{t('announcements.choose')}</option>
-            {repo.getDistricts(r.provinceCode).map((d) => (
-              <option key={d.id} value={d.id}>{d.name}</option>
-            ))}
-          </select>
-        </div>
-      ) : null}
-      {level === 'mahalle' && r.districtId ? (
-        <div className="field">
-          <label htmlFor="an-neighbourhood">{t('announcements.neighbourhood')}</label>
-          <select id="an-neighbourhood" value={r.neighbourhoodId ?? ''} disabled={sc.level === 'mahalle' || !neighbourhoods} onChange={(e) => setRegion({ ...r, neighbourhoodId: e.target.value })}>
-            <option value="">{neighbourhoods ? t('announcements.choose') : t('announcements.loading')}</option>
-            {(neighbourhoods ?? []).map((n) => (
-              <option key={n.id} value={n.id}>{n.name}</option>
-            ))}
-          </select>
-        </div>
-      ) : null}
+      <RegionFields idPrefix="an" publisher={publisher} region={input.region} onChange={(region) => set({ region })} />
       <div className="field">
         <label htmlFor="an-ends">{input.kind === 'acil' ? t('announcements.endsRequired') : t('announcements.endsOptional')}</label>
         <input

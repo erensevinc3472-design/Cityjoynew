@@ -467,5 +467,60 @@
     "until": "Bitiş: {{date}}",
     "urgentNote": "Acil durumda hayati tehlike varsa 112'yi arayın.",
     "gone": "Bu duyuru artık yayında değil."
+  },
+  "events": {
+    "title": "Etkinlikler",
+    "one": "Etkinlik",
+    "empty": "Yaklaşan etkinlik yok.",
+    "loadError": "Etkinlikler yüklenemedi.",
+    "needLocation": "Etkinlikleri görmek için konumunuzu seçin.",
+    "wholeProvince": "{{place}} geneli",
+    "onlyDistrict": "Yalnızca {{place}}",
+    "note": "Etkinlikleri belediyeler, kurumlar ve yetkili hesaplar ekler.",
+    "gone": "Bu etkinlik artık yayında değil.",
+    "cancelled": "İptal edildi",
+    "cancelledNote": "Bu etkinlik iptal edildi.",
+    "when": "Ne zaman",
+    "where": "Nerede",
+    "openMap": "Haritada aç",
+    "price": "Ücret",
+    "free": "Ücretsiz",
+    "ticket": "Resmî bilet / kayıt sayfası",
+    "ticketNote": "CityJoy bilet satmaz; bağlantı düzenleyenin sayfasına gider.",
+    "attendance": "Katılım",
+    "attending": "{{count}} kişi katılıyor",
+    "seatsLeft": "{{capacity}} kişilik kontenjanda {{count}} yer kaldı",
+    "signIn": "\"Katılıyorum\" demek için giriş yapın.",
+    "attend": "Katılıyorum",
+    "leave": "Katılmaktan vazgeç",
+    "youAttend": "Katılıyorsunuz. Adınız düzenleyenle paylaşılmadı.",
+    "youAttendNamed": "Katılıyorsunuz. Adınız düzenleyenle paylaşıldı.",
+    "shareName": "Adım düzenleyenle paylaşılsın (isteğe bağlı)",
+    "full": "Kontenjan doldu.",
+    "attendError": "İşlem yapılamadı. Bağlantınızı kontrol edin.",
+    "categories": {
+      "kultur-sanat": "Kültür ve sanat",
+      "muzik": "Müzik",
+      "tiyatro-sinema": "Tiyatro ve sinema",
+      "spor": "Spor",
+      "cocuk-aile": "Çocuk ve aile",
+      "egitim-seminer": "Eğitim ve seminer",
+      "festival-senlik": "Festival ve şenlik",
+      "saglik": "Sağlık",
+      "gonulluluk": "Gönüllülük",
+      "diger": "Diğer"
+    }
+  },
+  "social": {
+    "sections": {
+      "events": "Etkinlikler",
+      "activities": "Aktiviteler",
+      "news": "Haberler",
+      "contests": "Yarışmalar",
+      "polls": "Anketler",
+      "forum": "Forum",
+      "clubs": "Şehir Kulüpleri",
+      "deals": "Fırsatlar"
+    }
   }
 }

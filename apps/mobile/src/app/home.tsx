@@ -35,7 +35,7 @@ function greetingKey(now = new Date()) {
   return 'home.greetingEvening';
 }
 
-/** Ana sayfa. Benim Şehrim ve Acil İhtiyaçlar bağlı; diğer modüller sonraki aşamalarda bağlanacak. */
+/** Ana sayfa. Benim Şehrim, Sosyal Harmoni ve Acil İhtiyaçlar bağlı; Seyahat sonraki aşamada bağlanacak. */
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -94,8 +94,8 @@ export default function HomeScreen() {
         ))}
         <View style={styles.grid}>
           {MODULES.map((m) => {
-            // Benim Şehrim ve Acil İhtiyaçlar hazır; diğerleri sonraki aşamalarda bağlanacak.
-            const href = m.key === 'urgent' ? '/urgent' : m.key === 'myCity' ? '/city' : undefined;
+            // Benim Şehrim, Sosyal Harmoni (etkinlikler) ve Acil İhtiyaçlar hazır; Seyahat sonraki aşamada.
+            const href = m.key === 'urgent' ? '/urgent' : m.key === 'myCity' ? '/city' : m.key === 'social' ? '/social' : undefined;
             return (
               <Pressable
                 key={m.key}

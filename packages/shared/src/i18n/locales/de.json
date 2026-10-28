@@ -467,5 +467,60 @@
     "until": "Bis: {{date}}",
     "urgentNote": "Bei Lebensgefahr rufen Sie 112 an.",
     "gone": "Diese Bekanntmachung ist nicht mehr veröffentlicht."
+  },
+  "events": {
+    "title": "Veranstaltungen",
+    "one": "Veranstaltung",
+    "empty": "Keine bevorstehenden Veranstaltungen.",
+    "loadError": "Veranstaltungen konnten nicht geladen werden.",
+    "needLocation": "Wählen Sie Ihren Standort, um Veranstaltungen zu sehen.",
+    "wholeProvince": "Ganz {{place}}",
+    "onlyDistrict": "Nur {{place}}",
+    "note": "Veranstaltungen werden von Gemeinden, Einrichtungen und berechtigten Konten eingetragen.",
+    "gone": "Diese Veranstaltung ist nicht mehr veröffentlicht.",
+    "cancelled": "Abgesagt",
+    "cancelledNote": "Diese Veranstaltung wurde abgesagt.",
+    "when": "Wann",
+    "where": "Wo",
+    "openMap": "In Karten öffnen",
+    "price": "Preis",
+    "free": "Kostenlos",
+    "ticket": "Offizielle Ticket- / Anmeldeseite",
+    "ticketNote": "CityJoy verkauft keine Tickets; der Link führt zur Seite des Veranstalters.",
+    "attendance": "Teilnahme",
+    "attending": "{{count}} Personen nehmen teil",
+    "seatsLeft": "Noch {{count}} von {{capacity}} Plätzen frei",
+    "signIn": "Melden Sie sich an, um teilzunehmen.",
+    "attend": "Ich nehme teil",
+    "leave": "Doch nicht teilnehmen",
+    "youAttend": "Sie nehmen teil. Ihr Name wurde nicht weitergegeben.",
+    "youAttendNamed": "Sie nehmen teil. Ihr Name wurde an den Veranstalter weitergegeben.",
+    "shareName": "Meinen Namen an den Veranstalter weitergeben (freiwillig)",
+    "full": "Keine Plätze mehr frei.",
+    "attendError": "Nicht möglich. Prüfen Sie Ihre Verbindung.",
+    "categories": {
+      "kultur-sanat": "Kultur und Kunst",
+      "muzik": "Musik",
+      "tiyatro-sinema": "Theater und Kino",
+      "spor": "Sport",
+      "cocuk-aile": "Kinder und Familie",
+      "egitim-seminer": "Bildung und Seminare",
+      "festival-senlik": "Festivals",
+      "saglik": "Gesundheit",
+      "gonulluluk": "Ehrenamt",
+      "diger": "Sonstiges"
+    }
+  },
+  "social": {
+    "sections": {
+      "events": "Veranstaltungen",
+      "activities": "Aktivitäten",
+      "news": "Nachrichten",
+      "contests": "Wettbewerbe",
+      "polls": "Umfragen",
+      "forum": "Forum",
+      "clubs": "Stadtvereine",
+      "deals": "Angebote"
+    }
   }
 }
