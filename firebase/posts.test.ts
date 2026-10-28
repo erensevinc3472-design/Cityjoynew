@@ -61,7 +61,7 @@ describe('Keşfet gönderileri', () => {
     await assertFails(repo('ali').create('ayse', 'Ayşe K.', input()));
     await assertFails(createFirestorePostRepository(guest()).create('x', 'X', input()));
     await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ text: '   ' })));
-    await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['takip' as never] })));
+    await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['herkes' as never] })));
   });
 
   it('görünürlük: Mahallem yalnızca o mahallede, Bölgesel yalnızca o ilde, Genel herkese (sorgular da)', async () => {

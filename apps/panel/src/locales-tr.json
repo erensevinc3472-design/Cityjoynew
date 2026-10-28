@@ -410,6 +410,24 @@
       "deleted": "Yorum silinmiş",
       "remove": "Yorumu sil",
       "note": "Nefret söylemi, taciz, dolandırıcılık, reklam ya da uygunsuz içerikte silin. Yazı, şikâyet anındaki kopyadır. Her işlem işlem kaydına yazılır."
+    },
+    "profiles": {
+      "title": "Keşfet profil şikâyetleri",
+      "intro": "Kullanıcı profillerinin (ad ve kısa tanıtım) şikâyetleri. Profilde bölge bilgisi tutulmadığı için yalnızca admin görür.",
+      "profile": "Profil (şikâyet anındaki hâli)",
+      "deleted": "Hesap silinmiş",
+      "bioRemoved": "Tanıtım kaldırıldı",
+      "removeBio": "Tanıtımı kaldır",
+      "dismiss": "İşlem gerekmiyor",
+      "note": "Taklit ya da uygunsuz ad için kişiyle iletişime geçin ya da hesabı kapatın (şimdilik Firebase konsolundan). Her işlem işlem kaydına yazılır.",
+      "reasons": {
+        "taklit": "Başkasını taklit ediyor",
+        "nefret": "Nefret söylemi",
+        "taciz": "Taciz ya da zorbalık",
+        "spam": "Spam ya da reklam",
+        "uygunsuz": "Uygunsuz içerik",
+        "diger": "Diğer"
+      }
     }
   },
   "sosSettings": {

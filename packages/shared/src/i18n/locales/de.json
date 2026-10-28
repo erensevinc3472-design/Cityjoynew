@@ -680,12 +680,14 @@
     "targets": {
       "mahallem": "Mein Viertel",
       "bolgesel": "Regional",
-      "genel": "Allgemein"
+      "genel": "Allgemein",
+      "takip": "Gefolgt"
     },
     "tabHints": {
       "mahallem": "nur Menschen in deinem Viertel sehen es",
       "bolgesel": "alle in deiner Provinz sehen es",
-      "genel": "alle in der App sehen es"
+      "genel": "alle in der App sehen es",
+      "takip": "nur deine Follower sehen es"
     },
     "categories": {
       "genel": "Allgemein",
@@ -737,6 +739,49 @@
       "send": "Senden",
       "turnOff": "Kommentare deaktivieren",
       "turnOn": "Kommentare aktivieren"
-    }
+    },
+    "followHint": "Du folgst noch niemandem. Tippe bei einem Beitrag auf den Namen, um der Person über ihr Profil zu folgen.",
+    "profile": {
+      "title": "Profil",
+      "mine": "Mein Profil",
+      "open": "Profil von {{name}} öffnen",
+      "missing": "Dieses Profil wurde nicht gefunden.",
+      "private": "Privates Konto",
+      "counts": "{{followers}} Follower · {{following}} folgt",
+      "edit": "Profil bearbeiten",
+      "save": "Speichern",
+      "name": "Angezeigter Name",
+      "nameHint": "Dieser Name erscheint bei deinen Beiträgen und Kommentaren.",
+      "bio": "Kurzbeschreibung (bis zu 160 Zeichen)",
+      "privateToggle": "Privates Konto: Nur von mir bestätigte Personen können mir folgen.",
+      "invalid": "Der Name darf nicht leer sein; Beschreibung bis zu 160 Zeichen.",
+      "bioRemoved": "Deine Beschreibung wurde nach einer Meldung von einer Moderation entfernt.",
+      "follow": "Folgen",
+      "request": "Folgeanfrage senden",
+      "requested": "Angefragt (zurückziehen)",
+      "unfollow": "Nicht mehr folgen",
+      "requests": "Folgeanfragen",
+      "accept": "Annehmen",
+      "decline": "Ablehnen",
+      "posts": "Beiträge",
+      "noPosts": "Noch keine Beiträge.",
+      "privateNote": "Dieses Konto ist privat. Sende eine Folgeanfrage, um die Beiträge zu sehen.",
+      "ownNote": "Hier erscheinen alle deine Beiträge; andere sehen nur deine Allgemein- und (als Follower) Gefolgt-Beiträge.",
+      "unavailable": "Mit diesem Profil kannst du nicht interagieren.",
+      "youBlocked": "Du hast diese Person blockiert.",
+      "block": "Blockieren",
+      "unblock": "Blockierung aufheben",
+      "blockNote": "Eine blockierte Person kann dir nicht folgen und deine Beiträge nicht kommentieren; du siehst ihre Beiträge und Kommentare nicht.",
+      "report": "Profil melden",
+      "reasons": {
+        "taklit": "Gibt sich als jemand anderes aus",
+        "nefret": "Hassrede",
+        "taciz": "Belästigung oder Mobbing",
+        "spam": "Spam oder Werbung",
+        "uygunsuz": "Unangemessener Inhalt",
+        "diger": "Sonstiges"
+      }
+    },
+    "takipFeedHint": "Beiträge von Personen, denen du folgst, nur für Follower"
   }
 }

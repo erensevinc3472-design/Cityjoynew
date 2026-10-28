@@ -1,11 +1,12 @@
 /**
  * Keşfet gönderileri (PROJE.md 5.5). Kullanıcı yazısını paylaşırken "Nerede paylaşırsın?" sorusuna bir ya da birden
  * çok hedef seçer (Karar, Eren 28 Ekim 2026): Mahallem (yalnızca kendi mahallesi görür), Bölgesel (kendi ili), Genel
- * (herkes). Takip hedefi takip sistemiyle gelecek. Anonim paylaşım yok, ad "Ayşe K." biçiminde. Emlak ilanı Keşfet'te
+ * (herkes), Takip (yalnızca takipçiler). Anonim paylaşım yok, ad "Ayşe K." biçiminde. Emlak ilanı Keşfet'te
  * verilemez (madde 9). Üç şikâyette gönderi moderatör inceleyene kadar akıştan düşer (madde 8).
  */
 
-export const POST_TARGETS = ['mahallem', 'bolgesel', 'genel'] as const;
+/** Takip: yalnızca takipçiler görür (gizli hesapta takip isteği onaylananlar). */
+export const POST_TARGETS = ['mahallem', 'bolgesel', 'genel', 'takip'] as const;
 export type PostTarget = (typeof POST_TARGETS)[number];
 
 /** Keşfet kuralları madde 6. Taziyeyi yalnızca yakını paylaşır (kullanıcı beyan eder) ya da muhtar. */

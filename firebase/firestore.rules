@@ -1299,10 +1299,11 @@ service cloud.firestore {
              'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
         && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
-        && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel'])
+        && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip'])
         && d.targets.keys().hasAll(['mahallem', 'bolgesel', 'genel'])
         && d.targets.mahallem is bool && d.targets.bolgesel is bool && d.targets.genel is bool
-        && (d.targets.mahallem || d.targets.bolgesel || d.targets.genel)
+        && d.targets.get('takip', false) is bool
+        && (d.targets.mahallem || d.targets.bolgesel || d.targets.genel || d.targets.get('takip', false))
         && validLocation(d.region) && 'neighbourhoodId' in d.region
         && d.authorName is string && d.authorName.size() <= 40
         && d.likeCount is int && d.reportCount is int
@@ -1313,7 +1314,18 @@ service cloud.firestore {
       // süzülür ve kurallar sorguyu doğrulayabilir.
       return d.targets.get('genel', false) == true
         || (d.targets.get('bolgesel', false) == true && myLocation().get('provinceCode', '') == d.region.provinceCode)
-        || (d.targets.get('mahallem', false) == true && myLocation().get('neighbourhoodId', '') == d.region.neighbourhoodId);
+        || (d.targets.get('mahallem', false) == true && myLocation().get('neighbourhoodId', '') == d.region.neighbourhoodId)
+        || (d.targets.get('takip', false) == true && isFollowerOf(d.authorUid));
+    }
+    function followPath(follower, followee) {
+      return /databases/$(database)/documents/follows/$(follower + '_' + followee);
+    }
+    // Takip onaylanmış (gizli hesapta istek kabul edilmiş) mi.
+    function isFollowerOf(uid) {
+      return exists(followPath(request.auth.uid, uid)) && get(followPath(request.auth.uid, uid)).data.status == 'aktif';
+    }
+    function blockPath(blocker, blocked) {
+      return /databases/$(database)/documents/blocks/$(blocker + '_' + blocked);
     }
 
     match /posts/{id} {
@@ -1410,6 +1422,8 @@ service cloud.firestore {
           && request.resource.data.createdAt == request.time
           && get(postPath(id)).data.status == 'aktif' && canSeePost(get(postPath(id)).data)
           && get(postPath(id)).data.get('commentsOff', false) != true
+          // Gönderi sahibi beni engellediyse yorum yazamam.
+          && !exists(blockPath(get(postPath(id)).data.authorUid, request.auth.uid))
           && getAfter(postPath(id)).data.commentCount == get(postPath(id)).data.get('commentCount', 0) + 1;
         allow delete: if signedIn()
           && (resource.data.authorUid == request.auth.uid
@@ -1451,6 +1465,93 @@ service cloud.firestore {
         && request.resource.data.status == 'incelendi';
       allow delete: if false;
     }
+    // ---- Keşfet profili, takip ve engelleme (PROJE.md 5.5, 5.8). Herkese açık profil yalnızca ad ("Ayşe K."), kısa
+    // tanıtım ve gizli hesap bilgisini taşır. Takip belgesi "takipEden_takipEdilen"; gizli hesapta önce "istek", hesap
+    // sahibi kabul edince "aktif". Engellenen kişi engelleyeni takip edemez, gönderisine yorum yazamaz.
+    match /publicProfiles/{uid} {
+      allow read: if signedIn();
+      allow create: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'updatedAt'])
+        && request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 40
+        && request.resource.data.bio == ''
+        && request.resource.data.isPrivate is bool
+        && request.resource.data.updatedAt == request.time;
+      // Kişi adını, tanıtımını ve gizliliğini değiştirir; moderatörün kaldırdığı tanıtımı yeniden yazamaz.
+      allow update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'updatedAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'updatedAt'])
+        && request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 40
+        && request.resource.data.bio is string && request.resource.data.bio.size() <= 160
+        && (resource.data.get('bioRemoved', false) != true || request.resource.data.bio == '')
+        && request.resource.data.isPrivate is bool
+        && request.resource.data.updatedAt == request.time;
+      // Admin şikâyet üzerine tanıtımı kaldırır.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio', 'bioRemoved', 'updatedAt'])
+        && request.resource.data.bio == '' && request.resource.data.bioRemoved == true
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isSelf(uid);
+    }
+
+    match /follows/{fid} {
+      // Onaylı takipler herkese açık (takipçi sayısı); istekleri yalnızca iki taraf görür.
+      allow read: if signedIn()
+        && (resource.data.status == 'aktif' || resource.data.followerUid == request.auth.uid
+            || resource.data.followeeUid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['followerUid', 'followeeUid', 'status', 'createdAt'])
+        && request.resource.data.followerUid == request.auth.uid
+        && request.resource.data.followeeUid is string && request.resource.data.followeeUid != request.auth.uid
+        && fid == request.auth.uid + '_' + request.resource.data.followeeUid
+        && request.resource.data.createdAt == request.time
+        && exists(/databases/$(database)/documents/publicProfiles/$(request.resource.data.followeeUid))
+        && request.resource.data.status == (get(/databases/$(database)/documents/publicProfiles/$(request.resource.data.followeeUid)).data.isPrivate ? 'istek' : 'aktif')
+        && !exists(blockPath(request.resource.data.followeeUid, request.auth.uid))
+        && !exists(blockPath(request.auth.uid, request.resource.data.followeeUid));
+      // Hesap sahibi isteği kabul eder.
+      allow update: if signedIn() && resource.data.followeeUid == request.auth.uid
+        && resource.data.status == 'istek' && request.resource.data.status == 'aktif'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      // Takibi bırakma, isteği reddetme, takipçiyi çıkarma (engellerken yoksa da silinebilir).
+      allow delete: if signedIn()
+        && (resource == null || resource.data.followerUid == request.auth.uid || resource.data.followeeUid == request.auth.uid);
+    }
+
+    match /blocks/{bid} {
+      allow read: if signedIn() && (resource == null || resource.data.blockerUid == request.auth.uid
+        || resource.data.blockedUid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['blockerUid', 'blockedUid', 'createdAt'])
+        && request.resource.data.blockerUid == request.auth.uid
+        && request.resource.data.blockedUid is string && request.resource.data.blockedUid != request.auth.uid
+        && bid == request.auth.uid + '_' + request.resource.data.blockedUid
+        && request.resource.data.createdAt == request.time;
+      allow delete: if signedIn() && resource.data.blockerUid == request.auth.uid;
+      allow update: if false;
+    }
+
+    // Profil şikâyetleri: kişi başına profil başına bir; ad ve tanıtımın o anki kopyası saklanır. Profilde bölge
+    // olmadığı için yalnızca admin görür ve karar verir.
+    match /profileReports/{rid} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['targetUid', 'reporterUid', 'reason', 'displayName', 'bio', 'status', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.targetUid is string && request.resource.data.targetUid != request.auth.uid
+        && rid == request.resource.data.targetUid + '_' + request.auth.uid
+        && request.resource.data.reason in ['taklit', 'nefret', 'taciz', 'spam', 'uygunsuz', 'diger']
+        && request.resource.data.displayName is string && request.resource.data.displayName.size() <= 40
+        && request.resource.data.bio is string && request.resource.data.bio.size() <= 160
+        && request.resource.data.status == 'yeni'
+        && request.resource.data.createdAt == request.time;
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid)) || isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'incelendi';
+      allow delete: if false;
+    }
+
     // Kişinin bütün beğenileri (akıştaki kalpler ve hesap silme için).
     match /{path=**}/likes/{uid} {
       allow read: if signedIn() && resource.data.uid == request.auth.uid;

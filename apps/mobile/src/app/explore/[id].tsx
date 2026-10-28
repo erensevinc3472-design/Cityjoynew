@@ -103,7 +103,7 @@ export default function PostScreen() {
   return (
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content}>
-        <PostCard item={item} liked={isLiked(item.id)} full onLike={busy ? undefined : like} />
+        <PostCard item={item} liked={isLiked(item.id)} full onLike={busy ? undefined : like} onAuthor={() => router.push({ pathname: '/u/[uid]', params: { uid: item.authorUid } })} />
         {mine && item.reportCount >= 3 && !item.cleared ? <FormMessage kind="info" text={t('explore.hiddenForReview')} /> : null}
         {error ? <FormMessage kind="error" text={error} /> : null}
         <View style={styles.row}>

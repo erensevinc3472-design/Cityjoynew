@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import type { PostTarget } from '@cityjoy/shared';
+import { POST_TARGETS, type PostTarget } from '@cityjoy/shared';
 import type { FeedFilter } from '@cityjoy/shared/firebase';
 
 import { AnnouncementCard } from '@/components/announcement-card';
@@ -18,13 +18,14 @@ import { useAnnouncements } from '@/lib/announcements';
 import { locationRepository as repo } from '@/lib/locations';
 import { toggleLike, useFeed, useLiked } from '@/lib/posts';
 import { useSession } from '@/lib/session';
+import { useSocial } from '@/lib/social';
 import { useUserLocation } from '@/lib/user-location';
 import { spacing } from '@/theme/tokens';
 
 /**
  * Keşfet (PROJE.md 5.5): Mahallem (kendi mahallesi), Bölgesel (kendi ili, istenirse ilçesi), Genel (herkes).
  * Acil duyurular akışın en üstünde sabit. Aşağı kaydırdıkça sonraki sayfa gelir, aşağı çekince yenilenir.
- * Takip sekmesi takip sistemiyle gelecek.
+ * Takip sekmesi: takip ettiklerimin "Takip" hedefli gönderileri. Engellediklerimin gönderileri hiçbir sekmede görünmez.
  */
 export default function ExploreScreen() {
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ export default function ExploreScreen() {
   const { location } = useUserLocation();
   const [tab, setTab] = useState<PostTarget>('mahallem');
   const [onlyDistrict, setOnlyDistrict] = useState(false);
+  const { me, blocked, following } = useSocial();
   const district = location?.districtId ? repo.getDistrict(location.districtId) : undefined;
   const province = location ? repo.getProvince(location.provinceCode)?.name : undefined;
 
@@ -40,8 +42,12 @@ export default function ExploreScreen() {
     !user || !location ? null
     : tab === 'mahallem' ? (location.neighbourhoodId ? { target: 'mahallem', neighbourhoodId: location.neighbourhoodId } : null)
     : tab === 'bolgesel' ? { target: 'bolgesel', provinceCode: location.provinceCode, ...(onlyDistrict && district ? { districtId: district.id } : {}) }
+    : tab === 'takip' ? (following ? { target: 'takip', authorUids: following.filter((u) => !blocked.has(u)) } : null)
     : { target: 'genel' };
-  const { posts, hasMore, failed, loadingMore, reload, loadMore } = useFeed(filter);
+  const feed = useFeed(filter);
+  const { hasMore, failed, loadingMore, reload, loadMore } = feed;
+  // Engellediklerimin gönderileri görünmez.
+  const posts = feed.posts?.filter((p) => !blocked.has(p.authorUid)) ?? (tab === 'takip' && following === null ? null : feed.posts);
   const isLiked = useLiked(user?.uid);
   const [, rerender] = useState(0);
   const { list: announcements } = useAnnouncements(location);
@@ -69,7 +75,7 @@ export default function ExploreScreen() {
         label={t('explore.title')}
         value={tab}
         onChange={setTab}
-        options={(['mahallem', 'bolgesel', 'genel'] as const).map((x) => ({ value: x, label: t(`explore.targets.${x}`) }))}
+        options={POST_TARGETS.map((x) => ({ value: x, label: t(`explore.targets.${x}`) }))}
       />
       {tab === 'bolgesel' && district ? (
         <Chips<number>
@@ -79,12 +85,18 @@ export default function ExploreScreen() {
           options={[{ value: 0, label: province ?? '' }, { value: 1, label: district.name }]}
         />
       ) : null}
-      <AppText variant="caption" muted>{t(`explore.tabHints.${tab}`)}</AppText>
+      <AppText variant="caption" muted>{tab === 'takip' ? t('explore.takipFeedHint') : t(`explore.tabHints.${tab}`)}</AppText>
       {urgent.map((a) => (
         <AnnouncementCard key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />
       ))}
       {user && location ? <AppButton title={t('explore.newPost')} onPress={() => router.push('/explore/new')} /> : null}
-      {user ? <AppButton variant="ghost" title={t('explore.saved')} onPress={() => router.push('/explore/saved')} /> : null}
+      {tab === 'takip' && following?.length === 0 ? <FormMessage kind="info" text={t('explore.followHint')} /> : null}
+      {user ? (
+        <View style={styles.row}>
+          {me ? <AppButton variant="ghost" title={t('explore.profile.mine')} onPress={() => router.push({ pathname: '/u/[uid]', params: { uid: me.uid } })} /> : null}
+          <AppButton variant="ghost" title={t('explore.saved')} onPress={() => router.push('/explore/saved')} />
+        </View>
+      ) : null}
     </View>
   );
 
@@ -119,6 +131,7 @@ export default function ExploreScreen() {
             liked={isLiked(item.id)}
             onPress={() => router.push({ pathname: '/explore/[id]', params: { id: item.id } })}
             onLike={() => like(item.id)}
+            onAuthor={() => router.push({ pathname: '/u/[uid]', params: { uid: item.authorUid } })}
           />
         )}
         ListEmptyComponent={
@@ -138,5 +151,6 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
   top: { gap: spacing.sm },
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   center: { textAlign: 'center' },
 });
