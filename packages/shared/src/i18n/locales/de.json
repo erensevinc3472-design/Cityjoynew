@@ -797,7 +797,9 @@
         "diger": "Sonstiges"
       }
     },
-    "takipFeedHint": "Beiträge von Personen, denen du folgst, nur für Follower"
+    "takipFeedHint": "Beiträge von Personen, denen du folgst, nur für Follower",
+    "share": "Teilen",
+    "doubleTapHint": "Zum Liken zweimal tippen"
   },
   "news": {
     "title": "Nachrichten",
@@ -990,5 +992,11 @@
     "profile": "Mein Profil",
     "settings": "Einstellungen",
     "soon": "Bald"
+  },
+  "time": {
+    "now": "jetzt",
+    "minutes": "{{count}} Min.",
+    "hours": "{{count}} Std.",
+    "days": "{{count}} T."
   }
 }

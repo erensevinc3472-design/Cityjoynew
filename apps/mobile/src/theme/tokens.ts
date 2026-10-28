@@ -71,10 +71,10 @@ export const colors = {
 export type ColorScheme = keyof typeof colors;
 export type ThemeColors = { [K in keyof typeof colors.dark]: string };
 
-export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 } as const;
+export const spacing = { xs: 4, sm: 8, md: 14, lg: 20, xl: 28 } as const;
 /** Ekran kenar boşluğu. */
-export const GUTTER = 20;
-export const radius = { sm: 12, md: 14, lg: 18, xl: 24, pill: 999 } as const;
+export const GUTTER = 16;
+export const radius = { sm: 10, md: 12, lg: 16, xl: 20, pill: 999 } as const;
 
 export const fonts = {
   heading: 'PlusJakartaSans_700Bold',
@@ -85,4 +85,4 @@ export const fonts = {
 } as const;
 
 /** Dokunma alanı en az 44 nokta (erişilebilirlik). */
-export const MIN_TOUCH = 48;
+export const MIN_TOUCH = 44;

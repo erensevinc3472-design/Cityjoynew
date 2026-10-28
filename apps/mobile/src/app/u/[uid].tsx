@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   avatar: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
   initial: { fontFamily: fonts.heading, fontSize: 24 },
   who: { flex: 1 },
-  name: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26 },
+  name: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 24 },
   block: { gap: spacing.xs },
   request: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderTopWidth: 1, paddingTop: spacing.xs, flexWrap: 'wrap' },
 });

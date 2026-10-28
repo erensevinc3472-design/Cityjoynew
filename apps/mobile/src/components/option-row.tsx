@@ -50,7 +50,7 @@ export function OptionRow({ title, subtitle, selected, showChevron, trailing, on
 
 const styles = StyleSheet.create({
   row: {
-    minHeight: MIN_TOUCH + 8,
+    minHeight: MIN_TOUCH + 4,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,

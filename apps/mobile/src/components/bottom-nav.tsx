@@ -47,7 +47,7 @@ export function BottomNav({ active }: { active: TabKey }) {
                 else router.replace(tab.href);
               }}
               style={({ pressed }) => [styles.tab, { opacity: pressed ? 0.7 : 1 }]}>
-              <MaterialIcons name={tab.icon} size={24} color={color} />
+              <MaterialIcons name={tab.icon} size={23} color={color} />
               <AppText numberOfLines={1} style={[styles.label, { color }]}>{t(`nav.${tab.key}`)}</AppText>
             </Pressable>
           );
@@ -58,8 +58,8 @@ export function BottomNav({ active }: { active: TabKey }) {
 }
 
 const styles = StyleSheet.create({
-  bar: { borderTopWidth: 1, paddingTop: 6 },
+  bar: { borderTopWidth: StyleSheet.hairlineWidth, paddingTop: 4 },
   inner: { flexDirection: 'row', width: '100%', maxWidth: 640, alignSelf: 'center' },
-  tab: { flex: 1, minHeight: 52, alignItems: 'center', justifyContent: 'center', gap: 2 },
-  label: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 16 },
+  tab: { flex: 1, minHeight: 46, alignItems: 'center', justifyContent: 'center', gap: 2 },
+  label: { fontFamily: fonts.bodySemi, fontSize: 11, lineHeight: 14 },
 });

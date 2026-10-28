@@ -25,9 +25,9 @@ export function AppText({ variant = 'body', muted, style, ...rest }: TextProps &
 const WEB_AUTO_DIR = (Platform.OS === 'web' ? { dir: 'auto' } : {}) as object;
 
 const styles = StyleSheet.create({
-  title: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 36 },
-  subtitle: { fontFamily: fonts.headingSemi, fontSize: 18, lineHeight: 26 },
-  body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24 },
-  label: { fontFamily: fonts.bodySemi, fontSize: 16, lineHeight: 22 },
-  caption: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18 },
+  title: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 31 },
+  subtitle: { fontFamily: fonts.headingSemi, fontSize: 17, lineHeight: 23 },
+  body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 21 },
+  label: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
+  caption: { fontFamily: fonts.body, fontSize: 12, lineHeight: 17 },
 });

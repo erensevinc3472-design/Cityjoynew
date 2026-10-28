@@ -71,7 +71,7 @@ export function RoundButton({ icon, label, onPress, badge }: HeaderAction) {
   const c = useThemeColors();
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={4} style={({ pressed }) => [styles.round, { backgroundColor: c.heroChip, opacity: pressed ? 0.7 : 1 }]}>
-      <MaterialIcons name={icon} size={22} color={c.heroText} />
+      <MaterialIcons name={icon} size={21} color={c.heroText} />
       {badge ? <View style={[styles.badge, { backgroundColor: c.heroAccent, borderColor: c.heroChip }]} /> : null}
     </Pressable>
   );
@@ -92,14 +92,14 @@ export function LocationChip({ label, onPress }: { label: string; onPress(): voi
 
 const styles = StyleSheet.create({
   wrap: { gap: spacing.md },
-  top: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 44 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 40 },
   title: { flex: 1, textAlign: 'center', fontFamily: fonts.heading, fontSize: 17, lineHeight: 24 },
   subtitle: { fontSize: 14, lineHeight: 20, marginTop: -spacing.xs },
-  spacer: { width: 44 },
-  badge: { position: 'absolute', top: 8, right: 8, width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },
+  spacer: { width: 40 },
+  badge: { position: 'absolute', top: 7, right: 7, width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },
   row: { flexDirection: 'row', gap: spacing.xs },
   flex: { flex: 1 },
-  round: { width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start', maxWidth: '100%', minHeight: 40, paddingHorizontal: 12, borderRadius: radius.pill },
-  chipText: { flexShrink: 1, fontFamily: fonts.bodySemi, fontSize: 14 },
+  round: { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, alignSelf: 'flex-start', maxWidth: '100%', minHeight: 34, paddingHorizontal: 12, borderRadius: radius.pill },
+  chipText: { flexShrink: 1, fontFamily: fonts.bodySemi, fontSize: 13 },
 });

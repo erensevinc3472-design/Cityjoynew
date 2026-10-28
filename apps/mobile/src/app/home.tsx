@@ -116,7 +116,7 @@ export default function HomeScreen() {
               style={({ pressed }) => [styles.module, { borderColor: sceneRim(m.scene), opacity: pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
               <SceneArt kind={m.scene} />
               <View style={styles.moduleIcon}>
-                <MaterialIcons name={m.icon} size={22} color="#FFFFFF" />
+                <MaterialIcons name={m.icon} size={19} color="#FFFFFF" />
               </View>
               <View style={styles.moduleFoot}>
                 <AppText style={styles.moduleTitle}>{t(`modules.${m.key}`)}</AppText>
@@ -133,7 +133,7 @@ export default function HomeScreen() {
           onPress={() => WebBrowser.openBrowserAsync(videoUrl).catch(() => {})}
           style={({ pressed }) => [styles.video, { backgroundColor: c.surface, borderColor: c.accentBorder, opacity: !videoUrl ? 0.6 : pressed ? 0.85 : 1 }]}>
           <View style={[styles.play, { backgroundColor: c.primary }]}>
-            <MaterialIcons name="play-arrow" size={26} color={c.onPrimary} />
+            <MaterialIcons name="play-arrow" size={24} color={c.onPrimary} />
           </View>
           <View style={styles.grow}>
             <AppText style={[styles.videoTitle, { color: c.textStrong }]}>{t('home.introVideo')}</AppText>
@@ -150,15 +150,15 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.lg },
   heroText: { gap: 2 },
-  greeting: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 35 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  module: { flexGrow: 1, flexBasis: '45%', height: 190, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
+  greeting: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 30 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  module: { flexGrow: 1, flexBasis: '45%', height: 164, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
   moduleIcon: {
     position: 'absolute',
     top: 12,
     start: 12,
-    width: 42,
-    height: 42,
+    width: 36,
+    height: 36,
     borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
@@ -166,12 +166,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.18)',
   },
-  moduleFoot: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 12, backgroundColor: 'rgba(8, 26, 30, 0.72)' },
-  moduleTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 22, color: '#FFFFFF' },
-  moduleHint: { fontSize: 12, lineHeight: 17, color: '#D5E2E3', marginTop: 2 },
-  video: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingVertical: 8, paddingStart: 8, paddingEnd: 12, borderRadius: radius.lg, borderWidth: 1 },
-  play: { width: 48, height: 48, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  moduleFoot: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 10, backgroundColor: 'rgba(8, 26, 30, 0.72)' },
+  moduleTitle: { fontFamily: fonts.heading, fontSize: 15, lineHeight: 20, color: '#FFFFFF' },
+  moduleHint: { fontSize: 11, lineHeight: 15, color: '#D5E2E3', marginTop: 2 },
+  video: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingVertical: 8, paddingStart: 8, paddingEnd: 12, borderRadius: radius.lg, borderWidth: 1 },
+  play: { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   grow: { flex: 1, gap: 2 },
-  videoTitle: { fontFamily: fonts.heading, fontSize: 15, lineHeight: 21 },
+  videoTitle: { fontFamily: fonts.heading, fontSize: 14, lineHeight: 19 },
   watch: { fontFamily: fonts.bodySemi, fontSize: 12, paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill, overflow: 'hidden' },
 });

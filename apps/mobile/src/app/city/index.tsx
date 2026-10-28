@@ -136,11 +136,11 @@ export default function MyCityScreen() {
         onPress={() => open(tile)}
         style={({ pressed }) => [
           styles.tile,
-          { width: cell, height: 104, backgroundColor: c.surface, borderColor: c.border, opacity: !ready ? 0.5 : pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] },
+          { width: cell, height: 92, backgroundColor: c.surface, borderColor: c.border, opacity: !ready ? 0.5 : pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] },
         ]}>
         <View style={[styles.halo, { backgroundColor: `${hue}26` }]} />
         <View style={[styles.chip, { backgroundColor: `${hue}29` }]}>
-          <MaterialIcons name={tile.icon} size={22} color={hue} />
+          <MaterialIcons name={tile.icon} size={19} color={hue} />
         </View>
         {!ready ? <AppText style={[styles.soon, { backgroundColor: c.surfaceStrong, color: c.textMuted }]}>{t('city.soon')}</AppText> : null}
         <AppText numberOfLines={2} style={[styles.tileTitle, { color: c.textStrong }]}>{label}</AppText>
@@ -176,7 +176,7 @@ export default function MyCityScreen() {
               accessibilityLabel={townhall.ready ? townhall.label : `${townhall.label}. ${t('city.soon')}`}
               disabled={!townhall.ready}
               onPress={() => router.push({ pathname: '/city/[section]', params: { section: 'belediye-hizmetleri' } })}
-              style={({ pressed }) => [styles.big, { width: cell * 2 + GAP, height: 104 * 2 + GAP, borderColor: sceneRim('townhall'), opacity: !townhall.ready ? 0.6 : pressed ? 0.88 : 1 }]}>
+              style={({ pressed }) => [styles.big, { width: cell * 2 + GAP, height: 92 * 2 + GAP, borderColor: sceneRim('townhall'), opacity: !townhall.ready ? 0.6 : pressed ? 0.88 : 1 }]}>
               <SceneArt kind="townhall" />
               <View style={styles.bigIcon}>
                 <MaterialIcons name="apartment" size={22} color="#FFFFFF" />
@@ -216,19 +216,19 @@ export default function MyCityScreen() {
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
-  cover: { height: 200, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  coverText: { position: 'absolute', start: 0, end: 0, bottom: 0, padding: spacing.md, backgroundColor: 'rgba(8, 26, 30, 0.6)' },
+  cover: { height: 172, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
+  coverText: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: spacing.md, paddingVertical: 10, backgroundColor: 'rgba(8, 26, 30, 0.6)' },
   kicker: { fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 1 },
-  cityName: { fontFamily: fonts.heading, fontSize: 34, lineHeight: 40, color: white },
-  place: { fontSize: 14, color: '#D5E2E3' },
+  cityName: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 34, color: white },
+  place: { fontSize: 13, color: '#D5E2E3' },
   grid: {},
   row: { flexDirection: 'row' },
   wrap: { flexDirection: 'row', flexWrap: 'wrap' },
   tile: { borderRadius: radius.lg, borderWidth: 1, padding: 10, justifyContent: 'space-between', overflow: 'hidden' },
   halo: { position: 'absolute', top: -18, end: -18, width: 64, height: 64, borderRadius: 32 },
-  chip: { width: 40, height: 40, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
+  chip: { width: 34, height: 34, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   soon: { position: 'absolute', top: 10, end: 8, fontFamily: fonts.bodySemi, fontSize: 10, paddingHorizontal: 6, paddingVertical: 2, borderRadius: radius.pill, overflow: 'hidden' },
-  tileTitle: { fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 17 },
+  tileTitle: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 16 },
   big: { borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
   bigIcon: {
     position: 'absolute',
@@ -244,9 +244,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.18)',
   },
   foot: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: 'rgba(8, 26, 30, 0.72)' },
-  bigTitle: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23, color: white },
+  bigTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21, color: white },
   footHint: { fontSize: 12, lineHeight: 16, color: '#D5E2E3', marginTop: 2 },
-  featured: { flex: 1, height: 140, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
+  featured: { flex: 1, height: 124, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
   featuredTag: { fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 0.8 },
-  featuredTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21, color: white, marginTop: 2 },
+  featuredTitle: { fontFamily: fonts.heading, fontSize: 14, lineHeight: 19, color: white, marginTop: 2 },
 });

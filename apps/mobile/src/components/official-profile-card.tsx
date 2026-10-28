@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
   badge: { width: 42, height: 42, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   headText: { flex: 1, gap: 2 },
-  title: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 23 },
+  title: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21 },
   row: { gap: 2 },
   actions: { gap: spacing.sm },
 });

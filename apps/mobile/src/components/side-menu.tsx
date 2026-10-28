@@ -37,7 +37,7 @@ export function SideMenu({ open, onClose }: { open: boolean; onClose(): void }) 
   const signOut = useSignOut();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const panelWidth = Math.min(320, width * 0.84);
+  const panelWidth = Math.min(300, width * 0.78);
   const slide = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export function SideMenu({ open, onClose }: { open: boolean; onClose(): void }) 
         onPress={item.onPress ?? (item.href ? () => go(item.href!) : undefined)}
         style={({ pressed }) => [styles.row, { opacity: disabled ? 0.5 : pressed ? 0.7 : 1, backgroundColor: pressed ? c.surfaceStrong : 'transparent' }]}>
         <View style={[styles.rowIcon, { backgroundColor: item.danger ? c.dangerSoft : c.accentSoft }]}>
-          <MaterialIcons name={item.icon} size={20} color={item.danger ? c.danger : c.icon} />
+          <MaterialIcons name={item.icon} size={18} color={item.danger ? c.danger : c.icon} />
         </View>
         <AppText style={[styles.rowText, { color: c.textStrong }]}>{item.label}</AppText>
         {disabled ? <AppText variant="caption" muted>{t('menu.soon')}</AppText> : null}
@@ -97,7 +97,7 @@ export function SideMenu({ open, onClose }: { open: boolean; onClose(): void }) 
           style={[styles.panel, { width: panelWidth, backgroundColor: c.background, paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + spacing.md, transform: [{ translateX: offset }] }]}>
           <View style={styles.head}>
             <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
-              <MaterialIcons name="person" size={26} color={c.accent} />
+              <MaterialIcons name="person" size={22} color={c.accent} />
             </View>
             <View style={styles.flex}>
               <AppText numberOfLines={1} style={[styles.name, { color: c.textStrong }]}>{name || 'CityJoy'}</AppText>
@@ -125,13 +125,13 @@ const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.55)' },
   panel: { paddingHorizontal: spacing.md, gap: spacing.md },
   head: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  avatar: { width: 48, height: 48, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
-  name: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 23 },
+  avatar: { width: 42, height: 42, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  name: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21 },
   close: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   flex: { flex: 1 },
   list: { gap: 2, paddingBottom: spacing.lg },
-  group: { marginTop: spacing.md, marginBottom: spacing.xs, textTransform: 'uppercase', letterSpacing: 0.8 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 52, paddingHorizontal: spacing.sm, borderRadius: radius.md },
-  rowIcon: { width: 36, height: 36, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  rowText: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 15 },
+  group: { marginTop: spacing.sm, marginBottom: 2, textTransform: 'uppercase', letterSpacing: 0.8, fontSize: 11 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44, paddingHorizontal: spacing.sm, borderRadius: radius.md },
+  rowIcon: { width: 32, height: 32, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
+  rowText: { flex: 1, fontFamily: fonts.bodyMedium, fontSize: 14 },
 });

@@ -154,6 +154,6 @@ export default function EventScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
-  title: { fontFamily: fonts.heading, fontSize: 22, lineHeight: 29 },
+  title: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26 },
   meta: { gap: 2 },
 });
