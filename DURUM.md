@@ -420,7 +420,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    (Takip'te Mahallem gizlenir), parmakla sağa sola kaydırınca sekme değişir (sekme yalnızca açılınca okunur). Etiketler
    (#Tümü, #Yardım, #Kayıp...) kategoriye göre süzer. Gönderi: halkalı harf, ad, yer ve süre, Takip et / Takiptesin,
    iki kez dokun beğen, yorum, paylaş, kaydet (kaydettiklerim oturumda bir kez okunur), #kategori. Kaydedilenler yan
-   menüden profil üzerinden. Takip akışının önbellek anahtarı düzeltildi (Genel ile karışıyordu). **Profil:**
+   menüde. Takip akışının önbellek anahtarı düzeltildi (Genel ile karışıyordu). **Profil:**
    halkalı harf, gönderi/takipçi/takip sayıları, Takip et ve Mesaj yan yana. **Sosyal Harmoni:** yana kaydırılan kartlar,
    arkada değişen sahne; forum kaldırıldı (madde 18). **Karşılama:** beş sahne sırayla, "Kaydırarak başla" (dokunarak da),
    "Zaten hesabın var mı?". **Acil İhtiyaçlar:** nabız gibi atan büyük SOS kartı. Görseller şimdilik çizim

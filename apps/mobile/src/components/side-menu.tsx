@@ -61,6 +61,7 @@ export function SideMenu({ open, onClose }: { open: boolean; onClose(): void }) 
     ? [
         { key: 'profile', label: t('menu.profile'), icon: 'person-outline', href: { pathname: '/u/[uid]', params: { uid: user.uid } } },
         { key: 'messages', label: t('messages.title'), icon: 'chat-bubble-outline', href: '/messages' },
+        { key: 'saved', label: t('explore.saved'), icon: 'bookmark-border', href: '/explore/saved' },
         { key: 'notifications', label: t('notifications.title'), icon: 'notifications-none', href: '/notifications' },
         { key: 'settings', label: t('menu.settings'), icon: 'settings', href: '/account' },
         { key: 'signOut', label: t('account.signOut'), icon: 'logout', onPress: () => { onClose(); signOut(); } },
