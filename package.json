@@ -14,5 +14,8 @@
     "panel": "npm run dev --workspace apps/panel",
     "env:write": "node scripts/write-env.mjs",
     "test:rules": "npm test --workspace firebase"
+  },
+  "devDependencies": {
+    "write-excel-file": "4.1.1"
   }
 }
