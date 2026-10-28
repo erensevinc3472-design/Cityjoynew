@@ -2,25 +2,28 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { isRequestFor, otherMember, type Chat } from '@cityjoy/shared';
+import { foldForSearch, isRequestFor, otherMember, type Chat } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
-import { HeroHeader } from '@/components/hero-header';
-import { Screen } from '@/components/screen';
+import { BottomNav } from '@/components/bottom-nav';
+import { RoundButton } from '@/components/hero-header';
+import { SearchField } from '@/components/search-field';
+import { TopBar } from '@/components/top-bar';
 import { StateMessage } from '@/components/state-message';
 import { useChats, useReadReceipts } from '@/lib/messages';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { useSocial } from '@/lib/social';
-import { MIN_TOUCH, radius, spacing } from '@/theme/tokens';
+import { GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 type Tab = 'sohbetler' | 'istekler';
 
 /**
- * Mesajlar (PROJE.md 5.11): sohbetlerim ve mesaj istekleri (takipleşmediğim kişilerden gelen, kabul etmediğim).
+ * Mesajlar (PROJE.md 5.11; alt menüde sekme, 13. madde 31): üstte kullanıcı adım ve yeni mesaj düğmesi, altında
+ * sohbetlerde arama. Sohbetlerim ve mesaj istekleri (takipleşmediğim kişilerden gelen, kabul etmediğim).
  * Engellediklerim listede görünmez. Okundu bilgisi buradan kapatılır.
  */
 export default function MessagesScreen() {
@@ -29,16 +32,18 @@ export default function MessagesScreen() {
   const c = useThemeColors();
   const { language } = useSettings();
   const lang = language ?? 'tr';
-  const { user } = useSession();
+  const { user, profile } = useSession();
   const me = user?.uid ?? '';
   const { chats, failed } = useChats(user?.uid);
-  const { blocked } = useSocial();
+  const { blocked, me: myProfile } = useSocial();
   const [receipts, setReceipts] = useReadReceipts();
   const [tab, setTab] = useState<Tab>('sohbetler');
+  const [find, setFind] = useState('');
 
   const visible = (chats ?? []).filter((x) => !blocked.has(otherMember(x, me)));
   const requests = visible.filter((x) => isRequestFor(x, me));
-  const shown = tab === 'istekler' ? requests : visible.filter((x) => !isRequestFor(x, me));
+  const needle = foldForSearch(find.trim());
+  const shown = (tab === 'istekler' ? requests : visible.filter((x) => !isRequestFor(x, me))).filter((x) => !needle || foldForSearch(x.names[otherMember(x, me)] ?? '').includes(needle));
 
   const when = (iso: string) => {
     const d = new Date(iso);
@@ -49,11 +54,13 @@ export default function MessagesScreen() {
   const preview = (x: Chat) =>
     !x.last ? '' : x.last.text ? `${x.last.from === me ? `${t('messages.you')}: ` : ''}${x.last.text}` : t('messages.deleted');
 
-  const header = <HeroHeader title={t('messages.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/explore'))} />;
+  const title = myProfile?.displayName ?? profile?.displayName ?? t('messages.title');
 
   return (
-    <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content}>
+    <View style={[styles.root, { backgroundColor: c.background }]}>
+      <TopBar title={title} right={user ? <RoundButton icon="edit-square" label={t('messages.newMessage')} onPress={() => router.push('/messages/new')} /> : undefined} />
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <SearchField value={find} onChangeText={setFind} placeholder={t('messages.searchChats')} />
         <Chips<Tab>
           label={t('messages.title')}
           value={tab}
@@ -69,7 +76,7 @@ export default function MessagesScreen() {
         ) : chats === null ? (
           <StateMessage kind="loading" />
         ) : shown.length === 0 ? (
-          <StateMessage kind="empty" message={tab === 'istekler' ? t('messages.noRequests') : t('messages.empty')} />
+          <StateMessage kind="empty" message={needle ? t('messages.noMatch') : tab === 'istekler' ? t('messages.noRequests') : t('messages.empty')} />
         ) : (
           shown.map((x) => {
             const other = otherMember(x, me);
@@ -106,12 +113,14 @@ export default function MessagesScreen() {
         <AppText variant="caption" muted>{t('messages.readReceiptsNote')}</AppText>
         <AppText variant="caption" muted>{t('messages.safetyNote')}</AppText>
       </ScrollView>
-    </Screen>
+      <BottomNav active="messages" />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xl },
+  root: { flex: 1 },
+  content: { width: '100%', maxWidth: 640, alignSelf: 'center', gap: spacing.md, padding: GUTTER, paddingBottom: spacing.xl },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: MIN_TOUCH, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   avatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   texts: { flex: 1, gap: 2 },

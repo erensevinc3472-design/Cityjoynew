@@ -59,7 +59,7 @@ export function SideMenu({ open, onClose }: { open: boolean; onClose(): void }) 
   ];
   const account: Item[] = user
     ? [
-        { key: 'profile', label: t('menu.profile'), icon: 'person-outline', href: { pathname: '/u/[uid]', params: { uid: user.uid } } },
+        { key: 'profile', label: t('menu.profile'), icon: 'person-outline', href: '/me' },
         { key: 'messages', label: t('messages.title'), icon: 'chat-bubble-outline', href: '/messages' },
         { key: 'saved', label: t('explore.saved'), icon: 'bookmark-border', href: '/explore/saved' },
         { key: 'notifications', label: t('notifications.title'), icon: 'notifications-none', href: '/notifications' },

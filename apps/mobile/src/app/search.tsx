@@ -80,7 +80,7 @@ export default function SearchScreen() {
   const c = useThemeColors();
   const { language } = useSettings();
   const lang = language ?? 'tr';
-  const params = useLocalSearchParams<{ q?: string }>();
+  const params = useLocalSearchParams<{ q?: string; tab?: string }>();
   const { user } = useSession();
   const { location } = useUserLocation();
   const { blocked } = useSocial();
@@ -91,7 +91,7 @@ export default function SearchScreen() {
 
   const [input, setInput] = useState(params.q ?? '');
   const [query, setQuery] = useState(params.q?.trim() ?? '');
-  const [tab, setTab] = useState<SearchTab>('tumu');
+  const [tab, setTab] = useState<SearchTab>(() => (SEARCH_TABS as readonly string[]).includes(params.tab ?? '') ? (params.tab as SearchTab) : 'tumu');
   const [likes, setLikes] = useState<Record<string, number>>({});
 
   // Yazarken her harfte sorgu atılmaz: kısa bir duraklamadan sonra aranır.

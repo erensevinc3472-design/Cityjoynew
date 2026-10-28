@@ -25,6 +25,16 @@ import type { SaveMode } from './announcements';
 import { addAudit, iso } from './grants';
 
 const COLLECTION = 'events';
+const JOINED_LIMIT = 60;
+
+/** Profilde gösterilen katılım: etkinlik ya da kullanıcı aktivitesi. */
+export interface JoinedItem {
+  kind: 'etkinlik' | 'aktivite';
+  id: string;
+  title: string;
+  startsAt: string;
+  cancelled: boolean;
+}
 
 function fromDoc(id: string, d: DocumentData): CityEvent {
   return {
@@ -95,6 +105,28 @@ export function createFirestoreEventRepository(db: Firestore) {
       batch.delete(attendeeRef(db, eventId, uid));
       batch.update(doc(db, COLLECTION, eventId), { attendeeCount: increment(-1) });
       await batch.commit();
+    },
+
+    /**
+     * Profil > Katıldıklarım: kişinin katıldığı etkinlik ve aktiviteler (yeniden eskiye). Kaldırılan ya da artık
+     * okunamayanlar listede yok. Katılım kaydı yalnızca kişinin kendisine açık.
+     */
+    async listJoined(uid: string): Promise<JoinedItem[]> {
+      const snap = await getDocs(query(collectionGroup(db, 'attendees'), where('uid', '==', uid), limit(JOINED_LIMIT)));
+      const items = await Promise.allSettled(
+        snap.docs.map(async (a): Promise<JoinedItem | null> => {
+          const ref = a.ref.parent.parent!;
+          const kind = ref.parent.id === 'activities' ? 'aktivite' : 'etkinlik';
+          const d = await getDoc(ref);
+          if (!d.exists()) return null;
+          const status = String(d.get('status') ?? '');
+          if (status !== 'yayinda' && status !== 'aktif' && status !== 'iptal') return null;
+          return { kind, id: d.id, title: String(d.get('title') ?? ''), startsAt: iso(d.get('startsAt')) ?? '', cancelled: status === 'iptal' };
+        }),
+      );
+      return items
+        .flatMap((r) => (r.status === 'fulfilled' && r.value ? [r.value] : []))
+        .sort((x, y) => y.startsAt.localeCompare(x.startsAt));
     },
 
     /** Hesap silinirken kişinin bütün katılımları silinir (KVKK). */

@@ -123,6 +123,9 @@ describe('etkinlikler', () => {
     await assertFails(getDoc(doc(fs('ayse'), 'events', id, 'attendees', 'veli')));
     await repo('veli').leave(id, 'veli');
     await repo('ayse').join(id, 'ayse', null);
+    // Profil > Katıldıklarım: yalnızca kendi katılımları.
+    expect((await repo('ali').listJoined('ali')).map((x) => [x.kind, x.id])).toEqual([['etkinlik', id]]);
+    await expect(repo('veli').listJoined('ali')).rejects.toThrow();
     // Hesap silmede bütün katılımlar silinir.
     await repo('ali').leaveAll('ali');
     expect((await upcoming())[0]?.attendeeCount).toBe(1);

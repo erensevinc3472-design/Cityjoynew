@@ -134,7 +134,7 @@
     "save": "Kaydet ve devam et"
   },
   "account": {
-    "title": "Hesabım",
+    "title": "Ayarlar",
     "signOut": "Çıkış yap",
     "deleteAccount": "Hesabı sil",
     "deleteTitle": "Hesabını silmek istediğine emin misin?",
@@ -874,7 +874,26 @@
       "statFollowers": "Takipçi",
       "statFollowing": "Takip",
       "following": "Takiptesin",
-      "requestedShort": "İstek gitti"
+      "requestedShort": "İstek gitti",
+      "editShort": "Düzenle",
+      "share": "Profili paylaş",
+      "shareText": "CityJoy'da {{name}} profilini bul.",
+      "findPeople": "Kişi bul",
+      "more": "Diğer seçenekler",
+      "familyHint": "SOS'ta haber verilecekler",
+      "businessHint": "İşletmeni ekle, yönet",
+      "bioHint": "İstersen nerede yaşadığını da buraya yazabilirsin.",
+      "tabs": {
+        "gonderiler": "Gönderiler",
+        "kaydedilenler": "Kaydedilenler",
+        "katildiklarim": "Katıldıklarım"
+      },
+      "noPostsOwn": "Henüz paylaşımın yok. Keşfet'teki + düğmesiyle ilk gönderini paylaşabilirsin.",
+      "noSaved": "Kaydettiğin gönderiler burada görünür. Yalnızca sen görürsün.",
+      "noJoined": "Katıldığın etkinlik ve aktiviteler burada görünür.",
+      "joinedEvent": "Etkinlik",
+      "joinedActivity": "Aktivite",
+      "cancelled": "İptal edildi"
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
     "share": "Paylaş",
@@ -1013,7 +1032,14 @@
     "startError": "Bu kişiye şu an mesaj gönderilemiyor (engel, yaş sınırı ya da günlük yeni sohbet sınırı olabilir).",
     "actionError": "İşlem yapılamadı. Yeniden dene.",
     "youBlocked": "Bu kişiyi engelledin. Yazmak için profilinden engeli kaldır.",
-    "cannotWrite": "Bu kişiye mesaj gönderemezsin."
+    "cannotWrite": "Bu kişiye mesaj gönderemezsin.",
+    "newMessage": "Yeni mesaj",
+    "searchChats": "Sohbetlerde ara",
+    "searchPeople": "Kişi ara",
+    "followingTitle": "Takip ettiklerin",
+    "noFollowing": "Henüz kimseyi takip etmiyorsun. Yukarıdan adıyla kişi arayabilirsin.",
+    "writeTo": "{{name}} kişisine mesaj yaz",
+    "noMatch": "Bu adla bir sohbet yok."
   },
   "notifications": {
     "title": "Bildirimler",
@@ -1073,7 +1099,8 @@
     "home": "Ana Sayfa",
     "explore": "Keşfet",
     "search": "Ara",
-    "profile": "Profil"
+    "profile": "Profil",
+    "messages": "Mesajlar"
   },
   "menu": {
     "open": "Menüyü aç",
