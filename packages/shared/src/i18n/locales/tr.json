@@ -908,5 +908,59 @@
     "actionError": "İşlem yapılamadı. Yeniden dene.",
     "youBlocked": "Bu kişiyi engelledin. Yazmak için profilinden engeli kaldır.",
     "cannotWrite": "Bu kişiye mesaj gönderemezsin."
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "titleUnread": "Bildirimler, okunmamış var",
+    "settings": "Bildirim ayarları",
+    "markAll": "Tümünü okundu say",
+    "empty": "Son 14 günde bildirim yok.",
+    "unread": "Okunmadı",
+    "pushNote": "Bildirimler şimdilik uygulama içinde görünür. Telefona anlık bildirim, telefon sürümüyle birlikte gelecek; buradaki ayarlar o zaman da geçerli olur.",
+    "message_one": "{{name}} sana mesaj gönderdi",
+    "message_other": "{{name}} sana {{count}} mesaj gönderdi",
+    "messageRequest": "{{name}} sana mesaj isteği gönderdi",
+    "event": "Yeni etkinlik: {{title}}",
+    "follower": "{{name}} seni takip etmeye başladı",
+    "categories": {
+      "acil": "Acil duyurular",
+      "sos": "SOS (aile)",
+      "mesaj": "Mesajlar",
+      "takip": "Takip",
+      "duyuru": "Duyurular",
+      "haber": "Kurum haberleri",
+      "etkinlik": "Etkinlikler"
+    },
+    "hints": {
+      "acil": "Su kesintisi, afet gibi bölgendeki acil kamu duyuruları.",
+      "sos": "Ailenden biri yardım istediğinde.",
+      "mesaj": "Yeni mesajlar ve mesaj istekleri.",
+      "takip": "Seni takip etmeye başlayanlar.",
+      "duyuru": "Belediye, muhtarlık ve kurum duyuruları.",
+      "haber": "Kurumların bölgen için yayınladığı haberler.",
+      "etkinlik": "İlindeki yeni etkinlikler."
+    },
+    "offByCityJoy": "Bu tür şu an CityJoy tarafından kapalı.",
+    "criticalWarning": {
+      "acil": "Acil duyuruları kapatırsan su kesintisi, afet ya da tahliye gibi önemli uyarıları kaçırabilirsin. Yine de kapatmak istiyor musun?",
+      "sos": "SOS bildirimini kapatırsan ailenden biri yardım istediğinde haberin olmayabilir. Yine de kapatmak istiyor musun?"
+    },
+    "criticalOff": {
+      "acil": "Acil duyurular kapalı: önemli kamu uyarılarını kaçırabilirsin.",
+      "sos": "SOS kapalı: ailenden gelen yardım çağrılarını kaçırabilirsin."
+    },
+    "keepOn": "Açık kalsın",
+    "turnOffAnyway": "Yine de kapat",
+    "typesTitle": "Hangi bildirimleri almak istiyorsun?",
+    "quietTitle": "Sessiz saatler",
+    "quietOn": "Sessiz saatleri kullan",
+    "quiet": {
+      "start": "Başlangıç",
+      "end": "Bitiş"
+    },
+    "earlier": "Bir saat erken",
+    "later": "Bir saat geç",
+    "quietNote": "Sessiz saatlerde telefon bildirim sesi çıkarmaz. Acil duyurular ve SOS sessiz saatlerde de gelir.",
+    "saveError": "Ayar kaydedilemedi. Bağlantını kontrol edip yeniden dene."
   }
 }

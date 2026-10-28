@@ -908,5 +908,59 @@
     "actionError": "Could not complete. Try again.",
     "youBlocked": "You blocked this person. Unblock them on their profile to write.",
     "cannotWrite": "You can't message this person."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "titleUnread": "Notifications, unread items",
+    "settings": "Notification settings",
+    "markAll": "Mark all as read",
+    "empty": "No notifications in the last 14 days.",
+    "unread": "Unread",
+    "pushNote": "Notifications appear inside the app for now. Instant phone notifications will come with the phone version; these settings will apply then too.",
+    "message_one": "{{name}} sent you a message",
+    "message_other": "{{name}} sent you {{count}} messages",
+    "messageRequest": "{{name}} sent you a message request",
+    "event": "New event: {{title}}",
+    "follower": "{{name}} started following you",
+    "categories": {
+      "acil": "Urgent announcements",
+      "sos": "SOS (family)",
+      "mesaj": "Messages",
+      "takip": "Follows",
+      "duyuru": "Announcements",
+      "haber": "Official news",
+      "etkinlik": "Events"
+    },
+    "hints": {
+      "acil": "Urgent public notices for your area, such as water cuts or disasters.",
+      "sos": "When someone in your family asks for help.",
+      "mesaj": "New messages and message requests.",
+      "takip": "People who start following you.",
+      "duyuru": "Announcements from municipalities, mukhtars and institutions.",
+      "haber": "News published by institutions for your area.",
+      "etkinlik": "New events in your province."
+    },
+    "offByCityJoy": "This type is currently turned off by CityJoy.",
+    "criticalWarning": {
+      "acil": "If you turn off urgent announcements, you may miss important warnings such as water cuts, disasters or evacuations. Turn off anyway?",
+      "sos": "If you turn off SOS, you may not know when someone in your family asks for help. Turn off anyway?"
+    },
+    "criticalOff": {
+      "acil": "Urgent announcements are off: you may miss important public warnings.",
+      "sos": "SOS is off: you may miss help calls from your family."
+    },
+    "keepOn": "Keep on",
+    "turnOffAnyway": "Turn off anyway",
+    "typesTitle": "Which notifications do you want?",
+    "quietTitle": "Quiet hours",
+    "quietOn": "Use quiet hours",
+    "quiet": {
+      "start": "Start",
+      "end": "End"
+    },
+    "earlier": "One hour earlier",
+    "later": "One hour later",
+    "quietNote": "During quiet hours your phone won't make notification sounds. Urgent announcements and SOS still come through.",
+    "saveError": "Setting could not be saved. Check your connection and try again."
   }
 }

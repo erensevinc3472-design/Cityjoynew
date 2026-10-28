@@ -38,3 +38,4 @@ export * from './posts/social';
 export * from './posts/word-filter';
 export * from './search/search';
 export * from './messages/messages';
+export * from './notifications/notifications';

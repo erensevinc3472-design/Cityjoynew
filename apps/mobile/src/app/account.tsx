@@ -16,6 +16,7 @@ import { activityRepository, authService, businessRepository, eventRepository, f
 import { useSession } from '@/lib/session';
 import { useSettings, type ThemeMode } from '@/lib/settings';
 import { restartFlow } from '@/lib/navigation';
+import { notificationSettings } from '@/lib/notifications';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -56,6 +57,7 @@ export default function AccountScreen() {
         await eventRepository.leaveAll(uid);
         await activityRepository.deleteAllOf(uid);
         await messageRepository.deleteAllOf(uid);
+        await notificationSettings.delete(uid);
         await postRepository.deleteAllOf(uid);
         await socialRepository.deleteAllOf(uid);
         await reviewRepository.deleteAllBy(uid);

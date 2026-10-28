@@ -131,6 +131,20 @@ service cloud.firestore {
         allow create: if isSelf(uid) && request.resource.data.keys().hasOnly(['createdAt'])
           && request.resource.data.createdAt == request.time;
       }
+
+      // Bildirim tercihleri (PROJE.md 5.12): yalnızca kişinin kendisi; kategori aç/kapa ve sessiz saatler.
+      match /settings/{id} {
+        allow read, delete: if isSelf(uid);
+        allow create, update: if isSelf(uid) && id == 'notifications'
+          && request.resource.data.keys().hasOnly(['categories', 'quietHours', 'updatedAt'])
+          && validNotificationMap(request.resource.data.categories)
+          && request.resource.data.quietHours is map
+          && request.resource.data.quietHours.keys().hasOnly(['enabled', 'start', 'end'])
+          && request.resource.data.quietHours.enabled is bool
+          && request.resource.data.quietHours.start is int && request.resource.data.quietHours.start >= 0 && request.resource.data.quietHours.start <= 23
+          && request.resource.data.quietHours.end is int && request.resource.data.quietHours.end >= 0 && request.resource.data.quietHours.end <= 23
+          && request.resource.data.updatedAt == request.time;
+      }
     }
 
     // Meslek listesi: herkes okur (kayıt ekranı), yalnızca admin yönetir.
@@ -540,6 +554,13 @@ service cloud.firestore {
       allow delete: if isSelf(uid);
     }
 
+    // Bildirim kategorileri haritası (tercihler ve panel tetikleyicileri): bilinen kategoriler, hepsi evet/hayır.
+    function validNotificationMap(m) {
+      return m is map && m.keys().hasOnly(['acil', 'sos', 'mesaj', 'takip', 'duyuru', 'haber', 'etkinlik'])
+        && m.keys().hasAll(['acil', 'sos', 'mesaj', 'takip', 'duyuru', 'haber', 'etkinlik'])
+        && m.acil is bool && m.sos is bool && m.mesaj is bool && m.takip is bool && m.duyuru is bool && m.haber is bool && m.etkinlik is bool;
+    }
+
     // Önerilen aramalar listesi (dil başına en çok 12, her biri en çok 40 harf; uzunluğu panel denetler).
     function termList(t, k) {
       return !(k in t) || (t[k] is list && t[k].size() <= 12);
@@ -567,6 +588,13 @@ service cloud.firestore {
         && termList(request.resource.data.terms, 'tr') && termList(request.resource.data.terms, 'en')
         && termList(request.resource.data.terms, 'de') && termList(request.resource.data.terms, 'ar')
         && termList(request.resource.data.terms, 'ru')
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      // Bildirim tetikleyicileri (PROJE.md 7): admin yönetir; acil duyuru ve SOS kapatılamaz.
+      allow write: if isAdmin() && id == 'notificationTriggers'
+        && request.resource.data.keys().hasOnly(['triggers', 'updatedBy', 'updatedAt'])
+        && validNotificationMap(request.resource.data.triggers)
+        && request.resource.data.triggers.acil == true && request.resource.data.triggers.sos == true
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
     }
