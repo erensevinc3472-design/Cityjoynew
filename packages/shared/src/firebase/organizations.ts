@@ -20,7 +20,7 @@ import {
   type Auth,
 } from 'firebase/auth';
 
-import { normalizeEmail, ORG_MODULES } from '../permissions/grants';
+import { normalizeEmail, orgModulesFor } from '../permissions/grants';
 import { normalizeAssignment } from '../organizations/staff';
 import type { Organization, OrganizationMember } from '../organizations/types';
 import type { Module } from '../permissions/types';
@@ -108,7 +108,7 @@ export function createOrganizationAdmin(db: Firestore, actorUid: string) {
         name: input.name.trim(),
         kind: input.kind,
         scope: input.scope,
-        modules: input.modules.filter((m) => ORG_MODULES.includes(m)),
+        modules: input.modules.filter((m) => orgModulesFor(input.kind).includes(m)),
         officialEmail: normalizeEmail(input.officialEmail),
         status: 'aktif',
         ...(input.contractEndsAt ? { contractEndsAt: Timestamp.fromDate(input.contractEndsAt) } : {}),
@@ -134,7 +134,7 @@ export function createOrganizationAdmin(db: Firestore, actorUid: string) {
       const batch = writeBatch(db);
       batch.update(doc(db, ORGS, org.id), {
         ...(patch.status ? { status: patch.status } : {}),
-        ...(patch.modules ? { modules: patch.modules.filter((m) => ORG_MODULES.includes(m)) } : {}),
+        ...(patch.modules ? { modules: patch.modules.filter((m) => orgModulesFor(org.kind).includes(m)) } : {}),
         ...(patch.contractEndsAt !== undefined
           ? { contractEndsAt: patch.contractEndsAt ? Timestamp.fromDate(patch.contractEndsAt) : deleteField() }
           : {}),

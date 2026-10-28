@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assertFails, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { SEED_PLACES } from '@cityjoy/shared';
+import { SEED_LOCAL, SEED_PLACES, SEED_ROUTES } from '@cityjoy/shared';
 import { createFirestoreTravelRepository, createTravelAdmin } from '@cityjoy/shared/firebase';
 import { collection, doc, getDocs, setDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -29,7 +29,7 @@ describe('seyahat', () => {
   it('başlangıç içeriği taslak yüklenir, uygulama yalnızca yayındakini görür; yalnızca admin yazar; işlem kaydı', async () => {
     const admin = createTravelAdmin(fs('eren'), 'eren');
     const app = createFirestoreTravelRepository(fs('ali'));
-    expect(await admin.importSeed()).toBe(1 + 1 + SEED_PLACES.length);
+    expect(await admin.importSeed()).toBe(1 + 1 + SEED_PLACES.length + SEED_ROUTES.length + SEED_LOCAL.length);
     // İkinci yüklemede var olanlar atlanır.
     expect(await admin.importSeed()).toBe(0);
 

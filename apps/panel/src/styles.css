@@ -130,3 +130,5 @@ td input[type='checkbox'] { width: 20px; height: 20px; }
 /* Sekmeler (Seyahat) ve onay kutusu satırı. */
 .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
 .check { display: inline-flex; align-items: center; gap: 6px; margin-inline-end: 16px; }
+.stop-row { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-block: 10px; display: grid; gap: 4px; }
+.stop-row .field input + input { margin-top: 6px; }

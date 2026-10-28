@@ -22,7 +22,7 @@ type Filter = 'all' | TravelCategory;
 
 /**
  * Şehir sayfası (tasarım: bursa.html): kapak, kısa tanıtım, kaynaklı bilgiler (UNESCO, rakım...), Kareler / Başkanlarla
- * Keşif / Yöresel kutuları ve Hazır Rotalar (sonraki aşamalar, şimdilik "yakında"), kategoriye göre gezilecek yerler.
+ * Keşif / Yöresel kutuları ve Hazır Rotalar (Kareler 3. aşamada, şimdilik "yakında"), kategoriye göre gezilecek yerler.
  * Puan, nüfus gibi kaynaksız sayılar yok; yapay zekâ rehberi bilgi tabanı dolunca gelecek.
  */
 export default function TravelCityScreen() {
@@ -58,10 +58,11 @@ export default function TravelCityScreen() {
     if (embed) setPlaying(embed);
     else WebBrowser.openBrowserAsync(url).catch(() => {});
   };
-  const boxes: { icon: IconName; title: string; hint: string }[] = [
+  // Kareler 3. aşamada (fotoğraf paylaşımıyla); Başkanlarla Keşif ve Yöresel açık.
+  const boxes: { icon: IconName; title: string; hint: string; go?: () => void }[] = [
     { icon: 'photo-library', title: t('travel.frames', { name }), hint: t('travel.framesHint') },
-    { icon: 'explore', title: t('travel.mayors'), hint: t('travel.mayorsHint') },
-    { icon: 'diversity-3', title: t('travel.local', { name }), hint: t('travel.localHint') },
+    { icon: 'explore', title: t('travel.mayors'), hint: t('travel.mayorsHint'), go: () => router.push({ pathname: '/travel/mayors/[code]', params: { code } }) },
+    { icon: 'diversity-3', title: t('travel.local', { name }), hint: t('travel.localHint'), go: () => router.push({ pathname: '/travel/local/[code]', params: { code } }) },
   ];
 
   return (
@@ -105,23 +106,37 @@ export default function TravelCityScreen() {
               </ScrollView>
             ) : null}
 
-            {/* Kareler, Başkanlarla Keşif, Yöresel: sonraki aşamalar. */}
             <View style={styles.boxes}>
               {boxes.map((b) => (
-                <View key={b.title} accessible accessibilityLabel={`${b.title}. ${t('travel.soon')}`} style={[styles.box, { backgroundColor: c.surface, borderColor: c.border }]}>
+                <Pressable
+                  key={b.title}
+                  disabled={!b.go}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !b.go }}
+                  accessibilityLabel={b.go ? `${b.title}. ${b.hint}` : `${b.title}. ${t('travel.soon')}`}
+                  onPress={b.go}
+                  style={({ pressed }) => [styles.box, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
                   <View style={styles.boxTop}>
                     <View style={[styles.boxIcon, { backgroundColor: c.accentSoft }]}>
                       <MaterialIcons name={b.icon} size={16} color={c.accent} />
                     </View>
-                    <AppText style={[styles.soon, { color: c.accent }]}>{t('travel.soon').toLocaleUpperCase(i18n.language)}</AppText>
+                    {b.go ? (
+                      <MaterialIcons name="arrow-forward" size={14} color={c.accent} />
+                    ) : (
+                      <AppText style={[styles.soon, { color: c.accent }]}>{t('travel.soon').toLocaleUpperCase(i18n.language)}</AppText>
+                    )}
                   </View>
                   <AppText style={[styles.boxTitle, { color: c.textStrong }]} numberOfLines={2}>{b.title}</AppText>
                   <AppText style={[styles.boxHint, { color: c.textMuted }]} numberOfLines={2}>{b.hint}</AppText>
-                </View>
+                </Pressable>
               ))}
             </View>
 
-            <View accessible accessibilityLabel={`${t('travel.routes')}. ${t('travel.soon')}`} style={styles.routes}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`${t('travel.routes')}. ${t('travel.routesHint')}`}
+              onPress={() => router.push({ pathname: '/travel/routes/[code]', params: { code } })}
+              style={({ pressed }) => [styles.routes, { opacity: pressed ? 0.9 : 1 }]}>
               <View style={styles.routesIcon}>
                 <MaterialIcons name="route" size={24} color="#081F24" />
               </View>
@@ -129,10 +144,8 @@ export default function TravelCityScreen() {
                 <AppText style={styles.routesTitle}>{t('travel.routes')}</AppText>
                 <AppText style={styles.routesHint}>{t('travel.routesHint')}</AppText>
               </View>
-              <View style={styles.routesSoon}>
-                <AppText style={styles.routesSoonText}>{t('travel.soon')}</AppText>
-              </View>
-            </View>
+              <MaterialIcons name="arrow-forward" size={22} color="#081F24" />
+            </Pressable>
           </View>
         ) : null}
 
@@ -235,8 +248,6 @@ const styles = StyleSheet.create({
   routesIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
   routesTitle: { color: navy, fontFamily: fonts.heading, fontSize: 15, lineHeight: 20 },
   routesHint: { color: 'rgba(8,31,36,0.75)', fontSize: 12, lineHeight: 16 },
-  routesSoon: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill, backgroundColor: 'rgba(8,31,36,0.15)' },
-  routesSoonText: { color: navy, fontFamily: fonts.bodySemi, fontSize: 10 },
   filters: { paddingHorizontal: GUTTER, paddingTop: spacing.lg, gap: spacing.sm },
   filter: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, justifyContent: 'center' },
   filterText: { fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 0.5 },

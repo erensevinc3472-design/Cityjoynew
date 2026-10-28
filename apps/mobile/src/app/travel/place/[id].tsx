@@ -6,7 +6,7 @@ import { useState, type ComponentProps, type ReactNode } from 'react';
 import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { videoEmbedUrl, type NearbyKind, type TravelMode } from '@cityjoy/shared';
+import { videoEmbedUrl } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { RoundButton } from '@/components/hero-header';
@@ -15,22 +15,11 @@ import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { VideoModal } from '@/components/video-modal';
 import { locationRepository as repo } from '@/lib/locations';
-import { CATEGORY_SCENES, useTravelPlace } from '@/lib/travel';
+import { CATEGORY_SCENES, MODE_ICONS, NEARBY_ICONS, useTravelPlace } from '@/lib/travel';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
-const MODE_ICONS: Record<TravelMode, IconName> = {
-  metro: 'subway',
-  otobus: 'directions-bus',
-  tramvay: 'tram',
-  teleferik: 'airline-seat-recline-normal',
-  vapur: 'directions-boat',
-  taksi: 'local-taxi',
-  araba: 'directions-car',
-  yuruyus: 'directions-walk',
-};
-const NEARBY_ICONS: Record<NearbyKind, IconName> = { otopark: 'local-parking', yemek: 'restaurant', wc: 'wc', atm: 'local-atm', saglik: 'local-hospital' };
 
 /**
  * Gezilecek yer (tasarım: bursa.html ayrıntı penceresi): hakkında, tanıtım videosu, saat / ücret / adres / süre, nasıl

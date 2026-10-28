@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (tasarım uygulaması ilk dalga; önceki: OSM iskeleti, Bildirim merkezi).
+Son güncelleme: 29 Ekim 2026 (Seyahat 2. aşama; önceki: tasarım uygulaması ilk dalga).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -480,6 +480,19 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Telefonda bakılmadı (web önizlemede giriş ve bölge ekranları görüldü).
    **Düzeltme (Eren):** ülke şeridinde 15 ülke yazılı (Türkiye açık, diğerleri seçilince "yakında"); bölgeler içerik
    yayında olmasa da açılır (iller "yakında" listelenir). Büyük harf Türkçe kurala göre (TÜRKİYE).
+   Uygulama boş sonucu önbelleğe almaz, dolu içeriği 30 dakikada yeniler. Panel > Yerler: şehir taslaktayken yayındaki
+   yerler için uyarı (canlıda Bursa şehir kaydı taslakta kalmıştı, 29 Ekim).
+- **Seyahat 2. aşama (29 Ekim, dal `claude/seyahat-2`):** Hazır Rotalar (`/travel/routes/[code]`: temalı kartlar, süre
+   filtresi), rota ekranı (`/travel/route/[id]`: özet, "Rotayı başlat", durak durak ilerleme, yerin saat/ücret/ulaşım
+   bilgisi, sonraki durağa nasıl gidilir), Yöresel (`/travel/local/[code]`: tür filtresi, açılır kartlar, rozet), Başkanlarla
+   Keşif (`/travel/mayors/[code]`: il tanıtımı üstte, bütün ilçeler eşit kart, nüfusa göre sıra, bölge filtresi, "Belediye
+   tanıtımı", rota ve video). Şehir sayfasındaki kutular açıldı (Kareler hâlâ yakında). Veri: `travelRoutes`, `travelLocal`,
+   `travelMunicipal` (kimlik = kurum kimliği). Panel > Seyahat: Hazır rotalar (durak düzenleyici), Yöresel, Başkanlarla
+   Keşif (nüfus, bölge, başkan adı gösterimi, yayına alma) sekmeleri; başlangıç içeriğine 6 Bursa rotası ve 6 yöresel
+   eklendi. Belediye paneli: kuruma "Seyahat" bölümü yalnızca belediyelere verilir; personel tanıtım ve rotalarını "Onaya
+   gönder"ir, admin yayına alır, yayındaki tanıtım değişince yeniden onaya düşer. Kurallar + 3 yeni test (105 kural testi).
+   **Eren yapacak:** PR birleştir, kuralları yükle, Panel > Seyahat > "Başlangıç içeriğini yükle" (yalnızca yeni rota ve
+   yöresel eklenir), rotaları ve yöreselleri kontrol edip yayına al.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -555,6 +568,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Sıradaki adım (Eren seçecek)
 
+00. Seyahat: Keşfet'e fotoğraf paylaşımı (telefonda sıkıştırma, Storage) ve ardından "{Şehir}'dan Kareler" (kutucukla, ek
+   yükleme yok; PROJE.md 13. madde 34). Sonra Planla ve Navigasyon.
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). OSM iskeleti (31. madde) başlangıç
    olarak kullanılabilir. Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.

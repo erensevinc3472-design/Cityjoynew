@@ -1,4 +1,4 @@
-import type { TravelCityContent, TravelPlaceInput, TravelRegionContent } from './travel';
+import type { TravelCityContent, TravelLocalInput, TravelPlaceInput, TravelRegionContent, TravelRouteInput } from './travel';
 
 /**
  * Başlangıç içeriği (Marmara ve Bursa). Panelden "taslak" olarak yüklenir; ekip doğruluğunu kontrol edip yayına alır.
@@ -169,5 +169,208 @@ export const SEED_PLACES: { id: string; data: Omit<TravelPlaceInput, 'status'> }
       about: 'Kestane şekeri, kestanenin şeker şurubunda uzun süre pişirilip kurutulmasıyla yapılır. Şehrin hemen her yerinde, özellikle çarşı çevresinde satılır.',
       order: 9,
     }),
+  },
+];
+
+/**
+ * Bursa hazır rotaları (temalı; süre ayrıca). Duraklar mümkün olduğunca gezilecek yerlere bağlıdır. Ulaşım satırları
+ * genel tutuldu; hat ve durak adları kontrol edilip panelden eklenmeli.
+ */
+export const SEED_ROUTES: { id: string; data: Omit<TravelRouteInput, 'status'> }[] = [
+  {
+    id: 'bursa-osmanli-dogusu',
+    data: {
+      cityId: '16',
+      theme: 'tarih',
+      length: 'yarim',
+      title: 'Osmanlı\'nın Doğuşu',
+      summary: 'Osmanlı\'nın ilk başkentinde kurucu sultanların türbelerinden Ulu Camii\'ye ve ipek hanlarına uzanan yürüyüş rotası.',
+      durationMinutes: 270,
+      stops: [
+        { placeId: 'bursa-tophane', name: 'Tophane, Osman ve Orhan Gazi Türbeleri', note: 'Güne şehre tepeden bakarak başlayın: türbeler ve Saat Kulesi.', stayMinutes: 45, next: { mode: 'yuruyus', text: 'Yokuş aşağı yaklaşık 15 dakika yürüyüş' } },
+        { placeId: 'bursa-ulu-camii', name: 'Ulu Camii', note: '20 kubbe, şadırvan ve hat yazıları.', stayMinutes: 40, next: { mode: 'yuruyus', text: 'Birkaç dakikalık yürüyüş' } },
+        { placeId: 'bursa-koza-han', name: 'Koza Han', note: 'Avludaki çay bahçesinde mola, ipek dükkânları.', stayMinutes: 45, next: { mode: 'yuruyus', text: 'Çarşı içinden yürüyerek' } },
+        { name: 'Hanlar Bölgesi ve Kapalı Çarşı', note: 'Emir Han, Fidan Han ve çarşı sokakları.', stayMinutes: 60, next: { mode: 'taksi', text: 'Taksi ya da otobüsle kısa bir yol' } },
+        { placeId: 'bursa-muradiye', name: 'Muradiye Külliyesi', note: 'Ağaçlı bahçedeki türbelerle sakin bir kapanış.', stayMinutes: 50 },
+      ],
+      tips: ['Sabah erken başlayın, öğle kalabalığından kaçının.', 'Rahat ayakkabı giyin: rotanın çoğu yürüyüş.'],
+      order: 1,
+    },
+  },
+  {
+    id: 'bursa-camiler-turbeler',
+    data: {
+      cityId: '16',
+      theme: 'manevi',
+      length: 'yarim',
+      title: 'Camiler ve Türbeler',
+      summary: 'Erken Osmanlı mimarisinin en güzel örnekleri: Ulu Camii, çinileriyle Yeşil Türbe ve Yeşil Camii, Muradiye.',
+      durationMinutes: 240,
+      stops: [
+        { placeId: 'bursa-ulu-camii', name: 'Ulu Camii', note: 'Kündekâri minber ve iç mekândaki şadırvan.', stayMinutes: 40, next: { mode: 'taksi', text: 'Taksi ya da otobüsle kısa bir yol' } },
+        { placeId: 'bursa-yesil-turbe', name: 'Yeşil Türbe ve Yeşil Camii', note: 'Türbenin çinilerini ve caminin taç kapısını görün.', stayMinutes: 60, next: { mode: 'taksi', text: 'Taksi ya da otobüsle' } },
+        { name: 'Emir Sultan Camii ve Türbesi', note: 'Şehre bakan avlusuyla sevilen bir ziyaret yeri.', stayMinutes: 40, next: { mode: 'taksi', text: 'Taksi ya da otobüsle şehrin batısına' } },
+        { placeId: 'bursa-muradiye', name: 'Muradiye Külliyesi', note: 'Hanedan türbeleri ve bahçe.', stayMinutes: 50 },
+      ],
+      tips: ['Namaz vakitlerinde ziyaret kısıtlanabilir; vakitleri önceden kontrol edin.', 'Kadın ziyaretçilerin başörtüsü getirmesi önerilir.'],
+      order: 2,
+    },
+  },
+  {
+    id: 'bursa-gastro',
+    data: {
+      cityId: '16',
+      theme: 'lezzet',
+      length: 'kisa',
+      title: 'Gastro Bursa',
+      summary: 'İskender\'den pideli köfteye, çarşıda kestane şekerinden Koza Han\'da çaya: Bursa\'nın sofrası.',
+      durationMinutes: 180,
+      stops: [
+        { placeId: 'bursa-iskender', name: 'İskender kebap', note: 'Tereyağı masada dökülür, yanında yoğurt.', stayMinutes: 60, next: { mode: 'yuruyus', text: 'Çarşıya doğru yürüyerek' } },
+        { name: 'Pideli köfte ve cantık', note: 'Bursa\'nın pideli köftesi ve kıymalı cantığı.', stayMinutes: 40, next: { mode: 'yuruyus', text: 'Yürüyerek' } },
+        { placeId: 'bursa-kestane-sekeri', name: 'Kestane şekeri', note: 'Çarşıda tadın, hediyelik paket alın.', stayMinutes: 20, next: { mode: 'yuruyus', text: 'Birkaç dakikalık yürüyüş' } },
+        { placeId: 'bursa-koza-han', name: 'Koza Han\'da çay', note: 'Avluda çay ya da Türk kahvesiyle kapanış.', stayMinutes: 40 },
+      ],
+      tips: ['Aç gelin, porsiyonlar doyurucu.', 'Kalabalık saatlerde İskender için sıra olabilir.'],
+      order: 3,
+    },
+  },
+  {
+    id: 'bursa-uludag-rotasi',
+    data: {
+      cityId: '16',
+      theme: 'doga',
+      length: 'tam',
+      title: 'Uludağ',
+      summary: 'Teleferikle şehirden dağa: manzara, yürüyüş yolları, kışın kayak. Mevsime göre bütün bir gün.',
+      durationMinutes: 420,
+      stops: [
+        { name: 'Teleferik', note: 'Şehirden Uludağ\'a teleferikle çıkış; yolculuk boyunca şehir manzarası.', stayMinutes: 60, next: { mode: 'teleferik', text: 'Teleferikle yukarı' } },
+        { placeId: 'bursa-uludag', name: 'Uludağ Milli Parkı', note: 'Yazın yürüyüş ve piknik, kışın kayak.', stayMinutes: 300, next: { mode: 'teleferik', text: 'Teleferikle dönüş' } },
+        { name: 'Akşam şehirde', note: 'Dönüşte şehir merkezinde akşam yemeği.', stayMinutes: 60 },
+      ],
+      tips: ['Hava dağda şehirden çok daha soğuk ve değişken olabilir; yanınıza kalın giysi alın.', 'Teleferik çalışma saatlerini ve hava koşullarını yola çıkmadan kontrol edin.'],
+      order: 4,
+    },
+  },
+  {
+    id: 'bursa-carsi-hanlar',
+    data: {
+      cityId: '16',
+      theme: 'alisveris',
+      length: 'kisa',
+      title: 'Çarşı ve Hanlar',
+      summary: 'Yüzyıllık hanlar ve kapalı çarşı: ipek, bıçak, havlu ve yöresel ürünler.',
+      durationMinutes: 150,
+      stops: [
+        { placeId: 'bursa-koza-han', name: 'Koza Han', note: 'İpek şal ve eşarp dükkânları.', stayMinutes: 40, next: { mode: 'yuruyus', text: 'Yürüyerek' } },
+        { name: 'Kapalı Çarşı', note: 'Bursa havlusu, bıçak ve hediyelik.', stayMinutes: 60, next: { mode: 'yuruyus', text: 'Yürüyerek' } },
+        { name: 'Emir Han ve Fidan Han', note: 'Avlularda çay molası.', stayMinutes: 40 },
+      ],
+      tips: ['Pazar günü bazı dükkânlar kapalı olabilir.'],
+      order: 5,
+    },
+  },
+  {
+    id: 'bursa-cumalikizik-rotasi',
+    data: {
+      cityId: '16',
+      theme: 'kultur',
+      length: 'yarim',
+      title: 'Cumalıkızık Köy Rotası',
+      summary: 'Uludağ eteğinde, UNESCO listesindeki köyde taş sokaklar, eski evler ve köy kahvaltısı.',
+      durationMinutes: 240,
+      stops: [
+        { name: 'Köy kahvaltısı', note: 'Köydeki kahvaltı evlerinden birinde güne başlayın.', stayMinutes: 75, next: { mode: 'yuruyus', text: 'Köy içinde yürüyerek' } },
+        { placeId: 'bursa-cumalikizik', name: 'Cumalıkızık sokakları', note: 'Taş sokaklar, ahşap ve kerpiç evler.', stayMinutes: 90, next: { mode: 'yuruyus', text: 'Yürüyerek' } },
+        { name: 'Köy pazarı', note: 'Ev yapımı reçel, erişte ve el işleri.', stayMinutes: 30 },
+      ],
+      tips: ['Hafta sonları kalabalık olabilir; sabah erken gitmek daha sakin olur.', 'Köyde yaşayanların evlerine ve mahremiyetine saygı gösterin.'],
+      order: 6,
+    },
+  },
+];
+
+/** Yöresel Bursa. Rozet ve sayılar yalnızca kaynağı kesin olanlarda; coğrafi işaretler kontrol edilip panelden eklenmeli. */
+export const SEED_LOCAL: { id: string; data: Omit<TravelLocalInput, 'status'> }[] = [
+  {
+    id: 'bursa-karagoz',
+    data: {
+      cityId: '16',
+      kind: 'miras',
+      title: 'Karagöz ve Hacivat',
+      subtitle: 'Gölge oyununun şehri',
+      body:
+        'Karagöz gölge oyunu geleneği, insanlığın somut olmayan kültürel mirası listesindedir. Rivayete göre Karagöz ve Hacivat, Orhan Gazi döneminde Bursa\'da bir cami inşaatında çalışan iki ustadır. Şehirdeki Karagöz Müzesi\'nde tasvirler ve gösteriler görülebilir.',
+      badges: ['UNESCO'],
+      facts: [{ label: 'UNESCO listesi', value: 'Karagöz', source: 'UNESCO', asOf: '2009' }],
+      order: 1,
+    },
+  },
+  {
+    id: 'bursa-kilic-kalkan',
+    data: {
+      cityId: '16',
+      kind: 'gelenek',
+      title: 'Kılıç Kalkan',
+      subtitle: 'Müziksiz oynanan halk oyunu',
+      body:
+        'Kılıç Kalkan, Bursa\'ya özgü, müzik olmadan yalnızca kılıç ve kalkan sesleriyle oynanan bir halk oyunudur. Oyuncular geleneksel kıyafetleriyle selamlaşma, kılıç bileme ve çarpışma figürlerini canlandırır. Şehirdeki törenlerde ve festivallerde izlenebilir.',
+      badges: [],
+      facts: [],
+      order: 2,
+    },
+  },
+  {
+    id: 'bursa-ipek',
+    data: {
+      cityId: '16',
+      kind: 'el-sanati',
+      title: 'İpekçilik',
+      subtitle: 'Koza Han\'dan dünyaya',
+      body: 'Bursa, yüzyıllar boyunca ipek böcekçiliği ve ipekli dokumanın merkezi oldu; kumaşları saraylara kadar ulaştı. Bugün Koza Han\'daki dükkânlarda ipek şal ve eşarplar satılır.',
+      badges: [],
+      facts: [],
+      order: 3,
+    },
+  },
+  {
+    id: 'bursa-bicak',
+    data: {
+      cityId: '16',
+      kind: 'el-sanati',
+      title: 'Bursa bıçağı',
+      subtitle: 'Çarşıda hâlâ yaşayan zanaat',
+      body: 'Bursa bıçakçılığı, şehrin en bilinen el sanatlarından biridir. Çarşıdaki bıçakçılarda el yapımı bıçaklar bulunur.',
+      badges: [],
+      facts: [],
+      order: 4,
+    },
+  },
+  {
+    id: 'bursa-lezzet-iskender',
+    data: {
+      cityId: '16',
+      kind: 'lezzet',
+      title: 'İskender kebap',
+      subtitle: 'Bursa\'nın en bilinen lezzeti',
+      body: 'Pide üzerine dizilen ince döner, domates sosu, kızgın tereyağı ve yoğurt. Şehirde doğup bütün Türkiye\'ye yayıldı.',
+      badges: [],
+      facts: [],
+      order: 5,
+    },
+  },
+  {
+    id: 'bursa-lezzet-kestane',
+    data: {
+      cityId: '16',
+      kind: 'lezzet',
+      title: 'Kestane şekeri',
+      subtitle: 'En çok hediye alınan tatlı',
+      body: 'Kestanenin şeker şurubunda uzun süre pişirilip kurutulmasıyla yapılır. Çarşı çevresinde her yerde bulunur.',
+      badges: [],
+      facts: [],
+      order: 6,
+    },
   },
 ];
