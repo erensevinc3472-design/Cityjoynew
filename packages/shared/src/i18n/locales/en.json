@@ -572,6 +572,46 @@
         "tag": "Discounts",
         "desc": "Discounts from verified businesses are coming soon."
       }
+    },
+    "toDeals": "Explore deals",
+    "backToSocial": "Back to Social Harmony",
+    "dealsNote": "Discounts from verified businesses are coming here soon.",
+    "deals": {
+      "food": {
+        "name": "Food",
+        "tag": "Restaurants and cafés",
+        "desc": "Discounts at restaurants and cafés."
+      },
+      "market": {
+        "name": "Market",
+        "tag": "Daily needs",
+        "desc": "Discounts on groceries and daily shopping."
+      },
+      "sport": {
+        "name": "Sports",
+        "tag": "Gyms and classes",
+        "desc": "Discounts at gyms, pools and classes."
+      },
+      "fun": {
+        "name": "Fun",
+        "tag": "Cinema and games",
+        "desc": "Discounts at cinemas, theatres and play areas."
+      },
+      "craft": {
+        "name": "Local shops",
+        "tag": "Your neighbourhood",
+        "desc": "Discounts from shops in your neighbourhood."
+      },
+      "health": {
+        "name": "Health",
+        "tag": "Care and health",
+        "desc": "Discounts on health and care services."
+      },
+      "education": {
+        "name": "Education",
+        "tag": "Courses and books",
+        "desc": "Discounts on courses, books and stationery."
+      }
     }
   },
   "official": {

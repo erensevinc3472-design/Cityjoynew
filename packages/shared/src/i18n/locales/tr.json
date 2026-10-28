@@ -572,6 +572,46 @@
         "tag": "İndirim",
         "desc": "Doğrulanmış işletmelerden indirimler yakında."
       }
+    },
+    "toDeals": "Fırsatları keşfet",
+    "backToSocial": "Sosyal Harmoni'ye dön",
+    "dealsNote": "Doğrulanmış işletmelerin indirimleri yakında burada.",
+    "deals": {
+      "food": {
+        "name": "Yemek",
+        "tag": "Restoran ve kafe",
+        "desc": "Restoran ve kafelerde indirimler."
+      },
+      "market": {
+        "name": "Market",
+        "tag": "Günlük ihtiyaç",
+        "desc": "Market ve günlük alışverişte indirimler."
+      },
+      "sport": {
+        "name": "Spor",
+        "tag": "Salon ve kurs",
+        "desc": "Spor salonu, havuz ve kurslarda indirimler."
+      },
+      "fun": {
+        "name": "Eğlence",
+        "tag": "Sinema ve oyun",
+        "desc": "Sinema, tiyatro ve oyun alanlarında indirimler."
+      },
+      "craft": {
+        "name": "Esnaf",
+        "tag": "Mahallenin esnafı",
+        "desc": "Mahallendeki esnaftan indirimler."
+      },
+      "health": {
+        "name": "Sağlık",
+        "tag": "Bakım ve sağlık",
+        "desc": "Sağlık ve bakım hizmetlerinde indirimler."
+      },
+      "education": {
+        "name": "Eğitim",
+        "tag": "Kurs ve kitap",
+        "desc": "Kurs, kitap ve kırtasiyede indirimler."
+      }
     }
   },
   "official": {
