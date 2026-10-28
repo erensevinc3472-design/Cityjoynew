@@ -60,6 +60,10 @@ export function PostCard({ item, liked, full, onPress, onLike }: Props) {
           <MaterialIcons name={liked ? 'favorite' : 'favorite-border'} size={22} color={liked ? c.danger : c.icon} />
           <AppText variant="caption" muted>{item.likeCount}</AppText>
         </Pressable>
+        <View style={styles.like} accessible accessibilityLabel={t('explore.comments.title', { count: item.commentCount })}>
+          <MaterialIcons name="chat-bubble-outline" size={20} color={c.icon} />
+          <AppText variant="caption" muted>{item.commentCount}</AppText>
+        </View>
         <AppText variant="caption" muted numberOfLines={1} style={styles.targets}>
           {item.targets.map((x) => t(`explore.targets.${x}`)).join(' · ')}
         </AppText>

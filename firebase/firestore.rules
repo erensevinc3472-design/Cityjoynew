@@ -124,6 +124,13 @@ service cloud.firestore {
         && neighbourhoodChangeAllowed(resource.data, request.resource.data);
       // Hesap silme uygulama içinden yapılır (mağaza zorunluluğu).
       allow delete: if isSelf(uid);
+
+      // Keşfet'te kaydedilen gönderiler: yalnızca kişinin kendisi.
+      match /savedPosts/{postId} {
+        allow read, delete: if isSelf(uid);
+        allow create: if isSelf(uid) && request.resource.data.keys().hasOnly(['createdAt'])
+          && request.resource.data.createdAt == request.time;
+      }
     }
 
     // Meslek listesi: herkes okur (kayıt ekranı), yalnızca admin yönetir.
@@ -1289,7 +1296,7 @@ service cloud.firestore {
     }
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'likeCount',
-             'reportCount', 'cleared', 'moderatedBy', 'createdAt', 'updatedAt'])
+             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
         && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
         && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel'])
@@ -1318,7 +1325,9 @@ service cloud.firestore {
       allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid
         && request.resource.data.status == 'aktif'
         && request.resource.data.likeCount == 0 && request.resource.data.reportCount == 0
+        && request.resource.data.get('commentCount', 0) == 0
         && !('cleared' in request.resource.data) && !('moderatedBy' in request.resource.data)
+        && !('commentsOff' in request.resource.data) && !('lastComment' in request.resource.data)
         && request.resource.data.createdAt == request.time
         && validPost(request.resource.data)
         && request.resource.data.text.size() >= 1
@@ -1331,6 +1340,22 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time
         && request.resource.data.status == 'kaldirildi' && request.resource.data.text == '' && request.resource.data.authorName == ''
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'updatedAt']);
+      // Sahibi yorumları kapatır ya da açar.
+      allow update: if resource.data.authorUid == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.commentsOff is bool
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['commentsOff', 'updatedAt']);
+      // Yorum sayacı: yalnızca adı geçen yorum (lastComment) aynı yazımda eklenirken tam bir artar, silinirken azalır.
+      // Kimin silebileceğini yorum kuralı denetler.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['commentCount', 'lastComment'])
+        && request.resource.data.lastComment is string
+        && ((request.resource.data.commentCount == resource.data.get('commentCount', 0) + 1
+              && !exists(/databases/$(database)/documents/posts/$(id)/comments/$(request.resource.data.lastComment))
+              && existsAfter(/databases/$(database)/documents/posts/$(id)/comments/$(request.resource.data.lastComment)))
+            || (request.resource.data.commentCount == resource.data.get('commentCount', 0) - 1
+              && exists(/databases/$(database)/documents/posts/$(id)/comments/$(request.resource.data.lastComment))
+              && !existsAfter(/databases/$(database)/documents/posts/$(id)/comments/$(request.resource.data.lastComment))));
       // Beğeni sayacı: yalnızca kendi beğeni kaydıyla tam bir artar (görebildiği, kaldırılmamış gönderide) ya da azalır.
       allow update: if signedIn()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount'])
@@ -1368,6 +1393,63 @@ service cloud.firestore {
           && getAfter(postPath(id)).data.likeCount == get(postPath(id)).data.likeCount - 1;
         allow update: if false;
       }
+
+      // Yorumlar: gönderiyi görebilen okur ve (yorumlar açıksa) yazar; sayaç aynı yazımda artar. Yazan, gönderi sahibi ve
+      // moderatör siler. Şikâyet sayacı kendi şikâyet kaydıyla tam bir artar; moderatör "yerinde kalsın" der.
+      match /comments/{cid} {
+        allow read: if signedIn()
+          && ((get(postPath(id)).data.status == 'aktif' && canSeePost(get(postPath(id)).data))
+              || get(postPath(id)).data.authorUid == request.auth.uid
+              || regionAllows('moderasyon', 'goruntule', get(postPath(id)).data.region.provinceCode, null));
+        allow create: if signedIn()
+          && request.resource.data.keys().hasOnly(['authorUid', 'authorName', 'text', 'reportCount', 'createdAt'])
+          && request.resource.data.authorUid == request.auth.uid
+          && request.resource.data.authorName is string && request.resource.data.authorName.size() <= 40
+          && request.resource.data.text is string && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 500
+          && request.resource.data.reportCount == 0
+          && request.resource.data.createdAt == request.time
+          && get(postPath(id)).data.status == 'aktif' && canSeePost(get(postPath(id)).data)
+          && get(postPath(id)).data.get('commentsOff', false) != true
+          && getAfter(postPath(id)).data.commentCount == get(postPath(id)).data.get('commentCount', 0) + 1;
+        allow delete: if signedIn()
+          && (resource.data.authorUid == request.auth.uid
+              || get(postPath(id)).data.authorUid == request.auth.uid
+              || isAdmin() || regionAllows('moderasyon', 'sil', get(postPath(id)).data.region.provinceCode, null))
+          && getAfter(postPath(id)).data.commentCount == get(postPath(id)).data.get('commentCount', 0) - 1;
+        allow update: if signedIn()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])
+          && request.resource.data.reportCount == resource.data.reportCount + 1
+          && !exists(/databases/$(database)/documents/commentReports/$(id + '_' + cid + '_' + request.auth.uid))
+          && existsAfter(/databases/$(database)/documents/commentReports/$(id + '_' + cid + '_' + request.auth.uid));
+        allow update: if request.resource.data.moderatedBy == request.auth.uid
+          && request.resource.data.cleared == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cleared', 'moderatedBy'])
+          && (isAdmin() || regionAllows('moderasyon', 'duzenle', get(postPath(id)).data.region.provinceCode, null));
+      }
+    }
+    // Kişinin bütün yorumları (hesap silme için).
+    match /{path=**}/comments/{cid} {
+      allow read: if signedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    // Yorum şikâyetleri: kişi başına yorum başına bir; yorumun yazısı kopyalanır (silinse de moderatör görür).
+    match /commentReports/{rid} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['postId', 'commentId', 'reporterUid', 'reason', 'text', 'provinceCode', 'status', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && rid == request.resource.data.postId + '_' + request.resource.data.commentId + '_' + request.auth.uid
+        && request.resource.data.reason in ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger']
+        && request.resource.data.text is string && request.resource.data.text.size() <= 500
+        && request.resource.data.status == 'yeni'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.provinceCode == get(postPath(request.resource.data.postId)).data.region.provinceCode
+        && get(/databases/$(database)/documents/posts/$(request.resource.data.postId)/comments/$(request.resource.data.commentId)).data.authorUid != request.auth.uid;
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
+        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
+      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'incelendi';
+      allow delete: if false;
     }
     // Kişinin bütün beğenileri (akıştaki kalpler ve hesap silme için).
     match /{path=**}/likes/{uid} {

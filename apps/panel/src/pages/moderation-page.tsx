@@ -5,6 +5,7 @@ import {
   createPostModeration,
   createReviewModeration,
   type ActivityReport,
+  type CommentReport,
   type PostReport,
   type ReviewReport,
 } from '@cityjoy/shared/firebase';
@@ -133,6 +134,7 @@ export function ModerationPage() {
       )}
       {user ? <ActivityReports user={user} /> : null}
       {user ? <PostReports user={user} /> : null}
+      {user ? <CommentReports user={user} /> : null}
     </section>
   );
 }
@@ -375,6 +377,119 @@ function PostReports({ user }: { user: PanelUser }) {
             </tbody>
           </table>
           <p className="count">{t('moderation.posts.note')}</p>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Keşfet yorum şikâyetleri: admin hepsini, il yöneticisi ve il düzeyindeki gönüllü moderatör kendi ilini görür. Üç
+ * şikâyet alan yorum uygulamada gizlenir; "Yorumu sil" tamamen siler, "Yerinde kalsın" geri getirir. Yorum yazısının
+ * şikâyet anındaki kopyası gösterilir (yorum sonradan silinmiş olsa da). Her işlem kayda geçer.
+ */
+function CommentReports({ user }: { user: PanelUser }) {
+  const isAdmin = isAdminUser(user);
+  const provinces = useMemo(
+    () => [...new Set(user.grants.filter((g) => g.scope.level === 'il' && isGrantActive(g, new Date()) && g.modules.moderasyon?.includes('goruntule')).map((g) => (g.scope.level === 'il' ? g.scope.provinceCode : '')))],
+    [user],
+  );
+  const canDecide = !user.isDemo && (isAdmin || user.grants.some((g) => g.scope.level === 'il' && g.modules.moderasyon?.includes('sil')));
+  const [list, setList] = useState<CommentReport[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
+  const [busy, setBusy] = useState(false);
+  const mod = useMemo(() => createPostModeration(firestore, user.uid), [user]);
+
+  const load = useCallback(async () => {
+    setLoadError(false);
+    if (user.isDemo || (!isAdmin && !provinces.length)) return setList([]);
+    try {
+      const all = await Promise.all(isAdmin ? [mod.listCommentReports('admin')] : provinces.map((p) => mod.listCommentReports({ provinceCode: p })));
+      setList(all.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+    } catch {
+      setLoadError(true);
+    }
+  }, [user, isAdmin, provinces, mod]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const act = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setMessage(undefined);
+    try {
+      await fn();
+      setMessage({ kind: 'ok', text: t('moderation.saved') });
+      await load();
+    } catch {
+      setMessage({ kind: 'error', text: t('moderation.error') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!isAdmin && !provinces.length) return null;
+  return (
+    <>
+      <header className="page-head">
+        <div>
+          <h2>{t('moderation.comments.title')}</h2>
+          <p className="meta">{t('moderation.comments.intro')}</p>
+        </div>
+      </header>
+      {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {loadError ? (
+        <div className="state" role="alert">
+          <p>{t('moderation.loadError')}</p>
+          <button className="btn secondary" onClick={load}>{t('moderation.retry')}</button>
+        </div>
+      ) : list === null ? (
+        <div className="state" aria-live="polite">{t('moderation.loading')}</div>
+      ) : list.length === 0 ? (
+        <div className="state">{t('moderation.empty')}</div>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{t('moderation.date')}</th>
+                <th scope="col">{t('moderation.comments.comment')}</th>
+                <th scope="col">{t('moderation.reason')}</th>
+                <th scope="col">{t('moderation.status')}</th>
+                {canDecide ? <th scope="col"><span className="sr-only">{t('moderation.actions')}</span></th> : null}
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((r) => (
+                <tr key={r.id}>
+                  <td className="num">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
+                  <td>
+                    {r.comment ? <strong>{r.comment.authorName}</strong> : null}
+                    <p dir="auto" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{r.text}</p>
+                    {r.comment ? (
+                      <div className="meta">{t('moderation.comments.counts', { reports: r.comment.reportCount })}</div>
+                    ) : (
+                      <span className="pill warn">{t('moderation.comments.deleted')}</span>
+                    )}
+                    {r.comment?.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
+                  </td>
+                  <td>{t(`moderation.posts.reasons.${r.reason}`)}</td>
+                  <td><span className={r.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`moderation.statuses.${r.status}`)}</span></td>
+                  {canDecide ? (
+                    <td>
+                      <div className="row-actions">
+                        {r.comment ? <button className="link" disabled={busy} onClick={() => act(() => mod.removeComment(r))}>{t('moderation.comments.remove')}</button> : null}
+                        {r.comment && !r.comment.cleared ? <button className="link" disabled={busy} onClick={() => act(() => mod.keepComment(r))}>{t('moderation.posts.keep')}</button> : null}
+                      </div>
+                    </td>
+                  ) : null}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="count">{t('moderation.comments.note')}</p>
         </div>
       )}
     </>

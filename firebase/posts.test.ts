@@ -123,12 +123,63 @@ describe('Keşfet gönderileri', () => {
     await assertFails(getDoc(doc(fs('veli'), 'posts', id)));
   });
 
+  it('yorum: görebilen yazar, sayaç birlikte değişir; sahibi kapatır; yazan ve sahibi siler', async () => {
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['mahallem'] }));
+    const c = await repo('ali').addComment(id, 'ali', 'Ali', 'Çok güzel olmuş!');
+    expect((await repo('ali').comments(id)).map((x) => x.text)).toEqual(['Çok güzel olmuş!']);
+    expect((await repo('ayse').get(id))?.commentCount).toBe(1);
+    // Başka mahalledeki göremez, yazamaz; sayacı tek başına artırmak olmaz.
+    await assertFails(repo('veli').comments(id));
+    await assertFails(repo('veli').addComment(id, 'veli', 'Veli', 'Merhaba'));
+    await assertFails(updateDoc(doc(fs('ali'), 'posts', id), { commentCount: increment(1), lastComment: c.id }));
+    // Başkası silemez; gönderi sahibi siler.
+    await env.withSecurityRulesDisabled(async (ctx) => setDoc(doc(ctx.firestore(), 'users', 'can'), { uid: 'can', birthYear: 1990, location: ataevler }));
+    await assertFails(repo('can').deleteComment(id, c.id));
+    await assertSucceeds(repo('ayse').deleteComment(id, c.id));
+    expect((await repo('ayse').get(id))?.commentCount).toBe(0);
+    // Yorumlar kapalıyken yazılamaz; yalnızca sahibi kapatır.
+    await assertFails(repo('ali').setCommentsOff(id, true));
+    await assertSucceeds(repo('ayse').setCommentsOff(id, true));
+    await assertFails(repo('ali').addComment(id, 'ali', 'Ali', 'Bir daha'));
+  });
+
+  it('yorum şikâyeti: kişi başına bir; il yöneticisi görür, yorumu siler', async () => {
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['bolgesel'] }));
+    const p = (await repo('veli').get(id))!;
+    const c = await repo('ali').addComment(id, 'ali', 'Ali', 'Kaba bir yorum');
+    await assertFails(repo('ali').reportComment(p, c, 'ali', 'taciz'));
+    await assertSucceeds(repo('veli').reportComment(p, c, 'veli', 'taciz'));
+    await assertFails(repo('veli').reportComment(p, c, 'veli', 'taciz'));
+    await assertFails(createPostModeration(fs('veli'), 'veli').listCommentReports({ provinceCode: '16' }));
+    const mod = createPostModeration(fs('ahmet'), 'ahmet');
+    const list = await mod.listCommentReports({ provinceCode: '16' });
+    expect(list).toHaveLength(1);
+    expect(list[0]!.text).toBe('Kaba bir yorum');
+    await assertSucceeds(mod.removeComment(list[0]!));
+    expect(await repo('ayse').comments(id)).toEqual([]);
+    expect((await repo('ayse').get(id))?.commentCount).toBe(0);
+  });
+
+  it('kaydetme yalnızca kişinin kendisine', async () => {
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
+    await assertSucceeds(repo('ali').save('ali', id));
+    expect(await repo('ali').isSaved('ali', id)).toBe(true);
+    expect((await repo('ali').listSaved('ali')).map((p) => p.id)).toEqual([id]);
+    await assertFails(getDoc(doc(fs('veli'), 'users', 'ali', 'savedPosts', id)));
+    await assertFails(repo('veli').save('ali', id));
+    await assertSucceeds(repo('ali').unsave('ali', id));
+    expect(await repo('ali').listSaved('ali')).toEqual([]);
+  });
+
   it('hesap silme: gönderiler boşaltılır, beğeniler geri alınır', async () => {
     const mine = await repo('ali').create('ali', 'Ali', input({ targets: ['genel'] }));
     const other = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
     await repo('ali').like(other, 'ali');
+    await repo('ali').addComment(other, 'ali', 'Ali', 'Yorumum');
+    await repo('ali').save('ali', other);
     await assertSucceeds(repo('ali').deleteAllOf('ali'));
     expect(await repo('ali').get(mine)).toMatchObject({ status: 'kaldirildi', text: '' });
-    expect((await repo('ayse').get(other))?.likeCount).toBe(0);
+    expect(await repo('ayse').get(other)).toMatchObject({ likeCount: 0, commentCount: 0 });
+    expect(await repo('ali').listSaved('ali')).toEqual([]);
   });
 });

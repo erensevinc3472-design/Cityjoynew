@@ -720,6 +720,23 @@
       "region": "Konumunda mahalleni seç.",
       "realEstate": "Satılık ya da kiralık ev, arsa, dükkân ilanları Keşfet'te paylaşılamaz. Emlak ilanları yetki belgesiyle Emlak bölümünden verilecek.",
       "relative": "Taziye gönderisini yalnızca yakınları paylaşabilir."
+    },
+    "save": "Kaydet",
+    "unsave": "Kaydedildi ✓",
+    "saved": "Kaydettiklerim",
+    "savedEmpty": "Henüz kaydettiğin gönderi yok. Gönderi ayrıntısında \"Kaydet\"e dokun.",
+    "comments": {
+      "title": "Yorumlar ({{count}})",
+      "empty": "Henüz yorum yok.",
+      "loadError": "Yorumlar yüklenemedi.",
+      "sendError": "Yorum gönderilemedi, tekrar dene.",
+      "tooLong": "Yorum 1-500 karakter olmalı.",
+      "delete": "Yorumu sil",
+      "off": "Gönderi sahibi yorumları kapattı.",
+      "write": "Yorum yaz",
+      "send": "Gönder",
+      "turnOff": "Yorumları kapat",
+      "turnOn": "Yorumları aç"
     }
   }
 }
