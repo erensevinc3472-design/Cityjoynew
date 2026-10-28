@@ -44,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (sabit duyuru; önceki: kullanıcı aktiviteleri, 
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (83)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (73; Java 21 gerekir)
+npm test                      # ortak paket testleri (84)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (76; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -282,7 +282,19 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Testler: ortak 83 (4 yeni), kurallar 73 (6 yeni) geçti; uygulama ve panel derlendi. Uygulama emülatörde tarayıcıda
    denendi (Mahallem/Bölgesel süzme, beğeni, emlak engeli, iki hedefe paylaşma, kaldırma, şikâyet). Panel bölümü
    tarayıcıda açılmadı.
-   Sonraki aşamalar: yorumlar (sahibi kapatabilir), kaydetme, takip + Takip sekmesi + kullanıcı profili, engelleme,
+   PR #9 birleşti, kurallar yüklendi (Eren, 28 Ekim).
+
+24. **Keşfet, 2. aşama: yorumlar ve kaydetme** (PROJE.md 5.5 madde 3). Gönderi ayrıntısında yorumlar (eskiden yeniye ilk
+   50, 1-500 karakter); gönderiyi görebilen yazar. Gönderi sahibi "Yorumları kapat / aç" der. Yorumu yazan ve gönderi
+   sahibi siler. Yorum şikâyet edilir (kişi başına bir); 3 şikâyette gizlenir. Panel > Moderasyon > "Keşfet yorum
+   şikâyetleri": "Yorumu sil" ya da "Yerinde kalsın"; yorum yazısının şikâyet anındaki kopyası görünür; işlem kaydına
+   yazılır. "Kaydet" düğmesi ve Keşfet'ten açılan "Kaydettiklerim" listesi (yalnızca kişinin kendisi görür). Kartta yorum
+   sayısı. Hesap silmede yorumlar ve kaydedilenler de silinir. Veritabanı: `posts/{id}/comments/{cid}`,
+   `commentReports/{postId}_{cid}_{uid}`, `users/{uid}/savedPosts/{postId}`; gönderide `commentCount`, `commentsOff`,
+   `lastComment` (sayaç yalnızca adı geçen yorum eklenip silinirken değişir). Testler: ortak 84, kurallar 76 geçti;
+   uygulama emülatörde tarayıcıda denendi (yorum yazma/silme, kaydet, Kaydettiklerim, yorumları kapatma). Panel derlendi,
+   panel bölümü tarayıcıda açılmadı.
+   Sonraki aşamalar: takip + Takip sekmesi + kullanıcı profili, engelleme,
    fotoğraf/video (Storage, Blaze), Genel sekmesine haber akışı (5.3 Haberler), resmî hesap gönderileri (muhtar/belediye
    rozetli) ve "Taziye yalnızca muhtar ya da yakını", yasaklı kelime süzgeci, alt gezinme çubuğu.
 
@@ -359,9 +371,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 23. madde (Keşfet 1. aşama): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli. (22. madde sabit duyuru PR #8
-   birleşti; kurallarının yüklendiği Eren'den teyit edilmedi, bu yüklemeyle birlikte gider.)
-0b. Keşfet 2. aşama: yorumlar (sahibi kapatabilir) ve kaydetme; sonra takip + Takip sekmesi + profil, engelleme. Diğer
+0a. 24. madde (Keşfet 2. aşama): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli.
+0b. Keşfet 3. aşama: takip + Takip sekmesi + kullanıcı profili, engelleme. Diğer
    adaylar: aktivite/etkinlik değişiklik bildirimleri ve günlük sınırlar (Blaze ister), Haberler (resmî duyurulardan
    "Kurum Haberleri" akışı, 5.3). (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,

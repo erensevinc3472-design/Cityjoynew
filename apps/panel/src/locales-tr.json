@@ -401,6 +401,15 @@
         "emlak": "Emlak ilanı",
         "diger": "Diğer"
       }
+    },
+    "comments": {
+      "title": "Keşfet yorum şikâyetleri",
+      "intro": "Keşfet gönderilerine yazılan yorumların şikâyetleri. 3 şikâyet alan yorum siz karar verene kadar uygulamada gizlenir.",
+      "comment": "Yorum",
+      "counts": "{{reports}} şikâyet",
+      "deleted": "Yorum silinmiş",
+      "remove": "Yorumu sil",
+      "note": "Nefret söylemi, taciz, dolandırıcılık, reklam ya da uygunsuz içerikte silin. Yazı, şikâyet anındaki kopyadır. Her işlem işlem kaydına yazılır."
     }
   },
   "sosSettings": {

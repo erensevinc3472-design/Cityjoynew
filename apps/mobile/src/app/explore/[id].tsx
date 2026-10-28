@@ -10,6 +10,7 @@ import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
 import { PostCard } from '@/components/post-card';
+import { PostComments } from '@/components/post-comments';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { cachedPost, patchCachedPost, toggleLike, useLiked } from '@/lib/posts';
@@ -17,11 +18,11 @@ import { postRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { spacing } from '@/theme/tokens';
 
-/** Gönderi ayrıntısı: yazının tamamı, beğeni, şikâyet; sahibi için kaldırma. */
+/** Gönderi ayrıntısı: yazının tamamı, beğeni, kaydet, yorumlar, şikâyet; sahibi için yorumları kapatma ve kaldırma. */
 export default function PostScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { user } = useSession();
+  const { user, profile } = useSession();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [item, setItem] = useState<Post | null | undefined>(() => cachedPost(id));
   const [busy, setBusy] = useState(false);
@@ -29,6 +30,7 @@ export default function PostScreen() {
   const [reporting, setReporting] = useState<PostReportReason | null>(null);
   const [reported, setReported] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
+  const [saved, setSaved] = useState<boolean>();
   const isLiked = useLiked(user?.uid);
   const mine = !!item && !!user && item.authorUid === user.uid;
 
@@ -37,6 +39,7 @@ export default function PostScreen() {
     // Göremediği gönderide (başka mahalle, kaldırılmış) kurallar okutmaz: "artık yok" gösterilir.
     postRepository.get(id).then(setItem, () => setItem(null));
     postRepository.hasReported(id, user.uid).then(setReported);
+    postRepository.isSaved(user.uid, id).then(setSaved);
   }, [id, user]);
 
   const header = <HeroHeader title={t('explore.post')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/explore'))} />;
@@ -83,12 +86,31 @@ export default function PostScreen() {
       setReporting(null);
     }, 'explore.reportError');
 
+  const toggleSave = () =>
+    run(async () => {
+      if (saved) await postRepository.unsave(user.uid, item.id);
+      else await postRepository.save(user.uid, item.id);
+      setSaved(!saved);
+    }, 'explore.saveError');
+
+  const toggleComments = () =>
+    run(async () => {
+      await postRepository.setCommentsOff(item.id, !item.commentsOff);
+      patchCachedPost(item.id, { commentsOff: !item.commentsOff });
+      setItem({ ...item, commentsOff: !item.commentsOff });
+    }, 'explore.saveError');
+
   return (
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content}>
         <PostCard item={item} liked={isLiked(item.id)} full onLike={busy ? undefined : like} />
         {mine && item.reportCount >= 3 && !item.cleared ? <FormMessage kind="info" text={t('explore.hiddenForReview')} /> : null}
         {error ? <FormMessage kind="error" text={error} /> : null}
+        <View style={styles.row}>
+          <AppButton variant="secondary" title={saved ? t('explore.unsave') : t('explore.save')} disabled={busy || saved === undefined} onPress={toggleSave} />
+          {mine ? <AppButton variant="secondary" title={item.commentsOff ? t('explore.comments.turnOn') : t('explore.comments.turnOff')} disabled={busy} onPress={toggleComments} /> : null}
+        </View>
+        <PostComments post={item} uid={user.uid} displayName={profile?.displayName} onCount={(n) => setItem((p) => (p ? { ...p, commentCount: n } : p))} />
 
         {mine ? (
           confirmRemove ? (
@@ -120,4 +142,5 @@ export default function PostScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
   block: { gap: spacing.xs },
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

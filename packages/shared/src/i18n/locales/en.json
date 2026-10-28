@@ -720,6 +720,23 @@
       "region": "Choose your neighbourhood in your location.",
       "realEstate": "Listings for homes, land or shops for sale or rent can't be shared on Explore. Real estate listings will be posted in the Real Estate section with a licence.",
       "relative": "Only relatives can share a condolence post."
+    },
+    "save": "Save",
+    "unsave": "Saved ✓",
+    "saved": "Saved posts",
+    "savedEmpty": "You haven't saved any posts yet. Tap \"Save\" on a post.",
+    "comments": {
+      "title": "Comments ({{count}})",
+      "empty": "No comments yet.",
+      "loadError": "Comments could not be loaded.",
+      "sendError": "Your comment couldn't be sent, try again.",
+      "tooLong": "A comment must be 1-500 characters.",
+      "delete": "Delete comment",
+      "off": "The author has turned off comments.",
+      "write": "Write a comment",
+      "send": "Send",
+      "turnOff": "Turn off comments",
+      "turnOn": "Turn on comments"
     }
   }
 }

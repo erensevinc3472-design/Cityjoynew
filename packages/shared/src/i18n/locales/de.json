@@ -720,6 +720,23 @@
       "region": "Wähle in deinem Standort dein Viertel.",
       "realEstate": "Anzeigen für Wohnungen, Grundstücke oder Läden zum Kauf oder zur Miete sind in Entdecken nicht erlaubt. Immobilienanzeigen kommen mit Lizenz in den Bereich Immobilien.",
       "relative": "Nur Angehörige können einen Beileidsbeitrag teilen."
+    },
+    "save": "Speichern",
+    "unsave": "Gespeichert ✓",
+    "saved": "Gespeicherte Beiträge",
+    "savedEmpty": "Du hast noch keine Beiträge gespeichert. Tippe bei einem Beitrag auf \"Speichern\".",
+    "comments": {
+      "title": "Kommentare ({{count}})",
+      "empty": "Noch keine Kommentare.",
+      "loadError": "Kommentare konnten nicht geladen werden.",
+      "sendError": "Kommentar konnte nicht gesendet werden, versuche es erneut.",
+      "tooLong": "Ein Kommentar muss 1-500 Zeichen haben.",
+      "delete": "Kommentar löschen",
+      "off": "Die Person hat Kommentare deaktiviert.",
+      "write": "Kommentar schreiben",
+      "send": "Senden",
+      "turnOff": "Kommentare deaktivieren",
+      "turnOn": "Kommentare aktivieren"
     }
   }
 }

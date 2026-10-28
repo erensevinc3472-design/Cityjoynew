@@ -84,6 +84,7 @@ export default function ExploreScreen() {
         <AnnouncementCard key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />
       ))}
       {user && location ? <AppButton title={t('explore.newPost')} onPress={() => router.push('/explore/new')} /> : null}
+      {user ? <AppButton variant="ghost" title={t('explore.saved')} onPress={() => router.push('/explore/saved')} /> : null}
     </View>
   );
 
