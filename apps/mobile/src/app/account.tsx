@@ -5,16 +5,17 @@ import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
+import { BottomNav } from '@/components/bottom-nav';
 import { AppText } from '@/components/app-text';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
-import { unregisterPush } from '@/lib/push';
 import { activityRepository, authService, businessRepository, eventRepository, familyRepository, messageRepository, postRepository, profileRepository, reviewRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings, type ThemeMode } from '@/lib/settings';
+import { useSignOut } from '@/lib/sign-out';
 import { restartFlow } from '@/lib/navigation';
 import { notificationSettings } from '@/lib/notifications';
 import { radius, spacing } from '@/theme/tokens';
@@ -37,13 +38,7 @@ export default function AccountScreen() {
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
 
-  const signOut = async () => {
-    // Bu telefona artık bu hesabın aile SOS bildirimleri gelmesin.
-    if (user) await unregisterPush(user.uid);
-    await authService.signOut();
-    await adopt(null);
-    restartFlow(router);
-  };
+  const signOut = useSignOut();
 
   const deleteAccount = async () => {
     setError(undefined);
@@ -74,7 +69,7 @@ export default function AccountScreen() {
   };
 
   return (
-    <FormScreen title={t('account.title')}>
+    <FormScreen title={t('account.title')} showBack={false} footer={<BottomNav active="profile" />}>
       <View style={{ gap: spacing.xs }}>
         <AppText variant="subtitle">{profile?.displayName ?? user?.displayName}</AppText>
         <AppText muted>{user?.email}</AppText>

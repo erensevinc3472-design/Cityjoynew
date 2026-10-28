@@ -10,6 +10,7 @@ import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
+import { BottomNav } from '@/components/bottom-nav';
 import { HeroHeader, LocationChip } from '@/components/hero-header';
 import { PostCard } from '@/components/post-card';
 import { Screen } from '@/components/screen';
@@ -82,7 +83,6 @@ export default function ExploreScreen() {
   const header = (
     <HeroHeader
       title={t('explore.title')}
-      onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
       right={
         user
           ? [
@@ -128,7 +128,7 @@ export default function ExploreScreen() {
 
   if (!user || !location || (tab === 'mahallem' && !location.neighbourhoodId)) {
     return (
-      <Screen header={header}>
+      <Screen header={header} footer={<BottomNav active="explore" />}>
         <View style={styles.top}>
           {user && location ? top : null}
           {!user ? (
@@ -145,7 +145,7 @@ export default function ExploreScreen() {
   }
 
   return (
-    <Screen header={header}>
+    <Screen header={header} footer={<BottomNav active="explore" />}>
       <FlatList
         data={items ?? []}
         keyExtractor={(i) => (i.kind === 'post' ? i.post.id : `a-${i.ann.id}`)}

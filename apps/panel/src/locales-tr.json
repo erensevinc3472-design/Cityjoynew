@@ -459,6 +459,15 @@
       "hint": "Her satıra bir arama. Bir dili boş bırakırsanız uygulama kendi varsayılan önerilerini gösterir (nöbetçi eczane, berber, park gibi).",
       "save": "Önerileri kaydet",
       "saved": "Kaydedildi. Uygulama yeni önerileri bir sonraki açılışta gösterir."
+    },
+    "introVideo": {
+      "title": "Tanıtım videosu",
+      "intro": "Uygulamanın ana sayfasındaki \"CityJoy'u tanı\" düğmesi bu bağlantıyı açar (ör. YouTube videosu).",
+      "label": "Video bağlantısı",
+      "hint": "Yalnızca https ile başlayan bağlantı. Boş bırakırsanız düğme \"yakında\" görünür.",
+      "save": "Kaydet",
+      "saved": "Kaydedildi. Uygulama yeni bağlantıyı bir sonraki açılışta kullanır.",
+      "invalid": "Bağlantı https:// ile başlamalı ve boşluk içermemeli."
     }
   },
   "notifications": {
@@ -466,7 +475,15 @@
     "intro": "Kullanıcının uygulamadaki bildirim merkezine hangi olayların düşeceği. Kullanıcı kendi türlerini ayrıca açıp kapatabilir.",
     "sendingSoon": "Gruba bildirim gönderme (il, ilçe, mahalle ve ilgi alanına göre; onaylı kampanyalar) telefona bildirim altyapısıyla birlikte gelecek.",
     "triggers": "Bildirim üreten olaylar",
-    "categories": { "acil": "Acil duyuru", "sos": "SOS (aile)", "mesaj": "Yeni mesaj ve mesaj isteği", "takip": "Yeni takipçi", "duyuru": "Duyuru", "haber": "Kurum haberi", "etkinlik": "Yeni etkinlik" },
+    "categories": {
+      "acil": "Acil duyuru",
+      "sos": "SOS (aile)",
+      "mesaj": "Yeni mesaj ve mesaj isteği",
+      "takip": "Yeni takipçi",
+      "duyuru": "Duyuru",
+      "haber": "Kurum haberi",
+      "etkinlik": "Yeni etkinlik"
+    },
     "alwaysOn": "her zaman açık",
     "hint": "Kapatılan tür hiçbir kullanıcının bildirim merkezinde görünmez. Acil duyuru ve SOS kapatılamaz. Her değişiklik işlem kaydına yazılır.",
     "save": "Kaydet",

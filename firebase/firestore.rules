@@ -590,6 +590,13 @@ service cloud.firestore {
         && termList(request.resource.data.terms, 'ru')
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
+      // Ana sayfadaki tanıtım videosu bağlantısı (13. madde 29): admin yönetir; boş ya da https bağlantısı.
+      allow write: if isAdmin() && id == 'introVideo'
+        && request.resource.data.keys().hasOnly(['url', 'updatedBy', 'updatedAt'])
+        && request.resource.data.url is string && request.resource.data.url.size() <= 500
+        && (request.resource.data.url == '' || request.resource.data.url.matches('https://[^ ]+'))
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
       // Bildirim tetikleyicileri (PROJE.md 7): admin yönetir; acil duyuru ve SOS kapatılamaz.
       allow write: if isAdmin() && id == 'notificationTriggers'
         && request.resource.data.keys().hasOnly(['triggers', 'updatedBy', 'updatedAt'])

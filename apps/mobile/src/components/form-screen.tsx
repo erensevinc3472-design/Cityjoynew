@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 
 import { spacing } from '@/theme/tokens';
@@ -8,11 +8,11 @@ import { HeroHeader } from './hero-header';
 import { Screen } from './screen';
 
 /** Üst bantta başlık ve geri düğmesi, altında klavyeyle kayan form: giriş, kayıt, profil, hesap. */
-export function FormScreen({ title, subtitle, showBack = true, children }: PropsWithChildren<{ title: string; subtitle?: string; showBack?: boolean }>) {
+export function FormScreen({ title, subtitle, showBack = true, footer, children }: PropsWithChildren<{ title: string; subtitle?: string; showBack?: boolean; footer?: ReactNode }>) {
   const router = useRouter();
   const canBack = showBack && router.canGoBack();
   return (
-    <Screen header={<HeroHeader title={title} onBack={canBack ? () => router.back() : undefined} />}>
+    <Screen header={<HeroHeader title={title} onBack={canBack ? () => router.back() : undefined} />} footer={footer}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           {subtitle ? <AppText muted>{subtitle}</AppText> : null}

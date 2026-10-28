@@ -23,12 +23,14 @@ interface Props {
   /** Başlığın altında küçük açıklama (ör. "Bursa › Nilüfer"). */
   subtitle?: string;
   onBack?(): void;
+  /** Geri düğmesi yoksa soldaki işlem (ör. ana sayfada yan menü). */
+  left?: HeaderAction;
   /** Sağdaki işlem; iki işlem de olabilir (ör. Keşfet: Mesajlar ve yeni gönderi). */
   right?: HeaderAction | HeaderAction[];
 }
 
 /** Üst bant: geri düğmesi, ortada başlık, sağda işlem; altında isteğe bağlı içerik (konum çipi vb.). */
-export function HeroHeader({ title, subtitle, onBack, right, children }: PropsWithChildren<Props>) {
+export function HeroHeader({ title, subtitle, onBack, left, right, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
   const { rtl } = useSettings();
   const { t } = useTranslation();
@@ -37,6 +39,8 @@ export function HeroHeader({ title, subtitle, onBack, right, children }: PropsWi
       <View style={styles.top}>
         {onBack ? (
           <RoundButton icon={rtl ? 'arrow-forward' : 'arrow-back'} label={t('common.back')} onPress={onBack} />
+        ) : left ? (
+          <RoundButton {...left} />
         ) : (
           <View style={styles.spacer} />
         )}

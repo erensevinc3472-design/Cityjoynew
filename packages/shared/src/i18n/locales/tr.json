@@ -46,7 +46,10 @@
     "greetingMorning": "Günaydın, {{name}}",
     "greetingDay": "İyi günler, {{name}}",
     "greetingEvening": "İyi akşamlar, {{name}}",
-    "search": "Kişi, işletme, yer, etkinlik ara"
+    "search": "Kişi, işletme, yer, etkinlik ara",
+    "introVideo": "CityJoy'u 1 dakikada tanı",
+    "introVideoHint": "Tanıtım videosu",
+    "watch": "İzle"
   },
   "modules": {
     "myCity": "Benim Şehrim",
@@ -450,7 +453,17 @@
     "moreInfo": "Ayrıntılı bilgi",
     "source": "Kaynak: {{source}}, {{date}}",
     "verifiedOn": "Doğrulandı: {{date}}",
-    "firstHour": "İlk saat {{price}} ₺"
+    "firstHour": "İlk saat {{price}} ₺",
+    "soon": "Yakında",
+    "showcase": "Şehir Vitrini",
+    "townhallHint": "Başvuru, evrak, hizmetler",
+    "tiles": {
+      "cafe": "Kafe ve Restoran",
+      "events": "Etkinlikler",
+      "pharmacy": "Nöbetçi Eczane",
+      "listings": "Satılık ve Kiralık",
+      "volunteer": "Gönüllülük"
+    }
   },
   "announcements": {
     "title": "Duyurular",
@@ -962,5 +975,20 @@
     "later": "Bir saat geç",
     "quietNote": "Sessiz saatlerde telefon bildirim sesi çıkarmaz. Acil duyurular ve SOS sessiz saatlerde de gelir.",
     "saveError": "Ayar kaydedilemedi. Bağlantını kontrol edip yeniden dene."
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "explore": "Keşfet",
+    "search": "Ara",
+    "profile": "Profil"
+  },
+  "menu": {
+    "open": "Menüyü aç",
+    "close": "Menüyü kapat",
+    "modules": "Menü",
+    "account": "Hesap",
+    "profile": "Profilim",
+    "settings": "Ayarlar",
+    "soon": "Yakında"
   }
 }

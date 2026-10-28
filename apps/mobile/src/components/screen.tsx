@@ -9,10 +9,12 @@ import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 interface Props {
   /** Üst bant içeriği (HeroHeader). Açık modda koyu petrol yeşili, koyu modda zeminle aynı. */
   header?: ReactNode;
+  /** Altta sabit duran içerik (alt gezinme çubuğu); güvenli alanı kendisi bırakır. */
+  footer?: ReactNode;
 }
 
 /** Güvenli alan, zemin, üst bant ve geniş ekranlarda (tablet, web) ortalanmış içerik. */
-export function Screen({ header, children }: PropsWithChildren<Props>) {
+export function Screen({ header, footer, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
   const scheme = useResolvedScheme();
   const insets = useSafeAreaInsets();
@@ -29,7 +31,8 @@ export function Screen({ header, children }: PropsWithChildren<Props>) {
       ) : (
         <View style={{ height: insets.top }} />
       )}
-      <View style={[styles.inner, styles.body, { paddingBottom: insets.bottom }]}>{children}</View>
+      <View style={[styles.inner, styles.body, { paddingBottom: footer ? 0 : insets.bottom }]}>{children}</View>
+      {footer}
     </View>
   );
 }

@@ -46,7 +46,10 @@
     "greetingMorning": "Guten Morgen, {{name}}",
     "greetingDay": "Guten Tag, {{name}}",
     "greetingEvening": "Guten Abend, {{name}}",
-    "search": "Personen, Betriebe, Orte, Events suchen"
+    "search": "Personen, Betriebe, Orte, Events suchen",
+    "introVideo": "CityJoy in 1 Minute kennenlernen",
+    "introVideoHint": "Vorstellungsvideo",
+    "watch": "Ansehen"
   },
   "modules": {
     "myCity": "Meine Stadt",
@@ -450,7 +453,17 @@
     "moreInfo": "Weitere Informationen",
     "source": "Quelle: {{source}}, {{date}}",
     "verifiedOn": "Bestätigt: {{date}}",
-    "firstHour": "Erste Stunde {{price}} TRY"
+    "firstHour": "Erste Stunde {{price}} TRY",
+    "soon": "Bald",
+    "showcase": "Stadtschaufenster",
+    "townhallHint": "Anträge, Unterlagen, Dienste",
+    "tiles": {
+      "cafe": "Cafés und Restaurants",
+      "events": "Veranstaltungen",
+      "pharmacy": "Notdienstapotheke",
+      "listings": "Kaufen und Mieten",
+      "volunteer": "Ehrenamt"
+    }
   },
   "announcements": {
     "title": "Bekanntmachungen",
@@ -962,5 +975,20 @@
     "later": "Eine Stunde später",
     "quietNote": "Während der Ruhezeiten gibt dein Handy keinen Benachrichtigungston aus. Dringende Meldungen und SOS kommen trotzdem an.",
     "saveError": "Einstellung konnte nicht gespeichert werden. Prüfe deine Verbindung und versuche es erneut."
+  },
+  "nav": {
+    "home": "Start",
+    "explore": "Entdecken",
+    "search": "Suche",
+    "profile": "Profil"
+  },
+  "menu": {
+    "open": "Menü öffnen",
+    "close": "Menü schließen",
+    "modules": "Menü",
+    "account": "Konto",
+    "profile": "Mein Profil",
+    "settings": "Einstellungen",
+    "soon": "Bald"
   }
 }

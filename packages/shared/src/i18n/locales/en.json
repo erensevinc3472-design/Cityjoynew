@@ -46,7 +46,10 @@
     "greetingMorning": "Good morning, {{name}}",
     "greetingDay": "Good afternoon, {{name}}",
     "greetingEvening": "Good evening, {{name}}",
-    "search": "Search people, businesses, places, events"
+    "search": "Search people, businesses, places, events",
+    "introVideo": "Get to know CityJoy in 1 minute",
+    "introVideoHint": "Intro video",
+    "watch": "Watch"
   },
   "modules": {
     "myCity": "My City",
@@ -450,7 +453,17 @@
     "moreInfo": "More information",
     "source": "Source: {{source}}, {{date}}",
     "verifiedOn": "Verified: {{date}}",
-    "firstHour": "First hour {{price}} TRY"
+    "firstHour": "First hour {{price}} TRY",
+    "soon": "Soon",
+    "showcase": "City Showcase",
+    "townhallHint": "Applications, documents, services",
+    "tiles": {
+      "cafe": "Cafés and Restaurants",
+      "events": "Events",
+      "pharmacy": "On-duty Pharmacy",
+      "listings": "For Sale and Rent",
+      "volunteer": "Volunteering"
+    }
   },
   "announcements": {
     "title": "Announcements",
@@ -962,5 +975,20 @@
     "later": "One hour later",
     "quietNote": "During quiet hours your phone won't make notification sounds. Urgent announcements and SOS still come through.",
     "saveError": "Setting could not be saved. Check your connection and try again."
+  },
+  "nav": {
+    "home": "Home",
+    "explore": "Explore",
+    "search": "Search",
+    "profile": "Profile"
+  },
+  "menu": {
+    "open": "Open menu",
+    "close": "Close menu",
+    "modules": "Menu",
+    "account": "Account",
+    "profile": "My profile",
+    "settings": "Settings",
+    "soon": "Soon"
   }
 }

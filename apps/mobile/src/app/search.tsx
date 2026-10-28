@@ -25,6 +25,7 @@ import { AppText } from '@/components/app-text';
 import { BusinessCard } from '@/components/business-card';
 import { Chips } from '@/components/chips';
 import { EventCard } from '@/components/event-card';
+import { BottomNav } from '@/components/bottom-nav';
 import { HeroHeader } from '@/components/hero-header';
 import { OptionRow } from '@/components/option-row';
 import { PostCard } from '@/components/post-card';
@@ -225,10 +226,10 @@ export default function SearchScreen() {
   ];
   const urgentCategories = subcategories.filter((x) => x.urgent).slice(0, 6);
 
-  const header = <HeroHeader title={t('search.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))} />;
+  const header = <HeroHeader title={t('search.title')} />;
 
   return (
-    <Screen header={header}>
+    <Screen header={header} footer={<BottomNav active="search" />}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <SearchField value={input} onChangeText={setInput} placeholder={t('search.placeholder')} autoFocus={!params.q} onSubmitEditing={() => input.trim() && recent.add(input.trim())} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled">
