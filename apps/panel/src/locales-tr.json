@@ -347,7 +347,26 @@
     "loading": "Yükleniyor…",
     "empty": "Şikâyet yok.",
     "note": "Hakaret ve iftira şikâyetlerinde değerlendirmeyi gizlemeden önce metni okuyun: deneyim anlatımı serbest, kişiyi suçlama ve kişisel bilgi yasak. Her işlem işlem kaydına yazılır.",
-    "adminOnly": "Değerlendirme şikâyetleri şimdilik yalnızca admin panelinde. İl bazlı şikâyet kuyruğu sonraki adımda gelecek."
+    "adminOnly": "Değerlendirme şikâyetleri şimdilik yalnızca admin panelinde. Aktivite şikâyetleri aşağıda, kendi iliniz için.",
+    "activities": {
+      "title": "Aktivite şikâyetleri",
+      "intro": "Kullanıcıların açtığı aktivitelerin şikâyetleri. 3 şikâyet alan aktivite siz karar verene kadar uygulamada listeden düşer.",
+      "activity": "Aktivite",
+      "counts": "{{reports}} şikâyet · {{attendees}} katılımcı",
+      "removed": "Kaldırıldı",
+      "kept": "Yerinde kaldı",
+      "missing": "(aktivite bulunamadı)",
+      "remove": "Aktiviteyi kaldır",
+      "keep": "Yerinde kalsın",
+      "note": "Tehlike, taciz, para isteme ya da reklam şüphesinde kaldırın. Kaldırılan aktivite uygulamada görünmez. Her işlem işlem kaydına yazılır.",
+      "reasons": {
+        "tehlikeli": "Tehlikeli ya da güvensiz",
+        "uygunsuz": "Uygunsuz içerik",
+        "ticari": "Reklam ya da satış",
+        "sahte": "Sahte ya da yanıltıcı",
+        "diger": "Diğer"
+      }
+    }
   },
   "sosSettings": {
     "title": "SOS ayarları",
