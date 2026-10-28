@@ -1,7 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps, type ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   buildCategoryTree,
@@ -23,25 +25,22 @@ import {
 
 import { AppText } from '@/components/app-text';
 import { BusinessCard } from '@/components/business-card';
-import { Chips } from '@/components/chips';
 import { EventCard } from '@/components/event-card';
 import { BottomNav } from '@/components/bottom-nav';
-import { HeroHeader } from '@/components/hero-header';
+import { RoundButton } from '@/components/hero-header';
 import { OptionRow } from '@/components/option-row';
 import { PostCard } from '@/components/post-card';
-import { Screen } from '@/components/screen';
-import { SearchField } from '@/components/search-field';
 import { StateMessage } from '@/components/state-message';
 import { useEvents } from '@/lib/events';
 import { locationRepository as repo } from '@/lib/locations';
-import { toggleLike, useLiked } from '@/lib/posts';
+import { authorHref, toggleLike, useLiked } from '@/lib/posts';
 import { searchBusinesses, searchPeople, searchPosts, useCityPlaces, useRecentSearches, useSearchSuggestions } from '@/lib/search';
 import { useServiceCategories } from '@/lib/service-categories';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { useSocial } from '@/lib/social';
 import { useUserLocation } from '@/lib/user-location';
-import { MIN_TOUCH, radius, spacing } from '@/theme/tokens';
+import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
@@ -78,7 +77,7 @@ export default function SearchScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { language } = useSettings();
+  const { language, rtl } = useSettings();
   const lang = language ?? 'tr';
   const params = useLocalSearchParams<{ q?: string; tab?: string }>();
   const { user } = useSession();
@@ -91,7 +90,13 @@ export default function SearchScreen() {
 
   const [input, setInput] = useState(params.q ?? '');
   const [query, setQuery] = useState(params.q?.trim() ?? '');
-  const [tab, setTab] = useState<SearchTab>(() => (SEARCH_TABS as readonly string[]).includes(params.tab ?? '') ? (params.tab as SearchTab) : 'tumu');
+  const tabParam = (SEARCH_TABS as readonly string[]).includes(params.tab ?? '') ? (params.tab as SearchTab) : undefined;
+  const [tab, setTab] = useState<SearchTab>(tabParam ?? 'tumu');
+  // Profil > Kişi bul: ekran açıkken de sekme Kişiler'e geçsin.
+  useEffect(() => {
+    if (tabParam) setTab(tabParam);
+  }, [tabParam]);
+  const insets = useSafeAreaInsets();
   const [likes, setLikes] = useState<Record<string, number>>({});
 
   // Yazarken her harfte sorgu atılmaz: kısa bir duraklamadan sonra aranır.
@@ -116,7 +121,8 @@ export default function SearchScreen() {
     [location?.provinceCode, location?.neighbourhoodId],
   );
   const places = useCityPlaces(province, wants('yerler'));
-  const { list: events } = useEvents(wants('etkinlikler') ? province : undefined);
+  // Boşken "Yaklaşan etkinlikler" de buradan; oturumda önbellekte.
+  const { list: events } = useEvents(province);
 
   const subcategories = useMemo(() => buildCategoryTree(categories).flatMap((n) => n.children), [categories]);
   const categoryText = (x: ServiceCategory) => `${localized(x.names, lang)} ${x.names.tr}`;
@@ -207,7 +213,7 @@ export default function SearchScreen() {
         liked={isLiked(p.id)}
         onPress={() => router.push({ pathname: '/explore/[id]', params: { id: p.id } })}
         onLike={() => like(p)}
-        onAuthor={() => router.push({ pathname: '/u/[uid]', params: { uid: p.authorUid } })}
+        onAuthor={() => router.push(authorHref(p))}
       />
     ), { failed: posts.failed, note: postsOk ? undefined : t('search.postsTooShort') }),
   ];
@@ -218,42 +224,110 @@ export default function SearchScreen() {
   const nothing = tab === 'tumu' && allDone && allLists.every((l) => !l || l.length === 0);
   const loadingAll = tab === 'tumu' && !allDone && allLists.every((l) => !l || l.length === 0);
 
-  const quick: { icon: IconName; label: string; href: Parameters<typeof router.push>[0] }[] = [
-    { icon: 'handyman', label: t('search.quickServices'), href: '/services' },
-    { icon: 'emergency', label: t('search.quickUrgent'), href: '/urgent' },
-    { icon: 'event', label: t('search.quickEvents'), href: '/events' },
-    { icon: 'location-city', label: t('search.quickCity'), href: '/city' },
+  const quick: { icon: IconName; label: string; color: string; href: Parameters<typeof router.push>[0] }[] = [
+    { icon: 'emergency', label: t('search.quickUrgent'), color: c.danger, href: '/urgent' },
+    { icon: 'handyman', label: t('search.quickServices'), color: c.accent, href: '/services' },
+    { icon: 'event', label: t('search.quickEvents'), color: '#C2577A', href: '/events' },
+    { icon: 'location-city', label: t('search.quickCity'), color: '#2D8A8A', href: '/city' },
   ];
-  const urgentCategories = subcategories.filter((x) => x.urgent).slice(0, 6);
-
-  const header = <HeroHeader title={t('search.title')} />;
+  // Bölgendeki ustalar: önce acil kategoriler, en çok altı.
+  const masters = [...subcategories.filter((x) => x.urgent), ...subcategories.filter((x) => !x.urgent)].slice(0, 6);
+  const upcoming = (events ?? []).filter((e) => e.status === 'yayinda').slice(0, 2);
+  const typing = input.trim().length > 0;
+  const submit = () => {
+    const q = input.trim();
+    if (!q) return;
+    setQuery(q);
+    recent.add(q);
+  };
+  const sectionHead = (title: string, action?: { label: string; onPress(): void }) => (
+    <View style={styles.row}>
+      <AppText accessibilityRole="header" style={[styles.kicker, styles.grow, { color: c.textMuted }]}>{title.toLocaleUpperCase(lang)}</AppText>
+      {action ? (
+        <Pressable accessibilityRole="button" onPress={action.onPress} style={styles.more} hitSlop={6}>
+          <AppText style={[styles.link, { color: c.accent }]}>{action.label}</AppText>
+        </Pressable>
+      ) : null}
+    </View>
+  );
 
   return (
-    <Screen header={header} footer={<BottomNav active="search" />}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        <SearchField value={input} onChangeText={setInput} placeholder={t('search.placeholder')} autoFocus={!params.q} onSubmitEditing={() => input.trim() && recent.add(input.trim())} />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          <Chips<SearchTab> label={t('search.title')} value={tab} onChange={setTab} options={SEARCH_TABS.map((x) => ({ value: x, label: t(`search.tabs.${x}`) }))} />
-        </ScrollView>
+    <View style={[styles.root, { backgroundColor: c.background }]}>
+      <StatusBar style="light" />
+      {/* Üst bölüm (tasarım: ara.html): yazarken başlık küçülür, arama kutusu ve sekmeler kalır. */}
+      <View style={[styles.hero, { backgroundColor: c.hero, paddingTop: insets.top + spacing.xs }]}>
+        <View style={styles.heroInner}>
+          <View style={styles.row}>
+            <RoundButton icon="arrow-back" label={t('common.back')} onPress={() => router.dismissTo('/home')} />
+            {typing ? <AppText accessibilityRole="header" style={[styles.barTitle, { color: c.heroText }]}>{t('search.title')}</AppText> : null}
+          </View>
+          {!typing ? (
+            <View style={styles.titleBox}>
+              <AppText accessibilityRole="header" style={[styles.heroTitle, { color: c.heroText }]}>
+                {t('search.heroLine1')}{' '}
+                <AppText style={[styles.heroTitle, { color: c.heroAccent }]}>{t('search.heroLine2')}</AppText>
+              </AppText>
+              <AppText style={[styles.heroSub, { color: c.heroMuted }]}>{t('search.heroSub')}</AppText>
+            </View>
+          ) : null}
+          <View style={styles.searchRow}>
+            <View style={[styles.box, { borderColor: typing ? c.heroAccent : 'rgba(224, 176, 122, 0.35)' }]}>
+              <MaterialIcons name="search" size={20} color={c.heroAccent} />
+              <TextInput
+                value={input}
+                onChangeText={setInput}
+                placeholder={t('search.placeholder')}
+                placeholderTextColor="rgba(199, 216, 218, 0.6)"
+                accessibilityLabel={t('search.placeholder')}
+                autoCorrect={false}
+                autoCapitalize="none"
+                autoFocus={tabParam === 'kisiler'}
+                returnKeyType="search"
+                onSubmitEditing={submit}
+                style={[styles.input, { textAlign: rtl ? 'right' : 'left' }]}
+              />
+              {typing ? (
+                <Pressable accessibilityRole="button" accessibilityLabel={t('search.clear')} onPress={() => setInput('')} hitSlop={8}>
+                  <MaterialIcons name="close" size={20} color={c.heroMuted} />
+                </Pressable>
+              ) : null}
+            </View>
+            <Pressable accessibilityRole="button" accessibilityLabel={t('search.title')} onPress={submit} style={({ pressed }) => [styles.go, { backgroundColor: c.heroAccent, opacity: pressed ? 0.8 : 1 }]}>
+              <MaterialIcons name="search" size={24} color="#1A1408" />
+            </Pressable>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={styles.tabsScroll} contentContainerStyle={styles.tabs} accessibilityRole="tablist">
+            {SEARCH_TABS.map((x) => {
+              const selected = x === tab;
+              return (
+                <Pressable
+                  key={x}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected }}
+                  onPress={() => setTab(x)}
+                  style={[styles.tab, selected ? { backgroundColor: c.heroAccent, borderColor: c.heroAccent } : { borderColor: 'rgba(255, 255, 255, 0.18)' }]}>
+                  <AppText style={[styles.tabText, { color: selected ? '#1A1408' : c.heroText }]}>{t(`search.tabs.${x}`)}</AppText>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
+      </View>
 
+      <ScrollView style={styles.flex} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {!query ? (
           <>
             {recent.list.length ? (
               <View style={styles.group}>
-                <View style={styles.row}>
-                  <AppText variant="label" accessibilityRole="header" style={styles.grow}>{t('search.recent')}</AppText>
-                  <Pressable accessibilityRole="button" onPress={recent.clear} style={styles.more}>
-                    <AppText variant="caption" style={{ color: c.accent }}>{t('search.clearRecent')}</AppText>
-                  </Pressable>
-                </View>
+                {sectionHead(t('search.recent'), { label: t('search.clearRecent'), onPress: recent.clear })}
                 {recent.list.map((q) => (
-                  <View key={q} style={[styles.recent, { borderColor: c.border, backgroundColor: c.surface }]}>
+                  <View key={q} style={[styles.recent, { backgroundColor: c.surface }]}>
                     <Pressable accessibilityRole="button" accessibilityLabel={q} onPress={() => pick(q)} style={[styles.row, styles.grow]}>
                       <MaterialIcons name="history" size={20} color={c.textMuted} />
-                      <AppText style={styles.grow}>{q}</AppText>
+                      <AppText style={styles.grow} numberOfLines={1}>{q}</AppText>
                     </Pressable>
                     <Pressable accessibilityRole="button" accessibilityLabel={t('search.removeRecent', { q })} onPress={() => recent.remove(q)} style={styles.icon} hitSlop={8}>
-                      <MaterialIcons name="close" size={20} color={c.textMuted} />
+                      <MaterialIcons name="close" size={18} color={c.textMuted} />
                     </Pressable>
                   </View>
                 ))}
@@ -262,29 +336,55 @@ export default function SearchScreen() {
 
             {suggested.length ? (
               <View style={styles.group}>
-                <AppText variant="label" accessibilityRole="header">{t('search.suggested')}</AppText>
+                {sectionHead(t('search.suggested'))}
                 <View style={styles.wrap}>
                   {suggested.map((q) => (
-                    <Pressable key={q} accessibilityRole="button" onPress={() => pick(q)} style={({ pressed }) => [styles.pill, { borderColor: c.border, backgroundColor: c.surface, opacity: pressed ? 0.85 : 1 }]}>
-                      <AppText variant="label">{q}</AppText>
+                    <Pressable key={q} accessibilityRole="button" accessibilityLabel={q} onPress={() => pick(q)} style={({ pressed }) => [styles.tag, { borderColor: c.border, backgroundColor: c.surface, opacity: pressed ? 0.8 : 1 }]}>
+                      <AppText style={[styles.tagText, { color: c.text }]}>#{q.replace(/\s+/g, '')}</AppText>
                     </Pressable>
                   ))}
                 </View>
               </View>
             ) : null}
 
-            <View style={styles.group}>
-              <AppText variant="label" accessibilityRole="header">{t('search.quick')}</AppText>
-              <View style={styles.wrap}>
-                {quick.map((q) => (
-                  <Pressable key={q.label} accessibilityRole="button" onPress={() => router.push(q.href)} style={({ pressed }) => [styles.pill, styles.row, { borderColor: c.border, backgroundColor: c.surface, opacity: pressed ? 0.85 : 1 }]}>
-                    <MaterialIcons name={q.icon} size={18} color={c.icon} />
-                    <AppText variant="label">{q.label}</AppText>
-                  </Pressable>
+            {masters.length ? (
+              <View style={styles.group}>
+                {sectionHead(t('search.masters'), { label: t('search.seeAllShort'), onPress: () => router.push('/services') })}
+                <View style={styles.grid}>
+                  {masters.map((x) => (
+                    <Pressable
+                      key={x.id}
+                      accessibilityRole="button"
+                      onPress={() => router.push({ pathname: '/services/[id]', params: { id: x.id } })}
+                      style={({ pressed }) => [styles.master, { backgroundColor: c.surface, borderColor: x.urgent ? c.danger : c.border, opacity: pressed ? 0.85 : 1 }]}>
+                      <View style={[styles.masterIcon, { backgroundColor: c.accentSoft }]}>
+                        <MaterialIcons name={(x.icon || 'handyman') as IconName} size={20} color={c.accent} />
+                      </View>
+                      <AppText numberOfLines={2} style={[styles.masterText, { color: c.textStrong }]}>{localized(x.names, lang) ?? x.names.tr}</AppText>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            ) : null}
+
+            {upcoming.length ? (
+              <View style={styles.group}>
+                {sectionHead(t('search.upcoming'), { label: t('search.seeAllShort'), onPress: () => router.push('/events') })}
+                {upcoming.map((e) => (
+                  <EventCard key={e.id} item={e} onPress={() => router.push({ pathname: '/events/[id]', params: { id: e.id } })} />
                 ))}
-                {urgentCategories.map((x) => (
-                  <Pressable key={x.id} accessibilityRole="button" onPress={() => router.push({ pathname: '/services/[id]', params: { id: x.id } })} style={({ pressed }) => [styles.pill, { borderColor: c.danger, backgroundColor: c.surface, opacity: pressed ? 0.85 : 1 }]}>
-                    <AppText variant="label">{localized(x.names, lang)}</AppText>
+              </View>
+            ) : null}
+
+            <View style={styles.group}>
+              {sectionHead(t('search.quick'))}
+              <View style={styles.quick}>
+                {quick.map((q) => (
+                  <Pressable key={q.label} accessibilityRole="button" onPress={() => router.push(q.href)} style={({ pressed }) => [styles.quickTile, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
+                    <View style={[styles.quickIcon, { backgroundColor: q.color }]}>
+                      <MaterialIcons name={q.icon} size={20} color="#FFFFFF" />
+                    </View>
+                    <AppText numberOfLines={2} style={[styles.quickText, { color: c.textStrong }]}>{q.label}</AppText>
                   </Pressable>
                 ))}
               </View>
@@ -301,18 +401,46 @@ export default function SearchScreen() {
           </>
         )}
       </ScrollView>
-    </Screen>
+      <BottomNav active="search" />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xl },
+  root: { flex: 1 },
+  flex: { flex: 1 },
+  hero: { borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl, paddingBottom: spacing.md },
+  heroInner: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER, gap: spacing.md },
+  barTitle: { fontFamily: fonts.heading, fontSize: 18 },
+  titleBox: { gap: 6, paddingTop: spacing.xs },
+  heroTitle: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, letterSpacing: -0.3 },
+  heroSub: { fontSize: 13, lineHeight: 19 },
+  searchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  box: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 50, paddingHorizontal: 14, borderRadius: radius.lg, borderWidth: 1.5, backgroundColor: 'rgba(23, 70, 75, 0.6)' },
+  input: { flex: 1, fontFamily: fonts.body, fontSize: 15, paddingVertical: 10, color: '#FFFFFF' },
+  go: { width: 50, height: 50, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
+  tabsScroll: { marginHorizontal: -GUTTER, flexGrow: 0 },
+  tabs: { paddingHorizontal: GUTTER, gap: spacing.sm },
+  tab: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, justifyContent: 'center' },
+  tabText: { fontFamily: fonts.bodySemi, fontSize: 13 },
+  content: { width: '100%', maxWidth: 640, alignSelf: 'center', padding: GUTTER, gap: spacing.lg, paddingBottom: spacing.xl },
   group: { gap: spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   grow: { flex: 1 },
+  kicker: { fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 1.2 },
+  link: { fontFamily: fonts.bodySemi, fontSize: 12 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  pill: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: spacing.md, borderRadius: radius.pill, borderWidth: 1 },
-  recent: { flexDirection: 'row', alignItems: 'center', minHeight: MIN_TOUCH, paddingStart: spacing.md, borderRadius: radius.md, borderWidth: 1 },
+  tag: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 12, borderRadius: radius.pill, borderWidth: 1 },
+  tagText: { fontFamily: fonts.bodyMedium, fontSize: 13 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  master: { width: '48%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 56, padding: 10, borderRadius: radius.md, borderWidth: 1 },
+  masterIcon: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  masterText: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 17 },
+  quick: { flexDirection: 'row', gap: spacing.sm },
+  quickTile: { flex: 1, alignItems: 'center', gap: 6, paddingVertical: spacing.md, paddingHorizontal: 4, borderRadius: radius.md, borderWidth: 1 },
+  quickIcon: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
+  quickText: { fontFamily: fonts.bodySemi, fontSize: 11, lineHeight: 14, textAlign: 'center' },
+  recent: { flexDirection: 'row', alignItems: 'center', minHeight: MIN_TOUCH, paddingStart: spacing.md, borderRadius: radius.md },
   icon: { width: MIN_TOUCH, height: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' },
-  more: { minHeight: MIN_TOUCH, justifyContent: 'center' },
+  more: { minHeight: 32, justifyContent: 'center' },
 });

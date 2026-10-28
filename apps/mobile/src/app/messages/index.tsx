@@ -1,13 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { foldForSearch, isRequestFor, otherMember, type Chat } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
-import { BottomNav } from '@/components/bottom-nav';
 import { RoundButton } from '@/components/hero-header';
 import { SearchField } from '@/components/search-field';
 import { TopBar } from '@/components/top-bar';
@@ -22,7 +22,7 @@ import { useThemeColors } from '@/theme/use-theme';
 type Tab = 'sohbetler' | 'istekler';
 
 /**
- * Mesajlar (PROJE.md 5.11; alt menüde sekme, 13. madde 31): üstte kullanıcı adım ve yeni mesaj düğmesi, altında
+ * Mesajlar (PROJE.md 5.11; profilin sağ üstünden açılır, 13. madde 31): üstte kullanıcı adım ve yeni mesaj düğmesi, altında
  * sohbetlerde arama. Sohbetlerim ve mesaj istekleri (takipleşmediğim kişilerden gelen, kabul etmediğim).
  * Engellediklerim listede görünmez. Okundu bilgisi buradan kapatılır.
  */
@@ -30,6 +30,7 @@ export default function MessagesScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const insets = useSafeAreaInsets();
   const { language } = useSettings();
   const lang = language ?? 'tr';
   const { user, profile } = useSession();
@@ -58,8 +59,11 @@ export default function MessagesScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: c.background }]}>
-      <TopBar title={title} right={user ? <RoundButton icon="edit-square" label={t('messages.newMessage')} onPress={() => router.push('/messages/new')} /> : undefined} />
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <TopBar
+        title={title}
+        left={<RoundButton icon="arrow-back" label={t('common.back')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/me'))} />}
+        right={user ? <RoundButton icon="edit-square" label={t('messages.newMessage')} onPress={() => router.push('/messages/new')} /> : undefined} />
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]} keyboardShouldPersistTaps="handled">
         <SearchField value={find} onChangeText={setFind} placeholder={t('messages.searchChats')} />
         <Chips<Tab>
           label={t('messages.title')}
@@ -113,7 +117,6 @@ export default function MessagesScreen() {
         <AppText variant="caption" muted>{t('messages.readReceiptsNote')}</AppText>
         <AppText variant="caption" muted>{t('messages.safetyNote')}</AppText>
       </ScrollView>
-      <BottomNav active="messages" />
     </View>
   );
 }

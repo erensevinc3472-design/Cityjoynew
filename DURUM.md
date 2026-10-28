@@ -429,17 +429,37 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Yeni paket: react-native-svg. Testler: ortak 104, kurallar 98 (1 yeni). Telefonda ana sayfa ve yan menü görüldü;
    Keşfet, profil, Sosyal Harmoni, karşılama, Acil web önizlemede / tip denetiminde kontrol edildi, telefonda bakılmadı.
 
-33. **Profil ve Mesajlar sekmesi** (PROJE.md 13. madde 31). Alt gezinme beş sekme: Ana Sayfa, Keşfet, **Mesajlar**,
-   Ara, Profil. **Profil** (`/me`, başkasınınki `/u/[uid]`, ortak `components/profile-view.tsx`): Instagram düzeni;
-   üstte ad, zil ve ☰ (Ayarlar = eski Hesabım sayfası, artık geri düğmeli, bildirim ayarları da orada). Halkalı harf,
+33. **Profil, Mesajlar ve Ara** (PROJE.md 13. madde 31-32). Alt gezinme dört sekme (Ana Sayfa, Keşfet, Ara, Profil);
+   **Mesajlar profilin sağ üstünde** (okunmamışta nokta), Mesajlar ekranında geri düğmesi. **Profil** (`/me`, başkasınınki `/u/[uid]`, ortak `components/profile-view.tsx`): Instagram düzeni;
+   üstte solda geri (ana sayfaya), ortada ad (Plus Jakarta 800), sağda Mesajlar ve ☰ (Ayarlar = eski Hesabım sayfası, artık geri düğmeli, bildirim ayarları da orada). Halkalı harf,
    gönderi/takipçi/takip, ad ve tanıtım (il gösterilmez, isteyen tanıtıma yazar). Kendi profilinde Düzenle, Profili
-   paylaş, Kişi bul (Ara'yı Kişiler sekmesiyle açar; arama tek yerde); Ailem (SOS) ve İşletmem kısayol kartları; takip
+   paylaş, Kişi bul (Ara'yı Kişiler sekmesiyle açar, ekran açıksa da geçer; arama tek yerde); Ailem (SOS) ve İşletmem kısayol kartları; takip
    istekleri. Sekmeler: Gönderiler (üçlü ızgara, fotoğraf gelene kadar kategoriye göre renkli yazı kareleri),
    Kaydedilenler, Katıldıklarım (etkinlik + aktivite; `eventRepository.listJoined`, kişinin kendi katılım kayıtları,
    mevcut kural ve dizinle). Başkasının profilinde Takip et ve Mesaj; paylaş, şikâyet ve engelle "…" alt menüsünde.
    Paylaşım yalnızca Keşfet'ten. **Mesajlar:** üstte kullanıcının adı, sağda yeni mesaj, altında sohbetlerde arama;
    yeni mesaj ekranı (`/messages/new`) takip ettiklerini listeler ve adla kişi arar. Başarımlar ve banner yok (Eren).
-   Testler: kurallar +1 doğrulama (events). Telefonda bakılmadı.
+   **Ara** (tasarım ara.html, sadeleştirildi): üstte "Ne aramak istersin?", büyük arama kutusu ve altın ara düğmesi,
+   altın seçili sekmeler; yazınca başlık küçülür. Boşken son aramalar, #önerilen aramalar, bölgendeki ustalar (hizmet
+   kategorileri, acil olanlar önce), yaklaşan etkinlikler, hızlı erişim. Yapay zekâ asistanı, sesli arama, rotalar ve
+   örnek sayılar konmadı (altyapısı yok / sahte veri olurdu). Testler: kurallar +1 doğrulama (events). Telefonda bakılmadı.
+
+34. **İşletme sayfası, takip, yetkililer, işletme adına paylaşım** (PROJE.md 13. madde 33). **İşletme sayfası**
+   (`/business/[id]`): profil iskeleti; halkalı harf, gönderi / takipçi / puan, ad + doğrulama rozeti, kategori ve
+   ilçe, "Şu an açık · kapanış 23:00" (`openState`, gece yarısını geçen saatler dahil). Takip et, Ara, WhatsApp,
+   Yol tarifi (Apple / Google Haritalar, adresle). Sekmeler: Gönderiler (ızgara, `components/post-grid.tsx`), Menü ya da
+   Hizmetler (fiyat listesi), Yorumlar, Bilgiler (saat tablosu, ödeme, olanaklar, güven bilgisi). **Takip:**
+   `businessFollows/{işletme_kişi}` + `followerCount` (kurallar sayacı tam bir değiştirir); takip edilen işletmenin
+   "Takip" hedefli gönderileri Takip akışına düşer. **İşletmem formu:** mahalle (isteğe bağlı, gizli), haftalık saat
+   (gün gün, ilk günü tüm haftaya kopyala), ödeme yöntemleri, olanaklar. **Yetkililer:** sahibi en çok 3 kişiyi adıyla
+   bulup ekler; izinler: paylaşım kapalı / sahibinin onayıyla (varsayılan) / doğrudan, bilgileri düzenleme (telefon
+   hariç), yorumlara cevap. Yetkili kendini çıkarabilir; İşletmem'de "Yetkili olduğun işletmeler". **İşletme adına
+   paylaşım:** Keşfet + ekranında "Kimin adına?"; gönderi işletmenin adı ve konumuyla, akışta "İşletme" etiketiyle;
+   adına dokununca işletme sayfası. Onaylı yetkilinin paylaşımı `onay-bekliyor` durumunda akışa düşmez; sahibi işletme
+   sayfasında onaylar ya da reddeder. Kişisel profilde işletme paylaşımları görünmez. **Panel:** İşletmeler tablosunda
+   takipçi sayısı ve yetkililer; admin yetkiliyi çıkarır (işlem kaydı). Hesap silmede işletme takipleri ve
+   yetkililikler bırakılır. Testler: kurallar +4 (business-page), ortak +2. **Eren yapacak:** birleştirince kuralları
+   ve dizinleri yükle (3 yeni dizin). Telefonda bakılmadı.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

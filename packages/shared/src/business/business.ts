@@ -12,6 +12,39 @@ export type VerificationStatus = 'dogrulanmadi' | 'inceleniyor' | 'dogrulandi';
 /** yayinda: herkes görür; gizli: sahibi kapattı; kaldirildi: yönetim kaldırdı (sahibi açamaz). */
 export type BusinessStatus = 'yayinda' | 'gizli' | 'kaldirildi';
 
+/** Ödeme yöntemleri ve olanaklar: işletme sayfasının Bilgiler sekmesinde görünür (PROJE.md 5.7 adım 2). */
+export const PAYMENT_METHODS = ['nakit', 'kart', 'temassiz', 'yemek-karti', 'havale'] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+export const AMENITIES = ['paket-servis', 'aile-alani', 'engelli-erisimi', 'otopark', 'wifi', 'cocuk-dostu', 'evcil-hayvan', 'rezervasyon'] as const;
+export type Amenity = (typeof AMENITIES)[number];
+
+/** Bir günün açılış ve kapanış saati ("09:00", "23:30"); kapanış açılıştan küçükse gece yarısından sonra kapanır. */
+export interface DayHours {
+  open: string;
+  close: string;
+}
+
+/**
+ * İşletme yetkilisi (Eren, 28 Ekim 2026): sahibi en çok 3 kişiyi kullanıcı adıyla bulup atar ve izinlerini seçer.
+ * Paylaşım: kapalı, sahibinin onayıyla ya da doğrudan.
+ */
+export const MANAGER_POST_MODES = ['kapali', 'onayla', 'dogrudan'] as const;
+export type ManagerPostMode = (typeof MANAGER_POST_MODES)[number];
+export interface ManagerPermissions {
+  post: ManagerPostMode;
+  /** İşletme bilgilerini düzenler (telefon hariç; telefon sahibine bağlıdır). */
+  edit: boolean;
+  /** Yorumlara işletme adına cevap verir. */
+  reply: boolean;
+}
+export interface BusinessManager extends ManagerPermissions {
+  uid: string;
+  /** Atanırken görünen adı ("Ayşe K."). */
+  name: string;
+}
+export const BUSINESS_MANAGER_LIMIT = 3;
+export const DEFAULT_MANAGER_PERMISSIONS: ManagerPermissions = { post: 'onayla', edit: false, reply: false };
+
 export interface PriceItem {
   name: string;
   /** Serbest metin: "500 TL", "300-450 TL", "keşiften sonra". */
@@ -35,6 +68,10 @@ export interface BusinessInput {
   hoursNote?: string;
   description?: string;
   priceList: PriceItem[];
+  /** Pazartesiden pazara 7 gün; null o gün kapalı. Verilirse "Şu an açık" buradan hesaplanır. */
+  weeklyHours?: (DayHours | null)[];
+  paymentMethods?: PaymentMethod[];
+  amenities?: Amenity[];
 }
 
 export interface Business extends BusinessInput {
@@ -47,6 +84,9 @@ export interface Business extends BusinessInput {
   featuredUntil?: string;
   /** Yayındaki değerlendirmelerin yıldız toplamı ve sayısı; ortalama hesaplanır (kurallar toplamı denetler). */
   rating: { sum: number; count: number };
+  /** İşletmeyi takip edenler (kurallar sayacın tam bir değiştiğini denetler). */
+  followerCount: number;
+  managers: BusinessManager[];
   /** ISO tarihler. */
   createdAt: string;
   updatedAt: string;
@@ -72,7 +112,10 @@ export type BusinessError =
   | 'address'
   | 'hoursNote'
   | 'description'
-  | 'priceList';
+  | 'priceList'
+  | 'hours';
+
+const TIME = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
 /** Form doğrulaması; aynı sınırlar veritabanı kurallarında da var. */
 export function validateBusiness(b: BusinessInput): BusinessError[] {
@@ -92,6 +135,7 @@ export function validateBusiness(b: BusinessInput): BusinessError[] {
     b.priceList.some((p) => !len(p.name) || len(p.name) > BUSINESS_LIMITS.priceName || !len(p.price) || len(p.price) > BUSINESS_LIMITS.priceValue)
   )
     errors.push('priceList');
+  if (b.weeklyHours && (b.weeklyHours.length !== 7 || b.weeklyHours.some((d) => d && (!TIME.test(d.open) || !TIME.test(d.close) || d.open === d.close)))) errors.push('hours');
   return errors;
 }
 
@@ -110,7 +154,41 @@ export function cleanBusinessInput(b: BusinessInput): BusinessInput {
     ...(opt(b.hoursNote) ? { hoursNote: opt(b.hoursNote) } : {}),
     ...(opt(b.description) ? { description: opt(b.description) } : {}),
     priceList: b.priceList.map((p) => ({ name: p.name.trim(), price: p.price.trim() })).filter((p) => p.name || p.price),
+    ...(b.weeklyHours && !b.is24h && b.weeklyHours.some(Boolean) ? { weeklyHours: b.weeklyHours.map((d) => (d ? { open: d.open, close: d.close } : null)) } : {}),
+    paymentMethods: PAYMENT_METHODS.filter((m) => b.paymentMethods?.includes(m)),
+    amenities: AMENITIES.filter((m) => b.amenities?.includes(m)),
   };
+}
+
+const minutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
+
+/**
+ * "Şu an açık mı?" (işletme sayfası). 7/24 ise hep açık; haftalık saat yoksa bilinmiyor (null). Gece yarısını geçen
+ * saatler (18:00-02:00) bir önceki günün açıklığı sayılır. `until`: açıksa kapanış, kapalıysa bugünün açılış saati.
+ */
+export function openState(b: Pick<BusinessInput, 'is24h' | 'weeklyHours'>, now: Date): { open: boolean; until?: string } | null {
+  if (b.is24h) return { open: true };
+  const week = b.weeklyHours;
+  if (!week || week.length !== 7) return null;
+  const day = (now.getDay() + 6) % 7;
+  const t = now.getHours() * 60 + now.getMinutes();
+  const today = week[day];
+  const yesterday = week[(day + 6) % 7];
+  if (yesterday && minutes(yesterday.close) < minutes(yesterday.open) && t < minutes(yesterday.close)) return { open: true, until: yesterday.close };
+  if (today) {
+    const o = minutes(today.open);
+    const c = minutes(today.close);
+    if (t >= o && (c < o || t < c)) return { open: true, until: today.close };
+    if (t < o) return { open: false, until: today.open };
+  }
+  return { open: false };
+}
+
+/** Kişi bu işletme adına paylaşabilir mi; paylaşımı onay mı bekler? Sahibi her zaman doğrudan paylaşır. */
+export function postModeFor(b: Pick<Business, 'ownerUid' | 'managers'>, uid: string): 'dogrudan' | 'onayla' | null {
+  if (b.ownerUid === uid) return 'dogrudan';
+  const m = b.managers.find((x) => x.uid === uid);
+  return m && m.post !== 'kapali' ? m.post : null;
 }
 
 /** "905321234567" gibi uluslararası biçim (WhatsApp bağlantısı için). */
@@ -189,6 +267,18 @@ export interface BusinessRepository {
   searchByName(provinceCode: string, key: string): Promise<Business[]>;
   get(id: string): Promise<Business | null>;
   listMine(uid: string): Promise<Business[]>;
+  /** Kişinin yetkili olduğu (sahibi olmadığı) işletmeler. */
+  listManaged(uid: string): Promise<Business[]>;
+  /** Sahibi yetkilileri ve izinlerini kaydeder (en çok 3). */
+  setManagers(id: string, managers: BusinessManager[]): Promise<void>;
+  /** Yetkili kendini çıkarır (hesap silmede de). */
+  leaveManaged(id: string, uid: string): Promise<void>;
+  follow(id: string, uid: string): Promise<void>;
+  unfollow(id: string, uid: string): Promise<void>;
+  /** Takip ettiğim işletmelerin kimlikleri (en çok 200). */
+  followedIds(uid: string): Promise<string[]>;
+  /** Hesap silinirken işletme takipleri ve yetkililikler bırakılır. */
+  leaveAllOf(uid: string): Promise<void>;
   create(uid: string, input: BusinessInput): Promise<string>;
   update(id: string, input: BusinessInput): Promise<void>;
   setHidden(id: string, hidden: boolean): Promise<void>;

@@ -138,6 +138,18 @@ export function BusinessesPage() {
                       <div className="meta">{t(`businesses.types.${b.type}`)} · {place(b)}</div>
                       <div className="meta">{b.categoryIds.map(categoryName).join(', ')}</div>
                       <div className="meta" dir="ltr">{b.phone}</div>
+                      <div className="meta">{t('businesses.followers', { count: b.followerCount })}</div>
+                      {/* Yetkililer (sahibi atar); admin kötüye kullanımda çıkarır, işlem kayda geçer. */}
+                      {b.managers.map((m) => (
+                        <div key={m.uid} className="meta">
+                          {t('businesses.manager', { name: m.name, post: t(`businesses.managerPost.${m.post}`) })}
+                          {canEdit ? (
+                            <button className="link" disabled={busy} onClick={() => window.confirm(t('businesses.removeManagerConfirm', { name: m.name, business: b.name })) && act(() => admin!.removeManager(b, m.uid))}>
+                              {t('businesses.removeManager')}
+                            </button>
+                          ) : null}
+                        </div>
+                      ))}
                     </td>
                     <td>
                       <span className={b.status === 'yayinda' ? 'pill ok' : b.status === 'kaldirildi' ? 'pill warn' : 'pill'}>{t(`businesses.statuses.${b.status}`)}</span>

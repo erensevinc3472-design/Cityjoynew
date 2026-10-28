@@ -20,9 +20,9 @@ import { StateMessage } from '@/components/state-message';
 import { useAnnouncements } from '@/lib/announcements';
 import { locationRepository as repo } from '@/lib/locations';
 import { useNotificationFeed, useReadState } from '@/lib/notifications';
-import { toggleLike, toggleSave, useFeed, useLiked, useSaved } from '@/lib/posts';
+import { authorHref, toggleLike, toggleSave, useFeed, useLiked, useSaved } from '@/lib/posts';
 import { useSession } from '@/lib/session';
-import { toggleFollowAuthor, useSocial } from '@/lib/social';
+import { toggleFollowAuthor, toggleFollowBusiness, useSocial } from '@/lib/social';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -134,7 +134,7 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
   const { user } = useSession();
   const { location } = useUserLocation();
   const [onlyDistrict, setOnlyDistrict] = useState(false);
-  const { blocked, following } = useSocial();
+  const { blocked, following, followingBusinesses } = useSocial();
   const [pending, setPending] = useState<Record<string, 'istek' | undefined>>({});
   const district = location?.districtId ? repo.getDistrict(location.districtId) : undefined;
   const province = location ? repo.getProvince(location.provinceCode)?.name : undefined;
@@ -143,7 +143,7 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
     !user || !location ? null
     : tab === 'mahallem' ? (location.neighbourhoodId ? { target: 'mahallem', neighbourhoodId: location.neighbourhoodId } : null)
     : tab === 'bolgesel' ? { target: 'bolgesel', provinceCode: location.provinceCode, ...(onlyDistrict && district ? { districtId: district.id } : {}) }
-    : tab === 'takip' ? (following ? { target: 'takip', authorUids: following.filter((u) => !blocked.has(u)) } : null)
+    : tab === 'takip' ? (following && followingBusinesses ? { target: 'takip', authorUids: following.filter((u) => !blocked.has(u)), businessIds: followingBusinesses } : null)
     : { target: 'genel' };
   const feed = useFeed(filter);
   const { hasMore, failed, loadingMore, reload, loadMore } = feed;
@@ -186,6 +186,7 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
     const status = await toggleFollowAuthor(user.uid, uid, followOf(uid) === 'aktif').catch(() => undefined);
     if (status !== undefined) setPending((p) => ({ ...p, [uid]: status === 'istek' ? 'istek' : undefined }));
   };
+  const followBusiness = (bid: string) => user && toggleFollowBusiness(user.uid, bid, !!followingBusinesses?.includes(bid)).catch(() => {});
   const save = (id: string) => user && toggleSave(id, user.uid, isSaved(id)).catch(() => {});
 
   const top = (
@@ -223,7 +224,7 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
       {urgent.map((a) => (
         <AnnouncementCard key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />
       ))}
-      {tab === 'takip' && following?.length === 0 ? <FormMessage kind="info" text={t('explore.followHint')} /> : null}
+      {tab === 'takip' && following?.length === 0 && followingBusinesses?.length === 0 ? <FormMessage kind="info" text={t('explore.followHint')} /> : null}
     </View>
   );
 
@@ -261,11 +262,12 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
             liked={isLiked(i.post.id)}
             saved={isSaved(i.post.id)}
             onSave={() => save(i.post.id)}
-            follow={i.post.authorUid === user.uid ? undefined : followOf(i.post.authorUid)}
-            onFollow={() => follow(i.post.authorUid)}
+            // İşletme adına paylaşımda takip ve ad işletmeye gider.
+            follow={i.post.authorUid === user.uid ? undefined : i.post.business ? (followingBusinesses?.includes(i.post.business.id) ? 'aktif' : null) : followOf(i.post.authorUid)}
+            onFollow={() => (i.post.business ? followBusiness(i.post.business.id) : follow(i.post.authorUid))}
             onPress={() => router.push({ pathname: '/explore/[id]', params: { id: i.post.id } })}
             onLike={() => like(i.post.id)}
-            onAuthor={() => router.push({ pathname: '/u/[uid]', params: { uid: i.post.authorUid } })}
+            onAuthor={() => router.push(authorHref(i.post))}
           />
         )
       }

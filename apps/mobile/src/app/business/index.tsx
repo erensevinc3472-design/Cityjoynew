@@ -12,12 +12,13 @@ import { StateMessage } from '@/components/state-message';
 import { businessRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 
-/** Profil > İşletmem (PROJE.md 5.6): kullanıcının eklediği işletmeler. */
+/** Profil > İşletmem (PROJE.md 5.6): kullanıcının eklediği ve yetkili olduğu işletmeler; dokununca işletme sayfası açılır. */
 export default function MyBusinessesScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user } = useSession();
   const [list, setList] = useState<Business[] | null>(null);
+  const [managed, setManaged] = useState<Business[]>([]);
   const [error, setError] = useState(false);
 
   const load = useCallback(() => {
@@ -27,6 +28,7 @@ export default function MyBusinessesScreen() {
       .listMine(user.uid)
       .then((l) => setList(l.sort((a, b) => a.name.localeCompare(b.name, 'tr'))))
       .catch(() => setError(true));
+    businessRepository.listManaged(user.uid).then(setManaged, () => setManaged([]));
   }, [user]);
 
   // Düzenleme ekranından dönünce liste tazelenir.
@@ -52,8 +54,12 @@ export default function MyBusinessesScreen() {
               title={b.name}
               subtitle={`${statusText(b)} · ${b.verification.status === 'dogrulandi' ? t('business.verified') : t('business.unverified')}`}
               showChevron
-              onPress={() => router.push({ pathname: '/business/edit', params: { id: b.id } })}
+              onPress={() => router.push({ pathname: '/business/[id]', params: { id: b.id } })}
             />
+          ))}
+          {managed.length ? <AppText variant="label" accessibilityRole="header">{t('business.managers.mine')}</AppText> : null}
+          {managed.map((b) => (
+            <OptionRow key={b.id} title={b.name} subtitle={t('business.managers.youManage')} showChevron onPress={() => router.push({ pathname: '/business/[id]', params: { id: b.id } })} />
           ))}
           <AppButton title={t('business.add')} onPress={() => router.push('/business/edit')} />
           <AppText variant="caption" muted>{t('business.myVerifyNote')}</AppText>

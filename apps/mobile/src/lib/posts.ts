@@ -7,7 +7,7 @@ import { postRepository } from './services';
 const keyOf = (f: FeedFilter) =>
   f.target === 'mahallem' ? `m:${f.neighbourhoodId}`
   : f.target === 'bolgesel' ? `b:${f.provinceCode}:${f.districtId ?? ''}`
-  : f.target === 'takip' ? `t:${f.authorUids.join(',')}`
+  : f.target === 'takip' ? `t:${f.authorUids.join(',')}|${(f.businessIds ?? []).join(',')}`
   : 'g';
 
 /** Sekme başına okunan sayfalar; sekmeler arası geçişte yeniden okunmaz, 5 dakikada bir tazelenir (maliyet ilkesi). */
@@ -174,3 +174,7 @@ export async function toggleSave(postId: string, uid: string, isSaved: boolean):
   }
   savedListeners.forEach((f) => f());
 }
+
+/** Gönderiyi paylaşanın sayfası: işletme adına paylaşıldıysa işletme sayfası, değilse kişinin profili. */
+export const authorHref = (p: Pick<Post, 'authorUid' | 'business'>) =>
+  p.business ? ({ pathname: '/business/[id]', params: { id: p.business.id } } as const) : ({ pathname: '/u/[uid]', params: { uid: p.authorUid } } as const);

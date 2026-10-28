@@ -310,7 +310,16 @@
     "proposeConfirm": "{{name}} doğrulama için admin'e gönderilsin mi? Bu, işletmeyi incelediğiniz (belge, ziyaret ya da görüntülü görüşme) anlamına gelir.",
     "proposed": "Öneriniz admin'e gönderildi.",
     "pendingFirst": "Doğrulama isteği: il yöneticisi onayı bekliyor",
-    "pendingAdmin": "Doğrulama isteği: admin onayı bekliyor"
+    "pendingAdmin": "Doğrulama isteği: admin onayı bekliyor",
+    "followers": "{{count}} takipçi",
+    "manager": "Yetkili: {{name}} (paylaşım: {{post}})",
+    "managerPost": {
+      "kapali": "kapalı",
+      "onayla": "sahibinin onayıyla",
+      "dogrudan": "doğrudan"
+    },
+    "removeManager": "Yetkiliyi çıkar",
+    "removeManagerConfirm": "{{name}}, {{business}} işletmesinin yetkililerinden çıkarılsın mı? İşlem kayda geçer."
   },
   "moderation": {
     "title": "Moderasyon",

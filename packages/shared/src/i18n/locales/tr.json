@@ -246,7 +246,8 @@
       "hoursNote": "Çalışma saatleri en çok 120 karakter olabilir.",
       "description": "Tanıtım en çok 500 karakter olabilir.",
       "priceList": "Fiyat satırlarında hizmet ve fiyat ikisi de dolu olmalı (en çok 30 satır).",
-      "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Kurum hesabı için CityJoy ile iletişime geçin."
+      "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Kurum hesabı için CityJoy ile iletişime geçin.",
+      "hours": "Saatleri 09:00 biçiminde yaz; açılış ve kapanış aynı olamaz."
     },
     "hide": "Yayından kaldır (gizle)",
     "show": "Yeniden yayınla",
@@ -293,7 +294,93 @@
     "verifyRejected": "İsteğiniz reddedildi. Gerekçe: {{reason}}",
     "verifyAgain": "Yeniden iste",
     "verifyCancel": "İsteği geri çek",
-    "verifyDone": "İşletmeniz doğrulandı."
+    "verifyDone": "İşletmeniz doğrulandı.",
+    "neighbourhood": "Mahalle",
+    "neighbourhoodHint": "Mahalle herkese gösterilmez; işletme adına Mahallem'de paylaşım için gerekir.",
+    "weekly": {
+      "toggle": "Günlere göre çalışma saati gir",
+      "open": "Açılış",
+      "close": "Kapanış",
+      "isOpen": "açık",
+      "hint": "Gece yarısından sonra kapanıyorsan kapanışı ertesi günün saatiyle yaz (ör. 18:00 – 02:00). Sayfada \"Şu an açık\" buna göre görünür.",
+      "copy": "{{day}} saatlerini tüm günlere uygula"
+    },
+    "payment": {
+      "nakit": "Nakit",
+      "kart": "Kredi kartı",
+      "temassiz": "Temassız",
+      "yemek-karti": "Yemek kartı",
+      "havale": "Havale / EFT"
+    },
+    "amenity": {
+      "paket-servis": "Paket servis",
+      "aile-alani": "Aile alanı",
+      "engelli-erisimi": "Engelli erişimi",
+      "otopark": "Otopark",
+      "wifi": "Wi-Fi",
+      "cocuk-dostu": "Çocuk dostu",
+      "evcil-hayvan": "Evcil hayvan dostu",
+      "rezervasyon": "Rezervasyon"
+    },
+    "page": {
+      "shareText": "CityJoy'da {{name}} ({{place}}) sayfasına bak.",
+      "manage": "İşletmeyi yönet",
+      "share": "Sayfayı paylaş",
+      "statRating": "Puan",
+      "openNow": "Şu an açık",
+      "openUntil": "Şu an açık · kapanış {{time}}",
+      "opensAt": "Şu an kapalı · açılış {{time}}",
+      "closedNow": "Şu an kapalı",
+      "follow": "Takip et",
+      "following": "Takiptesin",
+      "directions": "Yol tarifi",
+      "postAs": "İşletme adına paylaş",
+      "needsApproval": "onaylı",
+      "noPostPermission": "Bu işletme adına paylaşım iznin yok.",
+      "pendingTitle": "Onay bekleyen paylaşımlar ({{count}})",
+      "approve": "Onayla",
+      "reject": "Reddet",
+      "waitingOwner": "Sahibinin onayını bekliyor",
+      "tabMenu": "Menü",
+      "tabServices": "Hizmetler ve fiyatlar",
+      "tabs": {
+        "gonderiler": "Gönderiler",
+        "yorumlar": "Yorumlar",
+        "bilgiler": "Bilgiler"
+      },
+      "noPosts": "Henüz paylaşım yok.",
+      "noMenu": "Henüz menü ya da fiyat listesi eklenmedi.",
+      "trust": "Güven bilgisi",
+      "closed": "Kapalı",
+      "payment": "Ödeme yöntemleri",
+      "amenities": "Olanaklar"
+    },
+    "managers": {
+      "title": "Yetkililer",
+      "intro": "İşletmeni yönetmesi için en çok {{max}} kişiyi adıyla bulup ekleyebilir, her birinin izinlerini seçebilirsin. Telefon numarası yalnızca sende kalır.",
+      "postLabel": "İşletme adına paylaşım",
+      "post": {
+        "kapali": "Kapalı",
+        "onayla": "Benim onayımla",
+        "dogrudan": "Doğrudan"
+      },
+      "edit": "Bilgileri düzenleyebilir",
+      "reply": "Yorumlara cevap verebilir",
+      "remove": "{{name}} yetkililerden çıkar",
+      "search": "Yetkili eklemek için ad ara",
+      "add": "{{name}} yetkili olarak ekle",
+      "full": "En çok {{max}} yetkili ekleyebilirsin.",
+      "save": "Yetkilileri kaydet",
+      "saved": "Yetkililer kaydedildi.",
+      "noEdit": "Bu işletmede yetkilisin ama bilgileri düzenleme iznin yok.",
+      "editingAs": "{{name}} işletmesini yetkili olarak düzenliyorsun.",
+      "phoneOwnerOnly": "Telefonu yalnızca işletme sahibi değiştirebilir.",
+      "leave": "Yetkililikten ayrıl",
+      "leaveConfirm": "Bu işletmenin yetkililiğinden ayrılırsan adına paylaşım yapamazsın.",
+      "leaveYes": "Ayrıl",
+      "mine": "Yetkili olduğun işletmeler",
+      "youManage": "Yetkilisin"
+    }
   },
   "reviews": {
     "title": "Değerlendirmeler",
@@ -909,6 +996,15 @@
       "soru-yardim": "Yardım",
       "kayip-buluntu": "Kayıp",
       "taziye": "Taziye"
+    },
+    "businessTag": "İşletme",
+    "business": {
+      "who": "Kimin adına?",
+      "me": "Kendim",
+      "needHood": "İşletme adına paylaşmak için önce işletmenin mahallesini seç.",
+      "setHood": "İşletmenin mahallesini seç",
+      "pendingNote": "Paylaşımın {{name}} sahibinin onayından sonra yayınlanır.",
+      "sendForApproval": "Onaya gönder"
     }
   },
   "news": {
@@ -978,7 +1074,14 @@
     "postsTooShort": "Gönderilerde aramak için en az 3 harfli bir kelime yazın.",
     "needLocation": "Bu sonuçlar için konumunu seç.",
     "loadError": "Sonuçlar yüklenemedi.",
-    "privateAccount": "Gizli hesap"
+    "privateAccount": "Gizli hesap",
+    "heroLine1": "Ne aramak",
+    "heroLine2": "istersin?",
+    "heroSub": "Kişiler, işletmeler, yerler, etkinlikler ve gönderiler tek yerde.",
+    "clear": "Aramayı temizle",
+    "masters": "Bölgendeki ustalar",
+    "upcoming": "Yaklaşan etkinlikler",
+    "seeAllShort": "Tümünü gör"
   },
   "messages": {
     "title": "Mesajlar",
@@ -1039,7 +1142,8 @@
     "followingTitle": "Takip ettiklerin",
     "noFollowing": "Henüz kimseyi takip etmiyorsun. Yukarıdan adıyla kişi arayabilirsin.",
     "writeTo": "{{name}} kişisine mesaj yaz",
-    "noMatch": "Bu adla bir sohbet yok."
+    "noMatch": "Bu adla bir sohbet yok.",
+    "titleUnread": "Mesajlar, okunmamış var"
   },
   "notifications": {
     "title": "Bildirimler",

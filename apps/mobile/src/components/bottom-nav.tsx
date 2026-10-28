@@ -10,18 +10,17 @@ import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
-export type TabKey = 'home' | 'explore' | 'messages' | 'search' | 'profile';
+export type TabKey = 'home' | 'explore' | 'search' | 'profile';
 
 const TABS: { key: TabKey; icon: IconName; href: Href }[] = [
   { key: 'home', icon: 'home', href: '/home' },
   { key: 'explore', icon: 'explore', href: '/explore' },
-  { key: 'messages', icon: 'chat-bubble-outline', href: '/messages' },
   { key: 'search', icon: 'search', href: '/search' },
   { key: 'profile', icon: 'person-outline', href: '/me' },
 ];
 
 /**
- * Alt gezinme çubuğu (PROJE.md 5, 13. madde 29 ve 31): Ana Sayfa, Keşfet, Mesajlar, Ara, Profil. Beş ana ekranın altında durur;
+ * Alt gezinme çubuğu (PROJE.md 5, 13. madde 29 ve 31): Ana Sayfa, Keşfet, Ara, Profil (Mesajlar profilin sağ üstünde). Dört ana ekranın altında durur;
  * sekmeler arasında geçişte yığın büyümesin diye ekran değiştirilir, geri tuşu ana sayfaya döner.
  */
 export function BottomNav({ active }: { active: TabKey }) {

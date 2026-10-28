@@ -252,7 +252,37 @@ service cloud.firestore {
         && (!('hoursNote' in d) || (d.hoursNote is string && d.hoursNote.size() <= 120))
         && (!('description' in d) || (d.description is string && d.description.size() <= 500))
         && d.priceList is list && d.priceList.size() <= 30
+        && (!('weeklyHours' in d) || (d.weeklyHours is list && d.weeklyHours.size() == 7))
+        && (!('paymentMethods' in d) || (d.paymentMethods is list
+              && d.paymentMethods.hasOnly(['nakit', 'kart', 'temassiz', 'yemek-karti', 'havale'])))
+        && (!('amenities' in d) || (d.amenities is list && d.amenities.hasOnly(['paket-servis', 'aile-alani',
+              'engelli-erisimi', 'otopark', 'wifi', 'cocuk-dostu', 'evcil-hayvan', 'rezervasyon'])))
         && validSearchKeys(d, 60);
+    }
+
+    // İşletme yetkilileri (en çok 3; sahibi atar): kimlik listesi + izin haritası birlikte tutarlı olmalı.
+    function validManager(m) {
+      return m is map && m.keys().hasOnly(['name', 'post', 'edit', 'reply'])
+        && m.name is string && m.name.size() <= 40
+        && m.post in ['kapali', 'onayla', 'dogrudan'] && m.edit is bool && m.reply is bool;
+    }
+    function validManagers(d) {
+      let u = d.get('managerUids', []);
+      let m = d.get('managers', {});
+      return u is list && u.size() <= 3 && m is map && m.size() == u.size() && m.keys().hasAll(u)
+        && !(d.ownerUid in u)
+        && (u.size() < 1 || validManager(m[u[0]]))
+        && (u.size() < 2 || validManager(m[u[1]]))
+        && (u.size() < 3 || validManager(m[u[2]]));
+    }
+    function isManagerOf(b) {
+      return signedIn() && request.auth.uid in b.get('managerUids', []);
+    }
+    function managerCan(b, perm) {
+      return isManagerOf(b) && b.managers[request.auth.uid][perm] == true;
+    }
+    function businessFollowPath(bid, uid) {
+      return /databases/$(database)/documents/businessFollows/$(bid + '_' + uid);
     }
 
     // Ara (PROJE.md 5.10): addan / yazıdan üretilen arama anahtarları (kelime başları), yalnızca sayısı sınırlanır.
@@ -262,7 +292,7 @@ service cloud.firestore {
 
     function businessContentKeys() {
       return ['type', 'name', 'categoryIds', 'location', 'address', 'phone', 'whatsapp', 'is24h', 'hoursNote',
-              'description', 'priceList', 'searchKeys'];
+              'description', 'priceList', 'searchKeys', 'weeklyHours', 'paymentMethods', 'amenities'];
     }
 
     function businessPath(id) {
@@ -302,6 +332,7 @@ service cloud.firestore {
       // Olmayan belgeyi okumak ("var mı?" sorusu) reddedilmez; içerik yoksa sızacak bilgi de yoktur.
       // İşletme doğrulama yetkisi olan yönetici kendi ilindeki gizli / kaldırılmış işletmeleri de görür.
       allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(resource.data.ownerUid)
+        || isManagerOf(resource.data)
         || regionAllows('isletme-dogrulama', 'goruntule', resource.data.location.provinceCode, null);
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(businessContentKeys().concat(
@@ -316,26 +347,69 @@ service cloud.firestore {
         && phoneClaimedBy(request.resource.data.phone, id)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
-      // Sahibi: yalnızca kendi bilgileri ve gizle/yayınla. Yönetimin kaldırdığı işletmeyi açamaz.
+      // Sahibi: kendi bilgileri, gizle/yayınla ve yetkililer. Yönetimin kaldırdığı işletmeyi açamaz.
       allow update: if isSelf(resource.data.ownerUid)
         && resource.data.status != 'kaldirildi'
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(businessContentKeys().concat(['status', 'updatedAt']))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(businessContentKeys().concat(['status', 'updatedAt', 'managers', 'managerUids']))
         && validBusinessContent(request.resource.data)
+        && validManagers(request.resource.data)
         && request.resource.data.status in ['yayinda', 'gizli']
         && (request.resource.data.phone == resource.data.phone || phoneClaimedBy(request.resource.data.phone, id))
         && request.resource.data.updatedAt == request.time;
+      // Düzenleme izni olan yetkili: bilgiler (telefon sahibine bağlı, değişmez).
+      allow update: if managerCan(resource.data, 'edit')
+        && resource.data.status != 'kaldirildi'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(businessContentKeys().concat(['updatedAt']))
+        && request.resource.data.phone == resource.data.phone
+        && validBusinessContent(request.resource.data)
+        && request.resource.data.updatedAt == request.time;
+      // Yetkili kendini çıkarır (yalnızca kendisi; diğerleri ve izinleri aynı kalır).
+      allow update: if isManagerOf(resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['managers', 'managerUids', 'updatedAt'])
+        && !(request.auth.uid in request.resource.data.managerUids)
+        && request.resource.data.managerUids.size() == resource.data.managerUids.size() - 1
+        && request.resource.data.managers.diff(resource.data.managers).affectedKeys().hasOnly([request.auth.uid])
+        && validManagers(request.resource.data);
+      // Takip sayacı: yalnızca kendi takip kaydıyla tam bir artar ya da azalır.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['followerCount'])
+        && ((request.resource.data.followerCount == resource.data.get('followerCount', 0) + 1
+              && !exists(businessFollowPath(id, request.auth.uid)) && existsAfter(businessFollowPath(id, request.auth.uid)))
+            || (request.resource.data.followerCount == resource.data.get('followerCount', 0) - 1
+              && exists(businessFollowPath(id, request.auth.uid)) && !existsAfter(businessFollowPath(id, request.auth.uid))));
       // Değerlendirme yazan kişi: yalnızca yıldız toplamı, tam olarak kendi değerlendirmesi kadar değişir.
       allow update: if signedIn()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating'])
         && ratingChangeValid(id);
-      // Yönetim (admin): doğrulama, kaldırma, kademe, öne çıkma. İşletmenin bilgilerini değiştiremez.
+      // Yönetim (admin): doğrulama, kaldırma, kademe, öne çıkma, yetkili çıkarma. İşletmenin bilgilerini değiştiremez.
       allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'verification', 'membership', 'featuredUntil', 'rating'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'verification', 'membership', 'featuredUntil', 'rating', 'managers', 'managerUids'])
+        && validManagers(request.resource.data)
+        && request.resource.data.get('managerUids', []).size() <= resource.data.get('managerUids', []).size()
         && request.resource.data.status in ['yayinda', 'gizli', 'kaldirildi']
         && request.resource.data.verification.status in ['dogrulanmadi', 'inceleniyor', 'dogrulandi']
         && request.resource.data.membership.tier in ['ucretsiz', 'standart', 'pro', 'premium'];
       // Sahibi silebilir (hesap silmede de kullanılır, KVKK).
       allow delete: if isSelf(resource.data.ownerUid);
+    }
+
+    // İşletme takibi (belge kimliği = işletme_kişi). Kişi yalnızca kendi takiplerini görür; sayaç aynı yazımda değişir.
+    match /businessFollows/{fid} {
+      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'businessId', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && fid == request.resource.data.businessId + '_' + request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && get(businessPath(request.resource.data.businessId)).data.status == 'yayinda'
+        && getAfter(businessPath(request.resource.data.businessId)).data.followerCount
+             == get(businessPath(request.resource.data.businessId)).data.get('followerCount', 0) + 1;
+      // İşletme silinmişse (ya da sayaç birlikte azalıyorsa) takip kaydı silinir.
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid
+        && (!existsAfter(businessPath(resource.data.businessId))
+            || getAfter(businessPath(resource.data.businessId)).data.followerCount
+                 == get(businessPath(resource.data.businessId)).data.get('followerCount', 0) - 1);
+      allow update: if false;
     }
 
     // Telefon kaydı: bir telefon tek işletmeye bağlıdır. Kart zaten telefonu gösterdiği için okunabilir (tekil).
@@ -396,8 +470,8 @@ service cloud.firestore {
         && validReview(request.resource.data)
         && request.resource.data.updatedAt == request.time
         && (request.resource.data.stars == resource.data.stars || ratingWrittenTogether());
-      // İşletme sahibinin cevabı.
-      allow update: if signedIn() && biz().ownerUid == request.auth.uid
+      // İşletme sahibinin (ya da cevap izni olan yetkilinin) cevabı.
+      allow update: if signedIn() && (biz().ownerUid == request.auth.uid || managerCan(biz(), 'reply'))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reply'])
         && request.resource.data.reply.keys().hasOnly(['text', 'at'])
         && request.resource.data.reply.text is string
@@ -1360,7 +1434,7 @@ service cloud.firestore {
       return get(myUserPath()).data.get('location', {});
     }
     function validPost(d) {
-      return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'likeCount',
+      return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
              'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
         && validSearchKeys(d, 300)
@@ -1381,7 +1455,25 @@ service cloud.firestore {
       return d.targets.get('genel', false) == true
         || (d.targets.get('bolgesel', false) == true && myLocation().get('provinceCode', '') == d.region.provinceCode)
         || (d.targets.get('mahallem', false) == true && myLocation().get('neighbourhoodId', '') == d.region.neighbourhoodId)
-        || (d.targets.get('takip', false) == true && isFollowerOf(d.authorUid));
+        || (d.targets.get('takip', false) == true
+            && ('business' in d ? exists(businessFollowPath(d.business.id, request.auth.uid)) : isFollowerOf(d.authorUid)));
+    }
+    // İşletme adına paylaşım: sahibi doğrudan; yetkili izni "doğrudan" ise yayında, "onayla" ise onay bekler.
+    // Bölge işletmenin konumudur (mahallesi seçilmiş olmalı).
+    function validBusinessPost(d) {
+      let b = get(businessPath(d.business.id)).data;
+      return d.business.keys().hasOnly(['id', 'name']) && d.business.name is string && d.business.name.size() <= 80
+        && b.status == 'yayinda'
+        && ((b.ownerUid == request.auth.uid && d.status == 'aktif')
+            || (isManagerOf(b) && b.managers[request.auth.uid].post == 'dogrudan' && d.status == 'aktif')
+            || (isManagerOf(b) && b.managers[request.auth.uid].post == 'onayla' && d.status == 'onay-bekliyor'))
+        && d.region.provinceCode == b.location.provinceCode
+        && d.region.districtId == b.location.districtId
+        && d.region.neighbourhoodId == b.location.get('neighbourhoodId', '');
+    }
+    function isBusinessTeam(bid) {
+      let b = get(businessPath(bid)).data;
+      return b.ownerUid == request.auth.uid || isManagerOf(b);
     }
     function followPath(follower, followee) {
       return /databases/$(database)/documents/follows/$(follower + '_' + followee);
@@ -1398,10 +1490,10 @@ service cloud.firestore {
       allow read: if signedIn()
         && ((resource.data.status == 'aktif' && canSeePost(resource.data))
             || resource.data.authorUid == request.auth.uid
+            || ('business' in resource.data && isBusinessTeam(resource.data.business.id))
             || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
-      // Paylaşma: kendi adına, kendi kayıtlı mahallesiyle.
+      // Paylaşma: kendi adına kendi kayıtlı mahallesiyle, ya da işletme adına işletmenin konumuyla.
       allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid
-        && request.resource.data.status == 'aktif'
         && request.resource.data.likeCount == 0 && request.resource.data.reportCount == 0
         && request.resource.data.get('commentCount', 0) == 0
         && !('cleared' in request.resource.data) && !('moderatedBy' in request.resource.data)
@@ -1409,12 +1501,21 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time
         && validPost(request.resource.data)
         && request.resource.data.text.size() >= 1
-        && exists(myUserPath())
-        && myLocation().get('neighbourhoodId', '') == request.resource.data.region.neighbourhoodId
-        && myLocation().get('districtId', '') == request.resource.data.region.districtId
-        && myLocation().get('provinceCode', '') == request.resource.data.region.provinceCode;
-      // Sahibi kaldırır: yazı, ad ve arama anahtarları boşaltılır, başka bir şey değişmez.
-      allow update: if resource.data.authorUid == request.auth.uid
+        && ('business' in request.resource.data
+            ? validBusinessPost(request.resource.data)
+            : (request.resource.data.status == 'aktif'
+                && exists(myUserPath())
+                && myLocation().get('neighbourhoodId', '') == request.resource.data.region.neighbourhoodId
+                && myLocation().get('districtId', '') == request.resource.data.region.districtId
+                && myLocation().get('provinceCode', '') == request.resource.data.region.provinceCode));
+      // İşletme sahibi yetkilinin bekleyen paylaşımını onaylar.
+      allow update: if 'business' in resource.data && resource.data.status == 'onay-bekliyor'
+        && isBusinessOwner(resource.data.business.id)
+        && request.resource.data.status == 'aktif' && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
+      // Sahibi (işletme paylaşımında işletme sahibi de) kaldırır: yazı, ad ve arama anahtarları boşaltılır.
+      allow update: if (resource.data.authorUid == request.auth.uid
+            || ('business' in resource.data && isBusinessOwner(resource.data.business.id)))
         && request.resource.data.updatedAt == request.time
         && request.resource.data.status == 'kaldirildi' && request.resource.data.text == '' && request.resource.data.authorName == ''
         && !('searchKeys' in request.resource.data)

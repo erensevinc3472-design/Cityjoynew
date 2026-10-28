@@ -13,7 +13,14 @@ export type PostTarget = (typeof POST_TARGETS)[number];
 export const POST_CATEGORIES = ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye'] as const;
 export type PostCategory = (typeof POST_CATEGORIES)[number];
 
-export type PostStatus = 'aktif' | 'kaldirildi';
+/** onay-bekliyor: işletme yetkilisinin paylaşımı, sahibi onaylayana kadar akışta görünmez. */
+export type PostStatus = 'aktif' | 'kaldirildi' | 'onay-bekliyor';
+
+/** İşletme adına paylaşım: akışta işletmenin adıyla ve "İşletme" etiketiyle görünür, adına dokununca işletme sayfası açılır. */
+export interface PostBusiness {
+  id: string;
+  name: string;
+}
 
 export interface PostRegion {
   provinceCode: string;
@@ -33,8 +40,10 @@ export interface Post extends PostInput {
   id: string;
   status: PostStatus;
   authorUid: string;
-  /** "Ayşe K." biçiminde. */
+  /** "Ayşe K." biçiminde; işletme paylaşımında işletmenin adı. */
   authorName: string;
+  /** Paylaşan kişi değil işletme adına paylaşıldıysa. */
+  business?: PostBusiness;
   likeCount: number;
   commentCount: number;
   /** Sahibi yorumları kapattı (Keşfet kuralları madde 3). */

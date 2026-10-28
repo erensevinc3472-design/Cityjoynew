@@ -1,5 +1,5 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
-import { PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans';
+import { PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold } from '@expo-google-fonts/plus-jakarta-sans';
 import { useFonts } from 'expo-font';
 import { LocaleProvider, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -27,6 +27,7 @@ function RootNavigator() {
     Inter_600SemiBold,
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
   });
   // Yazı tipi yüklenemezse sistem yazı tipiyle devam edilir.
   const loaded = ready && session.ready && (fontsLoaded || !!fontError);
