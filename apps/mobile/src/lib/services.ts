@@ -7,6 +7,7 @@ import {
   createFirestoreActivityRepository,
   createFirestorePostRepository,
   createFirestoreSocialRepository,
+  createFirestoreMessageRepository,
   createFirestoreCityGuideRepository,
   createFirestoreBusinessRepository,
   createFirestoreFamilyRepository,
@@ -44,6 +45,8 @@ export const activityRepository = createFirestoreActivityRepository(firestore);
 export const postRepository = createFirestorePostRepository(firestore);
 /** Keşfet profili, takip ve engelleme. */
 export const socialRepository = createFirestoreSocialRepository(firestore);
+/** Birebir mesajlar (yalnızca iki taraf okur). */
+export const messageRepository = createFirestoreMessageRepository(firestore);
 /** İşletme doğrulama isteği: önce il yöneticisi, sonra admin onaylar (PROJE.md 6.5). */
 export const verificationRequests = createVerificationRequests(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);

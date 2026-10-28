@@ -1497,6 +1497,163 @@ service cloud.firestore {
         && request.resource.data.status == 'incelendi';
       allow delete: if false;
     }
+    // ---- Mesajlar (PROJE.md 5.11). Birebir, yalnızca yazı. Sohbet "kişi_kişi" (sıralı) kimlikli; mesaj ve sohbet özeti
+    // (son mesaj, okunmamış sayısı) aynı yazımda değişir. Takipleşmeyen kişiden gelen sohbet alıcıda istektir. Yetişkin
+    // ile 13-17 yaş arası kişi arasında sohbet açılamaz; engel iki yönde de yazışmayı durdurur. Yeni sohbet sayısı 24 saatte
+    // sınırlı (yeni hesapta 10, sonra 30). Mesajları yalnızca iki taraf okur; admin yalnızca şikâyet edilen mesajın kopyasını.
+    function chatPath(id) {
+      return /databases/$(database)/documents/chats/$(id);
+    }
+    function chatMessagePath(id, mid) {
+      return /databases/$(database)/documents/chats/$(id)/messages/$(mid);
+    }
+    function quotaPath() {
+      return /databases/$(database)/documents/chatQuota/$(request.auth.uid);
+    }
+    function isMinor(uid) {
+      return ageOf(get(/databases/$(database)/documents/users/$(uid)).data.birthYear) < 18;
+    }
+    function notBlockedPair(a, b) {
+      return !exists(blockPath(a, b)) && !exists(blockPath(b, a));
+    }
+    // Bu bölümde exists() yerine doğrudan get(): belge yoksa get hata verir ve istek zaten reddedilir. Böylece ilk
+    // mesajın toplu yazımı Firestore'un istek başına belge okuma sınırının (20) altında kalır.
+    function followsActive(a, b) {
+      return get(followPath(a, b)).data.status == 'aktif';
+    }
+    function otherOf(members) {
+      return members[0] == request.auth.uid ? members[1] : members[0];
+    }
+    function profileName(uid) {
+      return get(/databases/$(database)/documents/publicProfiles/$(uid)).data.displayName;
+    }
+    function chatLimit() {
+      return get(myUserPath()).data.createdAt > request.time - duration.value(7, 'd') ? 10 : 30;
+    }
+    // Son mesaj özeti: aynı yazımda eklenen, benim yazdığım mesajı gösterir.
+    function validLast(id, last) {
+      return last.keys().hasOnly(['id', 'text', 'from', 'at'])
+        && last.from == request.auth.uid && last.at == request.time
+        && last.text is string && last.text.size() <= 80
+        && getAfter(chatMessagePath(id, last.id)).data.from == request.auth.uid;
+    }
+    // Yeni sohbet sayacı bu yazımda değişti (sayacın kendi kuralı yalnızca +1 ya da süresi dolunca sıfırlamaya izin verir).
+    function quotaCounted() {
+      return getAfter(quotaPath()).data.count <= chatLimit()
+        && (!exists(quotaPath()) || getAfter(quotaPath()).data != get(quotaPath()).data);
+    }
+    function validNewChat(id, d, other) {
+      return d.keys().hasOnly(['members', 'names', 'startedBy', 'accepted', 'last', 'unread', 'seen', 'createdAt', 'updatedAt'])
+        && d.names.keys().hasOnly([request.auth.uid, other])
+        && d.names[request.auth.uid] == profileName(request.auth.uid) && d.names[other] == profileName(other)
+        && d.startedBy == request.auth.uid
+        && (d.accepted == false || (d.accepted == true && followsActive(request.auth.uid, other) && followsActive(other, request.auth.uid)))
+        && d.unread.keys().hasOnly([request.auth.uid, other]) && d.unread[request.auth.uid] == 0 && d.unread[other] == 1
+        && d.seen == {}
+        && validLast(id, d.last)
+        && d.createdAt == request.time && d.updatedAt == request.time
+        && notBlockedPair(request.auth.uid, other)
+        && isMinor(request.auth.uid) == isMinor(other)
+        && quotaCounted();
+    }
+    function chatSending(id, before, after, other) {
+      return after.diff(before).affectedKeys().hasOnly(['last', 'unread', 'updatedAt', 'accepted'])
+        && validLast(id, after.last)
+        && after.unread.keys().hasOnly(before.members)
+        && after.unread[other] == before.unread.get(other, 0) + 1
+        && after.unread.get(request.auth.uid, 0) == before.unread.get(request.auth.uid, 0)
+        && after.updatedAt == request.time
+        && (after.accepted == before.accepted
+            || (before.accepted == false && after.accepted == true && before.startedBy != request.auth.uid));
+    }
+    function chatReading(before, after, other) {
+      return after.diff(before).affectedKeys().hasOnly(['unread', 'seen'])
+        && after.unread.keys().hasOnly(before.members)
+        && after.unread[request.auth.uid] == 0
+        && after.unread.get(other, 0) == before.unread.get(other, 0)
+        && after.seen.diff(before.seen).affectedKeys().hasOnly([request.auth.uid])
+        && (!(request.auth.uid in after.seen.diff(before.seen).affectedKeys()) || after.seen[request.auth.uid] == request.time);
+    }
+
+    // Mesaj, aynı yazımdaki sohbet özetinin son mesajıdır; iki taraf arasında engel yoktur.
+    function messageFits(chat, mid) {
+      return request.auth.uid in chat.members && chat.last.id == mid && notBlockedPair(request.auth.uid, otherOf(chat.members));
+    }
+
+    match /chats/{id} {
+      allow read: if signedIn() && (resource == null || request.auth.uid in resource.data.members);
+      allow create: if signedIn()
+        && request.resource.data.members is list && request.resource.data.members.size() == 2
+        && request.resource.data.members[0] < request.resource.data.members[1]
+        && request.auth.uid in request.resource.data.members
+        && id == request.resource.data.members[0] + '_' + request.resource.data.members[1]
+        && validNewChat(id, request.resource.data, otherOf(request.resource.data.members));
+      allow update: if signedIn() && request.auth.uid in resource.data.members
+        && request.resource.data.members == resource.data.members
+        && (chatSending(id, resource.data, request.resource.data, otherOf(resource.data.members))
+            || chatReading(resource.data, request.resource.data, otherOf(resource.data.members))
+            // İsteği alan kişi kabul eder.
+            || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['accepted'])
+                && request.resource.data.accepted == true && resource.data.startedBy != request.auth.uid)
+            // Kendi son mesajını silen kişi önizlemeyi boşaltır.
+            || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last'])
+                && request.resource.data.last.diff(resource.data.last).affectedKeys().hasOnly(['text'])
+                && request.resource.data.last.text == '' && resource.data.last.from == request.auth.uid));
+      // Hesap silinirken.
+      allow delete: if signedIn() && request.auth.uid in resource.data.members;
+
+      match /messages/{mid} {
+        allow read: if signedIn() && request.auth.uid in get(chatPath(id)).data.members;
+        allow create: if signedIn()
+          && request.resource.data.keys().hasOnly(['from', 'text', 'status', 'createdAt'])
+          && request.resource.data.from == request.auth.uid
+          && request.resource.data.status == 'aktif'
+          && request.resource.data.text is string && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 1000
+          && request.resource.data.createdAt == request.time
+          && messageFits(getAfter(chatPath(id)).data, mid);
+        // Gönderen siler (yazı boşalır); admin şikâyet üzerine kaldırır.
+        allow update: if signedIn() && resource.data.from == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text'])
+          && request.resource.data.status == 'silindi' && request.resource.data.text == '';
+        allow update: if isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text'])
+          && request.resource.data.status == 'kaldirildi' && request.resource.data.text == '';
+        allow delete: if signedIn() && resource.data.from == request.auth.uid;
+      }
+    }
+
+    // Yeni sohbet sayacı: yalnızca bir artar ya da 24 saat dolunca yeniden başlar; silinemez (sınır atlatılmasın).
+    match /chatQuota/{uid} {
+      allow read: if isSelf(uid);
+      allow create: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['windowStart', 'count'])
+        && request.resource.data.windowStart == request.time && request.resource.data.count == 1;
+      allow update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['windowStart', 'count'])
+        && ((request.resource.data.windowStart == request.time && request.resource.data.count == 1
+              && resource.data.windowStart + duration.value(1, 'd') <= request.time)
+            || (request.resource.data.windowStart == resource.data.windowStart && request.resource.data.count == resource.data.count + 1));
+    }
+
+    // Mesaj şikâyeti: kişi başına mesaj başına bir, mesajın o anki kopyasıyla; yalnızca admin görür ve karar verir.
+    match /messageReports/{rid} {
+      allow read: if isAdmin() || (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid));
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['chatId', 'messageId', 'reporterUid', 'reportedUid', 'text', 'reason', 'status', 'createdAt'])
+        && rid == request.auth.uid + '_' + request.resource.data.messageId
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.reason in ['taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'diger']
+        && request.resource.data.status == 'acik'
+        && request.resource.data.createdAt == request.time
+        && request.auth.uid in get(chatPath(request.resource.data.chatId)).data.members
+        && get(chatMessagePath(request.resource.data.chatId, request.resource.data.messageId)).data.from == request.resource.data.reportedUid
+        && request.resource.data.reportedUid != request.auth.uid
+        && get(chatMessagePath(request.resource.data.chatId, request.resource.data.messageId)).data.text == request.resource.data.text;
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'incelendi';
+    }
+
     // ---- Keşfet profili, takip ve engelleme (PROJE.md 5.5, 5.8). Herkese açık profil yalnızca ad ("Ayşe K."), kısa
     // tanıtım ve gizli hesap bilgisini taşır. Takip belgesi "takipEden_takipEdilen"; gizli hesapta önce "istek", hesap
     // sahibi kabul edince "aktif". Engellenen kişi engelleyeni takip edemez, gönderisine yorum yazamaz.
