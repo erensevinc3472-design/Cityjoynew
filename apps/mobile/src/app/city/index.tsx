@@ -58,6 +58,20 @@ export default function MyCityScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {stale ? <AppText variant="caption" muted>{t('city.staleNote')}</AppText> : null}
         {failed && !meta ? <StateMessage kind="error" message={t('city.loadError')} /> : !meta ? <StateMessage kind="loading" /> : null}
+        {/* Mahalle Meydanı: mahallenin künyesi (muhtarlık, duyurular, etkinlikler, toplanma alanları). */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${t('neighbourhood.title')}. ${t('neighbourhood.hint')}`}
+          onPress={() => router.push('/neighbourhood')}
+          style={({ pressed }) => [styles.wide, { backgroundColor: c.surface, borderColor: c.border, shadowColor: c.shadow, opacity: pressed ? 0.85 : 1 }]}>
+          <View style={[styles.icon, { backgroundColor: c.accentSoft, marginBottom: 0 }]}>
+            <MaterialIcons name="holiday-village" size={22} color={c.icon} />
+          </View>
+          <View style={styles.wideText}>
+            <AppText style={[styles.tileTitle, { color: c.textStrong }]}>{t('neighbourhood.title')}</AppText>
+            <AppText variant="caption" muted>{t('neighbourhood.hint')}</AppText>
+          </View>
+        </Pressable>
         <View style={styles.grid}>
           {CITY_GUIDE_SECTIONS.map((s) => {
             const count = meta?.sections[s.id]?.count ?? 0;
@@ -105,6 +119,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 10,
   },
+  wide: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: spacing.md,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+  },
+  wideText: { flex: 1, gap: 2 },
   icon: { width: 42, height: 42, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.xs },
   tileTitle: { fontFamily: fonts.heading, fontSize: 15, lineHeight: 21 },
   center: { textAlign: 'center' },

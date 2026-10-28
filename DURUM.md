@@ -4,7 +4,13 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (etkinlikler, Sosyal Harmoni girişi; önceki: resmî duyurular, kutucuklu yetkiler).
+Son güncelleme: 28 Ekim 2026 (resmî profil, Mahalle Meydanı; önceki: etkinlikler, resmî duyurular).
+
+> **Not (28 Ekim, 20. madde):** iş Eren'in bilgisayarında (`Desktop\Cityjoynew-main`, `main`'in ZIP kopyası, git deposu
+> değil) yapıldı ve `claude/resmi-profil-mahalle-meydani` dalına gönderildi; PR'ı Eren açar (bu bilgisayarda `gh` yok,
+> git ise kayıtlı GitHub girişiyle çalışıyor). Sistem Java'sı 8; kural testleri için Temurin JDK 21 zip olarak
+> `%TEMP%\cj-jdk21` klasörüne açıldı (kurulmadı). Kullanım: `JAVA_HOME` ve `PATH` o klasörü gösterecek şekilde ayarlanıp
+> `npm run test:rules`. Klasör silinmişse yeniden indirilir.
 
 ## Depo ve ortam
 
@@ -37,8 +43,8 @@ Son güncelleme: 28 Ekim 2026 (etkinlikler, Sosyal Harmoni girişi; önceki: res
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (70)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (57; Java gerekir)
+npm test                      # ortak paket testleri (75)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (61; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -217,6 +223,27 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    takvime ekleme, "Etkinlik düzenleme yetkisi iste" başvurusu (onay merkezine `etkinlik-yetkisi` türü), kullanıcı
    aktiviteleri (5.3: herkes açar, tam adres yalnızca katılana).
 
+20. **Resmî profil ve Mahalle Meydanı** (PROJE.md 6.2 madde 2, 5.1). Ortak yapı `packages/shared/src/organizations/profiles.ts`.
+   **Panel > Resmî profil** (menüde Genel bakış'ın altında; kurum yöneticisi, muhtar ve admin görür): tanıtım, telefon,
+   e-posta, web (yalnızca https), adres, çalışma saatleri; muhtarlıkta isteğe bağlı muhtar adı. Kurumun adı ve bölgesi kurum
+   kaydından gelir, değiştirilemez. Kurum yöneticisi kendi kurumunu, muhtar kendi mahallesini, admin her kurumu düzenler;
+   işlem kaydına yazılır. **Uygulama:** duyuru ve etkinlik ayrıntısında yayınlayan satırı "Resmî hesap · Profili gör"
+   (`AuthorLink`), dokununca `/official/[id]` (rozet, tanıtım, saatler, adres; Ara / Haritada aç / E-posta / Web; bilgi yoksa
+   "henüz eklenmedi"). İl yöneticisinin profili yok. **Mahalle Meydanı** (`/neighbourhood`, Benim Şehrim'in en üstünde geniş
+   kutu): muhtarlık (resmî profil; yoksa şehir rehberindeki "Muhtarlıklar" satırı, doğrulanmadıysa uyarıyla), mahalleye özel
+   duyurular (+ acil), mahalle ve ilçedeki yaklaşan etkinlikler (en çok 5), afet toplanma alanları (şehir rehberinden; mahallede
+   yoksa ilçedekiler ve e-Devlet/AFAD notu), belediyeler (ilçe + büyükşehir/il, yalnızca profili girilmişse), "Mahallem akışı
+   Keşfet ile gelecek" notu. Veritabanı: `officialProfiles/{bld-.. | krm-.. | mahalle-..}` (herkes okur, silinmez). Maliyet:
+   profil başına tek okuma, 30 dakika telefonda tutulur; duyuru/etkinlik mevcut il önbelleğinden. Kurallar: kurumda ad ve bölge
+   kurumla aynı olmalı ve yalnızca kurum yöneticisi/admin; muhtarlıkta geçerli muhtar yetkisi/admin; alan biçimleri denetlenir.
+   Testler: ortak paket 75 (5 yeni) geçti, tür denetimi ve panel derlemesi geçti, panel sayfası örnek muhtar hesabıyla
+   tarayıcıda görüldü. Kural testleri emülatörde geçti: 61/61 (4'ü yeni, `firebase/official-profiles.test.ts`); emülatör
+   hazırlık süresi 60 sn'ye çıkarıldı (yavaş bilgisayarda 10 sn aşılıyordu). Uygulama (web) emülatörde örnek veriyle
+   denendi: Mahalle Meydanı, etkinlik > "Profili gör" > resmî profil; açık mod Türkçe, koyu mod Arapça. Denemede bulunan
+   ve düzeltilen: Arapçada telefon numarası ters görünüyordu (`ltr()` ile yalıtıldı; şehir rehberi ayrıntısında da);
+   mahalle adı eşleşmesi "Ataevler" / "Ataevler Mahallesi" farkına dayanıklı (`sameNeighbourhoodName`). Yok (sonra): logo (Storage, Blaze), sabitlenmiş duyuru, mahalle haritası,
+   ilanlar ve kayıp-buluntu, profil sayfasında o hesabın duyuru/etkinlik listesi.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Yetkiler kutucuklarla (6.6, 27 Ekim 2026): kurum yöneticisi ve il yöneticisi kişiye verdiği her eylemi işaretler,
@@ -249,6 +276,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
+- **Kurallar yeniden değişti (resmî profiller, 28 Ekim):** emülatörde test edildi (61/61); yüklenmeli (aşağıdaki komut).
 - **Kurallar ve dizinler yeniden değişti (etkinlikler), yeniden yüklenmeli:** bu dal `main`'e birleşince aynı komut, Eren'in
   bilgisayarından (güncel ZIP indirip, `firebase.json` olan klasörde). Duyurular dahil önceki kurallar 28 Ekim'de yüklendi.
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
@@ -285,9 +313,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0b. Kurum içeriklerinin devamı: belediye / kurum profili (rozet, iletişim, çalışma saatleri; 6.2 madde 2; logo Storage
-   ister), Mahalle Meydanı sayfası (muhtar bilgisi, sabit duyurular, yaklaşan etkinlikler), "Etkinlik düzenleme yetkisi iste"
-   başvurusu, kullanıcı aktiviteleri.
+0a. 20. madde: Eren PR'ı açıp birleştirir, sonra kuralları Firebase'e yükler.
+0b. Kurum içeriklerinin devamı (profil ve Mahalle Meydanı yapıldı): "Etkinlik düzenleme yetkisi iste" başvurusu (onay
+   merkezine `etkinlik-yetkisi` türü), kullanıcı aktiviteleri (5.3), muhtarın sabitlenmiş duyurusu.
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"

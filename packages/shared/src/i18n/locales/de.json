@@ -432,7 +432,7 @@
     "loadError": "Die Informationen konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
     "comingSoon": "Für diese Provinz noch keine Informationen",
     "count": "{{count}} Einträge",
-    "otherSections": "Notdienstapotheken, Veranstaltungen, Cafés und Restaurants, Anzeigen und der Viertelplatz folgen in den nächsten Schritten.",
+    "otherSections": "Notdienstapotheken, Cafés und Restaurants sowie Anzeigen folgen in den nächsten Schritten.",
     "search": "Nach Name, Art oder Bezirk suchen",
     "allDistricts": "Alle Bezirke",
     "contentLanguage": "Die Informationen in diesem Bereich sind auf Türkisch erfasst.",
@@ -522,5 +522,32 @@
       "clubs": "Stadtvereine",
       "deals": "Angebote"
     }
+  },
+  "official": {
+    "title": "Offizielles Profil",
+    "badgeOpen": "Offizielles Konto · Profil ansehen",
+    "hours": "Öffnungszeiten",
+    "address": "Adresse",
+    "email": "E-Mail: {{email}}",
+    "noInfo": "Dieses Konto hat noch keine Kontaktdaten hinterlegt."
+  },
+  "neighbourhood": {
+    "title": "Viertelplatz",
+    "hint": "Ortsvorsteher, Viertelmeldungen, Veranstaltungen, Sammelplätze",
+    "needNeighbourhood": "Wählen Sie Ihr Viertel in Ihrem Standort, um den Viertelplatz zu sehen.",
+    "muhtarlik": "Ortsvorsteher (Muhtarlık)",
+    "noMuhtar": "Angaben zum Ortsvorsteher wurden noch nicht hinzugefügt.",
+    "fromGuide": "Angaben aus dem Stadtführer „Meine Stadt“.",
+    "fromGuideUnverified": "Angaben aus dem Stadtführer „Meine Stadt“, noch nicht geprüft. Bitte vorher telefonisch bestätigen.",
+    "announcements": "Meldungen im Viertel",
+    "noAnnouncements": "Keine aktuellen Meldungen für Ihr Viertel.",
+    "events": "Veranstaltungen in der Nähe",
+    "noEvents": "Keine anstehenden Veranstaltungen in Ihrem Viertel oder Bezirk.",
+    "allEvents": "Alle Veranstaltungen",
+    "gathering": "Notfall-Sammelplätze",
+    "gatheringDistrict": "Für Ihr Viertel ist kein Sammelplatz eingetragen; es werden die in {{place}} gezeigt. Verbindliche Angaben finden Sie bei e-Devlet oder AFAD.",
+    "noGathering": "Angaben zu Sammelplätzen wurden noch nicht hinzugefügt. Sie finden sie bei e-Devlet (Suche „Notfall-Sammelplatz“).",
+    "municipalities": "Meine Gemeinde",
+    "feedSoon": "Der Viertel-Feed (Beiträge der Nachbarn) kommt mit „Entdecken“."
   }
 }

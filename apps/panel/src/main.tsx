@@ -17,6 +17,7 @@ import { LoginPage } from './pages/login-page';
 import { ModerationPage } from './pages/moderation-page';
 import { OccupationsPage } from './pages/occupations-page';
 import { OrganizationsPage } from './pages/organizations-page';
+import { ProfilePage } from './pages/profile-page';
 import { ServiceCategoriesPage } from './pages/service-categories-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { OverviewPage } from './pages/overview-page';
@@ -52,6 +53,7 @@ const router = createHashRouter([
       { path: 'etkinlikler', element: <EventsPage /> },
       { path: 'sehir-rehberi', element: <CityGuidePage /> },
       { path: 'kurumlar', element: <OrganizationsPage /> },
+      { path: 'profil', element: <ProfilePage /> },
       { path: 'yetkiler', element: <GrantsPage /> },
       { path: 'islem-kayitlari', element: <AuditLogPage /> },
     ],

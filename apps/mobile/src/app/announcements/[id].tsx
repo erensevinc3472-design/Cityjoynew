@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { isAnnouncementLive, type Announcement } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
+import { AuthorLink } from '@/components/author-link';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
@@ -55,9 +56,8 @@ export default function AnnouncementScreen() {
           <>
             {item.kind === 'acil' ? <FormMessage kind="error" text={t('announcements.urgentNote')} /> : null}
             <AppText accessibilityRole="header" style={[styles.title, { color: c.textStrong }]}>{item.title}</AppText>
+            <AuthorLink author={item.author} label={author} />
             <View style={styles.meta}>
-              <AppText variant="label">{author}</AppText>
-              <AppText variant="caption" muted>{t('announcements.official')}</AppText>
               <AppText variant="caption" muted>{t('announcements.forRegion', { region })}</AppText>
               <AppText variant="caption" muted>{t('announcements.publishedAt', { date: when(item.publishedAt) })}</AppText>
               {item.endsAt ? <AppText variant="caption" muted>{t('announcements.until', { date: when(item.endsAt) })}</AppText> : null}

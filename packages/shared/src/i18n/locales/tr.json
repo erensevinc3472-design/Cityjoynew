@@ -432,7 +432,7 @@
     "loadError": "Bilgiler yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.",
     "comingSoon": "Bu ilde henüz bilgi yok",
     "count": "{{count}} kayıt",
-    "otherSections": "Nöbetçi eczane, etkinlikler, kafe ve restoranlar, ilanlar ve Mahalle Meydanı sonraki adımlarda eklenecek.",
+    "otherSections": "Nöbetçi eczane, kafe ve restoranlar ve ilanlar sonraki adımlarda eklenecek.",
     "search": "Ad, tür ya da ilçe ara",
     "allDistricts": "Tüm ilçeler",
     "contentLanguage": "Bu bölümdeki bilgiler Türkçe girilmiştir.",
@@ -522,5 +522,32 @@
       "clubs": "Şehir Kulüpleri",
       "deals": "Fırsatlar"
     }
+  },
+  "official": {
+    "title": "Resmî profil",
+    "badgeOpen": "Resmî hesap · Profili gör",
+    "hours": "Çalışma saatleri",
+    "address": "Adres",
+    "email": "E-posta: {{email}}",
+    "noInfo": "Bu hesap henüz iletişim bilgisi eklemedi."
+  },
+  "neighbourhood": {
+    "title": "Mahalle Meydanı",
+    "hint": "Muhtarlık, mahalle duyuruları, etkinlikler, toplanma alanları",
+    "needNeighbourhood": "Mahalle Meydanı için konumunuzda mahallenizi seçin.",
+    "muhtarlik": "Muhtarlık",
+    "noMuhtar": "Muhtarlık bilgisi henüz eklenmedi.",
+    "fromGuide": "Bilgi Benim Şehrim rehberinden.",
+    "fromGuideUnverified": "Bilgi Benim Şehrim rehberinden, henüz doğrulanmadı. Gitmeden önce telefonla teyit edin.",
+    "announcements": "Mahalle duyuruları",
+    "noAnnouncements": "Mahallenize özel yayında duyuru yok.",
+    "events": "Yakındaki etkinlikler",
+    "noEvents": "Mahallenizde ve ilçenizde yaklaşan etkinlik yok.",
+    "allEvents": "Tüm etkinlikler",
+    "gathering": "Afet toplanma alanları",
+    "gatheringDistrict": "Mahallenize kayıtlı toplanma alanı bulunamadı; {{place}} ilçesindekiler gösteriliyor. Kesin bilgi için e-Devlet ya da AFAD'a bakın.",
+    "noGathering": "Toplanma alanı bilgisi henüz eklenmedi. e-Devlet'te \"Acil Toplanma Alanı Sorgulama\" ile öğrenebilirsiniz.",
+    "municipalities": "Belediyem",
+    "feedSoon": "Mahallem akışı (komşu paylaşımları) Keşfet ile gelecek."
   }
 }

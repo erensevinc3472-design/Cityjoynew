@@ -5,6 +5,7 @@ import {
   cityChoiceLabel,
   cityFieldLabel,
   citySection,
+  ltr,
   mapsUrl,
   telUrl,
   type CityGuideItem,
@@ -105,7 +106,7 @@ export default function CityItemScreen() {
         ) : null}
 
         <View style={styles.actions}>
-          {typeof v.telefon === 'string' ? <AppButton title={t('city.call', { number: v.telefon })} onPress={() => open(telUrl(v.telefon as string))} /> : null}
+          {typeof v.telefon === 'string' ? <AppButton title={t('city.call', { number: ltr(v.telefon) })} onPress={() => open(telUrl(v.telefon as string))} /> : null}
           {mapLink ? <AppButton variant="secondary" title={t('city.openMap')} onPress={() => open(mapLink)} /> : null}
           {typeof v.web === 'string' ? <AppButton variant="secondary" title={t('city.website')} onPress={() => open(v.web as string)} /> : null}
           {typeof v.basvuru_baglantisi === 'string' ? <AppButton variant="secondary" title={t('city.apply')} onPress={() => open(v.basvuru_baglantisi as string)} /> : null}
