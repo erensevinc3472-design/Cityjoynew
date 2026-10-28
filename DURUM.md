@@ -480,6 +480,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Telefonda bakılmadı (web önizlemede giriş ve bölge ekranları görüldü).
    **Düzeltme (Eren):** ülke şeridinde 15 ülke yazılı (Türkiye açık, diğerleri seçilince "yakında"); bölgeler içerik
    yayında olmasa da açılır (iller "yakında" listelenir). Büyük harf Türkçe kurala göre (TÜRKİYE).
+   Uygulama boş sonucu önbelleğe almaz, dolu içeriği 30 dakikada yeniler. Panel > Yerler: şehir taslaktayken yayındaki
+   yerler için uyarı (canlıda Bursa şehir kaydı taslakta kalmıştı, 29 Ekim).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
