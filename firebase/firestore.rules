@@ -237,12 +237,18 @@ service cloud.firestore {
         && d.whatsapp is bool && d.is24h is bool
         && (!('hoursNote' in d) || (d.hoursNote is string && d.hoursNote.size() <= 120))
         && (!('description' in d) || (d.description is string && d.description.size() <= 500))
-        && d.priceList is list && d.priceList.size() <= 30;
+        && d.priceList is list && d.priceList.size() <= 30
+        && validSearchKeys(d, 60);
+    }
+
+    // Ara (PROJE.md 5.10): addan / yazıdan üretilen arama anahtarları (kelime başları), yalnızca sayısı sınırlanır.
+    function validSearchKeys(d, max) {
+      return !('searchKeys' in d) || (d.searchKeys is list && d.searchKeys.size() <= max);
     }
 
     function businessContentKeys() {
       return ['type', 'name', 'categoryIds', 'location', 'address', 'phone', 'whatsapp', 'is24h', 'hoursNote',
-              'description', 'priceList'];
+              'description', 'priceList', 'searchKeys'];
     }
 
     function businessPath(id) {
@@ -534,6 +540,11 @@ service cloud.firestore {
       allow delete: if isSelf(uid);
     }
 
+    // Önerilen aramalar listesi (dil başına en çok 12, her biri en çok 40 harf; uzunluğu panel denetler).
+    function termList(t, k) {
+      return !(k in t) || (t[k] is list && t[k].size() <= 12);
+    }
+
     // Uygulama ayarları (SOS süreleri): herkes okur, admin yazar.
     match /config/{id} {
       allow read: if true;
@@ -547,6 +558,15 @@ service cloud.firestore {
       allow write: if isAdmin() && id == 'bannedWords'
         && request.resource.data.keys().hasOnly(['words', 'updatedBy', 'updatedAt'])
         && request.resource.data.words is list && request.resource.data.words.size() <= 1000
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      // Ara: önerilen aramalar (PROJE.md 5.10), dil başına en çok 12; admin yönetir, uygulama okur.
+      allow write: if isAdmin() && id == 'searchSuggestions'
+        && request.resource.data.keys().hasOnly(['terms', 'updatedBy', 'updatedAt'])
+        && request.resource.data.terms is map && request.resource.data.terms.keys().hasOnly(['tr', 'en', 'de', 'ar', 'ru'])
+        && termList(request.resource.data.terms, 'tr') && termList(request.resource.data.terms, 'en')
+        && termList(request.resource.data.terms, 'de') && termList(request.resource.data.terms, 'ar')
+        && termList(request.resource.data.terms, 'ru')
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
     }
@@ -1306,8 +1326,9 @@ service cloud.firestore {
     }
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'likeCount',
-             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'createdAt', 'updatedAt'])
+             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
+        && validSearchKeys(d, 300)
         && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
         && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip'])
         && d.targets.keys().hasAll(['mahallem', 'bolgesel', 'genel'])
@@ -1357,11 +1378,12 @@ service cloud.firestore {
         && myLocation().get('neighbourhoodId', '') == request.resource.data.region.neighbourhoodId
         && myLocation().get('districtId', '') == request.resource.data.region.districtId
         && myLocation().get('provinceCode', '') == request.resource.data.region.provinceCode;
-      // Sahibi kaldırır: yazı ve ad boşaltılır, başka bir şey değişmez.
+      // Sahibi kaldırır: yazı, ad ve arama anahtarları boşaltılır, başka bir şey değişmez.
       allow update: if resource.data.authorUid == request.auth.uid
         && request.resource.data.updatedAt == request.time
         && request.resource.data.status == 'kaldirildi' && request.resource.data.text == '' && request.resource.data.authorName == ''
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'updatedAt']);
+        && !('searchKeys' in request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'updatedAt']);
       // Sahibi yorumları kapatır ya da açar.
       allow update: if resource.data.authorUid == request.auth.uid
         && request.resource.data.updatedAt == request.time
@@ -1480,17 +1502,20 @@ service cloud.firestore {
     // sahibi kabul edince "aktif". Engellenen kişi engelleyeni takip edemez, gönderisine yorum yazamaz.
     match /publicProfiles/{uid} {
       allow read: if signedIn();
+      // Arama anahtarları yalnızca addan üretilir (gizli hesap da yalnızca adıyla bulunur, PROJE.md 5.10).
       allow create: if isSelf(uid)
-        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'searchKeys', 'updatedAt'])
         && request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
         && request.resource.data.displayName.size() <= 40
+        && validSearchKeys(request.resource.data, 40)
         && request.resource.data.bio == ''
         && request.resource.data.isPrivate is bool
         && request.resource.data.updatedAt == request.time;
       // Kişi adını, tanıtımını ve gizliliğini değiştirir; moderatörün kaldırdığı tanıtımı yeniden yazamaz.
       allow update: if isSelf(uid)
-        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'updatedAt'])
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'searchKeys', 'updatedAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'searchKeys', 'updatedAt'])
+        && validSearchKeys(request.resource.data, 40)
         && request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
         && request.resource.data.displayName.size() <= 40
         && request.resource.data.bio is string && request.resource.data.bio.size() <= 160

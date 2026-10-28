@@ -185,6 +185,8 @@ export function rankBusinesses(list: readonly Business[], opts: { districtId?: s
 export interface BusinessRepository {
   /** Bir ilde, bir hizmet alt kategorisindeki yayındaki işletmeler (en çok 100). */
   listByCategory(provinceCode: string, categoryId: string): Promise<Business[]>;
+  /** Ara > İşletmeler: ildeki yayındaki işletmelerden adının bir kelimesi anahtarla başlayanlar (en çok 30). */
+  searchByName(provinceCode: string, key: string): Promise<Business[]>;
   get(id: string): Promise<Business | null>;
   listMine(uid: string): Promise<Business[]>;
   create(uid: string, input: BusinessInput): Promise<string>;

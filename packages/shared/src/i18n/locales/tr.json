@@ -45,7 +45,8 @@
     "account": "Hesabım",
     "greetingMorning": "Günaydın, {{name}}",
     "greetingDay": "İyi günler, {{name}}",
-    "greetingEvening": "İyi akşamlar, {{name}}"
+    "greetingEvening": "İyi akşamlar, {{name}}",
+    "search": "Kişi, işletme, yer, etkinlik ara"
   },
   "modules": {
     "myCity": "Benim Şehrim",
@@ -813,5 +814,45 @@
       "cevre": "Çevre",
       "ekonomi": "Ekonomi"
     }
+  },
+  "search": {
+    "title": "Ara",
+    "placeholder": "Kişi, işletme, yer, etkinlik ya da gönderi",
+    "tabs": {
+      "tumu": "Tümü",
+      "kisiler": "Kişiler",
+      "isletmeler": "İşletmeler",
+      "yerler": "Yerler",
+      "etkinlikler": "Etkinlikler",
+      "gonderiler": "Gönderiler"
+    },
+    "recent": "Son aramalar",
+    "clearRecent": "Temizle",
+    "removeRecent": "{{q}} aramasını sil",
+    "suggested": "Önerilen aramalar",
+    "quick": "Hızlı erişim",
+    "quickServices": "Hizmetler",
+    "quickUrgent": "Acil İhtiyaçlar",
+    "quickEvents": "Etkinlikler",
+    "quickCity": "Benim Şehrim",
+    "defaults": [
+      "Nöbetçi eczane",
+      "Berber",
+      "Tesisatçı",
+      "Park",
+      "Müze",
+      "Otopark",
+      "Pazar",
+      "Elektrikçi"
+    ],
+    "services": "Hizmetler",
+    "serviceCategory": "Hizmet kategorisi",
+    "seeAll": "Tümünü gör ({{count}})",
+    "noResults": "“{{q}}” için sonuç bulunamadı.",
+    "tooShort": "Aramak için en az 2 harf yazın.",
+    "postsTooShort": "Gönderilerde aramak için en az 3 harfli bir kelime yazın.",
+    "needLocation": "Bu sonuçlar için konumunu seç.",
+    "loadError": "Sonuçlar yüklenemedi.",
+    "privateAccount": "Gizli hesap"
   }
 }

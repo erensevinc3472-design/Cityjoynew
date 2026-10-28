@@ -45,7 +45,8 @@
     "account": "Mein Konto",
     "greetingMorning": "Guten Morgen, {{name}}",
     "greetingDay": "Guten Tag, {{name}}",
-    "greetingEvening": "Guten Abend, {{name}}"
+    "greetingEvening": "Guten Abend, {{name}}",
+    "search": "Personen, Betriebe, Orte, Events suchen"
   },
   "modules": {
     "myCity": "Meine Stadt",
@@ -813,5 +814,45 @@
       "cevre": "Umwelt",
       "ekonomi": "Wirtschaft"
     }
+  },
+  "search": {
+    "title": "Suche",
+    "placeholder": "Personen, Betriebe, Orte, Events oder Beiträge",
+    "tabs": {
+      "tumu": "Alle",
+      "kisiler": "Personen",
+      "isletmeler": "Betriebe",
+      "yerler": "Orte",
+      "etkinlikler": "Veranstaltungen",
+      "gonderiler": "Beiträge"
+    },
+    "recent": "Letzte Suchen",
+    "clearRecent": "Löschen",
+    "removeRecent": "Suche {{q}} entfernen",
+    "suggested": "Vorgeschlagene Suchen",
+    "quick": "Schnellzugriff",
+    "quickServices": "Dienstleistungen",
+    "quickUrgent": "Dringende Hilfe",
+    "quickEvents": "Veranstaltungen",
+    "quickCity": "Meine Stadt",
+    "defaults": [
+      "Notdienst-Apotheke",
+      "Friseur",
+      "Installateur",
+      "Park",
+      "Museum",
+      "Parkplatz",
+      "Markt",
+      "Elektriker"
+    ],
+    "services": "Dienstleistungen",
+    "serviceCategory": "Dienstleistungskategorie",
+    "seeAll": "Alle anzeigen ({{count}})",
+    "noResults": "Keine Ergebnisse für „{{q}}“.",
+    "tooShort": "Gib mindestens 2 Buchstaben ein.",
+    "postsTooShort": "Für Beiträge ein Wort mit mindestens 3 Buchstaben eingeben.",
+    "needLocation": "Wähle deinen Standort für diese Ergebnisse.",
+    "loadError": "Ergebnisse konnten nicht geladen werden.",
+    "privateAccount": "Privates Konto"
   }
 }

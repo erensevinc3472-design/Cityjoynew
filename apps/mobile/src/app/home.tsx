@@ -16,7 +16,7 @@ import { locationRepository as repo } from '@/lib/locations';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, radius, spacing } from '@/theme/tokens';
+import { fonts, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
@@ -90,6 +90,15 @@ export default function HomeScreen() {
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <VerifyEmailBanner />
+        {/* Ara (PROJE.md 5.10); alt gezinme çubuğu gelene kadar ana sayfadan açılır. */}
+        <Pressable
+          accessibilityRole="search"
+          accessibilityLabel={t('home.search')}
+          onPress={() => router.push('/search')}
+          style={({ pressed }) => [styles.search, { backgroundColor: c.surfaceStrong, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
+          <MaterialIcons name="search" size={22} color={c.textMuted} />
+          <AppText muted numberOfLines={1} style={styles.grow}>{t('home.search')}</AppText>
+        </Pressable>
         {/* Acil duyurular en üstte sabit (PROJE.md 5.5). */}
         {urgent.map((a) => (
           <AnnouncementCard key={a.id} item={a} onPress={() => openAnnouncement(a.id)} />
@@ -154,5 +163,7 @@ const styles = StyleSheet.create({
   moduleTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 22 },
   wide: { flexBasis: '100%', minHeight: 0 },
   center: { textAlign: 'center' },
+  search: { minHeight: MIN_TOUCH, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.pill, borderWidth: 1 },
+  grow: { flex: 1 },
   section: { gap: spacing.sm },
 });

@@ -5,7 +5,19 @@ import { useSettings } from '@/lib/settings';
 import { fonts, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
-export function SearchField({ value, onChangeText, placeholder }: { value: string; onChangeText(v: string): void; placeholder: string }) {
+export function SearchField({
+  value,
+  onChangeText,
+  placeholder,
+  autoFocus,
+  onSubmitEditing,
+}: {
+  value: string;
+  onChangeText(v: string): void;
+  placeholder: string;
+  autoFocus?: boolean;
+  onSubmitEditing?(): void;
+}) {
   const c = useThemeColors();
   const { rtl } = useSettings();
   return (
@@ -20,6 +32,9 @@ export function SearchField({ value, onChangeText, placeholder }: { value: strin
         autoCorrect={false}
         autoCapitalize="none"
         clearButtonMode="while-editing"
+        autoFocus={autoFocus}
+        returnKeyType="search"
+        onSubmitEditing={onSubmitEditing}
         style={[styles.input, { color: c.textStrong, textAlign: rtl ? 'right' : 'left' }]}
       />
     </View>

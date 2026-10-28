@@ -21,6 +21,8 @@ export const PROFILE_LIMITS = {
   feedAuthors: 30,
   /** Takip akışında hesap başına okunan gönderi. */
   perAuthor: 10,
+  /** Ara > Kişiler: tek sorguda en çok. */
+  searchResults: 30,
 } as const;
 
 export type FollowStatus = 'aktif' | 'istek';

@@ -45,7 +45,8 @@
     "account": "My account",
     "greetingMorning": "Good morning, {{name}}",
     "greetingDay": "Good afternoon, {{name}}",
-    "greetingEvening": "Good evening, {{name}}"
+    "greetingEvening": "Good evening, {{name}}",
+    "search": "Search people, businesses, places, events"
   },
   "modules": {
     "myCity": "My City",
@@ -813,5 +814,45 @@
       "cevre": "Environment",
       "ekonomi": "Economy"
     }
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "People, businesses, places, events or posts",
+    "tabs": {
+      "tumu": "All",
+      "kisiler": "People",
+      "isletmeler": "Businesses",
+      "yerler": "Places",
+      "etkinlikler": "Events",
+      "gonderiler": "Posts"
+    },
+    "recent": "Recent searches",
+    "clearRecent": "Clear",
+    "removeRecent": "Remove search {{q}}",
+    "suggested": "Suggested searches",
+    "quick": "Quick access",
+    "quickServices": "Services",
+    "quickUrgent": "Urgent Needs",
+    "quickEvents": "Events",
+    "quickCity": "My City",
+    "defaults": [
+      "Pharmacy on duty",
+      "Barber",
+      "Plumber",
+      "Park",
+      "Museum",
+      "Parking",
+      "Market",
+      "Electrician"
+    ],
+    "services": "Services",
+    "serviceCategory": "Service category",
+    "seeAll": "See all ({{count}})",
+    "noResults": "No results for “{{q}}”.",
+    "tooShort": "Type at least 2 letters to search.",
+    "postsTooShort": "Type a word of at least 3 letters to search posts.",
+    "needLocation": "Choose your location for these results.",
+    "loadError": "Results could not be loaded.",
+    "privateAccount": "Private account"
   }
 }

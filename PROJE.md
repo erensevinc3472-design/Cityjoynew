@@ -319,6 +319,8 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
 
 Üstte arama kutusu. Sekmeler: Tümü, Kişiler, İşletmeler, Yerler, Etkinlikler, Gönderiler. Son aramalar (silinebilir), önerilen aramalar, hizmet kategorilerine hızlı erişim (usta, nöbetçi eczane, tuvalet vb.). Sonuçlar seçili il/ilçeye göre süzülür, doğrulanmış işletmeler önce gelir. Yazım hatası ve Türkçe karakter toleransı, beş dilde arama. Engellenen kullanıcılar sonuçlarda görünmez, gizli hesaplar yalnızca ad ve kullanıcı adıyla bulunur.
 
+- **Yapıldı (28 Ekim 2026):** ana sayfadaki arama kutusundan açılan Ara ekranı, altı sekme, son aramalar, panelden yönetilen önerilen aramalar (Panel > Moderasyon), hızlı erişim. Ücretli arama hizmeti olmadan: ad ve yazılardan kelime başı "arama anahtarları" üretilir (Türkçe karakter ve tek harf hatası toleranslı). Arayüz beş dilde; içerik Türkçe girildiği için arama içeriğin kendi diliyle yapılır. Kullanıcı adı alanı henüz yok, kişiler adla bulunur. Ayrıntı DURUM.md 28. madde.
+
 ### 5.11 Mesajlar (standart ve öneri)
 
 - **Standart (sormadan eklenir):** birebir mesajlaşma, takipleşilmeyen kişilerden gelenler "mesaj isteği" olarak düşer, **yetişkinler küçük yaş gruplarına mesaj atamaz**, engelle ve şikâyet et, mesaj silme, okundu bilgisi kapatılabilir, yeni hesaplara günlük mesaj sınırı (spam), sohbette IBAN/kapora/dış bağlantı geçerse dolandırıcılık uyarısı, ilan kartıyla başlayan sohbetler (ilan platformu).

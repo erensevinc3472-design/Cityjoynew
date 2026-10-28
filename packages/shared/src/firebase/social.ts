@@ -8,6 +8,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
   where,
   writeBatch,
   type DocumentData,
@@ -15,12 +16,15 @@ import {
 } from 'firebase/firestore';
 
 import { blockId, followId, PROFILE_LIMITS, type FollowStatus, type ProfileReportReason, type PublicProfile } from '../posts/social';
+import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
 
 const PROFILES = 'publicProfiles';
 const FOLLOWS = 'follows';
 const BLOCKS = 'blocks';
 const REPORTS = 'profileReports';
+
+const nameKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.profileKeys);
 
 function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
   return { uid, displayName: d.displayName ?? '', bio: d.bio ?? '', isPrivate: d.isPrivate === true, bioRemoved: d.bioRemoved === true };
@@ -44,11 +48,18 @@ export function createFirestoreSocialRepository(db: Firestore) {
     /** Keşfet'e ilk girişte herkese açık profil açılır (gizlilik, kayıttaki tercihle başlar; 13-17 yaş gizli). */
     async ensureProfile(uid: string, displayName: string, isPrivate: boolean): Promise<PublicProfile> {
       const snap = await getDoc(profileRef(uid));
-      if (snap.exists()) return profileFromDoc(uid, snap.data());
+      if (snap.exists()) {
+        // Ara'dan önce açılmış profillere arama anahtarı bir kez eklenir.
+        if (!snap.get('searchKeys')) {
+          await updateDoc(profileRef(uid), { searchKeys: nameKeys(snap.get('displayName') ?? ''), updatedAt: serverTimestamp() }).catch(() => {});
+        }
+        return profileFromDoc(uid, snap.data());
+      }
+      const name = displayName.slice(0, 40);
       const batch = writeBatch(db);
-      batch.set(profileRef(uid), { displayName: displayName.slice(0, 40), bio: '', isPrivate, updatedAt: serverTimestamp() });
+      batch.set(profileRef(uid), { displayName: name, bio: '', isPrivate, searchKeys: nameKeys(name), updatedAt: serverTimestamp() });
       await batch.commit();
-      return { uid, displayName: displayName.slice(0, 40), bio: '', isPrivate, bioRemoved: false };
+      return { uid, displayName: name, bio: '', isPrivate, bioRemoved: false };
     },
 
     async updateProfile(uid: string, patch: { displayName: string; bio: string; isPrivate: boolean }): Promise<void> {
@@ -57,9 +68,19 @@ export function createFirestoreSocialRepository(db: Firestore) {
         displayName: patch.displayName.slice(0, 40),
         bio: patch.bio.trim().slice(0, PROFILE_LIMITS.bio),
         isPrivate: patch.isPrivate,
+        searchKeys: nameKeys(patch.displayName.slice(0, 40)),
         updatedAt: serverTimestamp(),
       });
       await batch.commit();
+    },
+
+    /**
+     * Ara > Kişiler: yalnızca adla bulunur (tanıtım aranmaz; gizli hesaplar da yalnızca adıyla görünür, PROJE.md 5.10).
+     * Engellenenleri ekran süzer.
+     */
+    async searchPeople(key: string): Promise<PublicProfile[]> {
+      const snap = await getDocs(query(collection(db, PROFILES), where('searchKeys', 'array-contains', key), limit(PROFILE_LIMITS.searchResults)));
+      return snap.docs.map((d) => profileFromDoc(d.id, d.data()));
     },
 
     /** Benim o kişiyle takip durumum: takip ediyorum, istek gönderdim ya da yok. */
