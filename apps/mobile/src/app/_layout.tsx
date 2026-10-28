@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 import { LocaleProvider, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import '@/lib/i18n';
@@ -39,7 +39,8 @@ function RootNavigator() {
 
   return (
     <LocaleProvider direction={rtl ? 'rtl' : 'ltr'}>
-      <View style={{ flex: 1, direction: rtl ? 'rtl' : 'ltr', backgroundColor: c.background }}>
+      {/* Web bu stili tanımaz; orada yönü LocaleProvider ve dir verir. */}
+      <View style={{ flex: 1, ...(Platform.OS === 'web' ? {} : { direction: rtl ? ('rtl' as const) : ('ltr' as const) }), backgroundColor: c.background }}>
         <IncomingSosProvider>
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }} />
           <IncomingSosBanner />

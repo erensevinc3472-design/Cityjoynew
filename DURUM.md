@@ -415,8 +415,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    acil şerit (varsa), dört modül resimli kartta, tanıtım videosu (bağlantı Panel > Moderasyon > Tanıtım videosu,
    `config/introVideo`, yalnızca https, işlem kaydı; boşsa "yakında"). YouTube / Vimeo bağlantısı uygulama içinde,
    ekranın ortasında açılan pencerede oynar (`videoEmbedUrl`, çerezsiz YouTube adresi; react-native-webview), başka bağlantı tarayıcıda. **Benim Şehrim:** kapak, Belediye büyük kart,
-   renkli kutucuklar (verisi olmayan "Yakında"), Mahalle Meydanı ve Şehir Vitrini (yakında). **Keşfet:** ince sekmeler,
-   çerçevesiz gönderi, iki kez dokun beğen (kalp), paylaş, "5 dk" gibi süre; Kaydedilenler üst solda. **Profil:**
+   renkli kutucuklar (verisi olmayan "Yakında"), Mahalle Meydanı ve Şehir Vitrini (yakında). **Keşfet (Eren'in örnek ekranıyla, 2. tur):** üstte menü, "KEŞFET" ve açık sekme, + (yeni gönderi; açık
+   sekme hedef olarak seçili gelir) ve zil; konum çipi yok. MAHALLEM / BÖLGESEL / GENEL / TAKİP şeridinde üçü görünür
+   (Takip'te Mahallem gizlenir), parmakla sağa sola kaydırınca sekme değişir (sekme yalnızca açılınca okunur). Etiketler
+   (#Tümü, #Yardım, #Kayıp...) kategoriye göre süzer. Gönderi: halkalı harf, ad, yer ve süre, Takip et / Takiptesin,
+   iki kez dokun beğen, yorum, paylaş, kaydet (kaydettiklerim oturumda bir kez okunur), #kategori. Kaydedilenler yan
+   menüde. Takip akışının önbellek anahtarı düzeltildi (Genel ile karışıyordu). **Profil:**
    halkalı harf, gönderi/takipçi/takip sayıları, Takip et ve Mesaj yan yana. **Sosyal Harmoni:** yana kaydırılan kartlar,
    arkada değişen sahne; forum kaldırıldı (madde 18). **Karşılama:** beş sahne sırayla, "Kaydırarak başla" (dokunarak da),
    "Zaten hesabın var mı?". **Acil İhtiyaçlar:** nabız gibi atan büyük SOS kartı. Görseller şimdilik çizim

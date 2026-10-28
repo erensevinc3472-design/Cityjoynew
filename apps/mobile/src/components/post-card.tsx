@@ -20,6 +20,12 @@ interface Props {
   onLike?(): void;
   /** Paylaşanın Keşfet profili. */
   onAuthor?(): void;
+  /** Takip düğmesi: 'aktif' takiptesin, 'istek' istek gönderildi, null takip etmiyorsun; undefined ise düğme yok. */
+  follow?: 'aktif' | 'istek' | null;
+  onFollow?(): void;
+  /** Kaydet işareti; onSave yoksa görünmez. */
+  saved?: boolean;
+  onSave?(): void;
 }
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
@@ -42,14 +48,14 @@ export function useRelativeTime() {
 }
 
 /**
- * Keşfet gönderisi, akış görünümünde (Instagram hissi, 13. madde 29): çerçevesiz, ekran genişliğinde; üstte paylaşan
- * ve yeri, ortada yazı, altta beğeni, yorum ve paylaş. Yazıya iki kez dokunmak beğenir (kalp belirir), bir kez dokunmak
- * gönderiyi açar. "Hareketi azalt" açıksa kalp animasyonsuz görünür.
+ * Keşfet gönderisi (Instagram hissi; Eren'in örnek ekranı, 13. madde 30): çerçevesiz, ekran genişliğinde. Üstte halkalı
+ * harf, ad, yer ve zaman, sağda Takip et; ortada yazı (kısa yazı büyük harfle); altta beğeni, yorum, paylaş ve kaydet;
+ * en altta kategori etiketi. Yazıya iki kez dokunmak beğenir (kalp belirir), bir kez dokunmak gönderiyi açar.
  */
-export function PostCard({ item, liked, full, onPress, onLike, onAuthor }: Props) {
+export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow, onFollow, saved, onSave }: Props) {
   const { t } = useTranslation();
   const c = useThemeColors();
-  const { language, rtl } = useSettings();
+  const { language } = useSettings();
   const lang = language ?? 'tr';
   const reduce = useReduceMotion();
   const ago = useRelativeTime();
@@ -58,6 +64,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor }: Props
   const bump = useRef(new Animated.Value(1)).current;
   const lastTap = useRef(0);
   const single = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const short = !full && item.text.length <= 140;
 
   useEffect(() => () => clearTimeout(single.current), []);
 
@@ -95,10 +102,11 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor }: Props
 
   const action = (icon: IconName, label: string, onAct: (() => void) | undefined, color: string, count?: number) => (
     <Pressable accessibilityRole="button" accessibilityLabel={label} disabled={!onAct} onPress={onAct} hitSlop={6} style={({ pressed }) => [styles.action, { opacity: pressed ? 0.6 : 1 }]}>
-      <MaterialIcons name={icon} size={23} color={color} />
+      <MaterialIcons name={icon} size={24} color={color} />
       {count !== undefined ? <AppText style={[styles.count, { color: c.textStrong }]}>{count}</AppText> : null}
     </Pressable>
   );
+  const followLabel = follow === 'aktif' ? t('explore.profile.following') : follow === 'istek' ? t('explore.profile.requestedShort') : t('explore.profile.follow');
 
   return (
     <View style={[styles.post, { borderBottomColor: c.border }]}>
@@ -119,9 +127,20 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor }: Props
             <AppText style={[styles.meta, { color: c.textMuted }]} numberOfLines={1}>{[district, ago(item.createdAt)].filter(Boolean).join(' · ')}</AppText>
           </View>
         </Pressable>
-        <View style={[styles.tag, { backgroundColor: c.accentSoft }]}>
-          <AppText style={[styles.tagText, { color: c.icon }]}>{t(`explore.categories.${item.category}`)}</AppText>
-        </View>
+        {follow !== undefined && onFollow ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`${followLabel}: ${item.authorName}`}
+            onPress={onFollow}
+            hitSlop={6}
+            style={({ pressed }) => [
+              styles.follow,
+              follow === 'aktif' ? { backgroundColor: c.primary, borderColor: c.primary } : { borderColor: c.accent },
+              { opacity: pressed ? 0.75 : 1 },
+            ]}>
+            <AppText style={[styles.followText, { color: follow === 'aktif' ? c.onPrimary : c.accent }]}>{followLabel}</AppText>
+          </Pressable>
+        ) : null}
       </View>
 
       <Pressable
@@ -130,9 +149,9 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor }: Props
         accessibilityHint={onLike ? t('explore.doubleTapHint') : undefined}
         onPress={tapBody}
         style={styles.body}>
-        <AppText selectable={full} numberOfLines={full ? undefined : 6} style={[styles.text, { color: c.text }]}>{item.text}</AppText>
+        <AppText selectable={full} numberOfLines={full ? undefined : 8} style={[short ? styles.textBig : styles.text, { color: c.text }]}>{item.text}</AppText>
         <Animated.View pointerEvents="none" style={[styles.heart, { opacity: heart, transform: [{ scale: heart.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }] }]}>
-          <MaterialIcons name="favorite" size={72} color={c.danger} />
+          <MaterialIcons name="favorite" size={76} color={c.danger} />
         </Animated.View>
       </Pressable>
 
@@ -141,8 +160,13 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor }: Props
           {action(liked ? 'favorite' : 'favorite-border', liked ? t('explore.unlike') : t('explore.like'), onLike ? pressLike : undefined, liked ? c.danger : c.textStrong, item.likeCount)}
         </Animated.View>
         {action('chat-bubble-outline', t('explore.comments.title', { count: item.commentCount }), onPress, c.textStrong, item.commentCount)}
-        {action('send', t('explore.share'), share, c.textStrong)}
-        <AppText style={[styles.targets, { color: c.textSoft, textAlign: rtl ? 'left' : 'right' }]} numberOfLines={1}>
+        {action('share', t('explore.share'), share, c.textStrong)}
+        <View style={styles.flex} />
+        {onSave ? action(saved ? 'bookmark' : 'bookmark-border', saved ? t('explore.unsave') : t('explore.save'), onSave, saved ? c.accent : c.textStrong) : null}
+      </View>
+      <View style={styles.foot}>
+        <AppText style={[styles.tag, { color: c.accent }]}>#{t(`explore.categories.${item.category}`)}</AppText>
+        <AppText style={[styles.targets, { color: c.textSoft }]} numberOfLines={1}>
           {item.targets.map((x) => t(`explore.targets.${x}`)).join(' · ')}
         </AppText>
       </View>
@@ -151,22 +175,26 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor }: Props
 }
 
 const styles = StyleSheet.create({
-  post: { marginHorizontal: -GUTTER, paddingHorizontal: GUTTER, paddingTop: spacing.sm, paddingBottom: 4, borderBottomWidth: StyleSheet.hairlineWidth },
+  post: { marginHorizontal: -GUTTER, paddingHorizontal: GUTTER, paddingTop: spacing.md, paddingBottom: spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth },
   top: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   author: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
-  ring: { width: 38, height: 38, borderRadius: 19, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  avatar: { width: 31, height: 31, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  initial: { fontFamily: fonts.heading, fontSize: 14 },
+  ring: { width: 44, height: 44, borderRadius: 22, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  initial: { fontFamily: fonts.heading, fontSize: 15 },
   who: { flex: 1 },
-  name: { fontFamily: fonts.bodySemi, fontSize: 14, lineHeight: 18 },
+  name: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
   meta: { fontSize: 12, lineHeight: 16 },
-  tag: { borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
-  tagText: { fontFamily: fonts.bodyMedium, fontSize: 11 },
-  body: { paddingVertical: 6 },
-  text: { fontSize: 15, lineHeight: 21 },
+  follow: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  followText: { fontFamily: fonts.bodySemi, fontSize: 13 },
+  body: { paddingVertical: 10 },
+  text: { fontSize: 15, lineHeight: 22 },
+  textBig: { fontFamily: fonts.bodyMedium, fontSize: 18, lineHeight: 26 },
   heart: { position: 'absolute', top: 0, bottom: 0, start: 0, end: 0, alignItems: 'center', justifyContent: 'center' },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  action: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 44, minWidth: 44, paddingEnd: 8 },
-  count: { fontFamily: fonts.bodySemi, fontSize: 13 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  action: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, minWidth: 44, paddingEnd: 10 },
+  count: { fontFamily: fonts.bodySemi, fontSize: 14 },
+  flex: { flex: 1 },
+  foot: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  tag: { fontFamily: fonts.bodySemi, fontSize: 12 },
   targets: { flex: 1, fontSize: 11 },
 });

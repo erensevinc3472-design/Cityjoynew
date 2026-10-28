@@ -71,3 +71,21 @@ export function setBlocked(uid: string, other: string, blocked: boolean) {
   } else state.blocked.delete(other);
   notify();
 }
+
+/**
+ * Akıştan takip et / bırak. Gizli hesapta istek gider (profil okunup anlaşılır). Döner: yeni durum.
+ * Takip listesi yerelde hemen güncellenir; Takip akışı bir sonraki açılışta yenilenir.
+ */
+export async function toggleFollowAuthor(me: string, other: string, following: boolean): Promise<'aktif' | 'istek' | null> {
+  if (following) {
+    await socialRepository.unfollow(me, other);
+    if (state?.uid === me && state.following) state.following = state.following.filter((x) => x !== other);
+    notify();
+    return null;
+  }
+  const profile = await socialRepository.getProfile(other);
+  const status = await socialRepository.follow(me, other, profile?.isPrivate ?? false);
+  if (status === 'aktif' && state?.uid === me) state.following = [...(state.following ?? []), other];
+  notify();
+  return status;
+}

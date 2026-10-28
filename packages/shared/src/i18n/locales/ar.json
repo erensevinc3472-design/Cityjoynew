@@ -832,11 +832,25 @@
       },
       "statPosts": "المنشورات",
       "statFollowers": "المتابِعون",
-      "statFollowing": "يتابع"
+      "statFollowing": "يتابع",
+      "following": "تتابعه",
+      "requestedShort": "تم الطلب"
     },
     "takipFeedHint": "منشورات من تتابعهم المخصّصة لمتابعيهم فقط",
     "share": "مشاركة",
-    "doubleTapHint": "انقر مرتين للإعجاب"
+    "doubleTapHint": "انقر مرتين للإعجاب",
+    "tagsLabel": "الوسوم",
+    "tagEmpty": "لا توجد منشورات بهذا الوسم بعد.",
+    "tags": {
+      "all": "الكل",
+      "genel": "عام",
+      "duyuru": "إعلان",
+      "etkinlik": "فعالية",
+      "firsat": "عرض",
+      "soru-yardim": "مساعدة",
+      "kayip-buluntu": "مفقودات",
+      "taziye": "تعزية"
+    }
   },
   "news": {
     "title": "الأخبار",

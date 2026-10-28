@@ -832,11 +832,25 @@
       },
       "statPosts": "Posts",
       "statFollowers": "Followers",
-      "statFollowing": "Following"
+      "statFollowing": "Following",
+      "following": "Following",
+      "requestedShort": "Requested"
     },
     "takipFeedHint": "posts shared only with followers by people you follow",
     "share": "Share",
-    "doubleTapHint": "Double-tap to like"
+    "doubleTapHint": "Double-tap to like",
+    "tagsLabel": "Tags",
+    "tagEmpty": "No posts with this tag yet.",
+    "tags": {
+      "all": "All",
+      "genel": "General",
+      "duyuru": "Notice",
+      "etkinlik": "Event",
+      "firsat": "Deal",
+      "soru-yardim": "Help",
+      "kayip-buluntu": "LostFound",
+      "taziye": "Condolence"
+    }
   },
   "news": {
     "title": "News",

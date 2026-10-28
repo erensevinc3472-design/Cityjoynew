@@ -832,11 +832,25 @@
       },
       "statPosts": "Публикации",
       "statFollowers": "Подписчики",
-      "statFollowing": "Подписки"
+      "statFollowing": "Подписки",
+      "following": "Вы подписаны",
+      "requestedShort": "Запрошено"
     },
     "takipFeedHint": "публикации тех, на кого вы подписаны, только для подписчиков",
     "share": "Поделиться",
-    "doubleTapHint": "Дважды коснитесь, чтобы поставить лайк"
+    "doubleTapHint": "Дважды коснитесь, чтобы поставить лайк",
+    "tagsLabel": "Теги",
+    "tagEmpty": "С этим тегом пока нет публикаций.",
+    "tags": {
+      "all": "Все",
+      "genel": "Общее",
+      "duyuru": "Объявление",
+      "etkinlik": "Событие",
+      "firsat": "Выгода",
+      "soru-yardim": "Помощь",
+      "kayip-buluntu": "Потеряшки",
+      "taziye": "Соболезнование"
+    }
   },
   "news": {
     "title": "Новости",

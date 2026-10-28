@@ -5,7 +5,10 @@ import type { FeedFilter } from '@cityjoy/shared/firebase';
 import { postRepository } from './services';
 
 const keyOf = (f: FeedFilter) =>
-  f.target === 'mahallem' ? `m:${f.neighbourhoodId}` : f.target === 'bolgesel' ? `b:${f.provinceCode}:${f.districtId ?? ''}` : 'g';
+  f.target === 'mahallem' ? `m:${f.neighbourhoodId}`
+  : f.target === 'bolgesel' ? `b:${f.provinceCode}:${f.districtId ?? ''}`
+  : f.target === 'takip' ? `t:${f.authorUids.join(',')}`
+  : 'g';
 
 /** Sekme başına okunan sayfalar; sekmeler arası geçişte yeniden okunmaz, 5 dakikada bir tazelenir (maliyet ilkesi). */
 const cache = new Map<string, { at: number; posts: Post[]; cursor: string | null }>();
@@ -136,4 +139,38 @@ export async function toggleLike(post: Pick<Post, 'id' | 'likeCount'>, uid: stri
   patchCachedPost(post.id, { likeCount: count });
   listeners.forEach((f) => f());
   return count;
+}
+
+/** Kaydettiklerim: oturum başına tek sorgu, sonra yerelde güncellenir (akıştaki kaydet işareti). */
+let saved: { uid: string; ids: Set<string> } | null = null;
+const savedListeners = new Set<() => void>();
+
+export function useSaved(uid: string | undefined) {
+  const [, force] = useState(0);
+  useEffect(() => {
+    const l = () => force((n) => n + 1);
+    savedListeners.add(l);
+    if (uid && saved?.uid !== uid) {
+      saved = { uid, ids: new Set() };
+      postRepository.savedIds(uid).then((ids) => {
+        if (saved?.uid === uid) saved.ids = ids;
+        savedListeners.forEach((f) => f());
+      }, () => {});
+    }
+    return () => {
+      savedListeners.delete(l);
+    };
+  }, [uid]);
+  return (id: string) => (!!uid && saved?.uid === uid && saved.ids.has(id));
+}
+
+/** Kaydet / kaldır: veritabanı ve işaret birlikte. */
+export async function toggleSave(postId: string, uid: string, isSaved: boolean): Promise<void> {
+  if (isSaved) await postRepository.unsave(uid, postId);
+  else await postRepository.save(uid, postId);
+  if (saved?.uid === uid) {
+    if (isSaved) saved.ids.delete(postId);
+    else saved.ids.add(postId);
+  }
+  savedListeners.forEach((f) => f());
 }
