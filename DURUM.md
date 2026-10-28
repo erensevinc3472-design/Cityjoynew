@@ -4,13 +4,14 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (resmî profil, Mahalle Meydanı; önceki: etkinlikler, resmî duyurular).
+Son güncelleme: 28 Ekim 2026 (kullanıcı aktiviteleri; önceki: resmî profil, Mahalle Meydanı).
 
-> **Not (28 Ekim, 20. madde):** iş Eren'in bilgisayarında (`Desktop\Cityjoynew-main`, `main`'in ZIP kopyası, git deposu
-> değil) yapıldı ve `claude/resmi-profil-mahalle-meydani` dalına gönderildi; PR'ı Eren açar (bu bilgisayarda `gh` yok,
-> git ise kayıtlı GitHub girişiyle çalışıyor). Sistem Java'sı 8; kural testleri için Temurin JDK 21 zip olarak
-> `%TEMP%\cj-jdk21` klasörüne açıldı (kurulmadı). Kullanım: `JAVA_HOME` ve `PATH` o klasörü gösterecek şekilde ayarlanıp
-> `npm run test:rules`. Klasör silinmişse yeniden indirilir.
+> **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
+> `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
+> girişiyle gönderir, PR'ı Eren bağlantıdan açıp birleştirir (20. madde PR #6). Sistem Java'sı 8; kural testleri için
+> Temurin JDK 21 zip olarak `%TEMP%\cj-jdk21` klasörüne açıldı (kurulmadı): `JAVA_HOME` ve `PATH` o klasörü gösterecek
+> şekilde ayarlanıp `npm run test:rules`. Klasör silinmişse yeniden indirilir. Kurallar Eren'in bilgisayarından yüklenir:
+> `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew` (giriş kayıtlı).
 
 ## Depo ve ortam
 
@@ -43,8 +44,8 @@ Son güncelleme: 28 Ekim 2026 (resmî profil, Mahalle Meydanı; önceki: etkinli
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (75)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (61; Java 21 gerekir)
+npm test                      # ortak paket testleri (78)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (66; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -244,7 +245,27 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    mahalle adı eşleşmesi "Ataevler" / "Ataevler Mahallesi" farkına dayanıklı (`sameNeighbourhoodName`). Yok (sonra): logo (Storage, Blaze), sabitlenmiş duyuru, mahalle haritası,
    ilanlar ve kayıp-buluntu, profil sayfasında o hesabın duyuru/etkinlik listesi.
 
+21. **Kullanıcı aktiviteleri** (PROJE.md 5.3). Ortak yapı `packages/shared/src/activities`. **Uygulama:** Sosyal Harmoni >
+   Aktiviteler açıldı (`/activities`; giriş gerekir): ildeki yaklaşanlar, il / ilçem / mahallem süzgeci, "+ Aktivite aç"
+   (`/activities/new`: başlık, 9 tür, gün (14 gün), saat, süre, mahalle = kullanıcının mahallesi, yalnızca katılanlara
+   görünen buluşma yeri, kontenjan 1-50, açıklama, "ilk buluşma ipuçlarını okudum" onayı). Ayrıntı (`/activities/[id]`):
+   açan "Ayşe K.", tarih, mahalle; tam yer yalnızca katılınca (ve haritada aç); "Katılıyorum" (ad paylaşımı isteğe bağlı),
+   düzenleyene adını paylaşanlar ve iptal; herkese ilk buluşma ipuçları ve "Şikâyet et" (5 neden). **Kararlar (Claude,
+   standart güvenlik):** yalnızca 18 yaş ve üstü açar ve katılır; yalnızca kendi ilinde, en çok 30 gün sonrası için, en çok
+   12 saat; tarih ve yer sonradan değişmez (değişiklik bildirimi Blaze ister), yalnızca iptal; 3 şikâyette moderatör karar
+   verene kadar listeden düşer. **Panel > Moderasyon > Aktivite şikâyetleri:** admin hepsini, il yöneticisi / il düzeyi
+   moderatör kendi ilini görür; "Aktiviteyi kaldır" ya da "Yerinde kalsın"; işlem kaydı. Veritabanı: `activities`,
+   `activities/{id}/private/details` (adres), `activities/{id}/attendees/{uid}` (etkinliklerle aynı ad: hesap silmede tek
+   sorgu), `activityReports/{aktivite}_{uid}`; yeni dizinler. Hesap silinince katılımlar silinir, açtığı aktiviteler kaldırılır
+   ve adresleri silinir. Testler: ortak 78 (3 yeni), kurallar 66 (5 yeni) geçti; uygulama emülatörde denendi (liste, gizli
+   adres > katılınca görünür, aktivite açma, iptal). Panel moderasyon bölümü yalnızca derleme ve kural testiyle denendi.
+   Yok (sonra): değişiklik / iptal bildirimi katılanlara (Blaze), günlük açma sınırı (sunucu işlevi), kullanıcı engelleme,
+   ilçe düzeyi moderatörün kuyruğu, aktiviteye yorum / mesaj.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
+
+- STK ve kulüpler için ayrı "etkinlik yetkisi iste" başvurusu şimdilik yok (Eren, 28 Ekim 2026): gerekirse admin Panel >
+  Kurumlar'dan "kurum" ya da "kulüp" olarak açar, etkinlik bölümünü verir (6.4 madde 18).
 
 - Yetkiler kutucuklarla (6.6, 27 Ekim 2026): kurum yöneticisi ve il yöneticisi kişiye verdiği her eylemi işaretler,
   "Onaysız yayınla" ayrı kutucuk; işaretli değilse içerik onaya gider.
@@ -276,9 +297,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
-- **Kurallar yeniden değişti (resmî profiller, 28 Ekim):** emülatörde test edildi (61/61); yüklenmeli (aşağıdaki komut).
-- **Kurallar ve dizinler yeniden değişti (etkinlikler), yeniden yüklenmeli:** bu dal `main`'e birleşince aynı komut, Eren'in
-  bilgisayarından (güncel ZIP indirip, `firebase.json` olan klasörde). Duyurular dahil önceki kurallar 28 Ekim'de yüklendi.
+- **Kurallar ve dizinler 28 Ekim'de yüklendi** (etkinlikler ve resmî profiller dahil, PR #6 birleştikten sonra, Eren'in
+  bilgisayarından). Derlemedeki 7 "Invalid type ... null" uyarısı `get(..., null)` kalıbından, zararsız.
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
@@ -313,9 +333,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 0. Benim Şehrim: Eren'in Excel'i gelince kaynak kontrolü + yükleme (ekranlar hazır). Sonra aynı yöntemle Seyahat şablonu
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
-0a. 20. madde: Eren PR'ı açıp birleştirir, sonra kuralları Firebase'e yükler.
-0b. Kurum içeriklerinin devamı (profil ve Mahalle Meydanı yapıldı): "Etkinlik düzenleme yetkisi iste" başvurusu (onay
-   merkezine `etkinlik-yetkisi` türü), kullanıcı aktiviteleri (5.3), muhtarın sabitlenmiş duyurusu.
+0a. 21. madde (aktiviteler): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli.
+0b. Kurum içeriklerinin devamı (profil, Mahalle Meydanı ve kullanıcı aktiviteleri yapıldı): muhtarın sabitlenmiş duyurusu.
+   ("Etkinlik düzenleme yetkisi iste" başvurusu şimdilik yok, Karar Eren 28 Ekim: STK ve kulüpleri admin Kurumlar
+   sayfasından açar.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"

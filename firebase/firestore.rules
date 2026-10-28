@@ -1137,6 +1137,144 @@ service cloud.firestore {
       allow read: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
+    // ---- Kullanıcı aktiviteleri (PROJE.md 5.3): her yetişkin kullanıcı kendi ilinde açar. Herkes (giriş yapmış) mahalleyi
+    // görür; tam buluşma yeri ayrı belgede, yalnızca düzenleyen ve katılanlar okur. Yalnızca 18 yaş ve üstü açar ve katılır.
+    // Tarih ve yer sonradan değişmez (değişiklik bildirimi yok), yalnızca iptal edilir. Sayaçlar yalnızca kendi katılım ya
+    // da şikâyet kaydıyla birlikte tam bir değişir. Moderatör (admin, ildeki moderasyon yetkisi) kaldırır ya da bırakır.
+    function myUserPath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+    function isAdultUser() {
+      return signedIn() && exists(myUserPath()) && ageOf(get(myUserPath()).data.birthYear) >= 18;
+    }
+    function activityPath(id) {
+      return /databases/$(database)/documents/activities/$(id);
+    }
+    function myActivityAttendance(id) {
+      return /databases/$(database)/documents/activities/$(id)/attendees/$(request.auth.uid);
+    }
+    function myActivityReport(id) {
+      return /databases/$(database)/documents/activityReports/$(id + '_' + request.auth.uid);
+    }
+    function validActivity(d) {
+      return d.keys().hasOnly(['title', 'description', 'category', 'startsAt', 'endsAt', 'region', 'capacity', 'status',
+             'organizerUid', 'organizerName', 'attendeeCount', 'reportCount', 'cleared', 'moderatedBy', 'createdAt', 'updatedAt'])
+        && d.title is string && d.title.size() >= 3 && d.title.size() <= 80
+        && d.description is string && d.description.size() >= 10 && d.description.size() <= 1000
+        && d.category in ['yuruyus-doga', 'spor', 'kahve-sohbet', 'oyun', 'kitap-kultur', 'cocuk-aile', 'ogrenme', 'gonullu', 'diger']
+        && d.startsAt is timestamp && d.endsAt is timestamp && d.endsAt > d.startsAt
+        && d.endsAt <= d.startsAt + duration.value(12, 'h')
+        && validLocation(d.region) && 'neighbourhoodId' in d.region
+        && d.capacity is int && d.capacity >= 1 && d.capacity <= 50
+        && d.organizerName is string && d.organizerName.size() <= 40
+        && d.attendeeCount is int && d.reportCount is int
+        && d.updatedAt == request.time;
+    }
+
+    match /activities/{id} {
+      allow read: if signedIn()
+        && (resource.data.status in ['aktif', 'iptal'] || resource.data.organizerUid == request.auth.uid
+            || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
+      // Açma: yetişkin, kendi adına, kendi ilinde, en çok 30 gün sonrası için; tam adres aynı yazımda.
+      allow create: if request.resource.data.organizerUid == request.auth.uid
+        && request.resource.data.status == 'aktif'
+        && request.resource.data.attendeeCount == 0 && request.resource.data.reportCount == 0
+        && !('cleared' in request.resource.data) && !('moderatedBy' in request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && validActivity(request.resource.data)
+        && request.resource.data.startsAt > request.time
+        && request.resource.data.startsAt <= request.time + duration.value(30, 'd')
+        && isAdultUser()
+        && get(myUserPath()).data.get('location', {}).get('provinceCode', '') == request.resource.data.region.provinceCode
+        && existsAfter(/databases/$(database)/documents/activities/$(id)/private/details);
+      // Düzenleyen: iptal eder ya da (hesap silmede) kaldırır; başka bir şey değişmez.
+      allow update: if resource.data.organizerUid == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && ((resource.data.status == 'aktif' && request.resource.data.status == 'iptal'
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']))
+            || (request.resource.data.status == 'kaldirildi' && request.resource.data.organizerName == ''
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'organizerName', 'updatedAt'])));
+      // "Katılıyorum" sayacı: yalnızca kendi katılım kaydıyla tam bir artar (yetişkin, düzenleyen değil, aktif, başlamamış,
+      // kontenjan içinde) ya da azalır.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeCount'])
+        && ((request.resource.data.attendeeCount == resource.data.attendeeCount + 1
+              && !exists(myActivityAttendance(id)) && existsAfter(myActivityAttendance(id))
+              && resource.data.status == 'aktif' && resource.data.startsAt > request.time
+              && resource.data.organizerUid != request.auth.uid
+              && request.resource.data.attendeeCount <= resource.data.capacity
+              && isAdultUser())
+            || (request.resource.data.attendeeCount == resource.data.attendeeCount - 1
+              && exists(myActivityAttendance(id)) && !existsAfter(myActivityAttendance(id))));
+      // Şikâyet sayacı: yalnızca kendi şikâyet kaydıyla tam bir artar.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])
+        && request.resource.data.reportCount == resource.data.reportCount + 1
+        && !exists(myActivityReport(id)) && existsAfter(myActivityReport(id));
+      // Moderasyon: kaldır ya da "yerinde kalsın".
+      allow update: if request.resource.data.moderatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cleared', 'moderatedBy', 'updatedAt'])
+        && (request.resource.data.status == 'kaldirildi'
+            || (request.resource.data.status == resource.data.status && request.resource.data.cleared == true))
+        && (isAdmin() || regionAllows('moderasyon', 'duzenle', resource.data.region.provinceCode, resource.data.region.districtId));
+      allow delete: if false;
+
+      // Tam buluşma yeri: düzenleyen, katılanlar ve admin okur. Aktiviteyle birlikte yazılır; hesap silmede düzenleyen siler.
+      match /private/{doc} {
+        allow read: if signedIn()
+          && (get(activityPath(id)).data.organizerUid == request.auth.uid || exists(myActivityAttendance(id)) || isAdmin());
+        allow create: if doc == 'details' && !exists(activityPath(id))
+          && getAfter(activityPath(id)).data.organizerUid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['address'])
+          && request.resource.data.address is string
+          && request.resource.data.address.size() >= 5 && request.resource.data.address.size() <= 200;
+        allow delete: if signedIn() && get(activityPath(id)).data.organizerUid == request.auth.uid;
+        allow update: if false;
+      }
+
+      // Katılım: kişi kendisi ekler ve siler. Ad yalnızca izinle yazılır; düzenleyen yalnızca adını paylaşanları görür.
+      match /attendees/{uid} {
+        allow read: if isSelf(uid) || (resource.data.shareName == true && get(activityPath(id)).data.organizerUid == request.auth.uid);
+        allow create: if isSelf(uid)
+          && request.resource.data.keys().hasOnly(['uid', 'shareName', 'displayName', 'createdAt'])
+          && request.resource.data.uid == uid
+          && request.resource.data.shareName is bool
+          && (request.resource.data.shareName
+              ? (request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
+                  && request.resource.data.displayName.size() <= 60)
+              : !('displayName' in request.resource.data))
+          && request.resource.data.createdAt == request.time
+          && getAfter(activityPath(id)).data.attendeeCount == get(activityPath(id)).data.attendeeCount + 1;
+        allow delete: if isSelf(uid)
+          && getAfter(activityPath(id)).data.attendeeCount == get(activityPath(id)).data.attendeeCount - 1;
+        allow update: if false;
+      }
+    }
+
+    // Aktivite şikâyetleri: kişi başına aktivite başına bir; kendi aktivitesini şikâyet edemez. Admin hepsini, ildeki
+    // moderasyon yetkisi olan kendi ilini görür ve "incelendi" yapar.
+    match /activityReports/{rid} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['activityId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && rid == request.resource.data.activityId + '_' + request.auth.uid
+        && request.resource.data.reason in ['tehlikeli', 'uygunsuz', 'ticari', 'sahte', 'diger']
+        && request.resource.data.status == 'yeni'
+        && request.resource.data.createdAt == request.time
+        && get(activityPath(request.resource.data.activityId)).data.organizerUid != request.auth.uid
+        && request.resource.data.provinceCode == get(activityPath(request.resource.data.activityId)).data.region.provinceCode
+        && getAfter(activityPath(request.resource.data.activityId)).data.reportCount
+           == get(activityPath(request.resource.data.activityId)).data.reportCount + 1;
+      // Kişi kendi şikâyetini görür ("şikâyet ettiniz" bilgisi için).
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
+        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
+      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'incelendi';
+      allow delete: if false;
+    }
+
     // ---- Resmî profiller (PROJE.md 6.2 madde 2): kurumun ya da muhtarlığın herkese açık künyesi (tanıtım, iletişim,
     // çalışma saatleri). Kurumda kurum yöneticisi, muhtarlıkta muhtarın kendisi, ikisinde de admin yazar. Kurumun adı ve
     // bölgesi kurum kaydından gelir, değiştirilemez. Herkes okur (girişsiz de). Silinmez, alanlar boşaltılır.
