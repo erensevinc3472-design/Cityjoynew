@@ -82,7 +82,9 @@
     "or": "or",
     "acceptTerms": "I have read and accept the terms of use.",
     "readPrivacy": "I have read the privacy notice on the processing of personal data.",
-    "read": "Read"
+    "read": "Read",
+    "slideToStart": "Slide to start",
+    "slideToStartHint": "Opens sign-up; you can also tap to start."
   },
   "errors": {
     "required": "This field is required.",

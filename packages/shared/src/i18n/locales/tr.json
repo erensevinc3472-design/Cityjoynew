@@ -82,7 +82,9 @@
     "or": "veya",
     "acceptTerms": "Kullanım şartlarını okudum ve kabul ediyorum.",
     "readPrivacy": "Kişisel verilerin işlenmesine ilişkin aydınlatma metnini okudum.",
-    "read": "Metni oku"
+    "read": "Metni oku",
+    "slideToStart": "Kaydırarak başla",
+    "slideToStartHint": "Kayıt ekranını açar; dokunarak da başlayabilirsin."
   },
   "errors": {
     "required": "Bu alan zorunlu.",

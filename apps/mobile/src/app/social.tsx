@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/app-text';
 import { LocationChip, RoundButton } from '@/components/hero-header';
-import { SceneArt, sceneRim, type SceneKind } from '@/components/scene-art';
+import { SceneArt, sceneRim, sceneSky, type SceneKind } from '@/components/scene-art';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
@@ -68,8 +68,10 @@ export default function SocialScreen() {
         <Animated.View
           key={s.key}
           pointerEvents="none"
-          style={[StyleSheet.absoluteFill, { opacity: x.interpolate({ inputRange: [(i - 1) * step, i * step, (i + 1) * step], outputRange: [0, 1, 0], extrapolate: 'clamp' }) }]}>
-          <SceneArt kind={s.scene} still />
+          style={[StyleSheet.absoluteFill, { backgroundColor: sceneSky(s.scene), opacity: x.interpolate({ inputRange: [(i - 1) * step, i * step, (i + 1) * step], outputRange: [0, 1, 0], extrapolate: 'clamp' }) }]}>
+          <View style={[styles.scene, { height: Math.round(width * 1.25) }]}>
+            <SceneArt kind={s.scene} still />
+          </View>
         </Animated.View>
       ))}
       <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dim]} />
@@ -138,6 +140,7 @@ export default function SocialScreen() {
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
   root: { flex: 1 },
+  scene: { position: 'absolute', start: 0, end: 0, bottom: 0, overflow: 'hidden' },
   dim: { backgroundColor: 'rgba(8, 26, 30, 0.62)' },
   top: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER, gap: spacing.sm },
   bar: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },

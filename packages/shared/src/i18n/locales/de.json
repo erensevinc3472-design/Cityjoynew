@@ -82,7 +82,9 @@
     "or": "oder",
     "acceptTerms": "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie.",
     "readPrivacy": "Ich habe die Datenschutzhinweise zur Verarbeitung personenbezogener Daten gelesen.",
-    "read": "Lesen"
+    "read": "Lesen",
+    "slideToStart": "Zum Starten schieben",
+    "slideToStartHint": "Öffnet die Registrierung; du kannst auch tippen."
   },
   "errors": {
     "required": "Dieses Feld ist erforderlich.",

@@ -166,5 +166,8 @@ export function SceneArt({ kind, still }: { kind: SceneKind; still?: boolean }) 
   );
 }
 
+/** Sahnenin gök rengi (tam ekran kullanımda üst boşluğu doldurmak için). */
+export const sceneSky = (kind: SceneKind) => SCENES[kind].sky;
+
 /** Kartın kenar rengi: sahnenin vurgu rengi, hafif. */
 export const sceneRim = (kind: SceneKind) => `${SCENES[kind].sun}59`;

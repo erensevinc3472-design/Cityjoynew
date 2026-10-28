@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 28 Ekim 2026 (OSM şehir rehberi iskeleti, tasarım yönü; önceki: Bildirim merkezi).
+Son güncelleme: 28 Ekim 2026 (tasarım uygulaması ilk dalga; önceki: OSM iskeleti, Bildirim merkezi).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -45,7 +45,7 @@ Son güncelleme: 28 Ekim 2026 (OSM şehir rehberi iskeleti, tasarım yönü; ön
 ```sh
 npm install
 npm test                      # ortak paket testleri (104)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (97; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (98; Java 21 gerekir)
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -409,10 +409,26 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    tamamlar. Toplanma alanları için AFAD / e-Devlet gerekir. Uygulamada "© OpenStreetMap katkıda bulunanlar" yazılmalı
    (ODbL; birleşik veritabanının paylaşımı avukata sorulacak).
 
+32. **Tasarım uygulaması, ilk dalga** (PROJE.md 13. madde 27-30). Ölçüler tüm uygulamada küçüldü (yazı, düğme,
+   kenar boşluğu; dokunma alanı en az 44). **Alt gezinme** (Ana Sayfa, Keşfet, Ara, Profil = Hesabım) ve ana sayfada
+   **yan menü** (modüller, Profilim, Mesajlar, Bildirimler, Ayarlar, Çıkış). **Ana sayfa:** tarih, selamlama, konum,
+   acil şerit (varsa), dört modül resimli kartta, tanıtım videosu (bağlantı Panel > Moderasyon > Tanıtım videosu,
+   `config/introVideo`, yalnızca https, işlem kaydı; boşsa "yakında"). **Benim Şehrim:** kapak, Belediye büyük kart,
+   renkli kutucuklar (verisi olmayan "Yakında"), Mahalle Meydanı ve Şehir Vitrini (yakında). **Keşfet:** ince sekmeler,
+   çerçevesiz gönderi, iki kez dokun beğen (kalp), paylaş, "5 dk" gibi süre; Kaydedilenler üst solda. **Profil:**
+   halkalı harf, gönderi/takipçi/takip sayıları, Takip et ve Mesaj yan yana. **Sosyal Harmoni:** yana kaydırılan kartlar,
+   arkada değişen sahne; forum kaldırıldı (madde 18). **Karşılama:** beş sahne sırayla, "Kaydırarak başla" (dokunarak da),
+   "Zaten hesabın var mı?". **Acil İhtiyaçlar:** nabız gibi atan büyük SOS kartı. Görseller şimdilik çizim
+   (`components/scene-art.tsx`, "hareketi azalt" açıksa durur); gerçek fotoğraflar Storage (Blaze) ile panelden gelecek.
+   Yeni paket: react-native-svg. Testler: ortak 104, kurallar 98 (1 yeni). Telefonda ana sayfa ve yan menü görüldü;
+   Keşfet, profil, Sosyal Harmoni, karşılama, Acil web önizlemede / tip denetiminde kontrol edildi, telefonda bakılmadı.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Keşfet'te gönderi birden çok hedefe paylaşılabilir (Eren, 28 Ekim 2026; PROJE.md 5.5).
 - Ana sayfa ve Benim Şehrim için yeni tasarım yönü onaylandı (Eren, 28 Ekim 2026; PROJE.md 13. madde 29).
+- Tasarım ölçütlerini Eren Claude'a bıraktı: daha derli toplu, keyifli, Keşfet'te Instagram hissi (hikâye halkaları
+  istemiyor), mağaza incelemesinde sorun çıkaracak şeylerden kaçınılır (Eren, 28 Ekim 2026; PROJE.md 13. madde 30).
 
 - STK ve kulüpler için ayrı "etkinlik yetkisi iste" başvurusu şimdilik yok (Eren, 28 Ekim 2026): gerekirse admin Panel >
   Kurumlar'dan "kurum" ya da "kulüp" olarak açar, etkinlik bölümünü verir (6.4 madde 18).
@@ -486,8 +502,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    (Keşfet ve Öğren şehir bilgileri). Kullanıcının "bilgi hatası bildir" düğmesi ve belediyenin kendi ilçesini düzenlemesi sonra.
 0a. 30. madde (Bildirim merkezi): Eren PR'ı birleştirince kurallar ve dizinler yüklenmeli (1 yeni dizin). Admin Panel >
    Moderasyon'dan yasaklı kelime listesini (26. madde) ve isterse önerilen aramaları (28. madde) doldurmalı.
-0b. Keşfet'in kalanı: fotoğraf/video (Storage, Blaze), alt gezinme çubuğu (Ana Sayfa, Keşfet, Ara, Profil; görünümü
-   değiştirir, tasarım uygulamasıyla birlikte, bölüm 13). Blaze ve Eren gerektirmeyen büyük iş kalmadı: sıradakiler
+0b. Keşfet'in kalanı: fotoğraf/video (Storage, Blaze). Kalan ekranların tasarım uygulaması (32. madde: liste ve
+   ayrıntı ekranları, formlar) Claude'un ölçütleriyle sürüyor. Blaze ve Eren gerektirmeyen büyük iş kalmadı: sıradakiler
    Eren'e bağlı (Benim Şehrim Excel'i, nöbetçi eczane onayı, Expo hesabı / EAS ile telefon sürümü, Blaze plana geçiş)
    ya da avukat teyidi isteyen haber yayıncısı başvurusu. Blaze isteyenler:
    aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
