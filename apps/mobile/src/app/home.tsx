@@ -5,11 +5,13 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '@cityjoy/shared';
 
+import { AnnouncementCard } from '@/components/announcement-card';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { HeroHeader, LocationChip } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { VerifyEmailBanner } from '@/components/verify-email-banner';
+import { useAnnouncements } from '@/lib/announcements';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
@@ -42,6 +44,10 @@ export default function HomeScreen() {
   const { location } = useUserLocation();
   const { user, profile } = useSession();
   const [neighbourhoodName, setNeighbourhoodName] = useState<string>();
+  const { list: announcements } = useAnnouncements(location);
+  const urgent = (announcements ?? []).filter((a) => a.kind === 'acil');
+  const latest = (announcements ?? []).filter((a) => a.kind !== 'acil').slice(0, 3);
+  const openAnnouncement = (id: string) => router.push({ pathname: '/announcements/[id]', params: { id } });
 
   useEffect(() => {
     setNeighbourhoodName(undefined);
@@ -82,6 +88,10 @@ export default function HomeScreen() {
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <VerifyEmailBanner />
+        {/* Acil duyurular en üstte sabit (PROJE.md 5.5). */}
+        {urgent.map((a) => (
+          <AnnouncementCard key={a.id} item={a} onPress={() => openAnnouncement(a.id)} />
+        ))}
         <View style={styles.grid}>
           {MODULES.map((m) => {
             // Benim Şehrim ve Acil İhtiyaçlar hazır; diğerleri sonraki aşamalarda bağlanacak.
@@ -103,6 +113,17 @@ export default function HomeScreen() {
             );
           })}
         </View>
+        {location ? (
+          <View style={styles.section}>
+            <AppText variant="label" accessibilityRole="header">{t('announcements.title')}</AppText>
+            {latest.length ? (
+              latest.map((a) => <AnnouncementCard key={a.id} item={a} onPress={() => openAnnouncement(a.id)} />)
+            ) : announcements ? (
+              <AppText variant="caption" muted>{t('announcements.empty')}</AppText>
+            ) : null}
+            {latest.length ? <AppButton variant="secondary" title={t('announcements.seeAll')} onPress={() => router.push('/announcements')} /> : null}
+          </View>
+        ) : null}
         <AppText variant="caption" muted style={styles.center}>{t('home.comingSoon')}</AppText>
         <AppButton variant="ghost" title={`${t('home.changeLanguage')} · ${languageName}`} onPress={() => router.push('/language')} />
       </ScrollView>
@@ -130,4 +151,5 @@ const styles = StyleSheet.create({
   icon: { width: 42, height: 42, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
   moduleTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 22 },
   center: { textAlign: 'center' },
+  section: { gap: spacing.sm },
 });

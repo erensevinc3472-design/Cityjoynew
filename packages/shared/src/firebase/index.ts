@@ -42,3 +42,4 @@ export {
   type ApprovalActor,
   type TrustedApproverInput,
 } from './approvals';
+export { createAnnouncementPanel, createFirestoreAnnouncementRepository, type SaveMode } from './announcements';

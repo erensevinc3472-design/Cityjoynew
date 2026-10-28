@@ -448,5 +448,24 @@
     "source": "Source: {{source}}, {{date}}",
     "verifiedOn": "Verified: {{date}}",
     "firstHour": "First hour {{price}} TRY"
+  },
+  "announcements": {
+    "title": "Announcements",
+    "one": "Announcement",
+    "urgent": "Urgent announcement",
+    "seeAll": "All announcements",
+    "empty": "There are no announcements in your area right now.",
+    "loadError": "Announcements could not be loaded.",
+    "needLocation": "Choose your location to see announcements.",
+    "scopeNote": "Official announcements for your whole province, your district and your neighbourhood appear here.",
+    "muhtarOf": "{{place}} Neighbourhood Office",
+    "cityjoyOf": "CityJoy {{place}}",
+    "wholeProvince": "All of {{place}}",
+    "official": "Official account",
+    "forRegion": "Area: {{region}}",
+    "publishedAt": "Published: {{date}}",
+    "until": "Until: {{date}}",
+    "urgentNote": "If there is a danger to life, call 112.",
+    "gone": "This announcement is no longer published."
   }
 }

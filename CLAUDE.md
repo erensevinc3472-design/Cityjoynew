@@ -14,6 +14,7 @@ Bu dosya proje klasörünün kökünde durur. Claude Code her oturumda önce bun
 ## Eren ile çalışma biçimi
 - Eren'in kodlama bilgisi yok. Sade Türkçe konuş, her adımda ne yaptığını ve nasıl deneyebileceğini anlat. Komut çalıştırmadan önce ne yapacağını kısaca söyle.
 - Küçük adımlarla ilerle. Her aşamada çalışan bir hâl göster. Büyük kararlardan önce planı anlat.
+- **Karar (Eren, 27 Ekim 2026):** Teknik ve sıradaki adım kararlarını Eren'e sormadan ver, işi kendin yürüt (dal, PR, test, belge güncelleme). Eren'e yalnızca kendisinin yapması gerekenleri, zamanı gelince sade adımlarla söyle (PR birleştirme, kuralları Firebase'e yükleme, hesap/anahtar/ödeme gibi). "SORULACAK" işaretli ürün kararları ve görünümü belirgin değiştiren işler yine sorulur.
 - Standart uygulama gereklilikleri (Apple App Store, Google Play, KVKK, güvenlik, erişilebilirlik; `PROJE.md` bölüm 15) Eren'e sorulmadan eklenir.
 - Hukuki konularda `PROJE.md`'de belirtilen avukat uyarılarını koru. Avukat/mali müşavir soru listesini yalnızca Eren isterse hazırla.
 

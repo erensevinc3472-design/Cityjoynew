@@ -550,13 +550,14 @@ service cloud.firestore {
       return role == 'il-yoneticisi' ? {
           'konumlar': ['goruntule'], 'acil-numaralar': ['goruntule'], 'hizmet-kategorileri': ['goruntule', 'onayla'],
           'kurumlar': ['goruntule'], 'yetkiler': ['goruntule', 'ekle', 'duzenle', 'sil'], 'onaylar': ['goruntule', 'onayla'],
-          'islem-kayitlari': ['goruntule'], 'bildirimler': ['goruntule', 'ekle', 'duzenle', 'sil', 'bildirim-gonder'],
-          'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'], 'etkinlikler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla'],
+          'islem-kayitlari': ['goruntule'], 'bildirimler': ['goruntule', 'ekle', 'duzenle', 'sil', 'yayinla', 'bildirim-gonder'],
+          'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla'],
+          'etkinlikler': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla'],
           'hizmetler': ['goruntule', 'ekle', 'duzenle', 'sil'], 'moderasyon': ['goruntule', 'duzenle', 'sil'],
           'isletme-dogrulama': ['goruntule', 'onayla'], 'sehir-rehberi': ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla']}
         : role == 'muhtar' ? {
-          'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil'],
-          'etkinlikler': ['goruntule', 'ekle', 'duzenle'], 'bildirimler': ['goruntule', 'ekle', 'bildirim-gonder']}
+          'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'gonderiler': ['goruntule', 'ekle', 'duzenle', 'sil', 'yayinla'],
+          'etkinlikler': ['goruntule', 'ekle', 'duzenle', 'yayinla'], 'bildirimler': ['goruntule', 'ekle', 'yayinla', 'bildirim-gonder']}
         : {'konumlar': ['goruntule'], 'islem-kayitlari': ['goruntule'], 'moderasyon': ['goruntule', 'duzenle']};
     }
     function within(m, caps, k) {
@@ -718,10 +719,12 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Görev: bölüm başına işaretlenen eylemler (Karar, Eren, 27 Ekim 2026). "Bildirim gönder" yalnızca bildirimlerde.
     function validAssignment(a, k) {
-      return !(k in a) || (a[k] is map && a[k].keys().hasOnly(['role', 'canPublishDirectly'])
-        && a[k].role in ['hazirlayan', 'onaylayan', 'izleyen']
-        && (!('canPublishDirectly' in a[k]) || a[k].canPublishDirectly is bool));
+      return !(k in a) || (a[k] is list && a[k].size() >= 1
+        && a[k].hasOnly(k == 'bildirimler'
+            ? ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla', 'bildirim-gonder']
+            : ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla']));
     }
     function validMember(id, d) {
       return d.keys().hasOnly(['orgId', 'email', 'displayName', 'isOrgAdmin', 'assignments', 'expiresAt', 'addedBy', 'updatedAt'])
@@ -906,6 +909,109 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---- Resmî duyurular (PROJE.md 6.2, 6.6, 6.7): kurum personeli, muhtar ve il yöneticisi yazar. "Ekle" taslak yazar
+    // ve onaya gönderir; "Onaysız yayınla" ya da "Onayla" işaretli olan doğrudan yayınlar; "Onayla" olan başkasınınkini
+    // onaylar. Muhtar / il yöneticisi duyurusunun onayı il yöneticisinde. Yayındakini herkes okur.
+    function regionWithin(r, sc) {
+      return sc.level == 'ulke'
+        || (r.provinceCode == sc.provinceCode
+            && (sc.level == 'il'
+                || (r.get('districtId', null) == sc.districtId
+                    && (sc.level == 'ilce' || r.get('neighbourhoodId', null) == sc.neighbourhoodId))));
+    }
+    // Kurum personelinin duyuru bölümündeki işaretli eylemleri (görev listesi; eski biçimde boş sayılır).
+    function staffCan(orgId, action) {
+      return isMemberOf(orgId) && 'gonderiler' in get(orgPath(orgId)).data.modules
+        && get(memberPath(orgId)).data.assignments.get('gonderiler', []) is list
+        && get(memberPath(orgId)).data.assignments.get('gonderiler', []).hasAny([action]);
+    }
+    // Yayınlayan hesapta bu eylem var ve hedef bölge hesabın bölgesinin içinde.
+    function authorCan(d, action) {
+      return d.author.type == 'kurum'
+        ? (d.author.keys().hasOnly(['type', 'orgId', 'name']) && d.author.orgId is string
+            && staffCan(d.author.orgId, action)
+            && d.author.name == get(orgPath(d.author.orgId)).data.name
+            && regionWithin(d.region, get(orgPath(d.author.orgId)).data.scope))
+        : (d.author.type == 'kisi' && d.author.keys().hasOnly(['type', 'role', 'grantKey']) && d.author.grantKey is string
+            && grantAllows(d.author.grantKey, 'gonderiler', action)
+            && get(grantPath(d.author.grantKey)).data.role == d.author.role
+            && d.author.role in ['muhtar', 'il-yoneticisi']
+            && regionWithin(d.region, get(grantPath(d.author.grantKey)).data.scope));
+    }
+    // Başkasının hazırladığını onaylayan / yayından kaldıran: kurumda "Onayla" işaretli personel; kişi duyurusunda
+    // o ilde duyuru onayı olan il yöneticisi; admin.
+    function canReview(d) {
+      return isAdmin()
+        || (d.author.type == 'kurum' ? staffCan(d.author.orgId, 'onayla')
+            : grantAllows('il-' + d.region.provinceCode, 'gonderiler', 'onayla'));
+    }
+    function validAnnouncement(d) {
+      return d.keys().hasOnly(['kind', 'title', 'body', 'region', 'endsAt', 'author', 'status', 'preparedBy', 'preparedByName',
+             'createdAt', 'updatedAt', 'publishedAt', 'reviewedBy', 'reviewNote'])
+        && d.kind in ['duyuru', 'acil']
+        && d.title is string && d.title.size() >= 3 && d.title.size() <= 100
+        && d.body is string && d.body.size() >= 10 && d.body.size() <= 2000
+        && validLocation(d.region)
+        && (!('endsAt' in d) || (d.endsAt is timestamp && d.endsAt > request.time))
+        // Acil duyuru bitiş tarihiyle, en çok 7 gün (sürekli en üstte kalmasın).
+        && (d.kind != 'acil' || ('endsAt' in d && d.endsAt <= request.time + duration.value(7, 'd') + duration.value(1, 'h')))
+        && d.author is map
+        && d.preparedBy == request.auth.uid
+        && d.preparedByName is string && d.preparedByName.size() <= 80
+        && d.updatedAt == request.time;
+    }
+    // Hazırlayanın seçebileceği durum: taslak, onaya gönder ya da (yetkisi varsa) doğrudan yayınla.
+    function authorStatusOk(d) {
+      return (d.status in ['taslak', 'onay-bekliyor'] && !('publishedAt' in d))
+        || (d.status == 'yayinda' && d.publishedAt == request.time
+            && (authorCan(d, 'yayinla') || authorCan(d, 'onayla')));
+    }
+
+    match /announcements/{id} {
+      allow read: if resource.data.status == 'yayinda'
+        || (signedIn() && resource.data.preparedBy == request.auth.uid)
+        || isAdmin()
+        || (resource.data.author.type == 'kurum' && isMemberOf(resource.data.author.orgId))
+        || (resource.data.author.type == 'kisi' && grantAllows('il-' + resource.data.region.provinceCode, 'gonderiler', 'onayla'));
+      // (Ucuz denetimler önce: kuralların hesap sınırı aşılmasın.)
+      allow create: if request.resource.data.preparedBy == request.auth.uid
+        && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && validAnnouncement(request.resource.data)
+        && authorStatusOk(request.resource.data)
+        && authorCan(request.resource.data, 'ekle');
+      // Hazırlayan: yayında olmayanı düzenler / yeniden gönderir. Yayınlayan hesap ve oluşturma tarihi değişmez.
+      allow update: if resource.data.preparedBy == request.auth.uid
+        && resource.data.status in ['taslak', 'onay-bekliyor', 'reddedildi']
+        && request.resource.data.author == resource.data.author
+        && request.resource.data.createdAt == resource.data.createdAt
+        && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
+        && validAnnouncement(request.resource.data)
+        && authorStatusOk(request.resource.data)
+        && authorCan(request.resource.data, 'ekle');
+      // Onay ya da gerekçeli ret (yalnızca durum ve inceleme bilgisi değişir).
+      allow update: if resource.data.status == 'onay-bekliyor'
+        && request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && ((request.resource.data.status == 'yayinda' && request.resource.data.publishedAt == request.time
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'publishedAt', 'reviewedBy', 'updatedAt']))
+            || (request.resource.data.status == 'reddedildi'
+              && request.resource.data.reviewNote is string && request.resource.data.reviewNote.size() >= 5
+              && request.resource.data.reviewNote.size() <= 300
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewNote', 'reviewedBy', 'updatedAt'])))
+        && canReview(resource.data);
+      // Yayından kaldırma: onaylayan, admin ya da "Sil" yetkisi olan hazırlayan.
+      allow update: if resource.data.status == 'yayinda'
+        && request.resource.data.status == 'kaldirildi'
+        && request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedBy', 'updatedAt'])
+        && (canReview(resource.data)
+            || (resource.data.preparedBy == request.auth.uid && authorCan(resource.data, 'sil')));
+      // Silinmez: kayıt için kalır.
+      allow delete: if false;
+    }
+
     // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez. Admin hepsini, her yönetici kendi
     // kayıtlarını görür. Admin olmayan yönetici yalnızca yetkisi olan bölgede ve bölümde kayıt ekler.
     match /auditLog/{id} {
@@ -918,9 +1024,17 @@ service cloud.firestore {
                 && regionAllows(request.resource.data.module, request.resource.data.action,
                      request.resource.data.region.get('provinceCode', null),
                      request.resource.data.region.get('districtId', null)))
+            // Muhtar kendi mahallesinde.
+            || (request.resource.data.get('region', null) is map
+                && request.resource.data.region.get('neighbourhoodId', null) is string
+                && grantAllows('mahalle-' + request.resource.data.region.neighbourhoodId, request.resource.data.module,
+                     request.resource.data.action))
             // Kurum yöneticisi kendi kurumunda (personel işlemleri).
             || (request.resource.data.get('orgId', null) is string && request.resource.data.module == 'kurumlar'
-                && isOrgAdminOf(request.resource.data.orgId)));
+                && isOrgAdminOf(request.resource.data.orgId))
+            // Kurum personeli kurumun bölümlerinde (duyuru hazırlama, onay).
+            || (request.resource.data.get('orgId', null) is string && request.resource.data.module == 'gonderiler'
+                && staffCan(request.resource.data.orgId, request.resource.data.action)));
       allow update, delete: if false;
     }
   }

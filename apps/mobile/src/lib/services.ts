@@ -1,6 +1,7 @@
 import { createCityGuideStore, createEmergencyNumberStore, createServiceCategoryStore } from '@cityjoy/shared';
 import {
   createFirebaseAuthService,
+  createFirestoreAnnouncementRepository,
   createFirestoreCityGuideRepository,
   createFirestoreBusinessRepository,
   createFirestoreFamilyRepository,
@@ -28,6 +29,7 @@ export const occupationRepository = createFirestoreOccupationRepository(firestor
 export const emergencyNumbers = createEmergencyNumberStore(createFirestoreEmergencyNumberRepository(firestore), deviceStorage);
 export const businessRepository = createFirestoreBusinessRepository(firestore);
 export const reviewRepository = createFirestoreReviewRepository(firestore);
+export const announcementRepository = createFirestoreAnnouncementRepository(firestore);
 /** İşletme doğrulama isteği: önce il yöneticisi, sonra admin onaylar (PROJE.md 6.5). */
 export const verificationRequests = createVerificationRequests(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);

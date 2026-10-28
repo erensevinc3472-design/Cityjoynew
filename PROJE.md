@@ -390,6 +390,8 @@ Aşağıdaki 24 madde belediye panelinin kapsamıdır. Her biri 6.1'deki ilkeye 
 24. Talep kutusu raporu
 25. Keşif rotası ve tanıtım videosu girme (ilçe tanıtımı: Seyahat > Keşfet ve Öğren > Başkanlarla Keşif)
 
+**Yapıldı (27 Ekim 2026):** 1 (yazılı resmî duyuru, hedef il / ilçe / mahalle; fotoğraf sonra), 4 (taslak; planlı yayın sonra), 6 (acil duyuru: en üstte, bitiş tarihli, il / admin onayına girmez), 17 ve 18 (kutucuklu görevler, hazırla > onayla > yayınla), 19 (işlem kaydı). Muhtar duyurusu "Onaysız yayınla" yoksa il yöneticisinin onayına gider (6.7).
+
 **İlk sürüm önerisi (Eren onayladı):** 1, 2, 3, 4, 6, 8, 12, 14, 15, 17, 18, 19. (18. madde, Eren'in kurum içi onay kararıyla ilk sürüme eklendi, bölüm 6.6.) Talep kutusu (11) ikinci aşamaya: cevap beklentisi doğurur, belediyenin hazır olması gerekir. Geri kalanı sonraki aşamalarda.
 - Onay kuyruğu (14): **Karar (Eren): önce il yöneticisi, sonra admin** (iki aşamalı onay, bölüm 6.5).
 
@@ -461,7 +463,8 @@ Not: 9 ve 10 numaralı güvenlik ve KVKK maddeleri mağaza onayı ve yasal uyum 
 ### 6.6 Kurum içi personel ve onay akışı (Karar, Eren)
 
 - **Karar (Eren): kurum kendi personeline sınırlar içinde görev verir.** "Yetkiyi yalnızca admin verir" kuralı kurumlara verilen yetki içindir. Admin kurumu (belediye, muhtarlık, kurum, kulüp) açar, bölgesini ve bölümlerini belirler ve bir **kurum yöneticisi** atar. Kurum yöneticisi kendi personelini ekler, çıkarır ve görev verir. Admin'in kuruma vermediği bölge ya da bölümü kimseye veremez.
-- **Personel rolleri (her bölüm için ayrı):** *Hazırlayan* taslak yazar ve onaya gönderir, kendisi yayınlayamaz. *Onaylayan* inceler; onaylarsa yayınlanır, reddederse gerekçe notuyla hazırlayana geri döner. *İzleyen* yalnızca görür. Kurum yöneticisi bir bölümde bazı kişilere **"onaysız yayınlayabilir"** yetkisi verebilir (örn. acil duyuruda fen işleri müdürü). Onaylayan taslakta düzeltme yapabilir, değişiklik kayda geçer (öneri).
+- **Karar (Eren, 27 Ekim 2026): görevler kutucuklarla seçilir.** Kurum yöneticisi (ve il yöneticisi muhtara verirken) her bölümde kişiye vereceği eylemleri tek tek işaretler: Görüntüle, Ekle, Düzenle, Sil, Onayla, **Onaysız yayınla**, Bildirim gönder. "Onaysız yayınla" işaretli değilse kişinin hazırladığı içerik onaya gider. Aşağıdaki roller artık örnek kalıplardır (yapıldı, 27 Ekim 2026).
+- **Personel rolleri (her bölüm için ayrı, örnek):** *Hazırlayan* taslak yazar ve onaya gönderir, kendisi yayınlayamaz. *Onaylayan* inceler; onaylarsa yayınlanır, reddederse gerekçe notuyla hazırlayana geri döner. *İzleyen* yalnızca görür. Kurum yöneticisi bir bölümde bazı kişilere **"onaysız yayınlayabilir"** yetkisi verebilir (örn. acil duyuruda fen işleri müdürü). Onaylayan taslakta düzeltme yapabilir, değişiklik kayda geçer (öneri).
 - **Örnek (Eren'in örneği):** Basın müdürü gönderi ve etkinlikte hazırlayan, özel kalem onaylayan. Basın müdürü "Onaya gönder" der, özel kaleme bildirim gider, onaylanınca yayınlanır.
 - **Dış onaylarla ilişkisi:** Kurum içi onaydan sonra, iki aşamalı onay gereken işler (kampanya bildirimi vb.) bölüm 6.5'teki il yöneticisi → admin akışına girer.
 - **Kayıt ve güvenlik (standart):** Kim hazırladı, kim onayladı, ne zaman yayınlandı kayda geçer. Personel ayrılınca yetki tek tuşla kapatılır, süreli görev verilebilir. Aynı yapı muhtarlıkta (muhtar yardımcısı hazırlar, muhtar onaylar) ve diğer kurumlarda geçerlidir.

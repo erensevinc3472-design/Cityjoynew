@@ -18,7 +18,7 @@ export const MENU: { module: Module; path?: string }[] = [
   { module: 'yetkiler', path: '/yetkiler' },
   { module: 'islem-kayitlari', path: '/islem-kayitlari' },
   { module: 'bildirimler' },
-  { module: 'gonderiler' },
+  { module: 'gonderiler', path: '/duyurular' },
   { module: 'etkinlikler' },
   { module: 'hizmetler' },
   { module: 'moderasyon', path: '/moderasyon' },

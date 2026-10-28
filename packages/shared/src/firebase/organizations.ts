@@ -21,7 +21,9 @@ import {
 } from 'firebase/auth';
 
 import { normalizeEmail, ORG_MODULES } from '../permissions/grants';
+import { normalizeAssignment } from '../organizations/staff';
 import type { Organization, OrganizationMember } from '../organizations/types';
+import type { Module } from '../permissions/types';
 import { addAudit, iso } from './grants';
 
 const ORGS = 'organizations';
@@ -50,7 +52,7 @@ function memberFromDoc(d: DocumentData): OrganizationMember {
     email: d.email,
     displayName: d.displayName,
     isOrgAdmin: !!d.isOrgAdmin,
-    assignments: d.assignments ?? {},
+    assignments: Object.fromEntries(Object.entries(d.assignments ?? {}).map(([m, a]) => [m, normalizeAssignment(m as Module, a)]).filter(([, a]) => a.length)),
     ...(d.expiresAt ? { expiresAt: iso(d.expiresAt) } : {}),
     ...(d.removedAt ? { removedAt: iso(d.removedAt) ?? new Date().toISOString() } : {}),
   };
@@ -157,7 +159,12 @@ export function createOrganizationAdmin(db: Firestore, actorUid: string) {
      * yöneticisi atayamaz (bunu admin yapar). Görev yeniden verilince "çıkarıldı" bilgisi temizlenir.
      */
     async saveMember(org: Organization, m: { email: string; displayName: string; isOrgAdmin: boolean; assignments: OrganizationMember['assignments']; expiresAt?: Date }, isNew: boolean) {
-      const assignments = Object.fromEntries(Object.entries(m.assignments).filter(([k, v]) => v && org.modules.includes(k as never)));
+      const assignments = Object.fromEntries(
+        Object.entries(m.assignments)
+          .filter(([k]) => org.modules.includes(k as Module))
+          .map(([k, v]) => [k, normalizeAssignment(k as Module, v)])
+          .filter(([, v]) => v.length),
+      );
       const batch = writeBatch(db);
       const id = memberDocId(org.id, m.email);
       batch.set(doc(db, MEMBERS, id), {
