@@ -432,7 +432,7 @@
     "loadError": "Could not load the information. Check your connection and try again.",
     "comingSoon": "No information yet for this province",
     "count": "{{count}} entries",
-    "otherSections": "Pharmacies on duty, events, cafés and restaurants, listings and Neighbourhood Square are coming next.",
+    "otherSections": "Pharmacies on duty, cafés and restaurants, and listings are coming next.",
     "search": "Search by name, type or district",
     "allDistricts": "All districts",
     "contentLanguage": "The information in this section is provided in Turkish.",
@@ -522,5 +522,32 @@
       "clubs": "City Clubs",
       "deals": "Deals"
     }
+  },
+  "official": {
+    "title": "Official profile",
+    "badgeOpen": "Official account · View profile",
+    "hours": "Opening hours",
+    "address": "Address",
+    "email": "Email: {{email}}",
+    "noInfo": "This account has not added contact details yet."
+  },
+  "neighbourhood": {
+    "title": "Neighbourhood Square",
+    "hint": "Headman's office, local announcements, events, assembly areas",
+    "needNeighbourhood": "Choose your neighbourhood in your location to see Neighbourhood Square.",
+    "muhtarlik": "Headman's office (muhtarlık)",
+    "noMuhtar": "Headman's office details have not been added yet.",
+    "fromGuide": "Details from the My City guide.",
+    "fromGuideUnverified": "Details from the My City guide, not verified yet. Please confirm by phone before you go.",
+    "announcements": "Neighbourhood announcements",
+    "noAnnouncements": "No live announcements for your neighbourhood.",
+    "events": "Events nearby",
+    "noEvents": "No upcoming events in your neighbourhood or district.",
+    "allEvents": "All events",
+    "gathering": "Disaster assembly areas",
+    "gatheringDistrict": "No assembly area is listed for your neighbourhood; showing those in {{place}}. Check e-Devlet or AFAD for official information.",
+    "noGathering": "Assembly area details have not been added yet. You can look them up on e-Devlet (\"Emergency Assembly Area\" search).",
+    "municipalities": "My municipality",
+    "feedSoon": "The neighbourhood feed (posts from neighbours) will come with Discover."
   }
 }

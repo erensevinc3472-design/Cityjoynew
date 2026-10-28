@@ -3,6 +3,7 @@ import {
   createFirebaseAuthService,
   createFirestoreAnnouncementRepository,
   createFirestoreEventRepository,
+  createFirestoreOfficialProfileRepository,
   createFirestoreCityGuideRepository,
   createFirestoreBusinessRepository,
   createFirestoreFamilyRepository,
@@ -32,6 +33,8 @@ export const businessRepository = createFirestoreBusinessRepository(firestore);
 export const reviewRepository = createFirestoreReviewRepository(firestore);
 export const announcementRepository = createFirestoreAnnouncementRepository(firestore);
 export const eventRepository = createFirestoreEventRepository(firestore);
+/** Kurum ve muhtarlık künyeleri (herkese açık). */
+export const officialProfileRepository = createFirestoreOfficialProfileRepository(firestore);
 /** İşletme doğrulama isteği: önce il yöneticisi, sonra admin onaylar (PROJE.md 6.5). */
 export const verificationRequests = createVerificationRequests(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);

@@ -44,3 +44,4 @@ export {
 } from './approvals';
 export { createAnnouncementPanel, createFirestoreAnnouncementRepository, type SaveMode } from './announcements';
 export { createEventPanel, createFirestoreEventRepository } from './events';
+export { createFirestoreOfficialProfileRepository, createOfficialProfileAdmin } from './official-profiles';

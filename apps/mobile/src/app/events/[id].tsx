@@ -6,6 +6,7 @@ import { isEventVisible, remainingSeats, type CityEvent } from '@cityjoy/shared'
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { AuthorLink } from '@/components/author-link';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
@@ -100,10 +101,7 @@ export default function EventScreen() {
         {cancelled ? <FormMessage kind="error" text={t('events.cancelledNote')} /> : null}
         <AppText variant="caption" muted>{t(`events.categories.${item.category}`)}</AppText>
         <AppText accessibilityRole="header" style={[styles.title, { color: c.textStrong }]}>{item.title}</AppText>
-        <View style={styles.meta}>
-          <AppText variant="label">{author}</AppText>
-          <AppText variant="caption" muted>{t('announcements.official')}</AppText>
-        </View>
+        <AuthorLink author={item.author} label={author} />
 
         <View style={styles.meta}>
           <AppText variant="label">{t('events.when')}</AppText>

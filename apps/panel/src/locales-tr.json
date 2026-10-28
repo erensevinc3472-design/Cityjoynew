@@ -17,7 +17,8 @@
     "hizmet-kategorileri": "Hizmet kategorileri",
     "sos": "SOS ayarları",
     "kurumlar": "Kurumlar",
-    "sehir-rehberi": "Şehir rehberi"
+    "sehir-rehberi": "Şehir rehberi",
+    "profile": "Resmî profil"
   },
   "roles": {
     "admin": "Admin",
@@ -907,5 +908,45 @@
     "directNote": "Bu hesapta \"Onaysız yayınla\" yetkiniz var: etkinliğiniz onay beklemeden yayınlanır.",
     "approvalNoteOrg": "Etkinliğiniz, kurumunuzda \"Onayla\" yetkisi olan kişinin onayından sonra yayınlanır.",
     "approvalNoteProvince": "Etkinliğiniz, il yöneticisinin onayından sonra yayınlanır."
+  },
+  "profile": {
+    "title": "Resmî profil",
+    "intro": "Kurumunuzun ya da muhtarlığınızın uygulamada \"Resmî hesap\" rozetiyle görünen künyesi. Duyuru ve etkinliklerde adınıza dokunan kişi bu bilgileri görür; muhtarlık bilgisi Mahalle Meydanı'nda da çıkar.",
+    "which": "Profil",
+    "orgName": "Kurum adı",
+    "muhtarlik": "Muhtarlık",
+    "national": "Ülke geneli",
+    "nameLocked": "Ad ve bölge kurum kaydından gelir; değişiklik için CityJoy ile iletişime geçin.",
+    "muhtarNameHint": "İsteğe bağlı. Boş bırakılırsa yalnızca \"... Mahallesi Muhtarlığı\" yazılır.",
+    "phoneHint": "Örnek: 0224 123 45 67",
+    "websiteHint": "https:// ile başlamalı.",
+    "hoursHint": "Örnek: Hafta içi 08.30-17.30, cumartesi 09.00-12.00",
+    "publicNote": "Buradaki bilgiler herkese açıktır. Kişisel cep telefonu yerine kurum telefonu yazmanızı öneririz.",
+    "fields": {
+      "name": "Muhtarın adı",
+      "about": "Kısa tanıtım",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "website": "Web sitesi",
+      "address": "Adres",
+      "hours": "Çalışma saatleri"
+    },
+    "errors": {
+      "name": "En çok 80 karakter.",
+      "about": "En çok 600 karakter.",
+      "phone": "Geçerli bir telefon numarası yazın (yalnızca rakam, boşluk, +, -, parantez).",
+      "email": "Geçerli bir e-posta adresi yazın.",
+      "website": "https:// ile başlayan geçerli bir adres yazın.",
+      "address": "En çok 200 karakter.",
+      "hours": "En çok 200 karakter."
+    },
+    "save": "Kaydet",
+    "saved": "Profil kaydedildi. Uygulamada hemen görünür.",
+    "error": "Kaydedilemedi. Yetkinizi ve bağlantınızı kontrol edip yeniden deneyin.",
+    "fixErrors": "İşaretli alanları düzeltin.",
+    "loadError": "Profil okunamadı. Sayfayı yenileyin.",
+    "loading": "Yükleniyor...",
+    "none": "Düzenleyebileceğiniz bir resmî profil yok. Kurum yöneticileri kendi kurumunun, muhtarlar kendi mahallesinin profilini düzenler.",
+    "demoReadOnly": "Örnek hesapla yalnızca görüntülenir, kaydedilemez."
   }
 }

@@ -1137,6 +1137,54 @@ service cloud.firestore {
       allow read: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
+    // ---- Resmî profiller (PROJE.md 6.2 madde 2): kurumun ya da muhtarlığın herkese açık künyesi (tanıtım, iletişim,
+    // çalışma saatleri). Kurumda kurum yöneticisi, muhtarlıkta muhtarın kendisi, ikisinde de admin yazar. Kurumun adı ve
+    // bölgesi kurum kaydından gelir, değiştirilemez. Herkes okur (girişsiz de). Silinmez, alanlar boşaltılır.
+    function regionOfScope(sc) {
+      return sc.level == 'il' ? {'provinceCode': sc.provinceCode}
+        : sc.level == 'ilce' ? {'provinceCode': sc.provinceCode, 'districtId': sc.districtId}
+        : {'provinceCode': sc.provinceCode, 'districtId': sc.districtId, 'neighbourhoodId': sc.neighbourhoodId};
+    }
+    function validOfficialProfile(d) {
+      return d.keys().hasOnly(['type', 'name', 'region', 'about', 'phone', 'email', 'website', 'address', 'hours',
+             'updatedBy', 'updatedAt'])
+        && d.name is string && d.name.size() <= 120
+        && (!('about' in d) || (d.about is string && d.about.size() >= 1 && d.about.size() <= 600))
+        && (!('phone' in d) || (d.phone is string && d.phone.matches('^[+]?[0-9][0-9 ()-]{5,18}[0-9]$')))
+        && (!('email' in d) || validEmail(d.email))
+        && (!('website' in d) || (d.website is string && d.website.size() <= 200 && d.website.matches('^https://[^ ]+[.][^ ]+$')))
+        && (!('address' in d) || (d.address is string && d.address.size() >= 1 && d.address.size() <= 200))
+        && (!('hours' in d) || (d.hours is string && d.hours.size() >= 1 && d.hours.size() <= 200))
+        && d.updatedBy == request.auth.uid
+        && d.updatedAt == request.time;
+    }
+    function orgProfileOk(id, d) {
+      let org = get(orgPath(id)).data;
+      return d.type == 'kurum' && d.name == org.name
+        && (org.scope.level == 'ulke' ? !('region' in d) : d.region == regionOfScope(org.scope))
+        && (isAdmin() || isOrgAdminOf(id));
+    }
+    // Bu mahallenin geçerli muhtar yetkisi bende mi?
+    function isMuhtarOf(key) {
+      return verified() && exists(grantPath(key))
+        && get(grantPath(key)).data.role == 'muhtar'
+        && get(grantPath(key)).data.get('revokedAt', null) == null
+        && (get(grantPath(key)).data.get('expiresAt', null) == null || get(grantPath(key)).data.expiresAt > request.time);
+    }
+    function muhtarProfileOk(id, d) {
+      return d.type == 'muhtar' && d.name.size() <= 80
+        && validLocation(d.region) && 'neighbourhoodId' in d.region && id == 'mahalle-' + d.region.neighbourhoodId
+        && (isAdmin() || isMuhtarOf(id));
+    }
+
+    match /officialProfiles/{id} {
+      allow read: if true;
+      allow create, update: if validOfficialProfile(request.resource.data)
+        && ((id.matches('^(bld|krm)-.+') && exists(orgPath(id)) && orgProfileOk(id, request.resource.data))
+            || (id.matches('^mahalle-.+') && muhtarProfileOk(id, request.resource.data)));
+      allow delete: if false;
+    }
+
     // Yönetici işlem kaydı: yalnızca eklenir, değiştirilemez ve silinemez. Admin hepsini, her yönetici kendi
     // kayıtlarını görür. Admin olmayan yönetici yalnızca yetkisi olan bölgede ve bölümde kayıt ekler.
     match /auditLog/{id} {
@@ -1157,6 +1205,10 @@ service cloud.firestore {
             // Kurum yöneticisi kendi kurumunda (personel işlemleri).
             || (request.resource.data.get('orgId', null) is string && request.resource.data.module == 'kurumlar'
                 && isOrgAdminOf(request.resource.data.orgId))
+            // Muhtar kendi mahallesinin resmî profilini düzenler.
+            || (request.resource.data.module == 'kurumlar' && request.resource.data.action == 'duzenle'
+                && request.resource.data.targetId is string && request.resource.data.targetId.matches('^mahalle-.+')
+                && isMuhtarOf(request.resource.data.targetId))
             // Kurum personeli kurumun bölümlerinde (duyuru hazırlama, onay).
             || (request.resource.data.get('orgId', null) is string && request.resource.data.module in ['gonderiler', 'etkinlikler']
                 && staffCan(request.resource.data.orgId, request.resource.data.module, request.resource.data.action)));

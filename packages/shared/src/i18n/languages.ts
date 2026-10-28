@@ -26,3 +26,9 @@ export function pickLanguage(deviceLanguageTags: readonly string[]): LanguageCod
   }
   return DEFAULT_LANGUAGE;
 }
+
+/**
+ * Telefon, e-posta gibi her dilde soldan sağa okunan değeri metin içinde yalıtır (Unicode LRI ... PDI); Arapça
+ * metinde "0532 000 00 00" ters dönmez.
+ */
+export const ltr = (s: string) => `\u2066${s}\u2069`;
