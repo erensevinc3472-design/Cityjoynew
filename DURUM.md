@@ -545,6 +545,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
+- **Kurallar ve dizinler 29 Ekim akşamı yüklendi** (yol üstü tesis, Yoldayım dizini, roadsidePacks; PR #36 sonrası).
 - **Kurallar ve dizinler 28 Ekim'de yüklendi** (etkinlikler ve resmî profiller dahil, PR #6 birleştikten sonra, Eren'in
   bilgisayarından). Derlemedeki 7 "Invalid type ... null" uyarısı `get(..., null)` kalıbından, zararsız.
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
@@ -576,16 +577,6 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Ana sayfadaki arama kutusu ve hava durumu ilgili özelliklerle gelecek (duyurular ana sayfada).
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin
   bağlantı bilgilerini içeriyor; Eren'e o projeyi kapatması önerildi.
-
-## Eren eve gelince hatırlat (29 Ekim 2026)
-
-Eren "eve geldim" dediğinde ilk iş bunları sırayla hatırlat ve adım adım yaptır:
-1. PR'ı birleştir: `claude/yoldayim` (Yoldayım ekranı). Birleşti mi diye `git log origin/main` ile bak.
-2. Bilgisayarda kuralları ve dizinleri yükle (yol üstü tesis kuralları + Yoldayım dizini; ikisi aynı komutla gider):
-   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`
-   Dizinin hazır olması birkaç dakika sürebilir.
-3. Telefonda dene: Seyahat > Yoldayım (konum izni ver), Profil > İşletme ekle > "Yol üstü tesis".
-Bitince bu bölümü sil.
 
 ## Sıradaki adım (Eren seçecek)
 
