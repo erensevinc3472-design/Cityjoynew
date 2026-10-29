@@ -527,6 +527,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Açık işler ve bilinen eksikler
 
+- Toplu güvenlik taraması (`/security-review`, tüm kod: Firebase kuralları, giriş, yönetici yetkileri): Eren mağazaya
+  çıkmadan önce en sonda toplu yapılmasını istedi (29 Ekim 2026).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
 - Yasal metinler boş (yalnızca "avukat kontrolünden geçecek" notu).
