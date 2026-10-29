@@ -496,6 +496,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
+- Benim Şehrim tasarıma döndü (Eren, 29 Ekim 2026: "benim tasarımlarım gibi, gereksizleri çıkar"): Şehir Paneli başlığı, Bugün kartı, Belediye Hizmetleri büyük kartı, parlak simgeli 11 bölüm (tasarımdaki sıra ve adlar), Mahalle Meydanı ve Vitrin kartları. Önemli Kurumlar alt başlıklı sayfa (muhtarlık, kamu, hastane, ASM, emniyet, itfaiye, nüfus, noter, PTT, vergi, SGK, eğitim, toplanma); Park & Pazar tek ekran iki sekme; liste sayfaları Müzeler tasarımındaki gibi (arama, altın filtreler, sayı kutuları, simgeli kartlar). Toplanma alanları ve Muhtarlıklar ana ızgaradan çıktı (Önemli Kurumlar içinde).
 - Benim Şehrim 1. parça (29 Ekim 2026; PROJE.md 5.1): Bursa OSM Excel'i (`veri-denemesi/osm-16-Bursa.xlsx`, masaüstüne de kopyalandı), "Nasıl yapılır?" ülke geneli Excel'i, Cafe ve Restoran (`/city/food`), Şehir Vitrini (`/city/showcase`, Panel > Şehir rehberi > Şehir Vitrini). Açık iş: boş Excel şablonu (`scripts/build-data-templates.py`) yeniden üretilmeli (3 sütun isteğe bağlı oldu; bu bilgisayarda Python yok).
 - Acil İhtiyaçlar yeni düzen (Eren, 29 Ekim 2026; PROJE.md 5.4): "Hemen lazım olabilir" kutucukları Panel > Hizmet kategorilerindeki "acil" işaretinden ve sıradan gelir.
 - Panel girişindeki "Örnek Nilüfer Belediyesi" hesabı belediye panelini (Seyahat > Başkanlarla Keşif) gösterir; kaydetme kapalı (29 Ekim 2026).

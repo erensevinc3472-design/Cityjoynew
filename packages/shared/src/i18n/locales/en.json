@@ -558,13 +558,85 @@
     "firstHour": "First hour {{price}} TRY",
     "soon": "Soon",
     "showcase": "City Showcase",
-    "townhallHint": "Applications, documents, services",
+    "townhallHint": "Services and applications",
     "tiles": {
-      "cafe": "Cafés and Restaurants",
+      "cafe": "Cafés & rest.",
       "events": "Events",
-      "pharmacy": "On-duty Pharmacy",
-      "listings": "For Sale and Rent",
-      "volunteer": "Volunteering"
+      "pharmacy": "On-duty pharmacy",
+      "listings": "For sale & rent",
+      "volunteer": "Volunteering",
+      "kurumlar": "Key institutions",
+      "muzeler": "Museums",
+      "ulasim": "Transport",
+      "parkPazar": "Parks & markets",
+      "otopark": "Parking",
+      "howTo": "How do I…?"
+    },
+    "panelTitle": "City panel",
+    "today": "Today",
+    "townhall": "Municipal services",
+    "meydanHint": "{{name}} · life in your neighbourhood",
+    "vitrinHint": "Discover the city's best",
+    "all": "All",
+    "allDays": "All days",
+    "records": "Places",
+    "districts": "Districts",
+    "parks": "Parks",
+    "markets": "Markets",
+    "kurumlarIntro": "Neighbourhood heads, public offices, health and safety units.",
+    "groups": {
+      "muhtarlik": {
+        "title": "Neighbourhood heads",
+        "hint": "Muhtar offices and contacts"
+      },
+      "kamu": {
+        "title": "Public offices",
+        "hint": "Governorship, district office, courthouse"
+      },
+      "hastane": {
+        "title": "Hospitals",
+        "hint": "Public and private hospitals"
+      },
+      "asm": {
+        "title": "Family health centres",
+        "hint": "Family doctors"
+      },
+      "emniyet": {
+        "title": "Police and gendarmerie",
+        "hint": "Police stations"
+      },
+      "itfaiye": {
+        "title": "Fire stations",
+        "hint": "Fire brigade"
+      },
+      "nufus": {
+        "title": "Civil registry offices",
+        "hint": "ID card, passport and registry"
+      },
+      "noter": {
+        "title": "Notaries",
+        "hint": "Notary services"
+      },
+      "ptt": {
+        "title": "PTT post offices",
+        "hint": "Post and parcels"
+      },
+      "vergi": {
+        "title": "Tax offices",
+        "hint": "Tax matters"
+      },
+      "sgk": {
+        "title": "Social security (SGK)",
+        "hint": "Social security matters"
+      },
+      "egitim": {
+        "title": "Education and libraries",
+        "hint": "Schools, adult education, libraries"
+      },
+      "toplanma": {
+        "title": "Assembly areas",
+        "hint": "Disaster and emergency assembly areas"
+      }
     }
   },
   "announcements": {

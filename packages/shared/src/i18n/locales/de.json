@@ -558,13 +558,85 @@
     "firstHour": "Erste Stunde {{price}} TRY",
     "soon": "Bald",
     "showcase": "Stadtschaufenster",
-    "townhallHint": "Anträge, Unterlagen, Dienste",
+    "townhallHint": "Dienste und Anträge",
     "tiles": {
-      "cafe": "Cafés und Restaurants",
+      "cafe": "Cafés & Rest.",
       "events": "Veranstaltungen",
-      "pharmacy": "Notdienstapotheke",
-      "listings": "Kaufen und Mieten",
-      "volunteer": "Ehrenamt"
+      "pharmacy": "Notdienst-Apotheke",
+      "listings": "Kauf & Miete",
+      "volunteer": "Ehrenamt",
+      "kurumlar": "Wichtige Stellen",
+      "muzeler": "Museen",
+      "ulasim": "Verkehr",
+      "parkPazar": "Parks & Märkte",
+      "otopark": "Parken",
+      "howTo": "Wie mache ich…?"
+    },
+    "panelTitle": "Stadtpanel",
+    "today": "Heute",
+    "townhall": "Gemeindedienste",
+    "meydanHint": "{{name}} · Leben im Viertel",
+    "vitrinHint": "Das Beste der Stadt entdecken",
+    "all": "Alle",
+    "allDays": "Alle Tage",
+    "records": "Orte",
+    "districts": "Bezirke",
+    "parks": "Parks",
+    "markets": "Märkte",
+    "kurumlarIntro": "Ortsvorsteher, Behörden, Gesundheit und Sicherheit.",
+    "groups": {
+      "muhtarlik": {
+        "title": "Ortsvorsteher",
+        "hint": "Muhtar-Büros und Kontakte"
+      },
+      "kamu": {
+        "title": "Behörden",
+        "hint": "Gouverneursamt, Landratsamt, Gericht"
+      },
+      "hastane": {
+        "title": "Krankenhäuser",
+        "hint": "Staatliche und private Kliniken"
+      },
+      "asm": {
+        "title": "Familiengesundheitszentren",
+        "hint": "Hausärzte"
+      },
+      "emniyet": {
+        "title": "Polizei und Gendarmerie",
+        "hint": "Polizeiwachen"
+      },
+      "itfaiye": {
+        "title": "Feuerwehr",
+        "hint": "Feuerwachen"
+      },
+      "nufus": {
+        "title": "Standesämter",
+        "hint": "Ausweis, Pass und Melderegister"
+      },
+      "noter": {
+        "title": "Notare",
+        "hint": "Notarielle Dienste"
+      },
+      "ptt": {
+        "title": "PTT-Postämter",
+        "hint": "Post und Pakete"
+      },
+      "vergi": {
+        "title": "Finanzämter",
+        "hint": "Steuerangelegenheiten"
+      },
+      "sgk": {
+        "title": "Sozialversicherung (SGK)",
+        "hint": "Sozialversicherung"
+      },
+      "egitim": {
+        "title": "Bildung und Bibliotheken",
+        "hint": "Schulen, Volksbildung, Bibliotheken"
+      },
+      "toplanma": {
+        "title": "Sammelplätze",
+        "hint": "Sammelplätze für Katastrophen"
+      }
     }
   },
   "announcements": {
