@@ -239,9 +239,9 @@
     },
     {
      "key": "ucret_durumu",
-     "required": true,
+     "required": false,
      "type": "choice",
-     "hint": "Ücretsiz / Ücretli",
+     "hint": "Ücretsiz / Ücretli Bilinmiyorsa boş bırakın.",
      "choices": [
       "Ücretsiz",
       "Ücretli"
@@ -340,9 +340,9 @@
    "columns": [
     {
      "key": "tip",
-     "required": true,
+     "required": false,
      "type": "choice",
-     "hint": "Listeden seçin.",
+     "hint": "Listeden seçin. Bilinmiyorsa boş bırakın.",
      "choices": [
       "kapali",
       "acik",
@@ -708,9 +708,9 @@
     },
     {
      "key": "gunler",
-     "required": true,
+     "required": false,
      "type": "list",
-     "hint": "Virgülle: Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar"
+     "hint": "Virgülle: Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar Bilinmiyorsa boş bırakın."
     },
     {
      "key": "saatler",

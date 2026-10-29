@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {
   buildCategoryTree,
   filterByName,
+  FOOD_KINDS,
   localized,
   searchCategoryTree,
   type LanguageCode,
@@ -206,8 +207,37 @@ export function CategoryPicker({
   );
 }
 
+/** Yeme-içme işletmesinin türleri (kafe, restoran, kebap…): hizmet kategorileri yerine seçilir. */
+export function FoodKindPicker({ selected, max, onChange }: { selected: string[]; max: number; onChange(ids: string[]): void }) {
+  const { t } = useTranslation();
+  const c = useThemeColors();
+  const own = selected.filter((id) => FOOD_KINDS.some((k) => k.id === id));
+  const toggle = (id: string) => onChange(own.includes(id) ? own.filter((x) => x !== id) : own.length < max ? [...own, id] : own);
+  return (
+    <View style={styles.chips}>
+      {FOOD_KINDS.map((k) => {
+        const on = own.includes(k.id);
+        const disabled = !on && own.length >= max;
+        return (
+          <Pressable
+            key={k.id}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: on, disabled }}
+            disabled={disabled}
+            onPress={() => toggle(k.id)}
+            style={[styles.chip, styles.foodChip, on ? { backgroundColor: c.primary, borderColor: c.primary } : { borderColor: c.border, backgroundColor: c.surface, opacity: disabled ? 0.5 : 1 }]}>
+            <MaterialIcons name={(k.icon in MaterialIcons.glyphMap ? k.icon : 'restaurant') as never} size={16} color={on ? c.onPrimary : c.icon} />
+            <AppText variant="caption" style={{ color: on ? c.onPrimary : c.text }}>{t(`food.kinds.${k.id}`)}</AppText>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  foodChip: { minHeight: 38, paddingHorizontal: spacing.md },
   group: { gap: spacing.sm },
   trigger: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: MIN_TOUCH + 8, paddingHorizontal: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   list: { borderWidth: 1, borderRadius: radius.md, padding: spacing.sm, gap: 2 },

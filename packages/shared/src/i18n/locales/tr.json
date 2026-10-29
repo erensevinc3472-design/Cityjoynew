@@ -1415,5 +1415,36 @@
     },
     "orderNote": "Sıralama ilçe nüfusuna göredir (TÜİK).",
     "orderNoteYear": "Sıralama ilçe nüfusuna göredir (TÜİK, {{year}})."
+  },
+  "food": {
+    "kinds": {
+      "yemek-kafe": "Kafe",
+      "yemek-restoran": "Restoran",
+      "yemek-kahvalti": "Kahvaltı",
+      "yemek-kebap": "Kebap ve ızgara",
+      "yemek-pide-lahmacun": "Pide ve lahmacun",
+      "yemek-ev-yemekleri": "Ev yemekleri",
+      "yemek-balik": "Balık",
+      "yemek-tatli": "Tatlı ve pastane",
+      "yemek-fast-food": "Fast food"
+    },
+    "kindsHint": "Mekânınızın türünü seçin (en çok 5). Benim Şehrim > Cafe ve Restoran'da bu türlerle bulunursunuz.",
+    "openNow": "Şu an açık",
+    "all": "Tümü",
+    "count_one": "{{count}} mekân",
+    "count_other": "{{count}} mekân",
+    "noMatch": "Bu seçime uyan mekân yok.",
+    "empty": "{{province}} için henüz kayıtlı kafe ya da restoran yok. Mekân sahipleri İşletmem'den ücretsiz kaydolabilir.",
+    "inviteTitle": "Mekânın burada görünsün",
+    "inviteBody": "Kafe ya da restoran sahibiysen İşletmem'den ücretsiz kaydol; menün, saatlerin ve yorumların burada görünsün.",
+    "inviteCta": "İşletmemi ekle"
+  },
+  "showcase": {
+    "title": "{{city}} Vitrini",
+    "weekly": "Haftanın seçkisi",
+    "issue": "Sayı {{n}}",
+    "editorsPick": "Editör seçkisi",
+    "archive": "Geçmiş sayılar",
+    "empty": "{{city}} Vitrini'nin ilk sayısı hazırlanıyor. Her hafta şehrin en iyileri burada."
   }
 }

@@ -66,6 +66,11 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
     listByCategory: (provinceCode, categoryId) =>
       list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), where('categoryIds', 'array-contains', categoryId), limit(100)),
 
+    listByType: (provinceCode, type) =>
+      list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), where('type', '==', type), limit(200)),
+
+    listInProvince: (provinceCode) => list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), limit(300)),
+
     searchByName: (provinceCode, key) =>
       list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), where('searchKeys', 'array-contains', key), limit(30)),
 

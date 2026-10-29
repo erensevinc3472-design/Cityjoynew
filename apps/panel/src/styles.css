@@ -146,3 +146,6 @@ td.handle-cell { width: 40px; padding-inline: 4px; }
 .sort-bar.dirty { background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: var(--accent); color: inherit; }
 .stop-head { display: flex; align-items: center; gap: 6px; }
 .sorter { margin: 8px 0 16px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; }
+.pick-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 4px 0; }
+.pick-row .pick-name { flex: 1 1 160px; }
+.pick-row input { flex: 1 1 200px; min-height: 40px; }
