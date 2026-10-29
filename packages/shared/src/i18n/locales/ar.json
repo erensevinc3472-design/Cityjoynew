@@ -558,7 +558,7 @@
     "firstHour": "الساعة الأولى {{price}} ليرة",
     "soon": "قريبًا",
     "showcase": "واجهة المدينة",
-    "townhallHint": "الخدمات والطلبات",
+    "townhallHint": "بلديتك والإعلانات والخدمات",
     "tiles": {
       "cafe": "مقاهٍ ومطاعم",
       "events": "الفعاليات",
@@ -649,7 +649,17 @@
         "title": "البنوك",
         "hint": "فروع البنوك"
       }
-    }
+    },
+    "townhallIntro": "جميع خدمات البلدية في مكان واحد",
+    "townhallSearch": "ابحث عن بلدية",
+    "myMunicipality": "بلدية منطقتك",
+    "cityMunicipality": "بلدية المدينة",
+    "profileSoon": "لم تُضف هذه البلدية بياناتها بعد. ستظهر معلومات الاتصال هنا عند إضافتها.",
+    "lastNews": "آخر إعلان",
+    "serviceGuide": "دليل الخدمات",
+    "otherMunicipalities": "بلديات المناطق الأخرى",
+    "districtCount_one": "المناطق: {{count}}",
+    "districtCount_other": "المناطق: {{count}}"
   },
   "announcements": {
     "title": "الإعلانات",

@@ -558,7 +558,7 @@
     "firstHour": "First hour {{price}} TRY",
     "soon": "Soon",
     "showcase": "City Showcase",
-    "townhallHint": "Services and applications",
+    "townhallHint": "Your municipality, notices and services",
     "tiles": {
       "cafe": "Cafés and Restaurants",
       "events": "Events",
@@ -649,7 +649,17 @@
         "title": "Banks",
         "hint": "Public and private bank branches"
       }
-    }
+    },
+    "townhallIntro": "All municipal services in one place",
+    "townhallSearch": "Search municipalities",
+    "myMunicipality": "Your district municipality",
+    "cityMunicipality": "City municipality",
+    "profileSoon": "This municipality hasn't added its details yet. Contact details will appear here once added.",
+    "lastNews": "Latest notice",
+    "serviceGuide": "Service guide",
+    "otherMunicipalities": "Other district municipalities",
+    "districtCount_one": "{{count}} district",
+    "districtCount_other": "{{count}} districts"
   },
   "announcements": {
     "title": "Announcements",

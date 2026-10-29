@@ -558,7 +558,7 @@
     "firstHour": "İlk saat {{price}} ₺",
     "soon": "Yakında",
     "showcase": "Şehir Vitrini",
-    "townhallHint": "Hizmetler ve başvurular",
+    "townhallHint": "Belediyen, duyurular ve hizmetler",
     "tiles": {
       "cafe": "Kafe ve Restoran",
       "events": "Etkinlikler",
@@ -649,7 +649,17 @@
         "title": "Bankalar",
         "hint": "Kamu ve özel banka şubeleri"
       }
-    }
+    },
+    "townhallIntro": "Tüm belediye hizmetleri tek noktada",
+    "townhallSearch": "Belediye ara",
+    "myMunicipality": "İlçe belediyen",
+    "cityMunicipality": "Şehrin belediyesi",
+    "profileSoon": "Belediye bilgilerini henüz eklemedi; iletişim bilgileri eklenince burada görünür.",
+    "lastNews": "Son duyuru",
+    "serviceGuide": "Hizmet rehberi",
+    "otherMunicipalities": "Diğer ilçe belediyeleri",
+    "districtCount_one": "{{count}} ilçe",
+    "districtCount_other": "{{count}} ilçe"
   },
   "announcements": {
     "title": "Duyurular",

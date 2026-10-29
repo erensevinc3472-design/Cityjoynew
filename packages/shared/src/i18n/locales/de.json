@@ -558,7 +558,7 @@
     "firstHour": "Erste Stunde {{price}} TRY",
     "soon": "Bald",
     "showcase": "Stadtschaufenster",
-    "townhallHint": "Dienste und Anträge",
+    "townhallHint": "Deine Gemeinde, Mitteilungen und Dienste",
     "tiles": {
       "cafe": "Cafés und Restaurants",
       "events": "Veranstaltungen",
@@ -649,7 +649,17 @@
         "title": "Banken",
         "hint": "Bankfilialen"
       }
-    }
+    },
+    "townhallIntro": "Alle städtischen Dienste an einem Ort",
+    "townhallSearch": "Gemeinde suchen",
+    "myMunicipality": "Deine Bezirksgemeinde",
+    "cityMunicipality": "Stadtverwaltung",
+    "profileSoon": "Diese Gemeinde hat noch keine Angaben gemacht. Kontaktdaten erscheinen hier, sobald sie hinzugefügt sind.",
+    "lastNews": "Letzte Mitteilung",
+    "serviceGuide": "Dienstleistungsführer",
+    "otherMunicipalities": "Andere Bezirksgemeinden",
+    "districtCount_one": "{{count}} Bezirk",
+    "districtCount_other": "{{count}} Bezirke"
   },
   "announcements": {
     "title": "Bekanntmachungen",
