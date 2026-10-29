@@ -560,7 +560,7 @@
     "showcase": "Şehir Vitrini",
     "townhallHint": "Hizmetler ve başvurular",
     "tiles": {
-      "cafe": "Cafe & Rest.",
+      "cafe": "Kafe ve Restoran",
       "events": "Etkinlikler",
       "pharmacy": "Nöbetçi Eczane",
       "listings": "Satılık & Kiralık",
@@ -583,7 +583,7 @@
     "districts": "İlçe",
     "parks": "Parklar",
     "markets": "Pazar alanları",
-    "kurumlarIntro": "Muhtarlıklar, kamu kurumları, sağlık ve güvenlik birimleri.",
+    "kurumlarIntro": "Muhtarlıklar, kamu kurumları ve sağlık",
     "groups": {
       "muhtarlik": {
         "title": "Muhtarlıklar",
@@ -598,16 +598,16 @@
         "hint": "Devlet ve özel hastaneler"
       },
       "asm": {
-        "title": "Aile Sağlığı Merkezleri",
-        "hint": "Aile hekimleri"
+        "title": "Sağlık Ocakları",
+        "hint": "Aile sağlığı merkezleri"
       },
       "emniyet": {
-        "title": "Emniyet ve Jandarma",
-        "hint": "Karakollar ve polis merkezleri"
+        "title": "Emniyet & Polis",
+        "hint": "Karakollar, polis ve jandarma"
       },
       "itfaiye": {
         "title": "İtfaiye",
-        "hint": "Yangın istasyonları"
+        "hint": "Yangın istasyonları ve acil müdahale"
       },
       "nufus": {
         "title": "Nüfus Müdürlükleri",
@@ -615,7 +615,7 @@
       },
       "noter": {
         "title": "Noterler",
-        "hint": "Noter işlemleri"
+        "hint": "Noter müdürlükleri ve işlemler"
       },
       "ptt": {
         "title": "PTT Şubeleri",
@@ -623,19 +623,31 @@
       },
       "vergi": {
         "title": "Vergi Daireleri",
-        "hint": "Vergi işlemleri"
+        "hint": "Maliye ve vergi işlemleri"
       },
       "sgk": {
         "title": "SGK Şubeleri",
-        "hint": "Sosyal güvenlik işlemleri"
+        "hint": "Sosyal güvenlik ve sigorta işlemleri"
       },
       "egitim": {
-        "title": "Eğitim ve Kütüphane",
-        "hint": "Okullar, halk eğitim, kütüphaneler"
+        "title": "Eğitim Kurumları",
+        "hint": "Okullar ve eğitim merkezleri"
       },
-      "toplanma": {
-        "title": "Toplanma Alanları",
-        "hint": "Afet ve acil durum toplanma alanları"
+      "eczane": {
+        "title": "Eczaneler",
+        "hint": "Nöbetçi eczaneler"
+      },
+      "kabin": {
+        "title": "Sağlık Kabinleri",
+        "hint": "Mobil sağlık hizmetleri"
+      },
+      "kutuphane": {
+        "title": "Kütüphaneler",
+        "hint": "Halk kütüphaneleri"
+      },
+      "banka": {
+        "title": "Bankalar",
+        "hint": "Kamu ve özel banka şubeleri"
       }
     }
   },

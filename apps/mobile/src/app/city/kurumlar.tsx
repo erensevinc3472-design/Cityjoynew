@@ -4,7 +4,6 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/app-text';
-import { GlossyIcon } from '@/components/glossy-icon';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
@@ -16,9 +15,8 @@ import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 /**
- * Önemli Kurumlar (tasarım: onemli-kurumlar.html): alt başlıklar listesi (muhtarlıklar, kamu kurumları, hastaneler,
- * emniyet, itfaiye, nüfus, noter, PTT, vergi, SGK, eğitim, toplanma alanları). Sayı bilgiden gelir; bilgisi olmayan
- * başlık soluk ve "Yakında". Nöbetçi eczane Benim Şehrim'de ayrı kutuda.
+ * Önemli Kurumlar (tasarım: onemli-kurumlar.html): tek, toplu liste. Her satırda renkli çerçeveli simge, başlık, kısa
+ * açıklama ve altın ok; dokununca o başlığın kurumları açılır. Bilgisi olmayan başlık soluk ve "Yakında".
  */
 export default function InstitutionsScreen() {
   const { t } = useTranslation();
@@ -30,18 +28,27 @@ export default function InstitutionsScreen() {
   const { meta } = useCityGuideMeta(provinceCode);
   const { items, error, retry } = useCityGuideItems(provinceCode, 'onemli-kurumlar');
 
-  const countOf = (g: (typeof INSTITUTION_GROUPS)[number]) =>
-    g.section ? (meta?.sections[g.section]?.count ?? 0) : (items ?? []).filter((i) => i.category && g.categories!.includes(i.category)).length;
+  const has = (g: (typeof INSTITUTION_GROUPS)[number]) =>
+    g.section
+      ? (meta?.sections[g.section]?.count ?? 0) > 0
+      : !!g.categories && (items ?? []).some((i) => i.category && g.categories!.includes(i.category));
+
+  const header = (
+    <HeroHeader
+      title={t('city.tiles.kurumlar')}
+      subtitle={t('city.kurumlarIntro')}
+      onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}
+    />
+  );
 
   return (
-    <Screen header={<HeroHeader title={t('city.tiles.kurumlar')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />}>
+    <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <AppText style={[styles.intro, { color: c.textMuted }]}>{t('city.kurumlarIntro')}</AppText>
-        {error ? <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} /> : items === null && !!meta?.sections['onemli-kurumlar'] ? <StateMessage kind="loading" /> : null}
+        {error ? <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} /> : null}
         {INSTITUTION_GROUPS.map((g) => {
-          const n = countOf(g);
-          const on = n > 0;
+          const on = has(g);
           const title = t(`city.groups.${g.id}.title`);
+          const color = g.look.colors[0];
           const go = () =>
             g.section
               ? router.push({ pathname: '/city/[section]', params: { section: g.section } })
@@ -50,21 +57,20 @@ export default function InstitutionsScreen() {
             <Pressable
               key={g.id}
               accessibilityRole="button"
-              accessibilityLabel={on ? `${title}. ${t('city.count', { count: n })}` : `${title}. ${t('city.soon')}`}
+              accessibilityLabel={on ? title : `${title}. ${t('city.soon')}`}
               disabled={!on}
               onPress={go}
-              style={({ pressed }) => [styles.row, { backgroundColor: c.surface, borderColor: c.border, transform: [{ scale: pressed ? 0.985 : 1 }] }]}>
-              <GlossyIcon icon={g.look.icon} colors={g.look.colors} size={48} dim={!on} />
-              <View style={styles.flex}>
-                <AppText style={[styles.title, { color: on ? c.textStrong : c.textSoft }]}>{title}</AppText>
-                <AppText style={[styles.hint, { color: c.textMuted }]} numberOfLines={1}>{t(`city.groups.${g.id}.hint`)}</AppText>
+              style={({ pressed }) => [styles.row, { backgroundColor: c.surface, borderColor: c.border, opacity: on ? 1 : 0.5, transform: [{ scale: pressed ? 0.985 : 1 }] }]}>
+              <View style={[styles.icon, { backgroundColor: `${color}1F`, borderColor: `${color}40` }]}>
+                <MaterialIcons name={g.look.icon} size={26} color={color} />
               </View>
-              {on ? (
-                <AppText style={[styles.count, { color: c.accent }]}>{n}</AppText>
-              ) : (
-                <AppText style={[styles.soon, { color: c.textSoft }]}>{t('city.soon')}</AppText>
-              )}
-              <MaterialIcons name={rtl ? 'arrow-back' : 'arrow-forward'} size={20} color={on ? c.textMuted : c.textSoft} />
+              <View style={styles.flex}>
+                <AppText style={[styles.title, { color: c.textStrong }]}>{title}</AppText>
+                <AppText style={[styles.hint, { color: c.textMuted }]} numberOfLines={1}>
+                  {on ? t(`city.groups.${g.id}.hint`) : t('city.soon')}
+                </AppText>
+              </View>
+              <MaterialIcons name={rtl ? 'arrow-back' : 'arrow-forward'} size={22} color={c.accent} />
             </Pressable>
           );
         })}
@@ -74,12 +80,10 @@ export default function InstitutionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.sm + 2, paddingBottom: spacing.xl },
-  intro: { fontSize: 13, lineHeight: 18 },
+  content: { gap: spacing.md, paddingBottom: spacing.xl },
   flex: { flex: 1, gap: 2 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.xl, borderWidth: 1 },
-  title: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21 },
-  hint: { fontSize: 12, lineHeight: 16 },
-  count: { fontFamily: fonts.display, fontSize: 16 },
-  soon: { fontSize: 10 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md + 2, paddingHorizontal: spacing.md, borderRadius: radius.xl, borderWidth: 1 },
+  icon: { width: 50, height: 50, borderRadius: radius.md, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  title: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 22 },
+  hint: { fontSize: 13, lineHeight: 18 },
 });
