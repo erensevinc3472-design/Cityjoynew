@@ -558,7 +558,7 @@
     "firstHour": "Первый час {{price}} TRY",
     "soon": "Скоро",
     "showcase": "Витрина города",
-    "townhallHint": "Услуги и заявления",
+    "townhallHint": "Ваш муниципалитет, объявления и услуги",
     "tiles": {
       "cafe": "Кафе и рестораны",
       "events": "События",
@@ -649,7 +649,17 @@
         "title": "Банки",
         "hint": "Отделения банков"
       }
-    }
+    },
+    "townhallIntro": "Все муниципальные услуги в одном месте",
+    "townhallSearch": "Поиск муниципалитета",
+    "myMunicipality": "Муниципалитет вашего района",
+    "cityMunicipality": "Муниципалитет города",
+    "profileSoon": "Муниципалитет ещё не добавил свои данные. Контакты появятся здесь после добавления.",
+    "lastNews": "Последнее объявление",
+    "serviceGuide": "Справочник услуг",
+    "otherMunicipalities": "Другие районные муниципалитеты",
+    "districtCount_one": "Районов: {{count}}",
+    "districtCount_other": "Районов: {{count}}"
   },
   "announcements": {
     "title": "Объявления",

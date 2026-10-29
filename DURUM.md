@@ -496,6 +496,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
+- Belediye Hizmetleri (29 Ekim 2026; tasarım belediye-hizmetleri.html): Benim Şehrim'deki büyük kart artık her zaman açılır (`/city/belediyeler`): ilçe belediyesi ve büyükşehir/il belediyesi (profil özeti ve son duyurusu), arama, açılır "Diğer ilçe belediyeleri"; her biri resmî profile gider. Şehir rehberinde belediye hizmetleri verisi varsa "Hizmet rehberi" satırı çıkar. Panel karşılığı: belediye hesabı Panel > Resmî profil ve Duyurular (yeni panel işi yok). Başkan adı ve parti bilgisi tasarımda var, eklenmedi (siyasi bilgi; profil alanı yok).
 - Benim Şehrim (Eren, 29 Ekim 2026): ana ekran önceki görünümünde kaldı (Eren daha güzel buldu), ama kategoriler toplu: Önemli Kurumlar tek liste (onemli-kurumlar.html sırasıyla; muhtarlıklar içinde), Park & Pazar tek bölüm iki sekme; toplanma alanları Mahalle Meydanı'nda. Liste sayfaları Müzeler tasarımı gibi (arama, altın filtreler, sayı kutuları).
 - Benim Şehrim 1. parça (29 Ekim 2026; PROJE.md 5.1): Bursa OSM Excel'i (`veri-denemesi/osm-16-Bursa.xlsx`, masaüstüne de kopyalandı), "Nasıl yapılır?" ülke geneli Excel'i, Cafe ve Restoran (`/city/food`), Şehir Vitrini (`/city/showcase`, Panel > Şehir rehberi > Şehir Vitrini). Açık iş: boş Excel şablonu (`scripts/build-data-templates.py`) yeniden üretilmeli (3 sütun isteğe bağlı oldu; bu bilgisayarda Python yok).
 - Acil İhtiyaçlar yeni düzen (Eren, 29 Ekim 2026; PROJE.md 5.4): "Hemen lazım olabilir" kutucukları Panel > Hizmet kategorilerindeki "acil" işaretinden ve sıradan gelir.
@@ -526,6 +527,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Açık işler ve bilinen eksikler
 
+- Toplu güvenlik taraması (`/security-review`, tüm kod: Firebase kuralları, giriş, yönetici yetkileri): Eren mağazaya
+  çıkmadan önce en sonda toplu yapılmasını istedi (29 Ekim 2026).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
 - Yasal metinler boş (yalnızca "avukat kontrolünden geçecek" notu).

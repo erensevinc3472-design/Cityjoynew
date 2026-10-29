@@ -171,17 +171,16 @@ export default function MyCityScreen() {
           <View style={[styles.row, { gap: GAP }]}>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={townhall.ready ? townhall.label : `${townhall.label}. ${t('city.soon')}`}
-              disabled={!townhall.ready}
-              onPress={() => router.push({ pathname: '/city/[section]', params: { section: 'belediye-hizmetleri' } })}
-              style={({ pressed }) => [styles.big, { width: cell * 2 + GAP, height: 92 * 2 + GAP, borderColor: sceneRim('townhall'), opacity: !townhall.ready ? 0.6 : pressed ? 0.88 : 1 }]}>
+              accessibilityLabel={townhall.label}
+              onPress={() => router.push('/city/belediyeler')}
+              style={({ pressed }) => [styles.big, { width: cell * 2 + GAP, height: 92 * 2 + GAP, borderColor: sceneRim('townhall'), opacity: pressed ? 0.88 : 1 }]}>
               <SceneArt kind="townhall" />
               <View style={styles.bigIcon}>
                 <MaterialIcons name="apartment" size={22} color="#FFFFFF" />
               </View>
               <View style={styles.foot}>
                 <AppText style={styles.bigTitle}>{townhall.label}</AppText>
-                <AppText style={styles.footHint}>{townhall.ready ? t('city.townhallHint') : t('city.soon')}</AppText>
+                <AppText style={styles.footHint}>{t('city.townhallHint')}</AppText>
               </View>
             </Pressable>
             <View style={{ gap: GAP }}>{TILES.slice(0, 2).map(renderTile)}</View>
