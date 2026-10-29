@@ -5,6 +5,7 @@ import {
   distanceKm,
   encodeGeohash,
   geoPoint,
+  geohashCellsAround,
   openState,
   postModeFor,
   rankBusinesses,
@@ -14,6 +15,7 @@ import {
   type Business,
   type BusinessInput,
 } from './business';
+import { mergePlaces, packByCell, placeOfBusiness, rankRoadsideStops, roadsidePackCells, unpackPlace, type RoadsidePlace } from './roadside';
 
 const input = (over: Partial<BusinessInput> = {}): BusinessInput => ({
   type: 'hizmet',
@@ -155,5 +157,67 @@ describe('yol üstü tesis', () => {
     expect(c.roadside).toEqual(['tuvalet', 'mescit']);
     expect(c.geo).toEqual(geoPoint(40.1234567, 29.7654321));
     expect(cleanBusinessInput(input({ geo: geoPoint(40.2, 29.1) })).geo).toBeUndefined();
+  });
+});
+
+describe('Yoldayım sıralaması', () => {
+  // Bursa'dan doğuya (İnegöl yönüne) giden yolcu.
+  const at = { lat: 40.19, lng: 29.2 };
+  const tesis = (id: string, lat: number, lng: number, roadside: Business['roadside']) =>
+    biz({ id, type: 'yol-ustu', roadside, geo: geoPoint(lat, lng) });
+  const list = [
+    tesis('dogu-10km', 40.19, 29.318, ['tuvalet', 'akaryakit']),
+    tesis('bati-8km', 40.19, 29.106, ['tuvalet']),
+    tesis('yanibasi', 40.195, 29.205, ['mescit']),
+    tesis('uzak', 40.19, 29.9, ['tuvalet']),
+    biz({ id: 'konumsuz' }),
+  ]
+    .map(placeOfBusiness)
+    .filter((p): p is RoadsidePlace => !!p);
+
+  it('gidilen yöndekiler önce, geride kalanlar sonda, uzaktakiler yok', () => {
+    const r = rankRoadsideStops(list, at, { heading: 90 });
+    expect(r.map((s) => [s.place.id, s.where])).toEqual([
+      ['yanibasi', 'yakinda'],
+      ['dogu-10km', 'ileride'],
+      ['bati-8km', 'geride'],
+    ]);
+  });
+
+  it('ihtiyaca göre süzer; yön yoksa mesafeye göre', () => {
+    expect(rankRoadsideStops(list, at, { need: ['tuvalet'] }).map((s) => s.place.id)).toEqual(['bati-8km', 'dogu-10km']);
+  });
+
+  it('çevre hücreleri 9 tane ve kendi hücresini içerir', () => {
+    const cells = geohashCellsAround(at.lat, at.lng);
+    expect(cells).toHaveLength(9);
+    expect(cells).toContain(geoPoint(at.lat, at.lng).geohash.slice(0, 4));
+  });
+});
+
+describe('OSM yol üstü paketleri', () => {
+  const osm = [
+    { i: 'n1', n: 'Opet Kestel', k: 'yol-akaryakit' as const, a: 40.1986, o: 29.2143, f: ['akaryakit' as const, 'lpg' as const], b: 'Opet' },
+    { i: 'n2', n: 'Şarj Noktası', k: 'yol-sarj' as const, a: 40.25, o: 29.3, f: ['sarj' as const] },
+    { i: 'w3', n: 'Ankara Dinlenme', k: 'yol-dinlenme-tesisi' as const, a: 39.92, o: 32.85, f: [] },
+  ];
+
+  it('paketten yer çıkarır; hücrelere ayırır', () => {
+    expect(unpackPlace(osm[0])).toMatchObject({ id: 'osm-n1', source: 'osm', roadside: ['akaryakit', 'lpg'], brand: 'Opet', kind: 'yol-akaryakit' });
+    const cells = packByCell(osm);
+    expect([...cells.values()].flat()).toHaveLength(3);
+    expect(cells.size).toBe(2);
+  });
+
+  it('aynı yerdeki işletme OSM kaydının yerine geçer; olanağı bilinmeyen ihtiyaç seçilince çıkmaz', () => {
+    const shop = placeOfBusiness(biz({ id: 'kestel', type: 'yol-ustu', roadside: ['tuvalet', 'akaryakit'], geo: geoPoint(40.1985, 29.2142) }))!;
+    const merged = mergePlaces([shop], osm.map(unpackPlace));
+    expect(merged.map((p) => p.id)).toEqual(['kestel', 'osm-n2', 'osm-w3']);
+    expect(rankRoadsideStops(merged, { lat: 39.93, lng: 32.86 }, { need: ['tuvalet'] })).toEqual([]);
+    expect(rankRoadsideStops(merged, { lat: 39.93, lng: 32.86 }).map((s) => s.place.id)).toEqual(['osm-w3']);
+  });
+
+  it('çevre paket hücreleri yolcunun hücresini içerir', () => {
+    expect(roadsidePackCells(40.19, 29.2)).toContain(geoPoint(40.19, 29.2).geohash.slice(0, 3));
   });
 });

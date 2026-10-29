@@ -88,11 +88,11 @@ export default function TravelIntroScreen() {
         <AppText style={styles.kicker}>{t('travel.intro.efficiency')}</AppText>
         <AppText accessibilityRole="header" style={styles.title}>{t('travel.intro.efficiencyTitle')}</AppText>
         <AppText style={styles.text}>{t('travel.intro.efficiencyText')}</AppText>
-        <View style={styles.modes}>
-          {(['directions-bus', 'train', 'map', 'alt-route'] as const).map((i) => (
-            <MaterialIcons key={i} name={i} size={20} color="rgba(255,255,255,0.5)" />
-          ))}
-        </View>
+        {/* Yoldayım (Yol Arkadaşı) hazır; planlayıcı sonra gelecek. */}
+        <Pressable accessibilityRole="button" onPress={() => router.push('/travel/yoldayim')} style={({ pressed }) => [styles.road, { opacity: pressed ? 0.85 : 1 }]}>
+          <MaterialIcons name="directions-car" size={18} color="#1A1408" />
+          <AppText style={styles.roadText}>{t('trip.title')}</AppText>
+        </Pressable>
         <View accessible accessibilityLabel={`${t('travel.intro.start')}, ${t('travel.soon')}`} style={styles.secondary}>
           <AppText style={styles.secondaryText}>{t('travel.intro.start')}</AppText>
           <View style={[styles.soon, { backgroundColor: c.heroAccent }]}>
@@ -119,7 +119,8 @@ const styles = StyleSheet.create({
   text: { color: 'rgba(255,255,255,0.9)', fontSize: 12, lineHeight: 18, textAlign: 'center', maxWidth: 200 },
   primary: { marginTop: spacing.xs, backgroundColor: TEAL, paddingVertical: 12, paddingHorizontal: 40, borderRadius: radius.pill, minHeight: 44, justifyContent: 'center' },
   primaryText: { color: '#0B2E34', fontFamily: fonts.heading, fontSize: 15 },
-  modes: { flexDirection: 'row', gap: spacing.md, marginVertical: 2 },
+  road: { marginTop: spacing.xs, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: GOLD, paddingVertical: 12, paddingHorizontal: 32, borderRadius: radius.pill, minHeight: 44 },
+  roadText: { color: '#1A1408', fontFamily: fonts.heading, fontSize: 15 },
   secondary: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: 10, paddingHorizontal: 22, borderRadius: radius.pill, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.05)', minHeight: 44 },
   secondaryText: { color: 'rgba(255,255,255,0.7)', fontFamily: fonts.bodySemi, fontSize: 14 },
   soon: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.pill },

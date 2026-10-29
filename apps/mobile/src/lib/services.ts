@@ -12,6 +12,7 @@ import {
   createFirestoreMessageRepository,
   createFirestoreCityGuideRepository,
   createFirestoreBusinessRepository,
+  createRoadsidePackRepository,
   createFirestoreFamilyRepository,
   createFirestorePushTokenRepository,
   createFirestoreSosRepository,
@@ -36,6 +37,7 @@ export const profileRepository = createFirestoreProfileRepository(firestore);
 export const occupationRepository = createFirestoreOccupationRepository(firestore);
 export const emergencyNumbers = createEmergencyNumberStore(createFirestoreEmergencyNumberRepository(firestore), deviceStorage);
 export const businessRepository = createFirestoreBusinessRepository(firestore);
+export const roadsidePackRepository = createRoadsidePackRepository(firestore);
 export const reviewRepository = createFirestoreReviewRepository(firestore);
 export const announcementRepository = createFirestoreAnnouncementRepository(firestore);
 export const eventRepository = createFirestoreEventRepository(firestore);

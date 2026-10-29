@@ -1577,5 +1577,66 @@
       "bebek-bakim": "Wickelraum",
       "hediyelik": "Souvenirs"
     }
+  },
+  "trip": {
+    "title": "Unterwegs",
+    "call112": "112 anrufen",
+    "onRoad": "UNTERWEGS",
+    "distance": "GEFAHREN",
+    "heading": "RICHTUNG",
+    "km": "{{km}} km",
+    "meters": "{{m}} m",
+    "minutes_one": "{{count}} Min.",
+    "minutes_other": "{{count}} Min.",
+    "hoursMinutes": "{{h}} Std. {{m}} Min.",
+    "eta": "≈ {{time}}",
+    "dir": {
+      "n": "Norden",
+      "ne": "Nordosten",
+      "e": "Osten",
+      "se": "Südosten",
+      "s": "Süden",
+      "sw": "Südwesten",
+      "w": "Westen",
+      "nw": "Nordwesten"
+    },
+    "passengerNote": "Nicht während der Fahrt bedienen; lass einen Mitfahrer das Handy halten. Gute Reise!",
+    "ask": "Was brauchst du?",
+    "needs": {
+      "tuvalet": "WC",
+      "yakit": "Tanken",
+      "yemek": "Essen",
+      "sarj": "Laden",
+      "mescit": "Gebet"
+    },
+    "tapAgain": "Erneut tippen, um alle Einrichtungen zu sehen.",
+    "showingAll": "Alle Einrichtungen an der Straße werden angezeigt.",
+    "breakTitle": "{{time}} unterwegs – Zeit für eine Pause!",
+    "breakText": "{{name}} liegt {{km}} km voraus. Ein Tee und frische Luft tun gut.",
+    "deniedTitle": "Standortberechtigung nötig",
+    "deniedText": "Wir nutzen deinen Standort nur, solange dieser Bildschirm offen ist. Erlaube CityJoy den Standort in den Telefoneinstellungen und versuche es erneut.",
+    "unavailableTitle": "Standort nicht verfügbar",
+    "unavailableText": "Das GPS-Signal ist vielleicht schwach. Versuche es gleich noch einmal.",
+    "retry": "Erneut versuchen",
+    "scanning": "Straße wird durchsucht…",
+    "scanningText": "Ich suche WCs, Tankstellen, Essen und Rastplätze in deiner Nähe.",
+    "loadError": "Einrichtungen konnten nicht geladen werden",
+    "loadErrorText": "Prüfe deine Internetverbindung und versuche es erneut.",
+    "none": "Hier ist noch keine Einrichtung eingetragen",
+    "noneForNeed": "Für diesen Bedarf ist in der Nähe nichts eingetragen",
+    "noneText": "Einrichtungen erscheinen hier, sobald sie CityJoy beitreten. Du betreibst eine? Trag sie jetzt ein.",
+    "addYours": "Meine Einrichtung eintragen",
+    "nearest": "AM NÄCHSTEN",
+    "where": {
+      "ileride": "Voraus",
+      "yakinda": "Ganz in der Nähe",
+      "geride": "Hinter dir"
+    },
+    "open": "Jetzt geöffnet",
+    "closed": "Jetzt geschlossen",
+    "details": "Details",
+    "footnote": "Luftlinie; Zeiten bei durchschnittlich {{kmh}} km/h geschätzt.",
+    "osmNote": "OSM-Eintrag, nicht geprüft",
+    "osmCredit": "Einige Orte © OpenStreetMap-Mitwirkende."
   }
 }

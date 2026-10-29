@@ -25,6 +25,7 @@ export * from './emergency/numbers';
 export * from './categories/service-categories';
 export * from './business/business';
 export * from './business/reviews';
+export * from './business/roadside';
 export * from './sos/sos';
 export * from './city-guide/schema';
 export * from './city-guide/items';

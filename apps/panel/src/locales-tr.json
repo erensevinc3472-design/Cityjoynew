@@ -841,7 +841,8 @@
     "editHint": "Alanlar Excel sütunlarıyla aynıdır ve aynı denetimden geçer. Kaydedince doğrulama yeniden gerekir.",
     "provinceFixed": "İl değiştirilemez; başka ile taşımak için kaldırıp o ile yükleyin.",
     "save": "Kaydet",
-    "showcase": "Şehir Vitrini"
+    "showcase": "Şehir Vitrini",
+    "roadside": "Yol üstü verisi"
   },
   "approvals": {
     "title": "Bekleyen onaylar",
@@ -1443,5 +1444,30 @@
       "stories": "1-8 konu olmalı.",
       "story": "Her konunun başlığı olmalı; konuda seçim yoksa en az birkaç cümle yazı olmalı."
     }
+  },
+  "roadside": {
+    "title": "Yol üstü verisi",
+    "intro": "Seyahat > Yoldayım: Türkiye genelindeki akaryakıt istasyonları, şarj noktaları ve dinlenme tesisleri (OpenStreetMap). Uygulamada \"OSM kaydı, doğrulanmadı\" diye görünür; aynı yerde kayıtlı yol üstü işletme varsa o gösterilir.",
+    "howTo": "Dosya, proje klasöründe \"npx vite-node scripts/osm-roadside.ts\" ile hazırlanır (masaüstüne \"CityJoy-yol-ustu-turkiye.json\" olarak kopyalanır). Birkaç ayda bir yenilemek yeterli.",
+    "adminOnly": "Bu sayfayı yalnızca admin yönetir.",
+    "demo": "Örnek hesapta yükleme kapalı.",
+    "current": "Yayındaki veri",
+    "loading": "Yükleniyor…",
+    "none": "Henüz yüklenmedi: Yoldayım yalnızca kayıtlı işletmeleri gösteriyor.",
+    "currentText": "{{places}} yer, {{cells}} bölgede. Son yükleme: {{date}}.",
+    "loadError": "Yayındaki veri okunamadı.",
+    "uploadTitle": "Yeni dosya yükle",
+    "pick": "JSON dosyası seç",
+    "preview": "Toplam {{places}} yer, {{cells}} bölge (en kalabalık bölgede {{biggest}} yer).",
+    "skipped_one": "Biçimi bozuk ya da Türkiye dışında olduğu için {{count}} kayıt atlandı.",
+    "skipped_other": "Biçimi bozuk ya da Türkiye dışında olduğu için {{count}} kayıt atlandı.",
+    "tooBig": "Bir bölgede {{max}} yerden fazlası var; dosya bu hâliyle yüklenemez.",
+    "replaceNote": "Yükleyince yayındaki verinin tamamı bu dosyayla değişir; dosyada olmayan bölgeler silinir.",
+    "upload": "Yükle ve yayına al",
+    "uploading": "Yükleniyor…",
+    "uploaded": "{{places}} yer {{cells}} bölgeye yüklendi.",
+    "uploadError": "Yüklenemedi. Admin olarak giriş yaptığınızdan emin olup tekrar deneyin.",
+    "emptyFile": "Dosyada geçerli kayıt yok.",
+    "badFile": "Dosya okunamadı: OSM betiğinin ürettiği JSON dosyasını seçin."
   }
 }
