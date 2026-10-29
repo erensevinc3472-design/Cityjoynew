@@ -93,12 +93,10 @@ export default function TravelIntroScreen() {
           <MaterialIcons name="directions-car" size={18} color="#1A1408" />
           <AppText style={styles.roadText}>{t('trip.title')}</AppText>
         </Pressable>
-        <View accessible accessibilityLabel={`${t('travel.intro.start')}, ${t('travel.soon')}`} style={styles.secondary}>
-          <AppText style={styles.secondaryText}>{t('travel.intro.start')}</AppText>
-          <View style={[styles.soon, { backgroundColor: c.heroAccent }]}>
-            <AppText style={styles.soonText}>{t('travel.soon')}</AppText>
-          </View>
-        </View>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/travel/planla')} style={({ pressed }) => [styles.secondary, { opacity: pressed ? 0.8 : 1 }]}>
+          <MaterialIcons name="map" size={18} color="#FFFFFF" />
+          <AppText style={styles.secondaryText}>{t('plan.title')}</AppText>
+        </Pressable>
       </View>
     </View>
   );

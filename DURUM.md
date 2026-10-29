@@ -496,6 +496,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
+- Seyahat > Planla (Eren onayladı 29 Ekim 2026: tek ekran, fiyatlar panelden elle): `/travel/planla`, Seyahat girişinde "Yolculuğunu planla". Nereden-nereye (il), tarih (7 gün), yolcu sayısı; Kendi aracım / Otobüs / Uçak / Tren kartları (süre, tahmini ücret); yolculuk kartı (İST ━ BUR, süre, km, maliyet, notlar); araba için güzergâh çevresindeki mola yerleri (OSM + yol üstü işletmeler, yaklaşık); varınca (şehri keşfet, yöresel, başkanlarla); hazırlık listesi; "Yola çık" Yoldayım'ı varış iliyle açar (kalan km, varınca "Vardın!" kartı). Planlar yalnızca telefonda (en çok 5). Hesap: il merkezleri arası kuş uçuşu x 1,3; araba 90 km/s + 2,5 saatte 15 dk mola; otobüs 70 km/s + 20 dk; uçak 650 km/s + 30 dk, iki ilde havalimanı ve 150 km üstü. Panel > Seyahat > Yolculuk fiyatları (yalnızca admin): akaryakıt (benzin, dizel, LPG, elektrik kWh), otobüs km aralığı, ay; boşsa ücret gösterilmez. **Kurallar değişti (config/travelPrices): yüklenmeli. Eren fiyatları girmeli.** Olmayanlar: bilet, sefer, firma adları, canlı yol durumu, yapay zekâ, hava durumu.
 - Yol Arkadaşı 3. parça, OSM başlangıç verisi (29 Ekim 2026): Türkiye'deki akaryakıt istasyonları, şarj noktaları ve dinlenme tesisleri OpenStreetMap'ten (`scripts/osm-roadside.ts`, çıktı `veri-denemesi/yol-ustu-tr.json` ve masaüstünde `CityJoy-yol-ustu-turkiye.json`). 3 harflik geohash hücresi başına bir paket (`roadsidePacks`, herkes okur, yalnızca admin yazar). Panel > Şehir rehberi > Yol üstü verisi (yalnızca admin) dosyayı yükler; eskiyen hücreler silinir, işlem kayda geçer. Uygulamada "OSM kaydı, doğrulanmadı" ve "© OpenStreetMap katkıda bulunanlar"; aynı yerde (150 m) kayıtlı işletme varsa o gösterilir. Olanaklar yalnızca OSM etiketlerinden (bilinmeyen eklenmez). Telefon paketi bir gün saklar. Birkaç ayda bir yenilenmeli.
 - Yol Arkadaşı 2. parça, Yoldayım ekranı (29 Ekim 2026; `/travel/yoldayim`, Seyahat girişindeki altın "Yoldayım" düğmesi): gece yolu canlandırması, yolda geçen süre / gidilen km / yön, büyük Tuvalet · Yakıt · Yemek · Şarj · Mescit düğmeleri, gidilen yöndeki en yakın tesis kartı (mesafe, tahmini süre, olanaklar, yol tarifi), 2 saat sonra mola önerisi, 112 düğmesi, "yolcu kullansın" uyarısı. Konum yalnızca ekran açıkken; tesisler geohash hücreleriyle (9 sorgu, 5 km'de bir) okunur. **Yeni dizin var: kurallar ve dizinler yüklenmeli.** Ayrıca düzeltildi: Rusça ve Arapçada 1'den farklı sayılarda metin Türkçeye düşüyordu (eksik çoğul biçimleri artık otomatik dolduruluyor). Sırada: OSM akaryakıt ve dinlenme tesisi başlangıç verisi, Planla.
 - Yol Arkadaşı 1. parça, işletme tarafı (Eren, 29 Ekim 2026; PROJE.md 5.2): her işletme "Yol üstü tesis" olarak işaretlenebilir (olanaklar: tuvalet, akaryakıt, LPG, şarj, restoran, kafe, mescit, market, oyun alanı, bebek bakım, hediyelik) ve tesisteyken "Konumu al" ile tam yerini kaydeder (`geo`, geohash). "Yol üstü tesis" türü kendi çeşitlerinden seçer (dinlenme tesisi, akaryakıt, şarj, lokanta, büfe). İşletme sayfasında olanaklar ve koordinata yol tarifi; panelde "Yol üstü tesisler" süzgeci ve harita bağlantısı. Kurallar değişti (yüklenmeli). Sırada: Planla > Yoldayım (yakındaki tesisler, yöne göre) > Vardım; başlangıç verisi OSM akaryakıt ve dinlenme tesisleri.
@@ -545,6 +546,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
+- **Kurallar ve dizinler 29 Ekim akşamı yüklendi** (yol üstü tesis, Yoldayım dizini, roadsidePacks; PR #36 sonrası).
 - **Kurallar ve dizinler 28 Ekim'de yüklendi** (etkinlikler ve resmî profiller dahil, PR #6 birleştikten sonra, Eren'in
   bilgisayarından). Derlemedeki 7 "Invalid type ... null" uyarısı `get(..., null)` kalıbından, zararsız.
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
@@ -576,16 +578,6 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Ana sayfadaki arama kutusu ve hava durumu ilgili özelliklerle gelecek (duyurular ana sayfada).
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin
   bağlantı bilgilerini içeriyor; Eren'e o projeyi kapatması önerildi.
-
-## Eren eve gelince hatırlat (29 Ekim 2026)
-
-Eren "eve geldim" dediğinde ilk iş bunları sırayla hatırlat ve adım adım yaptır:
-1. PR'ı birleştir: `claude/yoldayim` (Yoldayım ekranı). Birleşti mi diye `git log origin/main` ile bak.
-2. Bilgisayarda kuralları ve dizinleri yükle (yol üstü tesis kuralları + Yoldayım dizini; ikisi aynı komutla gider):
-   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`
-   Dizinin hazır olması birkaç dakika sürebilir.
-3. Telefonda dene: Seyahat > Yoldayım (konum izni ver), Profil > İşletme ekle > "Yol üstü tesis".
-Bitince bu bölümü sil.
 
 ## Sıradaki adım (Eren seçecek)
 

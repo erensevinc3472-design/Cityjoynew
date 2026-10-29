@@ -10,6 +10,7 @@ import { AuditLogPage } from './pages/audit-log-page';
 import { BusinessesPage } from './pages/businesses-page';
 import { CityGuidePage } from './pages/city-guide-page';
 import { RoadsidePage } from './pages/roadside-page';
+import { TravelPricesPage } from './pages/travel-prices-page';
 import { ShowcasePage } from './pages/showcase-page';
 import { TravelPage } from './pages/travel-page';
 import { EmergencyNumbersPage } from './pages/emergency-numbers-page';
@@ -60,6 +61,7 @@ const router = createHashRouter([
       { path: 'sehir-vitrini', element: <ShowcasePage /> },
       { path: 'yol-ustu-verisi', element: <RoadsidePage /> },
       { path: 'seyahat', element: <TravelPage /> },
+      { path: 'yolculuk-fiyatlari', element: <TravelPricesPage /> },
       { path: 'kurumlar', element: <OrganizationsPage /> },
       { path: 'profil', element: <ProfilePage /> },
       { path: 'yetkiler', element: <GrantsPage /> },

@@ -135,6 +135,27 @@ export function RegionPicker({
   );
 }
 
+/** Yalnızca il seçimi (Seyahat > Planla: nereden, nereye). */
+export function ProvincePicker({ label, value, onChange }: { label: string; value?: string; onChange(code: string): void }) {
+  const [open, setOpen] = useState(false);
+  const provinces = useMemo(() => repo.getProvinces().map((p) => ({ id: p.code, name: p.name })), []);
+  return (
+    <View style={styles.group}>
+      <Trigger label={label} value={value ? repo.getProvince(value)?.name : undefined} open={open} onPress={() => setOpen(!open)} />
+      {open ? (
+        <ChoiceList
+          items={provinces}
+          selected={value}
+          onSelect={(p) => {
+            onChange(p.id);
+            setOpen(false);
+          }}
+        />
+      ) : null}
+    </View>
+  );
+}
+
 /** Hizmet alt kategorisi seçimi (çoklu, en çok `max`). */
 export function CategoryPicker({
   all,

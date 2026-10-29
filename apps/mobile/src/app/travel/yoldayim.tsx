@@ -1,16 +1,17 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter, type Href } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 import { Animated, Linking, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { openState, rankRoadsideStops, ROADSIDE_FEATURES, type RoadsideFeature, type RoadsideStop } from '@cityjoy/shared';
+import { distanceKm, openState, PROVINCE_CENTERS, rankRoadsideStops, ROADSIDE_FEATURES, type RoadsideFeature, type RoadsideStop } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { GlossyIcon } from '@/components/glossy-icon';
 import { RoundButton } from '@/components/hero-header';
 import { NightRoad, NIGHT_ROAD_HEIGHT } from '@/components/night-road';
+import { locationRepository as repo } from '@/lib/locations';
 import { useNearbyRoadside, useTrip } from '@/lib/trip';
 import { fonts, radius, spacing } from '@/theme/tokens';
 
@@ -46,6 +47,11 @@ export default function OnTheRoadScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const trip = useTrip();
+  // Planla'dan "Yola çık" ile gelindiyse varış ili: kalan yol (kuş uçuşu x 1,3, yaklaşık) ve varınca kutlama.
+  const { to } = useLocalSearchParams<{ to?: string }>();
+  const dest = to ? PROVINCE_CENTERS[to] : undefined;
+  const leftKm = dest && trip.pos ? distanceKm(trip.pos, dest) * 1.3 : null;
+  const arrived = leftKm !== null && leftKm < 15;
   const { list, failed, reload } = useNearbyRoadside(trip.pos);
   const [need, setNeed] = useState<string | null>(null);
   const [warned, setWarned] = useState(true);
@@ -110,6 +116,27 @@ export default function OnTheRoadScreen() {
             {stat('add-road', t('trip.distance'), t('trip.km', { km: kmText(trip.km, i18n.language) }))}
             {stat('explore', t('trip.heading'), compass)}
           </View>
+
+          {to && dest && leftKm !== null ? (
+            arrived ? (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push({ pathname: '/travel/city/[code]', params: { code: to } })}
+                style={({ pressed }) => [styles.arrived, { opacity: pressed ? 0.85 : 1 }]}>
+                <AppText style={styles.breakEmoji}>🎉</AppText>
+                <View style={styles.flex}>
+                  <AppText style={styles.breakTitle}>{t('trip.arrivedTitle', { city: repo.getProvince(to)?.name ?? '' })}</AppText>
+                  <AppText style={styles.breakText}>{t('trip.arrivedText')}</AppText>
+                </View>
+                <MaterialIcons name="arrow-forward" size={22} color={N.gold} />
+              </Pressable>
+            ) : (
+              <View style={[styles.dest, { borderColor: N.line }]}>
+                <MaterialIcons name="flag" size={20} color={N.teal} />
+                <AppText style={styles.destText}>{t('trip.toCity', { city: repo.getProvince(to)?.name ?? '', km: kmText(leftKm, i18n.language) })}</AppText>
+              </View>
+            )
+          ) : null}
 
           {warned ? (
             <View style={[styles.warn, { borderColor: N.line }]}>
@@ -343,6 +370,9 @@ const styles = StyleSheet.create({
   breakEmoji: { fontSize: 30 },
   breakTitle: { color: N.gold, fontFamily: fonts.heading, fontSize: 15 },
   breakText: { color: N.text, fontSize: 13, lineHeight: 18 },
+  dest: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.sm + 4, borderRadius: radius.lg, borderWidth: 1, backgroundColor: N.card },
+  destText: { flex: 1, color: N.text, fontFamily: fonts.heading, fontSize: 15 },
+  arrived: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.xl, backgroundColor: '#123F3A', borderWidth: 1, borderColor: N.teal },
   hero: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.xl, borderWidth: 1.5 },
   heroTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   badge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: radius.pill },

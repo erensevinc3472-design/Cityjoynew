@@ -56,3 +56,4 @@ export { createFirestoreMessageRepository, createMessageModeration, type Message
 export { createNotificationSettings, createNotificationTriggers } from './notifications';
 export { createFirestoreTravelRepository, createMunicipalTravel, createTravelAdmin, type TravelAdminKind } from './travel';
 export { createRoadsidePackAdmin, createRoadsidePackRepository, type RoadsidePackSummary } from './roadside';
+export { createTravelPrices } from './travel-prices';

@@ -43,4 +43,5 @@ export * from './media/video';
 export * from './messages/messages';
 export * from './notifications/notifications';
 export * from './travel/travel';
+export * from './travel/plan';
 export * from './travel/seed';
