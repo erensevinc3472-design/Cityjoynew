@@ -658,6 +658,10 @@ service cloud.firestore {
       return !(k in t) || (t[k] is list && t[k].size() <= 12);
     }
 
+    function fuelPrice(f, k) {
+      return !(k in f) || (f[k] is number && f[k] >= 1 && f[k] <= 500);
+    }
+
     // Uygulama ayarları (SOS süreleri): herkes okur, admin yazar.
     match /config/{id} {
       allow read: if true;
@@ -665,6 +669,20 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['liveMinutes', 'countdownSeconds', 'updatedBy', 'updatedAt'])
         && request.resource.data.liveMinutes is int && request.resource.data.liveMinutes >= 10 && request.resource.data.liveMinutes <= 120
         && request.resource.data.countdownSeconds is int && request.resource.data.countdownSeconds >= 3 && request.resource.data.countdownSeconds <= 10
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      // Seyahat > Planla tahmini ücretleri: akaryakıt (TL/litre, elektrikte TL/kWh) ve otobüs km ücreti; admin girer.
+      allow write: if isAdmin() && id == 'travelPrices'
+        && request.resource.data.keys().hasOnly(['fuel', 'busPerKm', 'month', 'updatedBy', 'updatedAt'])
+        && request.resource.data.fuel is map && request.resource.data.fuel.keys().hasOnly(['benzin', 'dizel', 'lpg', 'elektrik'])
+        && fuelPrice(request.resource.data.fuel, 'benzin') && fuelPrice(request.resource.data.fuel, 'dizel')
+        && fuelPrice(request.resource.data.fuel, 'lpg') && fuelPrice(request.resource.data.fuel, 'elektrik')
+        && (!('busPerKm' in request.resource.data) || (request.resource.data.busPerKm is map
+              && request.resource.data.busPerKm.keys().hasOnly(['min', 'max'])
+              && request.resource.data.busPerKm.min is number && request.resource.data.busPerKm.min >= 0.1
+              && request.resource.data.busPerKm.max is number && request.resource.data.busPerKm.max <= 20
+              && request.resource.data.busPerKm.min <= request.resource.data.busPerKm.max))
+        && request.resource.data.month is string && request.resource.data.month.matches('^20[0-9]{2}-(0[1-9]|1[0-2])$')
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
       // Keşfet yasaklı kelime listesi (madde 8): admin yönetir, uygulama okur.

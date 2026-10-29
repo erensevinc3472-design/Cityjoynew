@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { Link } from 'react-router';
 import {
   can,
   NEARBY_KINDS,
@@ -22,7 +23,7 @@ import { createTravelAdmin, type TravelAdminKind } from '@cityjoy/shared/firebas
 
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
-import { useSession } from '../lib/session';
+import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 import { LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
@@ -230,11 +231,12 @@ function AdminTravelPage() {
           <h1>{t('travel.title')}</h1>
           <p className="meta">{t('travel.intro')}</p>
         </div>
-        {canEdit ? (
+        {canEdit || isAdminUser(user) ? (
           <div className="actions">
-            <button className="btn secondary" disabled={busy} onClick={() => window.confirm(t('travel.seedConfirm')) && act(async () => t('travel.seeded', { count: await admin!.importSeed() }))}>
+            {isAdminUser(user) ? <Link className="btn secondary" to="/yolculuk-fiyatlari">{t('prices.title')}</Link> : null}
+            {canEdit ? <button className="btn secondary" disabled={busy} onClick={() => window.confirm(t('travel.seedConfirm')) && act(async () => t('travel.seeded', { count: await admin!.importSeed() }))}>
               {t('travel.seed')}
-            </button>
+            </button> : null}
           </div>
         ) : null}
       </header>

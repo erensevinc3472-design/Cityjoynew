@@ -1469,5 +1469,35 @@
     "uploadError": "Yüklenemedi. Admin olarak giriş yaptığınızdan emin olup tekrar deneyin.",
     "emptyFile": "Dosyada geçerli kayıt yok.",
     "badFile": "Dosya okunamadı: OSM betiğinin ürettiği JSON dosyasını seçin."
+  },
+  "prices": {
+    "title": "Yolculuk fiyatları",
+    "intro": "Seyahat > Planla ekranındaki tahmini ücretler: akaryakıt ve şehirlerarası otobüs. Ayda bir güncelleyin; uygulamada \"tahmini\" ve girilen ayla görünür. Boş bırakılan yakıt türünde ücret tahmini gösterilmez.",
+    "adminOnly": "Bu sayfayı yalnızca admin düzenler.",
+    "demo": "Örnek hesapta kaydetme kapalı.",
+    "updated": "Son güncelleme: {{date}}",
+    "loadError": "Fiyatlar okunamadı.",
+    "fuelTitle": "Akaryakıt (TL / litre)",
+    "fuel": {
+      "benzin": "Benzin",
+      "dizel": "Dizel (motorin)",
+      "lpg": "LPG",
+      "elektrik": "Elektrik (TL / kWh)"
+    },
+    "elektrikHint": "Şehirlerarası hızlı şarj istasyonlarının ortalama kWh fiyatı.",
+    "busTitle": "Şehirlerarası otobüs",
+    "busHint": "Kilometre başına kişi başı ücret aralığı (ör. 1,2 – 1,8 TL). Uygulama mesafeyle çarpıp \"≈ 320 – 480 TL\" gibi gösterir.",
+    "busMin": "En az (TL / km)",
+    "busMax": "En çok (TL / km)",
+    "month": "Geçerli ay",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor…",
+    "saved": "Fiyatlar kaydedildi.",
+    "saveError": "Kaydedilemedi. Admin olarak giriş yaptığınızdan emin olun.",
+    "errors": {
+      "fuel": "Akaryakıt fiyatları 1 ile 500 TL arasında olmalı.",
+      "busPerKm": "Otobüs km ücreti 0,1 ile 20 TL arasında olmalı, en az en çoktan büyük olamaz.",
+      "month": "Geçerli ayı seçin."
+    }
   }
 }

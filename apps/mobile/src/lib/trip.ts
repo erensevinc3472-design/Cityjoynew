@@ -23,8 +23,8 @@ const HEADING_KM = 0.15;
 const PACK_TTL = 24 * 60 * 60 * 1000;
 const packCache = new Map<string, { at: number; places: RoadsidePlace[] }>();
 
-async function osmPlaces(lat: number, lng: number): Promise<RoadsidePlace[]> {
-  const cells = roadsidePackCells(lat, lng);
+/** Hücrelerdeki OSM yerleri (paket önbellekten; eksik ya da bayat hücreler okunur). */
+export async function osmPlacesInCells(cells: string[]): Promise<RoadsidePlace[]> {
   const missing = cells.filter((c) => !packCache.has(c) || Date.now() - packCache.get(c)!.at > PACK_TTL);
   await Promise.all(
     missing.map(async (c) => {
@@ -34,6 +34,8 @@ async function osmPlaces(lat: number, lng: number): Promise<RoadsidePlace[]> {
   );
   return cells.flatMap((c) => packCache.get(c)?.places ?? []);
 }
+
+const osmPlaces = (lat: number, lng: number) => osmPlacesInCells(roadsidePackCells(lat, lng));
 
 /**
  * Yoldayım: yalnızca ekran açıkken konum izlenir (arka planda takip yok, PROJE.md 5.1 gizlilik). Gidilen yön, yolda
