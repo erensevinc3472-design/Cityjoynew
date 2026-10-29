@@ -576,6 +576,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin
   bağlantı bilgilerini içeriyor; Eren'e o projeyi kapatması önerildi.
 
+## Eren eve gelince hatırlat (29 Ekim 2026)
+
+Eren "eve geldim" dediğinde ilk iş bunları sırayla hatırlat ve adım adım yaptır:
+1. PR'ı birleştir: `claude/yoldayim` (Yoldayım ekranı). Birleşti mi diye `git log origin/main` ile bak.
+2. Bilgisayarda kuralları ve dizinleri yükle (yol üstü tesis kuralları + Yoldayım dizini; ikisi aynı komutla gider):
+   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`
+   Dizinin hazır olması birkaç dakika sürebilir.
+3. Telefonda dene: Seyahat > Yoldayım (konum izni ver), Profil > İşletme ekle > "Yol üstü tesis".
+Bitince bu bölümü sil.
+
 ## Sıradaki adım (Eren seçecek)
 
 00. Seyahat: Keşfet'e fotoğraf paylaşımı (telefonda sıkıştırma, Storage) ve ardından "{Şehir}'dan Kareler" (kutucukla, ek
