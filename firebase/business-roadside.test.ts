@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { geoPoint, type BusinessInput } from '@cityjoy/shared';
+import { geohashCellsAround, geoPoint, type BusinessInput } from '@cityjoy/shared';
 import { createFirestoreBusinessRepository } from '@cityjoy/shared/firebase';
 import { deleteField, doc, serverTimestamp, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -61,5 +61,18 @@ describe('yol üstü tesis', () => {
   it('yol üstü olmayan işletmede konum tutulmaz', async () => {
     const id = await biz('ayse').create('ayse', { ...tesis, type: 'hizmet', categoryIds: ['tesisatci'], roadside: undefined, geo: undefined, phone: '05321112233' });
     await assertFails(updateDoc(doc(fs('ayse'), 'businesses', id), { geo: geoPoint(40.2, 29.2), updatedAt: serverTimestamp() }));
+  });
+});
+
+describe('Yoldayım sorgusu', () => {
+  it('girişsiz kullanıcı hücredeki yayındaki tesisleri okur; gizli olan gelmez', async () => {
+    const a = await biz('ali').create('ali', tesis);
+    const b = await biz('veli').create('veli', { ...tesis, name: 'Uzak Tesis', phone: '02249998877', geo: geoPoint(39.9, 32.8) });
+    const c = await biz('can').create('can', { ...tesis, name: 'Kapalı Tesis', phone: '02247776655' });
+    await biz('can').setHidden(c, true);
+    const guest = createFirestoreBusinessRepository(env.unauthenticatedContext().firestore() as unknown as Firestore);
+    const found = await guest.listInCells(geohashCellsAround(40.1985, 29.2142));
+    expect(found.map((x) => x.id)).toEqual([a]);
+    expect(found.map((x) => x.id)).not.toContain(b);
   });
 });

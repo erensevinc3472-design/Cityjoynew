@@ -4,6 +4,7 @@ import {
   ageGroup,
   createLocationRepository,
   filterByName,
+  fillPlurals,
   foldForSearch,
   isRtl,
   LANGUAGES,
@@ -22,12 +23,20 @@ describe('diller', () => {
   it('her dil Türkçe ile aynı anahtarları taşır ve boş metin yoktur', () => {
     const base = keyPaths(translations.tr).sort();
     for (const { code } of LANGUAGES) {
-      expect(keyPaths(translations[code]).sort(), code).toEqual(base);
+      // Rusça / Arapça ek çoğul biçimleri (_few, _many…) yüklenirken _other'dan doldurulur.
+      expect(keyPaths(translations[code]).filter((p) => !/_(zero|two|few|many)$/.test(p)).sort(), code).toEqual(base);
       for (const path of base) {
         const value = path.split('.').reduce<any>((o, k) => o[k], translations[code]);
         expect(String(value).trim(), `${code}:${path}`).not.toBe('');
       }
     }
+  });
+
+  it('Rusça ve Arapçada eksik çoğul biçimleri _other ile doldurulur', () => {
+    expect(fillPlurals({ a: { n_one: 'bir', n_other: 'Sayı: {{count}}', n_few: 'az' } })).toEqual({
+      a: { n_one: 'bir', n_other: 'Sayı: {{count}}', n_few: 'az', n_zero: 'Sayı: {{count}}', n_two: 'Sayı: {{count}}', n_many: 'Sayı: {{count}}' },
+    });
+    expect((translations.ru.city as unknown as Record<string, string>).districtCount_few).toBe((translations.ru.city as unknown as Record<string, string>).districtCount_other);
   });
 
   it('yalnızca Arapça sağdan soladır', () => {

@@ -1577,5 +1577,64 @@
       "bebek-bakim": "Baby changing room",
       "hediyelik": "Gifts and souvenirs"
     }
+  },
+  "trip": {
+    "title": "On the road",
+    "call112": "Call 112",
+    "onRoad": "ON THE ROAD",
+    "distance": "TRAVELLED",
+    "heading": "HEADING",
+    "km": "{{km}} km",
+    "meters": "{{m}} m",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hoursMinutes": "{{h}} h {{m}} min",
+    "eta": "≈ {{time}}",
+    "dir": {
+      "n": "North",
+      "ne": "Northeast",
+      "e": "East",
+      "se": "Southeast",
+      "s": "South",
+      "sw": "Southwest",
+      "w": "West",
+      "nw": "Northwest"
+    },
+    "passengerNote": "Don't use while driving; let a passenger hold the phone. Have a good trip!",
+    "ask": "What do you need?",
+    "needs": {
+      "tuvalet": "Toilet",
+      "yakit": "Fuel",
+      "yemek": "Food",
+      "sarj": "Charging",
+      "mescit": "Prayer"
+    },
+    "tapAgain": "Tap again to see all facilities.",
+    "showingAll": "Showing all roadside facilities.",
+    "breakTitle": "{{time}} on the road, time for a break!",
+    "breakText": "{{name}} is {{km}} km ahead. A cup of tea and some fresh air will do you good.",
+    "deniedTitle": "Location permission needed",
+    "deniedText": "We use your location only while this screen is open, to find nearby facilities. Allow location for CityJoy in your phone settings and try again.",
+    "unavailableTitle": "Couldn't get your location",
+    "unavailableText": "The GPS signal may be weak. Try again in a moment.",
+    "retry": "Try again",
+    "scanning": "Scanning the road…",
+    "scanningText": "Looking for toilets, fuel, food and rest stops around you.",
+    "loadError": "Couldn't load facilities",
+    "loadErrorText": "Check your internet connection and try again.",
+    "none": "No registered facilities around here yet",
+    "noneForNeed": "No registered facility nearby for this need",
+    "noneText": "Roadside facilities will appear here as they join CityJoy. Own one? Add it now so travellers can find you.",
+    "addYours": "Add my facility",
+    "nearest": "NEAREST",
+    "where": {
+      "ileride": "Ahead",
+      "yakinda": "Right here",
+      "geride": "Behind you"
+    },
+    "open": "Open now",
+    "closed": "Closed now",
+    "details": "Details",
+    "footnote": "Distances are straight-line; times assume an average of {{kmh}} km/h."
   }
 }

@@ -1577,5 +1577,64 @@
       "bebek-bakim": "Bebek bakım odası",
       "hediyelik": "Hediyelik eşya"
     }
+  },
+  "trip": {
+    "title": "Yoldayım",
+    "call112": "112'yi ara",
+    "onRoad": "YOLDA",
+    "distance": "GİDİLEN",
+    "heading": "YÖN",
+    "km": "{{km}} km",
+    "meters": "{{m}} m",
+    "minutes_one": "{{count}} dk",
+    "minutes_other": "{{count}} dk",
+    "hoursMinutes": "{{h}} sa {{m}} dk",
+    "eta": "≈ {{time}}",
+    "dir": {
+      "n": "Kuzey",
+      "ne": "Kuzeydoğu",
+      "e": "Doğu",
+      "se": "Güneydoğu",
+      "s": "Güney",
+      "sw": "Güneybatı",
+      "w": "Batı",
+      "nw": "Kuzeybatı"
+    },
+    "passengerNote": "Sürüş sırasında kullanma; ekranı yanındaki yolcu kullansın. İyi yolculuklar!",
+    "ask": "Neye ihtiyacın var?",
+    "needs": {
+      "tuvalet": "Tuvalet",
+      "yakit": "Yakıt",
+      "yemek": "Yemek",
+      "sarj": "Şarj",
+      "mescit": "Mescit"
+    },
+    "tapAgain": "Tekrar dokunursan tüm tesisler görünür.",
+    "showingAll": "Tüm yol üstü tesisler gösteriliyor.",
+    "breakTitle": "{{time}} oldu, mola vakti!",
+    "breakText": "{{km}} km ileride {{name}} var. Bir çay, biraz hava iyi gelir.",
+    "deniedTitle": "Konum izni gerekiyor",
+    "deniedText": "Yakındaki tesisleri bulmak için konumunu yalnızca bu ekran açıkken kullanırız. Telefon ayarlarından CityJoy'a konum izni verip tekrar dene.",
+    "unavailableTitle": "Konum alınamadı",
+    "unavailableText": "GPS sinyali zayıf olabilir. Biraz sonra tekrar dene.",
+    "retry": "Tekrar dene",
+    "scanning": "Yolu tarıyorum…",
+    "scanningText": "Çevrendeki tuvalet, yakıt, yemek ve mola yerlerine bakıyorum.",
+    "loadError": "Tesisler yüklenemedi",
+    "loadErrorText": "İnternet bağlantını kontrol edip tekrar dene.",
+    "none": "Bu çevrede henüz kayıtlı tesis yok",
+    "noneForNeed": "Bu ihtiyaç için yakında kayıtlı tesis yok",
+    "noneText": "Yol üstü tesisler CityJoy'a katıldıkça burada görünecek. Bir tesisin mi var? Hemen ekle, yolcular seni bulsun.",
+    "addYours": "Tesisimi ekle",
+    "nearest": "EN YAKIN",
+    "where": {
+      "ileride": "İleride",
+      "yakinda": "Hemen yanında",
+      "geride": "Geride kaldı"
+    },
+    "open": "Şu an açık",
+    "closed": "Şu an kapalı",
+    "details": "Bilgiler",
+    "footnote": "Mesafeler kuş uçuşudur; süre ortalama {{kmh}} km/s ile tahmin edilir."
   }
 }

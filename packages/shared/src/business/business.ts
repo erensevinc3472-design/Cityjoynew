@@ -103,6 +103,62 @@ export function geoPoint(lat: number, lng: number): GeoPoint {
   return { lat: round(lat), lng: round(lng), geohash: encodeGeohash(lat, lng) };
 }
 
+/**
+ * Bir noktanın çevresindeki geohash hücreleri (kendisi ve 8 komşusu, tekrarsız). 4 harfte hücre yaklaşık 39 x 20 km:
+ * yolcunun 20-40 km çevresi 9 sorguyla okunur.
+ */
+export function geohashCellsAround(lat: number, lng: number, precision = 4): string[] {
+  const latBits = Math.floor((5 * precision) / 2);
+  const lngBits = Math.ceil((5 * precision) / 2);
+  const dLat = 180 / 2 ** latBits;
+  const dLng = 360 / 2 ** lngBits;
+  const out = new Set<string>();
+  for (const a of [-1, 0, 1]) for (const o of [-1, 0, 1]) out.add(encodeGeohash(Math.max(-89.9, Math.min(89.9, lat + a * dLat)), lng + o * dLng, precision));
+  return [...out];
+}
+
+/** a'dan b'ye pusula yönü (derece, 0 = kuzey, saat yönünde). */
+export function bearingDeg(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const rad = (x: number) => (x * Math.PI) / 180;
+  const y = Math.sin(rad(b.lng - a.lng)) * Math.cos(rad(b.lat));
+  const x = Math.cos(rad(a.lat)) * Math.sin(rad(b.lat)) - Math.sin(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.cos(rad(b.lng - a.lng));
+  return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+}
+
+export interface RoadsideStop {
+  business: Business;
+  km: number;
+  /** Gidiş yönüne göre: ileride, yakında (2 km içinde, yön fark etmez) ya da geride. Yön bilinmiyorsa "yakinda" / "ileride". */
+  where: 'ileride' | 'yakinda' | 'geride';
+}
+
+/**
+ * Yoldayım: yol üstü tesisleri ihtiyaca göre süzer ve sıralar. Yön biliniyorsa (heading) gidilen yönün ±70° içindekiler
+ * "ileride"; 2 km içindekiler her zaman gösterilir; geride kalanlar listenin sonuna gider. maxKm dışındakiler atılır.
+ */
+export function rankRoadsideStops(
+  list: readonly Business[],
+  at: { lat: number; lng: number },
+  opts: { need?: readonly RoadsideFeature[]; heading?: number | null; maxKm?: number } = {},
+): RoadsideStop[] {
+  const maxKm = opts.maxKm ?? 40;
+  const stops: RoadsideStop[] = [];
+  for (const b of list) {
+    if (b.status !== 'yayinda' || !b.geo || !b.roadside?.length) continue;
+    if (opts.need?.length && !opts.need.some((n) => b.roadside!.includes(n))) continue;
+    const km = distanceKm(at, b.geo);
+    if (km > maxKm) continue;
+    let where: RoadsideStop['where'] = km <= 2 ? 'yakinda' : 'ileride';
+    if (km > 2 && opts.heading != null) {
+      const diff = Math.abs(((bearingDeg(at, b.geo) - opts.heading + 540) % 360) - 180);
+      if (diff > 70) where = 'geride';
+    }
+    stops.push({ business: b, km, where });
+  }
+  const order = { yakinda: 0, ileride: 0, geride: 1 } as const;
+  return stops.sort((x, y) => order[x.where] - order[y.where] || x.km - y.km);
+}
+
 /** İki nokta arası kuş uçuşu km (haversine). */
 export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const rad = (x: number) => (x * Math.PI) / 180;
@@ -388,6 +444,8 @@ export interface BusinessRepository {
   listByCategory(provinceCode: string, categoryId: string): Promise<Business[]>;
   /** Bir ilde, bir türdeki yayındaki işletmeler (Cafe ve Restoran için yeme-içme; en çok 200). */
   listByType(provinceCode: string, type: BusinessType): Promise<Business[]>;
+  /** Yoldayım: geohash hücrelerindeki (önek) yayındaki yol üstü tesisler; hücre başına en çok 60. */
+  listInCells(cells: string[]): Promise<Business[]>;
   /** Bir ildeki yayındaki işletmeler (panelde Şehir Vitrini seçimi için; en çok 300). */
   listInProvince(provinceCode: string): Promise<Business[]>;
   /** Ara > İşletmeler: ildeki yayındaki işletmelerden adının bir kelimesi anahtarla başlayanlar (en çok 30). */

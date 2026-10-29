@@ -5,6 +5,8 @@ import {
   distanceKm,
   encodeGeohash,
   geoPoint,
+  geohashCellsAround,
+  rankRoadsideStops,
   openState,
   postModeFor,
   rankBusinesses,
@@ -155,5 +157,38 @@ describe('yol üstü tesis', () => {
     expect(c.roadside).toEqual(['tuvalet', 'mescit']);
     expect(c.geo).toEqual(geoPoint(40.1234567, 29.7654321));
     expect(cleanBusinessInput(input({ geo: geoPoint(40.2, 29.1) })).geo).toBeUndefined();
+  });
+});
+
+describe('Yoldayım sıralaması', () => {
+  // Bursa'dan doğuya (İnegöl yönüne) giden yolcu.
+  const at = { lat: 40.19, lng: 29.2 };
+  const tesis = (id: string, lat: number, lng: number, roadside: Business['roadside']) =>
+    biz({ id, type: 'yol-ustu', roadside, geo: geoPoint(lat, lng) });
+  const list = [
+    tesis('dogu-10km', 40.19, 29.318, ['tuvalet', 'akaryakit']),
+    tesis('bati-8km', 40.19, 29.106, ['tuvalet']),
+    tesis('yanibasi', 40.195, 29.205, ['mescit']),
+    tesis('uzak', 40.19, 29.9, ['tuvalet']),
+    biz({ id: 'konumsuz' }),
+  ];
+
+  it('gidilen yöndekiler önce, geride kalanlar sonda, uzaktakiler yok', () => {
+    const r = rankRoadsideStops(list, at, { heading: 90 });
+    expect(r.map((s) => [s.business.id, s.where])).toEqual([
+      ['yanibasi', 'yakinda'],
+      ['dogu-10km', 'ileride'],
+      ['bati-8km', 'geride'],
+    ]);
+  });
+
+  it('ihtiyaca göre süzer; yön yoksa mesafeye göre', () => {
+    expect(rankRoadsideStops(list, at, { need: ['tuvalet'] }).map((s) => s.business.id)).toEqual(['bati-8km', 'dogu-10km']);
+  });
+
+  it('çevre hücreleri 9 tane ve kendi hücresini içerir', () => {
+    const cells = geohashCellsAround(at.lat, at.lng);
+    expect(cells).toHaveLength(9);
+    expect(cells).toContain(geoPoint(at.lat, at.lng).geohash.slice(0, 4));
   });
 });

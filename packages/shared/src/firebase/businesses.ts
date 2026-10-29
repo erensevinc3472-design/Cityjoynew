@@ -66,6 +66,17 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
     listByCategory: (provinceCode, categoryId) =>
       list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), where('categoryIds', 'array-contains', categoryId), limit(100)),
 
+    async listInCells(cells) {
+      const lists = await Promise.all(
+        [...new Set(cells)].map((cell) =>
+          list(where('status', '==', 'yayinda'), where('geo.geohash', '>=', cell), where('geo.geohash', '<', `${cell}~`), limit(60)),
+        ),
+      );
+      const seen = new Map<string, Business>();
+      for (const b of lists.flat()) seen.set(b.id, b);
+      return [...seen.values()];
+    },
+
     listByType: (provinceCode, type) =>
       list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), where('type', '==', type), limit(200)),
 
