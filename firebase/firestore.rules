@@ -964,6 +964,20 @@ service cloud.firestore {
         && (resource == null || resource.data.provinceCode == request.resource.data.provinceCode);
       allow delete: if canEditGuide(resource.data.provinceCode);
     }
+    // Yoldayım: OpenStreetMap'ten hazırlanan yol üstü yerler (akaryakıt, şarj, dinlenme tesisi), 3 harflik geohash
+    // hücresi başına bir paket. Herkes okur (girişsiz de); yalnızca admin yükler.
+    match /roadsidePacks/{cell} {
+      allow read: if true;
+      allow create, update: if isAdmin() && cell.matches('^[0-9b-hjkmnp-z]{3}$')
+        && request.resource.data.keys().hasOnly(['cell', 'items', 'count', 'source', 'updatedAt', 'updatedBy'])
+        && request.resource.data.cell == cell
+        && request.resource.data.items is list && request.resource.data.items.size() <= 2500
+        && request.resource.data.count == request.resource.data.items.size()
+        && request.resource.data.source == 'osm'
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
+    }
     match /cityGuidePacks/{id} {
       allow read: if true;
       allow create, update: if canEditGuide(request.resource.data.provinceCode)

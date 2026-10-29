@@ -1635,6 +1635,8 @@
     "open": "Şu an açık",
     "closed": "Şu an kapalı",
     "details": "Bilgiler",
-    "footnote": "Mesafeler kuş uçuşudur; süre ortalama {{kmh}} km/s ile tahmin edilir."
+    "footnote": "Mesafeler kuş uçuşudur; süre ortalama {{kmh}} km/s ile tahmin edilir.",
+    "osmNote": "OSM kaydı, doğrulanmadı",
+    "osmCredit": "Bazı yerler © OpenStreetMap katkıda bulunanlar."
   }
 }

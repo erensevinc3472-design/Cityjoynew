@@ -1635,6 +1635,8 @@
     "open": "Open now",
     "closed": "Closed now",
     "details": "Details",
-    "footnote": "Distances are straight-line; times assume an average of {{kmh}} km/h."
+    "footnote": "Distances are straight-line; times assume an average of {{kmh}} km/h.",
+    "osmNote": "OSM record, unverified",
+    "osmCredit": "Some places © OpenStreetMap contributors."
   }
 }

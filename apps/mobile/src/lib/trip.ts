@@ -1,8 +1,16 @@
 import * as Location from 'expo-location';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { bearingDeg, distanceKm, geohashCellsAround, type Business } from '@cityjoy/shared';
+import {
+  bearingDeg,
+  distanceKm,
+  geohashCellsAround,
+  mergePlaces,
+  placeOfBusiness,
+  roadsidePackCells,
+  type RoadsidePlace,
+} from '@cityjoy/shared';
 
-import { businessRepository } from './services';
+import { businessRepository, roadsidePackRepository } from './services';
 
 type Point = { lat: number; lng: number };
 export type TripState = 'waiting' | 'ready' | 'denied' | 'unavailable';
@@ -11,6 +19,21 @@ export type TripState = 'waiting' | 'ready' | 'denied' | 'unavailable';
 const REFRESH_KM = 5;
 /** Yön, en az bu kadar aralıklı iki konumdan hesaplanır (yerinde sayarken yön oynamasın). */
 const HEADING_KM = 0.15;
+/** OSM paketleri seyrek değişir: hücre başına bir gün saklanır (aynı bölgede tekrar okunmaz). */
+const PACK_TTL = 24 * 60 * 60 * 1000;
+const packCache = new Map<string, { at: number; places: RoadsidePlace[] }>();
+
+async function osmPlaces(lat: number, lng: number): Promise<RoadsidePlace[]> {
+  const cells = roadsidePackCells(lat, lng);
+  const missing = cells.filter((c) => !packCache.has(c) || Date.now() - packCache.get(c)!.at > PACK_TTL);
+  await Promise.all(
+    missing.map(async (c) => {
+      const places = await roadsidePackRepository.getCells([c]);
+      packCache.set(c, { at: Date.now(), places });
+    }),
+  );
+  return cells.flatMap((c) => packCache.get(c)?.places ?? []);
+}
 
 /**
  * Yoldayım: yalnızca ekran açıkken konum izlenir (arka planda takip yok, PROJE.md 5.1 gizlilik). Gidilen yön, yolda
@@ -63,9 +86,12 @@ export function useTrip() {
   return { state, pos, heading, km, startedAt, retry: start };
 }
 
-/** Yakındaki yol üstü tesisler; yolcu 5 km ilerleyince yeniden okunur. */
+/**
+ * Yakındaki yol üstü yerler: CityJoy'a kayıtlı tesisler ve OSM yerleri (aynı yerde ikisi varsa işletme). Yolcu 5 km
+ * ilerleyince yeniden okunur; OSM paketi bir gün saklanır. Biri okunamazsa diğeriyle devam edilir.
+ */
 export function useNearbyRoadside(pos: Point | null) {
-  const [list, setList] = useState<Business[] | null>(null);
+  const [list, setList] = useState<RoadsidePlace[] | null>(null);
   const [failed, setFailed] = useState(false);
   const at = useRef<Point | null>(null);
 
@@ -73,7 +99,10 @@ export function useNearbyRoadside(pos: Point | null) {
     at.current = p;
     setFailed(false);
     try {
-      setList(await businessRepository.listInCells(geohashCellsAround(p.lat, p.lng)));
+      const [shops, osm] = await Promise.allSettled([businessRepository.listInCells(geohashCellsAround(p.lat, p.lng)), osmPlaces(p.lat, p.lng)]);
+      if (shops.status === 'rejected' && osm.status === 'rejected') throw shops.reason;
+      const own = shops.status === 'fulfilled' ? shops.value.map(placeOfBusiness).filter((x): x is RoadsidePlace => !!x) : [];
+      setList(mergePlaces(own, osm.status === 'fulfilled' ? osm.value : []));
     } catch {
       setFailed(true);
       setList((x) => x ?? []);

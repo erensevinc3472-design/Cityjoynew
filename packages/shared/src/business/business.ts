@@ -125,40 +125,6 @@ export function bearingDeg(a: { lat: number; lng: number }, b: { lat: number; ln
   return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
 }
 
-export interface RoadsideStop {
-  business: Business;
-  km: number;
-  /** Gidiş yönüne göre: ileride, yakında (2 km içinde, yön fark etmez) ya da geride. Yön bilinmiyorsa "yakinda" / "ileride". */
-  where: 'ileride' | 'yakinda' | 'geride';
-}
-
-/**
- * Yoldayım: yol üstü tesisleri ihtiyaca göre süzer ve sıralar. Yön biliniyorsa (heading) gidilen yönün ±70° içindekiler
- * "ileride"; 2 km içindekiler her zaman gösterilir; geride kalanlar listenin sonuna gider. maxKm dışındakiler atılır.
- */
-export function rankRoadsideStops(
-  list: readonly Business[],
-  at: { lat: number; lng: number },
-  opts: { need?: readonly RoadsideFeature[]; heading?: number | null; maxKm?: number } = {},
-): RoadsideStop[] {
-  const maxKm = opts.maxKm ?? 40;
-  const stops: RoadsideStop[] = [];
-  for (const b of list) {
-    if (b.status !== 'yayinda' || !b.geo || !b.roadside?.length) continue;
-    if (opts.need?.length && !opts.need.some((n) => b.roadside!.includes(n))) continue;
-    const km = distanceKm(at, b.geo);
-    if (km > maxKm) continue;
-    let where: RoadsideStop['where'] = km <= 2 ? 'yakinda' : 'ileride';
-    if (km > 2 && opts.heading != null) {
-      const diff = Math.abs(((bearingDeg(at, b.geo) - opts.heading + 540) % 360) - 180);
-      if (diff > 70) where = 'geride';
-    }
-    stops.push({ business: b, km, where });
-  }
-  const order = { yakinda: 0, ileride: 0, geride: 1 } as const;
-  return stops.sort((x, y) => order[x.where] - order[y.where] || x.km - y.km);
-}
-
 /** İki nokta arası kuş uçuşu km (haversine). */
 export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const rad = (x: number) => (x * Math.PI) / 180;

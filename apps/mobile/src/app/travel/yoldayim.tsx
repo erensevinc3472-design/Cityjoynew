@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState, type ComponentProps } from 'react
 import { Animated, Linking, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { openState, rankRoadsideStops, ROADSIDE_FEATURES, isRoadsideKind, type RoadsideFeature, type RoadsideStop } from '@cityjoy/shared';
+import { openState, rankRoadsideStops, ROADSIDE_FEATURES, type RoadsideFeature, type RoadsideStop } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { GlossyIcon } from '@/components/glossy-icon';
@@ -73,10 +73,11 @@ export default function OnTheRoadScreen() {
   };
   const compass = trip.heading == null ? '–' : t(`trip.dir.${['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'][Math.round(trip.heading / 45) % 8]}`);
   const directions = (s: RoadsideStop) => {
-    const at = `${s.business.geo!.lat},${s.business.geo!.lng}`;
+    const at = `${s.place.geo.lat},${s.place.geo.lng}`;
     Linking.openURL(Platform.OS === 'ios' ? `http://maps.apple.com/?daddr=${at}` : `https://www.google.com/maps/dir/?api=1&destination=${at}`).catch(() => {});
   };
-  const open = (s: RoadsideStop) => router.push({ pathname: '/business/[id]', params: { id: s.business.id } });
+  // Kayıtlı işletmenin sayfası açılır; OSM yerinin sayfası yok, yol tarifi açılır.
+  const open = (s: RoadsideStop) => (s.place.business ? router.push({ pathname: '/business/[id]', params: { id: s.place.business.id } }) : directions(s));
 
   return (
     <View style={[styles.root, { backgroundColor: N.bg }]}>
@@ -133,7 +134,7 @@ export default function OnTheRoadScreen() {
               <AppText style={styles.breakEmoji}>☕</AppText>
               <View style={styles.flex}>
                 <AppText style={styles.breakTitle}>{t('trip.breakTitle', { time: duration(elapsed) })}</AppText>
-                <AppText style={styles.breakText}>{t('trip.breakText', { name: breakStop.business.name, km: kmText(breakStop.km, i18n.language) })}</AppText>
+                <AppText style={styles.breakText}>{t('trip.breakText', { name: breakStop.place.name || t(`roadside.kinds.${breakStop.place.kind ?? 'yol-dinlenme-tesisi'}`), km: kmText(breakStop.km, i18n.language) })}</AppText>
               </View>
             </Pressable>
           ) : null}
@@ -162,11 +163,11 @@ export default function OnTheRoadScreen() {
             <>
               <StopHero stop={stops[0]} onDirections={() => directions(stops[0])} onOpen={() => open(stops[0])} />
               {stops.slice(1, 12).map((s) => (
-                <StopRow key={s.business.id} stop={s} onDirections={() => directions(s)} onOpen={() => open(s)} />
+                <StopRow key={s.place.id} stop={s} onDirections={() => directions(s)} onOpen={() => open(s)} />
               ))}
             </>
           )}
-          <AppText style={[styles.footnote, { color: N.muted }]}>{t('trip.footnote', { kmh: AVG_KMH })}</AppText>
+          <AppText style={[styles.footnote, { color: N.muted }]}>{t('trip.footnote', { kmh: AVG_KMH })} {t('trip.osmCredit')}</AppText>
         </View>
       </ScrollView>
     </View>
@@ -205,11 +206,15 @@ function NeedButton({ label, icon, colors, active, onPress }: { label: string; i
 
 function useStopText(s: RoadsideStop) {
   const { t, i18n } = useTranslation();
-  const b = s.business;
+  const p = s.place;
   const minutes = Math.max(1, Math.round((s.km / AVG_KMH) * 60));
-  const kind = b.categoryIds.filter(isRoadsideKind).map((k) => t(`roadside.kinds.${k}`))[0];
-  const state = openState(b, new Date());
+  const kind = p.kind ? t(`roadside.kinds.${p.kind}`) : undefined;
+  const state = p.business ? openState(p.business, new Date()) : null;
   return {
+    // Adı olmayan OSM yerinde çeşidi yazılır ("Akaryakıt istasyonu").
+    name: p.name || kind || t('roadside.title'),
+    // OSM kaydı: markası ve "doğrulanmadı" notu.
+    sub: [p.name ? kind : undefined, p.brand, p.source === 'osm' ? t('trip.osmNote') : undefined],
     km: s.km < 1 ? t('trip.meters', { m: Math.round(s.km * 100) * 10 }) : t('trip.km', { km: kmText(s.km, i18n.language) }),
     eta: minutes < 60 ? t('trip.eta', { time: t('trip.minutes', { count: minutes }) }) : t('trip.eta', { time: t('trip.hoursMinutes', { h: Math.floor(minutes / 60), m: minutes % 60 }) }),
     where: t(`trip.where.${s.where}`),
@@ -251,20 +256,22 @@ function StopHero({ stop, onDirections, onOpen }: { stop: RoadsideStop; onDirect
         <MaterialIcons name="near-me" size={34} color={N.gold} />
       </View>
       <Pressable accessibilityRole="button" onPress={onOpen}>
-        <AppText style={styles.heroName} numberOfLines={2}>{stop.business.name}</AppText>
+        <AppText style={styles.heroName} numberOfLines={2}>{x.name}</AppText>
         <AppText style={[styles.meta, { color: N.muted }]} numberOfLines={1}>
-          {[x.kind, x.open].filter(Boolean).join(' · ')}
+          {[...x.sub, x.open].filter(Boolean).join(' · ')}
         </AppText>
       </Pressable>
-      <Features list={stop.business.roadside ?? []} size={18} />
+      <Features list={stop.place.roadside} size={18} />
       <View style={styles.heroButtons}>
         <Pressable accessibilityRole="button" onPress={onDirections} style={({ pressed }) => [styles.go, { opacity: pressed ? 0.85 : 1 }]}>
           <MaterialIcons name="directions" size={20} color={N.ink} />
           <AppText style={styles.goText}>{t('roadside.directions')}</AppText>
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={onOpen} style={({ pressed }) => [styles.more, { opacity: pressed ? 0.7 : 1 }]}>
-          <AppText style={styles.moreText}>{t('trip.details')}</AppText>
-        </Pressable>
+        {stop.place.business ? (
+          <Pressable accessibilityRole="button" onPress={onOpen} style={({ pressed }) => [styles.more, { opacity: pressed ? 0.7 : 1 }]}>
+            <AppText style={styles.moreText}>{t('trip.details')}</AppText>
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );
@@ -282,11 +289,12 @@ function StopRow({ stop, onDirections, onOpen }: { stop: RoadsideStop; onDirecti
           <AppText style={[styles.rowWhere, { color: stop.where === 'geride' ? N.muted : N.teal }]}>{x.where}</AppText>
         </View>
         <View style={styles.flex}>
-          <AppText style={styles.rowName} numberOfLines={1}>{stop.business.name}</AppText>
-          <Features list={stop.business.roadside ?? []} size={14} />
+          <AppText style={styles.rowName} numberOfLines={1}>{x.name}</AppText>
+          {stop.place.roadside.length ? <Features list={stop.place.roadside} size={14} /> : null}
+          {x.sub.some(Boolean) ? <AppText style={[styles.rowSub, { color: N.muted }]} numberOfLines={1}>{x.sub.filter(Boolean).join(' · ')}</AppText> : null}
         </View>
       </Pressable>
-      <Pressable accessibilityRole="button" accessibilityLabel={`${t('roadside.directions')}: ${stop.business.name}`} hitSlop={6} onPress={onDirections} style={styles.rowGo}>
+      <Pressable accessibilityRole="button" accessibilityLabel={`${t('roadside.directions')}: ${x.name}`} hitSlop={6} onPress={onDirections} style={styles.rowGo}>
         <MaterialIcons name="directions" size={22} color={N.gold} />
       </Pressable>
     </View>
@@ -357,6 +365,7 @@ const styles = StyleSheet.create({
   rowKm: { width: 66, alignItems: 'center' },
   rowKmText: { color: N.text, fontFamily: fonts.heading, fontSize: 17 },
   rowWhere: { fontSize: 10, fontFamily: fonts.bodySemi },
+  rowSub: { fontSize: 11, marginTop: 2 },
   rowName: { color: N.text, fontFamily: fonts.bodySemi, fontSize: 14, marginBottom: 4 },
   rowGo: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   empty: { alignItems: 'center', gap: spacing.sm, padding: spacing.lg, borderRadius: radius.xl, borderWidth: 1 },

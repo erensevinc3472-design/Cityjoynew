@@ -151,6 +151,7 @@ export function CityGuidePage() {
         </div>
         <div className="actions">
           <Link className="btn secondary" to="/sehir-vitrini">{t('guide.showcase')}</Link>
+          {admin ? <Link className="btn secondary" to="/yol-ustu-verisi">{t('guide.roadside')}</Link> : null}
           <a className="btn secondary" href="./benim-sehrim-sablon.xlsx" download>{t('guide.downloadTemplate')}</a>
           {!user?.isDemo && editable.length ? (
             <label className="btn">

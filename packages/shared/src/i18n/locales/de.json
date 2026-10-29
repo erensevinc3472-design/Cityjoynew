@@ -1635,6 +1635,8 @@
     "open": "Jetzt geöffnet",
     "closed": "Jetzt geschlossen",
     "details": "Details",
-    "footnote": "Luftlinie; Zeiten bei durchschnittlich {{kmh}} km/h geschätzt."
+    "footnote": "Luftlinie; Zeiten bei durchschnittlich {{kmh}} km/h geschätzt.",
+    "osmNote": "OSM-Eintrag, nicht geprüft",
+    "osmCredit": "Einige Orte © OpenStreetMap-Mitwirkende."
   }
 }
