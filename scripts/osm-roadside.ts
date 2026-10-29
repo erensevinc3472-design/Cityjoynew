@@ -1,14 +1,15 @@
 /**
  * OpenStreetMap'ten Yoldayım'ın Türkiye yol üstü verisi (PROJE.md 5.2, Yol Arkadaşı): akaryakıt istasyonları, elektrikli
- * araç şarj noktaları, dinlenme tesisleri ve mola yerleri. Önce tüm Türkiye tek sorguyla denenir (il il sorgu il başına
- * birkaç dakika sürüyor); olmazsa il il sorgulanır. Sonuç diske önbelleklenir. Olanaklar yalnızca OSM
- * etiketlerinden çıkar, bilinmeyen eklenmez (sürprizsiz bilgi ilkesi).
+ * araç şarj noktaları, dinlenme tesisleri ve mola yerleri. İl il sorgulanır, sunucular sırayla denenir; her il diske
+ * önbelleklenir, yarıda kalırsa kaldığı ilden devam eder. "--ulke" ile önce tüm Türkiye tek sorguyla denenir (ücretsiz
+ * sunucular çoğu zaman kaldırmıyor). Olanaklar yalnızca OSM etiketlerinden çıkar, bilinmeyen eklenmez (sürprizsiz bilgi).
  *
  * Kullanım: npx vite-node scripts/osm-roadside.ts
  * Çıktı: veri-denemesi/yol-ustu-tr.json (Panel > Şehir rehberi > Yol üstü verisi ile yüklenir; masaüstüne de kopyalanır).
  * Lisans (ODbL): uygulamada "© OpenStreetMap katkıda bulunanlar" yazılır. Uygulama Overpass'e hiç gitmez (maliyet ilkesi).
  */
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import https from 'node:https';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -26,7 +27,14 @@ interface OsmElement {
   tags?: Tags;
 }
 
-const ENDPOINTS = ['https://overpass-api.de/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter'];
+const ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.private.coffee/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+];
+/** Ülke sorgusu yalnızca istenirse ("--ulke"): ücretsiz sunucular çoğu zaman kaldırmıyor. */
+const TRY_COUNTRY = process.argv.includes('--ulke');
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const COUNTRY = `[out:json][timeout:900][maxsize:1073741824];
@@ -47,18 +55,40 @@ area["ISO3166-2"="TR-${code}"]->.il;
 );
 out center tags;`;
 
+/**
+ * Uzun süren ülke sorgusu için: fetch'in 5 dakikalık yanıt bekleme sınırı yok (node:https), yalnızca 16 dakikalık
+ * genel süre sınırı var.
+ */
+function post(url: string, body: string): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      url,
+      { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'CityJoy-yol-ustu/0.1 (veri hazirlama)' } },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c: Buffer) => chunks.push(c));
+        res.on('end', () => {
+          if (res.statusCode !== 200) return reject(new Error(String(res.statusCode)));
+          try {
+            resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')));
+          } catch (e) {
+            reject(e as Error);
+          }
+        });
+        res.on('error', reject);
+      },
+    );
+    req.setTimeout(TRY_COUNTRY ? 960_000 : 300_000, () => req.destroy(new Error('süre doldu')));
+    req.on('error', reject);
+    req.end(body);
+  });
+}
+
 async function overpass(q: string): Promise<OsmElement[]> {
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 6; attempt++) {
     for (const url of ENDPOINTS) {
       try {
-        const r = await fetch(url, {
-          method: 'POST',
-          body: new URLSearchParams({ data: q }),
-          headers: { 'User-Agent': 'CityJoy-yol-ustu/0.1 (veri hazirlama)' },
-          signal: AbortSignal.timeout(950_000),
-        });
-        if (!r.ok) throw new Error(`${r.status}`);
-        return ((await r.json()) as { elements: OsmElement[] }).elements;
+        return ((await post(url, new URLSearchParams({ data: q }).toString())) as { elements: OsmElement[] }).elements;
       } catch (e) {
         console.warn(`  ${new URL(url).host} olmadı (${(e as Error).message})`);
       }
@@ -124,11 +154,13 @@ function toPlace(e: OsmElement): PackedPlace | null {
 
 const all = new Map<string, PackedPlace>();
 let country: OsmElement[] | null = null;
-try {
-  process.stdout.write('Türkiye tek sorgu… ');
-  country = await cached('TR', COUNTRY);
-} catch {
-  console.log('olmadı, il il devam');
+if (TRY_COUNTRY) {
+  try {
+    process.stdout.write('Türkiye tek sorgu… ');
+    country = await cached('TR', COUNTRY);
+  } catch {
+    console.log('olmadı, il il devam');
+  }
 }
 for (const p of country ? [{ code: 'TR', name: 'Türkiye' }] : provinces) {
   process.stdout.write(`${p.code} ${p.name}… `);
