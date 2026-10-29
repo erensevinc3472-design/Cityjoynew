@@ -1415,5 +1415,36 @@
     },
     "orderNote": "Sortiert nach Einwohnerzahl der Bezirke (TÜİK).",
     "orderNoteYear": "Sortiert nach Einwohnerzahl der Bezirke (TÜİK, {{year}})."
+  },
+  "food": {
+    "kinds": {
+      "yemek-kafe": "Café",
+      "yemek-restoran": "Restaurant",
+      "yemek-kahvalti": "Frühstück",
+      "yemek-kebap": "Kebab und Grill",
+      "yemek-pide-lahmacun": "Pide und Lahmacun",
+      "yemek-ev-yemekleri": "Hausmannskost",
+      "yemek-balik": "Fisch",
+      "yemek-tatli": "Desserts und Konditorei",
+      "yemek-fast-food": "Fast Food"
+    },
+    "kindsHint": "Wähle die Art deines Lokals (höchstens 5). Darüber wirst du unter Meine Stadt > Cafés und Restaurants gefunden.",
+    "openNow": "Jetzt geöffnet",
+    "all": "Alle",
+    "count_one": "{{count}} Lokal",
+    "count_other": "{{count}} Lokale",
+    "noMatch": "Keine Lokale für diese Auswahl.",
+    "empty": "In {{province}} sind noch keine Cafés oder Restaurants eingetragen. Inhaber können sich kostenlos unter Mein Unternehmen eintragen.",
+    "inviteTitle": "Dein Lokal hier zeigen",
+    "inviteBody": "Du hast ein Café oder Restaurant? Trag dich kostenlos unter Mein Unternehmen ein, dann erscheinen Speisekarte, Öffnungszeiten und Bewertungen hier.",
+    "inviteCta": "Unternehmen eintragen"
+  },
+  "showcase": {
+    "title": "{{city}} Schaufenster",
+    "weekly": "Auswahl der Woche",
+    "issue": "Ausgabe {{n}}",
+    "editorsPick": "Redaktionstipp",
+    "archive": "Frühere Ausgaben",
+    "empty": "Die erste Ausgabe des {{city}} Schaufensters ist in Arbeit. Jede Woche das Beste der Stadt."
   }
 }

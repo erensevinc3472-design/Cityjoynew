@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import {
   averageRating,
   findCategory,
+  isFoodKind,
   isPostListed,
   localized,
   openState,
@@ -97,7 +98,10 @@ export default function BusinessScreen() {
   const verified = b.verification.status === 'dogrulandi';
   const district = locationRepository.getDistrict(b.location.districtId)?.name;
   const province = locationRepository.getProvince(b.location.provinceCode)?.name;
-  const services = b.categoryIds.map((cid) => findCategory(all, cid)).filter(Boolean).map((cat) => localized(cat!.names, lang));
+  const services = [
+    ...b.categoryIds.filter(isFoodKind).map((k) => t(`food.kinds.${k}`)),
+    ...b.categoryIds.map((cid) => findCategory(all, cid)).filter(Boolean).map((cat) => localized(cat!.names, lang)),
+  ];
   const state = openState(b, new Date());
   const avg = averageRating(b.rating);
   const isFood = b.type === 'yeme-icme';

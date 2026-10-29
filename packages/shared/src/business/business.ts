@@ -5,6 +5,24 @@ import { isReservedName } from '../organizations/municipalities';
 export const BUSINESS_TYPES = ['hizmet', 'esnaf', 'evden-uretim', 'yeme-icme', 'konaklama', 'yol-ustu', 'emlak'] as const;
 export type BusinessType = (typeof BUSINESS_TYPES)[number];
 
+/**
+ * Yeme-içme işletmelerinin türleri (Benim Şehrim > Cafe ve Restoran filtreleri; tasarım: cafe-restaurant.html). Hizmet
+ * kategorileri yerine bunlar seçilir; kimlikler categoryIds içinde "yemek-" önekiyle tutulur.
+ */
+export const FOOD_KINDS = [
+  { id: 'yemek-kafe', icon: 'local-cafe' },
+  { id: 'yemek-restoran', icon: 'restaurant' },
+  { id: 'yemek-kahvalti', icon: 'egg-alt' },
+  { id: 'yemek-kebap', icon: 'outdoor-grill' },
+  { id: 'yemek-pide-lahmacun', icon: 'local-pizza' },
+  { id: 'yemek-ev-yemekleri', icon: 'soup-kitchen' },
+  { id: 'yemek-balik', icon: 'set-meal' },
+  { id: 'yemek-tatli', icon: 'cake' },
+  { id: 'yemek-fast-food', icon: 'lunch-dining' },
+] as const;
+export type FoodKindId = (typeof FOOD_KINDS)[number]['id'];
+export const isFoodKind = (id: string): id is FoodKindId => FOOD_KINDS.some((k) => k.id === id);
+
 /** Ev adresi gösterilmeyen türler: konum mahalle düzeyinde kalır (PROJE.md 5.7, ev işletmeleri için gizlilik). */
 export const HOME_BASED_TYPES: readonly BusinessType[] = ['evden-uretim'];
 
@@ -263,6 +281,10 @@ export function rankBusinesses(list: readonly Business[], opts: { districtId?: s
 export interface BusinessRepository {
   /** Bir ilde, bir hizmet alt kategorisindeki yayındaki işletmeler (en çok 100). */
   listByCategory(provinceCode: string, categoryId: string): Promise<Business[]>;
+  /** Bir ilde, bir türdeki yayındaki işletmeler (Cafe ve Restoran için yeme-içme; en çok 200). */
+  listByType(provinceCode: string, type: BusinessType): Promise<Business[]>;
+  /** Bir ildeki yayındaki işletmeler (panelde Şehir Vitrini seçimi için; en çok 300). */
+  listInProvince(provinceCode: string): Promise<Business[]>;
   /** Ara > İşletmeler: ildeki yayındaki işletmelerden adının bir kelimesi anahtarla başlayanlar (en çok 30). */
   searchByName(provinceCode: string, key: string): Promise<Business[]>;
   get(id: string): Promise<Business | null>;

@@ -1415,5 +1415,36 @@
     },
     "orderNote": "Sorted by district population (TurkStat).",
     "orderNoteYear": "Sorted by district population (TurkStat, {{year}})."
+  },
+  "food": {
+    "kinds": {
+      "yemek-kafe": "Café",
+      "yemek-restoran": "Restaurant",
+      "yemek-kahvalti": "Breakfast",
+      "yemek-kebap": "Kebab and grill",
+      "yemek-pide-lahmacun": "Pide and lahmacun",
+      "yemek-ev-yemekleri": "Home-style food",
+      "yemek-balik": "Fish",
+      "yemek-tatli": "Desserts and bakery",
+      "yemek-fast-food": "Fast food"
+    },
+    "kindsHint": "Choose your venue type (up to 5). People find you by these in My City > Cafés and restaurants.",
+    "openNow": "Open now",
+    "all": "All",
+    "count_one": "{{count}} place",
+    "count_other": "{{count}} places",
+    "noMatch": "No places match this choice.",
+    "empty": "No cafés or restaurants are listed in {{province}} yet. Owners can join for free from My business.",
+    "inviteTitle": "Get your venue listed here",
+    "inviteBody": "Own a café or restaurant? Join for free from My business so your menu, hours and reviews show here.",
+    "inviteCta": "Add my business"
+  },
+  "showcase": {
+    "title": "{{city}} Showcase",
+    "weekly": "This week's picks",
+    "issue": "Issue {{n}}",
+    "editorsPick": "Editor's pick",
+    "archive": "Past issues",
+    "empty": "The first {{city}} Showcase is on its way. Every week, the city's best in one place."
   }
 }

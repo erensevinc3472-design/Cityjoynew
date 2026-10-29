@@ -22,7 +22,7 @@ import { BusinessManagers } from '@/components/business-managers';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
-import { CategoryPicker, RegionPicker } from '@/components/pickers';
+import { CategoryPicker, FoodKindPicker, RegionPicker } from '@/components/pickers';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { goBackOr } from '@/lib/navigation';
@@ -176,14 +176,24 @@ export default function EditBusinessScreen() {
 
       <AppText variant="label" accessibilityRole="header">{t('business.type')}</AppText>
       {BUSINESS_TYPES.map((type) => (
-        <OptionRow key={type} title={t(`business.types.${type}`)} selected={form.type === type} onPress={() => set({ type })} />
+        // Yeme-içme ile diğer türler farklı listeden seçer: tür değişince seçimler sıfırlanır.
+        <OptionRow
+          key={type}
+          title={t(`business.types.${type}`)}
+          selected={form.type === type}
+          onPress={() => set({ type, ...((type === 'yeme-icme') !== (form.type === 'yeme-icme') ? { categoryIds: [] } : {}) })}
+        />
       ))}
 
       <TextField label={t('business.name')} value={form.name} onChangeText={(name) => set({ name })} maxLength={BUSINESS_LIMITS.name[1]} error={err('name')} />
 
       <AppText variant="label" accessibilityRole="header">{t('business.categories')}</AppText>
-      <AppText variant="caption" muted>{t('business.categoriesHint')}</AppText>
-      <CategoryPicker all={categories} selected={form.categoryIds} max={BUSINESS_LIMITS.categories[1]} onChange={(categoryIds) => set({ categoryIds })} />
+      <AppText variant="caption" muted>{form.type === 'yeme-icme' ? t('food.kindsHint') : t('business.categoriesHint')}</AppText>
+      {form.type === 'yeme-icme' ? (
+        <FoodKindPicker selected={form.categoryIds} max={BUSINESS_LIMITS.categories[1]} onChange={(categoryIds) => set({ categoryIds })} />
+      ) : (
+        <CategoryPicker all={categories} selected={form.categoryIds} max={BUSINESS_LIMITS.categories[1]} onChange={(categoryIds) => set({ categoryIds })} />
+      )}
       {err('categories') ? <AppText variant="caption" style={{ color: c.danger }}>{err('categories')}</AppText> : null}
 
       <AppText variant="label" accessibilityRole="header">{t('business.location')}</AppText>

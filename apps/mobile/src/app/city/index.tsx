@@ -45,7 +45,7 @@ interface Tile {
 const TILES: Tile[] = [
   { key: 'onemli-kurumlar', section: 'onemli-kurumlar', icon: 'account-balance', hue: 'blue' },
   { key: 'muzeler', section: 'muzeler', icon: 'museum', hue: 'gold' },
-  { key: 'cafe', icon: 'restaurant', hue: 'amber' },
+  { key: 'cafe', href: '/city/food', icon: 'restaurant', hue: 'amber' },
   { key: 'events', href: '/events', icon: 'event', hue: 'rose' },
   { key: 'pharmacy', icon: 'local-pharmacy', hue: 'green' },
   { key: 'ulasim', section: 'ulasim', icon: 'directions-bus', hue: 'blue' },
@@ -151,7 +151,7 @@ export default function MyCityScreen() {
   const townhall = tileState({ key: 'belediye-hizmetleri', section: 'belediye-hizmetleri', icon: 'apartment', hue: 'gold' });
   const featured: { key: string; scene: SceneKind; tag: string; title: string; href?: Href }[] = [
     { key: 'neighbourhood', scene: 'neighbourhood', tag: t('neighbourhood.title'), title: neighbourhood ?? t('neighbourhood.hint'), href: '/neighbourhood' },
-    { key: 'showcase', scene: 'showcase', tag: t('city.showcase'), title: province ?? '' },
+    { key: 'showcase', scene: 'showcase', tag: t('city.showcase'), title: t('showcase.weekly'), href: '/city/showcase' },
   ];
 
   return (

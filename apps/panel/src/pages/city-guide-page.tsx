@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import readXlsxFile from 'read-excel-file/browser';
+import { Link } from 'react-router';
 import {
   can,
   CITY_GUIDE_SECTIONS,
@@ -149,6 +150,7 @@ export function CityGuidePage() {
           <p className="meta">{t('guide.intro')}</p>
         </div>
         <div className="actions">
+          <Link className="btn secondary" to="/sehir-vitrini">{t('guide.showcase')}</Link>
           <a className="btn secondary" href="./benim-sehrim-sablon.xlsx" download>{t('guide.downloadTemplate')}</a>
           {!user?.isDemo && editable.length ? (
             <label className="btn">

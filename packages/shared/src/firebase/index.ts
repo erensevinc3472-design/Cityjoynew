@@ -36,6 +36,7 @@ export {
   type OrganizationInput,
 } from './organizations';
 export { CITY_PACK_SIZE, createCityGuideAdmin, createFirestoreCityGuideRepository } from './city-guide';
+export { createFirestoreShowcaseRepository, createShowcaseAdmin } from './showcase';
 export {
   createApprovalAdmin,
   createVerificationRequests,

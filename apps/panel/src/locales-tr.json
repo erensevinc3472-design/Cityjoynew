@@ -805,7 +805,8 @@
     "editTitle": "Düzenle: {{name}}",
     "editHint": "Alanlar Excel sütunlarıyla aynıdır ve aynı denetimden geçer. Kaydedince doğrulama yeniden gerekir.",
     "provinceFixed": "İl değiştirilemez; başka ile taşımak için kaldırıp o ile yükleyin.",
-    "save": "Kaydet"
+    "save": "Kaydet",
+    "showcase": "Şehir Vitrini"
   },
   "approvals": {
     "title": "Bekleyen onaylar",
@@ -1336,5 +1337,76 @@
     "save": "Yeni sıralamayı kaydet",
     "cancel": "Vazgeç",
     "saved": "Sıralama kaydedildi ({{count}} kayıt)."
+  },
+  "showcase": {
+    "title": "Şehir Vitrini",
+    "intro": "Benim Şehrim > Şehir Vitrini: ilin haftalık seçkisi. Uygulama en son yayındaki sayıyı açar, eski sayılar arşivde kalır.",
+    "rules": "Editör seçkisidir: para karşılığı girilmez (ücretli öne çıkarma İşletmeler sayfasında, \"Reklam\" etiketiyle). Seçilen işletmenin bilgilerinin doğru olduğundan emin olun.",
+    "province": "İl",
+    "add": "Yeni sayı",
+    "editIssue": "Sayı {{n}}",
+    "defaultTitle": "{{city}} haftalık seçkisi",
+    "issueCol": "Sayı",
+    "titleCol": "Başlık",
+    "statusCol": "Durum",
+    "weekOf": "Hafta (ilk gün)",
+    "introLabel": "Giriş yazısı",
+    "stories": "Konular",
+    "storiesHint": "En çok 8 konu; her konuda en çok 8 işletme ya da yer. Yalnızca yazı olan konu da olabilir.",
+    "storyN": "{{n}}. konu",
+    "storyTitle": "Konu başlığı",
+    "theme": "Görsel teması",
+    "subtitle": "Alt başlık",
+    "body": "Yazı",
+    "removeStory": "Konuyu sil",
+    "addStory": "Konu ekle",
+    "items": "Seçilenler",
+    "addItem": "İşletme ya da gezilecek yer ekle…",
+    "businesses": "İşletmeler (yayında)",
+    "places": "Gezilecek yerler (yayında)",
+    "removeItem": "Çıkar",
+    "note": "{{name}} için not",
+    "notePlaceholder": "Kısa not (isteğe bağlı)",
+    "noPicks": "Bu ilde seçilebilecek yayında işletme ya da gezilecek yer yok.",
+    "kind": {
+      "isletme": "işletme",
+      "yer": "yer"
+    },
+    "themes": {
+      "lezzet": "Lezzet",
+      "tarih": "Tarih",
+      "doga": "Doğa",
+      "konaklama": "Konaklama",
+      "alisveris": "Alışveriş",
+      "kultur": "Kültür",
+      "aile": "Aile",
+      "gece": "Akşam ve gece"
+    },
+    "status": {
+      "taslak": "Taslak",
+      "yayinda": "Yayında"
+    },
+    "storyCount": "{{count}} konu",
+    "publish": "Yayına al",
+    "unpublish": "Taslağa çek",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "deleteConfirm": "Sayı {{n}} silinsin mi?",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "saved": "Kaydedildi.",
+    "deleted": "Silindi.",
+    "error": "İşlem yapılamadı. Yetkinizi ve bağlantınızı kontrol edin.",
+    "loadError": "Sayılar okunamadı.",
+    "retry": "Yeniden dene",
+    "loading": "Yükleniyor…",
+    "none": "Bu il için henüz sayı yok.",
+    "errors": {
+      "title": "Başlık 2-80 karakter olmalı.",
+      "intro": "Giriş yazısı en çok 400 karakter.",
+      "week": "Hafta tarihini seçin.",
+      "stories": "1-8 konu olmalı.",
+      "story": "Her konunun başlığı olmalı; konuda seçim yoksa en az birkaç cümle yazı olmalı."
+    }
   }
 }

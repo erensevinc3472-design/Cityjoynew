@@ -28,6 +28,7 @@ export * from './business/reviews';
 export * from './sos/sos';
 export * from './city-guide/schema';
 export * from './city-guide/items';
+export * from './city-guide/showcase';
 export * from './models/sign-up';
 export * from './approvals/approvals';
 export * from './announcements/announcements';
