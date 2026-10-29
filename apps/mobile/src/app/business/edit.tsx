@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
   AMENITIES,
@@ -8,11 +8,15 @@ import {
   BUSINESS_TYPES,
   HOME_BASED_TYPES,
   PAYMENT_METHODS,
+  ROADSIDE_FEATURES,
+  ROADSIDE_KINDS,
+  geoPoint,
   validateBusiness,
   type Approval,
   type Business,
   type BusinessError,
   type BusinessInput,
+  type BusinessType,
   type DayHours,
 } from '@cityjoy/shared';
 
@@ -22,9 +26,10 @@ import { BusinessManagers } from '@/components/business-managers';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
-import { CategoryPicker, FoodKindPicker, RegionPicker } from '@/components/pickers';
+import { CategoryPicker, FoodKindPicker, IconChipPicker, RegionPicker } from '@/components/pickers';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
+import { currentLocation } from '@/lib/location';
 import { goBackOr } from '@/lib/navigation';
 import { useServiceCategories } from '@/lib/service-categories';
 import { businessRepository, DuplicateBusinessError, verificationRequests } from '@/lib/services';
@@ -36,6 +41,8 @@ import { useThemeColors } from '@/theme/use-theme';
 
 type Form = Omit<BusinessInput, 'location'> & { provinceCode?: string; districtId?: string; neighbourhoodId?: string };
 const DEFAULT_DAY: DayHours = { open: '09:00', close: '18:00' };
+/** Kategori listesi türe göre değişir (yeme-içme ve yol üstü kendi çeşitlerinden seçer); grup değişince seçim sıfırlanır. */
+const kindGroup = (type: BusinessType) => (type === 'yeme-icme' || type === 'yol-ustu' ? type : 'hizmet');
 
 /**
  * Profil > İşletme ekle / düzenle (PROJE.md 5.7). Bilgiler bir kez girilir; seçilen hizmetlerin listesinde, işletmenin
@@ -67,6 +74,7 @@ export default function EditBusinessScreen() {
   const [message, setMessage] = useState<{ kind: 'info' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [locating, setLocating] = useState<'idle' | 'busy' | 'denied' | 'failed'>('idle');
 
   useEffect(() => {
     if (!id) return;
@@ -112,10 +120,22 @@ export default function EditBusinessScreen() {
   const set = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
   const err = (k: BusinessError) => (errors.includes(k) ? t(`business.errors.${k}`) : undefined);
 
+  // Yol üstü tesis: "yol-ustu" türünde her zaman açık; diğer türlerde işaretlenirse (roadside tanımlı).
+  const roadsideOn = form.type === 'yol-ustu' || form.roadside !== undefined;
+  const takeLocation = async () => {
+    setLocating('busy');
+    const r = await currentLocation();
+    if (r.status === 'ready') {
+      set({ geo: geoPoint(r.location.lat, r.location.lng) });
+      setLocating('idle');
+    } else setLocating(r.status === 'denied' ? 'denied' : 'failed');
+  };
+
   const toInput = (): BusinessInput => {
     const { provinceCode, districtId, neighbourhoodId, ...rest } = form;
     return {
       ...rest,
+      ...(roadsideOn ? { roadside: form.roadside ?? [] } : { roadside: undefined, geo: undefined }),
       phone: form.phone.replace(/\D/g, ''),
       ...(homeBased ? { address: undefined } : {}),
       location: { provinceCode: provinceCode ?? '', districtId: districtId ?? '', ...(neighbourhoodId ? { neighbourhoodId } : {}) },
@@ -176,21 +196,28 @@ export default function EditBusinessScreen() {
 
       <AppText variant="label" accessibilityRole="header">{t('business.type')}</AppText>
       {BUSINESS_TYPES.map((type) => (
-        // Yeme-içme ile diğer türler farklı listeden seçer: tür değişince seçimler sıfırlanır.
+        // Yeme-içme, yol üstü ve diğer türler farklı listeden seçer: grup değişince seçimler sıfırlanır.
         <OptionRow
           key={type}
           title={t(`business.types.${type}`)}
           selected={form.type === type}
-          onPress={() => set({ type, ...((type === 'yeme-icme') !== (form.type === 'yeme-icme') ? { categoryIds: [] } : {}) })}
+          onPress={() => set({ type, ...(kindGroup(type) !== kindGroup(form.type) ? { categoryIds: [] } : {}) })}
         />
       ))}
 
       <TextField label={t('business.name')} value={form.name} onChangeText={(name) => set({ name })} maxLength={BUSINESS_LIMITS.name[1]} error={err('name')} />
 
       <AppText variant="label" accessibilityRole="header">{t('business.categories')}</AppText>
-      <AppText variant="caption" muted>{form.type === 'yeme-icme' ? t('food.kindsHint') : t('business.categoriesHint')}</AppText>
+      <AppText variant="caption" muted>{form.type === 'yeme-icme' ? t('food.kindsHint') : form.type === 'yol-ustu' ? t('roadside.kindsHint') : t('business.categoriesHint')}</AppText>
       {form.type === 'yeme-icme' ? (
         <FoodKindPicker selected={form.categoryIds} max={BUSINESS_LIMITS.categories[1]} onChange={(categoryIds) => set({ categoryIds })} />
+      ) : form.type === 'yol-ustu' ? (
+        <IconChipPicker
+          options={ROADSIDE_KINDS.map((k) => ({ id: k.id, icon: k.icon, label: t(`roadside.kinds.${k.id}`) }))}
+          selected={form.categoryIds}
+          max={BUSINESS_LIMITS.categories[1]}
+          onChange={(categoryIds) => set({ categoryIds })}
+        />
       ) : (
         <CategoryPicker all={categories} selected={form.categoryIds} max={BUSINESS_LIMITS.categories[1]} onChange={(categoryIds) => set({ categoryIds })} />
       )}
@@ -222,6 +249,43 @@ export default function EditBusinessScreen() {
       <ToggleChips options={PAYMENT_METHODS.map((m) => ({ value: m, label: t(`business.payment.${m}`) }))} selected={form.paymentMethods ?? []} onToggle={(m) => set({ paymentMethods: toggleIn(form.paymentMethods, m) })} />
       <AppText variant="label" accessibilityRole="header">{t('business.page.amenities')}</AppText>
       <ToggleChips options={AMENITIES.map((m) => ({ value: m, label: t(`business.amenity.${m}`) }))} selected={form.amenities ?? []} onToggle={(m) => set({ amenities: toggleIn(form.amenities, m) })} />
+
+      {/* Yol Arkadaşı: yolcular ihtiyacına göre (tuvalet, yakıt, şarj…) yakındaki tesisleri bulur. */}
+      <AppText variant="label" accessibilityRole="header">{t('roadside.title')}</AppText>
+      {form.type === 'yol-ustu' ? null : (
+        <SwitchRow label={t('roadside.toggle')} value={roadsideOn} onChange={(on) => set(on ? { roadside: form.roadside ?? [] } : { roadside: undefined, geo: undefined })} />
+      )}
+      <AppText variant="caption" muted>{t('roadside.hint')}</AppText>
+      {roadsideOn ? (
+        <>
+          <IconChipPicker
+            options={ROADSIDE_FEATURES.map((k) => ({ id: k.id, icon: k.icon, label: t(`roadside.features.${k.id}`) }))}
+            selected={form.roadside ?? []}
+            onChange={(ids) => set({ roadside: ids as BusinessInput['roadside'] })}
+          />
+          {err('roadside') ? <AppText variant="caption" style={{ color: c.danger }}>{err('roadside')}</AppText> : null}
+          <View style={[styles.geoBox, { borderColor: err('geo') ? c.danger : c.border, backgroundColor: c.surface }]}>
+            <AppText variant="caption" muted>{t('roadside.locationHint')}</AppText>
+            {form.geo ? (
+              <AppText style={{ color: c.text }}>{t('roadside.located', { lat: form.geo.lat.toFixed(5), lng: form.geo.lng.toFixed(5) })}</AppText>
+            ) : null}
+            <AppButton
+              variant="secondary"
+              title={form.geo ? t('roadside.relocate') : t('roadside.locate')}
+              onPress={takeLocation}
+              loading={locating === 'busy'}
+              disabled={locating === 'busy'}
+            />
+            {form.geo ? (
+              <AppButton variant="ghost" title={t('roadside.checkMap')} onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${form.geo!.lat},${form.geo!.lng}`)} />
+            ) : null}
+            {locating === 'denied' || locating === 'failed' ? (
+              <AppText variant="caption" style={{ color: c.danger }}>{t(locating === 'denied' ? 'roadside.locationDenied' : 'roadside.locationFailed')}</AppText>
+            ) : null}
+            {err('geo') ? <AppText variant="caption" style={{ color: c.danger }}>{err('geo')}</AppText> : null}
+          </View>
+        </>
+      ) : null}
 
       <AppText variant="label" accessibilityRole="header">{form.type === 'yeme-icme' ? t('business.page.tabMenu') : t('business.priceList')}</AppText>
       <AppText variant="caption" muted>{t('business.priceNote')}</AppText>
@@ -433,6 +497,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 48 },
   priceRow: { gap: spacing.sm, borderWidth: 1, borderRadius: 14, padding: spacing.sm },
+  geoBox: { gap: spacing.sm, borderWidth: 1, borderRadius: radius.md, padding: spacing.md },
   confirm: { gap: spacing.sm },
   week: { gap: spacing.sm, borderWidth: 1, borderRadius: 14, padding: spacing.sm },
   dayRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },

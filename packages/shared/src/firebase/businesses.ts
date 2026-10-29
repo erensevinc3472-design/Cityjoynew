@@ -149,7 +149,7 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
       const before = await getDoc(doc(db, COLLECTION, id));
       const oldPhone = before.get('phone') as string | undefined;
       // Boşaltılan isteğe bağlı alanlar silinir.
-      const removed = Object.fromEntries((['address', 'hoursNote', 'description', 'weeklyHours'] as const).filter((k) => !(k in clean)).map((k) => [k, deleteField()]));
+      const removed = Object.fromEntries((['address', 'hoursNote', 'description', 'weeklyHours', 'roadside', 'geo'] as const).filter((k) => !(k in clean)).map((k) => [k, deleteField()]));
       const batch = writeBatch(db);
       batch.update(doc(db, COLLECTION, id), { ...clean, location: clean.location, ...removed, searchKeys: nameKeys(clean.name), updatedAt: serverTimestamp() });
       if (oldPhone !== clean.phone) {

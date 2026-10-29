@@ -8,6 +8,7 @@ import {
   averageRating,
   findCategory,
   isFoodKind,
+  isRoadsideKind,
   isPostListed,
   localized,
   openState,
@@ -100,6 +101,7 @@ export default function BusinessScreen() {
   const province = locationRepository.getProvince(b.location.provinceCode)?.name;
   const services = [
     ...b.categoryIds.filter(isFoodKind).map((k) => t(`food.kinds.${k}`)),
+    ...b.categoryIds.filter(isRoadsideKind).map((k) => t(`roadside.kinds.${k}`)),
     ...b.categoryIds.map((cid) => findCategory(all, cid)).filter(Boolean).map((cat) => localized(cat!.names, lang)),
   ];
   const state = openState(b, new Date());
@@ -113,6 +115,11 @@ export default function BusinessScreen() {
     Linking.openURL(url).catch(() => {});
   };
   const mapsUrl = () => {
+    // Yol üstü tesiste tam konum var: yol tarifi doğrudan oraya.
+    if (b.geo) {
+      const at = `${b.geo.lat},${b.geo.lng}`;
+      return Platform.OS === 'ios' ? `http://maps.apple.com/?daddr=${at}` : `https://www.google.com/maps/dir/?api=1&destination=${at}`;
+    }
     const q = encodeURIComponent([b.name, b.address, district, province].filter(Boolean).join(', '));
     return Platform.OS === 'ios' ? `http://maps.apple.com/?q=${q}` : `https://www.google.com/maps/search/?api=1&query=${q}`;
   };
@@ -218,7 +225,7 @@ export default function BusinessScreen() {
             {team ? null : pill(following ? t('business.page.following') : t('business.page.follow'), following ? 'check' : 'add', toggleFollow, !following)}
             {pill(t('business.call'), 'call', () => contact(telUrl(b.phone)))}
             {b.whatsapp ? pill(t('business.whatsappBtn'), 'chat', () => contact(whatsappUrl(b.phone))) : null}
-            {b.address ? pill(t('business.page.directions'), 'directions', () => Linking.openURL(mapsUrl()).catch(() => {})) : null}
+            {b.address || b.geo ? pill(t('business.page.directions'), 'directions', () => Linking.openURL(mapsUrl()).catch(() => {})) : null}
           </View>
 
           {/* Ekip: işletme adına paylaş ve onay bekleyenler. */}
@@ -315,6 +322,7 @@ export default function BusinessScreen() {
             )}
             {services.length ? infoRow('handyman', t('business.servicesLabel'), services.join(', ')) : null}
             {b.paymentMethods?.length ? infoRow('payments', t('business.page.payment'), chips(b.paymentMethods.map((m) => t(`business.payment.${m}`)))) : null}
+            {b.roadside?.length ? infoRow('add-road', t('roadside.title'), chips(b.roadside.map((m) => t(`roadside.features.${m}`)))) : null}
             {b.amenities?.length ? infoRow('check-circle-outline', t('business.page.amenities'), chips(b.amenities.map((m) => t(`business.amenity.${m}`)))) : null}
             {!verified ? <AppText variant="caption" muted>{t('business.unverifiedWarning')}</AppText> : null}
             <AppText variant="caption" muted>{t('business.updated', { date: new Date(b.updatedAt).toLocaleDateString(i18n.language) })}</AppText>
