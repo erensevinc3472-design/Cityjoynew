@@ -558,13 +558,85 @@
     "firstHour": "İlk saat {{price}} ₺",
     "soon": "Yakında",
     "showcase": "Şehir Vitrini",
-    "townhallHint": "Başvuru, evrak, hizmetler",
+    "townhallHint": "Hizmetler ve başvurular",
     "tiles": {
-      "cafe": "Kafe ve Restoran",
+      "cafe": "Cafe & Rest.",
       "events": "Etkinlikler",
       "pharmacy": "Nöbetçi Eczane",
-      "listings": "Satılık ve Kiralık",
-      "volunteer": "Gönüllülük"
+      "listings": "Satılık & Kiralık",
+      "volunteer": "Gönüllülük",
+      "kurumlar": "Önemli Kurumlar",
+      "muzeler": "Müzeler",
+      "ulasim": "Ulaşım",
+      "parkPazar": "Park & Pazar",
+      "otopark": "Otopark",
+      "howTo": "Nasıl yapabilirim?"
+    },
+    "panelTitle": "Şehir Paneli",
+    "today": "Bugün",
+    "townhall": "Belediye Hizmetleri",
+    "meydanHint": "{{name}} · semtindeki yaşam",
+    "vitrinHint": "Şehrin en iyilerini keşfet",
+    "all": "Tümü",
+    "allDays": "Tüm günler",
+    "records": "Kayıt",
+    "districts": "İlçe",
+    "parks": "Parklar",
+    "markets": "Pazar alanları",
+    "kurumlarIntro": "Muhtarlıklar, kamu kurumları, sağlık ve güvenlik birimleri.",
+    "groups": {
+      "muhtarlik": {
+        "title": "Muhtarlıklar",
+        "hint": "Mahalle muhtarlıkları ve iletişim"
+      },
+      "kamu": {
+        "title": "Kamu Kurumları",
+        "hint": "Valilik, kaymakamlık, adliye, resmî kurumlar"
+      },
+      "hastane": {
+        "title": "Hastaneler",
+        "hint": "Devlet ve özel hastaneler"
+      },
+      "asm": {
+        "title": "Aile Sağlığı Merkezleri",
+        "hint": "Aile hekimleri"
+      },
+      "emniyet": {
+        "title": "Emniyet ve Jandarma",
+        "hint": "Karakollar ve polis merkezleri"
+      },
+      "itfaiye": {
+        "title": "İtfaiye",
+        "hint": "Yangın istasyonları"
+      },
+      "nufus": {
+        "title": "Nüfus Müdürlükleri",
+        "hint": "Kimlik, pasaport ve nüfus işlemleri"
+      },
+      "noter": {
+        "title": "Noterler",
+        "hint": "Noter işlemleri"
+      },
+      "ptt": {
+        "title": "PTT Şubeleri",
+        "hint": "Posta ve kargo işlemleri"
+      },
+      "vergi": {
+        "title": "Vergi Daireleri",
+        "hint": "Vergi işlemleri"
+      },
+      "sgk": {
+        "title": "SGK Şubeleri",
+        "hint": "Sosyal güvenlik işlemleri"
+      },
+      "egitim": {
+        "title": "Eğitim ve Kütüphane",
+        "hint": "Okullar, halk eğitim, kütüphaneler"
+      },
+      "toplanma": {
+        "title": "Toplanma Alanları",
+        "hint": "Afet ve acil durum toplanma alanları"
+      }
     }
   },
   "announcements": {

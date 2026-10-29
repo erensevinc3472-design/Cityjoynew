@@ -1,71 +1,54 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
-import { useEffect, useState, type ComponentProps } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { CITY_GUIDE_SECTIONS, type CityGuideSectionId } from '@cityjoy/shared';
+import type { CityGuideSectionId } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { GlossyIcon } from '@/components/glossy-icon';
 import { HeroHeader } from '@/components/hero-header';
-import { SceneArt, sceneRim, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useCityGuideMeta } from '@/lib/city-guide';
+import { LOOK, type Look } from '@/lib/city-look';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
-type IconName = ComponentProps<typeof MaterialIcons>['name'];
-
-/** Her kutucuğun kendi rengi (simge ve hafif hale); koyu ve açık zeminde okunur tonlar. */
-const HUES = {
-  gold: '#D9A15C',
-  teal: '#2FB3A3',
-  blue: '#5B9BE6',
-  rose: '#E07A9B',
-  green: '#3DBB8C',
-  violet: '#9B87E8',
-  amber: '#E6A23C',
-} as const;
-type Hue = keyof typeof HUES;
-
 interface Tile {
   key: string;
-  icon: IconName;
-  hue: Hue;
-  /** Şehir rehberi bölümü (veri sayısına göre açılır) ya da doğrudan bir ekran; ikisi de yoksa "yakında". */
-  section?: CityGuideSectionId;
+  look: Look;
   href?: Href;
+  /** Açılması için bilgisi olması gereken bölümler (biri yeterli). Yoksa ve href yoksa "yakında". */
+  needs?: CityGuideSectionId[];
 }
 
-// Sıra Eren'in tasarımındaki gibi; Belediye Hizmetleri ayrıca büyük kartta.
+// Sıra ve adlar Eren'in tasarımındaki gibi (benim-sehrim.html): Belediye Hizmetleri büyük kartta, 11 simge.
 const TILES: Tile[] = [
-  { key: 'onemli-kurumlar', section: 'onemli-kurumlar', icon: 'account-balance', hue: 'blue' },
-  { key: 'muzeler', section: 'muzeler', icon: 'museum', hue: 'gold' },
-  { key: 'cafe', href: '/city/food', icon: 'restaurant', hue: 'amber' },
-  { key: 'events', href: '/events', icon: 'event', hue: 'rose' },
-  { key: 'pharmacy', icon: 'local-pharmacy', hue: 'green' },
-  { key: 'ulasim', section: 'ulasim', icon: 'directions-bus', hue: 'blue' },
-  { key: 'parklar', section: 'parklar', icon: 'park', hue: 'green' },
-  { key: 'pazarlar', section: 'pazarlar', icon: 'storefront', hue: 'amber' },
-  { key: 'listings', icon: 'sell', hue: 'violet' },
-  { key: 'otoparklar', section: 'otoparklar', icon: 'local-parking', hue: 'teal' },
-  { key: 'toplanma-alanlari', section: 'toplanma-alanlari', icon: 'emergency-share', hue: 'rose' },
-  { key: 'muhtarliklar', section: 'muhtarliklar', icon: 'location-city', hue: 'teal' },
-  { key: 'volunteer', icon: 'volunteer-activism', hue: 'rose' },
-  { key: 'nasil-yapilir', section: 'nasil-yapilir', icon: 'lightbulb', hue: 'gold' },
+  { key: 'kurumlar', look: LOOK.kurumlar, href: '/city/kurumlar', needs: ['onemli-kurumlar', 'muhtarliklar', 'toplanma-alanlari'] },
+  { key: 'muzeler', look: LOOK.muzeler, href: { pathname: '/city/[section]', params: { section: 'muzeler' } }, needs: ['muzeler'] },
+  { key: 'cafe', look: LOOK.cafe, href: '/city/food' },
+  { key: 'events', look: LOOK.etkinlik, href: '/events' },
+  { key: 'pharmacy', look: LOOK.eczane },
+  { key: 'ulasim', look: LOOK.ulasim, href: { pathname: '/city/[section]', params: { section: 'ulasim' } }, needs: ['ulasim'] },
+  { key: 'parkPazar', look: LOOK.parkPazar, href: '/city/park-pazar', needs: ['parklar', 'pazarlar'] },
+  { key: 'listings', look: LOOK.emlak },
+  { key: 'otopark', look: LOOK.otopark, href: { pathname: '/city/[section]', params: { section: 'otoparklar' } }, needs: ['otoparklar'] },
+  { key: 'volunteer', look: LOOK.gonullu },
+  { key: 'howTo', look: LOOK.rehber, href: { pathname: '/city/[section]', params: { section: 'nasil-yapilir' } } },
 ];
 
 /**
- * Benim Şehrim (PROJE.md 5.1, 13. madde 29; Eren onayladı): üstte şehrin kapağı, altında tek ızgara (Belediye
- * Hizmetleri büyük, diğer bölümler kendi renginde), en altta Mahalle Meydanı ve Şehir Vitrini. Bölümler veritabanından,
- * il başına gelir; bilgisi olmayan bölüm soluk "Yakında" görünür.
+ * Benim Şehrim = Şehir Paneli (tasarım: benim-sehrim.html): üstte konum, "Bugün" kartı, Belediye Hizmetleri büyük
+ * kartı ve parlak simgeli 11 bölüm, altta Mahalle Meydanı ve Şehir Vitrini. Bilgisi olmayan bölüm soluk ve "Yakında".
+ * Hava durumu verisi gelene kadar "Bugün" kartında tarih ve konum durur (uydurma derece yok).
  */
 export default function MyCityScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { language } = useSettings();
@@ -90,10 +73,21 @@ export default function MyCityScreen() {
 
   const header = (
     <HeroHeader
-      title={t('modules.myCity')}
+      title={t('city.panelTitle')}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
-      right={{ icon: 'edit-location-alt', label: t('home.changeLocation'), onPress: () => router.push('/location?edit=1') }}
-    />
+      right={{ icon: 'notifications-none', label: t('notifications.title'), onPress: () => router.push('/notifications') }}>
+      {province ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${[district, province].filter(Boolean).join(', ')}. ${t('home.changeLocation')}`}
+          onPress={() => router.push('/location?edit=1')}
+          style={styles.locRow}>
+          <MaterialIcons name="location-on" size={14} color={c.heroAccent} />
+          <AppText style={[styles.locText, { color: c.heroMuted }]}>{[district, province].filter(Boolean).join(', ')}</AppText>
+          <MaterialIcons name="expand-more" size={16} color={c.heroMuted} />
+        </Pressable>
+      ) : null}
+    </HeroHeader>
   );
 
   if (!provinceCode) {
@@ -107,63 +101,69 @@ export default function MyCityScreen() {
     );
   }
 
-  // Üç sütunlu ızgara: Belediye Hizmetleri 2x2, yanında iki küçük kutu, gerisi üçerli.
-  const GAP = 10;
+  const count = (s: CityGuideSectionId) => meta?.sections[s]?.count ?? 0;
+  const ready = (x: Tile) => !!x.href && (!x.needs || x.needs.some((s) => count(s) > 0));
+  const GAP = 12;
   const inner = Math.min(width, 640) - GUTTER * 2;
-  const cell = Math.floor((inner - GAP * 2) / 3);
-  const sectionName = (id: CityGuideSectionId) => {
-    const s = CITY_GUIDE_SECTIONS.find((x) => x.id === id);
-    return s ? (s.names[lang] ?? s.names.tr) : id;
-  };
-  const tileState = (tile: Tile) => {
-    if (tile.href) return { ready: true, label: t(`city.tiles.${tile.key}`) };
-    if (!tile.section) return { ready: false, label: t(`city.tiles.${tile.key}`) };
-    const count = meta?.sections[tile.section]?.count ?? 0;
-    // "Nasıl yapılır?" ülke geneli içerikle de dolar; il boş olsa da açılır.
-    return { ready: !!meta && (count > 0 || tile.section === 'nasil-yapilir'), label: sectionName(tile.section) };
-  };
-  const open = (tile: Tile) => (tile.href ? router.push(tile.href) : router.push({ pathname: '/city/[section]', params: { section: tile.section! } }));
+  const cell = Math.floor((inner - GAP * 3) / 4);
+  const iconSize = Math.min(58, cell - 14);
+  const townhallReady = count('belediye-hizmetleri') > 0;
 
-  const renderTile = (tile: Tile) => {
-    const { ready, label } = tileState(tile);
-    const hue = HUES[tile.hue];
+  const tile = (x: Tile) => {
+    const on = ready(x);
+    const label = t(`city.tiles.${x.key}`);
     return (
       <Pressable
-        key={tile.key}
+        key={x.key}
         accessibilityRole="button"
-        accessibilityLabel={ready ? label : `${label}. ${t('city.soon')}`}
-        disabled={!ready}
-        onPress={() => open(tile)}
-        style={({ pressed }) => [
-          styles.tile,
-          { width: cell, height: 92, backgroundColor: c.surface, borderColor: c.border, opacity: !ready ? 0.5 : pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] },
-        ]}>
-        <View style={[styles.halo, { backgroundColor: `${hue}26` }]} />
-        <View style={[styles.chip, { backgroundColor: `${hue}29` }]}>
-          <MaterialIcons name={tile.icon} size={19} color={hue} />
-        </View>
-        {!ready ? <AppText style={[styles.soon, { backgroundColor: c.surfaceStrong, color: c.textMuted }]}>{t('city.soon')}</AppText> : null}
-        <AppText numberOfLines={2} style={[styles.tileTitle, { color: c.textStrong }]}>{label}</AppText>
+        accessibilityLabel={on ? label : `${label}. ${t('city.soon')}`}
+        disabled={!on}
+        onPress={() => router.push(x.href!)}
+        style={({ pressed }) => [styles.tile, { width: cell, transform: [{ scale: pressed ? 0.94 : 1 }] }]}>
+        <GlossyIcon icon={x.look.icon} colors={x.look.colors} size={iconSize} dim={!on} />
+        <AppText numberOfLines={2} style={[styles.tileText, { color: on ? c.textStrong : c.textSoft }]}>{label}</AppText>
+        {!on ? <AppText style={[styles.soon, { color: c.textSoft }]}>{t('city.soon')}</AppText> : null}
       </Pressable>
     );
   };
 
-  const townhall = tileState({ key: 'belediye-hizmetleri', section: 'belediye-hizmetleri', icon: 'apartment', hue: 'gold' });
-  const featured: { key: string; scene: SceneKind; tag: string; title: string; href?: Href }[] = [
-    { key: 'neighbourhood', scene: 'neighbourhood', tag: t('neighbourhood.title'), title: neighbourhood ?? t('neighbourhood.hint'), href: '/neighbourhood' },
-    { key: 'showcase', scene: 'showcase', tag: t('city.showcase'), title: t('showcase.weekly'), href: '/city/showcase' },
-  ];
+  const wide = (key: string, look: Look, title: string, hint: string, href: Href) => (
+    <Pressable
+      key={key}
+      accessibilityRole="button"
+      accessibilityLabel={`${title}. ${hint}`}
+      onPress={() => router.push(href)}
+      style={({ pressed }) => [styles.wide, { backgroundColor: c.surface, borderColor: c.border, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+      <GlossyIcon icon={look.icon} colors={look.colors} size={52} />
+      <View style={styles.flex}>
+        <AppText style={[styles.wideTitle, { color: c.textStrong }]} numberOfLines={1}>{title}</AppText>
+        <AppText style={[styles.wideHint, { color: c.textMuted }]} numberOfLines={1}>{hint}</AppText>
+      </View>
+      <View style={[styles.arrow, { backgroundColor: c.surfaceStrong }]}>
+        <MaterialIcons name="arrow-forward" size={18} color={c.textStrong} />
+      </View>
+    </Pressable>
+  );
+
+  const today = new Date();
 
   return (
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Şehir kapağı: fotoğraflar panelden yüklenebilir olunca (Storage) çizimin yerini alacak. */}
-        <View style={[styles.cover, { borderColor: c.border }]}>
-          <SceneArt kind="cover" />
-          <View style={styles.coverText}>
-            <AppText style={[styles.kicker, { color: c.heroAccent }]}>{t('modules.myCity').toLocaleUpperCase(lang)}</AppText>
-            <AppText accessibilityRole="header" style={styles.cityName}>{province}</AppText>
-            <AppText style={styles.place}>{[district, neighbourhood].filter(Boolean).join(' · ')}</AppText>
+        {/* Bugün: hava durumu verisi gelince derece burada görünecek. */}
+        <View style={[styles.today, { backgroundColor: c.surface, borderColor: c.border }]}>
+          <View style={[styles.sun, { backgroundColor: c.accentSoft }]}>
+            <MaterialIcons name="today" size={22} color={c.accent} />
+          </View>
+          <View style={styles.flex}>
+            <AppText style={[styles.todayDate, { color: c.textStrong }]}>{today.toLocaleDateString(i18n.language, { day: 'numeric', month: 'long' })}</AppText>
+            <AppText style={[styles.todaySub, { color: c.textMuted }]}>
+              {[today.toLocaleDateString(i18n.language, { weekday: 'long' }), neighbourhood ?? district].filter(Boolean).join(' · ')}
+            </AppText>
+          </View>
+          <View style={styles.todayRight}>
+            <AppText style={[styles.todayLabel, { color: c.textSoft }]}>{t('city.today')}</AppText>
+            <AppText style={[styles.live, { color: c.success }]}>● {province?.toLocaleUpperCase(lang)}</AppText>
           </View>
         </View>
         {stale ? <AppText variant="caption" muted>{t('city.staleNote')}</AppText> : null}
@@ -171,82 +171,64 @@ export default function MyCityScreen() {
 
         <View style={[styles.grid, { gap: GAP }]}>
           <View style={[styles.row, { gap: GAP }]}>
+            {/* Belediye Hizmetleri: tasarımdaki büyük altın kart. */}
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={townhall.ready ? townhall.label : `${townhall.label}. ${t('city.soon')}`}
-              disabled={!townhall.ready}
+              accessibilityLabel={townhallReady ? t('city.townhall') : `${t('city.townhall')}. ${t('city.soon')}`}
+              disabled={!townhallReady}
               onPress={() => router.push({ pathname: '/city/[section]', params: { section: 'belediye-hizmetleri' } })}
-              style={({ pressed }) => [styles.big, { width: cell * 2 + GAP, height: 92 * 2 + GAP, borderColor: sceneRim('townhall'), opacity: !townhall.ready ? 0.6 : pressed ? 0.88 : 1 }]}>
-              <SceneArt kind="townhall" />
-              <View style={styles.bigIcon}>
-                <MaterialIcons name="apartment" size={22} color="#FFFFFF" />
+              style={({ pressed }) => [
+                styles.big,
+                { width: cell * 2 + GAP, backgroundColor: c.surface, borderColor: c.accentBorder, opacity: townhallReady ? 1 : 0.6, transform: [{ scale: pressed ? 0.98 : 1 }] },
+              ]}>
+              <View style={styles.bigTop}>
+                <GlossyIcon icon={LOOK.belediye.icon} colors={LOOK.belediye.colors} size={54} />
+                <View style={[styles.bigArrow, { borderColor: c.border }]}>
+                  <MaterialIcons name="north-east" size={16} color={c.textMuted} />
+                </View>
               </View>
-              <View style={styles.foot}>
-                <AppText style={styles.bigTitle}>{townhall.label}</AppText>
-                <AppText style={styles.footHint}>{townhall.ready ? t('city.townhallHint') : t('city.soon')}</AppText>
+              <View>
+                <AppText style={[styles.bigTitle, { color: c.textStrong }]}>{t('city.townhall')}</AppText>
+                <AppText style={[styles.bigHint, { color: c.textMuted }]}>{townhallReady ? t('city.townhallHint') : t('city.soon')}</AppText>
               </View>
             </Pressable>
-            <View style={{ gap: GAP }}>{TILES.slice(0, 2).map(renderTile)}</View>
+            <View style={[styles.wrap, { width: cell * 2 + GAP, gap: GAP }]}>{TILES.slice(0, 4).map(tile)}</View>
           </View>
-          <View style={[styles.wrap, { gap: GAP }]}>{TILES.slice(2).map(renderTile)}</View>
+          <View style={[styles.wrap, { gap: GAP }]}>{TILES.slice(4).map(tile)}</View>
         </View>
 
-        <View style={[styles.row, { gap: GAP }]}>
-          {featured.map((f) => (
-            <Pressable
-              key={f.key}
-              accessibilityRole="button"
-              accessibilityLabel={f.href ? `${f.tag}. ${f.title}` : `${f.tag}. ${t('city.soon')}`}
-              disabled={!f.href}
-              onPress={f.href ? () => router.push(f.href!) : undefined}
-              style={({ pressed }) => [styles.featured, { borderColor: sceneRim(f.scene), opacity: !f.href ? 0.6 : pressed ? 0.88 : 1 }]}>
-              <SceneArt kind={f.scene} />
-              <View style={styles.foot}>
-                <AppText numberOfLines={1} style={[styles.featuredTag, { color: c.heroAccent }]}>{f.tag.toLocaleUpperCase(lang)}</AppText>
-                <AppText numberOfLines={1} style={styles.featuredTitle}>{f.href ? f.title : t('city.soon')}</AppText>
-              </View>
-            </Pressable>
-          ))}
-        </View>
+        {wide('meydan', LOOK.meydan, t('neighbourhood.title'), neighbourhood ? t('city.meydanHint', { name: neighbourhood }) : t('neighbourhood.hint'), '/neighbourhood')}
+        {wide('vitrin', LOOK.vitrin, t('showcase.title', { city: province ?? '' }), t('city.vitrinHint'), '/city/showcase')}
       </ScrollView>
     </Screen>
   );
 }
 
-const white = '#FFFFFF';
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
-  cover: { height: 172, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  coverText: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: spacing.md, paddingVertical: 10, backgroundColor: 'rgba(8, 26, 30, 0.6)' },
-  kicker: { fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 1 },
-  cityName: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 34, color: white },
-  place: { fontSize: 13, color: '#D5E2E3' },
+  flex: { flex: 1, gap: 2 },
+  locRow: { flexDirection: 'row', alignItems: 'center', gap: 2, alignSelf: 'center', minHeight: 28 },
+  locText: { fontSize: 13 },
+  today: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.xl, borderWidth: 1 },
+  sun: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  todayDate: { fontFamily: fonts.display, fontSize: 22, lineHeight: 28 },
+  todaySub: { fontSize: 12, lineHeight: 16, textTransform: 'capitalize' },
+  todayRight: { alignItems: 'flex-end', gap: 2 },
+  todayLabel: { fontSize: 12 },
+  live: { fontFamily: fonts.bodySemi, fontSize: 10, letterSpacing: 0.8 },
   grid: {},
   row: { flexDirection: 'row' },
   wrap: { flexDirection: 'row', flexWrap: 'wrap' },
-  tile: { borderRadius: radius.lg, borderWidth: 1, padding: 10, justifyContent: 'space-between', overflow: 'hidden' },
-  halo: { position: 'absolute', top: -18, end: -18, width: 64, height: 64, borderRadius: 32 },
-  chip: { width: 34, height: 34, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  soon: { position: 'absolute', top: 10, end: 8, fontFamily: fonts.bodySemi, fontSize: 10, paddingHorizontal: 6, paddingVertical: 2, borderRadius: radius.pill, overflow: 'hidden' },
-  tileTitle: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 16 },
-  big: { borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  bigIcon: {
-    position: 'absolute',
-    top: 12,
-    start: 12,
-    width: 42,
-    height: 42,
-    borderRadius: radius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(11, 35, 40, 0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.18)',
-  },
-  foot: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: 'rgba(8, 26, 30, 0.72)' },
-  bigTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21, color: white },
-  footHint: { fontSize: 12, lineHeight: 16, color: '#D5E2E3', marginTop: 2 },
-  featured: { flex: 1, height: 124, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  featuredTag: { fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 0.8 },
-  featuredTitle: { fontFamily: fonts.heading, fontSize: 14, lineHeight: 19, color: white, marginTop: 2 },
+  tile: { alignItems: 'center', gap: 6, paddingTop: 2, paddingBottom: 4 },
+  tileText: { fontFamily: fonts.bodySemi, fontSize: 11, lineHeight: 14, textAlign: 'center' },
+  soon: { fontSize: 9, marginTop: -4 },
+  big: { borderRadius: radius.xl, borderWidth: 1, padding: spacing.md, justifyContent: 'space-between', minHeight: 196 },
+  bigTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  bigArrow: { width: 30, height: 30, borderRadius: 15, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  bigTitle: { fontFamily: fonts.display, fontSize: 21, lineHeight: 26 },
+  bigHint: { fontSize: 12, lineHeight: 16, marginTop: 4 },
+  wide: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.xl, borderWidth: 1 },
+  wideTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 22 },
+  wideHint: { fontSize: 12, lineHeight: 16 },
+  arrow: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
 });
