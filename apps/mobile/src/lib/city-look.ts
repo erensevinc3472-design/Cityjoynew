@@ -24,21 +24,25 @@ export const LOOK = {
 } as const satisfies Record<string, Look>;
 
 /**
- * Önemli Kurumlar alt başlıkları (tasarım: onemli-kurumlar.html). Kurumlar tek bölümde tutulur, burada kategoriye göre
- * gruplanır; Muhtarlıklar kendi bölümünden gelir.
+ * Önemli Kurumlar alt başlıkları, tasarımdaki sırayla (onemli-kurumlar.html). Kurumlar tek bölümde tutulur, burada
+ * kategoriye göre toplanır; Muhtarlıklar kendi bölümünden gelir. Bilgisi olmayan başlık (eczane, sağlık kabini, banka)
+ * "Yakında" görünür.
  */
-export const INSTITUTION_GROUPS: { id: string; look: Look; categories?: string[]; section?: 'muhtarliklar' | 'toplanma-alanlari' }[] = [
+export const INSTITUTION_GROUPS: { id: string; look: Look; categories?: string[]; section?: 'muhtarliklar' }[] = [
   { id: 'muhtarlik', section: 'muhtarliklar', look: { icon: 'location-city', colors: ['#F6D38B', '#C98A2C'] } },
-  { id: 'kamu', categories: ['valilik', 'kaymakamlik', 'il-mudurlugu', 'adliye', 'goc-idaresi', 'diger'], look: { icon: 'account-balance', colors: ['#8EA2F7', '#4157CF'] } },
-  { id: 'hastane', categories: ['hastane-devlet', 'hastane-ozel'], look: { icon: 'local-hospital', colors: ['#F48A8A', '#D63A3A'] } },
-  { id: 'asm', categories: ['aile-sagligi-merkezi'], look: { icon: 'healing', colors: ['#F7A6C8', '#D04C88'] } },
-  { id: 'emniyet', categories: ['emniyet', 'jandarma'], look: { icon: 'local-police', colors: ['#6CB6FA', '#2165C9'] } },
-  { id: 'itfaiye', categories: ['itfaiye'], look: { icon: 'fire-truck', colors: ['#FFB25C', '#EE5A24'] } },
+  { id: 'kamu', categories: ['valilik', 'kaymakamlik', 'il-mudurlugu', 'adliye', 'goc-idaresi', 'diger'], look: { icon: 'account-balance', colors: ['#8EA2F7', '#5468E0'] } },
+  { id: 'hastane', categories: ['hastane-devlet', 'hastane-ozel'], look: { icon: 'medical-services', colors: ['#F48A8A', '#E04848'] } },
+  { id: 'eczane', look: { icon: 'local-pharmacy', colors: ['#7FDB86', '#2E9B48'] } },
+  { id: 'emniyet', categories: ['emniyet', 'jandarma'], look: { icon: 'local-police', colors: ['#B49CF7', '#7651E0'] } },
+  { id: 'itfaiye', categories: ['itfaiye'], look: { icon: 'fire-truck', colors: ['#FFB25C', '#EE6A24'] } },
   { id: 'nufus', categories: ['nufus-mudurlugu'], look: { icon: 'badge', colors: ['#4FDCCB', '#11907F'] } },
-  { id: 'noter', categories: ['noter'], look: { icon: 'gavel', colors: ['#C9A27A', '#8A5A35'] } },
+  { id: 'noter', categories: ['noter'], look: { icon: 'gavel', colors: ['#E8C07A', '#B98A3A'] } },
   { id: 'ptt', categories: ['ptt'], look: { icon: 'mail', colors: ['#FFD86B', '#D9A400'] } },
   { id: 'vergi', categories: ['vergi-dairesi'], look: { icon: 'receipt-long', colors: ['#9EA8F5', '#4F5BD5'] } },
-  { id: 'sgk', categories: ['sgk'], look: { icon: 'health-and-safety', colors: ['#7FDB86', '#2E9B48'] } },
-  { id: 'egitim', categories: ['okul', 'halk-egitim', 'kutuphane'], look: { icon: 'school', colors: ['#D59CF0', '#8B3FC8'] } },
-  { id: 'toplanma', section: 'toplanma-alanlari', look: LOOK.toplanma },
+  { id: 'sgk', categories: ['sgk'], look: { icon: 'health-and-safety', colors: ['#5FD0F5', '#1C7FD6'] } },
+  { id: 'kabin', look: { icon: 'healing', colors: ['#F7A6C8', '#D04C88'] } },
+  { id: 'asm', categories: ['aile-sagligi-merkezi'], look: { icon: 'local-hospital', colors: ['#F48A8A', '#E04848'] } },
+  { id: 'egitim', categories: ['okul', 'halk-egitim'], look: { icon: 'school', colors: ['#D59CF0', '#8B3FC8'] } },
+  { id: 'kutuphane', categories: ['kutuphane'], look: { icon: 'menu-book', colors: ['#C9A27A', '#8A5A35'] } },
+  { id: 'banka', look: { icon: 'account-balance-wallet', colors: ['#7FDB86', '#2E9B48'] } },
 ];

@@ -560,7 +560,7 @@
     "showcase": "City Showcase",
     "townhallHint": "Services and applications",
     "tiles": {
-      "cafe": "Cafés & rest.",
+      "cafe": "Cafés and Restaurants",
       "events": "Events",
       "pharmacy": "On-duty pharmacy",
       "listings": "For sale & rent",
@@ -583,7 +583,7 @@
     "districts": "Districts",
     "parks": "Parks",
     "markets": "Markets",
-    "kurumlarIntro": "Neighbourhood heads, public offices, health and safety units.",
+    "kurumlarIntro": "Neighbourhood heads, public offices and health",
     "groups": {
       "muhtarlik": {
         "title": "Neighbourhood heads",
@@ -602,8 +602,8 @@
         "hint": "Family doctors"
       },
       "emniyet": {
-        "title": "Police and gendarmerie",
-        "hint": "Police stations"
+        "title": "Police",
+        "hint": "Police and gendarmerie stations"
       },
       "itfaiye": {
         "title": "Fire stations",
@@ -630,12 +630,24 @@
         "hint": "Social security matters"
       },
       "egitim": {
-        "title": "Education and libraries",
-        "hint": "Schools, adult education, libraries"
+        "title": "Schools",
+        "hint": "Schools and education centres"
       },
-      "toplanma": {
-        "title": "Assembly areas",
-        "hint": "Disaster and emergency assembly areas"
+      "eczane": {
+        "title": "Pharmacies",
+        "hint": "On-duty pharmacies"
+      },
+      "kabin": {
+        "title": "Health cabins",
+        "hint": "Mobile health services"
+      },
+      "kutuphane": {
+        "title": "Libraries",
+        "hint": "Public libraries"
+      },
+      "banka": {
+        "title": "Banks",
+        "hint": "Public and private bank branches"
       }
     }
   },
