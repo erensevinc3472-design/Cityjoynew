@@ -257,7 +257,25 @@ service cloud.firestore {
               && d.paymentMethods.hasOnly(['nakit', 'kart', 'temassiz', 'yemek-karti', 'havale'])))
         && (!('amenities' in d) || (d.amenities is list && d.amenities.hasOnly(['paket-servis', 'aile-alani',
               'engelli-erisimi', 'otopark', 'wifi', 'cocuk-dostu', 'evcil-hayvan', 'rezervasyon'])))
-        && validSearchKeys(d, 60);
+        && validSearchKeys(d, 60)
+        && validRoadside(d);
+    }
+
+    // Yol üstü tesis (Yol Arkadaşı): olanaklar listeden; işaretlenmişse (ve "yol-ustu" türünde her zaman) olanak ve
+    // Türkiye içinde bir konum zorunlu. Konum yalnızca yol üstü tesiste tutulur.
+    function validRoadside(d) {
+      let on = d.type == 'yol-ustu' || 'roadside' in d;
+      return (!('roadside' in d) || (d.roadside is list && d.roadside.size() >= 1 && d.roadside.size() <= 11
+              && d.roadside.hasOnly(['tuvalet', 'akaryakit', 'lpg', 'sarj', 'restoran', 'kafe', 'mescit', 'market',
+                'oyun-alani', 'bebek-bakim', 'hediyelik'])))
+        && (!on || ('roadside' in d && 'geo' in d))
+        && (!('geo' in d) || (on && validGeo(d.geo)));
+    }
+    function validGeo(g) {
+      return g is map && g.keys().hasOnly(['lat', 'lng', 'geohash']) && g.keys().hasAll(['lat', 'lng', 'geohash'])
+        && g.lat is number && g.lat >= 35.5 && g.lat <= 42.5
+        && g.lng is number && g.lng >= 25.5 && g.lng <= 45
+        && g.geohash is string && g.geohash.matches('^[0-9b-hjkmnp-z]{9}$');
     }
 
     // İşletme yetkilileri (en çok 3; sahibi atar): kimlik listesi + izin haritası birlikte tutarlı olmalı.
@@ -292,7 +310,7 @@ service cloud.firestore {
 
     function businessContentKeys() {
       return ['type', 'name', 'categoryIds', 'location', 'address', 'phone', 'whatsapp', 'is24h', 'hoursNote',
-              'description', 'priceList', 'searchKeys', 'weeklyHours', 'paymentMethods', 'amenities'];
+              'description', 'priceList', 'searchKeys', 'weeklyHours', 'paymentMethods', 'amenities', 'roadside', 'geo'];
     }
 
     function businessPath(id) {

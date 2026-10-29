@@ -259,7 +259,9 @@
       "description": "Tanıtım en çok 500 karakter olabilir.",
       "priceList": "Fiyat satırlarında hizmet ve fiyat ikisi de dolu olmalı (en çok 30 satır).",
       "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Kurum hesabı için CityJoy ile iletişime geçin.",
-      "hours": "Saatleri 09:00 biçiminde yaz; açılış ve kapanış aynı olamaz."
+      "hours": "Saatleri 09:00 biçiminde yaz; açılış ve kapanış aynı olamaz.",
+      "roadside": "Yol üstü tesisin en az bir olanağını seç (tuvalet, akaryakıt…).",
+      "geo": "Tesisin konumunu al: tesisteyken \"Konumu al\" düğmesine bas."
     },
     "hide": "Yayından kaldır (gizle)",
     "show": "Yeniden yayınla",
@@ -1540,5 +1542,40 @@
     "editorsPick": "Editör seçkisi",
     "archive": "Geçmiş sayılar",
     "empty": "{{city}} Vitrini'nin ilk sayısı hazırlanıyor. Her hafta şehrin en iyileri burada."
+  },
+  "roadside": {
+    "title": "Yol üstü tesis",
+    "toggle": "İşletmem yol üstünde",
+    "hint": "Yolculuk eden kullanıcılar ihtiyacına göre (tuvalet, yakıt, şarj, mescit…) yakınındaki tesisleri görür.",
+    "kindsHint": "Tesisinin çeşidini seç (en çok 5).",
+    "locationHint": "Yolcuların seni bulabilmesi için tesisin tam yeri gerekir. Tesisteyken düğmeye bas.",
+    "locate": "Konumu al",
+    "relocate": "Konumu yeniden al",
+    "located": "Konum kaydedildi: {{lat}}, {{lng}}",
+    "checkMap": "Haritada kontrol et",
+    "locationDenied": "Konum izni verilmedi. Telefon ayarlarından CityJoy'a konum izni verip tekrar dene.",
+    "locationFailed": "Konum alınamadı. Açık alanda tekrar dene.",
+    "directions": "Yol tarifi",
+    "badge": "Yol üstü",
+    "kinds": {
+      "yol-dinlenme-tesisi": "Dinlenme tesisi",
+      "yol-akaryakit": "Akaryakıt istasyonu",
+      "yol-sarj": "Şarj istasyonu",
+      "yol-lokanta": "Yol üstü lokanta",
+      "yol-bufe": "Büfe"
+    },
+    "features": {
+      "tuvalet": "Tuvalet",
+      "akaryakit": "Akaryakıt",
+      "lpg": "LPG",
+      "sarj": "Elektrikli araç şarjı",
+      "restoran": "Restoran",
+      "kafe": "Kafe",
+      "mescit": "Mescit",
+      "market": "Market",
+      "oyun-alani": "Çocuk oyun alanı",
+      "bebek-bakim": "Bebek bakım odası",
+      "hediyelik": "Hediyelik eşya"
+    }
   }
 }

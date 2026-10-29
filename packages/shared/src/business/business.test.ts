@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   cleanBusinessInput,
+  distanceKm,
+  encodeGeohash,
+  geoPoint,
   openState,
   postModeFor,
   rankBusinesses,
@@ -120,5 +123,37 @@ describe('sıralama (Karar, Eren)', () => {
     expect(postModeFor(b, 'ayse')).toBe('onayla');
     expect(postModeFor(b, 'veli')).toBeNull();
     expect(postModeFor(b, 'yabanci')).toBeNull();
+  });
+});
+
+describe('yol üstü tesis', () => {
+  it('geohash standart değeri verir', () => {
+    expect(encodeGeohash(57.64911, 10.40744, 11)).toBe('u4pruydqqvj');
+    expect(geoPoint(40.1885, 29.061).geohash).toHaveLength(9);
+  });
+
+  it('mesafeyi km olarak hesaplar (Bursa - İstanbul yaklaşık 92 km kuş uçuşu)', () => {
+    const d = distanceKm({ lat: 40.1885, lng: 29.061 }, { lat: 41.0082, lng: 28.9784 });
+    expect(d).toBeGreaterThan(88);
+    expect(d).toBeLessThan(96);
+  });
+
+  it('yol üstü türünde olanak ve konum zorunlu', () => {
+    const base = input({ type: 'yol-ustu', categoryIds: ['yol-dinlenme-tesisi'] });
+    expect(validateBusiness(base)).toEqual(['roadside', 'geo']);
+    expect(validateBusiness({ ...base, roadside: ['tuvalet'] })).toEqual(['geo']);
+    expect(validateBusiness({ ...base, roadside: ['tuvalet'], geo: geoPoint(40.2, 29.1) })).toEqual([]);
+  });
+
+  it('başka türdeki işletme de yol üstü olabilir; Türkiye dışı konum reddedilir', () => {
+    expect(validateBusiness(input({ roadside: ['restoran'], geo: geoPoint(40.2, 29.1) }))).toEqual([]);
+    expect(validateBusiness(input({ roadside: ['restoran'], geo: geoPoint(0, 0) }))).toEqual(['geo']);
+  });
+
+  it('temizlerken olanakları sıraya koyar; olanak yoksa konum da atılır', () => {
+    const c = cleanBusinessInput(input({ roadside: ['mescit', 'tuvalet'], geo: { lat: 40.1234567, lng: 29.7654321, geohash: 'x' } }));
+    expect(c.roadside).toEqual(['tuvalet', 'mescit']);
+    expect(c.geo).toEqual(geoPoint(40.1234567, 29.7654321));
+    expect(cleanBusinessInput(input({ geo: geoPoint(40.2, 29.1) })).geo).toBeUndefined();
   });
 });

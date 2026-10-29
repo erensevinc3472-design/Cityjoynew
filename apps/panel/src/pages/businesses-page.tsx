@@ -47,6 +47,8 @@ export function BusinessesPage() {
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
+  // "Yol üstü" süzgeci: türü yol-ustu olanlar ve kendini yol üstü tesis işaretleyen diğer işletmeler.
+  const [typeFilter, setTypeFilter] = useState<'' | 'yol-ustu'>('');
 
   const load = useCallback(async () => {
     setLoadError(false);
@@ -80,7 +82,8 @@ export function BusinessesPage() {
     }
   };
 
-  const categoryName = (id: string) => DEFAULT_SERVICE_CATEGORIES.find((c) => c.id === id)?.names.tr ?? id;
+  const categoryName = (id: string) => DEFAULT_SERVICE_CATEGORIES.find((c) => c.id === id)?.names.tr ?? t(`businesses.kinds.${id}`, { defaultValue: id });
+  const shown = (list ?? []).filter((b) => !typeFilter || b.type === 'yol-ustu' || !!b.roadside?.length);
   const place = (b: Business) =>
     [locationRepository.getDistrict(b.location.districtId)?.name, locationRepository.getProvince(b.location.provinceCode)?.name].filter(Boolean).join(', ');
   const now = new Date();
@@ -104,6 +107,11 @@ export function BusinessesPage() {
             <option key={p.code} value={p.code}>{p.name}</option>
           ))}
         </select>
+        <label htmlFor="biz-type" className="sr-only">{t('businesses.typeFilter')}</label>
+        <select id="biz-type" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as '' | 'yol-ustu')}>
+          <option value="">{t('businesses.allTypes')}</option>
+          <option value="yol-ustu">{t('businesses.roadsideOnly')}</option>
+        </select>
       </div>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
 
@@ -114,7 +122,7 @@ export function BusinessesPage() {
         </div>
       ) : list === null ? (
         <div className="state" aria-live="polite">{t('businesses.loading')}</div>
-      ) : list.length === 0 ? (
+      ) : shown.length === 0 ? (
         <div className="state">{t('businesses.empty')}</div>
       ) : (
         <div className="table-wrap">
@@ -129,7 +137,7 @@ export function BusinessesPage() {
               </tr>
             </thead>
             <tbody>
-              {list.map((b) => {
+              {shown.map((b) => {
                 const featured = isFeatured(b, now);
                 return (
                   <tr key={b.id}>
@@ -137,6 +145,17 @@ export function BusinessesPage() {
                       <strong>{b.name}</strong>
                       <div className="meta">{t(`businesses.types.${b.type}`)} · {place(b)}</div>
                       <div className="meta">{b.categoryIds.map(categoryName).join(', ')}</div>
+                      {b.roadside?.length ? (
+                        <div className="meta">
+                          {t('businesses.roadside', { list: b.roadside.map((m) => t(`businesses.roadsideFeatures.${m}`)).join(', ') })}
+                          {' · '}
+                          {b.geo ? (
+                            <a href={`https://www.google.com/maps/search/?api=1&query=${b.geo.lat},${b.geo.lng}`} target="_blank" rel="noreferrer">{t('businesses.onMap')}</a>
+                          ) : (
+                            t('businesses.noGeo')
+                          )}
+                        </div>
+                      ) : null}
                       <div className="meta" dir="ltr">{b.phone}</div>
                       <div className="meta">{t('businesses.followers', { count: b.followerCount })}</div>
                       {/* Yetkililer (sahibi atar); admin kötüye kullanımda çıkarır, işlem kayda geçer. */}

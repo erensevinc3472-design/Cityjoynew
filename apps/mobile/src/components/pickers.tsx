@@ -210,14 +210,23 @@ export function CategoryPicker({
 /** Yeme-içme işletmesinin türleri (kafe, restoran, kebap…): hizmet kategorileri yerine seçilir. */
 export function FoodKindPicker({ selected, max, onChange }: { selected: string[]; max: number; onChange(ids: string[]): void }) {
   const { t } = useTranslation();
+  return <IconChipPicker options={FOOD_KINDS.map((k) => ({ id: k.id, icon: k.icon, label: t(`food.kinds.${k.id}`) }))} selected={selected} max={max} onChange={onChange} />;
+}
+
+/**
+ * Simgeli çoklu seçim (yeme-içme türleri, yol üstü tesis çeşidi ve olanakları). Listede olmayan seçimler dışarıda
+ * kalır; max dolunca seçilmemişler soluklaşır.
+ */
+export function IconChipPicker({ options, selected, max, onChange }: { options: { id: string; icon: string; label: string }[]; selected: string[]; max?: number; onChange(ids: string[]): void }) {
   const c = useThemeColors();
-  const own = selected.filter((id) => FOOD_KINDS.some((k) => k.id === id));
-  const toggle = (id: string) => onChange(own.includes(id) ? own.filter((x) => x !== id) : own.length < max ? [...own, id] : own);
+  const own = selected.filter((id) => options.some((k) => k.id === id));
+  const full = max !== undefined && own.length >= max;
+  const toggle = (id: string) => onChange(own.includes(id) ? own.filter((x) => x !== id) : full ? own : [...own, id]);
   return (
     <View style={styles.chips}>
-      {FOOD_KINDS.map((k) => {
+      {options.map((k) => {
         const on = own.includes(k.id);
-        const disabled = !on && own.length >= max;
+        const disabled = !on && full;
         return (
           <Pressable
             key={k.id}
@@ -226,8 +235,8 @@ export function FoodKindPicker({ selected, max, onChange }: { selected: string[]
             disabled={disabled}
             onPress={() => toggle(k.id)}
             style={[styles.chip, styles.foodChip, on ? { backgroundColor: c.primary, borderColor: c.primary } : { borderColor: c.border, backgroundColor: c.surface, opacity: disabled ? 0.5 : 1 }]}>
-            <MaterialIcons name={(k.icon in MaterialIcons.glyphMap ? k.icon : 'restaurant') as never} size={16} color={on ? c.onPrimary : c.icon} />
-            <AppText variant="caption" style={{ color: on ? c.onPrimary : c.text }}>{t(`food.kinds.${k.id}`)}</AppText>
+            <MaterialIcons name={(k.icon in MaterialIcons.glyphMap ? k.icon : 'check') as never} size={16} color={on ? c.onPrimary : c.icon} />
+            <AppText variant="caption" style={{ color: on ? c.onPrimary : c.text }}>{k.label}</AppText>
           </Pressable>
         );
       })}

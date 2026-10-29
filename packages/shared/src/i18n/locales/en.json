@@ -259,7 +259,9 @@
       "description": "Description can be at most 500 characters.",
       "priceList": "Each price row needs both a service and a price (max 30 rows).",
       "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Contact CityJoy for an institution account.",
-      "hours": "Write hours like 09:00; opening and closing can't be the same."
+      "hours": "Write hours like 09:00; opening and closing can't be the same.",
+      "roadside": "Choose at least one roadside facility (toilet, fuel…).",
+      "geo": "Set the facility's location: tap \"Use my location\" while you are there."
     },
     "hide": "Unpublish (hide)",
     "show": "Publish again",
@@ -1540,5 +1542,40 @@
     "editorsPick": "Editor's pick",
     "archive": "Past issues",
     "empty": "The first {{city}} Showcase is on its way. Every week, the city's best in one place."
+  },
+  "roadside": {
+    "title": "Roadside facility",
+    "toggle": "My business is on the road",
+    "hint": "Travellers see nearby facilities by what they need (toilet, fuel, charging, prayer room…).",
+    "kindsHint": "Choose your facility type (up to 5).",
+    "locationHint": "Travellers need the exact location to find you. Tap the button while you are at the facility.",
+    "locate": "Use my location",
+    "relocate": "Update location",
+    "located": "Location saved: {{lat}}, {{lng}}",
+    "checkMap": "Check on map",
+    "locationDenied": "Location permission was not given. Allow location for CityJoy in your phone settings and try again.",
+    "locationFailed": "Couldn't get your location. Try again in an open area.",
+    "directions": "Directions",
+    "badge": "Roadside",
+    "kinds": {
+      "yol-dinlenme-tesisi": "Rest area",
+      "yol-akaryakit": "Fuel station",
+      "yol-sarj": "Charging station",
+      "yol-lokanta": "Roadside restaurant",
+      "yol-bufe": "Snack bar"
+    },
+    "features": {
+      "tuvalet": "Toilet",
+      "akaryakit": "Fuel",
+      "lpg": "LPG",
+      "sarj": "EV charging",
+      "restoran": "Restaurant",
+      "kafe": "Café",
+      "mescit": "Prayer room",
+      "market": "Shop",
+      "oyun-alani": "Children's play area",
+      "bebek-bakim": "Baby changing room",
+      "hediyelik": "Gifts and souvenirs"
+    }
   }
 }

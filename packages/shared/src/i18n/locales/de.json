@@ -259,7 +259,9 @@
       "description": "Die Beschreibung darf höchstens 500 Zeichen haben.",
       "priceList": "Jede Preiszeile braucht Leistung und Preis (höchstens 30 Zeilen).",
       "reservedName": "Dieser Name ist offiziellen Einrichtungen vorbehalten (Gemeinde, Gouverneursamt, CityJoy usw.). Für ein Behördenkonto wenden Sie sich an CityJoy.",
-      "hours": "Uhrzeiten wie 09:00 eingeben; Öffnung und Schließung dürfen nicht gleich sein."
+      "hours": "Uhrzeiten wie 09:00 eingeben; Öffnung und Schließung dürfen nicht gleich sein.",
+      "roadside": "Wähle mindestens eine Einrichtung (WC, Kraftstoff…).",
+      "geo": "Standort festlegen: Tippe vor Ort auf \"Standort übernehmen\"."
     },
     "hide": "Nicht mehr anzeigen",
     "show": "Wieder veröffentlichen",
@@ -1540,5 +1542,40 @@
     "editorsPick": "Redaktionstipp",
     "archive": "Frühere Ausgaben",
     "empty": "Die erste Ausgabe des {{city}} Schaufensters ist in Arbeit. Jede Woche das Beste der Stadt."
+  },
+  "roadside": {
+    "title": "Raststätte / Rastplatz",
+    "toggle": "Mein Betrieb liegt an der Straße",
+    "hint": "Reisende sehen nahe Einrichtungen nach Bedarf (WC, Kraftstoff, Laden, Gebetsraum…).",
+    "kindsHint": "Wähle die Art deiner Einrichtung (höchstens 5).",
+    "locationHint": "Reisende brauchen den genauen Standort. Tippe auf die Schaltfläche, während du vor Ort bist.",
+    "locate": "Standort übernehmen",
+    "relocate": "Standort aktualisieren",
+    "located": "Standort gespeichert: {{lat}}, {{lng}}",
+    "checkMap": "Auf der Karte prüfen",
+    "locationDenied": "Keine Standortberechtigung. Erlaube CityJoy den Standort in den Telefoneinstellungen und versuche es erneut.",
+    "locationFailed": "Standort konnte nicht ermittelt werden. Versuche es im Freien erneut.",
+    "directions": "Route",
+    "badge": "An der Straße",
+    "kinds": {
+      "yol-dinlenme-tesisi": "Raststätte",
+      "yol-akaryakit": "Tankstelle",
+      "yol-sarj": "Ladestation",
+      "yol-lokanta": "Straßenrestaurant",
+      "yol-bufe": "Imbiss"
+    },
+    "features": {
+      "tuvalet": "WC",
+      "akaryakit": "Kraftstoff",
+      "lpg": "Autogas",
+      "sarj": "E-Auto-Laden",
+      "restoran": "Restaurant",
+      "kafe": "Café",
+      "mescit": "Gebetsraum",
+      "market": "Shop",
+      "oyun-alani": "Kinderspielplatz",
+      "bebek-bakim": "Wickelraum",
+      "hediyelik": "Souvenirs"
+    }
   }
 }

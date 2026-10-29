@@ -324,7 +324,42 @@
       "dogrudan": "doğrudan"
     },
     "removeManager": "Yetkiliyi çıkar",
-    "removeManagerConfirm": "{{name}}, {{business}} işletmesinin yetkililerinden çıkarılsın mı? İşlem kayda geçer."
+    "removeManagerConfirm": "{{name}}, {{business}} işletmesinin yetkililerinden çıkarılsın mı? İşlem kayda geçer.",
+    "typeFilter": "İşletme türü",
+    "allTypes": "Tüm türler",
+    "roadsideOnly": "Yol üstü tesisler",
+    "roadside": "Yol üstü: {{list}}",
+    "noGeo": "Konum girilmemiş",
+    "onMap": "Haritada aç",
+    "kinds": {
+      "yemek-kafe": "Kafe",
+      "yemek-restoran": "Restoran",
+      "yemek-kahvalti": "Kahvaltı",
+      "yemek-kebap": "Kebap ve ızgara",
+      "yemek-pide-lahmacun": "Pide ve lahmacun",
+      "yemek-ev-yemekleri": "Ev yemekleri",
+      "yemek-balik": "Balık",
+      "yemek-tatli": "Tatlı ve pastane",
+      "yemek-fast-food": "Fast food",
+      "yol-dinlenme-tesisi": "Dinlenme tesisi",
+      "yol-akaryakit": "Akaryakıt istasyonu",
+      "yol-sarj": "Şarj istasyonu",
+      "yol-lokanta": "Yol üstü lokanta",
+      "yol-bufe": "Büfe"
+    },
+    "roadsideFeatures": {
+      "tuvalet": "Tuvalet",
+      "akaryakit": "Akaryakıt",
+      "lpg": "LPG",
+      "sarj": "Elektrikli araç şarjı",
+      "restoran": "Restoran",
+      "kafe": "Kafe",
+      "mescit": "Mescit",
+      "market": "Market",
+      "oyun-alani": "Çocuk oyun alanı",
+      "bebek-bakim": "Bebek bakım odası",
+      "hediyelik": "Hediyelik eşya"
+    }
   },
   "moderation": {
     "title": "Moderasyon",

@@ -23,6 +23,95 @@ export const FOOD_KINDS = [
 export type FoodKindId = (typeof FOOD_KINDS)[number]['id'];
 export const isFoodKind = (id: string): id is FoodKindId => FOOD_KINDS.some((k) => k.id === id);
 
+/**
+ * Yol Arkadaşı (Eren, 29 Ekim 2026): "Yol üstü tesis" türündeki işletmenin çeşidi. Yeme-içme türleri gibi categoryIds
+ * içinde "yol-" önekiyle tutulur.
+ */
+export const ROADSIDE_KINDS = [
+  { id: 'yol-dinlenme-tesisi', icon: 'storefront' },
+  { id: 'yol-akaryakit', icon: 'local-gas-station' },
+  { id: 'yol-sarj', icon: 'ev-station' },
+  { id: 'yol-lokanta', icon: 'restaurant' },
+  { id: 'yol-bufe', icon: 'fastfood' },
+] as const;
+export type RoadsideKindId = (typeof ROADSIDE_KINDS)[number]['id'];
+export const isRoadsideKind = (id: string): id is RoadsideKindId => ROADSIDE_KINDS.some((k) => k.id === id);
+
+/**
+ * Yol üstü tesisin olanakları: yolcu "Tuvalet", "Yakıt" gibi ihtiyacına göre arar. Her işletme türü kendini yol üstü
+ * tesis olarak işaretleyebilir (yol kenarındaki restoran, akaryakıt istasyonu); işaretleyen tam konumunu da girer.
+ */
+export const ROADSIDE_FEATURES = [
+  { id: 'tuvalet', icon: 'wc' },
+  { id: 'akaryakit', icon: 'local-gas-station' },
+  { id: 'lpg', icon: 'propane-tank' },
+  { id: 'sarj', icon: 'ev-station' },
+  { id: 'restoran', icon: 'restaurant' },
+  { id: 'kafe', icon: 'local-cafe' },
+  { id: 'mescit', icon: 'mosque' },
+  { id: 'market', icon: 'local-grocery-store' },
+  { id: 'oyun-alani', icon: 'toys' },
+  { id: 'bebek-bakim', icon: 'child-care' },
+  { id: 'hediyelik', icon: 'card-giftcard' },
+] as const;
+export type RoadsideFeature = (typeof ROADSIDE_FEATURES)[number]['id'];
+export const ROADSIDE_FEATURE_IDS = ROADSIDE_FEATURES.map((f) => f.id) as RoadsideFeature[];
+
+/** Tesisin yeri. geohash yakındaki tesisleri aramak için (9 harf, yaklaşık 5 metre). */
+export interface GeoPoint {
+  lat: number;
+  lng: number;
+  geohash: string;
+}
+
+/** Türkiye ve hemen çevresi: yanlış girilmiş (ör. 0,0) konumları ayıklar. */
+export const TURKEY_BOUNDS = { lat: [35.5, 42.5], lng: [25.5, 45] } as const;
+
+const BASE32 = '0123456789bcdefghjkmnpqrstuvwxyz';
+
+/** Standart geohash (enlem/boylam bitleri dönüşümlü). */
+export function encodeGeohash(lat: number, lng: number, precision = 9): string {
+  let latR = [-90, 90];
+  let lngR = [-180, 180];
+  let out = '';
+  let bit = 0;
+  let ch = 0;
+  let even = true;
+  while (out.length < precision) {
+    const r = even ? lngR : latR;
+    const v = even ? lng : lat;
+    const mid = (r[0] + r[1]) / 2;
+    if (v >= mid) {
+      ch = (ch << 1) | 1;
+      r[0] = mid;
+    } else {
+      ch <<= 1;
+      r[1] = mid;
+    }
+    even = !even;
+    if (++bit === 5) {
+      out += BASE32[ch];
+      bit = 0;
+      ch = 0;
+    }
+  }
+  return out;
+}
+
+export function geoPoint(lat: number, lng: number): GeoPoint {
+  const round = (x: number) => Math.round(x * 1e6) / 1e6;
+  return { lat: round(lat), lng: round(lng), geohash: encodeGeohash(lat, lng) };
+}
+
+/** İki nokta arası kuş uçuşu km (haversine). */
+export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+  const rad = (x: number) => (x * Math.PI) / 180;
+  const dLat = rad(b.lat - a.lat);
+  const dLng = rad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(h));
+}
+
 /** Ev adresi gösterilmeyen türler: konum mahalle düzeyinde kalır (PROJE.md 5.7, ev işletmeleri için gizlilik). */
 export const HOME_BASED_TYPES: readonly BusinessType[] = ['evden-uretim'];
 
@@ -90,6 +179,10 @@ export interface BusinessInput {
   weeklyHours?: (DayHours | null)[];
   paymentMethods?: PaymentMethod[];
   amenities?: Amenity[];
+  /** Yol üstü tesisse olanakları (en az 1); "yol-ustu" türünde zorunlu. Verilirse geo da zorunlu. */
+  roadside?: RoadsideFeature[];
+  /** Tesisin tam yeri (şimdilik yalnızca yol üstü tesislerde). */
+  geo?: GeoPoint;
 }
 
 export interface Business extends BusinessInput {
@@ -131,7 +224,9 @@ export type BusinessError =
   | 'hoursNote'
   | 'description'
   | 'priceList'
-  | 'hours';
+  | 'hours'
+  | 'roadside'
+  | 'geo';
 
 const TIME = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
@@ -153,9 +248,17 @@ export function validateBusiness(b: BusinessInput): BusinessError[] {
     b.priceList.some((p) => !len(p.name) || len(p.name) > BUSINESS_LIMITS.priceName || !len(p.price) || len(p.price) > BUSINESS_LIMITS.priceValue)
   )
     errors.push('priceList');
+  const roadside = b.type === 'yol-ustu' || b.roadside !== undefined;
+  if (roadside && !b.roadside?.length) errors.push('roadside');
+  if (b.geo && !validGeo(b.geo)) errors.push('geo');
+  else if (roadside && !b.geo) errors.push('geo');
   if (b.weeklyHours && (b.weeklyHours.length !== 7 || b.weeklyHours.some((d) => d && (!TIME.test(d.open) || !TIME.test(d.close) || d.open === d.close)))) errors.push('hours');
   return errors;
 }
+
+const validGeo = (g: GeoPoint) =>
+  Number.isFinite(g.lat) && Number.isFinite(g.lng) &&
+  g.lat >= TURKEY_BOUNDS.lat[0] && g.lat <= TURKEY_BOUNDS.lat[1] && g.lng >= TURKEY_BOUNDS.lng[0] && g.lng <= TURKEY_BOUNDS.lng[1];
 
 /** Kaydetmeden önce boşlukları temizler, boş alanları atar. */
 export function cleanBusinessInput(b: BusinessInput): BusinessInput {
@@ -175,6 +278,8 @@ export function cleanBusinessInput(b: BusinessInput): BusinessInput {
     ...(b.weeklyHours && !b.is24h && b.weeklyHours.some(Boolean) ? { weeklyHours: b.weeklyHours.map((d) => (d ? { open: d.open, close: d.close } : null)) } : {}),
     paymentMethods: PAYMENT_METHODS.filter((m) => b.paymentMethods?.includes(m)),
     amenities: AMENITIES.filter((m) => b.amenities?.includes(m)),
+    ...(b.roadside?.length ? { roadside: ROADSIDE_FEATURE_IDS.filter((m) => b.roadside!.includes(m)) } : {}),
+    ...(b.roadside?.length && b.geo ? { geo: geoPoint(b.geo.lat, b.geo.lng) } : {}),
   };
 }
 
