@@ -538,6 +538,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Açık işler ve bilinen eksikler
 
+- **Eren'in yapacakları tek listede:** `docs/eren-yapilacaklar.md` (31 Ekim). Eren bir maddeyi bitirdim deyince işaretle.
 - **Mağaza öncesi kontrol listesi (30 Ekim 2026, 20 maddelik liste üzerinden):** Claude'un üç işi yapıldı (konum izni metni,
   çökme ekranı, "Bağlantı yok" bildirimi; Yapılanlar'da). EAS ile gelecekler: çökme
   raporu ve analiz (Sentry ya da Crashlytics), gerçek bildirim denemesi, TestFlight ile 5-10 kişiyle gerçek kullanıcı testi
