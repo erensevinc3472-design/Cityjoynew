@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "CityJoy uses your location only while you use a feature: to send your location to your family list when you trigger SOS, to show rest stops along your route in On the road, and to pin your business on the map.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "When you send an SOS, your location keeps reaching your family list even if the screen locks or the app closes. Background location is used only while an SOS is active (up to 2 hours). While the app is open, it is also used to show rest stops along your route and to pin your business on the map.",
+    "NSLocationAlwaysUsageDescription": "When you send an SOS, your location keeps reaching your family list even if the screen locks or the app closes. Background location is used only while an SOS is active (up to 2 hours). While the app is open, it is also used to show rest stops along your route and to pin your business on the map."
+  }
+}

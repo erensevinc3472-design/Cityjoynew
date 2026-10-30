@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "CityJoy konumunuzu yalnızca bir özelliği kullanırken alır: SOS gönderdiğinizde konumunuzu aile listenizdeki kişilere iletmek, Yoldayım ekranında yolunuzun üstündeki mola yerlerini göstermek ve işletmenizin yerini haritada işaretlemek için.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "SOS gönderdiğinizde ekran kilitlense ya da uygulama kapansa da konumunuz aile listenizdeki kişilere iletilmeye devam eder. Arka planda konum yalnızca SOS süresince (en çok 2 saat) kullanılır. Uygulama açıkken Yoldayım ekranında yol üstü mola yerlerini göstermek ve işletmenizin yerini işaretlemek için de kullanılır.",
+    "NSLocationAlwaysUsageDescription": "SOS gönderdiğinizde ekran kilitlense ya da uygulama kapansa da konumunuz aile listenizdeki kişilere iletilmeye devam eder. Arka planda konum yalnızca SOS süresince (en çok 2 saat) kullanılır. Uygulama açıkken Yoldayım ekranında yol üstü mola yerlerini göstermek ve işletmenizin yerini işaretlemek için de kullanılır."
+  }
+}

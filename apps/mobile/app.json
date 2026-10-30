@@ -58,8 +58,8 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "CityJoy, SOS gönderdiğinizde konumunuzu yalnızca aile listenizdeki kişilere iletmek için kullanır.",
-          "locationAlwaysAndWhenInUsePermission": "SOS gönderdiğinizde ekran kilitlense ya da uygulama kapansa da konumunuz aile listenizdeki kişilere iletilmeye devam eder. Yalnızca SOS süresince (en çok 2 saat) kullanılır; başka zaman arka planda konum alınmaz.",
+          "locationWhenInUsePermission": "CityJoy konumunuzu yalnızca bir özelliği kullanırken alır: SOS gönderdiğinizde konumunuzu aile listenizdeki kişilere iletmek, Yoldayım ekranında yolunuzun üstündeki mola yerlerini göstermek ve işletmenizin yerini haritada işaretlemek için.",
+          "locationAlwaysAndWhenInUsePermission": "SOS gönderdiğinizde ekran kilitlense ya da uygulama kapansa da konumunuz aile listenizdeki kişilere iletilmeye devam eder. Arka planda konum yalnızca SOS süresince (en çok 2 saat) kullanılır. Uygulama açıkken Yoldayım ekranında yol üstü mola yerlerini göstermek ve işletmenizin yerini işaretlemek için de kullanılır.",
           "isAndroidBackgroundLocationEnabled": true,
           "isAndroidForegroundServiceEnabled": true,
           "isIosBackgroundLocationEnabled": true
@@ -77,6 +77,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "locales": {
+      "tr": "./locales/tr.json",
+      "en": "./locales/en.json",
+      "de": "./locales/de.json",
+      "ar": "./locales/ar.json",
+      "ru": "./locales/ru.json"
     }
   }
 }
