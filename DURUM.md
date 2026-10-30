@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 29 Ekim 2026 (Seyahat 2. aşama; önceki: tasarım uygulaması ilk dalga).
+Son güncelleme: 30 Ekim 2026 (mağaza öncesi: çökme ekranı, bağlantı uyarısı, konum izni metni; önceki: Seyahat 2. aşama).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -493,6 +493,13 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    gönder"ir, admin yayına alır, yayındaki tanıtım değişince yeniden onaya düşer. Kurallar + 3 yeni test (105 kural testi).
    **Eren yapacak:** PR birleştir, kuralları yükle, Panel > Seyahat > "Başlangıç içeriğini yükle" (yalnızca yeni rota ve
    yöresel eklenir), rotaları ve yöreselleri kontrol edip yayına al.
+- **Mağaza öncesi, Claude'un üç işi (30 Ekim, dal `claude/magaza-oncesi`):** (1) Kök hata yakalayıcı: bir ekran çökerse
+   "Bir sorun oldu" + "Tekrar dene" (`components/crash-screen.tsx`, `_layout.tsx` içinde `ErrorBoundary`; ayar ve oturuma
+   bağlı değil, açılışta çökerse açılış görselini kapatır). (2) İnternet kesilince altta 5 saniyelik "Bağlantı yok" bildirimi
+   (`components/offline-banner.tsx`, `@react-native-community/netinfo`; düğmeleri kapatmasın diye kaybolur, dokunmayı
+   engellemez). (3) iPhone konum izni metni SOS + Yoldayım (yol üstü mola yerleri) + işletme konumunu anlatıyor, 5 dilde
+   (`apps/mobile/locales/*.json`, `app.json` > `locales`; yalnızca EAS derlemesinde etkili, Expo Go kendi metnini gösterir).
+   Web önizlemede çökme ekranı ve bildirim görüldü; telefonda bakılmadı. Panel karşılığı gerekmez (altyapı).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -530,6 +537,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - Değerlendirme kuralları (5.6, Eren "gerekeni yap" dedi): uygulamadan arama şartı, kişi başına bir, cevap hakkı, şikâyet ve gizleme.
 
 ## Açık işler ve bilinen eksikler
+
+- **Mağaza öncesi kontrol listesi (30 Ekim 2026, 20 maddelik liste üzerinden):** Claude'un üç işi yapıldı (konum izni metni,
+  çökme ekranı, "Bağlantı yok" bildirimi; Yapılanlar'da). EAS ile gelecekler: çökme
+  raporu ve analiz (Sentry ya da Crashlytics), gerçek bildirim denemesi, TestFlight ile 5-10 kişiyle gerçek kullanıcı testi
+  (Apple geliştirici hesabı), Android'de deneme. Eren/avukat: gizlilik politikası ve kullanım şartları metni.
 
 - Toplu güvenlik taraması (`/security-review`, tüm kod: Firebase kuralları, giriş, yönetici yetkileri): Eren mağazaya
   çıkmadan önce en sonda toplu yapılmasını istedi (29 Ekim 2026).

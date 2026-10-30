@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "CityJoy verwendet deinen Standort nur, während du eine Funktion nutzt: um ihn bei einem SOS an deine Familienliste zu senden, um in „Unterwegs“ Rastplätze entlang deiner Route anzuzeigen und um dein Geschäft auf der Karte zu markieren.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Wenn du ein SOS sendest, wird dein Standort weiter an deine Familienliste übermittelt, auch wenn der Bildschirm gesperrt oder die App geschlossen ist. Im Hintergrund wird der Standort nur während eines aktiven SOS verwendet (höchstens 2 Stunden). Bei geöffneter App dient er außerdem dazu, Rastplätze entlang deiner Route anzuzeigen und dein Geschäft auf der Karte zu markieren.",
+    "NSLocationAlwaysUsageDescription": "Wenn du ein SOS sendest, wird dein Standort weiter an deine Familienliste übermittelt, auch wenn der Bildschirm gesperrt oder die App geschlossen ist. Im Hintergrund wird der Standort nur während eines aktiven SOS verwendet (höchstens 2 Stunden). Bei geöffneter App dient er außerdem dazu, Rastplätze entlang deiner Route anzuzeigen und dein Geschäft auf der Karte zu markieren."
+  }
+}

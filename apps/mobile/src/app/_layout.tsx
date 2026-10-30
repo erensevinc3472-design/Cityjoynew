@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 import { Platform, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { CrashScreen } from '@/components/crash-screen';
+import { OfflineBanner } from '@/components/offline-banner';
 import '@/lib/i18n';
 import { IncomingSosBanner, IncomingSosProvider, PushRegistrar } from '@/lib/incoming-sos';
 // SOS arka plan konum görevi, uygulama kapalıyken de çalışabilmesi için en başta tanımlanır.
@@ -45,12 +47,16 @@ function RootNavigator() {
         <IncomingSosProvider>
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }} />
           <IncomingSosBanner />
+          <OfflineBanner />
           <PushRegistrar />
         </IncomingSosProvider>
       </View>
     </LocaleProvider>
   );
 }
+
+/** Herhangi bir ekran çökerse uygulama beyaz ekranda kalmaz, "Bir sorun oldu, tekrar dene" gösterilir. */
+export const ErrorBoundary = CrashScreen;
 
 export default function RootLayout() {
   return (
