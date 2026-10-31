@@ -155,3 +155,26 @@ export function pointInProvince(p: { lat: number; lng: number }, provinceCode: s
   for (const center of Object.values(PROVINCE_CENTERS)) nearest = Math.min(nearest, distanceKm(p, center));
   return distanceKm(p, own) - nearest <= 60;
 }
+
+const placeKey = (s: string) =>
+  s
+    .toLocaleLowerCase('tr')
+    .replace(/ı/g, 'i')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/\b(ili|province|provinz|il)\b/g, '')
+    .replace(/[^a-z]/g, '');
+
+/** Telefonun adres çözümlemesinin verdiği bazı kısa ya da yabancı adlar. */
+const PLACE_ALIASES: Record<string, string> = { afyon: 'afyonkarahisar', maras: 'kahramanmaras', urfa: 'sanliurfa', antep: 'gaziantep', izmit: 'kocaeli', adapazari: 'sakarya', icel: 'mersin' };
+
+/**
+ * Telefonun adres çözümlemesinden gelen il adını (ör. "Bursa", "İstanbul", "Afyon") il koduna çevirir. Tanınmazsa null
+ * (o zaman uzaklık denetimi kullanılır).
+ */
+export function provinceCodeFromPlaceName(name: string | null | undefined, provinces: readonly { code: string; name: string }[]): string | null {
+  if (!name) return null;
+  const key = placeKey(name);
+  const want = PLACE_ALIASES[key] ?? key;
+  return provinces.find((p) => placeKey(p.name) === want)?.code ?? null;
+}

@@ -356,7 +356,8 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
   kategoriler elektronik, ev ve mobilya, ev aletleri, giyim, bebek ve çocuk, kitap ve hobi, spor, diğer; durum sıfır / az
   kullanılmış / kullanılmış / tamir gerekli. Fiyat TL, tam sayı (yalnızca satılık ve kiralıkta). İlanı e-postası
   doğrulanmış 18+ kişi kayıtlı mahallesiyle verir; yeni ilanda telefonun konumu bir kez kayıtlı ille karşılaştırılır
-  (yaklaşık; tek önlem sayılmaz). Günde en çok 5 ilan (ilk 7 gün 2). İlan 30 gün listede kalır, son 3 günde sahibi
+  (önce telefonun adres çözümlemesiyle il adı, olmazsa il merkezlerine uzaklık; tek önlem sayılmaz). Çarşı ekranında
+  konum değiştirme düğmesi yok (Eren, 31 Ekim): kişi yalnızca kayıtlı ilini görür ve oraya ilan verir. Günde en çok 5 ilan (ilk 7 gün 2). İlan 30 gün listede kalır, son 3 günde sahibi
   yeniler. 3 şikâyette listeden düşer, Panel > Moderasyon'da kaldırılır ya da yerinde kalır. İlan sohbeti ayrı sohbettir,
   istek aşaması yoktur, alıcı başlatır; iki taraf da Mesajlar > Çarşı'da görür. Telefon numarası alanı yok. Fotoğraflar
   Blaze ile (en çok 6). Formdaki yasaklı ürünler: silah ve mühimmat, ilaç, alkol ve tütün, canlı hayvan, sahte / taklit,
