@@ -560,6 +560,12 @@ Tümü yayından önce avukat tarafından kontrol edilmelidir.
 
 (Hukuk ve KVKK işleri 2. adımdan itibaren paralel hazırlanır, en sona bırakılmaz.)
 
+- **Karar (Eren, 31 Ekim 2026): ilk sürüm Bursa, altyapı 81 il.** Uygulama ilk sürümde Bursa içeriğiyle doldurulur;
+  kod, panel, yetkiler ve veri yapısı 81 ilde aynı çalışır, yeni il yalnızca veri ve yetkili hesaplarla açılır (kod
+  değişmez). Ülke geneli bölümler (Acil, Nasıl yapılır?, Seyahat, Yoldayım) her ilde baştan çalışır; içeriği olmayan
+  ilde boş durum ekranı görünür. Panelde "81 il durumu" tablosu hangi ilin ne kadar dolu olduğunu gösterir.
+  Belediye, oda ve haber sitesi ortaklıkları yayından sonraya bırakıldı (Eren'in yükünü azaltmak için).
+
 ## 11. Tasarım dosyaları
 
 Hepsi Eren'in bilgisayarında. Not: bazı dosyalar henüz bu belgeyi hazırlayan oturuma gelmedi, Claude Code dosyaların tam listesini klasörden görüp bu bölümü güncellemeli.

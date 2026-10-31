@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 30 Ekim 2026 (mağaza öncesi: çökme ekranı, bağlantı uyarısı, konum izni metni; önceki: Seyahat 2. aşama).
+Son güncelleme: 31 Ekim 2026 (kapsam kararı: ilk sürüm Bursa, altyapı 81 il; panelde "81 il durumu"). Önceki: mağaza öncesi (PR #38 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -500,6 +500,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    engellemez). (3) iPhone konum izni metni SOS + Yoldayım (yol üstü mola yerleri) + işletme konumunu anlatıyor, 5 dilde
    (`apps/mobile/locales/*.json`, `app.json` > `locales`; yalnızca EAS derlemesinde etkili, Expo Go kendi metnini gösterir).
    Web önizlemede çökme ekranı ve bildirim görüldü; telefonda bakılmadı. Panel karşılığı gerekmez (altyapı).
+- **Kapsam kararı ve 81 il durumu (31 Ekim, dal `claude/81-il`):** Karar (Eren): ilk sürüm Bursa içeriğiyle çıkar,
+   altyapı 81 il için hazır olur. Tarama: kodda Bursa'ya sabit bir şey yok (yalnızca yorumlar, testler ve Seyahat
+   başlangıç içeriği); konum 81 il / 973 ilçe, şehir rehberi, yetkiler ve OSM aracı (`scripts/osm-city-guide.ts <il kodu>`)
+   her ilde çalışıyor, boş ilde "Bu ilde henüz bilgi yok" görünür. Yeni: Panel > Şehir rehberi > "81 il durumu" (yalnızca
+   admin): her ilde Benim Şehrim bölümlerinin kayıt sayısı ve "dolu bölüm x / 9"; il adına basınca o il açılır. İl başına
+   tek özet belgesi okunur, kural değişikliği yok. Derleme ve 131 test geçti; gerçek veriyle panelde bakılmadı.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

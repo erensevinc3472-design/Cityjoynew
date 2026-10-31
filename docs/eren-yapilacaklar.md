@@ -5,7 +5,7 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 
 ## 1. Hemen (bugün yarın, kısa işler)
 
-- [ ] **PR'ı birleştir:** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/magaza-oncesi
+- [x] **PR'ı birleştir (yapıldı, 31 Ekim):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/magaza-oncesi
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Kural yüklemen gerekmiyor.
 - [ ] **Anthropic iadesi ve Max plan:** claude.ai > sol altta adın > Get help > Send us a message > Accept >
   Claude Refund Request. Sonra Ayarlar > Faturalandırma'dan Max plana geç.
@@ -61,7 +61,7 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 - [ ] **Nöbetçi eczane:** `docs/oneri-nobetci-eczane.md` önerisini onayla ya da değiştir. Onaylarsan nosyapi.com'dan
   hesap açıp anahtar al (anahtarı sohbete yazma; Claude nereye gireceğini söyler).
 - [ ] **Benim Şehrim Excel'i:** il/ilçe bilgilerinin olduğu dosya hazır olunca proje klasörüne koy.
-- [ ] **İlk sürümün kapsamı:** her şey hazır olunca mı çıkalım, yoksa önce yalnızca Bursa ve hazır bölümlerle mi?
+- [x] **İlk sürümün kapsamı (karar, 31 Ekim):** ilk sürüm Bursa içeriğiyle çıkar, altyapı 81 il için hazır.
 - [ ] **Belediye fotoğrafları (sonra):** belediyelerden şehir fotoğrafı kullanma izni (Blaze sonrası panelden yüklenecek).
 
 ## Claude'un yapacakları (bilgin olsun)
