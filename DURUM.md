@@ -588,6 +588,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   günlük sesli tavan (5); sunucu `pushCount/{uid}` ile sayar, tavandan sonra sessiz kanaldan gönderir; admin onayda "bildirim
   her zaman çalsın" (`ringAlways`). Düzeltilen hata: sunucu panelin kapattığı türleri yanlış alandan okuyordu. Testler:
   kurallar 130, sunucu 19, ortak 148. Birleşti, kurallar ve dizinler 31 Ekim'de yüklendi (Eren'in isteğiyle Claude).
+- **Hesap silinince hizmet önerileri ve sınır sayaçları da silinir (31 Ekim, dal `claude/hesap-oneri`).** Kişi kendi
+  önerilerini okuyup silebilir (kurallar), hesap ekranı siler; sunucudaki silme güvenlik ağı da öneri, sayaç ve günlük
+  bildirim sayacını (`pushCount`) temizler. Testler: kurallar 130, sunucu 19. **Kurallar değişti: birleşince yüklenmeli.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -658,8 +661,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
 - Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, asistan, taksi durağı (SOS ve hizmetler yapıldı).
-- Hizmet önerileri: admin hepsini, il yöneticisi kendi ilininkileri görür ve inceler. Günlük sınır yapıldı (31 Ekim);
-  hesap silinince kullanıcının önerilerinin silinmesi sunucu işleviyle eklenecek (Blaze plan gerektirir).
+- Hizmet önerileri: admin hepsini, il yöneticisi kendi ilininkileri görür ve inceler. Günlük sınır ve hesap silinince
+  önerilerin silinmesi yapıldı (31 Ekim; uygulama siler, sunucudaki günlük temizlik Blaze ile güvenlik ağı).
 - **SOS bildirimi ve arka plan konumu telefonda denenmedi:** kod hazır, ama Expo push adresi için `app.json` içinde EAS proje
   kimliği (`extra.eas.projectId`) gerekir; `eas init` ile gelir. Telefonda denenecekler: kilitli ekranda bildirim sesi,
   uygulama kapalıyken konum güncellemesi, bildirime dokununca SOS ekranı. Expo push güvenliği: bildirim adresleri yalnızca aile
@@ -694,7 +697,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Karar (Eren): bölümün adı **Çarşı**; Benim Şehrim kartı "Satılık & Kiralık" yerine "Çarşı" yapıldı (5 dil),
    Mesajlar'daki bölüm de "Çarşı" olacak. ~~Çarşı (eşya ilanları) ve Mesajlar > Çarşı~~ (31 Ekim). Çarşı'da kalan:
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
-4. ~~Günlük sınırlar ve bildirim öncelikleri~~ (31 Ekim). Kalan: hesap silinince hizmet önerilerinin silinmesi.
+4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
 5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
