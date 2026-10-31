@@ -1,9 +1,10 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { foldForSearch, isRequestFor, otherMember, type Chat } from '@cityjoy/shared';
+import { chatTitle, foldForSearch, inboxSection, isHiddenFor, otherMember, type Chat, type InboxSection } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { CheckboxRow } from '@/components/checkbox-row';
@@ -12,19 +13,18 @@ import { RoundButton } from '@/components/hero-header';
 import { SearchField } from '@/components/search-field';
 import { TopBar } from '@/components/top-bar';
 import { StateMessage } from '@/components/state-message';
-import { useChats, useReadReceipts } from '@/lib/messages';
+import { chatHref, useChats, useReadReceipts } from '@/lib/messages';
+import { businessRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { useSocial } from '@/lib/social';
 import { GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
-type Tab = 'sohbetler' | 'istekler';
-
 /**
  * Mesajlar (PROJE.md 5.11; profilin sağ üstünden açılır, 13. madde 31): üstte kullanıcı adım ve yeni mesaj düğmesi, altında
- * sohbetlerde arama. Sohbetlerim ve mesaj istekleri (takipleşmediğim kişilerden gelen, kabul etmediğim).
- * Engellediklerim listede görünmez. Okundu bilgisi buradan kapatılır.
+ * sohbetlerde arama. Sohbetlerim, mesaj istekleri (takipleşmediğim kişilerden gelen, kabul etmediğim) ve işletmesi olan
+ * kişide "İşletmem" (müşterilerin işletmeme yazdıkları). Engellediklerim ve sildiğim sohbetler listede görünmez. Okundu bilgisi buradan kapatılır.
  */
 export default function MessagesScreen() {
   const { t } = useTranslation();
@@ -38,13 +38,21 @@ export default function MessagesScreen() {
   const { chats, failed } = useChats(user?.uid);
   const { blocked, me: myProfile } = useSocial();
   const [receipts, setReceipts] = useReadReceipts();
-  const [tab, setTab] = useState<Tab>('sohbetler');
+  const [tab, setTab] = useState<InboxSection>('sohbetler');
   const [find, setFind] = useState('');
+  const [hasBusiness, setHasBusiness] = useState(false);
 
-  const visible = (chats ?? []).filter((x) => !blocked.has(otherMember(x, me)));
-  const requests = visible.filter((x) => isRequestFor(x, me));
+  useEffect(() => {
+    if (!me) return;
+    businessRepository.listMine(me).then((l) => setHasBusiness(l.length > 0), () => {});
+  }, [me]);
+
+  const visible = (chats ?? []).filter((x) => !blocked.has(otherMember(x, me)) && !isHiddenFor(x, me));
+  const count = (s: InboxSection) => visible.filter((x) => inboxSection(x, me) === s).length;
+  const unreadIn = (s: InboxSection) => visible.some((x) => inboxSection(x, me) === s && (x.unread[me] ?? 0) > 0);
   const needle = foldForSearch(find.trim());
-  const shown = (tab === 'istekler' ? requests : visible.filter((x) => !isRequestFor(x, me))).filter((x) => !needle || foldForSearch(x.names[otherMember(x, me)] ?? '').includes(needle));
+  const shown = visible.filter((x) => inboxSection(x, me) === tab && (!needle || foldForSearch(chatTitle(x, me)).includes(needle)));
+  const tabLabel = (s: InboxSection, label: string, n?: number) => `${label}${n ? ` (${n})` : ''}${unreadIn(s) && s !== tab ? ' •' : ''}`;
 
   const when = (iso: string) => {
     const d = new Date(iso);
@@ -65,41 +73,50 @@ export default function MessagesScreen() {
         right={user ? <RoundButton icon="edit-square" label={t('messages.newMessage')} onPress={() => router.push('/messages/new')} /> : undefined} />
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]} keyboardShouldPersistTaps="handled">
         <SearchField value={find} onChangeText={setFind} placeholder={t('messages.searchChats')} />
-        <Chips<Tab>
+        <Chips<InboxSection>
           label={t('messages.title')}
           value={tab}
           onChange={setTab}
           options={[
-            { value: 'sohbetler', label: t('messages.chats') },
-            { value: 'istekler', label: requests.length ? `${t('messages.requests')} (${requests.length})` : t('messages.requests') },
+            { value: 'sohbetler', label: tabLabel('sohbetler', t('messages.chats')) },
+            { value: 'istekler', label: tabLabel('istekler', t('messages.requests'), count('istekler')) },
+            ...(hasBusiness || count('isletmem') ? [{ value: 'isletmem' as const, label: tabLabel('isletmem', t('messages.business')) }] : []),
           ]}
         />
         {tab === 'istekler' ? <AppText variant="caption" muted>{t('messages.requestsIntro')}</AppText> : null}
+        {tab === 'isletmem' ? <AppText variant="caption" muted>{t('messages.businessIntro')}</AppText> : null}
         {failed && !chats?.length ? (
           <StateMessage kind="error" message={t('messages.loadError')} />
         ) : chats === null ? (
           <StateMessage kind="loading" />
         ) : shown.length === 0 ? (
-          <StateMessage kind="empty" message={needle ? t('messages.noMatch') : tab === 'istekler' ? t('messages.noRequests') : t('messages.empty')} />
+          <StateMessage kind="empty" message={needle ? t('messages.noMatch') : tab === 'istekler' ? t('messages.noRequests') : tab === 'isletmem' ? t('messages.noBusinessChats') : t('messages.empty')} />
         ) : (
           shown.map((x) => {
-            const other = otherMember(x, me);
+            const name = chatTitle(x, me);
+            // İşletme sohbetinde: müşteri işletmenin adını, sahibi müşterinin adını ve altında işletmesini görür.
+            const about = x.context && x.startedBy !== me ? x.context.title : null;
             const unread = x.unread[me] ?? 0;
             return (
               <Pressable
                 key={x.id}
                 accessibilityRole="button"
-                accessibilityLabel={`${x.names[other] ?? '?'}. ${preview(x)}${unread ? `. ${t('messages.unread', { count: unread })}` : ''}`}
-                onPress={() => router.push({ pathname: '/messages/[uid]', params: { uid: other } })}
+                accessibilityLabel={`${name}. ${about ? `${about}. ` : ''}${preview(x)}${unread ? `. ${t('messages.unread', { count: unread })}` : ''}`}
+                onPress={() => router.push(chatHref(x, me))}
                 style={({ pressed }) => [styles.row, { backgroundColor: c.surface, borderColor: unread ? c.accentBorder : c.border, opacity: pressed ? 0.85 : 1 }]}>
                 <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
-                  <AppText variant="label">{(x.names[other] ?? '?').slice(0, 1)}</AppText>
+                  {x.context && x.startedBy === me ? (
+                    <MaterialIcons name="storefront" size={20} color={c.textStrong} />
+                  ) : (
+                    <AppText variant="label">{name.slice(0, 1)}</AppText>
+                  )}
                 </View>
                 <View style={styles.texts}>
                   <View style={styles.line}>
-                    <AppText variant="label" numberOfLines={1} style={styles.grow}>{x.names[other] ?? '?'}</AppText>
+                    <AppText variant="label" numberOfLines={1} style={styles.grow}>{name}</AppText>
                     {x.last ? <AppText variant="caption" muted>{when(x.last.at)}</AppText> : null}
                   </View>
+                  {about ? <AppText variant="caption" muted numberOfLines={1}>{t('messages.aboutBusiness', { name: about })}</AppText> : null}
                   <View style={styles.line}>
                     <AppText variant="caption" muted={!unread} numberOfLines={1} style={styles.grow}>{preview(x)}</AppText>
                     {unread ? (

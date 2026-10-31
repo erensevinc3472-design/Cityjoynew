@@ -492,7 +492,8 @@
         "spam": "Spam ya da reklam",
         "uygunsuz": "Uygunsuz içerik",
         "diger": "Diğer"
-      }
+      },
+      "businessChat": "İşletme sohbeti (işletme: {{id}})"
     },
     "words": {
       "title": "Yasaklı kelimeler",

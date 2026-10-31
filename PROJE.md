@@ -332,6 +332,19 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
 - **Kapsam (Eren onayladı):** ilk sürümde metin ve fotoğraf, video ve ses mesajı yok. **Grup sohbeti ilk sürümde yok** (moderasyon ve maliyet).
 - **KVKK ve güvenlik:** mesaj saklama süresi tanımlanır, şikâyet edilen mesajlar inceleme için görülebilir, bu kullanım şartlarında belirtilir.
 - **Yapıldı (28 Ekim 2026):** birebir yazılı sohbet, mesaj istekleri (takipleşmeyenler), yetişkin ile 13-17 yaş arası yazışma kapalı, engel, mesaj silme, şikâyet (admin yalnızca şikâyet edilen mesajın kopyasını görür), okundu bilgisini kapatma, günlük yeni sohbet sınırı (yeni hesapta 10, sonra 30), IBAN / kapora / bağlantı uyarısı. Kalan: mesaj bildirimi, saklama süresi (TTL, Blaze), ilan kartıyla başlayan sohbet. Ayrıntı DURUM.md 29. madde.
+- **Eren'in isteği (31 Ekim 2026):** ekli olmayandan gelen mesaj istek olur (zaten vardı); işletmeye mesaj atılabilir ve bu
+  mesajlar Mesajlar'da "İşletmem" bölümüne düşer; Facebook Marketplace gibi bölgede satılık / kiralık ilan alanı ve
+  konuşmaları ayrı bölümde; mesaj silme ve engelleme. "Diğer detaylar sende."
+- **Claude'un kararları (31 Ekim 2026, yapıldı):** her işletme (ve ileride her ilan) için ayrı sohbet, kişisel sohbetle
+  karışmaz. İşletme sohbetinde istek aşaması yok, ama ilk mesajı yalnızca müşteri atar (işletme kimseye reklam mesajı
+  başlatamaz). Engel, yaş kuralı, günlük sınır, şikâyet ve dolandırıcılık uyarısı her sohbette geçerli. "Sohbeti sil"
+  yalnızca kişinin kendi listesinden kaldırır (karşı tarafın kopyası kalır); yeniden yazışılırsa eski mesajlar görünmez.
+  Mesajlar ekranı: Sohbetler, İstekler, İşletmem (işletmesi olana); İlanlar bölümü ilan pazarıyla gelecek.
+- **İlan pazarı önerisi (Eren'e soruldu, onay bekliyor):** ilk sürümde eşya ilanları (satılık, kiralık, ücretsiz, takas);
+  emlak ve araç ilanları sonra. Neden: Ticaret Bakanlığı'nın emlak ilan düzenlemesi ilan platformundan ilan verenin kimlik
+  ve yetki doğrulamasını istiyor; avukat görüşü ve kimlik doğrulama kurulmadan açılmamalı (avukata sorulacak). Fotoğraf
+  zorunlu olduğu için Storage, yani Blaze plan gerekir. Daha önceki kararlar geçerli: telefon numarası yok, yazışma
+  uygulama içinde, konumu doğrulanmamış kişi ilan veremez, günlük ilan sınırı, dolandırıcılık uyarıları.
 
 ### 5.12 Bildirimler (standart)
 

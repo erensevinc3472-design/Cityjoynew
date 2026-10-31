@@ -5,6 +5,11 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 
 ## 1. Hemen (bugün yarın, kısa işler)
 
+- [ ] **Mesajlar PR'ını birleştir ve kuralları yükle:** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/mesaj-isletme
+  > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra bu bilgisayarda
+  > Claude'a "kuralları yükle komutunu ver" de, ya da terminale şunu yaz:
+  > `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`
+  > (Kurallar yüklenmeden işletmeye mesaj ve "Sohbeti sil" canlı uygulamada çalışmaz.)
 - [x] **PR'ı birleştir (yapıldı, 31 Ekim):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/magaza-oncesi
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Kural yüklemen gerekmiyor.
 - [ ] **Anthropic iadesi ve Max plan:** claude.ai > sol altta adın > Get help > Send us a message > Accept >

@@ -1254,7 +1254,20 @@
     "noFollowing": "You don't follow anyone yet. You can search people by name above.",
     "writeTo": "Write to {{name}}",
     "noMatch": "No chat with this name.",
-    "titleUnread": "Messages, unread"
+    "titleUnread": "Messages, unread",
+    "business": "My business",
+    "businessIntro": "Messages customers sent to your business. Only a customer can start the chat; you reply.",
+    "noBusinessChats": "No customer messages yet.",
+    "aboutBusiness": "For your business: {{name}}",
+    "newBusiness": "Your message goes straight to the business. Never send a deposit or prepayment for something you have not seen.",
+    "businessUnavailable": "This business is not accepting messages right now.",
+    "businessStartError": "You cannot message this business right now (a block, the age rule or the daily new chat limit may apply).",
+    "openBusiness": "Open business",
+    "options": "Options",
+    "deleteChat": "Delete chat",
+    "deleteChatConfirm": "The chat is removed only from your list; the other person keeps it. If they write again, the chat comes back but older messages stay hidden.",
+    "deleteChatYes": "Yes, delete",
+    "cancel": "Cancel"
   },
   "notifications": {
     "title": "Notifications",

@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { chatId, type Chat } from '@cityjoy/shared';
+import { chatId, chatTitle, inboxSection, isHiddenFor, threadId, type Chat, type ChatContext, type ChatMessage } from '@cityjoy/shared';
 import { createFirestoreMessageRepository, createFirestoreSocialRepository, createMessageModeration } from '@cityjoy/shared/firebase';
 import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -42,6 +42,8 @@ beforeEach(async () => {
       await setDoc(doc(db, 'users', uid), { uid, displayName: uid, birthYear, createdAt });
       await setDoc(doc(db, 'publicProfiles', uid), { displayName: NAMES[uid], bio: '', isPrivate: uid === 'genc', updatedAt: new Date() });
     }
+    await setDoc(doc(db, 'businesses/kafe'), { ownerUid: 'veli', status: 'yayinda', name: 'Kafe Veli' });
+    await setDoc(doc(db, 'businesses/kapali'), { ownerUid: 'veli', status: 'gizli', name: 'Kapalı' });
   });
 });
 
@@ -122,6 +124,55 @@ describe('Mesajlar', () => {
     expect(removed.get('status')).toBe('kaldirildi');
     expect(removed.get('text')).toBe('');
     expect(await createMessageModeration(fs('eren'), 'eren').listReports()).toEqual([]);
+  });
+
+  it('işletmeye yazılan sohbet baştan açık, sahibinde "İşletmem"de; kişisel sohbetle karışmaz', async () => {
+    const kafe: ChatContext = { type: 'isletme', id: 'kafe', title: 'Kafe Veli' };
+    const toBiz = (from: string, ctx: ChatContext, text = 'Yarın açık mısınız?') =>
+      msg(from).send(from, 'veli', text, { chat: null, myName: NAMES[from], otherName: 'Veli', mutual: false, context: ctx });
+    await toBiz('ali', kafe);
+    const id = threadId('ali', 'veli', kafe);
+    let chat = (await msg('veli').getChat(id)) as Chat;
+    expect(chat.accepted).toBe(true);
+    expect(inboxSection(chat, 'veli')).toBe('isletmem');
+    expect(inboxSection(chat, 'ali')).toBe('sohbetler');
+    expect(chatTitle(chat, 'ali')).toBe('Kafe Veli');
+    expect(chatTitle(chat, 'veli')).toBe('Ali Y.');
+    await msg('veli').send('veli', 'ali', 'Evet, 8-22', { chat, myName: 'Veli', otherName: 'Ali Y.', mutual: false });
+    chat = (await msg('ali').getChat(id)) as Chat;
+    expect(chat.unread.ali).toBe(1);
+    // Aynı iki kişinin kişisel sohbeti ayrı (ve takipleşmedikleri için istek).
+    await send('ali', 'veli', 'Selam');
+    expect((await chatOf('veli', 'ali', 'veli')).accepted).toBe(false);
+    // İşletme müşteriye ilk mesajı atamaz; sahte ad, gizli işletme, başkasının işletmesi, yaş sınırı ve engel geçmez.
+    await assertFails(msg('veli').send('veli', 'ayse', 'Kampanya!', { chat: null, myName: 'Veli', otherName: 'Ayşe K.', mutual: false, context: kafe }));
+    await assertFails(toBiz('ayse', { ...kafe, title: 'Başka Ad' }));
+    await assertFails(toBiz('ayse', { ...kafe, id: 'kapali', title: 'Kapalı' }));
+    await assertFails(msg('ayse').send('ayse', 'ali', 'Merhaba', { chat: null, myName: 'Ayşe K.', otherName: 'Ali Y.', mutual: false, context: kafe }));
+    await assertFails(toBiz('genc', kafe));
+    await social('veli').block('veli', 'ayse');
+    await assertFails(toBiz('ayse', kafe));
+  });
+
+  it('sohbeti sil: yalnızca benim listemden kalkar; yeni mesajla geri gelir, eskiler görünmez', async () => {
+    await send('ali', 'ayse', 'Eski mesaj');
+    await send('ayse', 'ali', 'Eski cevap');
+    let chat = await chatOf('ali', 'ali', 'ayse');
+    await msg('ali').hide(chat, 'ali');
+    chat = await chatOf('ali', 'ali', 'ayse');
+    expect(isHiddenFor(chat, 'ali')).toBe(true);
+    expect(chat.unread.ali).toBe(0);
+    expect(isHiddenFor(await chatOf('ayse', 'ali', 'ayse'), 'ayse')).toBe(false);
+    // Karşı tarafın yerine silemez.
+    await assertFails(updateDoc(doc(fs('ali'), 'chats', chat.id), { 'hidden.ayse': serverTimestamp() }));
+    await new Promise((r) => setTimeout(r, 50));
+    await send('ayse', 'ali', 'Yeni mesaj');
+    chat = await chatOf('ali', 'ali', 'ayse');
+    expect(isHiddenFor(chat, 'ali')).toBe(false);
+    const seen = await new Promise<ChatMessage[]>((resolve, reject) => {
+      const stop = msg('ali').watchMessages(chat.id, (list) => { stop(); resolve(list); }, reject, chat.hidden.ali);
+    });
+    expect(seen.map((m) => m.text)).toEqual(['Yeni mesaj']);
   });
 
   it('hesap silinince mesajlarım ve sohbetlerim silinir', async () => {

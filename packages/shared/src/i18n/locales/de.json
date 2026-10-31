@@ -1254,7 +1254,20 @@
     "noFollowing": "Du folgst noch niemandem. Oben kannst du Personen nach Namen suchen.",
     "writeTo": "{{name}} schreiben",
     "noMatch": "Kein Chat mit diesem Namen.",
-    "titleUnread": "Nachrichten, ungelesen"
+    "titleUnread": "Nachrichten, ungelesen",
+    "business": "Mein Betrieb",
+    "businessIntro": "Nachrichten, die Kunden an deinen Betrieb geschickt haben. Nur Kunden können den Chat beginnen, du antwortest.",
+    "noBusinessChats": "Noch keine Kundennachrichten.",
+    "aboutBusiness": "Für deinen Betrieb: {{name}}",
+    "newBusiness": "Deine Nachricht geht direkt an den Betrieb. Schicke keine Anzahlung oder Vorauszahlung für etwas, das du nicht gesehen hast.",
+    "businessUnavailable": "Dieser Betrieb nimmt gerade keine Nachrichten an.",
+    "businessStartError": "Du kannst diesem Betrieb gerade nicht schreiben (Blockierung, Altersregel oder Tageslimit für neue Chats).",
+    "openBusiness": "Betrieb öffnen",
+    "options": "Optionen",
+    "deleteChat": "Chat löschen",
+    "deleteChatConfirm": "Der Chat wird nur aus deiner Liste entfernt, die andere Person behält ihn. Schreibt sie erneut, erscheint der Chat wieder, ältere Nachrichten bleiben ausgeblendet.",
+    "deleteChatYes": "Ja, löschen",
+    "cancel": "Abbrechen"
   },
   "notifications": {
     "title": "Benachrichtigungen",

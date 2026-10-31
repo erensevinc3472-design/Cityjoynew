@@ -1254,7 +1254,20 @@
     "noFollowing": "Henüz kimseyi takip etmiyorsun. Yukarıdan adıyla kişi arayabilirsin.",
     "writeTo": "{{name}} kişisine mesaj yaz",
     "noMatch": "Bu adla bir sohbet yok.",
-    "titleUnread": "Mesajlar, okunmamış var"
+    "titleUnread": "Mesajlar, okunmamış var",
+    "business": "İşletmem",
+    "businessIntro": "Müşterilerin işletmene yazdığı mesajlar. İlk mesajı yalnızca müşteri atabilir, sen cevap verirsin.",
+    "noBusinessChats": "Henüz müşteri mesajı yok.",
+    "aboutBusiness": "İşletmen için: {{name}}",
+    "newBusiness": "Mesajın doğrudan işletmeye gider. Görmeden kapora ya da ön ödeme gönderme.",
+    "businessUnavailable": "Bu işletme şu an mesaj almıyor.",
+    "businessStartError": "İşletmeye şu an mesaj gönderilemiyor (engel, yaş sınırı ya da günlük yeni sohbet sınırı olabilir).",
+    "openBusiness": "İşletmeyi aç",
+    "options": "Seçenekler",
+    "deleteChat": "Sohbeti sil",
+    "deleteChatConfirm": "Sohbet yalnızca senin listenden silinir, karşı tarafta kalır. Yeniden yazarsa sohbet geri gelir ama eski mesajlar görünmez.",
+    "deleteChatYes": "Evet, sil",
+    "cancel": "Vazgeç"
   },
   "notifications": {
     "title": "Bildirimler",

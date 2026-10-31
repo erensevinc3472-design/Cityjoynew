@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Chat } from '@cityjoy/shared';
+import { otherMember, type Chat } from '@cityjoy/shared';
 
 import { messageRepository } from './services';
 import { deviceStorage } from './storage';
+
+/** Sohbet ekranının adresi: işletme sohbetinde sohbetin kimliği de gider (aynı kişiyle kişisel sohbetten ayrı). */
+export function chatHref(c: Chat, me: string) {
+  return { pathname: '/messages/[uid]' as const, params: { uid: otherMember(c, me), ...(c.context ? { thread: c.id } : {}) } };
+}
 
 /** Sohbetlerim, ekran açıkken canlı. Döner: null = yükleniyor. */
 export function useChats(uid: string | undefined) {

@@ -1749,12 +1749,27 @@ service cloud.firestore {
       return getAfter(quotaPath()).data.count <= chatLimit()
         && (!exists(quotaPath()) || getAfter(quotaPath()).data != get(quotaPath()).data);
     }
+    // İşletmeye yazılan sohbet: kimliğin sonunda işletme, karşı taraf işletmenin sahibi, işletme yayında; baştan açık.
+    function businessChat(id, d, other) {
+      return d.context.keys().hasOnly(['type', 'id', 'title']) && d.context.type == 'isletme'
+        && id == d.members[0] + '_' + d.members[1] + '__b_' + d.context.id
+        && get(/databases/$(database)/documents/businesses/$(d.context.id)).data.ownerUid == other
+        && get(/databases/$(database)/documents/businesses/$(d.context.id)).data.status == 'yayinda'
+        && d.context.title == get(/databases/$(database)/documents/businesses/$(d.context.id)).data.name
+        && d.names[other] == d.context.title
+        && d.accepted == true;
+    }
+    function personChat(id, d, other) {
+      return id == d.members[0] + '_' + d.members[1]
+        && d.names[other] == profileName(other)
+        && (d.accepted == false || (d.accepted == true && followsActive(request.auth.uid, other) && followsActive(other, request.auth.uid)));
+    }
     function validNewChat(id, d, other) {
-      return d.keys().hasOnly(['members', 'names', 'startedBy', 'accepted', 'last', 'unread', 'seen', 'createdAt', 'updatedAt'])
+      return d.keys().hasOnly(['members', 'names', 'startedBy', 'accepted', 'last', 'unread', 'seen', 'context', 'createdAt', 'updatedAt'])
         && d.names.keys().hasOnly([request.auth.uid, other])
-        && d.names[request.auth.uid] == profileName(request.auth.uid) && d.names[other] == profileName(other)
+        && d.names[request.auth.uid] == profileName(request.auth.uid)
         && d.startedBy == request.auth.uid
-        && (d.accepted == false || (d.accepted == true && followsActive(request.auth.uid, other) && followsActive(other, request.auth.uid)))
+        && ('context' in d ? businessChat(id, d, other) : personChat(id, d, other))
         && d.unread.keys().hasOnly([request.auth.uid, other]) && d.unread[request.auth.uid] == 0 && d.unread[other] == 1
         && d.seen == {}
         && validLast(id, d.last)
@@ -1781,6 +1796,15 @@ service cloud.firestore {
         && after.seen.diff(before.seen).affectedKeys().hasOnly([request.auth.uid])
         && (!(request.auth.uid in after.seen.diff(before.seen).affectedKeys()) || after.seen[request.auth.uid] == request.time);
     }
+    // "Sohbeti sil": kişi yalnızca kendi silme zamanını yazar (ve kendi okunmamışını sıfırlar); karşı tarafa dokunulmaz.
+    function chatHiding(before, after, other) {
+      return after.diff(before).affectedKeys().hasOnly(['hidden', 'unread'])
+        && after.hidden.diff(before.get('hidden', {})).affectedKeys().hasOnly([request.auth.uid])
+        && after.hidden[request.auth.uid] == request.time
+        && after.unread.keys().hasOnly(before.members)
+        && after.unread[request.auth.uid] == 0
+        && after.unread.get(other, 0) == before.unread.get(other, 0);
+    }
 
     // Mesaj, aynı yazımdaki sohbet özetinin son mesajıdır; iki taraf arasında engel yoktur.
     function messageFits(chat, mid) {
@@ -1793,12 +1817,12 @@ service cloud.firestore {
         && request.resource.data.members is list && request.resource.data.members.size() == 2
         && request.resource.data.members[0] < request.resource.data.members[1]
         && request.auth.uid in request.resource.data.members
-        && id == request.resource.data.members[0] + '_' + request.resource.data.members[1]
         && validNewChat(id, request.resource.data, otherOf(request.resource.data.members));
       allow update: if signedIn() && request.auth.uid in resource.data.members
         && request.resource.data.members == resource.data.members
         && (chatSending(id, resource.data, request.resource.data, otherOf(resource.data.members))
             || chatReading(resource.data, request.resource.data, otherOf(resource.data.members))
+            || chatHiding(resource.data, request.resource.data, otherOf(resource.data.members))
             // İsteği alan kişi kabul eder.
             || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['accepted'])
                 && request.resource.data.accepted == true && resource.data.startedBy != request.auth.uid)
