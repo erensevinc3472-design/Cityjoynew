@@ -60,6 +60,7 @@ export function CityGuidePage() {
   const [preview, setPreview] = useState<Preview | null>(null);
   const [message, setMessage] = useState<Msg>();
   const [busy, setBusy] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
   const loadMeta = useCallback(async () => {
     setLoadError(false);
@@ -139,6 +140,9 @@ export function CityGuidePage() {
   if (open && service) {
     return <SectionView provinceCode={provinceCode} section={open} canEdit={canEdit(provinceCode)} onBack={() => { setOpen(null); loadMeta(); }} />;
   }
+  if (showAll && service) {
+    return <ProvinceReadiness load={service.meta} onBack={() => setShowAll(false)} onPick={(p) => { setProvinceCode(p); setShowAll(false); }} />;
+  }
 
   const validCount = preview?.groups.reduce((n, g) => n + g.items.length, 0) ?? 0;
 
@@ -150,6 +154,7 @@ export function CityGuidePage() {
           <p className="meta">{t('guide.intro')}</p>
         </div>
         <div className="actions">
+          {admin && !user?.isDemo ? <button className="btn secondary" onClick={() => setShowAll(true)}>{t('guide.readiness')}</button> : null}
           <Link className="btn secondary" to="/sehir-vitrini">{t('guide.showcase')}</Link>
           {admin ? <Link className="btn secondary" to="/yol-ustu-verisi">{t('guide.roadside')}</Link> : null}
           <a className="btn secondary" href="./benim-sehrim-sablon.xlsx" download>{t('guide.downloadTemplate')}</a>
@@ -266,6 +271,84 @@ export function CityGuidePage() {
             </tbody>
           </table>
         </div>
+      )}
+    </section>
+  );
+}
+
+const PROVINCE_SECTIONS = CITY_GUIDE_SECTIONS.filter((s) => s.id !== 'nasil-yapilir');
+
+/**
+ * 81 il durumu (yalnızca admin): her ilde hangi bölümün kaç kaydı var. Yeni il açmadan önce eksikleri görmek için;
+ * il başına tek özet belgesi okunur (81 okuma). İl adına basınca o il seçilir.
+ */
+function ProvinceReadiness({ load, onBack, onPick }: { load: (p: string) => Promise<CityGuideMeta | null>; onBack: () => void; onPick: (p: string) => void }) {
+  const [rows, setRows] = useState<{ code: string; meta: CityGuideMeta | null }[] | undefined>(undefined);
+  const [error, setError] = useState(false);
+
+  const fetchAll = useCallback(async () => {
+    setError(false);
+    setRows(undefined);
+    try {
+      const provinces = repo.getProvinces();
+      const metas = await Promise.all(provinces.map((p) => load(p.code)));
+      setRows(provinces.map((p, i) => ({ code: p.code, meta: metas[i] })));
+    } catch {
+      setError(true);
+    }
+  }, [load]);
+
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
+
+  const count = (m: CityGuideMeta | null, id: CityGuideSectionId) => m?.sections[id]?.count ?? 0;
+  const filled = (m: CityGuideMeta | null) => PROVINCE_SECTIONS.filter((s) => count(m, s.id) > 0).length;
+  const started = rows?.filter((r) => filled(r.meta) > 0).length ?? 0;
+
+  return (
+    <section className="page">
+      <header className="page-head">
+        <div>
+          <button className="link" onClick={onBack}>‹ {t('guide.title')}</button>
+          <h1>{t('guide.readinessTitle')}</h1>
+          <p className="meta">{t('guide.readinessIntro')}</p>
+        </div>
+      </header>
+      {error ? (
+        <div className="state" role="alert">
+          <p>{t('guide.loadError')}</p>
+          <button className="btn secondary" onClick={fetchAll}>{t('guide.retry')}</button>
+        </div>
+      ) : !rows ? (
+        <div className="state" aria-live="polite">{t('guide.loading')}</div>
+      ) : (
+        <>
+          <p className="note" role="status">{t('guide.readinessSummary', { started, all: rows.length })}</p>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">{t('guide.province')}</th>
+                  <th scope="col">{t('guide.readinessFilled')}</th>
+                  {PROVINCE_SECTIONS.map((s) => <th scope="col" key={s.id}>{s.names.tr}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map(({ code, meta }) => {
+                  const f = filled(meta);
+                  return (
+                    <tr key={code}>
+                      <td><button className="link" onClick={() => onPick(code)}><strong>{provinceName(code)}</strong></button></td>
+                      <td><span className={f === PROVINCE_SECTIONS.length ? 'pill ok' : 'pill'}>{f} / {PROVINCE_SECTIONS.length}</span></td>
+                      {PROVINCE_SECTIONS.map((s) => <td className="num" key={s.id}>{count(meta, s.id) || '-'}</td>)}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </section>
   );
