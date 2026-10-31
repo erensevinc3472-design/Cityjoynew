@@ -31,5 +31,11 @@ async function deleteExpired(db: Firestore, collection: string, now: Date): Prom
  */
 export async function deleteUserLeftovers(db: Firestore, uid: string): Promise<void> {
   await db.recursiveDelete(db.doc(`users/${uid}`));
-  await Promise.all(['pushTokens', 'publicProfiles', 'chatQuota'].map((c) => db.doc(`${c}/${uid}`).delete()));
+  await Promise.all(['pushTokens', 'publicProfiles', 'chatQuota', 'pushCount'].map((c) => db.doc(`${c}/${uid}`).delete()));
+  // Hizmet önerileri ve günlük sınır sayaçları.
+  const [suggestions, usage] = await Promise.all([
+    db.collection('serviceSuggestions').where('uid', '==', uid).get(),
+    db.collection('usage').where('type', '==', 'u').where('sid', '==', uid).get(),
+  ]);
+  await Promise.all([...suggestions.docs, ...usage.docs].map((d) => d.ref.delete()));
 }

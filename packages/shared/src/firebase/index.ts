@@ -15,6 +15,7 @@ export { createEmergencyNumberAdmin, createFirestoreEmergencyNumberRepository } 
 export {
   createFirestoreServiceCategoryRepository,
   createServiceCategoryAdmin,
+  deleteServiceSuggestionsOf,
   submitServiceSuggestion,
 } from './service-categories';
 export { createBusinessAdmin, createFirestoreBusinessRepository, DuplicateBusinessError } from './businesses';
@@ -55,7 +56,7 @@ export { cleanVideoUrl, createIntroVideo, INTRO_VIDEO_URL_MAX } from './intro';
 export { createFirestoreMessageRepository, createMessageModeration, type MessageReport } from './messages';
 export { createFirestoreListingRepository, createListingModeration, type ListingFilter, type ListingPage, type ListingReport } from './listings';
 export { createNotificationSettings, createNotificationTriggers } from './notifications';
-export { countUsage, createLimitsAdmin } from './limits';
+export { countUsage, createLimitsAdmin, deleteUsageOf } from './limits';
 export { createFirestoreTravelRepository, createMunicipalTravel, createTravelAdmin, type TravelAdminKind } from './travel';
 export { createRoadsidePackAdmin, createRoadsidePackRepository, type RoadsidePackSummary } from './roadside';
 export { createTravelPrices } from './travel-prices';

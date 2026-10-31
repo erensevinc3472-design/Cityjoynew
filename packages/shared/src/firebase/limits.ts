@@ -7,6 +7,7 @@ import {
   limitFor,
   nextUsage,
   normalizeLimits,
+  USAGE_KINDS,
   usageId,
   type Limits,
   type UsageKind,
@@ -52,6 +53,13 @@ export async function countUsage(db: Firestore, batch: WriteBatch, subject: Usag
       ? { type: subject.type, sid: subject.id, kind, windowStart: serverTimestamp(), count: 1 }
       : { type: subject.type, sid: subject.id, kind, windowStart: snap.get('windowStart'), count: next.count },
   );
+}
+
+/** Hesap silinirken kişinin günlük sınır sayaçları. */
+export async function deleteUsageOf(db: Firestore, uid: string): Promise<void> {
+  const batch = writeBatch(db);
+  USAGE_KINDS.forEach((kind) => batch.delete(doc(db, 'usage', usageId({ type: 'u', id: uid }, kind))));
+  await batch.commit();
 }
 
 /** Panel (admin): sınır sayıları. Her değişiklik işlem kaydına yazılır. */

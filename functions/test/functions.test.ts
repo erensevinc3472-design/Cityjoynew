@@ -242,12 +242,17 @@ describe('temizlik', () => {
     await db.doc('users/u1/settings/notifications').set({ categories: {} });
     await db.doc('pushTokens/u1').set({ tokens: ['T'] });
     await db.doc('publicProfiles/u1').set({ displayName: 'Ali' });
+    await db.doc('pushCount/u1').set({ day: '2026-11-01', count: 2 });
+    await db.doc('serviceSuggestions/s1').set({ uid: 'u1', text: 'Kilim tamiri' });
+    await db.doc('serviceSuggestions/s2').set({ uid: 'u2', text: 'Saat tamiri' });
+    await db.doc('usage/u-u1~oneri').set({ type: 'u', sid: 'u1', kind: 'oneri', count: 1 });
     await db.doc('users/u2').set({ displayName: 'Ayşe' });
     await deleteUserLeftovers(db, 'u1');
-    for (const p of ['users/u1', 'users/u1/settings/notifications', 'pushTokens/u1', 'publicProfiles/u1']) {
+    for (const p of ['users/u1', 'users/u1/settings/notifications', 'pushTokens/u1', 'publicProfiles/u1', 'pushCount/u1', 'serviceSuggestions/s1', 'usage/u-u1~oneri']) {
       expect((await db.doc(p).get()).exists, p).toBe(false);
     }
     expect((await db.doc('users/u2').get()).exists).toBe(true);
+    expect((await db.doc('serviceSuggestions/s2').get()).exists).toBe(true);
   });
 });
 

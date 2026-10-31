@@ -228,9 +228,12 @@ service cloud.firestore {
         && request.resource.data.status == 'yeni'
         && request.resource.data.createdAt == request.time;
       // Admin hepsini, il yöneticisi kendi ilininkileri görür ve "incelendi" yapar.
+      // Kişi kendi önerilerini okur ve hesabını silerken siler.
       allow read: if isAdmin()
+        || (signedIn() && resource.data.uid == request.auth.uid)
         || (resource.data.get('provinceCode', null) != null
             && regionAllows('hizmet-kategorileri', 'goruntule', resource.data.provinceCode, null));
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
       allow update: if (isAdmin()
             || (resource.data.get('provinceCode', null) != null
                 && regionAllows('hizmet-kategorileri', 'onayla', resource.data.provinceCode, null)))
@@ -727,6 +730,8 @@ service cloud.firestore {
     }
 
     match /usage/{id} {
+      // Kişi kendi sayaçlarını hesabını silerken siler.
+      allow delete: if signedIn() && id.split('~')[0] == 'u-' + request.auth.uid;
       allow read: if signedIn() && (resource == null || ownsUsage(resource.data.type, resource.data.sid));
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['type', 'sid', 'kind', 'windowStart', 'count'])
