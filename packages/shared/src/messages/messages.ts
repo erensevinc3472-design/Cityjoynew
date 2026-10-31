@@ -46,6 +46,25 @@ export function otherMember(chat: Pick<Chat, 'members'>, me: string): string {
   return chat.members[0] === me ? chat.members[1] : chat.members[0];
 }
 
+/** İşletme sohbetinde işletmenin sahibi (sohbeti başlatmayan üye). */
+export function businessOwnerOf(chat: Pick<Chat, 'members' | 'startedBy'>): string {
+  return otherMember(chat, chat.startedBy);
+}
+
+/**
+ * Yazıştığım kişi. İşletme sohbetinde işletme tarafındaysam (sahibi ya da mesaj izni olan yetkili) müşteri; yetkili
+ * sohbetin üyesi değildir.
+ */
+export function counterpartOf(chat: Pick<Chat, 'members' | 'startedBy' | 'context'>, me: string): string {
+  if (chat.context && chat.startedBy !== me) return chat.startedBy;
+  return otherMember(chat, me);
+}
+
+/** Okunmamış sayısının anahtarı: işletme tarafında sahip ve yetkililer ortak sayacı (sahibinkini) kullanır. */
+export function unreadKey(chat: Pick<Chat, 'members' | 'startedBy' | 'context'>, me: string): string {
+  return chat.context && chat.startedBy !== me ? businessOwnerOf(chat) : me;
+}
+
 export interface Chat {
   id: string;
   members: [string, string];
@@ -95,7 +114,7 @@ export function isHiddenFor(chat: Pick<Chat, 'hidden' | 'last'>, me: string): bo
 /** Listede görünen ad: müşteri işletmenin adını, diğerleri kişinin adını görür. */
 export function chatTitle(chat: Pick<Chat, 'names' | 'members' | 'context' | 'startedBy'>, me: string): string {
   if (chat.context && chat.startedBy === me) return chat.context.title;
-  return chat.names[otherMember(chat, me)] ?? '?';
+  return chat.names[counterpartOf(chat, me)] ?? '?';
 }
 
 export function validateMessage(text: string): 'empty' | 'tooLong' | null {

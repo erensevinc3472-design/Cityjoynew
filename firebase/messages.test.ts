@@ -42,7 +42,8 @@ beforeEach(async () => {
       await setDoc(doc(db, 'users', uid), { uid, displayName: uid, birthYear, createdAt });
       await setDoc(doc(db, 'publicProfiles', uid), { displayName: NAMES[uid], bio: '', isPrivate: uid === 'genc', updatedAt: new Date() });
     }
-    await setDoc(doc(db, 'businesses/kafe'), { ownerUid: 'veli', status: 'yayinda', name: 'Kafe Veli' });
+    const staff = (messages: boolean) => ({ name: 'x', post: 'kapali', edit: false, reply: false, messages });
+    await setDoc(doc(db, 'businesses/kafe'), { ownerUid: 'veli', status: 'yayinda', name: 'Kafe Veli', managerUids: ['ayse', 'yeni'], managers: { ayse: staff(true), yeni: staff(false) } });
     await setDoc(doc(db, 'businesses/kapali'), { ownerUid: 'veli', status: 'gizli', name: 'Kapalı' });
   });
 });
@@ -152,6 +153,36 @@ describe('Mesajlar', () => {
     await assertFails(toBiz('genc', kafe));
     await social('veli').block('veli', 'ayse');
     await assertFails(toBiz('ayse', kafe));
+  });
+
+  it('mesaj izni olan yetkili işletme sohbetlerini görür ve işletme adına cevaplar; izni olmayan göremez', async () => {
+    const kafe: ChatContext = { type: 'isletme', id: 'kafe', title: 'Kafe Veli' };
+    await msg('ali').send('ali', 'veli', 'Rezervasyon yapabilir miyim?', { chat: null, myName: 'Ali Y.', otherName: 'Veli', mutual: false, context: kafe });
+    const id = threadId('ali', 'veli', kafe);
+    const list = await new Promise<Chat[]>((resolve, reject) => {
+      const stop = msg('ayse').watchBusinessChats('kafe', (l) => { stop(); resolve(l); }, reject);
+    });
+    expect(list.map((c) => c.id)).toEqual([id]);
+    const chat = list[0];
+    expect(inboxSection(chat, 'ayse')).toBe('isletmem');
+    expect(chatTitle(chat, 'ayse')).toBe('Ali Y.');
+    await assertSucceeds(getDocs(collection(fs('ayse'), 'chats', id, 'messages')));
+    await msg('ayse').send('ayse', 'ali', 'Tabii, kaç kişisiniz?', { chat, myName: 'Ayşe K.', otherName: 'Ali Y.', mutual: false });
+    let now = (await msg('ali').getChat(id)) as Chat;
+    expect(now.unread).toEqual({ ali: 1, veli: 1 });
+    expect(now.last?.from).toBe('ayse');
+    await msg('ayse').markRead(now, 'ayse', true);
+    now = (await msg('veli').getChat(id)) as Chat;
+    expect(now.unread.veli).toBe(0);
+    expect(now.seen.ayse).toBeUndefined();
+    // Yetkili müşterinin okunmamışını sıfırlayamaz; izni olmayan yetkili ve kişisel sohbetler kapalı.
+    await assertFails(updateDoc(doc(fs('ayse'), 'chats', id), { 'unread.ali': 0 }));
+    await assertFails(getDoc(doc(fs('yeni'), 'chats', id)));
+    await assertFails(new Promise((resolve, reject) => {
+      const stop = msg('yeni').watchBusinessChats('kafe', (l) => { stop(); resolve(l); }, reject);
+    }));
+    await send('ali', 'veli', 'Selam');
+    await assertFails(getDoc(doc(fs('ayse'), 'chats', chatId('ali', 'veli'))));
   });
 
   it('sohbeti sil: yalnızca benim listemden kalkar; yeni mesajla geri gelir, eskiler görünmez', async () => {

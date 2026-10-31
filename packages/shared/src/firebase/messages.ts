@@ -16,7 +16,7 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 
-import { MESSAGE_LIMITS, quotaAfter, threadId, type Chat, type ChatContext, type ChatMessage, type MessageReportReason } from '../messages/messages';
+import { MESSAGE_LIMITS, quotaAfter, threadId, unreadKey, type Chat, type ChatContext, type ChatMessage, type MessageReportReason } from '../messages/messages';
 import { addAudit, iso } from './grants';
 
 const CHATS = 'chats';
@@ -77,6 +77,15 @@ export function createFirestoreMessageRepository(db: Firestore) {
     watchChats(me: string, onChange: (chats: Chat[]) => void, onError: () => void): () => void {
       return onSnapshot(
         query(collection(db, CHATS), where('members', 'array-contains', me), orderBy('updatedAt', 'desc'), limit(MESSAGE_LIMITS.listSize)),
+        (s) => onChange(s.docs.map((d) => chatFromDoc(d.id, d.data()))),
+        onError,
+      );
+    },
+
+    /** Bir işletmeye yazılan sohbetler (mesaj izni olan yetkili için; sahibi zaten üyedir). */
+    watchBusinessChats(businessId: string, onChange: (chats: Chat[]) => void, onError: () => void): () => void {
+      return onSnapshot(
+        query(collection(db, CHATS), where('context.id', '==', businessId), orderBy('updatedAt', 'desc'), limit(MESSAGE_LIMITS.listSize)),
         (s) => onChange(s.docs.map((d) => chatFromDoc(d.id, d.data()))),
         onError,
       );
@@ -145,11 +154,16 @@ export function createFirestoreMessageRepository(db: Firestore) {
       await batch.commit();
     },
 
-    /** Okunmamış sayısı sıfırlanır; okundu bilgisi açıksa "gördüm" zamanı yazılır. */
+    /**
+     * Okunmamış sayısı sıfırlanır; okundu bilgisi açıksa "gördüm" zamanı yazılır. Yetkili işletmenin ortak sayacını
+     * sıfırlar, "gördüm" yazmaz.
+     */
     async markRead(chat: Chat, me: string, receipts: boolean): Promise<void> {
-      if (!chat.unread[me] && !receipts) return;
+      const key = unreadKey(chat, me);
+      const seen = receipts && chat.members.includes(me);
+      if (!chat.unread[key] && !seen) return;
       const batch = writeBatch(db);
-      batch.update(chatRef(chat.id), { [`unread.${me}`]: 0, ...(receipts ? { [`seen.${me}`]: serverTimestamp() } : {}) });
+      batch.update(chatRef(chat.id), { [`unread.${key}`]: 0, ...(seen ? { [`seen.${me}`]: serverTimestamp() } : {}) });
       await batch.commit();
     },
 

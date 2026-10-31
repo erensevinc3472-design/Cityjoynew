@@ -42,8 +42,8 @@ describe('işletme sayfası', () => {
     expect(b.weeklyHours?.[5]).toEqual({ open: '11:00', close: '02:00' });
 
     // Sahibi en çok 3 yetkili atar; kendini atayamaz; yabancı atayamaz.
-    const ayse = { uid: 'ayse', name: 'Ayşe K.', post: 'onayla' as const, edit: true, reply: true };
-    const veli = { uid: 'veli', name: 'Veli T.', post: 'kapali' as const, edit: false, reply: false };
+    const ayse = { uid: 'ayse', name: 'Ayşe K.', post: 'onayla' as const, edit: true, reply: true, messages: false };
+    const veli = { uid: 'veli', name: 'Veli T.', post: 'kapali' as const, edit: false, reply: false, messages: false };
     await biz('cengiz').setManagers(id, [ayse, veli]);
     await expect(biz('yabanci').setManagers(id, [{ ...ayse, uid: 'yabanci' }])).rejects.toThrow();
     await assertFails(updateDoc(doc(fs('cengiz'), 'businesses', id), { managerUids: ['cengiz'], managers: { cengiz: { name: 'C', post: 'dogrudan', edit: true, reply: true } } }));
@@ -99,9 +99,9 @@ describe('işletme sayfası', () => {
   it('işletme adına paylaşım: sahibi doğrudan, yetkili onayla ya da doğrudan, izni kapalı ve yabancı paylaşamaz', async () => {
     const id = await biz('cengiz').create('cengiz', input);
     await biz('cengiz').setManagers(id, [
-      { uid: 'ayse', name: 'Ayşe K.', post: 'onayla', edit: false, reply: false },
-      { uid: 'mehmet', name: 'Mehmet S.', post: 'dogrudan', edit: false, reply: false },
-      { uid: 'veli', name: 'Veli T.', post: 'kapali', edit: false, reply: false },
+      { uid: 'ayse', name: 'Ayşe K.', post: 'onayla', edit: false, reply: false, messages: false },
+      { uid: 'mehmet', name: 'Mehmet S.', post: 'dogrudan', edit: false, reply: false, messages: false },
+      { uid: 'veli', name: 'Veli T.', post: 'kapali', edit: false, reply: false, messages: false },
     ]);
     const as = (pending: boolean) => ({ business: { id, name: 'Cengiz Kebap' }, pending });
 

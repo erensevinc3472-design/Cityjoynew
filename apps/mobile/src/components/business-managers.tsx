@@ -96,6 +96,7 @@ export function BusinessManagers({ business, onSaved }: { business: Business; on
           <Chips label={t('business.managers.postLabel')} value={m.post} onChange={(post) => patch(m.uid, { post })} options={MANAGER_POST_MODES.map((x) => ({ value: x, label: t(`business.managers.post.${x}`) }))} />
           <PermissionRow label={t('business.managers.edit')} value={m.edit} onChange={(edit) => patch(m.uid, { edit })} />
           <PermissionRow label={t('business.managers.reply')} value={m.reply} onChange={(reply) => patch(m.uid, { reply })} />
+          <PermissionRow label={t('business.managers.messages')} value={m.messages} onChange={(messages) => patch(m.uid, { messages })} />
         </View>
       ))}
 

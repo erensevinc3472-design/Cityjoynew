@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { chatId, inboxSection, isHiddenFor, isRequestFor, otherMember, quotaAfter, scamSignal, threadId, validateMessage } from '../index';
+import { chatId, counterpartOf, inboxSection, isHiddenFor, isRequestFor, otherMember, quotaAfter, scamSignal, threadId, unreadKey, validateMessage } from '../index';
 
 describe('mesajlar', () => {
   it('iki kişinin tek sohbeti olur', () => {
@@ -44,6 +44,11 @@ describe('mesajlar', () => {
     expect(inboxSection(chat, 'sahip')).toBe('isletmem');
     expect(inboxSection(chat, 'musteri')).toBe('sohbetler');
     expect(inboxSection({ accepted: false, startedBy: 'x' }, 'y')).toBe('istekler');
+    // Yetkili üye değildir: karşısındaki müşteri, okunmamış sayacı sahibinki.
+    const full = { ...chat, members: ['musteri', 'sahip'] as [string, string] };
+    expect(counterpartOf(full, 'yetkili')).toBe('musteri');
+    expect(unreadKey(full, 'yetkili')).toBe('sahip');
+    expect(unreadKey(full, 'musteri')).toBe('musteri');
   });
 
   it('silinen sohbet yeni mesaj gelene kadar gizli', () => {

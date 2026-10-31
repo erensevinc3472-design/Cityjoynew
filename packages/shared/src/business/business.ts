@@ -165,6 +165,8 @@ export interface ManagerPermissions {
   edit: boolean;
   /** Yorumlara işletme adına cevap verir. */
   reply: boolean;
+  /** Müşterilerin işletmeye yazdığı mesajları görür ve işletme adına cevaplar (Mesajlar > İşletmem). */
+  messages: boolean;
 }
 export interface BusinessManager extends ManagerPermissions {
   uid: string;
@@ -172,7 +174,7 @@ export interface BusinessManager extends ManagerPermissions {
   name: string;
 }
 export const BUSINESS_MANAGER_LIMIT = 3;
-export const DEFAULT_MANAGER_PERMISSIONS: ManagerPermissions = { post: 'onayla', edit: false, reply: false };
+export const DEFAULT_MANAGER_PERMISSIONS: ManagerPermissions = { post: 'onayla', edit: false, reply: false, messages: false };
 
 export interface PriceItem {
   name: string;

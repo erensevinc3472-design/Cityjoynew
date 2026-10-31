@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (mesajlar: işletmeye mesaj, İşletmem bölümü, sohbeti sil). Önceki: duyuru bildirimi (PR #41 birleşti).
+Son güncelleme: 31 Ekim 2026 (yetkiliye mesaj izni, dal `claude/carsi`). Önceki: işletmeye mesaj (PR #42 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -542,6 +542,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    işaretli. Bildirimdeki adres işletme sohbetini açar. Testler: kural 8 (2 yeni), ortak 137. Emülatörde web sürümüyle
    baştan sona denendi (müşteri yazdı, sildi; sahip İşletmem'de gördü, cevapladı; sohbet müşteride yalnızca yeni mesajla
    geri geldi). PR #42 birleşti, kurallar 31 Ekim'de yüklendi. İlan pazarı (İlanlar bölümü) sıradaki iş.
+- **Yetkiliye mesaj izni (31 Ekim, dal `claude/carsi`):** Eren'in isteği. İşletmem > Yetkililer'de yeni izin "Müşteri
+   mesajlarına cevap verebilir" (varsayılan kapalı). İzni olan yetkili, işletmeye yazılan sohbetleri Mesajlar > İşletmem'de
+   görür ve işletme adına cevaplar; sohbetin üyesi olmaz. Okunmamış sayısı işletme tarafında ortaktır (sahip ya da yetkili
+   okuyunca sıfırlanır). Yetkili "Sohbeti sil" yapamaz, "gördüm" yazmaz, kişisel sohbetleri göremez. Sohbette ekip
+   arkadaşının mesajının altında "İşletme ekibi" yazar. Kurallar sunucuda denetler (`isBusinessStaff`); yeni sorgu için yeni
+   dizin. Testler: kural 118, ortak 137 (yeni yetkili testi). **Birleştirince kurallar ve dizin yüklenmeli.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

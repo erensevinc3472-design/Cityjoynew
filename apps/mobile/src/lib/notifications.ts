@@ -6,7 +6,8 @@ import {
   DEFAULT_NOTIFICATION_TRIGGERS,
   isRecent,
   isRequestFor,
-  otherMember,
+  counterpartOf,
+  unreadKey,
   type AppNotification,
   type NotificationPrefs,
   type NotificationTriggers,
@@ -165,13 +166,14 @@ export function useNotificationFeed(full: boolean): AppNotification[] | null {
     });
   }
   for (const c of chats ?? []) {
-    if (!c.last || c.last.from === me || !(c.unread[me] ?? 0)) continue;
-    const other = otherMember(c, me);
+    const count = c.unread[unreadKey(c, me)] ?? 0;
+    if (!c.last || c.last.from === me || !count) continue;
+    const other = counterpartOf(c, me);
     const name = c.names[other] ?? '?';
     items.push({
       id: `mesaj:${c.id}:${c.last.id}`,
       category: 'mesaj',
-      title: isRequestFor(c, me) ? t('notifications.messageRequest', { name }) : t('notifications.message', { name, count: c.unread[me] }),
+      title: isRequestFor(c, me) ? t('notifications.messageRequest', { name }) : t('notifications.message', { name, count }),
       body: c.last.text || undefined,
       at: c.last.at,
       href: chatHref(c, me),
