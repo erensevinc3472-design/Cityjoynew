@@ -29,6 +29,7 @@ import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { useReadReceipts } from '@/lib/messages';
+import { setOpenChat } from '@/lib/push';
 import { businessRepository, listingRepository, messageRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
@@ -77,6 +78,12 @@ export default function ChatScreen() {
   const topic: Pick<ChatContext, 'type' | 'id'> | null = business ? { type: 'isletme', id: business } : listing ? { type: 'ilan', id: listing } : null;
   const id = thread ?? (me && other ? threadId(me, other, topic) : '');
   const iBlocked = blocked.has(other ?? '');
+
+  // Bu sohbet ekrandayken onun mesaj bildirimi çıkmaz.
+  useEffect(() => {
+    setOpenChat(other ?? null, thread || topic ? id : undefined);
+    return () => setOpenChat(null);
+  }, [other, thread, id, topic?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!me || !other) return;

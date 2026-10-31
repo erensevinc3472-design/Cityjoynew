@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (Çarşı: ikinci el eşya ilanları, PR #44 birleşti, kurallar yüklendi). Önceki: yetkiliye mesaj izni (PR #43 birleşti).
+Son güncelleme: 31 Ekim 2026 (mesaj ve takip için telefon bildirimi, dal `claude/carsi-belge`). Önceki: Çarşı (PR #44 birleşti, kurallar yüklendi).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -568,6 +568,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    verilemesin diye ilan verirken telefonun adres çözümlemesi (cihazda, ücretsiz) hangi ilde olduğunu söyler, kayıtlı ille
    aynı değilse ilan verilmez; il adı tanınmazsa ya da web'de il merkezlerine uzaklık denetimi. Ayrıca sayfa yenilenince favori kalplerinin boş görünmesi düzeltildi (React Compiler modül değişkenini izlemiyordu; `useSyncExternalStore`). Beğenilerde (`useLiked`) aynı sorun olabilir, bakılacak (dal `claude/carsi-belge`). Not: Windows'ta Expo'nun ürettiği rota türlerinde
    `/carsi` yerine `/carsi/index` çıkabiliyor (Expo hatası); `apps/mobile/.expo/types/router.d.ts` içinde düzeltilir.
+- **Arka uç 3. parça: mesaj ve takip için telefon bildirimi (31 Ekim, dal `claude/carsi-belge`).** Uygulama içindeki zil
+   listesinde bunlar zaten vardı; şimdi uygulama kapalıyken de telefona düşer. `messageSent`: yeni mesajda karşı tarafa,
+   başlıkta gönderenin adı, gövdede mesajın ilk 150 harfi. İşletmeye yazılınca sahip ve mesaj izni olan yetkililer alır
+   (başlık "Ali Y. · İşletme"); işletme adına cevap müşteriye işletmenin adıyla gider; Çarşı sohbetinde başlıkta ilanın adı.
+   Mesaj isteğinde (takipleşmeyen iki kişi) metin kilit ekranında görünmez ("X sana mesaj göndermek istiyor") ve yalnızca ilk
+   mesajda gider. `followChanged`: yeni takipçi ve takip isteği hesap sahibine, isteğin kabulü isteyene; takip bırakılıp
+   yeniden edilirse 7 gün içinde tekrar gitmez (`pushLog`, günlük temizlik siler). Kişinin tür ayarları ve sessiz saatleri
+   geçerli. Bildirime dokununca sohbet, profil ya da (takip isteğinde) kendi profili açılır; o an açık olan sohbetin
+   bildirimi uygulama içinde çıkmaz. 5 dilde metinler. Testler: sunucu 17 (8 yeni), ortak 145. Blaze ve işlev yüklemesiyle
+   çalışmaya başlar; gerçek telefonda deneme EAS ile. Kural değişikliği yok.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -668,12 +678,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 **Arka uç yol haritası (Eren'in sırası: arka uç > ekran tasarımları > eksik bilgiler; panel tasarımı da):**
 1. ~~Sunucu işlevleri paketi, iptal bildirimleri, SOS temizliği, hesap silme güvenlik ağı~~ (31 Ekim).
 2. ~~Acil duyuru ve duyuruda bölgedeki kişilere telefon bildirimi~~ (31 Ekim).
-3. Mesaj ve yeni takipçi bildirimleri.
+3. ~~Mesaj ve yeni takipçi bildirimleri~~ (31 Ekim; telefona bildirim, Blaze ile çalışır).
    Araya giren (Eren, 31 Ekim): mesajlar. ~~İşletmeye mesaj, İşletmem, sohbeti sil~~ (31 Ekim). Sırada ilan pazarı
    (Marketplace) ve "İlanlar" bölümü; Karar (Eren): önce ikinci el eşya, emlak ve araç sonra.
    Karar (Eren): bölümün adı **Çarşı**; Benim Şehrim kartı "Satılık & Kiralık" yerine "Çarşı" yapıldı (5 dil),
    Mesajlar'daki bölüm de "Çarşı" olacak. ~~Çarşı (eşya ilanları) ve Mesajlar > Çarşı~~ (31 Ekim). Çarşı'da kalan:
-   fotoğraflar (Blaze), yeni mesaj bildirimi (3. madde), emlak ve araç (avukat ve kimlik doğrulama sonrası).
+   fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. Günlük sınırlar (aktivite açma, hizmet önerisi) ve hesap silinince önerilerin silinmesi.
 5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
