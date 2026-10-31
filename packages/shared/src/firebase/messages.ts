@@ -9,13 +9,14 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  Timestamp,
   where,
   writeBatch,
   type DocumentData,
   type Firestore,
 } from 'firebase/firestore';
 
-import { chatId, MESSAGE_LIMITS, quotaAfter, type Chat, type ChatMessage, type MessageReportReason } from '../messages/messages';
+import { MESSAGE_LIMITS, quotaAfter, threadId, type Chat, type ChatContext, type ChatMessage, type MessageReportReason } from '../messages/messages';
 import { addAudit, iso } from './grants';
 
 const CHATS = 'chats';
@@ -23,11 +24,14 @@ const QUOTA = 'chatQuota';
 const REPORTS = 'messageReports';
 
 function chatFromDoc(id: string, d: DocumentData): Chat {
-  const seen: Record<string, string> = {};
-  for (const [k, v] of Object.entries((d.seen ?? {}) as Record<string, unknown>)) {
-    const at = iso(v);
-    if (at) seen[k] = at;
-  }
+  const times = (m: unknown) => {
+    const out: Record<string, string> = {};
+    for (const [k, v] of Object.entries((m ?? {}) as Record<string, unknown>)) {
+      const at = iso(v);
+      if (at) out[k] = at;
+    }
+    return out;
+  };
   return {
     id,
     members: d.members,
@@ -36,7 +40,9 @@ function chatFromDoc(id: string, d: DocumentData): Chat {
     accepted: d.accepted === true,
     ...(d.last ? { last: { id: d.last.id, text: d.last.text ?? '', from: d.last.from, at: iso(d.last.at) ?? new Date().toISOString() } } : {}),
     unread: d.unread ?? {},
-    seen,
+    seen: times(d.seen),
+    hidden: times(d.hidden),
+    ...(d.context ? { context: { type: d.context.type, id: d.context.id, title: d.context.title ?? '' } } : {}),
     // Sunucu zamanı henüz yazılmadıysa (yerel önbellek) şimdiki zaman sayılır.
     updatedAt: iso(d.updatedAt) ?? new Date().toISOString(),
   };
@@ -85,10 +91,11 @@ export function createFirestoreMessageRepository(db: Firestore) {
       return onSnapshot(chatRef(id), (s) => onChange(s.exists() ? chatFromDoc(s.id, s.data()) : null), onError);
     },
 
-    /** Sohbetin son mesajları, eskiden yeniye. */
-    watchMessages(id: string, onChange: (list: ChatMessage[]) => void, onError: () => void): () => void {
+    /** Sohbetin son mesajları, eskiden yeniye. Sohbeti sildiysem yalnızca sonrakiler (`after`, ISO). */
+    watchMessages(id: string, onChange: (list: ChatMessage[]) => void, onError: () => void, after?: string): () => void {
+      const since = after ? [where('createdAt', '>', Timestamp.fromDate(new Date(after)))] : [];
       return onSnapshot(
-        query(messages(id), orderBy('createdAt', 'desc'), limit(MESSAGE_LIMITS.pageSize)),
+        query(messages(id), ...since, orderBy('createdAt', 'desc'), limit(MESSAGE_LIMITS.pageSize)),
         (s) => onChange(s.docs.map((d) => messageFromDoc(d.id, d.data())).reverse()),
         onError,
       );
@@ -96,10 +103,15 @@ export function createFirestoreMessageRepository(db: Firestore) {
 
     /**
      * Mesaj gönderir. Sohbet yoksa açılır: takipleşiyorlarsa doğrudan sohbet, değilse alıcıda istek. İsteği alan kişi
-     * cevap yazınca sohbet kabul edilmiş olur.
+     * cevap yazınca sohbet kabul edilmiş olur. İşletmeye yazılan sohbet (`context`) baştan açıktır; adı işletmenin adıdır.
      */
-    async send(me: string, other: string, text: string, opts: { chat: Chat | null; myName: string; otherName: string; mutual: boolean }): Promise<void> {
-      const id = chatId(me, other);
+    async send(
+      me: string,
+      other: string,
+      text: string,
+      opts: { chat: Chat | null; myName: string; otherName: string; mutual: boolean; context?: ChatContext },
+    ): Promise<void> {
+      const id = opts.chat?.id ?? threadId(me, other, opts.context);
       const ref = doc(messages(id));
       const body = text.trim();
       const last = { id: ref.id, text: body.slice(0, MESSAGE_LIMITS.preview), from: me, at: serverTimestamp() };
@@ -111,9 +123,10 @@ export function createFirestoreMessageRepository(db: Firestore) {
         batch.set(doc(db, QUOTA, me), next.reset ? { windowStart: serverTimestamp(), count: 1 } : { windowStart: quota.get('windowStart'), count: next.count });
         batch.set(chatRef(id), {
           members: [me, other].sort(),
-          names: { [me]: opts.myName, [other]: opts.otherName },
+          names: { [me]: opts.myName, [other]: opts.context ? opts.context.title : opts.otherName },
           startedBy: me,
-          accepted: opts.mutual,
+          accepted: opts.context ? true : opts.mutual,
+          ...(opts.context ? { context: { type: opts.context.type, id: opts.context.id, title: opts.context.title } } : {}),
           last,
           unread: { [me]: 0, [other]: 1 },
           seen: {},
@@ -144,6 +157,13 @@ export function createFirestoreMessageRepository(db: Firestore) {
     async accept(id: string): Promise<void> {
       const batch = writeBatch(db);
       batch.update(chatRef(id), { accepted: true });
+      await batch.commit();
+    },
+
+    /** "Sohbeti sil": sohbet yalnızca benim listemden kalkar; karşı taraf yeniden yazarsa geri gelir, eski mesajlar görünmez. */
+    async hide(chat: Chat, me: string): Promise<void> {
+      const batch = writeBatch(db);
+      batch.update(chatRef(chat.id), { [`hidden.${me}`]: serverTimestamp(), [`unread.${me}`]: 0 });
       await batch.commit();
     },
 

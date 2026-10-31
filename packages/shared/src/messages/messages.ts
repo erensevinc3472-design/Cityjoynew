@@ -26,6 +26,22 @@ export function chatId(a: string, b: string): string {
   return a < b ? `${a}_${b}` : `${b}_${a}`;
 }
 
+/**
+ * Sohbetin konusu: işletmeye yazılan sohbet (müşteri başlatır, istek aşaması yok; işletme sahibinde "İşletmem" bölümüne
+ * düşer). Aynı iki kişinin konusuz sohbetiyle ve başka işletmeler için açılan sohbetlerle karışmaz.
+ */
+export interface ChatContext {
+  type: 'isletme';
+  id: string;
+  /** İşletmenin adı (sohbet açılırken yazılır). */
+  title: string;
+}
+
+/** Sohbet kimliği: iki kişi (sıralı), konu varsa sonuna konunun kimliği ("__b_" işletme). */
+export function threadId(a: string, b: string, context?: Pick<ChatContext, 'type' | 'id'> | null): string {
+  return context ? `${chatId(a, b)}__b_${context.id}` : chatId(a, b);
+}
+
 export function otherMember(chat: Pick<Chat, 'members'>, me: string): string {
   return chat.members[0] === me ? chat.members[1] : chat.members[0];
 }
@@ -40,6 +56,9 @@ export interface Chat {
   accepted: boolean;
   last?: { id: string; text: string; from: string; at: string };
   unread: Record<string, number>;
+  context?: ChatContext;
+  /** "Sohbeti sil": kişinin sohbeti listesinden kaldırdığı an (ISO). Karşı tarafın kopyasına dokunulmaz. */
+  hidden: Record<string, string>;
   /** Okundu bilgisi açık olan kişinin sohbeti en son gördüğü an (ISO). */
   seen: Record<string, string>;
   updatedAt: string;
@@ -57,6 +76,26 @@ export interface ChatMessage {
 /** Sohbet bana göre nerede: Sohbetler mi, İstekler mi (bana gelen, kabul etmediğim). */
 export function isRequestFor(chat: Pick<Chat, 'accepted' | 'startedBy'>, me: string): boolean {
   return !chat.accepted && chat.startedBy !== me;
+}
+
+export type InboxSection = 'sohbetler' | 'istekler' | 'isletmem';
+
+/** Sohbet gelen kutumda hangi bölümde: müşterilerin işletmeme yazdıkları "İşletmem"de, gelen istekler "İstekler"de. */
+export function inboxSection(chat: Pick<Chat, 'accepted' | 'startedBy' | 'context'>, me: string): InboxSection {
+  if (chat.context?.type === 'isletme' && chat.startedBy !== me) return 'isletmem';
+  return isRequestFor(chat, me) ? 'istekler' : 'sohbetler';
+}
+
+/** Sildiğim sohbet, sonra yeni mesaj gelmediyse listemde görünmez. */
+export function isHiddenFor(chat: Pick<Chat, 'hidden' | 'last'>, me: string): boolean {
+  const at = chat.hidden[me];
+  return !!at && (!chat.last || chat.last.at <= at);
+}
+
+/** Listede görünen ad: müşteri işletmenin adını, diğerleri kişinin adını görür. */
+export function chatTitle(chat: Pick<Chat, 'names' | 'members' | 'context' | 'startedBy'>, me: string): string {
+  if (chat.context && chat.startedBy === me) return chat.context.title;
+  return chat.names[otherMember(chat, me)] ?? '?';
 }
 
 export function validateMessage(text: string): 'empty' | 'tooLong' | null {

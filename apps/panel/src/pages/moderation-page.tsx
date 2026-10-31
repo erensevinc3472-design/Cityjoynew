@@ -688,6 +688,7 @@ function MessageReports({ user }: { user: PanelUser }) {
                   <td>
                     <p dir="auto" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{r.text}</p>
                     <span className="meta">{t('moderation.messages.parties', { reporter: r.reporterUid.slice(0, 8), reported: r.reportedUid.slice(0, 8) })}</span>
+                    {r.chatId.includes('__b_') ? <span className="meta"> · {t('moderation.messages.businessChat', { id: r.chatId.split('__b_')[1] })}</span> : null}
                   </td>
                   <td>{t(`moderation.messages.reasons.${r.reason}`)}</td>
                   {user.isDemo ? null : (

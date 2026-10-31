@@ -4,13 +4,15 @@ import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
-  chatId,
+  chatTitle,
   isRequestFor,
   MESSAGE_LIMITS,
   MESSAGE_REPORT_REASONS,
   scamSignal,
+  threadId,
   validateMessage,
   type Chat,
+  type ChatContext,
   type ChatMessage,
   type MessageReportReason,
   type PublicProfile,
@@ -25,7 +27,7 @@ import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { useReadReceipts } from '@/lib/messages';
-import { messageRepository, socialRepository } from '@/lib/services';
+import { businessRepository, messageRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { setBlocked, useSocial } from '@/lib/social';
@@ -36,6 +38,9 @@ import { useThemeColors } from '@/theme/use-theme';
  * Birebir sohbet (PROJE.md 5.11). İlk mesaj sohbeti açar: takipleşmiyorlarsa alıcıda "mesaj isteği" olur. Mesaja
  * dokununca: kendi mesajında "Sil", karşı tarafınkinde "Şikâyet et". IBAN, kapora ya da bağlantı geçen mesajın altında
  * dolandırıcılık uyarısı çıkar. Engel varsa yazma kapanır.
+ *
+ * İşletmeye yazılan sohbet ayrı bir sohbettir: işletme sayfasından `business` ile açılır (ilk mesajı müşteri atar, istek
+ * aşaması yok), sonra `thread` (sohbet kimliği) ile. Sağ üstteki seçeneklerde profil / işletme, "Sohbeti sil" ve engelle var.
  */
 export default function ChatScreen() {
   const { t } = useTranslation();
@@ -43,7 +48,7 @@ export default function ChatScreen() {
   const c = useThemeColors();
   const { language, rtl } = useSettings();
   const lang = language ?? 'tr';
-  const { uid: other } = useLocalSearchParams<{ uid: string }>();
+  const { uid: other, business, thread } = useLocalSearchParams<{ uid: string; business?: string; thread?: string }>();
   const { user } = useSession();
   const me = user?.uid ?? '';
   const { me: myProfile, blocked } = useSocial();
@@ -61,27 +66,42 @@ export default function ChatScreen() {
   const [selected, setSelected] = useState<string | null>(null);
   const [reporting, setReporting] = useState<MessageReportReason | null>(null);
   const [reported, setReported] = useState<Set<string>>(new Set());
+  const [options, setOptions] = useState<'menu' | 'confirmDelete' | null>(null);
+  // İşletme sayfasından açılan yeni sohbetin konusu (işletme yayında ve karşı taraf sahibi olmalı).
+  const [biz, setBiz] = useState<ChatContext | null | undefined>(business ? undefined : null);
   const scroll = useRef<ScrollViewInstance>(null);
-  const id = me && other ? chatId(me, other) : '';
+  const id = thread ?? (me && other ? threadId(me, other, business ? { type: 'isletme', id: business } : null) : '');
   const iBlocked = blocked.has(other ?? '');
 
   useEffect(() => {
     if (!me || !other) return;
     socialRepository.getProfile(other).then(setProfile, () => setProfile(null));
+    if (business) {
+      businessRepository.get(business).then(
+        (b) => setBiz(b && b.status === 'yayinda' && b.ownerUid === other ? { type: 'isletme', id: b.id, title: b.name } : null),
+        () => setBiz(null),
+      );
+    }
     socialRepository.isBlockedBy(me, other).then(setBlockedMe, () => {});
     // Takipleşiyorlarsa sohbet baştan açık başlar (istek olmaz).
     Promise.all([socialRepository.followState(me, other), socialRepository.followState(other, me)]).then(
       ([a, b]) => setMutual(a === 'aktif' && b === 'aktif'),
       () => {},
     );
-    return messageRepository.watchChat(chatId(me, other), setChat, () => setChat(null));
-  }, [me, other]);
+    return messageRepository.watchChat(id, setChat, () => setChat(null));
+  }, [me, other, business, id]);
 
   const exists = !!chat;
+  // Sohbeti sildiysem, silmeden önceki mesajlar görünmez.
+  const hiddenAt = chat?.hidden[me];
   useEffect(() => {
     if (!exists || !id) return;
-    return messageRepository.watchMessages(id, setMessages, () => setMessages((m) => m ?? []));
-  }, [exists, id]);
+    return messageRepository.watchMessages(id, setMessages, () => setMessages((m) => m ?? []), hiddenAt);
+  }, [exists, id, hiddenAt]);
+
+  const context = chat ? chat.context ?? null : biz ?? null;
+  // Müşteri işletmeyle yazışıyor (sahibi değil): başlıkta işletmenin adı, seçeneklerde işletme sayfası.
+  const asCustomer = !!context && (chat ? chat.startedBy === me : true);
 
   // Açık sohbette okunmamışlar sıfırlanır. Okundu bilgisi açıksa "gördüm" yazılır; mesaj isteğinde yazılmaz (gönderen,
   // istek kabul edilene kadar okunduğunu bilmez).
@@ -97,14 +117,14 @@ export default function ChatScreen() {
     const body = text.trim();
     if (validateMessage(body) || !other) return;
     if (hasBanned(body)) return setError(t('messages.banned'));
-    if (!myProfile || !profile) return;
+    if (!myProfile || (!profile && !context)) return;
     setBusy(true);
     setError(undefined);
     try {
-      await messageRepository.send(me, other, body, { chat: chat ?? null, myName: myProfile.displayName, otherName: profile.displayName, mutual });
+      await messageRepository.send(me, other, body, { chat: chat ?? null, myName: myProfile.displayName, otherName: profile?.displayName ?? '', mutual, context: context ?? undefined });
       setText('');
     } catch {
-      setError(chat ? t('messages.sendError') : t('messages.startError'));
+      setError(chat ? t('messages.sendError') : context ? t('messages.businessStartError') : t('messages.startError'));
     } finally {
       setBusy(false);
     }
@@ -129,16 +149,25 @@ export default function ChatScreen() {
       router.back();
     });
 
+  const hide = () =>
+    run(async () => {
+      await messageRepository.hide(chat!, me);
+      router.back();
+    });
+
+  const title = chat ? chatTitle(chat, me) : asCustomer ? context!.title : profile?.displayName ?? t('messages.title');
   const header = (
     <HeroHeader
-      title={profile?.displayName ?? t('messages.title')}
+      title={title}
+      subtitle={context && !asCustomer ? t('messages.aboutBusiness', { name: context.title }) : undefined}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/messages'))}
-      right={profile ? { icon: 'person-outline', label: t('messages.openProfile'), onPress: () => router.push({ pathname: '/u/[uid]', params: { uid: other! } }) } : undefined}
+      right={{ icon: 'more-vert', label: t('messages.options'), onPress: () => setOptions(options ? null : 'menu') }}
     />
   );
 
-  if (!user || profile === undefined || chat === undefined) return <Screen header={header}><StateMessage kind="loading" /></Screen>;
-  if (!profile || other === me) return <Screen header={header}><StateMessage kind="empty" message={t('messages.notFound')} /></Screen>;
+  if (!user || profile === undefined || chat === undefined || biz === undefined) return <Screen header={header}><StateMessage kind="loading" /></Screen>;
+  if (business && !chat && !biz) return <Screen header={header}><StateMessage kind="empty" message={t('messages.businessUnavailable')} /></Screen>;
+  if ((!profile && !context) || other === me) return <Screen header={header}><StateMessage kind="empty" message={t('messages.notFound')} /></Screen>;
 
   const request = chat && isRequestFor(chat, me);
   const pendingMine = chat && !chat.accepted && chat.startedBy === me;
@@ -156,9 +185,32 @@ export default function ChatScreen() {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
           onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}>
+          {options ? (
+            <View style={[styles.notice, { backgroundColor: c.surface, borderColor: c.border }]}>
+              {options === 'confirmDelete' ? (
+                <>
+                  <AppText>{t('messages.deleteChatConfirm')}</AppText>
+                  <View style={styles.actions}>
+                    <AppButton title={t('messages.deleteChatYes')} loading={busy} disabled={busy} onPress={hide} />
+                    <AppButton variant="ghost" title={t('messages.cancel')} onPress={() => setOptions(null)} />
+                  </View>
+                </>
+              ) : (
+                <View style={styles.actions}>
+                  {asCustomer ? (
+                    <AppButton variant="ghost" title={t('messages.openBusiness')} onPress={() => router.push({ pathname: '/business/[id]', params: { id: context!.id } })} />
+                  ) : profile ? (
+                    <AppButton variant="ghost" title={t('messages.openProfile')} onPress={() => router.push({ pathname: '/u/[uid]', params: { uid: other! } })} />
+                  ) : null}
+                  {chat ? <AppButton variant="ghost" title={t('messages.deleteChat')} onPress={() => setOptions('confirmDelete')} /> : null}
+                  {!iBlocked ? <AppButton variant="ghost" title={t('messages.block')} disabled={busy} onPress={block} /> : null}
+                </View>
+              )}
+            </View>
+          ) : null}
           {request ? (
             <View style={[styles.notice, { backgroundColor: c.accentSoft, borderColor: c.accentBorder }]}>
-              <AppText>{t('messages.requestNotice', { name: profile.displayName })}</AppText>
+              <AppText>{t('messages.requestNotice', { name: title })}</AppText>
               <View style={styles.actions}>
                 <AppButton title={t('messages.accept')} disabled={busy} onPress={() => run(() => messageRepository.accept(chat!.id))} />
                 <AppButton variant="ghost" title={t('messages.block')} disabled={busy} onPress={block} />
@@ -166,7 +218,7 @@ export default function ChatScreen() {
             </View>
           ) : null}
           {pendingMine ? <AppText variant="caption" muted style={styles.center}>{t('messages.pendingNotice')}</AppText> : null}
-          {!chat ? <AppText variant="caption" muted style={styles.center}>{mutual ? t('messages.newChat') : t('messages.newRequest')}</AppText> : null}
+          {!chat ? <AppText variant="caption" muted style={styles.center}>{context ? t('messages.newBusiness') : mutual ? t('messages.newChat') : t('messages.newRequest')}</AppText> : null}
           {chat && messages === null ? <StateMessage kind="loading" /> : null}
 
           {(messages ?? []).map((m) => {

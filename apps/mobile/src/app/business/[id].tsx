@@ -224,6 +224,7 @@ export default function BusinessScreen() {
           <View style={styles.buttons}>
             {team ? null : pill(following ? t('business.page.following') : t('business.page.follow'), following ? 'check' : 'add', toggleFollow, !following)}
             {pill(t('business.call'), 'call', () => contact(telUrl(b.phone)))}
+            {!team && user && b.status === 'yayinda' ? pill(t('messages.write'), 'mail-outline', () => router.push({ pathname: '/messages/[uid]', params: { uid: b.ownerUid, business: b.id } })) : null}
             {b.whatsapp ? pill(t('business.whatsappBtn'), 'chat', () => contact(whatsappUrl(b.phone))) : null}
             {b.address || b.geo ? pill(t('business.page.directions'), 'directions', () => Linking.openURL(mapsUrl()).catch(() => {})) : null}
           </View>

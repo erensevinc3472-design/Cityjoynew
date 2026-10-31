@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (arka uç 2. parça: duyuru bildirimi). Önceki: sunucu işlevleri paketi (PR #40 birleşti).
+Son güncelleme: 31 Ekim 2026 (mesajlar: işletmeye mesaj, İşletmem bölümü, sohbeti sil). Önceki: duyuru bildirimi (PR #41 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -530,6 +530,18 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    her ilde çalışıyor, boş ilde "Bu ilde henüz bilgi yok" görünür. Yeni: Panel > Şehir rehberi > "81 il durumu" (yalnızca
    admin): her ilde Benim Şehrim bölümlerinin kayıt sayısı ve "dolu bölüm x / 9"; il adına basınca o il açılır. İl başına
    tek özet belgesi okunur, kural değişikliği yok. Derleme ve 131 test geçti; gerçek veriyle panelde bakılmadı.
+- **Mesajlar: işletmeye mesaj, İşletmem, sohbeti sil (31 Ekim, dal `claude/mesaj-isletme`):** Eren'in isteği. İşletme
+   sayfasında "Mesaj gönder" (sahibi ve ekibi görmez). İşletmeye yazılan sohbet ayrı bir sohbettir (kimlik
+   `kişi_kişi__b_<işletme>`, `context {type:'isletme', id, title}`): aynı iki kişinin kişisel sohbetiyle karışmaz; istek
+   aşaması yok; ilk mesajı yalnızca müşteri atar (işletme reklam mesajı başlatamaz). Kurallar: karşı taraf işletmenin sahibi,
+   işletme yayında, ad işletmenin adı; engel, yaş kuralı ve günlük yeni sohbet sınırı aynen geçerli. Mesajlar ekranı:
+   Sohbetler / İstekler / **İşletmem** (yalnızca işletmesi olana; müşteri adı ve altında "İşletmen için: ..."); okunmamış
+   olan bölümde nokta. Sohbette sağ üstte seçenekler: profil ya da işletme, **Sohbeti sil**, Engelle. "Sohbeti sil"
+   (`hidden.<uid>` = silme anı) sohbeti yalnızca kendi listesinden kaldırır, karşı tarafa dokunmaz; yeni mesaj gelince sohbet
+   geri gelir ama silmeden önceki mesajlar görünmez. Panel > Moderasyon > Mesaj şikâyetleri: işletme sohbetinden gelen şikâyet
+   işaretli. Bildirimdeki adres işletme sohbetini açar. Testler: kural 8 (2 yeni), ortak 137. Emülatörde web sürümüyle
+   baştan sona denendi (müşteri yazdı, sildi; sahip İşletmem'de gördü, cevapladı; sohbet müşteride yalnızca yeni mesajla
+   geri geldi). **Kurallar değişti: birleştirince Eren kuralları yükleyecek.** İlan pazarı (İlanlar bölümü) sıradaki iş.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -627,6 +639,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 1. ~~Sunucu işlevleri paketi, iptal bildirimleri, SOS temizliği, hesap silme güvenlik ağı~~ (31 Ekim).
 2. ~~Acil duyuru ve duyuruda bölgedeki kişilere telefon bildirimi~~ (31 Ekim).
 3. Mesaj ve yeni takipçi bildirimleri.
+   Araya giren (Eren, 31 Ekim): mesajlar. ~~İşletmeye mesaj, İşletmem, sohbeti sil~~ (31 Ekim). Sırada ilan pazarı
+   (Marketplace) ve "İlanlar" bölümü; Karar (Eren): önce ikinci el eşya, emlak ve araç sonra.
+   Karar (Eren): bölümün adı **Çarşı**; Benim Şehrim kartı "Satılık & Kiralık" yerine "Çarşı" yapıldı (5 dil),
+   Mesajlar'daki bölüm de "Çarşı" olacak. Sıradaki iş: Çarşı (eşya ilanları) ve Mesajlar > Çarşı.
 4. Günlük sınırlar (aktivite açma, hizmet önerisi) ve hesap silinince önerilerin silinmesi.
 5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.

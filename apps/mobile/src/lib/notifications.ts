@@ -19,7 +19,7 @@ import { useEvents } from './events';
 import { firestore } from './firebase';
 import { isFirebaseConfigured } from './firebase-config';
 import { useIncomingSos } from './incoming-sos';
-import { useChats } from './messages';
+import { chatHref, useChats } from './messages';
 import { socialRepository } from './services';
 import { useSession } from './session';
 import { deviceStorage } from './storage';
@@ -174,7 +174,7 @@ export function useNotificationFeed(full: boolean): AppNotification[] | null {
       title: isRequestFor(c, me) ? t('notifications.messageRequest', { name }) : t('notifications.message', { name, count: c.unread[me] }),
       body: c.last.text || undefined,
       at: c.last.at,
-      href: { pathname: '/messages/[uid]', params: { uid: other } },
+      href: chatHref(c, me),
     });
   }
   for (const e of full ? (events ?? []) : []) {
