@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri, dal `claude/sinirlar`). Önceki: mesaj ve takip için telefon bildirimi (PR #47 birleşti).
+Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri birleşti, kurallar yüklendi). Önceki: mesaj ve takip için telefon bildirimi (PR #47 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -587,7 +587,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sınırları da artık panelden. Bildirim öncelikleri: Panel > Bildirimler'de tür başına her zaman / normal / uygulama içi ve
   günlük sesli tavan (5); sunucu `pushCount/{uid}` ile sayar, tavandan sonra sessiz kanaldan gönderir; admin onayda "bildirim
   her zaman çalsın" (`ringAlways`). Düzeltilen hata: sunucu panelin kapattığı türleri yanlış alandan okuyordu. Testler:
-  kurallar 130, sunucu 19, ortak 148. **Kurallar değişti: birleşince yüklenmeli.**
+  kurallar 130, sunucu 19, ortak 148. Birleşti, kurallar ve dizinler 31 Ekim'de yüklendi (Eren'in isteğiyle Claude).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

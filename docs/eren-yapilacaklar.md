@@ -5,7 +5,7 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 
 ## 1. Hemen (bugün yarın, kısa işler)
 
-- [ ] **Günlük sınırlar PR'ını birleştir, sonra kuralları yükle:** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/sinirlar
+- [x] **Günlük sınırlar PR'ını birleştir, sonra kuralları yükle (yapıldı, 31 Ekim):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/sinirlar
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra Claude'a "kuralları
   > yükle" de. (Kurallar yüklenmeden yeni sınırlar ve panelin Günlük sınırlar sayfası canlıda çalışmaz.)
 
