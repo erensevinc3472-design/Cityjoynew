@@ -96,6 +96,29 @@ describe('sunucu olay bildirimi', () => {
     expect(d.priority).toBeUndefined();
   });
 
+  it('mesajda başlık gönderenin adı, gövde mesajın kendisi; takipte kişinin adı metne yerleşir', () => {
+    const href = { pathname: '/messages/[uid]', params: { uid: 'ali' } };
+    const [m] = noticePushMessages([target('a')], { kind: 'message', category: 'mesaj', title: 'Ali Y.', body: 'Merhaba', href }, DEFAULT_NOTIFICATION_TRIGGERS, 12);
+    expect(m).toMatchObject({ title: 'Ali Y.', body: 'Merhaba', data: { href } });
+    const [r] = noticePushMessages([target('a', { language: 'en' })], { kind: 'messageRequest', category: 'mesaj', title: 'Ali Y.', href }, DEFAULT_NOTIFICATION_TRIGGERS, 12);
+    expect(r).toMatchObject({ title: 'Message request', body: 'Ali Y. wants to send you a message.' });
+    const [f] = noticePushMessages([target('a')], { kind: 'follower', category: 'takip', title: 'Ali Y.', href }, DEFAULT_NOTIFICATION_TRIGGERS, 12);
+    expect(f).toMatchObject({ title: 'Yeni takipçi', body: 'Ali Y. seni takip etmeye başladı.' });
+    const off = { ...DEFAULT_NOTIFICATION_PREFS, categories: { ...DEFAULT_NOTIFICATION_PREFS.categories, takip: false } };
+    expect(noticePushMessages([target('a', { prefs: off })], { kind: 'follower', category: 'takip', title: 'Ali Y.', href }, DEFAULT_NOTIFICATION_TRIGGERS, 12)).toEqual([]);
+  });
+
+  it('her bildirim türünün metni beş dilde var', () => {
+    const kinds = ['eventCancelled', 'activityCancelled', 'message', 'messageRequest', 'follower', 'followRequest', 'followAccepted'] as const;
+    for (const language of ['tr', 'en', 'de', 'ar', 'ru'] as const) {
+      for (const kind of kinds) {
+        const [m] = noticePushMessages([target('a', { language })], { kind, category: 'mesaj', title: 'X', href: notice.href }, DEFAULT_NOTIFICATION_TRIGGERS, 12);
+        expect(m.title, `${language} ${kind}`).toBeTruthy();
+        expect(m.body, `${language} ${kind}`).toBeTruthy();
+      }
+    }
+  });
+
   it('Türkiye saati UTC+3', () => {
     expect(turkeyHour(new Date('2026-10-31T22:30:00Z'))).toBe(1);
     expect(turkeyHour(new Date('2026-10-31T09:00:00Z'))).toBe(12);

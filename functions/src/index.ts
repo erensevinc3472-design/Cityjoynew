@@ -6,13 +6,14 @@ import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functionsV1 from 'firebase-functions/v1';
 import { setGlobalOptions } from 'firebase-functions/v2';
-import { onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 import { handleAnnouncementWrite } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
-import { deleteExpiredSos, deleteUserLeftovers } from './cleanup';
+import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
 import { expoSender } from './push';
+import { handleFollowWrite, handleMessageCreate } from './social';
 
 initializeApp();
 const db = getFirestore();
@@ -35,8 +36,18 @@ export const announcementPublished = onDocumentWritten('announcements/{id}', asy
   await handleAnnouncementWrite(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deps());
 });
 
+export const messageSent = onDocumentCreated('chats/{chatId}/messages/{mid}', async (e) => {
+  await handleMessageCreate(db, e.params.chatId, e.data?.data(), deps());
+});
+
+export const followChanged = onDocumentWritten('follows/{fid}', async (e) => {
+  await handleFollowWrite(db, e.params.fid, e.data?.before.data(), e.data?.after.data(), deps());
+});
+
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {
-  await deleteExpiredSos(db, new Date());
+  const now = new Date();
+  await deleteExpiredSos(db, now);
+  await deleteExpiredPushLog(db, now);
 });
 
 // Hesap silme tetikleyicisi yalnızca 1. kuşak işlevlerde var.

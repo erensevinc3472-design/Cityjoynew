@@ -5,9 +5,18 @@ import type { Firestore } from 'firebase-admin/firestore';
  * Firestore TTL ayarına gerek kalmaz. Silinen sayıyı döndürür.
  */
 export async function deleteExpiredSos(db: Firestore, now: Date): Promise<number> {
+  return deleteExpired(db, 'sosAlerts', now);
+}
+
+/** Bildirim tekrarını önleyen süreli kayıtlar (takip bildirimi; `deleteAt` olmayan duyuru kayıtları kalır). */
+export async function deleteExpiredPushLog(db: Firestore, now: Date): Promise<number> {
+  return deleteExpired(db, 'pushLog', now);
+}
+
+async function deleteExpired(db: Firestore, collection: string, now: Date): Promise<number> {
   let total = 0;
   for (;;) {
-    const snap = await db.collection('sosAlerts').where('deleteAt', '<=', now).limit(400).get();
+    const snap = await db.collection(collection).where('deleteAt', '<=', now).limit(400).get();
     if (snap.empty) return total;
     const batch = db.batch();
     snap.docs.forEach((d) => batch.delete(d.ref));

@@ -14,12 +14,25 @@ import { pushTokenRepository } from './services';
  */
 export const pushSupported = Platform.OS !== 'web';
 
+type Href = PushNotice['href'];
+
 let currentToken: string | null = null;
 
+// Ekranda açık olan sohbet ("karşıdaki|sohbet"): o sohbetin mesaj bildirimi uygulama açıkken gösterilmez.
+let openChat: string | null = null;
+const chatKey = (uid: string, thread?: string) => `${uid}|${thread ?? ''}`;
+export function setOpenChat(uid: string | null, thread?: string) {
+  openChat = uid ? chatKey(uid, thread) : null;
+}
+
 if (pushSupported) {
-  // Uygulama açıkken gelen SOS da sesli ve görünür olsun.
+  // Uygulama açıkken gelen SOS da sesli ve görünür olsun; yalnızca o an açık sohbetin mesajı gösterilmez.
   Notifications.setNotificationHandler({
-    handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }),
+    handleNotification: async (n) => {
+      const href = (n.request.content.data as { href?: Href } | undefined)?.href;
+      const inChat = href?.pathname === '/messages/[uid]' && !!openChat && openChat === chatKey(href.params?.uid ?? '', href.params?.thread);
+      return { shouldShowBanner: !inChat, shouldShowList: !inChat, shouldPlaySound: !inChat, shouldSetBadge: false };
+    },
   });
 }
 
@@ -100,9 +113,7 @@ export async function sendSosPush(alert: Pick<SosAlert, 'id' | 'fromName' | 'tes
 }
 
 /** Sunucu bildirimlerinin açabileceği ekranlar (bildirimdeki adres yalnızca bunlardan biri olabilir). */
-const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]', '/announcements/[id]']);
-
-type Href = PushNotice['href'];
+const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]', '/announcements/[id]', '/messages/[uid]', '/u/[uid]', '/me']);
 
 /** Bildirime dokununca ilgili ekran açılır: SOS ya da sunucu bildiriminin gösterdiği ekran. */
 export function onNotificationTap(open: (href: Href) => void): () => void {

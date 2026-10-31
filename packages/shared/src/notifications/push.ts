@@ -9,14 +9,22 @@ export const GENERAL_CHANNEL_ID = 'genel';
  * Sunucunun gönderdiği olay bildirimleri; metinler dil dosyasında `notifications.push` altında. Duyuruda başlık
  * türe göredir ("Acil duyuru · Nilüfer Belediyesi"), gövde duyurunun kendi başlığıdır (yazıldığı dilde).
  */
-export type PushNoticeKind = 'eventCancelled' | 'activityCancelled' | 'announcement';
+export type PushNoticeKind =
+  | 'eventCancelled'
+  | 'activityCancelled'
+  | 'announcement'
+  | 'message'
+  | 'messageRequest'
+  | 'follower'
+  | 'followRequest'
+  | 'followAccepted';
 
 export interface PushNotice {
   kind: PushNoticeKind;
   category: NotificationCategory;
-  /** Metne yerleşen ad (etkinlik / aktivite adı, duyuruda yayınlayan). */
+  /** Metne yerleşen ad (etkinlik / aktivite adı, duyuruda yayınlayan, mesajda ve takipte kişinin adı). */
   title: string;
-  /** Hazır gövde (duyurunun başlığı); yoksa dil dosyasındaki metin. */
+  /** Hazır gövde (duyurunun başlığı, mesajın kendisi); yoksa dil dosyasındaki metin. */
   body?: string;
   /** Dokununca açılacak ekran. */
   href: { pathname: string; params?: Record<string, string> };

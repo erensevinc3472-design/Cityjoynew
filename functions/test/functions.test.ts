@@ -5,8 +5,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { handleAnnouncementWrite } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
-import { deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
+import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
 import type { NotifyDeps } from '../src/push';
+import { handleFollowWrite, handleMessageCreate } from '../src/social';
 
 // Emülatördeki veritabanıyla çalışır (npm test, firebase emulators:exec). Gerçek bildirim gönderilmez.
 let app: App;
@@ -122,6 +123,107 @@ describe('duyuru bildirimi', () => {
     await handleAnnouncementWrite(db, 'd5', ann(), ann({ status: 'kaldirildi' }), deps);
     await handleAnnouncementWrite(db, 'd6', undefined, ann({ kind: 'acil', endsAt: Timestamp.fromDate(new Date('2026-10-01T00:00:00Z')) }), deps);
     expect(sent).toEqual([]);
+  });
+});
+
+async function phone(uid: string, language = 'tr') {
+  await db.doc(`pushTokens/${uid}`).set({ tokens: [`T-${uid}`], language, updatedAt: Timestamp.now() });
+}
+
+describe('mesaj bildirimi', () => {
+  const msg = (from: string, text = 'Merhaba, bisiklet duruyor mu?') => ({ from, text, status: 'aktif', createdAt: Timestamp.now() });
+
+  it('karşı tarafa gönderenin adı ve mesajla gider; dokununca sohbet açılır', async () => {
+    await phone('ali');
+    await phone('veli');
+    await db.doc('chats/ali_veli').set({ members: ['ali', 'veli'], names: { ali: 'Ali Y.', veli: 'Veli K.' }, startedBy: 'ali', accepted: true, unread: { veli: 1 } });
+    const { sent, deps } = fakeSender();
+    expect(await handleMessageCreate(db, 'ali_veli', msg('ali'), deps)).toBe(1);
+    expect(sent[0]).toMatchObject({ to: 'T-veli', title: 'Ali Y.', body: 'Merhaba, bisiklet duruyor mu?' });
+    expect(sent[0].data.href).toEqual({ pathname: '/messages/[uid]', params: { uid: 'ali' } });
+  });
+
+  it('uzun mesaj kısaltılır; silinen mesajda ve mesaj bildirimini kapatana gitmez', async () => {
+    await phone('veli');
+    await db.doc('chats/ali_veli').set({ members: ['ali', 'veli'], names: { ali: 'Ali Y.' }, startedBy: 'ali', accepted: true, unread: {} });
+    const { sent, deps } = fakeSender();
+    await handleMessageCreate(db, 'ali_veli', msg('ali', 'x'.repeat(400)), deps);
+    expect(sent[0].body.length).toBe(150);
+    await handleMessageCreate(db, 'ali_veli', { ...msg('ali'), status: 'silindi' }, deps);
+    await db.doc('users/veli/settings/notifications').set({ categories: { mesaj: false } });
+    await handleMessageCreate(db, 'ali_veli', msg('ali'), deps);
+    expect(sent).toHaveLength(1);
+  });
+
+  it('mesaj isteğinde metin görünmez ve yalnızca ilk mesajda gider', async () => {
+    await phone('veli', 'en');
+    await db.doc('chats/ali_veli').set({ members: ['ali', 'veli'], names: { ali: 'Ali Y.' }, startedBy: 'ali', accepted: false, unread: { veli: 1 } });
+    const { sent, deps } = fakeSender();
+    await handleMessageCreate(db, 'ali_veli', msg('ali'), deps);
+    expect(sent[0]).toMatchObject({ title: 'Message request', body: 'Ali Y. wants to send you a message.' });
+    await db.doc('chats/ali_veli').update({ unread: { veli: 2 } });
+    await handleMessageCreate(db, 'ali_veli', msg('ali'), deps);
+    expect(sent).toHaveLength(1);
+  });
+
+  it('işletmeye yazılınca sahip ve mesaj izni olan yetkili alır; cevap müşteriye işletme adıyla gider', async () => {
+    for (const u of ['musteri', 'sahip', 'yetkili', 'izinsiz']) await phone(u);
+    await db.doc('businesses/b1').set({ name: 'Fırın', managerUids: ['yetkili', 'izinsiz'], managers: { yetkili: { messages: true }, izinsiz: { messages: false } } });
+    const chat = { members: ['musteri', 'sahip'], names: { musteri: 'Ali Y.', sahip: 'Veli K.' }, startedBy: 'musteri', accepted: true, unread: {}, context: { type: 'isletme', id: 'b1', title: 'Fırın' } };
+    await db.doc('chats/t1').set(chat);
+    const { sent, deps } = fakeSender();
+    expect(await handleMessageCreate(db, 't1', msg('musteri'), deps)).toBe(2);
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-sahip', 'T-yetkili']);
+    expect(sent[0]).toMatchObject({ title: 'Ali Y. · Fırın', data: { href: { pathname: '/messages/[uid]', params: { uid: 'musteri', thread: 't1' } } } });
+    sent.length = 0;
+    await handleMessageCreate(db, 't1', msg('yetkili', 'Evet, açığız'), deps);
+    expect(sent).toHaveLength(1);
+    expect(sent[0]).toMatchObject({ to: 'T-musteri', title: 'Fırın', body: 'Evet, açığız', data: { href: { pathname: '/messages/[uid]', params: { uid: 'sahip', thread: 't1' } } } });
+  });
+
+  it('Çarşı sohbetinde başlıkta ilanın adı da yazar', async () => {
+    await phone('satici');
+    await db.doc('chats/t2').set({ members: ['alici', 'satici'], names: { alici: 'Ali Y.' }, startedBy: 'alici', accepted: true, unread: {}, context: { type: 'ilan', id: 'l1', title: 'Çocuk bisikleti' } });
+    const { sent, deps } = fakeSender();
+    await handleMessageCreate(db, 't2', msg('alici'), deps);
+    expect(sent[0]).toMatchObject({ to: 'T-satici', title: 'Ali Y. · Çocuk bisikleti' });
+  });
+});
+
+describe('takip bildirimi', () => {
+  const follow = (status: string) => ({ followerUid: 'ali', followeeUid: 'veli', status, createdAt: Timestamp.now() });
+  beforeEach(async () => {
+    await phone('ali');
+    await phone('veli');
+    await db.doc('publicProfiles/ali').set({ displayName: 'Ali Y.' });
+    await db.doc('publicProfiles/veli').set({ displayName: 'Veli K.' });
+  });
+
+  it('yeni takipçi hesap sahibine gider; bırakıp yeniden takip edince 7 gün tekrar gitmez', async () => {
+    const { sent, deps } = fakeSender();
+    expect(await handleFollowWrite(db, 'ali_veli', undefined, follow('aktif'), deps)).toBe(1);
+    expect(sent[0]).toMatchObject({ to: 'T-veli', title: 'Yeni takipçi', body: 'Ali Y. seni takip etmeye başladı.', data: { href: { pathname: '/u/[uid]', params: { uid: 'ali' } } } });
+    await handleFollowWrite(db, 'ali_veli', undefined, follow('aktif'), deps);
+    expect(sent).toHaveLength(1);
+    // Takibi bırakmak bildirim göndermez.
+    expect(await handleFollowWrite(db, 'ali_veli', follow('aktif'), undefined, deps)).toBe(0);
+  });
+
+  it('gizli hesaba istek sahibine, kabul isteyene gider', async () => {
+    const { sent, deps } = fakeSender();
+    await handleFollowWrite(db, 'ali_veli', undefined, follow('istek'), deps);
+    expect(sent[0]).toMatchObject({ to: 'T-veli', title: 'Takip isteği', data: { href: { pathname: '/me' } } });
+    await handleFollowWrite(db, 'ali_veli', follow('istek'), follow('aktif'), deps);
+    expect(sent[1]).toMatchObject({ to: 'T-ali', title: 'Takip isteğin kabul edildi', body: 'Artık Veli K. adlı kişiyi takip ediyorsun.' });
+  });
+
+  it('tekrar önleme kayıtları süresi dolunca günlük temizlikte silinir', async () => {
+    const { deps } = fakeSender();
+    await handleFollowWrite(db, 'ali_veli', undefined, follow('aktif'), deps);
+    await db.doc('pushLog/duyuru_d1').set({ at: Timestamp.now() });
+    expect(await deleteExpiredPushLog(db, new Date(NOW.getTime() + 8 * 86_400_000))).toBe(1);
+    expect((await db.doc('pushLog/takip_ali_veli').get()).exists).toBe(false);
+    expect((await db.doc('pushLog/duyuru_d1').get()).exists).toBe(true);
   });
 });
 
