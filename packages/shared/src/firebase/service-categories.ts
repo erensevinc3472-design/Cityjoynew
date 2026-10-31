@@ -61,6 +61,16 @@ export async function submitServiceSuggestion(db: Firestore, uid: string, text: 
   await batch.commit();
 }
 
+/** Hesap silinirken kişinin gönderdiği öneriler de silinir (KVKK). */
+export async function deleteServiceSuggestionsOf(db: Firestore, uid: string) {
+  const snap = await getDocs(query(collection(db, SUGGESTIONS), where('uid', '==', uid)));
+  for (let i = 0; i < snap.docs.length; i += 400) {
+    const batch = writeBatch(db);
+    snap.docs.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+  }
+}
+
 /**
  * Hizmet kategorisi yönetimi (admin, ülke geneli). Her değişiklik aynı toplu yazımda işlem kaydına ve
  * sürüm belgesine de yazılır; biri yazılamazsa hiçbiri yazılmaz.

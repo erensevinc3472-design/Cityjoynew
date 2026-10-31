@@ -20,6 +20,7 @@ import {
 
 import type { AnnouncementRegion, Publisher } from '../announcements/announcements';
 import { EVENT_LIMITS, type CityEvent, type EventInput } from '../events/events';
+import { cleanPhoto, photoFrom } from '../media/photo';
 import type { Action, RegionScope } from '../permissions/types';
 import type { SaveMode } from './announcements';
 import { addAudit, iso } from './grants';
@@ -53,6 +54,7 @@ function fromDoc(id: string, d: DocumentData): CityEvent {
     ...(d.priceNote ? { priceNote: d.priceNote } : {}),
     ...(d.ticketUrl ? { ticketUrl: d.ticketUrl } : {}),
     ...(typeof d.capacity === 'number' ? { capacity: d.capacity } : {}),
+    ...(photoFrom(d.cover) ? { cover: photoFrom(d.cover) } : {}),
     author: d.author,
     status: d.status,
     preparedBy: d.preparedBy,
@@ -199,6 +201,7 @@ export function createEventPanel(db: Firestore, actor: { uid: string; name: stri
         priceNote: !input.free && input.priceNote?.trim() ? input.priceNote.trim().slice(0, EVENT_LIMITS.priceNote) : undefined,
         ticketUrl: input.ticketUrl?.trim() || undefined,
         capacity: input.capacity,
+        cover: input.cover ? cleanPhoto(input.cover) : undefined,
       };
       const data = {
         title: input.title.trim(),

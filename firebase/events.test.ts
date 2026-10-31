@@ -70,6 +70,10 @@ async function publisher(uid: string): Promise<Publisher> {
 }
 const panel = (uid: string) => createEventPanel(fs(uid), { uid, name: uid });
 const day = 86400000;
+const media = (uid: string, kind: string, id = 'abcDEF123456') => {
+  const p = `media/${uid}/${kind}/${id}.jpg`;
+  return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 800, height: 600 };
+};
 const input = (patch: Partial<EventInput> = {}): EventInput => ({
   title: 'Nilüfer Caz Gecesi',
   description: 'Açık havada ücretsiz caz konseri.',
@@ -83,6 +87,15 @@ const input = (patch: Partial<EventInput> = {}): EventInput => ({
   ...patch,
 });
 const upcoming = () => createFirestoreEventRepository(guest()).listUpcoming('16');
+
+describe('etkinlik kapağı', () => {
+  it('yalnızca hazırlayanın yüklediği görsel kapak olur', async () => {
+    await expect(panel('fen').save(await publisher('fen'), input({ cover: media('basin', 'etkinlik') }), 'yayinla')).rejects.toThrow();
+    await expect(panel('fen').save(await publisher('fen'), input({ cover: media('fen', 'kurum') }), 'yayinla')).rejects.toThrow();
+    const id = await panel('fen').save(await publisher('fen'), input({ cover: media('fen', 'etkinlik') }), 'yayinla');
+    expect((await getDoc(doc(fs('ali'), 'events', id))).get('cover.path')).toBe('media/fen/etkinlik/abcDEF123456.jpg');
+  });
+});
 
 describe('etkinlikler', () => {
   it('basın hazırlar, özel kalem onaylar; herkes görür; işlem kaydı', async () => {

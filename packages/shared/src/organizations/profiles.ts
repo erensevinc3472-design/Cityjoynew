@@ -1,3 +1,4 @@
+import type { Photo } from '../media/photo';
 import type { AnnouncementAuthor, AnnouncementRegion } from '../announcements/announcements';
 import { isGrantActive } from '../permissions/can';
 import { scopeKey } from '../permissions/grants';
@@ -24,6 +25,8 @@ export interface OfficialProfileInput {
   address?: string;
   /** Serbest metin: "Hafta içi 08.30-17.30". */
   hours?: string;
+  /** Logo (panelden yüklenir; Storage, Blaze). */
+  logo?: Photo;
 }
 
 export interface OfficialProfile extends OfficialProfileInput {

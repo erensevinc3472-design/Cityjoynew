@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isCommentListed, isPostListed, looksLikeRealEstate, normalizeTargets, validateComment, validatePost, type PostInput } from '../index';
+import { isCommentListed, isPostListed, looksLikeRealEstate, normalizeTargets, postPhotoPath, validateComment, validatePost, type PostInput } from '../index';
 
 const input = (patch: Partial<PostInput> = {}): PostInput => ({
   text: 'Parktaki banklar yenilenmiş, teşekkürler!',
@@ -16,6 +16,11 @@ describe('Keşfet gönderileri', () => {
     expect(validatePost(input({ targets: ['mahallem', 'bolgesel', 'genel'] }))).toEqual([]);
     expect(validatePost(input({ text: '   ' }))).toEqual(['text']);
     expect(validatePost(input({ text: 'a'.repeat(2001) }))).toEqual(['text']);
+    // Fotoğraflı gönderide yazı boş olabilir; en çok dört fotoğraf.
+    const photo = { path: 'posts/u/p/0.jpg', url: 'https://x', width: 10, height: 10 };
+    expect(validatePost(input({ text: '', photos: [photo] }))).toEqual([]);
+    expect(validatePost(input({ photos: [photo, photo, photo, photo, photo] }))).toEqual(['photos']);
+    expect(postPhotoPath('u1', 'p1', 2)).toBe('posts/u1/p1/2.jpg');
     expect(validatePost(input({ targets: [] }))).toEqual(['targets']);
     expect(validatePost(input({ targets: ['mahallem', 'mahallem'] }))).toEqual(['targets']);
     expect(validatePost(input({ category: 'reklam' as never }))).toEqual(['category']);

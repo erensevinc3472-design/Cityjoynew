@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState, type ComponentProps, type ReactNode } from 'react';
 import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
@@ -186,8 +187,14 @@ export default function BusinessScreen() {
           <View style={styles.head}>
             <View style={[styles.ring, { borderColor: c.accent }]}>
               <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
-                <MaterialIcons name="storefront" size={22} color={c.accent} style={styles.avatarIcon} />
-                <AppText style={[styles.initial, { color: c.accent }]}>{b.name.slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                {b.logo ? (
+                  <Image source={{ uri: b.logo.url }} style={styles.logo} contentFit="cover" accessibilityLabel={b.name} />
+                ) : (
+                  <>
+                    <MaterialIcons name="storefront" size={22} color={c.accent} style={styles.avatarIcon} />
+                    <AppText style={[styles.initial, { color: c.accent }]}>{b.name.slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                  </>
+                )}
               </View>
             </View>
             <View style={styles.stats}>
@@ -220,6 +227,20 @@ export default function BusinessScreen() {
             {b.description ? <AppText style={styles.desc}>{b.description}</AppText> : null}
             {b.status !== 'yayinda' ? <AppText variant="caption" style={{ color: c.danger }}>{b.status === 'gizli' ? t('business.statusHidden') : t('business.statusRemoved')}</AppText> : null}
           </View>
+
+          {b.gallery?.length ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery} accessibilityLabel={t('business.page.gallery')}>
+              {b.gallery.map((p, i) => (
+                <Image
+                  key={p.path}
+                  source={{ uri: p.url }}
+                  style={[styles.galleryItem, { aspectRatio: Math.min(1.5, Math.max(0.8, p.width / p.height)), backgroundColor: c.surfaceStrong }]}
+                  contentFit="cover"
+                  accessibilityLabel={t('explore.photos.label', { n: i + 1, total: b.gallery!.length })}
+                />
+              ))}
+            </ScrollView>
+          ) : null}
 
           <View style={styles.buttons}>
             {team ? null : pill(following ? t('business.page.following') : t('business.page.follow'), following ? 'check' : 'add', toggleFollow, !following)}
@@ -344,6 +365,9 @@ const styles = StyleSheet.create({
   ring: { width: 88, height: 88, borderRadius: 44, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 76, height: 76, borderRadius: 38, alignItems: 'center', justifyContent: 'center' },
   avatarIcon: { position: 'absolute', top: 8, opacity: 0.35 },
+  logo: { width: 76, height: 76, borderRadius: 38 },
+  gallery: { gap: spacing.sm },
+  galleryItem: { height: 140, borderRadius: radius.md },
   initial: { fontFamily: fonts.heading, fontSize: 32, marginTop: 8 },
   stats: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
   stat: { alignItems: 'center', flexShrink: 1 },

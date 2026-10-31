@@ -55,6 +55,11 @@ beforeEach(async () => {
   });
 });
 
+const media = (uid: string, kind: string, id = 'abcDEF123456') => {
+  const p = `media/${uid}/${kind}/${id}.jpg`;
+  return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 800, height: 600 };
+};
+
 const info = { about: 'Nilüfer ilçesinin belediyesi.', phone: '0224 123 45 67', email: 'Bilgi@Nilufer.bel.tr', website: 'https://nilufer.bel.tr', hours: 'Hafta içi 08.30-17.30' };
 
 describe('resmî profiller', () => {
@@ -81,6 +86,14 @@ describe('resmî profiller', () => {
     await assertFails(setDoc(doc(db, 'officialProfiles', org.id), { ...base, website: 'http://nilufer.bel.tr' }));
     await assertFails(setDoc(doc(db, 'officialProfiles', org.id), { ...base, phone: 'beni ara' }));
     await assertFails(setDoc(doc(db, 'officialProfiles', org.id), { ...base, logo: 'x' }));
+  });
+
+  it('logo: yalnızca kendi yüklediği görsel bağlanır; başka yetkili değiştirmeden kaydedebilir', async () => {
+    await assertFails(createOfficialProfileAdmin(fs('kalem'), 'kalem').save(orgTarget, { ...info, logo: media('baskasi', 'kurum') }));
+    await assertFails(createOfficialProfileAdmin(fs('kalem'), 'kalem').save(orgTarget, { ...info, logo: media('kalem', 'etkinlik') }));
+    await assertSucceeds(createOfficialProfileAdmin(fs('kalem'), 'kalem').save(orgTarget, { ...info, logo: media('kalem', 'kurum') }));
+    expect((await createFirestoreOfficialProfileRepository(guest()).get(org.id))?.logo?.path).toBe('media/kalem/kurum/abcDEF123456.jpg');
+    await assertSucceeds(createOfficialProfileAdmin(fs('eren'), 'eren').save(orgTarget, { ...info, logo: media('kalem', 'kurum'), hours: 'Her gün' }));
   });
 
   it('muhtar kendi mahallesinin profilini yazar; geri alınmış yetki ve başka mahalle yazamaz', async () => {

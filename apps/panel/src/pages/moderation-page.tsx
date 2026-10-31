@@ -482,7 +482,7 @@ function PostReports({ user }: { user: PanelUser }) {
                 <tr key={r.id}>
                   <td className="num">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
                   <td>
-                    {r.post && r.post.text ? (
+                    {r.post && (r.post.text || r.post.photos?.length) ? (
                       <>
                         <strong>{r.post.authorName}</strong> <span className="meta">· {t(`moderation.posts.categories.${r.post.category}`)}</span>
                         <div className="meta">{regionLabel(r.post.region)} · {r.post.targets.map((x) => t(`moderation.posts.targets.${x}`)).join(', ')}</div>
@@ -491,6 +491,15 @@ function PostReports({ user }: { user: PanelUser }) {
                           <summary>{t('announcements.showBody')}</summary>
                           <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.post.text}</p>
                         </details>
+                        {r.post.photos?.length ? (
+                          <div className="photo-row">
+                            {r.post.photos.map((p, i) => (
+                              <a key={p.path} href={p.url} target="_blank" rel="noreferrer noopener" title={t('moderation.posts.photo', { n: i + 1 })}>
+                                <img src={p.url} alt={t('moderation.posts.photo', { n: i + 1 })} loading="lazy" />
+                              </a>
+                            ))}
+                          </div>
+                        ) : null}
                         {r.post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : r.post.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
                       </>
                     ) : (

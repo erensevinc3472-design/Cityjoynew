@@ -425,6 +425,7 @@
       "removed": "Kaldırıldı",
       "kept": "Yerinde kaldı",
       "missing": "(gönderi sahibi tarafından silinmiş)",
+      "photo": "Fotoğraf {{n}} (büyütmek için tıkla)",
       "remove": "Gönderiyi kaldır",
       "keep": "Yerinde kalsın",
       "note": "Nefret söylemi, taciz, dolandırıcılık, reklam, uygunsuz içerik ya da emlak ilanında kaldırın. Kaldırılan gönderi uygulamada görünmez. Her işlem işlem kaydına yazılır.",
@@ -1180,7 +1181,9 @@
     "unpublishConfirm": "\"{{title}}\" yayından kaldırılsın mı? Uygulamada artık görünmez.",
     "directNote": "Bu hesapta \"Onaysız yayınla\" yetkiniz var: etkinliğiniz onay beklemeden yayınlanır.",
     "approvalNoteOrg": "Etkinliğiniz, kurumunuzda \"Onayla\" yetkisi olan kişinin onayından sonra yayınlanır.",
-    "approvalNoteProvince": "Etkinliğiniz, il yöneticisinin onayından sonra yayınlanır."
+    "approvalNoteProvince": "Etkinliğiniz, il yöneticisinin onayından sonra yayınlanır.",
+    "cover": "Kapak görseli (isteğe bağlı)",
+    "coverHint": "Yatay bir görsel en iyi görünür. Kullanma izni olan bir görsel seç; küçültülerek yüklenir, konum bilgisi silinir."
   },
   "profile": {
     "title": "Resmî profil",
@@ -1202,7 +1205,8 @@
       "email": "E-posta",
       "website": "Web sitesi",
       "address": "Adres",
-      "hours": "Çalışma saatleri"
+      "hours": "Çalışma saatleri",
+      "logo": "Logo (isteğe bağlı)"
     },
     "errors": {
       "name": "En çok 80 karakter.",
@@ -1220,7 +1224,8 @@
     "loadError": "Profil okunamadı. Sayfayı yenileyin.",
     "loading": "Yükleniyor...",
     "none": "Düzenleyebileceğiniz bir resmî profil yok. Kurum yöneticileri kendi kurumunun, muhtarlar kendi mahallesinin profilini düzenler.",
-    "demoReadOnly": "Örnek hesapla yalnızca görüntülenir, kaydedilemez."
+    "demoReadOnly": "Örnek hesapla yalnızca görüntülenir, kaydedilemez.",
+    "logoHint": "Kare bir logo en iyi görünür. Uygulamada yuvarlak gösterilir."
   },
   "travel": {
     "title": "Seyahat: Keşfet ve Öğren",
@@ -1562,7 +1567,7 @@
     "never": "SOS, 112 araması ve hesap silme hiçbir zaman sınırlanmaz. İl yöneticisi ve admin sınırsızdır, işlemleri kayda geçer. Muhtar ve kurumun sınırı dolunca duyuru engellenmez, onaya gönderilir.",
     "groups": {
       "kullanici": "Kullanıcı (günlük)",
-      "isletme": "İşletme (günlük)",
+      "isletme": "İşletme",
       "muhtar": "Muhtar",
       "kurum": "Kurum ve belediye"
     },
@@ -1582,13 +1587,17 @@
       "oneri": "Hizmet önerisi",
       "oneriYeni": "Hizmet önerisi (yeni hesap)",
       "sikayet": "Şikâyet",
-      "isletmeGonderi": "İşletme gönderisi",
+      "isletmeGonderi": "İşletme gönderisi (günlük)",
       "muhtarDuyuru": "Muhtar duyurusu (günlük)",
       "muhtarDuyuruHafta": "Muhtar duyurusu (haftalık)",
       "kurumDuyuru": "Kurum duyuru ve haberi (günlük)",
       "kurumDuyuruHafta": "Kurum duyuru ve haberi (haftalık)",
       "acil": "Acil duyuru (günlük, muhtar ve kurum)",
-      "etkinlik": "Kurum etkinliği (günlük)"
+      "etkinlik": "Kurum etkinliği (günlük)",
+      "vitrinUcretsiz": "Vitrin fotoğrafı, ücretsiz kademe (en çok 30)",
+      "vitrinStandart": "Vitrin fotoğrafı, standart kademe (en çok 30)",
+      "vitrinPro": "Vitrin fotoğrafı, pro kademe (en çok 30)",
+      "vitrinPremium": "Vitrin fotoğrafı, premium kademe (en çok 30)"
     },
     "hint": "Her sayı 1 ile 10.000 arasında olmalı. Değişiklik birkaç dakika içinde herkese uygulanır ve işlem kaydına yazılır.",
     "save": "Kaydet",
@@ -1604,5 +1613,12 @@
     "daily": "Bugünkü doğrudan yayın sınırı doldu ({{when}} itibarıyla yenilenir). İstersen onaya gönder; onaylanan içerik sınıra sayılmaz.",
     "weekly": "Bu haftaki doğrudan yayın sınırı doldu ({{when}} itibarıyla yenilenir). İstersen onaya gönder; onaylanan içerik sınıra sayılmaz.",
     "sendForApproval": "Onaya gönder"
+  },
+  "image": {
+    "remove": "Görseli kaldır",
+    "uploading": "Yükleniyor…",
+    "tooLarge": "Görsel çok büyük. Daha küçük bir görsel seç.",
+    "notImage": "Bu bir görsel dosyası değil. JPEG, PNG ya da WEBP seç.",
+    "error": "Görsel yüklenemedi. Dosya deposu (Storage) Blaze plan ile açılınca çalışır; bağlantını da kontrol et."
   }
 }

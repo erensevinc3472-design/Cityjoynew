@@ -6,6 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { handleAnnouncementWrite } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
+import { handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
 
@@ -228,6 +229,31 @@ describe('takip bildirimi', () => {
   });
 });
 
+describe('gönderi fotoğrafları', () => {
+  const photo = { path: 'posts/u1/p1/0.jpg', url: 'https://x', width: 10, height: 10 };
+  it('moderatör kaldırınca dosyalar ve kayıttaki alan silinir; sahibi kaldırınca dosyalar silinir', async () => {
+    const deleted: string[] = [];
+    const del = async (p: string) => void deleted.push(p);
+    const before = { authorUid: 'u1', status: 'aktif', text: 'x', photos: [photo] };
+    await db.doc('posts/p1').set({ ...before, status: 'kaldirildi' });
+    expect(await handlePostPhotos(db, 'p1', before, { ...before, status: 'kaldirildi' }, del)).toBe(true);
+    expect(deleted).toEqual(['posts/u1/p1/']);
+    expect((await db.doc('posts/p1').get()).get('photos')).toBeUndefined();
+    // Sahibi kaldırdı: alan zaten boş.
+    expect(await handlePostPhotos(db, 'p1', before, { authorUid: 'u1', status: 'kaldirildi', text: '' }, del)).toBe(true);
+    expect(deleted).toEqual(['posts/u1/p1/', 'posts/u1/p1/']);
+  });
+
+  it('fotoğrafsız ya da hâlâ yayında gönderide bir şey yapılmaz', async () => {
+    const del = async () => {
+      throw new Error('silinmemeli');
+    };
+    const live = { authorUid: 'u1', status: 'aktif', photos: [photo] };
+    expect(await handlePostPhotos(db, 'p1', live, { ...live, likeCount: 1 }, del)).toBe(false);
+    expect(await handlePostPhotos(db, 'p1', { authorUid: 'u1', status: 'aktif' }, { authorUid: 'u1', status: 'kaldirildi' }, del)).toBe(false);
+  });
+});
+
 describe('temizlik', () => {
   it('süresi dolan SOS kayıtları silinir, diğerleri kalır', async () => {
     await db.doc('sosAlerts/eski').set({ fromUid: 'a', deleteAt: Timestamp.fromDate(new Date('2026-10-01T00:00:00Z')) });
@@ -242,12 +268,19 @@ describe('temizlik', () => {
     await db.doc('users/u1/settings/notifications').set({ categories: {} });
     await db.doc('pushTokens/u1').set({ tokens: ['T'] });
     await db.doc('publicProfiles/u1').set({ displayName: 'Ali' });
+    await db.doc('pushCount/u1').set({ day: '2026-11-01', count: 2 });
+    await db.doc('serviceSuggestions/s1').set({ uid: 'u1', text: 'Kilim tamiri' });
+    await db.doc('serviceSuggestions/s2').set({ uid: 'u2', text: 'Saat tamiri' });
+    await db.doc('usage/u-u1~oneri').set({ type: 'u', sid: 'u1', kind: 'oneri', count: 1 });
     await db.doc('users/u2').set({ displayName: 'Ayşe' });
-    await deleteUserLeftovers(db, 'u1');
-    for (const p of ['users/u1', 'users/u1/settings/notifications', 'pushTokens/u1', 'publicProfiles/u1']) {
+    const deleted: string[] = [];
+    await deleteUserLeftovers(db, 'u1', async (p) => void deleted.push(p));
+    expect(deleted).toEqual(['posts/u1/']);
+    for (const p of ['users/u1', 'users/u1/settings/notifications', 'pushTokens/u1', 'publicProfiles/u1', 'pushCount/u1', 'serviceSuggestions/s1', 'usage/u-u1~oneri']) {
       expect((await db.doc(p).get()).exists, p).toBe(false);
     }
     expect((await db.doc('users/u2').get()).exists).toBe(true);
+    expect((await db.doc('serviceSuggestions/s2').get()).exists).toBe(true);
   });
 });
 
@@ -283,5 +316,42 @@ describe('bildirim öncelikleri', () => {
     await db.doc('pushCount/a').set({ day: '2026-11-01', count: 5 });
     expect(await handleAnnouncementWrite(db, 'm2', undefined, ann(muhtar, { ringAlways: true }), deps)).toBe(1);
     expect(sent[0]).toMatchObject({ sound: 'default', channelId: 'genel' });
+  });
+});
+
+describe('etkinlik, kurum ve işletme görselleri', () => {
+  const m = (uid: string, kind: string, id: string) => ({ path: `media/${uid}/${kind}/${id}.jpg`, url: 'u', width: 10, height: 10 });
+
+  it('değişen ya da kaldırılan görselin dosyası silinir, kalan silinmez', async () => {
+    const deleted: string[] = [];
+    const del = async (p: string) => void deleted.push(p);
+    const a = m('o1', 'isletme-vitrin', 'aaaaaaaaaa');
+    const b = m('o1', 'isletme-vitrin', 'bbbbbbbbbb');
+    const logo = m('o1', 'isletme-logo', 'llllllllll');
+    const before = { ownerUid: 'o1', managerUids: ['m1'], logo, gallery: [a, b] };
+    expect(await handleMediaChange(MEDIA_FIELDS.businesses, before, { ...before, gallery: [b] }, del)).toEqual([a.path]);
+    // Kayıt silinince hepsi.
+    expect(await handleMediaChange(MEDIA_FIELDS.businesses, before, undefined, del)).toEqual([logo.path, a.path, b.path]);
+    expect(deleted).toEqual([a.path, logo.path, a.path, b.path]);
+  });
+
+  it('vitrinde sahibin ve yetkililerin dışındaki kişinin dosyası silinmez', async () => {
+    const deleted: string[] = [];
+    const before = { ownerUid: 'o1', managerUids: ['m1'], gallery: [m('x9', 'isletme-vitrin', 'xxxxxxxxxx'), m('m1', 'isletme-vitrin', 'mmmmmmmmmm')] };
+    expect(await handleMediaChange(MEDIA_FIELDS.businesses, before, { ...before, gallery: [] }, async (p) => void deleted.push(p))).toEqual(['media/m1/isletme-vitrin/mmmmmmmmmm.jpg']);
+    expect(deleted).toEqual(['media/m1/isletme-vitrin/mmmmmmmmmm.jpg']);
+  });
+
+  it('etkinlik kapağı yalnızca hazırlayanın klasöründense silinir; yeni kayıtta bir şey yapılmaz', async () => {
+    const del = async () => {
+      throw new Error('silinmemeli');
+    };
+    const ev = { preparedBy: 'k1', cover: m('k2', 'etkinlik', 'cccccccccc') };
+    expect(await handleMediaChange(MEDIA_FIELDS.events, ev, { preparedBy: 'k1' }, del)).toEqual([]);
+    expect(await handleMediaChange(MEDIA_FIELDS.events, undefined, ev, del)).toEqual([]);
+    const gone: string[] = [];
+    const own = { preparedBy: 'k1', cover: m('k1', 'etkinlik', 'dddddddddd') };
+    expect(await handleMediaChange(MEDIA_FIELDS.officialProfiles, { logo: own.cover }, { logo: own.cover }, del)).toEqual([]);
+    expect(await handleMediaChange(MEDIA_FIELDS.events, own, { preparedBy: 'k1' }, async (p) => void gone.push(p))).toEqual([own.cover.path]);
   });
 });

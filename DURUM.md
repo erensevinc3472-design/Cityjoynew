@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri, dal `claude/sinirlar`). Önceki: mesaj ve takip için telefon bildirimi (PR #47 birleşti).
+Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri birleşti, kurallar yüklendi). Önceki: mesaj ve takip için telefon bildirimi (PR #47 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -45,10 +45,12 @@ Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri, dal
 ```sh
 npm install
 npm test                      # ortak paket testleri (148)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (130; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (19; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (137; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (24; Java 21 gerekir)
+npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
+# Dosya deposu kuralları (Blaze + konsolda Storage açılınca): npx firebase-tools@15.34.1 deploy --only storage --project cityjoynew --config firebase/firebase.json
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -587,7 +589,41 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sınırları da artık panelden. Bildirim öncelikleri: Panel > Bildirimler'de tür başına her zaman / normal / uygulama içi ve
   günlük sesli tavan (5); sunucu `pushCount/{uid}` ile sayar, tavandan sonra sessiz kanaldan gönderir; admin onayda "bildirim
   her zaman çalsın" (`ringAlways`). Düzeltilen hata: sunucu panelin kapattığı türleri yanlış alandan okuyordu. Testler:
-  kurallar 130, sunucu 19, ortak 148. **Kurallar değişti: birleşince yüklenmeli.**
+  kurallar 130, sunucu 19, ortak 148. Birleşti, kurallar ve dizinler 31 Ekim'de yüklendi (Eren'in isteğiyle Claude).
+- **Hesap silinince hizmet önerileri ve sınır sayaçları da silinir (31 Ekim, dal `claude/hesap-oneri`).** Kişi kendi
+  önerilerini okuyup silebilir (kurallar), hesap ekranı siler; sunucudaki silme güvenlik ağı da öneri, sayaç ve günlük
+  bildirim sayacını (`pushCount`) temizler. Testler: kurallar 130, sunucu 19. **Kurallar değişti: birleşince yüklenmeli.**
+- **Keşfet'e fotoğraf (31 Ekim, dal `claude/foto`; hesap silme dalını da içerir).** Gönderiye en çok 4 fotoğraf; fotoğraf
+  varsa yazı boş olabilir. Telefonda galeriden seçilir (`expo-image-picker`), en uzun kenar 1600 piksel JPEG'e küçültülür
+  (`expo-image-manipulator`; konum ve cihaz bilgisi bu sırada atılır), gönderinin kimliğiyle
+  `posts/{uid}/{postId}/{0-3}.jpg` yoluna yüklenir, sonra gönderi kaydedilir (kayıt olmazsa dosyalar geri silinir).
+  Akışta ekran genişliğinde (oran 4:5 ile 1.91:1 arası), çoklu fotoğraf yana kaydırılır ("2/3" ve noktalar); profil
+  ızgarasında ilk fotoğraf kare olur. Panel > Moderasyon şikâyet edilen gönderinin fotoğraflarını gösterir. Kurallar:
+  Storage `firebase/storage.rules` (yalnızca sahibi, yalnızca JPEG, en çok 1,5 MB, üzerine yazma yok, okuma girişliye);
+  Firestore fotoğraf alanını denetler (kendi klasörü, bu gönderinin kimliği, sıra, Storage adresi). Sunucu işlevi
+  `postPhotosRemoved`: gönderi kaldırılınca (sahibi ya da moderatör) dosyaları siler; hesap silinince `posts/{uid}/`
+  klasörü silinir. Testler: kurallar 133 (Storage emülatörüyle; emülatör "üzerine yazma"yı sınayamıyor), sunucu 21,
+  ortak 148. **Henüz çalışmıyor:** Blaze, konsolda Storage'ı açmak, Storage kurallarını ve işlevleri yüklemek gerekir;
+  o zamana kadar fotoğraflı paylaşım "yüklenemedi" der, yazılı paylaşım çalışır. Telefonda denenmedi (Blaze sonrası).
+  Açık: yükleme yarıda kalırsa klasörde artık dosya kalabilir (ileride günlük temizlik).
+- **Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini (31 Ekim, dal `claude/foto`; Blaze ile çalışır).** Ortak
+  altyapı `packages/shared/src/media/photo.ts`: dosyalar `media/{yükleyen}/{tür}/{rastgele}.jpg` (türler: etkinlik,
+  kurum, isletme-logo, isletme-vitrin), seçilince küçültülüp hemen yüklenir, kayıtla birlikte kaydedilir. Panel:
+  Etkinlikler formunda kapak, Profil sayfasında logo (`components/image-field.tsx`, tarayıcıda 1600 piksel JPEG).
+  Uygulama: etkinlik kartında küçük kapak, ayrıntıda tam genişlik; resmî profil kartında yuvarlak logo; İşletmem
+  formunda logo ve vitrin (`components/media-picker.tsx`), işletme sayfasında logo halkada ve vitrin yana kayan
+  şerit, liste kartında küçük logo. **Vitrin sayısı kademeye göre** panel > Sınırlar'dan (öneri: ücretsiz 3, standart 10,
+  pro 20, premium 30; kesin üst sınır 30; kademeler gelir konusunda kesinleşecek). Kurallar: yeni bağlanan logo/kapak
+  bağlayanın kendi dosyası olmalı, değişmeyen kalabilir; vitrinde kural motorunun 1000 işlem sınırı yüzünden yalnızca
+  sayı denetlenir, uygulama yalnızca kendi depomuzdaki (Storage) adresleri gösterir (`photoFrom`). Sunucu işlevleri
+  `eventMediaChanged`, `profileMediaChanged`, `businessMediaChanged`: kayıttan çıkan görselin dosyasını siler
+  (vitrinde yalnızca sahibin ve yetkililerin dosyası). Testler: kurallar 137, sunucu 24, ortak 150. Aktivite görseli
+  ve "{Şehir}'dan Kareler" sonra. Açık: panelde görsel seçip kaydetmeden çıkılırsa dosya artık kalır (günlük temizlik).
+- **Panel internette (31 Ekim, Eren onayladı):** https://cityjoynew.web.app. `firebase/firebase.json` içinde Hosting
+  ayarı (güvenlik başlıkları, arama motorlarına kapalı); `npm run panel:deploy` derler, `firebase/panel-dist`
+  klasörüne kopyalar (Firebase yalnızca kendi klasörünün içinden yükler; klasör GitHub'a gitmez) ve yükler. Ücretsiz
+  planda çalışır. Panelde her değişiklikten sonra yeniden yüklenmeli (birleşmiş `main` dalından yüklemek doğrusu;
+  ilk yükleme `claude/foto` dalından yapıldı).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -658,8 +694,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
 - Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, asistan, taksi durağı (SOS ve hizmetler yapıldı).
-- Hizmet önerileri: admin hepsini, il yöneticisi kendi ilininkileri görür ve inceler. Günlük sınır yapıldı (31 Ekim);
-  hesap silinince kullanıcının önerilerinin silinmesi sunucu işleviyle eklenecek (Blaze plan gerektirir).
+- Hizmet önerileri: admin hepsini, il yöneticisi kendi ilininkileri görür ve inceler. Günlük sınır ve hesap silinince
+  önerilerin silinmesi yapıldı (31 Ekim; uygulama siler, sunucudaki günlük temizlik Blaze ile güvenlik ağı).
 - **SOS bildirimi ve arka plan konumu telefonda denenmedi:** kod hazır, ama Expo push adresi için `app.json` içinde EAS proje
   kimliği (`extra.eas.projectId`) gerekir; `eas init` ile gelir. Telefonda denenecekler: kilitli ekranda bildirim sesi,
   uygulama kapalıyken konum güncellemesi, bildirime dokununca SOS ekranı. Expo push güvenliği: bildirim adresleri yalnızca aile
@@ -678,7 +714,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
-- Panel ve web sürümü internette yayında değil (Firebase Hosting için dağıtım anahtarı gerekir).
+- Panel internette: https://cityjoynew.web.app (31 Ekim). Uygulamanın web sürümü yayında değil.
 - Ana sayfadaki arama kutusu ve hava durumu ilgili özelliklerle gelecek (duyurular ana sayfada).
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin
   bağlantı bilgilerini içeriyor; Eren'e o projeyi kapatması önerildi.
@@ -694,8 +730,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Karar (Eren): bölümün adı **Çarşı**; Benim Şehrim kartı "Satılık & Kiralık" yerine "Çarşı" yapıldı (5 dil),
    Mesajlar'daki bölüm de "Çarşı" olacak. ~~Çarşı (eşya ilanları) ve Mesajlar > Çarşı~~ (31 Ekim). Çarşı'da kalan:
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
-4. ~~Günlük sınırlar ve bildirim öncelikleri~~ (31 Ekim). Kalan: hesap silinince hizmet önerilerinin silinmesi.
-5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
+4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
+5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini~~ (31 Ekim, Blaze
+   bekliyor). Kalan: aktivite görseli, belediye fotoğrafları, "{Şehir}'dan Kareler", Çarşı ilan fotoğrafları.
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 
@@ -721,8 +758,8 @@ toplamak olmaz, dron ve Wi-Fi Direct ayrı bir Ar-Ge projesi. Temeli bu duyuru b
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"
    sayfası ve çekim kodu sahte sağlayıcıyla emülatörde yapılır; anahtarlar gelince bağlanır.
-3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu ve fotoğraf vitrini (Firebase Storage; Blaze plan gerekir).
-4. Paneli internete koyma (Firebase Hosting).
+3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu (Firebase Storage; Blaze plan gerekir). ~~Fotoğraf vitrini~~ (31 Ekim).
+4. ~~Paneli internete koyma~~ (31 Ekim, https://cityjoynew.web.app).
 
 ## PROJE.md bölümleri (gerektiğinde ilgili bölümü oku)
 

@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { Linking, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ltr, telUrl, type OfficialProfile } from '@cityjoy/shared';
@@ -34,9 +35,13 @@ export function OfficialProfileCard({
   return (
     <View style={[styles.card, { backgroundColor: c.surface, borderColor: c.border, shadowColor: c.shadow }]}>
       <View style={styles.head}>
-        <View style={[styles.badge, { backgroundColor: c.accentSoft }]}>
-          <MaterialIcons name="verified" size={22} color={c.icon} />
-        </View>
+        {p?.logo ? (
+          <Image source={{ uri: p.logo.url }} style={[styles.logo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors />
+        ) : (
+          <View style={[styles.badge, { backgroundColor: c.accentSoft }]}>
+            <MaterialIcons name="verified" size={22} color={c.icon} />
+          </View>
+        )}
         <View style={styles.headText}>
           <AppText accessibilityRole="header" style={[styles.title, { color: c.textStrong }]}>{title}</AppText>
           {subtitle ? <AppText variant="caption" muted>{subtitle}</AppText> : null}
@@ -71,6 +76,7 @@ const styles = StyleSheet.create({
   card: { borderRadius: radius.lg, borderWidth: 1, padding: spacing.md, gap: spacing.sm, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 10 },
   head: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
   badge: { width: 42, height: 42, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
+  logo: { width: 48, height: 48, borderRadius: 24 },
   headText: { flex: 1, gap: 2 },
   title: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21 },
   row: { gap: 2 },

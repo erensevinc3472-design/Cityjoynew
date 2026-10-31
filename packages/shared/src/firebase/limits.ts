@@ -7,11 +7,14 @@ import {
   limitFor,
   nextUsage,
   normalizeLimits,
+  USAGE_KINDS,
   usageId,
   type Limits,
   type UsageKind,
   type UsageSubject,
 } from '../limits/limits';
+import { VITRIN_LIMIT_KEY } from '../media/photo';
+import type { MembershipTier } from '../models/membership';
 import { addAudit, iso } from './grants';
 
 const limitsRef = (db: Firestore) => doc(db, 'config', 'limits');
@@ -52,6 +55,18 @@ export async function countUsage(db: Firestore, batch: WriteBatch, subject: Usag
       ? { type: subject.type, sid: subject.id, kind, windowStart: serverTimestamp(), count: 1 }
       : { type: subject.type, sid: subject.id, kind, windowStart: snap.get('windowStart'), count: next.count },
   );
+}
+
+/** İşletme vitrininde bu kademede en çok kaç fotoğraf olabilir (panel > Sınırlar). */
+export async function vitrinLimit(db: Firestore, tier: MembershipTier): Promise<number> {
+  return Math.min(30, (await loadLimits(db))[VITRIN_LIMIT_KEY[tier]]);
+}
+
+/** Hesap silinirken kişinin günlük sınır sayaçları. */
+export async function deleteUsageOf(db: Firestore, uid: string): Promise<void> {
+  const batch = writeBatch(db);
+  USAGE_KINDS.forEach((kind) => batch.delete(doc(db, 'usage', usageId({ type: 'u', id: uid }, kind))));
+  await batch.commit();
 }
 
 /** Panel (admin): sınır sayıları. Her değişiklik işlem kaydına yazılır. */

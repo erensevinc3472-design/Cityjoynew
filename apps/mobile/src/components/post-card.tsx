@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { Post } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
+import { PostPhotos } from '@/components/post-photos';
 import { useReduceMotion } from '@/components/scene-art';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
@@ -50,7 +51,7 @@ export function useRelativeTime() {
 /**
  * Keşfet gönderisi (Instagram hissi; Eren'in örnek ekranı, 13. madde 30): çerçevesiz, ekran genişliğinde. Üstte halkalı
  * harf, ad, yer ve zaman, sağda Takip et; ortada yazı (kısa yazı büyük harfle); altta beğeni, yorum, paylaş ve kaydet;
- * en altta kategori etiketi. Yazıya iki kez dokunmak beğenir (kalp belirir), bir kez dokunmak gönderiyi açar.
+ * en altta kategori etiketi. Fotoğraf varsa ekran genişliğinde üstte durur, yazı altında. Yazıya ya da fotoğrafa iki kez dokunmak beğenir (kalp belirir), bir kez dokunmak gönderiyi açar.
  */
 export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow, onFollow, saved, onSave }: Props) {
   const { t } = useTranslation();
@@ -64,7 +65,9 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
   const bump = useRef(new Animated.Value(1)).current;
   const lastTap = useRef(0);
   const single = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const short = !full && item.text.length <= 140;
+  const photos = item.photos ?? [];
+  // Kısa yazı büyük harfle; fotoğraflı gönderide yazı fotoğrafın altında açıklama olur.
+  const short = !full && !photos.length && item.text.length <= 140;
 
   useEffect(() => () => clearTimeout(single.current), []);
 
@@ -154,11 +157,22 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
 
       <Pressable
         accessibilityRole={onPress ? 'button' : undefined}
-        accessibilityLabel={onPress ? `${item.authorName}. ${t(`explore.categories.${item.category}`)}. ${item.text.slice(0, 120)}` : undefined}
+        accessibilityLabel={
+          onPress
+            ? [item.authorName, t(`explore.categories.${item.category}`), photos.length ? t('explore.photos.count', { count: photos.length }) : '', item.text.slice(0, 120)].filter(Boolean).join('. ')
+            : undefined
+        }
         accessibilityHint={onLike ? t('explore.doubleTapHint') : undefined}
         onPress={tapBody}
         style={styles.body}>
-        <AppText selectable={full} numberOfLines={full ? undefined : 8} style={[short ? styles.textBig : styles.text, { color: c.text }]}>{item.text}</AppText>
+        {photos.length ? (
+          <View style={styles.photos}>
+            <PostPhotos photos={photos} maxWidth={640} />
+          </View>
+        ) : null}
+        {item.text ? (
+          <AppText selectable={full} numberOfLines={full ? undefined : photos.length ? 3 : 8} style={[short ? styles.textBig : styles.text, { color: c.text }]}>{item.text}</AppText>
+        ) : null}
         <Animated.View pointerEvents="none" style={[styles.heart, { opacity: heart, transform: [{ scale: heart.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }] }]}>
           <MaterialIcons name="favorite" size={76} color={c.danger} />
         </Animated.View>
@@ -199,7 +213,8 @@ const styles = StyleSheet.create({
   meta: { fontSize: 12, lineHeight: 16 },
   follow: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   followText: { fontFamily: fonts.bodySemi, fontSize: 13 },
-  body: { paddingVertical: 10 },
+  body: { paddingVertical: 10, gap: 10 },
+  photos: { marginHorizontal: -GUTTER },
   text: { fontSize: 15, lineHeight: 22 },
   textBig: { fontFamily: fonts.bodyMedium, fontSize: 18, lineHeight: 26 },
   heart: { position: 'absolute', top: 0, bottom: 0, start: 0, end: 0, alignItems: 'center', justifyContent: 'center' },

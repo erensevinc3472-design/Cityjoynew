@@ -5,7 +5,14 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 
 ## 1. Hemen (bugün yarın, kısa işler)
 
-- [ ] **Günlük sınırlar PR'ını birleştir, sonra kuralları yükle:** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/sinirlar
+- [ ] **Hesap silme + fotoğraflar (Keşfet, etkinlik kapağı, logolar, işletme vitrini) PR'ını birleştir, sonra kuralları yükle:** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/foto
+  > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra Claude'a "kuralları
+  > yükle" de. (Fotoğraf yükleme Blaze ile çalışır; o zamana kadar yazılı paylaşım aynen çalışır.)
+
+- [x] **Paneli internete koyma (yapıldı, 31 Ekim):** panel artık https://cityjoynew.web.app adresinde (arama
+  motorlarında çıkmaz, giriş zorunlu). Telefondan ya da başka bilgisayardan da açabilirsin.
+
+- [x] **Günlük sınırlar PR'ını birleştir, sonra kuralları yükle (yapıldı, 31 Ekim):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/sinirlar
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra Claude'a "kuralları
   > yükle" de. (Kurallar yüklenmeden yeni sınırlar ve panelin Günlük sınırlar sayfası canlıda çalışmaz.)
 
@@ -40,7 +47,8 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
   > Blaze > kartını ekle. Ardından **bütçe uyarısı** kur: Google Cloud'da "Faturalandırma > Bütçeler ve uyarılar" >
   aylık 10 dolar (aşınca e-posta gelir). Sunucu işlevleri yazıldı ve hazır bekliyor (etkinlik iptal
   bildirimi, duyuru, mesaj ve takip bildirimleri, SOS kayıtlarının 30 gün sonra silinmesi, hesap silinince verilerin temizlenmesi); Blaze'e geçince Claude
-  tek komutla yükler. Kalanlar (günlük sınırlar, fotoğraf yükleme) sırayla yazılıyor.
+  tek komutla yükler. Keşfet fotoğrafı için ayrıca konsolda sol menü > Storage > "Başlayın" (Get started) > konum
+  **europe-west1** seç (kurallar sorulursa "üretim modu" seç; asıl kuralları Claude yükler).
 - [ ] **Apple Developer Program (yılda 99 dolar):** developer.apple.com/programs/enroll
   - İki adımlı doğrulaması açık bir Apple kimliği gerekir.
   - iPhone'a "Apple Developer" uygulamasını kur, oradan kimliğinle (TC kimlik/pasaport) kayıt ol.

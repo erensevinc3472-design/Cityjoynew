@@ -8,7 +8,7 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -162,7 +162,7 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(setDoc(doc(db('ali'), 'catalogVersions/serviceCategories'), { updatedAt: serverTimestamp(), updatedBy: 'ali' }));
   });
 
-  it('hizmet önerisi: giriş yapan kendi adına gönderir, yalnızca admin okur ve incelendi yapar', async () => {
+  it('hizmet önerisi: giriş yapan kendi adına gönderir, admin ve gönderen okur, admin incelendi yapar', async () => {
     await seed('admins/eren', { addedAt: 'konsol' });
     const s = (uid: string, over: Record<string, unknown> = {}) => ({ uid, text: 'Kilim tamiri', provinceCode: '16', status: 'yeni', createdAt: serverTimestamp(), ...over });
     await assertFails(setDoc(doc(db(), 'serviceSuggestions/0'), s('misafir')));
@@ -172,10 +172,18 @@ describe('occupations, admins, auditLog', () => {
     // Sayaçsız gönderilemez (günlük sınır); sayaçla birlikte gider.
     await assertFails(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('ali')));
     await assertSucceeds(counted(db('ali'), 'u-ali~oneri', 'serviceSuggestions/1', s('ali')));
-    await assertFails(getDoc(doc(db('ali'), 'serviceSuggestions/1')));
+    await assertFails(getDoc(doc(db('veli'), 'serviceSuggestions/1')));
+    await assertSucceeds(getDoc(doc(db('ali'), 'serviceSuggestions/1')));
     await assertSucceeds(getDoc(doc(db('eren'), 'serviceSuggestions/1')));
     await assertFails(updateDoc(doc(db('eren'), 'serviceSuggestions/1'), { text: 'değişti' }));
     await assertSucceeds(updateDoc(doc(db('eren'), 'serviceSuggestions/1'), { status: 'incelendi', reviewedBy: 'eren', reviewedAt: serverTimestamp() }));
+    // Hesap silinirken: kişi kendi önerilerini ve sayaçlarını okur, siler; başkasınınkini değil.
+    await assertSucceeds(getDocs(query(collection(db('ali'), 'serviceSuggestions'), where('uid', '==', 'ali'))));
+    await assertFails(getDocs(query(collection(db('veli'), 'serviceSuggestions'), where('uid', '==', 'ali'))));
+    await assertFails(deleteDoc(doc(db('veli'), 'serviceSuggestions/1')));
+    await assertFails(deleteDoc(doc(db('veli'), 'usage/u-ali~oneri')));
+    await assertSucceeds(deleteDoc(doc(db('ali'), 'serviceSuggestions/1')));
+    await assertSucceeds(deleteDoc(doc(db('ali'), 'usage/u-ali~oneri')));
   });
 
   it('işletme: sahibi bilgilerini yazar ama doğrulama, kademe, puan ve öne çıkmayı değiştiremez', async () => {

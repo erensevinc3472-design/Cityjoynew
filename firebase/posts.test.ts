@@ -64,6 +64,36 @@ describe('Keşfet gönderileri', () => {
     await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['herkes' as never] })));
   });
 
+  it('fotoğraf: kendi klasöründen, bu gönderinin kimliğiyle, en çok dört; yazısız olabilir; kaldırınca alan silinir', async () => {
+    const r = repo('ayse');
+    const photo = (uid: string, id: string, i: number) => ({
+      path: `posts/${uid}/${id}/${i}.jpg`,
+      url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2F${uid}%2F${id}%2F${i}.jpg?alt=media&token=t`,
+      width: 1600,
+      height: 1200,
+    });
+    const ok = r.newId();
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', photos: [photo('ayse', ok, 0), photo('ayse', ok, 1)] }), undefined, ok));
+    expect((await r.get(ok))?.photos?.map((p) => p.path)).toEqual([`posts/ayse/${ok}/0.jpg`, `posts/ayse/${ok}/1.jpg`]);
+    // Başkasının klasörü, başka gönderinin kimliği, sıra atlama, beşinci fotoğraf, yabancı adres olmaz.
+    const id = () => r.newId();
+    let x = id();
+    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [photo('ali', x, 0)] }), undefined, x));
+    x = id();
+    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [photo('ayse', ok, 0)] }), undefined, x));
+    x = id();
+    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [photo('ayse', x, 1)] }), undefined, x));
+    x = id();
+    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [0, 1, 2, 3, 4].map((i) => photo('ayse', x, i)) }), undefined, x));
+    x = id();
+    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [{ ...photo('ayse', x, 0), url: 'https://kotu.example/posts%2Fayse%2F' + x + '%2F0.jpg?a' }] }), undefined, x));
+    // Sahibi kaldırınca fotoğraf alanı da boşalır.
+    await assertSucceeds(r.remove(ok));
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      expect('photos' in ((await getDoc(doc(ctx.firestore(), 'posts', ok))).data() ?? {})).toBe(false);
+    });
+  });
+
   it('görünürlük: Mahallem yalnızca o mahallede, Bölgesel yalnızca o ilde, Genel herkese (sorgular da)', async () => {
     const m = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['mahallem'] }));
     const b = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['bolgesel'] }));

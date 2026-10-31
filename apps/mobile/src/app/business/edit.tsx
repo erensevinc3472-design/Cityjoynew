@@ -19,16 +19,19 @@ import {
   type BusinessType,
   type DayHours,
 } from '@cityjoy/shared';
+import { vitrinLimit } from '@cityjoy/shared/firebase';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BusinessManagers } from '@/components/business-managers';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
+import { MediaPicker } from '@/components/media-picker';
 import { OptionRow } from '@/components/option-row';
 import { CategoryPicker, FoodKindPicker, IconChipPicker, RegionPicker } from '@/components/pickers';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
+import { firestore } from '@/lib/firebase';
 import { currentLocation } from '@/lib/location';
 import { goBackOr } from '@/lib/navigation';
 import { useServiceCategories } from '@/lib/service-categories';
@@ -75,6 +78,11 @@ export default function EditBusinessScreen() {
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [locating, setLocating] = useState<'idle' | 'busy' | 'denied' | 'failed'>('idle');
+  const tier = existing?.membership.tier ?? 'ucretsiz';
+  const [vitrinMax, setVitrinMax] = useState(0);
+  useEffect(() => {
+    vitrinLimit(firestore, tier).then(setVitrinMax, () => setVitrinMax(0));
+  }, [tier]);
 
   useEffect(() => {
     if (!id) return;
@@ -244,6 +252,10 @@ export default function EditBusinessScreen() {
         </>
       )}
       <TextField label={t('business.description')} value={form.description ?? ''} onChangeText={(description) => set({ description })} maxLength={BUSINESS_LIMITS.description} multiline error={err('description')} />
+      <MediaPicker label={t('business.logo')} hint={t('business.logoHint')} kind="isletme-logo" uid={user.uid} photos={form.logo ? [form.logo] : []} max={1} onChange={(p) => set({ logo: p[0] })} disabled={busy || removed} round />
+      {vitrinMax > 0 || form.gallery?.length ? (
+        <MediaPicker label={t('business.gallery')} hint={t('business.galleryHint')} kind="isletme-vitrin" uid={user.uid} photos={form.gallery ?? []} max={Math.max(vitrinMax, form.gallery?.length ?? 0)} onChange={(gallery) => set({ gallery })} disabled={busy || removed} />
+      ) : null}
 
       <AppText variant="label" accessibilityRole="header">{t('business.page.payment')}</AppText>
       <ToggleChips options={PAYMENT_METHODS.map((m) => ({ value: m, label: t(`business.payment.${m}`) }))} selected={form.paymentMethods ?? []} onToggle={(m) => set({ paymentMethods: toggleIn(form.paymentMethods, m) })} />

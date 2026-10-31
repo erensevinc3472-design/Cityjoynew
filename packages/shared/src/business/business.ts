@@ -1,3 +1,4 @@
+import { cleanPhoto, type Photo } from '../media/photo';
 import type { MembershipTier } from '../models/membership';
 import { isReservedName } from '../organizations/municipalities';
 
@@ -207,6 +208,10 @@ export interface BusinessInput {
   roadside?: RoadsideFeature[];
   /** Tesisin tam yeri (şimdilik yalnızca yol üstü tesislerde). */
   geo?: GeoPoint;
+  /** Kare logo (kartta ve sayfada yuvarlak). */
+  logo?: Photo;
+  /** Vitrin fotoğrafları; kademeye göre en çok sayı panelden (Sınırlar > vitrin...). */
+  gallery?: Photo[];
 }
 
 export interface Business extends BusinessInput {
@@ -304,6 +309,8 @@ export function cleanBusinessInput(b: BusinessInput): BusinessInput {
     amenities: AMENITIES.filter((m) => b.amenities?.includes(m)),
     ...(b.roadside?.length ? { roadside: ROADSIDE_FEATURE_IDS.filter((m) => b.roadside!.includes(m)) } : {}),
     ...(b.roadside?.length && b.geo ? { geo: geoPoint(b.geo.lat, b.geo.lng) } : {}),
+    ...(b.logo ? { logo: cleanPhoto(b.logo) } : {}),
+    gallery: (b.gallery ?? []).map(cleanPhoto),
   };
 }
 

@@ -31,9 +31,34 @@ const input: BusinessInput = {
   weeklyHours: [null, { open: '11:00', close: '23:00' }, { open: '11:00', close: '23:00' }, { open: '11:00', close: '23:00' }, { open: '11:00', close: '23:00' }, { open: '11:00', close: '02:00' }, { open: '11:00', close: '23:00' }],
   paymentMethods: ['nakit', 'kart'], amenities: ['aile-alani', 'paket-servis'],
 };
+const media = (uid: string, kind: string, id = 'abcDEF123456') => {
+  const p = `media/${uid}/${kind}/${id}.jpg`;
+  return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 800, height: 600 };
+};
 const post = (targets: ('genel' | 'takip' | 'bolgesel' | 'mahallem')[], text = 'Bugün öğlen menüsü hazır') => ({ text, category: 'firsat' as const, targets, region: location });
 
 describe('işletme sayfası', () => {
+  it('logo ve vitrin: kendi görseli, kademeye göre en çok sayı (ücretsiz 3, panelden değişir)', async () => {
+    const vitrin = (n: number, uid = 'cengiz') => Array.from({ length: n }, (_, i) => media(uid, 'isletme-vitrin', `vitrinFoto${String(i).padStart(3, '0')}`));
+    await expect(biz('cengiz').create('cengiz', { ...input, logo: media('baskasi', 'isletme-logo') })).rejects.toThrow();
+    const id = await biz('cengiz').create('cengiz', { ...input, logo: media('cengiz', 'isletme-logo'), gallery: vitrin(3) });
+    expect((await biz('x').get(id))!.gallery).toHaveLength(3);
+    expect((await biz('x').get(id))!.logo?.path).toBe('media/cengiz/isletme-logo/abcDEF123456.jpg');
+    await expect(biz('cengiz').update(id, { ...input, gallery: vitrin(4) })).rejects.toThrow();
+    // Başka siteden adres kuralda sayılmaz ama uygulama göstermez.
+    await biz('cengiz').update(id, { ...input, gallery: [{ ...vitrin(1)[0], url: 'https://kotu.site/x.jpg' }] });
+    expect((await biz('x').get(id))!.gallery).toEqual([]);
+    // Admin sınırı artırınca 4 olur; logo kaldırılınca alan silinir.
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'config/limits'), { vitrinUcretsiz: 4 }));
+    await biz('cengiz').update(id, { ...input, gallery: vitrin(4) });
+    const b = (await biz('x').get(id))!;
+    expect(b.gallery).toHaveLength(4);
+    expect(b.logo).toBeUndefined();
+    // Premium kademede bile en çok 30.
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'config/limits'), { vitrinUcretsiz: 100 }));
+    await expect(biz('cengiz').update(id, { ...input, gallery: vitrin(31) })).rejects.toThrow();
+  }, 30000);
+
   it('bilgiler, yetkililer ve izinleri, yetkilinin düzenlemesi ve ayrılması', async () => {
     const id = await biz('cengiz').create('cengiz', input);
     const b = (await biz('x').get(id))!;

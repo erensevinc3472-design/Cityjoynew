@@ -7,6 +7,7 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 
+import { cleanPhoto, photoFrom } from '../media/photo';
 import type { OfficialProfile, OfficialProfileInput, ProfileTarget } from '../organizations/profiles';
 import type { RegionScope } from '../permissions/types';
 import { addAudit, iso } from './grants';
@@ -21,6 +22,7 @@ function fromDoc(id: string, d: DocumentData): OfficialProfile {
     name: d.name ?? '',
     ...(d.region ? { region: d.region } : {}),
     ...Object.fromEntries(FIELDS.filter((k) => typeof d[k] === 'string' && d[k]).map((k) => [k, d[k]])),
+    ...(photoFrom(d.logo) ? { logo: photoFrom(d.logo) } : {}),
     updatedAt: iso(d.updatedAt) ?? '',
   };
 }
@@ -68,6 +70,7 @@ export function createOfficialProfileAdmin(db: Firestore, actorUid: string) {
         name: target.type === 'kurum' ? target.name : (input.name ?? '').trim().slice(0, 80),
         ...(target.region ? { region: target.region } : {}),
         ...clean,
+        ...(input.logo ? { logo: cleanPhoto(input.logo) } : {}),
         updatedBy: actorUid,
         updatedAt: serverTimestamp(),
       });

@@ -23,6 +23,11 @@ export const DEFAULT_LIMITS = {
   oneriYeni: 2,
   sikayet: 20,
   isletmeGonderi: 5,
+  /** İşletme vitrini: kademeye göre en çok fotoğraf (öneri; kademeler gelir konusunda kesinleşecek). */
+  vitrinUcretsiz: 3,
+  vitrinStandart: 10,
+  vitrinPro: 20,
+  vitrinPremium: 30,
   muhtarDuyuru: 3,
   muhtarDuyuruHafta: 10,
   kurumDuyuru: 5,
@@ -39,7 +44,7 @@ export const LIMIT_RANGE = [1, 10000] as const;
 /** Panelde gruplar halinde gösterilir. */
 export const LIMIT_GROUPS: { id: 'kullanici' | 'isletme' | 'muhtar' | 'kurum'; keys: LimitKey[] }[] = [
   { id: 'kullanici', keys: ['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'sikayet'] },
-  { id: 'isletme', keys: ['isletmeGonderi'] },
+  { id: 'isletme', keys: ['isletmeGonderi', 'vitrinUcretsiz', 'vitrinStandart', 'vitrinPro', 'vitrinPremium'] },
   { id: 'muhtar', keys: ['muhtarDuyuru', 'muhtarDuyuruHafta', 'acil'] },
   { id: 'kurum', keys: ['kurumDuyuru', 'kurumDuyuruHafta', 'etkinlik'] },
 ];

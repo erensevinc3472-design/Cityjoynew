@@ -28,6 +28,7 @@ import {
   type PostBusiness,
   type PostComment,
   type PostInput,
+  type PostPhoto,
   type PostReportReason,
   type PostTarget,
 } from '../posts/posts';
@@ -60,6 +61,7 @@ function fromDoc(id: string, d: DocumentData): Post {
     commentsOff: d.commentsOff === true,
     reportCount: d.reportCount ?? 0,
     cleared: d.cleared === true,
+    ...(Array.isArray(d.photos) && d.photos.length ? { photos: d.photos as PostPhoto[] } : {}),
     createdAt: iso(d.createdAt) ?? '',
   };
 }
@@ -204,9 +206,14 @@ export function createFirestorePostRepository(db: Firestore) {
       return snap.exists() ? fromDoc(snap.id, snap.data()) : null;
     },
 
+    /** Fotoğraflar gönderiden önce bu kimliğin klasörüne yüklenir (`postPhotoPath`), sonra `create` aynı kimlikle çağrılır. */
+    newId(): string {
+      return doc(collection(db, COLLECTION)).id;
+    },
+
     /** Döner: yeni kimlik. Bölge, kuralların denetlediği kayıtlı konumdur. */
-    async create(uid: string, authorName: string, input: PostInput, as?: { business: PostBusiness; pending: boolean }): Promise<string> {
-      const ref = doc(collection(db, COLLECTION));
+    async create(uid: string, authorName: string, input: PostInput, as?: { business: PostBusiness; pending: boolean }, id?: string): Promise<string> {
+      const ref = id ? postRef(db, id) : doc(collection(db, COLLECTION));
       const r = input.region;
       const batch = writeBatch(db);
       await countUsage(db, batch, as ? { type: 'b', id: as.business.id } : { type: 'u', id: uid }, as ? 'isletme-gonderi' : 'gonderi', uid);
@@ -222,6 +229,9 @@ export function createFirestorePostRepository(db: Firestore) {
         likeCount: 0,
         commentCount: 0,
         reportCount: 0,
+        ...(input.photos?.length
+          ? { photos: input.photos.map((p) => ({ path: p.path, url: p.url, width: Math.round(p.width), height: Math.round(p.height) })) }
+          : {}),
         searchKeys: searchKeys(input.text, SEARCH_LIMITS.postKeys, SEARCH_LIMITS.minPost),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -230,10 +240,13 @@ export function createFirestorePostRepository(db: Firestore) {
       return ref.id;
     },
 
-    /** Sahibi siler: yazı ve ad boşaltılır, gönderi akıştan çıkar (şikâyet kaydı varsa moderatör "silindi" görür). */
+    /**
+     * Sahibi siler: yazı, ad ve fotoğraflar boşaltılır, gönderi akıştan çıkar (şikâyet kaydı varsa moderatör "silindi"
+     * görür). Fotoğraf dosyalarını sunucu siler.
+     */
     async remove(id: string): Promise<void> {
       const batch = writeBatch(db);
-      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), updatedAt: serverTimestamp() });
+      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), updatedAt: serverTimestamp() });
       await batch.commit();
     },
 
@@ -375,9 +388,9 @@ export function createFirestorePostRepository(db: Firestore) {
       }
       const mine = await getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), limit(500)));
       for (const d of mine.docs) {
-        if (d.get('status') === 'kaldirildi' && !d.get('text')) continue;
+        if (d.get('status') === 'kaldirildi' && !d.get('text') && !d.get('photos')) continue;
         const batch = writeBatch(db);
-        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), updatedAt: serverTimestamp() });
+        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), updatedAt: serverTimestamp() });
         await batch.commit();
       }
       const likes = await getDocs(query(collectionGroup(db, 'likes'), where('uid', '==', uid), limit(500)));

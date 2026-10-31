@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
@@ -18,7 +19,7 @@ import { locationRepository as repo } from '@/lib/locations';
 import { eventRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
-import { fonts, spacing } from '@/theme/tokens';
+import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 /**
@@ -98,6 +99,14 @@ export default function EventScreen() {
   return (
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content}>
+        {item.cover ? (
+          <Image
+            source={{ uri: item.cover.url }}
+            style={[styles.cover, { aspectRatio: Math.min(2, Math.max(1, item.cover.width / item.cover.height)), backgroundColor: c.surfaceStrong }]}
+            contentFit="cover"
+            accessibilityIgnoresInvertColors
+          />
+        ) : null}
         {cancelled ? <FormMessage kind="error" text={t('events.cancelledNote')} /> : null}
         <AppText variant="caption" muted>{t(`events.categories.${item.category}`)}</AppText>
         <AppText accessibilityRole="header" style={[styles.title, { color: c.textStrong }]}>{item.title}</AppText>
@@ -155,5 +164,6 @@ export default function EventScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
   title: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26 },
+  cover: { width: '100%', borderRadius: radius.lg },
   meta: { gap: 2 },
 });

@@ -11,6 +11,7 @@ import {
 import { createOfficialProfileAdmin, createOrganizationAdmin } from '@cityjoy/shared/firebase';
 
 import { regionLabel, useNeighbourhoodNames } from '../components/content-common';
+import { ImageField } from '../components/image-field';
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
@@ -92,7 +93,7 @@ function Profiles({ user }: { user: PanelUser }) {
     }
   };
 
-  const field = (key: keyof Form, opts: { multiline?: boolean; type?: string; max: number; hint?: string }) => (
+  const field = (key: Exclude<keyof Form, 'logo'>, opts: { multiline?: boolean; type?: string; max: number; hint?: string }) => (
     <div className="field">
       <label htmlFor={`pr-${key}`}>{t(`profile.fields.${key}`)}</label>
       {opts.multiline ? (
@@ -144,6 +145,7 @@ function Profiles({ user }: { user: PanelUser }) {
           {field('website', { type: 'url', max: L.website, hint: t('profile.websiteHint') })}
           {field('address', { max: L.address })}
           {field('hours', { max: L.hours, hint: t('profile.hoursHint') })}
+          <ImageField label={t('profile.fields.logo')} hint={t('profile.logoHint')} kind="kurum" uid={user.uid} value={form.logo} onChange={(logo) => setForm({ ...form, logo })} disabled={!live || busy} round />
           <p className="meta">{t('profile.publicNote')}</p>
           {live ? (
             <div className="actions">

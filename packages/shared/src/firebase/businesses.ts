@@ -28,6 +28,7 @@ import {
   type BusinessRepository,
   type VerificationStatus,
 } from '../business/business';
+import { photoFrom, type Photo } from '../media/photo';
 import type { MembershipTier } from '../models/membership';
 import type { Action, Module } from '../permissions/types';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
@@ -50,6 +51,8 @@ function fromDoc(id: string, d: DocumentData): Business {
     rating: { sum: d.rating?.sum ?? 0, count: d.rating?.count ?? 0 },
     followerCount: d.followerCount ?? 0,
     managers: ((d.managerUids ?? []) as string[]).map((uid) => ({ uid, messages: false, ...(d.managers?.[uid] ?? { name: '', post: 'kapali', edit: false, reply: false }) })),
+    logo: photoFrom(d.logo),
+    gallery: Array.isArray(d.gallery) ? (d.gallery as unknown[]).map(photoFrom).filter((p): p is Photo => !!p) : [],
     weeklyHours: Array.isArray(d.weeklyHours) ? (d.weeklyHours as ({ open: string; close: string } | null)[]).map((x) => (x ? { open: x.open, close: x.close } : null)) : undefined,
     createdAt: iso(d.createdAt) ?? '',
     // Sunucu zaman damgası henüz yazılmadıysa (yerel önbellek) şimdiki zaman sayılır.
@@ -160,7 +163,7 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
       const before = await getDoc(doc(db, COLLECTION, id));
       const oldPhone = before.get('phone') as string | undefined;
       // Boşaltılan isteğe bağlı alanlar silinir.
-      const removed = Object.fromEntries((['address', 'hoursNote', 'description', 'weeklyHours', 'roadside', 'geo'] as const).filter((k) => !(k in clean)).map((k) => [k, deleteField()]));
+      const removed = Object.fromEntries((['address', 'hoursNote', 'description', 'weeklyHours', 'roadside', 'geo', 'logo'] as const).filter((k) => !(k in clean)).map((k) => [k, deleteField()]));
       const batch = writeBatch(db);
       batch.update(doc(db, COLLECTION, id), { ...clean, location: clean.location, ...removed, searchKeys: nameKeys(clean.name), updatedAt: serverTimestamp() });
       if (oldPhone !== clean.phone) {
