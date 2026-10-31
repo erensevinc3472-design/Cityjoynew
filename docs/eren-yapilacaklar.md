@@ -34,9 +34,9 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
   - Mali müşavirine sor: uygulama ileride gelir getirecekse şirket daha doğru olabilir.
 - [ ] **Firebase Blaze plan:** console.firebase.google.com > cityjoynew > sol altta "Spark" yazan yer > Yükselt (Upgrade)
   > Blaze > kartını ekle. Ardından **bütçe uyarısı** kur: Google Cloud'da "Faturalandırma > Bütçeler ve uyarılar" >
-  aylık 10 dolar (aşınca e-posta gelir). Sunucu işlevlerinin ilk parçası yazıldı ve hazır bekliyor (etkinlik iptal
-  bildirimi, SOS kayıtlarının 30 gün sonra silinmesi, hesap silinince verilerin temizlenmesi); Blaze'e geçince Claude
-  tek komutla yükler. Kalanlar (duyuru ve mesaj bildirimi, günlük sınırlar, fotoğraf yükleme) sırayla yazılıyor.
+  aylık 10 dolar (aşınca e-posta gelir). Sunucu işlevleri yazıldı ve hazır bekliyor (etkinlik iptal
+  bildirimi, duyuru, mesaj ve takip bildirimleri, SOS kayıtlarının 30 gün sonra silinmesi, hesap silinince verilerin temizlenmesi); Blaze'e geçince Claude
+  tek komutla yükler. Kalanlar (günlük sınırlar, fotoğraf yükleme) sırayla yazılıyor.
 - [ ] **Apple Developer Program (yılda 99 dolar):** developer.apple.com/programs/enroll
   - İki adımlı doğrulaması açık bir Apple kimliği gerekir.
   - iPhone'a "Apple Developer" uygulamasını kur, oradan kimliğinle (TC kimlik/pasaport) kayıt ol.
