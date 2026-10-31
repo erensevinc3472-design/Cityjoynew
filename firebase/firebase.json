@@ -7,7 +7,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "../apps/panel/dist",
+    "public": "panel-dist",
     "ignore": [
       "**/.*"
     ],

@@ -9,8 +9,8 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra Claude'a "kuralları
   > yükle" de. (Fotoğraf yükleme Blaze ile çalışır; o zamana kadar yazılı paylaşım aynen çalışır.)
 
-- [ ] **Paneli internete koyma onayı:** Claude'a "paneli yayınla" de. Panel https://cityjoynew.web.app adresinden
-  açılır (ücretsiz plan yeter, arama motorlarında çıkmaz, giriş yine zorunlu). Ayrıca bir şey yapman gerekmez.
+- [x] **Paneli internete koyma (yapıldı, 31 Ekim):** panel artık https://cityjoynew.web.app adresinde (arama
+  motorlarında çıkmaz, giriş zorunlu). Telefondan ya da başka bilgisayardan da açabilirsin.
 
 - [x] **Günlük sınırlar PR'ını birleştir, sonra kuralları yükle (yapıldı, 31 Ekim):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/sinirlar
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra Claude'a "kuralları

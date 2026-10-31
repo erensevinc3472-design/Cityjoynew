@@ -619,9 +619,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `eventMediaChanged`, `profileMediaChanged`, `businessMediaChanged`: kayıttan çıkan görselin dosyasını siler
   (vitrinde yalnızca sahibin ve yetkililerin dosyası). Testler: kurallar 137, sunucu 24, ortak 150. Aktivite görseli
   ve "{Şehir}'dan Kareler" sonra. Açık: panelde görsel seçip kaydetmeden çıkılırsa dosya artık kalır (günlük temizlik).
-- **Panel internete hazır (31 Ekim).** `firebase/firebase.json` içinde Hosting ayarı (güvenlik başlıkları, arama
-  motorlarına kapalı), `npm run panel:deploy` derleyip yükler. Ücretsiz planda çalışır; adres
-  https://cityjoynew.web.app olacak. Eren onay verince Claude yükler.
+- **Panel internette (31 Ekim, Eren onayladı):** https://cityjoynew.web.app. `firebase/firebase.json` içinde Hosting
+  ayarı (güvenlik başlıkları, arama motorlarına kapalı); `npm run panel:deploy` derler, `firebase/panel-dist`
+  klasörüne kopyalar (Firebase yalnızca kendi klasörünün içinden yükler; klasör GitHub'a gitmez) ve yükler. Ücretsiz
+  planda çalışır. Panelde her değişiklikten sonra yeniden yüklenmeli (birleşmiş `main` dalından yüklemek doğrusu;
+  ilk yükleme `claude/foto` dalından yapıldı).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -712,8 +714,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
-- Panel internette yayında değil; Hosting ayarı hazır, Eren'in onayıyla `npm run panel:deploy` (Eren'in bilgisayarındaki
-  Firebase girişiyle; ayrı anahtar gerekmez).
+- Panel internette: https://cityjoynew.web.app (31 Ekim). Uygulamanın web sürümü yayında değil.
 - Ana sayfadaki arama kutusu ve hava durumu ilgili özelliklerle gelecek (duyurular ana sayfada).
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin
   bağlantı bilgilerini içeriyor; Eren'e o projeyi kapatması önerildi.
@@ -758,7 +759,7 @@ toplamak olmaz, dron ve Wi-Fi Direct ayrı bir Ar-Ge projesi. Temeli bu duyuru b
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"
    sayfası ve çekim kodu sahte sağlayıcıyla emülatörde yapılır; anahtarlar gelince bağlanır.
 3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu (Firebase Storage; Blaze plan gerekir). ~~Fotoğraf vitrini~~ (31 Ekim).
-4. Paneli internete koyma: ayar hazır (31 Ekim), Eren onaylayınca yüklenir.
+4. ~~Paneli internete koyma~~ (31 Ekim, https://cityjoynew.web.app).
 
 ## PROJE.md bölümleri (gerektiğinde ilgili bölümü oku)
 
