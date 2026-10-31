@@ -132,6 +132,13 @@ service cloud.firestore {
           && request.resource.data.createdAt == request.time;
       }
 
+      // Çarşı favorileri: yalnızca kişinin kendisi.
+      match /favoriteListings/{listingId} {
+        allow read, delete: if isSelf(uid);
+        allow create: if isSelf(uid) && request.resource.data.keys().hasOnly(['createdAt'])
+          && request.resource.data.createdAt == request.time;
+      }
+
       // Bildirim tercihleri (PROJE.md 5.12): yalnızca kişinin kendisi; kategori aç/kapa ve sessiz saatler.
       match /settings/{id} {
         allow read, delete: if isSelf(uid);
@@ -1759,6 +1766,18 @@ service cloud.firestore {
         && d.names[other] == d.context.title
         && d.accepted == true;
     }
+    // Çarşı ilanı için açılan sohbet: kimliğin sonunda ilan, karşı taraf ilanın sahibi, ilan yayında ve süresi dolmamış;
+    // baştan açık (ilan herkese açık verildi), ad kişinin Keşfet adı.
+    function listingChat(id, d, other) {
+      let l = get(/databases/$(database)/documents/listings/$(d.context.id)).data;
+      return d.context.keys().hasOnly(['type', 'id', 'title']) && d.context.type == 'ilan'
+        && id == d.members[0] + '_' + d.members[1] + '__l_' + d.context.id
+        && l.ownerUid == other && l.status == 'yayinda'
+        && l.listedAt > request.time - duration.value(30, 'd')
+        && d.context.title == l.title
+        && d.names[other] == profileName(other)
+        && d.accepted == true;
+    }
     function personChat(id, d, other) {
       return id == d.members[0] + '_' + d.members[1]
         && d.names[other] == profileName(other)
@@ -1769,7 +1788,7 @@ service cloud.firestore {
         && d.names.keys().hasOnly([request.auth.uid, other])
         && d.names[request.auth.uid] == profileName(request.auth.uid)
         && d.startedBy == request.auth.uid
-        && ('context' in d ? businessChat(id, d, other) : personChat(id, d, other))
+        && ('context' in d ? (d.context.type == 'ilan' ? listingChat(id, d, other) : businessChat(id, d, other)) : personChat(id, d, other))
         && d.unread.keys().hasOnly([request.auth.uid, other]) && d.unread[request.auth.uid] == 0 && d.unread[other] == 1
         && d.seen == {}
         && validLast(id, d.last)
@@ -1917,6 +1936,134 @@ service cloud.firestore {
         && request.resource.data.reportedUid != request.auth.uid
         && get(chatMessagePath(request.resource.data.chatId, request.resource.data.messageId)).data.text == request.resource.data.text;
       allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'incelendi';
+    }
+
+    // ---- Çarşı: ikinci el eşya ilanları (PROJE.md 5.1, 5.11). İlanı e-postası doğrulanmış yetişkin, kendi kayıtlı
+    // mahallesiyle verir; 24 saatte sınırlı (yeni hesapta 2, sonra 5). Telefon numarası alanı yok. Yayındaki ve satılan
+    // ilanı giriş yapmış herkes okur; liste sorguları yalnızca yayındakileri ister. Fotoğraf alanı Storage gelene kadar
+    // boş. Sahibi düzenler, satıldı işaretler, son günlerde yeniler, boşaltarak kaldırır; moderatör kaldırır ya da bırakır.
+    function listingPath(id) {
+      return /databases/$(database)/documents/listings/$(id);
+    }
+    function listingQuotaPath() {
+      return /databases/$(database)/documents/listingQuota/$(request.auth.uid);
+    }
+    function listingLimit() {
+      return get(myUserPath()).data.createdAt > request.time - duration.value(7, 'd') ? 2 : 5;
+    }
+    function validListing(d) {
+      return d.keys().hasOnly(['kind', 'category', 'condition', 'title', 'description', 'price', 'rentUnit', 'swapFor', 'region',
+             'ownerUid', 'ownerName', 'status', 'photos', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'listedAt',
+             'createdAt', 'updatedAt'])
+        && d.kind in ['satilik', 'kiralik', 'ucretsiz', 'takas']
+        && d.category in ['elektronik', 'ev-mobilya', 'ev-aletleri', 'giyim', 'cocuk', 'kitap-hobi', 'spor', 'diger']
+        && d.condition in ['sifir', 'az-kullanilmis', 'kullanilmis', 'tamir']
+        && d.title is string && d.title.size() >= 3 && d.title.size() <= 80
+        && d.description is string && d.description.size() <= 1500
+        && d.swapFor is string && d.swapFor.size() <= 120
+        && (d.kind in ['satilik', 'kiralik']
+            ? (d.price is int && d.price >= 1 && d.price <= 10000000)
+            : d.price == null)
+        && (d.kind == 'kiralik' ? d.rentUnit in ['gun', 'hafta', 'ay'] : d.rentUnit == null)
+        && d.photos is list && d.photos.size() == 0
+        && validLocation(d.region) && 'neighbourhoodId' in d.region
+        && validSearchKeys(d, 100)
+        && d.updatedAt == request.time;
+    }
+    function listingContentKeys() {
+      return ['kind', 'category', 'condition', 'title', 'description', 'price', 'rentUnit', 'swapFor', 'searchKeys', 'updatedAt'];
+    }
+    // Günlük ilan sayacı bu yazımda değişti (sayacın kendi kuralı yalnızca +1 ya da süresi dolunca sıfırlamaya izin verir).
+    function listingQuotaCounted() {
+      return getAfter(listingQuotaPath()).data.count <= listingLimit()
+        && (!exists(listingQuotaPath()) || getAfter(listingQuotaPath()).data != get(listingQuotaPath()).data);
+    }
+
+    match /listings/{id} {
+      allow read: if signedIn()
+        && (resource.data.status in ['yayinda', 'satildi']
+            || resource.data.ownerUid == request.auth.uid
+            || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
+      allow create: if verified() && request.resource.data.ownerUid == request.auth.uid
+        && validListing(request.resource.data)
+        && request.resource.data.status == 'yayinda'
+        && request.resource.data.reportCount == 0
+        && !('cleared' in request.resource.data) && !('moderatedBy' in request.resource.data)
+        && request.resource.data.createdAt == request.time && request.resource.data.listedAt == request.time
+        && request.resource.data.ownerName == profileName(request.auth.uid)
+        && isAdultUser()
+        && myLocation().get('neighbourhoodId', '') == request.resource.data.region.neighbourhoodId
+        && myLocation().get('districtId', '') == request.resource.data.region.districtId
+        && myLocation().get('provinceCode', '') == request.resource.data.region.provinceCode
+        && listingQuotaCounted();
+      // Sahibi düzenler (yayındayken; bölge, ad ve tarihler değişmez).
+      allow update: if resource.data.ownerUid == request.auth.uid && resource.data.status == 'yayinda'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(listingContentKeys())
+        && validListing(request.resource.data);
+      // Satıldı / yeniden yayında.
+      allow update: if resource.data.ownerUid == request.auth.uid
+        && resource.data.status in ['yayinda', 'satildi'] && request.resource.data.status in ['yayinda', 'satildi']
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
+      // Yenile: son üç günde ya da süresi dolunca, 30 gün daha.
+      allow update: if resource.data.ownerUid == request.auth.uid && resource.data.status == 'yayinda'
+        && resource.data.listedAt <= request.time - duration.value(27, 'd')
+        && request.resource.data.listedAt == request.time && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['listedAt', 'updatedAt']);
+      // Sahibi kaldırır: yazılar, ad ve arama anahtarları boşaltılır.
+      allow update: if resource.data.ownerUid == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.status == 'kaldirildi' && request.resource.data.title == ''
+        && request.resource.data.description == '' && request.resource.data.swapFor == '' && request.resource.data.ownerName == ''
+        && !('searchKeys' in request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'title', 'description', 'swapFor', 'ownerName', 'searchKeys', 'updatedAt']);
+      // Şikâyet sayacı: yalnızca kendi şikâyet kaydıyla tam bir artar.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])
+        && request.resource.data.reportCount == resource.data.reportCount + 1
+        && !exists(/databases/$(database)/documents/listingReports/$(id + '_' + request.auth.uid))
+        && existsAfter(/databases/$(database)/documents/listingReports/$(id + '_' + request.auth.uid));
+      // Moderasyon: kaldır ya da "yerinde kalsın".
+      allow update: if request.resource.data.moderatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'cleared', 'moderatedBy', 'updatedAt'])
+        && (request.resource.data.status == 'kaldirildi'
+            || (request.resource.data.status == resource.data.status && request.resource.data.cleared == true))
+        && (isAdmin() || regionAllows('moderasyon', 'duzenle', resource.data.region.provinceCode, resource.data.region.districtId));
+      allow delete: if false;
+    }
+
+    // Günlük ilan sayacı: yalnızca bir artar ya da 24 saat dolunca yeniden başlar; silinemez.
+    match /listingQuota/{uid} {
+      allow read: if isSelf(uid);
+      allow create: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['windowStart', 'count'])
+        && request.resource.data.windowStart == request.time && request.resource.data.count == 1;
+      allow update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['windowStart', 'count'])
+        && ((request.resource.data.windowStart == request.time && request.resource.data.count == 1
+              && resource.data.windowStart + duration.value(1, 'd') <= request.time)
+            || (request.resource.data.windowStart == resource.data.windowStart && request.resource.data.count == resource.data.count + 1));
+    }
+
+    // İlan şikâyeti: kişi başına ilan başına bir; kendi ilanı şikâyet edilmez. Moderatör kendi ilinde görür ve kapatır.
+    match /listingReports/{rid} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['listingId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && rid == request.resource.data.listingId + '_' + request.auth.uid
+        && request.resource.data.reason in ['dolandiricilik', 'yasakli', 'sahte', 'emlak-arac', 'uygunsuz', 'spam', 'diger']
+        && request.resource.data.status == 'yeni'
+        && request.resource.data.createdAt == request.time
+        && get(listingPath(request.resource.data.listingId)).data.ownerUid != request.auth.uid
+        && request.resource.data.provinceCode == get(listingPath(request.resource.data.listingId)).data.region.provinceCode
+        && getAfter(listingPath(request.resource.data.listingId)).data.reportCount
+           == get(listingPath(request.resource.data.listingId)).data.reportCount + 1;
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
+        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
+      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status == 'incelendi';
     }

@@ -112,7 +112,8 @@ export function createFirestoreMessageRepository(db: Firestore) {
 
     /**
      * Mesaj gönderir. Sohbet yoksa açılır: takipleşiyorlarsa doğrudan sohbet, değilse alıcıda istek. İsteği alan kişi
-     * cevap yazınca sohbet kabul edilmiş olur. İşletmeye yazılan sohbet (`context`) baştan açıktır; adı işletmenin adıdır.
+     * cevap yazınca sohbet kabul edilmiş olur. İşletmeye ya da ilan için yazılan sohbet (`context`) baştan açıktır;
+     * işletme sohbetinde karşı tarafın adı işletmenin adıdır.
      */
     async send(
       me: string,
@@ -132,7 +133,7 @@ export function createFirestoreMessageRepository(db: Firestore) {
         batch.set(doc(db, QUOTA, me), next.reset ? { windowStart: serverTimestamp(), count: 1 } : { windowStart: quota.get('windowStart'), count: next.count });
         batch.set(chatRef(id), {
           members: [me, other].sort(),
-          names: { [me]: opts.myName, [other]: opts.context ? opts.context.title : opts.otherName },
+          names: { [me]: opts.myName, [other]: opts.context?.type === 'isletme' ? opts.context.title : opts.otherName },
           startedBy: me,
           accepted: opts.context ? true : opts.mutual,
           ...(opts.context ? { context: { type: opts.context.type, id: opts.context.id, title: opts.context.title } } : {}),

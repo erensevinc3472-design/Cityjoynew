@@ -5,6 +5,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text
 import { useTranslation } from 'react-i18next';
 import {
   chatTitle,
+  isListingLive,
   isRequestFor,
   MESSAGE_LIMITS,
   MESSAGE_REPORT_REASONS,
@@ -28,7 +29,7 @@ import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { useReadReceipts } from '@/lib/messages';
-import { businessRepository, messageRepository, socialRepository } from '@/lib/services';
+import { businessRepository, listingRepository, messageRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { setBlocked, useSocial } from '@/lib/social';
@@ -41,7 +42,9 @@ import { useThemeColors } from '@/theme/use-theme';
  * dolandırıcılık uyarısı çıkar. Engel varsa yazma kapanır.
  *
  * İşletmeye yazılan sohbet ayrı bir sohbettir: işletme sayfasından `business` ile açılır (ilk mesajı müşteri atar, istek
- * aşaması yok), sonra `thread` (sohbet kimliği) ile. Sağ üstteki seçeneklerde profil / işletme, "Sohbeti sil" ve engelle var.
+ * aşaması yok), sonra `thread` (sohbet kimliği) ile. Çarşı ilanı için açılan sohbet de öyle: ilan sayfasından `listing` ile
+ * açılır, alıcı başlatır, iki tarafta Mesajlar > Çarşı'da durur; üstte güvenli alışveriş uyarısı. Sağ üstteki seçeneklerde
+ * profil / işletme / ilan, "Sohbeti sil" ve engelle var.
  */
 export default function ChatScreen() {
   const { t } = useTranslation();
@@ -49,7 +52,7 @@ export default function ChatScreen() {
   const c = useThemeColors();
   const { language, rtl } = useSettings();
   const lang = language ?? 'tr';
-  const { uid: other, business, thread } = useLocalSearchParams<{ uid: string; business?: string; thread?: string }>();
+  const { uid: other, business, listing, thread } = useLocalSearchParams<{ uid: string; business?: string; listing?: string; thread?: string }>();
   const { user } = useSession();
   const me = user?.uid ?? '';
   const { me: myProfile, blocked } = useSocial();
@@ -68,10 +71,11 @@ export default function ChatScreen() {
   const [reporting, setReporting] = useState<MessageReportReason | null>(null);
   const [reported, setReported] = useState<Set<string>>(new Set());
   const [options, setOptions] = useState<'menu' | 'confirmDelete' | null>(null);
-  // İşletme sayfasından açılan yeni sohbetin konusu (işletme yayında ve karşı taraf sahibi olmalı).
-  const [biz, setBiz] = useState<ChatContext | null | undefined>(business ? undefined : null);
+  // İşletme ya da ilan sayfasından açılan yeni sohbetin konusu (yayında olmalı ve karşı taraf sahibi).
+  const [biz, setBiz] = useState<ChatContext | null | undefined>(business || listing ? undefined : null);
   const scroll = useRef<ScrollViewInstance>(null);
-  const id = thread ?? (me && other ? threadId(me, other, business ? { type: 'isletme', id: business } : null) : '');
+  const topic: Pick<ChatContext, 'type' | 'id'> | null = business ? { type: 'isletme', id: business } : listing ? { type: 'ilan', id: listing } : null;
+  const id = thread ?? (me && other ? threadId(me, other, topic) : '');
   const iBlocked = blocked.has(other ?? '');
 
   useEffect(() => {
@@ -82,6 +86,11 @@ export default function ChatScreen() {
         (b) => setBiz(b && b.status === 'yayinda' && b.ownerUid === other ? { type: 'isletme', id: b.id, title: b.name } : null),
         () => setBiz(null),
       );
+    } else if (listing) {
+      listingRepository.get(listing).then(
+        (l) => setBiz(l && isListingLive(l) && l.ownerUid === other ? { type: 'ilan', id: l.id, title: l.title } : null),
+        () => setBiz(null),
+      );
     }
     socialRepository.isBlockedBy(me, other).then(setBlockedMe, () => {});
     // Takipleşiyorlarsa sohbet baştan açık başlar (istek olmaz).
@@ -90,7 +99,7 @@ export default function ChatScreen() {
       () => {},
     );
     return messageRepository.watchChat(id, setChat, () => setChat(null));
-  }, [me, other, business, id]);
+  }, [me, other, business, listing, id]);
 
   const exists = !!chat;
   // Sohbeti sildiysem, silmeden önceki mesajlar görünmez.
@@ -101,9 +110,11 @@ export default function ChatScreen() {
   }, [exists, id, hiddenAt]);
 
   const context = chat ? chat.context ?? null : biz ?? null;
+  const isBiz = context?.type === 'isletme';
+  const isListing = context?.type === 'ilan';
   // Müşteri işletmeyle yazışıyor (sahibi değil): başlıkta işletmenin adı, seçeneklerde işletme sayfası.
-  const asCustomer = !!context && (chat ? chat.startedBy === me : true);
-  const businessSide = !!context && !asCustomer;
+  const asCustomer = isBiz && (chat ? chat.startedBy === me : true);
+  const businessSide = isBiz && !asCustomer;
 
   // Açık sohbette okunmamışlar sıfırlanır. Okundu bilgisi açıksa "gördüm" yazılır; mesaj isteğinde yazılmaz (gönderen,
   // istek kabul edilene kadar okunduğunu bilmez).
@@ -127,7 +138,7 @@ export default function ChatScreen() {
       await messageRepository.send(me, other, body, { chat: chat ?? null, myName: myProfile.displayName, otherName: profile?.displayName ?? '', mutual, context: context ?? undefined });
       setText('');
     } catch {
-      setError(chat ? t('messages.sendError') : context ? t('messages.businessStartError') : t('messages.startError'));
+      setError(chat ? t('messages.sendError') : isListing ? t('messages.listingStartError') : context ? t('messages.businessStartError') : t('messages.startError'));
     } finally {
       setBusy(false);
     }
@@ -162,14 +173,14 @@ export default function ChatScreen() {
   const header = (
     <HeroHeader
       title={title}
-      subtitle={context && !asCustomer ? t('messages.aboutBusiness', { name: context.title }) : undefined}
+      subtitle={isListing ? t('messages.aboutListing', { title: context!.title }) : businessSide ? t('messages.aboutBusiness', { name: context!.title }) : undefined}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/messages'))}
       right={{ icon: 'more-vert', label: t('messages.options'), onPress: () => setOptions(options ? null : 'menu') }}
     />
   );
 
   if (!user || profile === undefined || chat === undefined || biz === undefined) return <Screen header={header}><StateMessage kind="loading" /></Screen>;
-  if (business && !chat && !biz) return <Screen header={header}><StateMessage kind="empty" message={t('messages.businessUnavailable')} /></Screen>;
+  if ((business || listing) && !chat && !biz) return <Screen header={header}><StateMessage kind="empty" message={t(listing ? 'messages.listingUnavailable' : 'messages.businessUnavailable')} /></Screen>;
   if ((!profile && !context) || other === me) return <Screen header={header}><StateMessage kind="empty" message={t('messages.notFound')} /></Screen>;
 
   const request = chat && isRequestFor(chat, me);
@@ -200,6 +211,9 @@ export default function ChatScreen() {
                 </>
               ) : (
                 <View style={styles.actions}>
+                  {isListing ? (
+                    <AppButton variant="ghost" title={t('messages.openListing')} onPress={() => router.push({ pathname: '/carsi/[id]', params: { id: context!.id } })} />
+                  ) : null}
                   {asCustomer ? (
                     <AppButton variant="ghost" title={t('messages.openBusiness')} onPress={() => router.push({ pathname: '/business/[id]', params: { id: context!.id } })} />
                   ) : profile ? (
@@ -220,8 +234,14 @@ export default function ChatScreen() {
               </View>
             </View>
           ) : null}
+          {isListing ? (
+            <View style={[styles.warn, { borderColor: c.accentBorder }]}>
+              <MaterialIcons name="shield" size={18} color={c.textMuted} />
+              <AppText variant="caption" style={styles.grow}>{t('carsi.safety.chat')}</AppText>
+            </View>
+          ) : null}
           {pendingMine ? <AppText variant="caption" muted style={styles.center}>{t('messages.pendingNotice')}</AppText> : null}
-          {!chat ? <AppText variant="caption" muted style={styles.center}>{context ? t('messages.newBusiness') : mutual ? t('messages.newChat') : t('messages.newRequest')}</AppText> : null}
+          {!chat ? <AppText variant="caption" muted style={styles.center}>{isListing ? t('messages.newListing') : context ? t('messages.newBusiness') : mutual ? t('messages.newChat') : t('messages.newRequest')}</AppText> : null}
           {chat && messages === null ? <StateMessage kind="loading" /> : null}
 
           {(messages ?? []).map((m) => {
