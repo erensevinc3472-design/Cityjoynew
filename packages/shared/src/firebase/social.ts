@@ -18,6 +18,7 @@ import {
 import { blockId, followId, PROFILE_LIMITS, type FollowStatus, type ProfileReportReason, type PublicProfile } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
+import { countUsage } from './limits';
 
 const PROFILES = 'publicProfiles';
 const FOLLOWS = 'follows';
@@ -93,6 +94,7 @@ export function createFirestoreSocialRepository(db: Firestore) {
     async follow(me: string, other: string, isPrivate: boolean): Promise<FollowStatus> {
       const status: FollowStatus = isPrivate ? 'istek' : 'aktif';
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: me }, 'takip', me);
       batch.set(followRef(me, other), { followerUid: me, followeeUid: other, status, createdAt: serverTimestamp() });
       await batch.commit();
       return status;
@@ -190,6 +192,7 @@ export function createFirestoreSocialRepository(db: Firestore) {
     /** Kişi başına profil başına bir şikâyet; tanıtımın o anki kopyası saklanır. */
     async reportProfile(target: PublicProfile, me: string, reason: ProfileReportReason): Promise<void> {
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: me }, 'sikayet', me);
       batch.set(doc(db, REPORTS, `${target.uid}_${me}`), {
         targetUid: target.uid,
         reporterUid: me,

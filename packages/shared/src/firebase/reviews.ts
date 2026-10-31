@@ -18,6 +18,7 @@ import {
 
 import { nextRating, type ReportReason, type Review, type ReviewRepository } from '../business/reviews';
 import type { Module } from '../permissions/types';
+import { countUsage } from './limits';
 
 const iso = (v: unknown) => (v instanceof Timestamp ? v.toDate().toISOString() : new Date().toISOString());
 
@@ -100,6 +101,7 @@ export function createFirestoreReviewRepository(db: Firestore): ReviewRepository
 
     async report(businessId, reviewUid, reporterUid, reason: ReportReason) {
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: reporterUid }, 'sikayet', reporterUid);
       batch.set(doc(db, 'reviewReports', `${businessId}_${reviewUid}_${reporterUid}`), {
         businessId,
         reviewUid,

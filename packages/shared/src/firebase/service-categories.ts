@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   doc,
   getDoc,
@@ -21,6 +20,7 @@ import {
   type ServiceSuggestion,
 } from '../categories/service-categories';
 import type { Action, Module } from '../permissions/types';
+import { countUsage } from './limits';
 
 const COLLECTION = 'serviceCategories';
 const SUGGESTIONS = 'serviceSuggestions';
@@ -49,13 +49,16 @@ export function createFirestoreServiceCategoryRepository(db: Firestore): Service
 
 /** "Eksik hizmet mi var? Bildir": giriş yapmış kullanıcı öneri gönderir. */
 export async function submitServiceSuggestion(db: Firestore, uid: string, text: string, provinceCode?: string) {
-  await addDoc(collection(db, SUGGESTIONS), {
+  const batch = writeBatch(db);
+  await countUsage(db, batch, { type: 'u', id: uid }, 'oneri', uid);
+  batch.set(doc(collection(db, SUGGESTIONS)), {
     uid,
     text: text.trim(),
     ...(provinceCode ? { provinceCode } : {}),
     status: 'yeni',
     createdAt: serverTimestamp(),
   });
+  await batch.commit();
 }
 
 /**

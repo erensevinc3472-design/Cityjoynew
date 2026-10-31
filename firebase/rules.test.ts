@@ -51,6 +51,15 @@ async function seed(path: string, data: Record<string, unknown>) {
   });
 }
 
+/** Günlük sınır: içerik, sayacıyla aynı toplu yazımda (ilk kullanım). */
+function counted(d: ReturnType<typeof db>, usage: string, path: string, data: Record<string, unknown>) {
+  const [owner, kind] = usage.split('~');
+  const b = writeBatch(d);
+  b.set(doc(d, 'usage/' + usage), { type: owner.slice(0, 1), sid: owner.slice(2), kind, windowStart: serverTimestamp(), count: 1 });
+  b.set(doc(d, path), data);
+  return b.commit();
+}
+
 describe('users', () => {
   it('kullanıcı kendi profilini oluşturur, okur ve siler', async () => {
     await assertSucceeds(setDoc(doc(db('ali'), 'users/ali'), profile('ali')));
@@ -160,7 +169,9 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('veli')));
     await assertFails(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('ali', { text: 'x' })));
     await assertFails(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('ali', { status: 'incelendi' })));
-    await assertSucceeds(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('ali')));
+    // Sayaçsız gönderilemez (günlük sınır); sayaçla birlikte gider.
+    await assertFails(setDoc(doc(db('ali'), 'serviceSuggestions/1'), s('ali')));
+    await assertSucceeds(counted(db('ali'), 'u-ali~oneri', 'serviceSuggestions/1', s('ali')));
     await assertFails(getDoc(doc(db('ali'), 'serviceSuggestions/1')));
     await assertSucceeds(getDoc(doc(db('eren'), 'serviceSuggestions/1')));
     await assertFails(updateDoc(doc(db('eren'), 'serviceSuggestions/1'), { text: 'değişti' }));
@@ -261,7 +272,7 @@ describe('occupations, admins, auditLog', () => {
     await assertSucceeds(del.commit());
     // Şikâyet: kişi başına bir, kendi yorumunu şikâyet edemez.
     const rep = (reporter: string, over: Record<string, unknown> = {}) => ({ businessId: 'b1', reviewUid: 'ayse', reporterUid: reporter, reason: 'hakaret', status: 'yeni', createdAt: serverTimestamp(), ...over });
-    await assertSucceeds(setDoc(doc(db('veli'), 'reviewReports/b1_ayse_veli'), rep('veli')));
+    await assertSucceeds(counted(db('veli'), 'u-veli~sikayet', 'reviewReports/b1_ayse_veli', rep('veli')));
     await assertFails(setDoc(doc(db('veli'), 'reviewReports/baska'), rep('veli')));
     await assertFails(setDoc(doc(db('ayse'), 'reviewReports/b1_ayse_ayse'), rep('ayse')));
     await assertFails(getDoc(doc(db('veli'), 'reviewReports/b1_ayse_veli')));
@@ -353,5 +364,48 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(updateDoc(doc(db('eren'), 'auditLog/1'), { summary: 'değişti' }));
     await assertFails(deleteDoc(doc(db('eren'), 'auditLog/1')));
     await assertFails(getDoc(doc(db('ali'), 'auditLog/1')));
+  });
+});
+
+describe('günlük sınırlar', () => {
+  const s = (over: Record<string, unknown> = {}) => ({ uid: 'ali', text: 'Kilim tamiri', status: 'yeni', createdAt: serverTimestamp(), ...over });
+  const hoursAgo = (h: number) => Timestamp.fromMillis(Date.now() - h * 3600_000);
+  const bump = (d: ReturnType<typeof db>, count: number, path: string) => {
+    const b = writeBatch(d);
+    b.update(doc(d, 'usage/u-ali~oneri'), { count });
+    b.set(doc(d, path), s());
+    return b.commit();
+  };
+
+  it('sayaç yalnızca bir artar; sınır dolunca reddedilir, pencere geçince 1’den başlar', async () => {
+    await seed('usage/u-ali~oneri', { type: 'u', sid: 'ali', kind: 'oneri', windowStart: hoursAgo(2), count: 4 });
+    await assertFails(bump(db('ali'), 4, 'serviceSuggestions/a'));
+    await assertFails(bump(db('ali'), 3, 'serviceSuggestions/a'));
+    await assertSucceeds(bump(db('ali'), 5, 'serviceSuggestions/a'));
+    // 5/5 doldu.
+    await assertFails(bump(db('ali'), 6, 'serviceSuggestions/b'));
+    // Başkasının sayacı, elle sıfırlama olmaz.
+    await assertFails(updateDoc(doc(db('veli'), 'usage/u-ali~oneri'), { count: 6 }));
+    await assertFails(updateDoc(doc(db('ali'), 'usage/u-ali~oneri'), { count: 1, windowStart: serverTimestamp() }));
+    // 24 saat geçince yeniden başlar.
+    await seed('usage/u-ali~oneri', { type: 'u', sid: 'ali', kind: 'oneri', windowStart: hoursAgo(25), count: 5 });
+    const ali = db('ali');
+    const b = writeBatch(ali);
+    b.update(doc(ali, 'usage/u-ali~oneri'), { count: 1, windowStart: serverTimestamp() });
+    b.set(doc(ali, 'serviceSuggestions/c'), s());
+    await assertSucceeds(b.commit());
+  });
+
+  it('yeni hesapta (7 gün) düşük sınır; admin sayıları panelden değiştirir', async () => {
+    await seed('users/ali', { createdAt: hoursAgo(24) });
+    await seed('usage/u-ali~oneri', { type: 'u', sid: 'ali', kind: 'oneri', windowStart: hoursAgo(2), count: 2 });
+    await assertFails(bump(db('ali'), 3, 'serviceSuggestions/a'));
+    // Admin yeni hesap sınırını 3 yapar.
+    await seed('admins/eren', { addedAt: 'konsol' });
+    await assertFails(setDoc(doc(db('ali'), 'config/limits'), { oneriYeni: 3, updatedBy: 'ali', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(db('eren'), 'config/limits'), { oneriYeni: 0, updatedBy: 'eren', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(db('eren'), 'config/limits'), { bilinmeyen: 3, updatedBy: 'eren', updatedAt: serverTimestamp() }));
+    await assertSucceeds(setDoc(doc(db('eren'), 'config/limits'), { oneriYeni: 3, updatedBy: 'eren', updatedAt: serverTimestamp() }));
+    await assertSucceeds(bump(db('ali'), 3, 'serviceSuggestions/a'));
   });
 });

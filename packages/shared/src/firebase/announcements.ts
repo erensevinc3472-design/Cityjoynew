@@ -26,6 +26,8 @@ import {
 } from '../announcements/announcements';
 import type { Action, RegionScope } from '../permissions/types';
 import { addAudit, iso } from './grants';
+import { publishUsage } from '../limits/limits';
+import { countUsage } from './limits';
 
 const COLLECTION = 'announcements';
 
@@ -141,6 +143,9 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
         ...(status === 'yayinda' ? { publishedAt: serverTimestamp() } : {}),
       };
       const batch = writeBatch(db);
+      // Doğrudan yayın günlük sınıra sayılır; dolduysa LimitReachedError (panel "Onaya gönder" önerir).
+      const usage = status === 'yayinda' ? publishUsage(p.author, { module: 'duyuru', kind: input.kind }) : null;
+      for (const kind of usage?.kinds ?? []) await countUsage(db, batch, usage!.subject, kind, actor.uid);
       // Düzenlemede oluşturma tarihi korunur; boşaltılan bitiş, kaldırılan sabitleme ve önceki ret bilgisi silinir.
       if (existing) {
         batch.update(ref, {

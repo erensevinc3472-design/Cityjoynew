@@ -23,6 +23,8 @@ import { EVENT_LIMITS, type CityEvent, type EventInput } from '../events/events'
 import type { Action, RegionScope } from '../permissions/types';
 import type { SaveMode } from './announcements';
 import { addAudit, iso } from './grants';
+import { publishUsage } from '../limits/limits';
+import { countUsage } from './limits';
 
 const COLLECTION = 'events';
 const JOINED_LIMIT = 60;
@@ -216,6 +218,9 @@ export function createEventPanel(db: Firestore, actor: { uid: string; name: stri
         ...(status === 'yayinda' ? { publishedAt: serverTimestamp() } : {}),
       };
       const batch = writeBatch(db);
+      // Doğrudan yayın günlük sınıra sayılır; dolduysa LimitReachedError (panel "Onaya gönder" önerir).
+      const usage = status === 'yayinda' ? publishUsage(p.author, { module: 'etkinlik' }) : null;
+      for (const kind of usage?.kinds ?? []) await countUsage(db, batch, usage!.subject, kind, actor.uid);
       if (existing) {
         // Boşaltılan isteğe bağlı alanlar ve önceki ret bilgisi silinir; oluşturma tarihi ve katılım sayısı korunur.
         const removed = Object.fromEntries(Object.entries(optional).filter(([, v]) => v === undefined).map(([k]) => [k, deleteField()]));

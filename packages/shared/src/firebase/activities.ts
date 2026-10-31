@@ -17,6 +17,7 @@ import {
 
 import { ACTIVITY_LIMITS, type Activity, type ActivityInput, type ActivityReportReason } from '../activities/activities';
 import { addAudit, iso } from './grants';
+import { countUsage } from './limits';
 
 const COLLECTION = 'activities';
 const REPORTS = 'activityReports';
@@ -89,6 +90,7 @@ export function createFirestoreActivityRepository(db: Firestore) {
       const ref = doc(collection(db, COLLECTION));
       const r = input.region;
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: uid }, 'aktivite', uid);
       batch.set(ref, {
         title: input.title.trim(),
         description: input.description.trim(),
@@ -145,6 +147,7 @@ export function createFirestoreActivityRepository(db: Firestore) {
     /** Kişi başına aktivite başına bir şikâyet; sayaç aynı yazımda tam bir artar. */
     async report(a: Pick<Activity, 'id' | 'region'>, uid: string, reason: ActivityReportReason): Promise<void> {
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: uid }, 'sikayet', uid);
       batch.set(doc(db, REPORTS, `${a.id}_${uid}`), {
         activityId: a.id,
         reporterUid: uid,

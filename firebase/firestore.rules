@@ -220,6 +220,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['uid', 'text', 'provinceCode', 'status', 'createdAt'])
         && request.resource.data.uid == request.auth.uid
+        && usageOk('u-' + request.auth.uid, 'oneri', userLimit('oneri', 5, 2))
         && request.resource.data.text is string
         && request.resource.data.text.size() >= 3 && request.resource.data.text.size() <= 300
         && (!('provinceCode' in request.resource.data)
@@ -523,6 +524,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['businessId', 'reviewUid', 'reporterUid', 'reason', 'status', 'createdAt'])
         && request.resource.data.reporterUid == request.auth.uid
+        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
         && request.resource.data.reviewUid != request.auth.uid
         && id == request.resource.data.businessId + '_' + request.resource.data.reviewUid + '_' + request.auth.uid
         && request.resource.data.reason in ['hakaret', 'sahte', 'kisisel-veri', 'alakasiz', 'diger']
@@ -670,7 +672,95 @@ service cloud.firestore {
     }
 
     // Uygulama ayarları (SOS süreleri): herkes okur, admin yazar.
+    // ---- Günlük sınırlar (PROJE.md 15.6): her iş usage/{sahip~iş} sayacıyla sayılır, sayılar config/limits'ten (admin),
+    // yoksa varsayılan. Sahip: kişi (u-), işletme (b-), kurum (k-), kişi yetkisi / muhtar (g-). Yeni hesapta (7 gün) düşük sınır.
+    function limitsPath() {
+      return /databases/$(database)/documents/config/limits;
+    }
+    function limitOf(key, def) {
+      return exists(limitsPath()) ? get(limitsPath()).data.get(key, def) : def;
+    }
+    function userLimit(key, def, defNew) {
+      let created = exists(myUserPath()) ? get(myUserPath()).data.get('createdAt', null) : null;
+      return created != null && created > request.time - duration.value(7, 'd') ? limitOf(key + 'Yeni', defNew) : limitOf(key, def);
+    }
+    function usagePath(subject, kind) {
+      return /databases/$(database)/documents/usage/$(subject + '~' + kind);
+    }
+    // Sayaç bu yazımda değişti (kendi kuralı yalnızca +1 ya da süresi dolunca 1'den başlatmaya izin verir) ve sınırı aşmadı.
+    function usageOk(subject, kind, limit) {
+      return getAfter(usagePath(subject, kind)).data.count <= limit
+        && (!exists(usagePath(subject, kind)) || getAfter(usagePath(subject, kind)).data != get(usagePath(subject, kind)).data);
+    }
+    function ownsUsage(type, sid) {
+      return (type == 'u' && sid == request.auth.uid)
+        || (type == 'b' && isBusinessTeam(sid))
+        || (type == 'k' && isMemberOf(sid))
+        || (type == 'g' && exists(grantPath(sid)));
+    }
+    function usageWindow(kind) {
+      return kind == 'duyuru-hafta' ? duration.value(7, 'd') : duration.value(1, 'd');
+    }
+    // Kurum ve muhtarın doğrudan yayını sayılır; sınır dolunca onaya gönderir (onaylanan sayılmaz). İl yöneticisi ve
+    // admin sınırsız.
+    function publishUsageOk(d, module) {
+      let subject = d.author.type == 'kurum' ? 'k-' + d.author.orgId : 'g-' + d.author.grantKey;
+      let kurum = d.author.type == 'kurum';
+      return d.status != 'yayinda' || isAdmin() || (d.author.type == 'kisi' && d.author.role == 'il-yoneticisi')
+        || (module == 'etkinlikler' ? usageOk(subject, 'etkinlik', limitOf('etkinlik', 10))
+            : d.kind == 'acil' ? usageOk(subject, 'acil', limitOf('acil', 3))
+            : (usageOk(subject, 'duyuru', kurum ? limitOf('kurumDuyuru', 5) : limitOf('muhtarDuyuru', 3))
+               && usageOk(subject, 'duyuru-hafta', kurum ? limitOf('kurumDuyuruHafta', 20) : limitOf('muhtarDuyuruHafta', 10))));
+    }
+    function limitValue(d, key) {
+      return !(key in d) || (d[key] is int && d[key] >= 1 && d[key] <= 10000);
+    }
+
+    match /usage/{id} {
+      allow read: if signedIn() && (resource == null || ownsUsage(resource.data.type, resource.data.sid));
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['type', 'sid', 'kind', 'windowStart', 'count'])
+        && request.resource.data.kind in ['gonderi', 'yorum', 'takip', 'aktivite', 'oneri', 'sikayet', 'isletme-gonderi', 'duyuru', 'duyuru-hafta', 'acil', 'etkinlik']
+        && request.resource.data.sid is string
+        && id == request.resource.data.type + '-' + request.resource.data.sid + '~' + request.resource.data.kind
+        && ownsUsage(request.resource.data.type, request.resource.data.sid)
+        && request.resource.data.windowStart == request.time && request.resource.data.count == 1;
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['windowStart', 'count'])
+        && ownsUsage(resource.data.type, resource.data.sid)
+        && ((request.resource.data.windowStart == request.time && request.resource.data.count == 1
+              && resource.data.windowStart + usageWindow(resource.data.kind) <= request.time)
+            || (request.resource.data.windowStart == resource.data.windowStart && request.resource.data.count == resource.data.count + 1));
+    }
+
     match /config/{id} {
+      // Günlük sınır sayıları (Panel > Sınırlar, yalnızca admin).
+      allow write: if isAdmin() && id == 'limits'
+        && request.resource.data.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'sikayet', 'isletmeGonderi', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
+        && limitValue(request.resource.data, 'gonderi')
+        && limitValue(request.resource.data, 'gonderiYeni')
+        && limitValue(request.resource.data, 'yorum')
+        && limitValue(request.resource.data, 'yorumYeni')
+        && limitValue(request.resource.data, 'takip')
+        && limitValue(request.resource.data, 'takipYeni')
+        && limitValue(request.resource.data, 'sohbet')
+        && limitValue(request.resource.data, 'sohbetYeni')
+        && limitValue(request.resource.data, 'ilan')
+        && limitValue(request.resource.data, 'ilanYeni')
+        && limitValue(request.resource.data, 'aktivite')
+        && limitValue(request.resource.data, 'aktiviteYeni')
+        && limitValue(request.resource.data, 'oneri')
+        && limitValue(request.resource.data, 'oneriYeni')
+        && limitValue(request.resource.data, 'sikayet')
+        && limitValue(request.resource.data, 'isletmeGonderi')
+        && limitValue(request.resource.data, 'muhtarDuyuru')
+        && limitValue(request.resource.data, 'muhtarDuyuruHafta')
+        && limitValue(request.resource.data, 'kurumDuyuru')
+        && limitValue(request.resource.data, 'kurumDuyuruHafta')
+        && limitValue(request.resource.data, 'acil')
+        && limitValue(request.resource.data, 'etkinlik')
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
       allow read: if true;
       allow write: if isAdmin() && id == 'sos'
         && request.resource.data.keys().hasOnly(['liveMinutes', 'countdownSeconds', 'updatedBy', 'updatedAt'])
@@ -1214,7 +1304,8 @@ service cloud.firestore {
         && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
         && request.resource.data.createdAt == request.time
         && validAnnouncement(request.resource.data)
-        && authorWriteOk(request.resource.data, 'gonderiler');
+        && authorWriteOk(request.resource.data, 'gonderiler')
+        && publishUsageOk(request.resource.data, 'gonderiler');
       // Hazırlayan: yayında olmayanı düzenler / yeniden gönderir. Yayınlayan hesap ve oluşturma tarihi değişmez.
       allow update: if resource.data.preparedBy == request.auth.uid
         && resource.data.status in ['taslak', 'onay-bekliyor', 'reddedildi']
@@ -1222,7 +1313,8 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt
         && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
         && validAnnouncement(request.resource.data)
-        && authorWriteOk(request.resource.data, 'gonderiler');
+        && authorWriteOk(request.resource.data, 'gonderiler')
+        && publishUsageOk(request.resource.data, 'gonderiler');
       // Onay ya da gerekçeli ret (yalnızca durum ve inceleme bilgisi değişir).
       allow update: if resource.data.status == 'onay-bekliyor'
         && request.resource.data.reviewedBy == request.auth.uid
@@ -1297,7 +1389,8 @@ service cloud.firestore {
         && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
         && request.resource.data.createdAt == request.time
         && validEvent(request.resource.data)
-        && authorWriteOk(request.resource.data, 'etkinlikler');
+        && authorWriteOk(request.resource.data, 'etkinlikler')
+        && publishUsageOk(request.resource.data, 'etkinlikler');
       // Hazırlayan: yayında olmayanı düzenler / yeniden gönderir.
       allow update: if resource.data.preparedBy == request.auth.uid
         && resource.data.status in ['taslak', 'onay-bekliyor', 'reddedildi']
@@ -1306,7 +1399,8 @@ service cloud.firestore {
         && request.resource.data.attendeeCount == resource.data.attendeeCount
         && !('reviewedBy' in request.resource.data) && !('reviewNote' in request.resource.data)
         && validEvent(request.resource.data)
-        && authorWriteOk(request.resource.data, 'etkinlikler');
+        && authorWriteOk(request.resource.data, 'etkinlikler')
+        && publishUsageOk(request.resource.data, 'etkinlikler');
       // Onay ya da gerekçeli ret.
       allow update: if resource.data.status == 'onay-bekliyor'
         && request.resource.data.reviewedBy == request.auth.uid
@@ -1403,6 +1497,7 @@ service cloud.firestore {
             || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
       // Açma: yetişkin, kendi adına, kendi ilinde, en çok 30 gün sonrası için; tam adres aynı yazımda.
       allow create: if request.resource.data.organizerUid == request.auth.uid
+        && usageOk('u-' + request.auth.uid, 'aktivite', userLimit('aktivite', 3, 1))
         && request.resource.data.status == 'aktif'
         && request.resource.data.attendeeCount == 0 && request.resource.data.reportCount == 0
         && !('cleared' in request.resource.data) && !('moderatedBy' in request.resource.data)
@@ -1484,6 +1579,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['activityId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
         && request.resource.data.reporterUid == request.auth.uid
+        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
         && rid == request.resource.data.activityId + '_' + request.auth.uid
         && request.resource.data.reason in ['tehlikeli', 'uygunsuz', 'ticari', 'sahte', 'diger']
         && request.resource.data.status == 'yeni'
@@ -1580,9 +1676,11 @@ service cloud.firestore {
         && validPost(request.resource.data)
         && request.resource.data.text.size() >= 1
         && ('business' in request.resource.data
-            ? validBusinessPost(request.resource.data)
+            ? (validBusinessPost(request.resource.data)
+                && usageOk('b-' + request.resource.data.business.id, 'isletme-gonderi', limitOf('isletmeGonderi', 5)))
             : (request.resource.data.status == 'aktif'
                 && exists(myUserPath())
+                && usageOk('u-' + request.auth.uid, 'gonderi', userLimit('gonderi', 10, 3))
                 && myLocation().get('neighbourhoodId', '') == request.resource.data.region.neighbourhoodId
                 && myLocation().get('districtId', '') == request.resource.data.region.districtId
                 && myLocation().get('provinceCode', '') == request.resource.data.region.provinceCode));
@@ -1662,6 +1760,7 @@ service cloud.firestore {
         allow create: if signedIn()
           && request.resource.data.keys().hasOnly(['authorUid', 'authorName', 'text', 'reportCount', 'createdAt'])
           && request.resource.data.authorUid == request.auth.uid
+          && usageOk('u-' + request.auth.uid, 'yorum', userLimit('yorum', 100, 30))
           && request.resource.data.authorName is string && request.resource.data.authorName.size() <= 40
           && request.resource.data.text is string && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 500
           && request.resource.data.reportCount == 0
@@ -1697,6 +1796,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['postId', 'commentId', 'reporterUid', 'reason', 'text', 'provinceCode', 'status', 'createdAt'])
         && request.resource.data.reporterUid == request.auth.uid
+        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
         && rid == request.resource.data.postId + '_' + request.resource.data.commentId + '_' + request.auth.uid
         && request.resource.data.reason in ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger']
         && request.resource.data.text is string && request.resource.data.text.size() <= 500
@@ -1742,7 +1842,7 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/publicProfiles/$(uid)).data.displayName;
     }
     function chatLimit() {
-      return get(myUserPath()).data.createdAt > request.time - duration.value(7, 'd') ? 10 : 30;
+      return userLimit('sohbet', 30, 10);
     }
     // Son mesaj özeti: aynı yazımda eklenen, benim yazdığım mesajı gösterir.
     function validLast(id, last) {
@@ -1925,6 +2025,7 @@ service cloud.firestore {
       allow read: if isAdmin() || (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid));
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['chatId', 'messageId', 'reporterUid', 'reportedUid', 'text', 'reason', 'status', 'createdAt'])
+        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
         && rid == request.auth.uid + '_' + request.resource.data.messageId
         && request.resource.data.reporterUid == request.auth.uid
         && request.resource.data.reason in ['taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'diger']
@@ -1951,7 +2052,7 @@ service cloud.firestore {
       return /databases/$(database)/documents/listingQuota/$(request.auth.uid);
     }
     function listingLimit() {
-      return get(myUserPath()).data.createdAt > request.time - duration.value(7, 'd') ? 2 : 5;
+      return userLimit('ilan', 5, 2);
     }
     function validListing(d) {
       return d.keys().hasOnly(['kind', 'category', 'condition', 'title', 'description', 'price', 'rentUnit', 'swapFor', 'region',
@@ -2053,6 +2154,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['listingId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
         && request.resource.data.reporterUid == request.auth.uid
+        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
         && rid == request.resource.data.listingId + '_' + request.auth.uid
         && request.resource.data.reason in ['dolandiricilik', 'yasakli', 'sahte', 'emlak-arac', 'uygunsuz', 'spam', 'diger']
         && request.resource.data.status == 'yeni'
@@ -2111,6 +2213,7 @@ service cloud.firestore {
         && request.resource.data.followerUid == request.auth.uid
         && request.resource.data.followeeUid is string && request.resource.data.followeeUid != request.auth.uid
         && fid == request.auth.uid + '_' + request.resource.data.followeeUid
+        && usageOk('u-' + request.auth.uid, 'takip', userLimit('takip', 200, 50))
         && request.resource.data.createdAt == request.time
         && exists(/databases/$(database)/documents/publicProfiles/$(request.resource.data.followeeUid))
         && request.resource.data.status == (get(/databases/$(database)/documents/publicProfiles/$(request.resource.data.followeeUid)).data.isPrivate ? 'istek' : 'aktif')
@@ -2144,6 +2247,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['targetUid', 'reporterUid', 'reason', 'displayName', 'bio', 'status', 'createdAt'])
         && request.resource.data.reporterUid == request.auth.uid
+        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
         && request.resource.data.targetUid is string && request.resource.data.targetUid != request.auth.uid
         && rid == request.resource.data.targetUid + '_' + request.auth.uid
         && request.resource.data.reason in ['taklit', 'nefret', 'taciz', 'spam', 'uygunsuz', 'diger']
@@ -2169,6 +2273,7 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['postId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
         && request.resource.data.reporterUid == request.auth.uid
+        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
         && rid == request.resource.data.postId + '_' + request.auth.uid
         && request.resource.data.reason in ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger']
         && request.resource.data.status == 'yeni'

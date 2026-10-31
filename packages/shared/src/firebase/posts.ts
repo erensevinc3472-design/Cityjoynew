@@ -34,6 +34,7 @@ import {
 import { PROFILE_LIMITS } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
+import { countUsage } from './limits';
 
 const COLLECTION = 'posts';
 const REPORTS = 'postReports';
@@ -208,6 +209,7 @@ export function createFirestorePostRepository(db: Firestore) {
       const ref = doc(collection(db, COLLECTION));
       const r = input.region;
       const batch = writeBatch(db);
+      await countUsage(db, batch, as ? { type: 'b', id: as.business.id } : { type: 'u', id: uid }, as ? 'isletme-gonderi' : 'gonderi', uid);
       batch.set(ref, {
         text: input.text.trim(),
         category: input.category,
@@ -259,6 +261,7 @@ export function createFirestorePostRepository(db: Firestore) {
     /** Kişi başına gönderi başına bir şikâyet; sayaç aynı yazımda tam bir artar. */
     async report(p: Pick<Post, 'id' | 'region'>, uid: string, reason: PostReportReason): Promise<void> {
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: uid }, 'sikayet', uid);
       batch.set(doc(db, REPORTS, `${p.id}_${uid}`), {
         postId: p.id,
         reporterUid: uid,
@@ -285,6 +288,7 @@ export function createFirestorePostRepository(db: Firestore) {
     async addComment(postId: string, uid: string, authorName: string, text: string): Promise<PostComment> {
       const ref = doc(collection(db, COLLECTION, postId, 'comments'));
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: uid }, 'yorum', uid);
       batch.set(ref, { authorUid: uid, authorName: authorName.slice(0, 40), text: text.trim(), reportCount: 0, createdAt: serverTimestamp() });
       batch.update(postRef(db, postId), { commentCount: increment(1), lastComment: ref.id });
       await batch.commit();
@@ -309,6 +313,7 @@ export function createFirestorePostRepository(db: Firestore) {
     /** Kişi başına yorum başına bir şikâyet; moderatör yorum silinse de yazıyı görsün diye kopyası şikâyette durur. */
     async reportComment(post: Pick<Post, 'id' | 'region'>, c: Pick<PostComment, 'id' | 'text'>, uid: string, reason: PostReportReason): Promise<void> {
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: uid }, 'sikayet', uid);
       batch.set(doc(db, COMMENT_REPORTS, `${post.id}_${c.id}_${uid}`), {
         postId: post.id,
         commentId: c.id,
