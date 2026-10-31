@@ -1312,7 +1312,8 @@
       "haberTitle": "Amtliche Nachricht · {{title}}",
       "muhtar": "Ortsvorsteher",
       "cityjoy": "CityJoy",
-      "channel": "Allgemeine Benachrichtigungen"
+      "channel": "Allgemeine Benachrichtigungen",
+      "quietChannel": "Stille Benachrichtigungen"
     },
     "categories": {
       "acil": "Dringende Meldungen",

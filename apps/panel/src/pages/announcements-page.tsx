@@ -246,6 +246,11 @@ function Announcements({ user }: { user: PanelUser }) {
                       ) : live ? (
                         <div className="row-actions">
                           <button className="link" disabled={busy} onClick={() => act(() => service.approve(a), t('announcements.approved'))}>{t('announcements.approve')}</button>
+                          {isAdmin && a.kind !== 'acil' ? (
+                            <button className="link" disabled={busy} title={t('announcements.approveRingHint')} onClick={() => act(() => service.approve(a, { ringAlways: true }), t('announcements.approved'))}>
+                              {t('announcements.approveRing')}
+                            </button>
+                          ) : null}
                           <button className="link" disabled={busy} onClick={() => setRejecting({ id: a.id, note: '' })}>{t('announcements.reject')}</button>
                         </div>
                       ) : null,

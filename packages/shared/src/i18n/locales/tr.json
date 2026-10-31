@@ -1312,7 +1312,8 @@
       "haberTitle": "Kurum haberi · {{title}}",
       "muhtar": "Muhtarlık",
       "cityjoy": "CityJoy",
-      "channel": "Genel bildirimler"
+      "channel": "Genel bildirimler",
+      "quietChannel": "Sessiz bildirimler"
     },
     "categories": {
       "acil": "Acil duyurular",

@@ -164,10 +164,17 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
       return ref.id;
     },
 
-    async approve(a: Announcement): Promise<void> {
+    /** `ringAlways`: yalnızca admin; telefon bildirimi önceliğe bakmadan her zaman çalar (PROJE.md 5.12). */
+    async approve(a: Announcement, opts: { ringAlways?: boolean } = {}): Promise<void> {
       const batch = writeBatch(db);
-      batch.update(doc(db, COLLECTION, a.id), { status: 'yayinda', publishedAt: serverTimestamp(), reviewedBy: actor.uid, updatedAt: serverTimestamp() });
-      audit(batch, a, 'onayla', 'Duyuru onaylandı');
+      batch.update(doc(db, COLLECTION, a.id), {
+        status: 'yayinda',
+        publishedAt: serverTimestamp(),
+        reviewedBy: actor.uid,
+        updatedAt: serverTimestamp(),
+        ...(opts.ringAlways ? { ringAlways: true } : {}),
+      });
+      audit(batch, a, 'onayla', opts.ringAlways ? 'Duyuru onaylandı (bildirim her zaman çalsın)' : 'Duyuru onaylandı');
       await batch.commit();
     },
 

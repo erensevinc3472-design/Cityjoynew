@@ -1312,7 +1312,8 @@
       "haberTitle": "Official news · {{title}}",
       "muhtar": "Neighbourhood office",
       "cityjoy": "CityJoy",
-      "channel": "General notifications"
+      "channel": "General notifications",
+      "quietChannel": "Silent notifications"
     },
     "categories": {
       "acil": "Urgent announcements",

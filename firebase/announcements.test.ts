@@ -208,3 +208,24 @@ describe('yayın sınırı', () => {
     for (let i = 0; i < 6; i++) await panel('ahmet').save(ahmet, input({ title: `İl duyurusu ${i}` }), 'yayinla');
   });
 });
+
+describe('bildirim her zaman çalsın', () => {
+  it('onaylarken yalnızca admin işaretler', async () => {
+    const basin = await publisher('basin');
+    const a = await panel('basin').save(basin, input(), 'onaya');
+    const b = await panel('basin').save(basin, input({ title: 'İkinci duyuru' }), 'onaya');
+    const pending = await panel('kalem').listPending({ orgId: org.id });
+    await expect(panel('kalem').approve(pending.find((x) => x.id === a)!, { ringAlways: true })).rejects.toThrow();
+    await panel('eren').approve(pending.find((x) => x.id === a)!, { ringAlways: true });
+    await panel('kalem').approve(pending.find((x) => x.id === b)!);
+    const ring = async (id: string) => {
+      let v: unknown;
+      await env.withSecurityRulesDisabled(async (ctx) => {
+        v = (await getDoc(doc(ctx.firestore(), 'announcements', id))).get('ringAlways');
+      });
+      return v;
+    };
+    expect(await ring(a)).toBe(true);
+    expect(await ring(b)).toBeUndefined();
+  });
+});

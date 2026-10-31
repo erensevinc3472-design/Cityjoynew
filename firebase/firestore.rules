@@ -655,6 +655,16 @@ service cloud.firestore {
       allow delete: if isSelf(uid);
     }
 
+    function validPriorities(m) {
+      return m is map && m.keys().hasOnly(['kurum-duyuru', 'muhtar-duyuru', 'haber', 'etkinlik', 'mesaj', 'takip'])
+        && m.values().hasOnly(['always', 'normal', 'inapp']);
+    }
+
+    // Günlük sesli bildirim sayacı: yalnızca sunucu yazar; kişi hesabını silerken siler.
+    match /pushCount/{uid} {
+      allow delete: if isSelf(uid);
+    }
+
     // Bildirim kategorileri haritası (tercihler ve panel tetikleyicileri): bilinen kategoriler, hepsi evet/hayır.
     function validNotificationMap(m) {
       return m is map && m.keys().hasOnly(['acil', 'sos', 'mesaj', 'takip', 'duyuru', 'haber', 'etkinlik'])
@@ -672,7 +682,7 @@ service cloud.firestore {
     }
 
     // Uygulama ayarları (SOS süreleri): herkes okur, admin yazar.
-    // ---- Günlük sınırlar (PROJE.md 15.6): her iş usage/{sahip~iş} sayacıyla sayılır, sayılar config/limits'ten (admin),
+    // ---- Günlük sınırlar (PROJE.md 15.3): her iş usage/{sahip~iş} sayacıyla sayılır, sayılar config/limits'ten (admin),
     // yoksa varsayılan. Sahip: kişi (u-), işletme (b-), kurum (k-), kişi yetkisi / muhtar (g-). Yeni hesapta (7 gün) düşük sınır.
     function limitsPath() {
       return /databases/$(database)/documents/config/limits;
@@ -805,8 +815,12 @@ service cloud.firestore {
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
       // Bildirim tetikleyicileri (PROJE.md 7): admin yönetir; acil duyuru ve SOS kapatılamaz.
+      // Aynı belgede telefon bildirimi öncelikleri (her zaman / normal / uygulama içi) ve günlük sesli tavan (1-50).
       allow write: if isAdmin() && id == 'notificationTriggers'
-        && request.resource.data.keys().hasOnly(['triggers', 'updatedBy', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['triggers', 'priorities', 'dailySoundCap', 'updatedBy', 'updatedAt'])
+        && (!('priorities' in request.resource.data) || validPriorities(request.resource.data.priorities))
+        && (!('dailySoundCap' in request.resource.data)
+            || (request.resource.data.dailySoundCap is int && request.resource.data.dailySoundCap >= 1 && request.resource.data.dailySoundCap <= 50))
         && validNotificationMap(request.resource.data.triggers)
         && request.resource.data.triggers.acil == true && request.resource.data.triggers.sos == true
         && request.resource.data.updatedBy == request.auth.uid
@@ -1272,7 +1286,9 @@ service cloud.firestore {
     }
     function validAnnouncement(d) {
       return d.keys().hasOnly(['kind', 'title', 'body', 'region', 'endsAt', 'pinned', 'category', 'author', 'status', 'preparedBy',
-             'preparedByName', 'createdAt', 'updatedAt', 'publishedAt', 'reviewedBy', 'reviewNote'])
+             'preparedByName', 'createdAt', 'updatedAt', 'publishedAt', 'reviewedBy', 'reviewNote', 'ringAlways'])
+        // "Bildirim her zaman çalsın" (PROJE.md 5.12): yalnızca admin işaretler; düzenlemede korunur.
+        && (!('ringAlways' in d) || (d.ringAlways == true && (isAdmin() || (resource != null && resource.data.get('ringAlways', false) == true))))
         // Sabitleme yalnızca mahalleye yönelik, acil olmayan duyuruda (Mahalle Meydanı).
         && (!('pinned' in d) || (d.pinned == true && d.kind == 'duyuru' && 'neighbourhoodId' in d.region))
         && d.kind in ['duyuru', 'haber', 'acil']
@@ -1320,7 +1336,9 @@ service cloud.firestore {
         && request.resource.data.reviewedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time
         && ((request.resource.data.status == 'yayinda' && request.resource.data.publishedAt == request.time
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'publishedAt', 'reviewedBy', 'updatedAt']))
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'publishedAt', 'reviewedBy', 'updatedAt', 'ringAlways'])
+              // Onaylarken "her zaman çalsın" yalnızca admin.
+              && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ringAlways']) || (isAdmin() && request.resource.data.ringAlways == true)))
             || (request.resource.data.status == 'reddedildi'
               && request.resource.data.reviewNote is string && request.resource.data.reviewNote.size() >= 5
               && request.resource.data.reviewNote.size() <= 300

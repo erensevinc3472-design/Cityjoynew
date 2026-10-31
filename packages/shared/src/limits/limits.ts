@@ -1,5 +1,5 @@
 /**
- * Günlük sınırlar (PROJE.md 15.6, Eren onayladı 31 Ekim 2026). Her işlem bir sayaçla sayılır (`usage/{sahip~iş}`),
+ * Günlük sınırlar (PROJE.md 15.3, Eren onayladı 31 Ekim 2026). Her işlem bir sayaçla sayılır (`usage/{sahip~iş}`),
  * sınırı veritabanı kuralları denetler; sayılar panelden (admin, `config/limits`) değişir, boşsa buradaki varsayılan
  * geçerli. Yeni hesaplara (ilk 7 gün) daha düşük sınır. SOS, 112, hesap silme gibi hayati işler sınırlanmaz.
  * Kurum ve muhtar doğrudan yayında sınıra takılınca içerik engellenmez: onaya gönderilir (il yöneticisi / admin).

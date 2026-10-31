@@ -44,7 +44,15 @@ export async function handleAnnouncementWrite(
   return notifyUsers(
     db,
     uids,
-    { kind: 'announcement', category, title: sourceName(after.author), body: String(after.title ?? ''), href: { pathname: '/announcements/[id]', params: { id } } },
+    {
+      kind: 'announcement',
+      category,
+      title: sourceName(after.author),
+      body: String(after.title ?? ''),
+      href: { pathname: '/announcements/[id]', params: { id } },
+      source: after.author?.type === 'kurum' ? 'kurum' : 'kisi',
+      ringAlways: after.ringAlways === true,
+    },
     deps,
   );
 }

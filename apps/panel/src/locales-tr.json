@@ -572,7 +572,26 @@
     "retry": "Yeniden dene",
     "loading": "Yükleniyor…",
     "adminOnly": "Bu ayarları yalnızca admin değiştirebilir.",
-    "demoReadOnly": "Örnek hesapta yalnızca görüntülenir."
+    "demoReadOnly": "Örnek hesapta yalnızca görüntülenir.",
+    "priorityTitle": "Telefon bildirimi önceliği",
+    "priorityIntro": "Her türün telefona nasıl geleceği. Kişi kendi türlerini uygulamadan her zaman kapatabilir. Sessiz gelen bildirim de bildirim listesinde ve uygulamadaki zilde görünür.",
+    "priorities": {
+      "always": "Her zaman çalar",
+      "normal": "Normal (tavana kadar sesli, sonra sessiz)",
+      "inapp": "Sadece uygulama içi"
+    },
+    "priorityKeys": {
+      "acil": "Acil duyuru ve SOS",
+      "kurum-duyuru": "Belediye ve kurum duyurusu",
+      "muhtar-duyuru": "Muhtar ve il duyurusu",
+      "haber": "Kurum haberi",
+      "etkinlik": "Etkinlik",
+      "mesaj": "Mesaj",
+      "takip": "Takip"
+    },
+    "soundCap": "Kişi başına günlük sesli bildirim tavanı",
+    "soundCapHint": "\"Normal\" türlerde kişinin telefonu günde en çok bu kadar kez çalar; sonrakiler sessiz gelir. {{min}} ile {{max}} arası.",
+    "blazeNote": "Telefona bildirim sunucu işlevleriyle gider; Blaze planı açılınca çalışır. Onay sırasında tek bir duyuru için \"bildirim her zaman çalsın\" seçilebilir (yalnızca admin). Kampanya ve işletme bildirimleri yalnızca bunlara izin veren kişilere gidecek."
   },
   "sosSettings": {
     "title": "SOS ayarları",
@@ -1077,7 +1096,9 @@
       "saglik": "Sağlık",
       "cevre": "Çevre",
       "ekonomi": "Ekonomi"
-    }
+    },
+    "approveRing": "Onayla, bildirim her zaman çalsın",
+    "approveRingHint": "Telefon bildirimi, kişinin günlük sesli bildirim tavanına bakmadan sesli gelir (ör. önemli bir açılış ya da belediye duyurusu). Yalnızca admin."
   },
   "events": {
     "title": "Etkinlikler",

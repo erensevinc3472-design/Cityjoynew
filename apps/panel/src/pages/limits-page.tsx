@@ -7,7 +7,7 @@ import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 
 /**
- * Günlük sınırlar (PROJE.md 15.6). Kişi, işletme, muhtar ve kurumun günde (duyuruda haftada da) kaç iş yapabileceği.
+ * Günlük sınırlar (PROJE.md 15.3). Kişi, işletme, muhtar ve kurumun günde (duyuruda haftada da) kaç iş yapabileceği.
  * Yalnızca admin değiştirir, her değişiklik işlem kaydına yazılır; asıl denetim veritabanı kurallarında.
  */
 export function LimitsPage() {

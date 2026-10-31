@@ -1312,7 +1312,8 @@
       "haberTitle": "خبر رسمي · {{title}}",
       "muhtar": "مختار الحي",
       "cityjoy": "CityJoy",
-      "channel": "إشعارات عامة"
+      "channel": "إشعارات عامة",
+      "quietChannel": "إشعارات صامتة"
     },
     "categories": {
       "acil": "إعلانات عاجلة",

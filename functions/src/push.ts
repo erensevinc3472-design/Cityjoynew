@@ -1,8 +1,10 @@
 import { FieldValue, type Firestore } from 'firebase-admin/firestore';
 import {
+  noticePriority,
   noticePushMessages,
+  noticeRecipients,
+  normalizeNotificationSettings,
   normalizePrefs,
-  normalizeTriggers,
   turkeyHour,
   type LanguageCode,
   type NoticePushMessage,
@@ -38,14 +40,41 @@ export const expoSender: PushSender = async (messages) => {
 };
 
 /**
+ * Günlük sesli tavan: "normal" öncelikli bildirimde kişinin bugünkü (Türkiye günü) sesli sayısı artar; tavanı dolmuş
+ * olanlar döner (onlara sessiz gider). Sayaç `pushCount/{uid}`: { day, count }.
+ */
+async function spendSound(db: Firestore, uids: readonly string[], cap: number, now: Date): Promise<Set<string>> {
+  const day = new Date(now.getTime() + 3 * 3600_000).toISOString().slice(0, 10);
+  const silent = new Set<string>();
+  for (let i = 0; i < uids.length; i += 400) {
+    const part = uids.slice(i, i + 400);
+    const docs = await db.getAll(...part.map((uid) => db.doc(`pushCount/${uid}`)));
+    const batch = db.batch();
+    part.forEach((uid, k) => {
+      const count = docs[k].get('day') === day ? ((docs[k].get('count') as number | undefined) ?? 0) : 0;
+      if (count >= cap) silent.add(uid);
+      else batch.set(docs[k].ref, { day, count: count + 1 });
+    });
+    await batch.commit();
+  }
+  return silent;
+}
+
+/**
  * Kişilere olay bildirimi: telefon adresleri, dil ve kişinin tercihleri okunur, admin'in kapattığı türler ve sessiz
- * saatler (Türkiye saati) gözetilir. Telefonu kayıtlı olmayan kişi atlanır. Gönderilen ileti sayısını döndürür.
+ * saatler (Türkiye saati) gözetilir. Öncelik panelden: "uygulama içi" telefona gitmez, "normal" günlük sesli tavandan
+ * sonra sessiz gider, "her zaman" (acil, SOS, admin'in işaretlediği) hep çalar. Telefonu kayıtlı olmayan kişi atlanır.
+ * Gönderilen ileti sayısını döndürür.
  */
 export async function notifyUsers(db: Firestore, uids: readonly string[], notice: PushNotice, deps: NotifyDeps): Promise<number> {
   const unique = [...new Set(uids)];
   if (!unique.length) return 0;
-  const triggers = normalizeTriggers((await db.doc('config/notificationTriggers').get()).data());
+  // Tetikleyiciler belgenin `triggers` alanında (panel öyle kaydeder).
+  const settings = normalizeNotificationSettings((await db.doc('config/notificationTriggers').get()).data());
+  const { triggers } = settings;
   if (!triggers[notice.category]) return 0;
+  const priority = noticePriority(notice, settings.priorities);
+  if (priority === 'inapp') return 0;
 
   const targets: NoticeTarget[] = [];
   for (let i = 0; i < unique.length; i += 100) {
@@ -62,7 +91,10 @@ export async function notifyUsers(db: Firestore, uids: readonly string[], notice
     });
   }
 
-  const messages = noticePushMessages(targets, notice, triggers, turkeyHour(deps.now));
+  const hour = turkeyHour(deps.now);
+  const recipients = noticeRecipients(targets, notice, triggers, hour);
+  const silent = priority === 'normal' ? await spendSound(db, recipients.map((t) => t.uid), settings.dailySoundCap, deps.now) : new Set<string>();
+  const messages = noticePushMessages(recipients, notice, triggers, hour, silent);
   if (!messages.length) return 0;
   const dead = new Set(await deps.send(messages));
   if (dead.size) {
