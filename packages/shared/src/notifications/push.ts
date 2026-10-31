@@ -5,14 +5,19 @@ import { CRITICAL_CATEGORIES, quietAtHour, type NotificationCategory, type Notif
 /** Android'de SOS dışındaki bildirimlerin kanalı (uygulama açılışta kurar). */
 export const GENERAL_CHANNEL_ID = 'genel';
 
-/** Sunucunun gönderdiği olay bildirimleri; metinler dil dosyasında `notifications.push` altında. */
-export type PushNoticeKind = 'eventCancelled' | 'activityCancelled';
+/**
+ * Sunucunun gönderdiği olay bildirimleri; metinler dil dosyasında `notifications.push` altında. Duyuruda başlık
+ * türe göredir ("Acil duyuru · Nilüfer Belediyesi"), gövde duyurunun kendi başlığıdır (yazıldığı dilde).
+ */
+export type PushNoticeKind = 'eventCancelled' | 'activityCancelled' | 'announcement';
 
 export interface PushNotice {
   kind: PushNoticeKind;
   category: NotificationCategory;
-  /** Metne yerleşen başlık (etkinlik / aktivite adı). */
+  /** Metne yerleşen ad (etkinlik / aktivite adı, duyuruda yayınlayan). */
   title: string;
+  /** Hazır gövde (duyurunun başlığı); yoksa dil dosyasındaki metin. */
+  body?: string;
   /** Dokununca açılacak ekran. */
   href: { pathname: string; params?: Record<string, string> };
 }
@@ -34,6 +39,9 @@ export interface NoticePushMessage {
   channelId: string;
   /** Saniye: bir günden eski bildirim teslim edilmez. */
   ttl: number;
+  /** Acil duyuruda: hemen teslim edilir, iOS odak modunda da görünür. */
+  priority?: 'high';
+  interruptionLevel?: 'time-sensitive';
 }
 
 /**
@@ -46,9 +54,10 @@ export function noticePushMessages(targets: readonly NoticeTarget[], notice: Pus
   return targets.flatMap((target) => {
     if (!target.prefs.categories[notice.category]) return [];
     if (!critical && quietAtHour(target.prefs.quietHours, hour)) return [];
-    const push = (translations[target.language] ?? translations.tr).notifications.push;
-    const title = push[`${notice.kind}Title`];
-    const body = push[`${notice.kind}Body`].replace('{{title}}', notice.title);
+    const push = (translations[target.language] ?? translations.tr).notifications.push as Record<string, string>;
+    const key = notice.kind === 'announcement' ? notice.category : notice.kind;
+    const title = push[`${key}Title`].replace('{{title}}', notice.title);
+    const body = notice.body ?? push[`${key}Body`].replace('{{title}}', notice.title);
     return [...new Set(target.tokens)].map((to) => ({
       to,
       title,
@@ -57,6 +66,7 @@ export function noticePushMessages(targets: readonly NoticeTarget[], notice: Pus
       sound: 'default' as const,
       channelId: GENERAL_CHANNEL_ID,
       ttl: 86400,
+      ...(critical ? { priority: 'high' as const, interruptionLevel: 'time-sensitive' as const } : {}),
     }));
   });
 }

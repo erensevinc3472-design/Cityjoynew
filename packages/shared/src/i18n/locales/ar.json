@@ -1274,6 +1274,11 @@
       "eventCancelledBody": "أُلغيت «{{title}}» التي أكدت حضورك لها.",
       "activityCancelledTitle": "أُلغي النشاط",
       "activityCancelledBody": "أُلغي «{{title}}» الذي أكدت مشاركتك فيه.",
+      "acilTitle": "إعلان عاجل · {{title}}",
+      "duyuruTitle": "إعلان · {{title}}",
+      "haberTitle": "خبر رسمي · {{title}}",
+      "muhtar": "مختار الحي",
+      "cityjoy": "CityJoy",
       "channel": "إشعارات عامة"
     },
     "categories": {

@@ -1274,6 +1274,11 @@
       "eventCancelledBody": "„{{title}}“, für die du zugesagt hast, wurde abgesagt.",
       "activityCancelledTitle": "Aktivität abgesagt",
       "activityCancelledBody": "„{{title}}“, für die du zugesagt hast, wurde abgesagt.",
+      "acilTitle": "Dringende Meldung · {{title}}",
+      "duyuruTitle": "Mitteilung · {{title}}",
+      "haberTitle": "Amtliche Nachricht · {{title}}",
+      "muhtar": "Ortsvorsteher",
+      "cityjoy": "CityJoy",
       "channel": "Allgemeine Benachrichtigungen"
     },
     "categories": {

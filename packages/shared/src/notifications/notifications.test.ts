@@ -86,6 +86,16 @@ describe('sunucu olay bildirimi', () => {
     expect(noticePushMessages([target('a', { prefs: quiet })], notice, DEFAULT_NOTIFICATION_TRIGGERS, 9)).toHaveLength(1);
   });
 
+  it('acil duyuru: tür başlıkta, duyurunun başlığı gövdede, sessiz saatte de ve yüksek öncelikle gider', () => {
+    const quiet = { ...DEFAULT_NOTIFICATION_PREFS, quietHours: { enabled: true, start: 22, end: 8 } };
+    const acil: PushNotice = { kind: 'announcement', category: 'acil', title: 'Nilüfer Belediyesi', body: 'Su kesintisi', href: { pathname: '/announcements/[id]', params: { id: 'd1' } } };
+    const [m] = noticePushMessages([target('a', { prefs: quiet })], acil, DEFAULT_NOTIFICATION_TRIGGERS, 23);
+    expect(m).toMatchObject({ title: 'Acil duyuru · Nilüfer Belediyesi', body: 'Su kesintisi', priority: 'high', interruptionLevel: 'time-sensitive' });
+    const [d] = noticePushMessages([target('a', { language: 'de' })], { ...acil, category: 'duyuru' }, DEFAULT_NOTIFICATION_TRIGGERS, 12);
+    expect(d.title).toBe('Mitteilung · Nilüfer Belediyesi');
+    expect(d.priority).toBeUndefined();
+  });
+
   it('Türkiye saati UTC+3', () => {
     expect(turkeyHour(new Date('2026-10-31T22:30:00Z'))).toBe(1);
     expect(turkeyHour(new Date('2026-10-31T09:00:00Z'))).toBe(12);

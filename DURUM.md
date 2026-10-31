@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (arka uç 1. parça: sunucu işlevleri paketi). Önceki: kapsam kararı ve 81 il durumu (PR #39 birleşti).
+Son güncelleme: 31 Ekim 2026 (arka uç 2. parça: duyuru bildirimi). Önceki: sunucu işlevleri paketi (PR #40 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -46,7 +46,7 @@ Son güncelleme: 31 Ekim 2026 (arka uç 1. parça: sunucu işlevleri paketi). Ö
 npm install
 npm test                      # ortak paket testleri (106)
 npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (98; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (6; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (9; Java 21 gerekir)
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
 npm run typecheck
@@ -516,6 +516,14 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    etkinlik / aktivite ekranı açılır (yalnızca izinli ekranlar), Android'de "Genel bildirimler" kanalı. Testler: ortak 134
    (3 yeni), işlevler 6 (emülatörde); emülatör dört işlevi de yükledi. **Henüz çalışmıyor:** Blaze + yükleme gerekir;
    telefona bildirim için ayrıca EAS proje kimliği (telefon sürümü). Panel karşılığı: Panel > Bildirimler (tür anahtarı).
+- **Arka uç 2. parça: duyuru bildirimi (31 Ekim, dal `claude/duyuru-bildirimi`).** `announcementPublished`: duyuru, acil
+   duyuru ya da kurum haberi yayına girince (doğrudan yayın ya da onay) bölgedeki kişilere telefon bildirimi. Bölge,
+   kişinin profilindeki konumla eşleşir (`users.location`: il > ilçe > mahalle); kural ve telefon değişikliği gerekmedi.
+   Başlık türe göre, kişinin dilinde ("Acil duyuru · Nilüfer Belediyesi"; muhtarda "Muhtarlık", il yöneticisinde "CityJoy"),
+   gövde duyurunun kendi başlığı. Acil duyuru sessiz saatte de ve yüksek öncelikle gider (iOS odak modunda görünür).
+   Süresi geçmiş duyuruya gitmez; tetikleyici iki kez çalışsa da bir kez gönderilir (`pushLog/duyuru_{id}`, telefonlara
+   kapalı). Dokununca duyuru ekranı açılır. Testler: ortak 135, işlevler 9; emülatör beş işlevi yükledi. Not: çok büyük
+   illerde (yüz binlerce kişi) gönderim parçalara bölünmeli; kullanıcı sayısı artınca yapılacak.
 - **Kapsam kararı ve 81 il durumu (31 Ekim, dal `claude/81-il`):** Karar (Eren): ilk sürüm Bursa içeriğiyle çıkar,
    altyapı 81 il için hazır olur. Tarama: kodda Bursa'ya sabit bir şey yok (yalnızca yorumlar, testler ve Seyahat
    başlangıç içeriği); konum 81 il / 973 ilçe, şehir rehberi, yetkiler ve OSM aracı (`scripts/osm-city-guide.ts <il kodu>`)
@@ -617,12 +625,18 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 **Arka uç yol haritası (Eren'in sırası: arka uç > ekran tasarımları > eksik bilgiler; panel tasarımı da):**
 1. ~~Sunucu işlevleri paketi, iptal bildirimleri, SOS temizliği, hesap silme güvenlik ağı~~ (31 Ekim).
-2. Acil duyuru ve duyuruda bölgedeki kişilere telefon bildirimi (telefon adresine il/ilçe eklenecek).
+2. ~~Acil duyuru ve duyuruda bölgedeki kişilere telefon bildirimi~~ (31 Ekim).
 3. Mesaj ve yeni takipçi bildirimleri.
 4. Günlük sınırlar (aktivite açma, hizmet önerisi) ve hesap silinince önerilerin silinmesi.
 5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
+
+**Eren'in fikri, bekliyor (31 Ekim; Eren plan yapacak, şimdilik bir şey yapılmayacak):** afet / deprem modu. Bölgedekilere
+"Güvende misin?" (Güvendeyim / Yardıma ihtiyacım var), güvende olana toplanma alanları ve yardım noktaları, yardım isteyenin
+konumu panelde kırmızı harita ve liste, kurumlarla paylaşım, önceden izinle ailesine otomatik konum; dron / internetsiz
+iletişim fikri. Claude'un görüşü konuşuldu: ilk iki aşama yapılabilir (KVKK ve 112 sorumluluğu avukata), konumu izinsiz
+toplamak olmaz, dron ve Wi-Fi Direct ayrı bir Ar-Ge projesi. Temeli bu duyuru bildirimi altyapısı.
 
 00. Seyahat: Keşfet'e fotoğraf paylaşımı (telefonda sıkıştırma, Storage) ve ardından "{Şehir}'dan Kareler" (kutucukla, ek
    yükleme yok; PROJE.md 13. madde 34). Sonra Planla ve Navigasyon.
