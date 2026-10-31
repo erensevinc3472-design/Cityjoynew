@@ -4,7 +4,8 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "firebase"
+    "firebase",
+    "functions"
   ],
   "scripts": {
     "mobile": "npm run start --workspace apps/mobile",
@@ -13,7 +14,9 @@
     "locations:build": "node packages/shared/scripts/build-locations.mjs",
     "panel": "npm run dev --workspace apps/panel",
     "env:write": "node scripts/write-env.mjs",
-    "test:rules": "npm test --workspace firebase"
+    "test:rules": "npm test --workspace firebase",
+    "test:functions": "npm test --workspace functions",
+    "functions:build": "npm run build --workspace functions"
   },
   "devDependencies": {
     "write-excel-file": "4.1.1"

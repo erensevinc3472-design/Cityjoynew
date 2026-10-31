@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (kapsam kararı: ilk sürüm Bursa, altyapı 81 il; panelde "81 il durumu"). Önceki: mağaza öncesi (PR #38 birleşti).
+Son güncelleme: 31 Ekim 2026 (arka uç 1. parça: sunucu işlevleri paketi). Önceki: kapsam kararı ve 81 il durumu (PR #39 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -46,6 +46,9 @@ Son güncelleme: 31 Ekim 2026 (kapsam kararı: ilk sürüm Bursa, altyapı 81 il
 npm install
 npm test                      # ortak paket testleri (106)
 npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (98; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (6; Java 21 gerekir)
+npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
+# Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -500,6 +503,19 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    engellemez). (3) iPhone konum izni metni SOS + Yoldayım (yol üstü mola yerleri) + işletme konumunu anlatıyor, 5 dilde
    (`apps/mobile/locales/*.json`, `app.json` > `locales`; yalnızca EAS derlemesinde etkili, Expo Go kendi metnini gösterir).
    Web önizlemede çökme ekranı ve bildirim görüldü; telefonda bakılmadı. Panel karşılığı gerekmez (altyapı).
+- **Arka uç 1. parça: sunucu işlevleri (31 Ekim, dal `claude/sunucu-islevleri`).** Karar (Eren): önce arka uç, sonra
+   ekran tasarımları, sonra eksik bilgiler; panel tasarımı da iyileştirilecek. Yeni `functions/` paketi (Cloud Functions,
+   Node 22, bölge europe-west1, işlev başına en çok 5 kopya; esbuild ortak kodu tek dosyaya gömer, buluta yalnızca
+   firebase-admin ve firebase-functions kurulur). İşlevler: (1) `eventCancelled`: yayındaki etkinlik iptal edilince
+   "Katılıyorum" diyenlere telefon bildirimi; (2) `activityCancelled`: aktivite iptalinde katılanlara (düzenleyen hariç);
+   (3) `dailyCleanup`: süresi dolan SOS kayıtlarını siler (TTL yerine); (4) `userDeleted`: hesap silinince kalan kişisel
+   kayıtlar (users/{uid} altı, pushTokens, publicProfiles, chatQuota) silinir, uygulamanın kendi silmesine güvenlik ağı.
+   Bildirimler kişinin dilinde (5 dil, `notifications.push`), Panel > Bildirimler'deki "etkinlik" anahtarına, kişinin
+   tercihine ve sessiz saatlere (Türkiye saati) uyar; Expo "geçersiz adres" derse adres silinir. Ortak kod:
+   `packages/shared/src/notifications/push.ts` (`noticePushMessages`, `turkeyHour`). Telefonda bildirime dokununca
+   etkinlik / aktivite ekranı açılır (yalnızca izinli ekranlar), Android'de "Genel bildirimler" kanalı. Testler: ortak 134
+   (3 yeni), işlevler 6 (emülatörde); emülatör dört işlevi de yükledi. **Henüz çalışmıyor:** Blaze + yükleme gerekir;
+   telefona bildirim için ayrıca EAS proje kimliği (telefon sürümü). Panel karşılığı: Panel > Bildirimler (tür anahtarı).
 - **Kapsam kararı ve 81 il durumu (31 Ekim, dal `claude/81-il`):** Karar (Eren): ilk sürüm Bursa içeriğiyle çıkar,
    altyapı 81 il için hazır olur. Tarama: kodda Bursa'ya sabit bir şey yok (yalnızca yorumlar, testler ve Seyahat
    başlangıç içeriği); konum 81 il / 973 ilçe, şehir rehberi, yetkiler ve OSM aracı (`scripts/osm-city-guide.ts <il kodu>`)
@@ -579,10 +595,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   uygulama kapalıyken konum güncellemesi, bildirime dokununca SOS ekranı. Expo push güvenliği: bildirim adresleri yalnızca aile
   üyelerine açık; ileride Expo erişim anahtarıyla sunucudan gönderime geçilebilir (Blaze). Sonra: QR'ı kamerayla okutma
   (expo-camera), fotoğraf/ses ekleme (Storage, Blaze), "ID ile istek" yöntemi, iOS "kritik uyarı" başvurusu (isteğe bağlı).
-- **SOS kayıtlarının 30 gün sonra kendiliğinden silinmesi (TTL `sosAlerts.deleteAt`) ücretsiz planda yok:** 27 Ekim'de
-  yüklerken Firebase "billing disabled" dedi, ayar indexes dosyasından çıkarıldı. `deleteAt` alanı yazılmaya devam ediyor;
-  Blaze plana geçilince `firestore.indexes.json` > `fieldOverrides` içine TTL geri eklenecek (ya da gönderen kendi eski
-  kayıtlarını uygulamadan silecek). Gizlilik metninde "30 gün" sözü buna göre yazılmalı.
+- **SOS kayıtlarının 30 gün sonra silinmesi:** TTL ücretsiz planda yok (27 Ekim). Yerine sunucu işlevi `dailyCleanup`
+  yazıldı (her gün 04:00, `deleteAt` geçenleri siler); Blaze ve işlev yüklemesiyle çalışmaya başlar, TTL gerekmez.
+  Gizlilik metninde "30 gün" sözü buna göre yazılmalı.
 - Değerlendirme: şikâyet sayısı eşiğinde otomatik geçici gizleme ve il yöneticisi kuyruğu, yasaklı kelime süzgeci, yorum
   bildirimi (işletmeye "yeni değerlendirme") sonraki adımlarda. "Arama kaydı" kişisel veridir: aydınlatma metnine eklenecek
   (avukat kontrolü). Aynı telefonla kayıtlı işletmenin "sahiplik talebi" akışı henüz yok (mesaj CityJoy ile iletişime yönlendiriyor).
@@ -599,6 +614,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   bağlantı bilgilerini içeriyor; Eren'e o projeyi kapatması önerildi.
 
 ## Sıradaki adım (Eren seçecek)
+
+**Arka uç yol haritası (Eren'in sırası: arka uç > ekran tasarımları > eksik bilgiler; panel tasarımı da):**
+1. ~~Sunucu işlevleri paketi, iptal bildirimleri, SOS temizliği, hesap silme güvenlik ağı~~ (31 Ekim).
+2. Acil duyuru ve duyuruda bölgedeki kişilere telefon bildirimi (telefon adresine il/ilçe eklenecek).
+3. Mesaj ve yeni takipçi bildirimleri.
+4. Günlük sınırlar (aktivite açma, hizmet önerisi) ve hesap silinince önerilerin silinmesi.
+5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
+6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
+Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 
 00. Seyahat: Keşfet'e fotoğraf paylaşımı (telefonda sıkıştırma, Storage) ve ardından "{Şehir}'dan Kareler" (kutucukla, ek
    yükleme yok; PROJE.md 13. madde 34). Sonra Planla ve Navigasyon.

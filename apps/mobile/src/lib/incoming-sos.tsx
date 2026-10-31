@@ -10,7 +10,7 @@ import { AppText } from '@/components/app-text';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { isFirebaseConfigured } from './firebase-config';
-import { onSosNotificationTap, registerForPush } from './push';
+import { onNotificationTap, registerForPush } from './push';
 import { sosRepository } from './services';
 import { useSettings } from './settings';
 import { useSession } from './session';
@@ -106,7 +106,7 @@ export function PushRegistrar() {
     if (user && isFirebaseConfigured) registerForPush(user.uid, language ?? 'tr', false).catch(() => {});
   }, [user, language]);
 
-  useEffect(() => onSosNotificationTap((id) => router.push({ pathname: '/sos/[id]', params: { id } })), [router]);
+  useEffect(() => onNotificationTap((href) => router.push(href as Parameters<typeof router.push>[0])), [router]);
 
   return null;
 }

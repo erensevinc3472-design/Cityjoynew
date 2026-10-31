@@ -1269,6 +1269,13 @@
     "messageRequest": "{{name}} hat dir eine Nachrichtenanfrage gesendet",
     "event": "Neue Veranstaltung: {{title}}",
     "follower": "{{name}} folgt dir jetzt",
+    "push": {
+      "eventCancelledTitle": "Veranstaltung abgesagt",
+      "eventCancelledBody": "„{{title}}“, für die du zugesagt hast, wurde abgesagt.",
+      "activityCancelledTitle": "Aktivität abgesagt",
+      "activityCancelledBody": "„{{title}}“, für die du zugesagt hast, wurde abgesagt.",
+      "channel": "Allgemeine Benachrichtigungen"
+    },
     "categories": {
       "acil": "Dringende Meldungen",
       "sos": "SOS (Familie)",

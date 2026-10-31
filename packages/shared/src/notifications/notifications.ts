@@ -63,9 +63,18 @@ export function normalizeTriggers(raw: unknown): NotificationTriggers {
 
 /** Sessiz saatlerde mi (telefona bildirim gelince kullanılır; kritik kategoriler sessiz saatte de gelir). */
 export function inQuietHours(q: QuietHours, at: Date): boolean {
+  return quietAtHour(q, at.getHours());
+}
+
+/** Saat (0-23) sessiz aralıkta mı. Sunucu telefonun saatini bilmez, Türkiye saatini verir (turkeyHour). */
+export function quietAtHour(q: QuietHours, h: number): boolean {
   if (!q.enabled || q.start === q.end) return false;
-  const h = at.getHours();
   return q.start < q.end ? h >= q.start && h < q.end : h >= q.start || h < q.end;
+}
+
+/** Türkiye saati (UTC+3, yaz saati uygulaması yok). Sunucu UTC çalışır. */
+export function turkeyHour(at: Date): number {
+  return (at.getUTCHours() + 3) % 24;
 }
 
 export interface AppNotification {

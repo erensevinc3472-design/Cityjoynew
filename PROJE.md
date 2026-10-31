@@ -565,6 +565,9 @@ Tümü yayından önce avukat tarafından kontrol edilmelidir.
   değişmez). Ülke geneli bölümler (Acil, Nasıl yapılır?, Seyahat, Yoldayım) her ilde baştan çalışır; içeriği olmayan
   ilde boş durum ekranı görünür. Panelde "81 il durumu" tablosu hangi ilin ne kadar dolu olduğunu gösterir.
   Belediye, oda ve haber sitesi ortaklıkları yayından sonraya bırakıldı (Eren'in yükünü azaltmak için).
+- **Karar (Eren, 31 Ekim 2026): çalışma sırası.** Önce arka uç tamamlanır (sunucu işlevleri, bildirimler, günlük
+  sınırlar, fotoğraf yükleme; Blaze gelince yüklenir), sonra sayfaların tasarımı bitirilir, sonra eksik bilgiler
+  düzenlenir. Yönetim panelinin tasarımı da iyileştirilir.
 
 ## 11. Tasarım dosyaları
 

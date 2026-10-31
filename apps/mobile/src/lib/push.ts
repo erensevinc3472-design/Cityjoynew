@@ -2,8 +2,9 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { SOS_CHANNEL_ID, sosPushMessages, type LanguageCode, type PushMessage, type SosAlert } from '@cityjoy/shared';
+import { GENERAL_CHANNEL_ID, SOS_CHANNEL_ID, sosPushMessages, type LanguageCode, type PushMessage, type PushNotice, type SosAlert } from '@cityjoy/shared';
 
+import i18n from './i18n';
 import { pushTokenRepository } from './services';
 
 /**
@@ -36,6 +37,12 @@ async function ensureChannel() {
     vibrationPattern: [0, 600, 300, 600, 300, 600],
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     bypassDnd: true,
+  });
+  // Sunucunun gönderdiği olay bildirimleri (etkinlik iptali vb.).
+  await Notifications.setNotificationChannelAsync(GENERAL_CHANNEL_ID, {
+    name: i18n.t('notifications.push.channel'),
+    importance: Notifications.AndroidImportance.DEFAULT,
+    sound: 'default',
   });
 }
 
@@ -92,12 +99,18 @@ export async function sendSosPush(alert: Pick<SosAlert, 'id' | 'fromName' | 'tes
   return alert.recipients.filter((uid) => !ok.has(uid));
 }
 
-/** Bildirime dokununca ilgili SOS ekranı açılır. */
-export function onSosNotificationTap(open: (sosId: string) => void): () => void {
+/** Sunucu bildirimlerinin açabileceği ekranlar (bildirimdeki adres yalnızca bunlardan biri olabilir). */
+const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]']);
+
+type Href = PushNotice['href'];
+
+/** Bildirime dokununca ilgili ekran açılır: SOS ya da sunucu bildiriminin gösterdiği ekran. */
+export function onNotificationTap(open: (href: Href) => void): () => void {
   if (!pushSupported) return () => {};
   const handle = (r: Notifications.NotificationResponse | null) => {
-    const id = (r?.notification.request.content.data as { sosId?: string } | undefined)?.sosId;
-    if (id) open(id);
+    const data = r?.notification.request.content.data as { sosId?: string; href?: Href } | undefined;
+    if (typeof data?.sosId === 'string') open({ pathname: '/sos/[id]', params: { id: data.sosId } });
+    else if (data?.href && TAP_PATHS.has(data.href.pathname)) open(data.href);
   };
   Notifications.getLastNotificationResponseAsync().then(handle).catch(() => {});
   const sub = Notifications.addNotificationResponseReceivedListener(handle);

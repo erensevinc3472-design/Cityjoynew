@@ -1269,6 +1269,13 @@
     "messageRequest": "{{name}} sent you a message request",
     "event": "New event: {{title}}",
     "follower": "{{name}} started following you",
+    "push": {
+      "eventCancelledTitle": "Event cancelled",
+      "eventCancelledBody": "\"{{title}}\", which you said you would attend, has been cancelled.",
+      "activityCancelledTitle": "Activity cancelled",
+      "activityCancelledBody": "\"{{title}}\", which you said you would join, has been cancelled.",
+      "channel": "General notifications"
+    },
     "categories": {
       "acil": "Urgent announcements",
       "sos": "SOS (family)",
