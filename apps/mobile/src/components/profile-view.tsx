@@ -13,6 +13,7 @@ import {
   type Post,
   type ProfileReportReason,
   type PublicProfile,
+  unreadKey,
 } from '@cityjoy/shared';
 import type { JoinedItem } from '@cityjoy/shared/firebase';
 
@@ -77,7 +78,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const hasBanned = useBannedWordCheck();
   // Mesajlar profilin sağ üstünde (alt menüde değil); okunmamış varsa nokta.
   const { chats } = useChats(own ? uid : undefined);
-  const unreadChats = (chats ?? []).some((x) => (x.unread[uid] ?? 0) > 0);
+  const unreadChats = (chats ?? []).some((x) => (x.unread[unreadKey(x, uid)] ?? 0) > 0);
 
   const load = useCallback(async () => {
     if (!user) return;

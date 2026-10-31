@@ -396,7 +396,8 @@
       "leaveConfirm": "Bu işletmenin yetkililiğinden ayrılırsan adına paylaşım yapamazsın.",
       "leaveYes": "Ayrıl",
       "mine": "Yetkili olduğun işletmeler",
-      "youManage": "Yetkilisin"
+      "youManage": "Yetkilisin",
+      "messages": "Müşteri mesajlarına cevap verebilir"
     }
   },
   "reviews": {
@@ -1256,7 +1257,7 @@
     "noMatch": "Bu adla bir sohbet yok.",
     "titleUnread": "Mesajlar, okunmamış var",
     "business": "İşletmem",
-    "businessIntro": "Müşterilerin işletmene yazdığı mesajlar. İlk mesajı yalnızca müşteri atabilir, sen cevap verirsin.",
+    "businessIntro": "Müşterilerin işletmene yazdığı mesajlar. İlk mesajı yalnızca müşteri atabilir. Mesaj izni verdiğin yetkililer de görür ve işletme adına cevap verir.",
     "noBusinessChats": "Henüz müşteri mesajı yok.",
     "aboutBusiness": "İşletmen için: {{name}}",
     "newBusiness": "Mesajın doğrudan işletmeye gider. Görmeden kapora ya da ön ödeme gönderme.",
@@ -1267,7 +1268,8 @@
     "deleteChat": "Sohbeti sil",
     "deleteChatConfirm": "Sohbet yalnızca senin listenden silinir, karşı tarafta kalır. Yeniden yazarsa sohbet geri gelir ama eski mesajlar görünmez.",
     "deleteChatYes": "Evet, sil",
-    "cancel": "Vazgeç"
+    "cancel": "Vazgeç",
+    "fromTeam": "İşletme ekibi"
   },
   "notifications": {
     "title": "Bildirimler",

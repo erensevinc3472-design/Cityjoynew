@@ -396,7 +396,8 @@
       "leaveConfirm": "Wenn du die Verwaltung beendest, kannst du nicht mehr als dieser Betrieb posten.",
       "leaveYes": "Beenden",
       "mine": "Betriebe, die du verwaltest",
-      "youManage": "Verwalter"
+      "youManage": "Verwalter",
+      "messages": "Darf Kundennachrichten beantworten"
     }
   },
   "reviews": {
@@ -1256,7 +1257,7 @@
     "noMatch": "Kein Chat mit diesem Namen.",
     "titleUnread": "Nachrichten, ungelesen",
     "business": "Mein Betrieb",
-    "businessIntro": "Nachrichten, die Kunden an deinen Betrieb geschickt haben. Nur Kunden können den Chat beginnen, du antwortest.",
+    "businessIntro": "Nachrichten, die Kunden an deinen Betrieb geschickt haben. Nur Kunden können den Chat beginnen. Verantwortliche mit Nachrichtenrecht sehen sie auch und antworten für den Betrieb.",
     "noBusinessChats": "Noch keine Kundennachrichten.",
     "aboutBusiness": "Für deinen Betrieb: {{name}}",
     "newBusiness": "Deine Nachricht geht direkt an den Betrieb. Schicke keine Anzahlung oder Vorauszahlung für etwas, das du nicht gesehen hast.",
@@ -1267,7 +1268,8 @@
     "deleteChat": "Chat löschen",
     "deleteChatConfirm": "Der Chat wird nur aus deiner Liste entfernt, die andere Person behält ihn. Schreibt sie erneut, erscheint der Chat wieder, ältere Nachrichten bleiben ausgeblendet.",
     "deleteChatYes": "Ja, löschen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "fromTeam": "Betriebsteam"
   },
   "notifications": {
     "title": "Benachrichtigungen",

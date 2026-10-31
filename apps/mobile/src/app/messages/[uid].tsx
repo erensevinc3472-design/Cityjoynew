@@ -16,6 +16,7 @@ import {
   type ChatMessage,
   type MessageReportReason,
   type PublicProfile,
+  unreadKey,
 } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
@@ -102,13 +103,15 @@ export default function ChatScreen() {
   const context = chat ? chat.context ?? null : biz ?? null;
   // Müşteri işletmeyle yazışıyor (sahibi değil): başlıkta işletmenin adı, seçeneklerde işletme sayfası.
   const asCustomer = !!context && (chat ? chat.startedBy === me : true);
+  const businessSide = !!context && !asCustomer;
 
   // Açık sohbette okunmamışlar sıfırlanır. Okundu bilgisi açıksa "gördüm" yazılır; mesaj isteğinde yazılmaz (gönderen,
   // istek kabul edilene kadar okunduğunu bilmez).
   useEffect(() => {
     if (!chat || !me || !chat.last) return;
-    const sendSeen = receipts && chat.accepted;
-    const unread = (chat.unread[me] ?? 0) > 0;
+    // İşletme ekibindeki yetkili sohbetin üyesi değildir: işletmenin ortak sayacını sıfırlar, "gördüm" yazmaz.
+    const sendSeen = receipts && chat.accepted && chat.members.includes(me);
+    const unread = (chat.unread[unreadKey(chat, me)] ?? 0) > 0;
     const unseen = sendSeen && chat.last.from !== me && (!chat.seen[me] || chat.seen[me] < chat.last.at);
     if (unread || unseen) messageRepository.markRead(chat, me, sendSeen).catch(() => {});
   }, [chat, me, receipts]);
@@ -202,7 +205,7 @@ export default function ChatScreen() {
                   ) : profile ? (
                     <AppButton variant="ghost" title={t('messages.openProfile')} onPress={() => router.push({ pathname: '/u/[uid]', params: { uid: other! } })} />
                   ) : null}
-                  {chat ? <AppButton variant="ghost" title={t('messages.deleteChat')} onPress={() => setOptions('confirmDelete')} /> : null}
+                  {chat && chat.members.includes(me) ? <AppButton variant="ghost" title={t('messages.deleteChat')} onPress={() => setOptions('confirmDelete')} /> : null}
                   {!iBlocked ? <AppButton variant="ghost" title={t('messages.block')} disabled={busy} onPress={block} /> : null}
                 </View>
               )}
@@ -222,7 +225,10 @@ export default function ChatScreen() {
           {chat && messages === null ? <StateMessage kind="loading" /> : null}
 
           {(messages ?? []).map((m) => {
-            const mine = m.from === me;
+            // İşletme tarafında (sahip ya da yetkili) müşteri dışındaki herkesin mesajı işletmenin mesajıdır.
+            const own = m.from === me;
+            const mine = own || (businessSide && m.from !== other);
+            const team = mine && !own;
             const gone = m.status !== 'aktif';
             const signal = !mine && !gone ? scamSignal(m.text) : null;
             const open = selected === m.id && !gone;
@@ -230,7 +236,7 @@ export default function ChatScreen() {
               <View key={m.id} style={[styles.msgWrap, mine ? styles.mine : styles.theirs]}>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityHint={t(mine ? 'messages.tapOwn' : 'messages.tapOther')}
+                  accessibilityHint={team ? undefined : t(own ? 'messages.tapOwn' : 'messages.tapOther')}
                   onPress={() => {
                     setSelected(open ? null : m.id);
                     setReporting(null);
@@ -239,7 +245,7 @@ export default function ChatScreen() {
                   <AppText style={[gone && styles.italic, { color: mine ? c.onPrimary : gone ? c.textMuted : c.textStrong }]}>
                     {gone ? t(m.status === 'silindi' ? 'messages.deleted' : 'messages.removed') : m.text}
                   </AppText>
-                  <AppText variant="caption" style={{ color: mine ? c.onPrimary : c.textMuted, opacity: 0.8 }}>{time(m.createdAt)}</AppText>
+                  <AppText variant="caption" style={{ color: mine ? c.onPrimary : c.textMuted, opacity: 0.8 }}>{team ? `${t('messages.fromTeam')} · ` : ''}{time(m.createdAt)}</AppText>
                 </Pressable>
                 {signal ? (
                   <View style={[styles.warn, { borderColor: c.danger }]}>
@@ -247,13 +253,13 @@ export default function ChatScreen() {
                     <AppText variant="caption" style={styles.grow}>{t(`messages.scam.${signal}`)}</AppText>
                   </View>
                 ) : null}
-                {open && mine ? (
+                {open && own ? (
                   <AppButton variant="ghost" title={t('messages.delete')} disabled={busy} onPress={() => run(async () => {
                     await messageRepository.deleteMessage(chat!, m);
                     setSelected(null);
                   })} />
                 ) : null}
-                {open && !mine ? (
+                {open && !mine && !team ? (
                   reported.has(m.id) ? (
                     <AppText variant="caption" muted>{t('messages.reported')}</AppText>
                   ) : reporting ? (

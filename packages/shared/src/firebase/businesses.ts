@@ -49,7 +49,7 @@ function fromDoc(id: string, d: DocumentData): Business {
     featuredUntil: iso(d.featuredUntil),
     rating: { sum: d.rating?.sum ?? 0, count: d.rating?.count ?? 0 },
     followerCount: d.followerCount ?? 0,
-    managers: ((d.managerUids ?? []) as string[]).map((uid) => ({ uid, ...(d.managers?.[uid] ?? { name: '', post: 'kapali', edit: false, reply: false }) })),
+    managers: ((d.managerUids ?? []) as string[]).map((uid) => ({ uid, messages: false, ...(d.managers?.[uid] ?? { name: '', post: 'kapali', edit: false, reply: false }) })),
     weeklyHours: Array.isArray(d.weeklyHours) ? (d.weeklyHours as ({ open: string; close: string } | null)[]).map((x) => (x ? { open: x.open, close: x.close } : null)) : undefined,
     createdAt: iso(d.createdAt) ?? '',
     // Sunucu zaman damgası henüz yazılmadıysa (yerel önbellek) şimdiki zaman sayılır.
@@ -190,7 +190,7 @@ const followDoc = (db: Firestore, id: string, uid: string) => doc(db, FOLLOWS, `
 /** Yetkililer belgede kimlik listesi + izin haritası olarak durur (liste sorgu, harita kural denetimi için). */
 const managerFields = (managers: BusinessManager[]) => ({
   managerUids: managers.map((m) => m.uid),
-  managers: Object.fromEntries(managers.map((m) => [m.uid, { name: m.name.slice(0, 40), post: m.post, edit: m.edit, reply: m.reply }])),
+  managers: Object.fromEntries(managers.map((m) => [m.uid, { name: m.name.slice(0, 40), post: m.post, edit: m.edit, reply: m.reply, messages: m.messages === true }])),
   updatedAt: serverTimestamp(),
 });
 

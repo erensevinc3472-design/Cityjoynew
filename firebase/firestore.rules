@@ -280,9 +280,9 @@ service cloud.firestore {
 
     // İşletme yetkilileri (en çok 3; sahibi atar): kimlik listesi + izin haritası birlikte tutarlı olmalı.
     function validManager(m) {
-      return m is map && m.keys().hasOnly(['name', 'post', 'edit', 'reply'])
+      return m is map && m.keys().hasOnly(['name', 'post', 'edit', 'reply', 'messages'])
         && m.name is string && m.name.size() <= 40
-        && m.post in ['kapali', 'onayla', 'dogrudan'] && m.edit is bool && m.reply is bool;
+        && m.post in ['kapali', 'onayla', 'dogrudan'] && m.edit is bool && m.reply is bool && m.get('messages', false) is bool;
     }
     function validManagers(d) {
       let u = d.get('managerUids', []);
@@ -1806,13 +1806,40 @@ service cloud.firestore {
         && after.unread.get(other, 0) == before.unread.get(other, 0);
     }
 
+    // İşletme ekibi: mesaj izni olan yetkili, işletmeye yazılan sohbeti görür ve işletme adına cevaplar. Sohbetin üyesi
+    // değildir; işletme tarafının okunmamış sayacı sahibininkidir (sahip ve yetkililer için ortak).
+    function isBusinessStaff(chat) {
+      return signedIn() && chat.get('context', null) != null
+        && request.auth.uid in get(/databases/$(database)/documents/businesses/$(chat.context.id)).data.get('managerUids', [])
+        && get(/databases/$(database)/documents/businesses/$(chat.context.id)).data.managers[request.auth.uid].get('messages', false) == true;
+    }
+    function ownerOfChat(chat) {
+      return chat.members[0] == chat.startedBy ? chat.members[1] : chat.members[0];
+    }
+    function staffSending(id, before, after) {
+      return after.diff(before).affectedKeys().hasOnly(['last', 'unread', 'updatedAt'])
+        && validLast(id, after.last)
+        && after.unread.keys().hasOnly(before.members)
+        && after.unread[before.startedBy] == before.unread.get(before.startedBy, 0) + 1
+        && after.unread.get(ownerOfChat(before), 0) == before.unread.get(ownerOfChat(before), 0)
+        && after.updatedAt == request.time;
+    }
+    function staffReading(before, after) {
+      return after.diff(before).affectedKeys().hasOnly(['unread'])
+        && after.unread.keys().hasOnly(before.members)
+        && after.unread[ownerOfChat(before)] == 0
+        && after.unread.get(before.startedBy, 0) == before.unread.get(before.startedBy, 0);
+    }
+
     // Mesaj, aynı yazımdaki sohbet özetinin son mesajıdır; iki taraf arasında engel yoktur.
     function messageFits(chat, mid) {
-      return request.auth.uid in chat.members && chat.last.id == mid && notBlockedPair(request.auth.uid, otherOf(chat.members));
+      return chat.last.id == mid
+        && ((request.auth.uid in chat.members && notBlockedPair(request.auth.uid, otherOf(chat.members)))
+            || (isBusinessStaff(chat) && notBlockedPair(request.auth.uid, chat.startedBy) && notBlockedPair(ownerOfChat(chat), chat.startedBy)));
     }
 
     match /chats/{id} {
-      allow read: if signedIn() && (resource == null || request.auth.uid in resource.data.members);
+      allow read: if signedIn() && (resource == null || request.auth.uid in resource.data.members || isBusinessStaff(resource.data));
       allow create: if signedIn()
         && request.resource.data.members is list && request.resource.data.members.size() == 2
         && request.resource.data.members[0] < request.resource.data.members[1]
@@ -1830,11 +1857,19 @@ service cloud.firestore {
             || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last'])
                 && request.resource.data.last.diff(resource.data.last).affectedKeys().hasOnly(['text'])
                 && request.resource.data.last.text == '' && resource.data.last.from == request.auth.uid));
+      // İşletme ekibi: işletme adına cevap, okundu, kendi son mesajını silince önizleme.
+      allow update: if isBusinessStaff(resource.data)
+        && request.resource.data.members == resource.data.members
+        && (staffSending(id, resource.data, request.resource.data)
+            || staffReading(resource.data, request.resource.data)
+            || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['last'])
+                && request.resource.data.last.diff(resource.data.last).affectedKeys().hasOnly(['text'])
+                && request.resource.data.last.text == '' && resource.data.last.from == request.auth.uid));
       // Hesap silinirken.
       allow delete: if signedIn() && request.auth.uid in resource.data.members;
 
       match /messages/{mid} {
-        allow read: if signedIn() && request.auth.uid in get(chatPath(id)).data.members;
+        allow read: if signedIn() && (request.auth.uid in get(chatPath(id)).data.members || isBusinessStaff(get(chatPath(id)).data));
         allow create: if signedIn()
           && request.resource.data.keys().hasOnly(['from', 'text', 'status', 'createdAt'])
           && request.resource.data.from == request.auth.uid
@@ -1876,7 +1911,8 @@ service cloud.firestore {
         && request.resource.data.reason in ['taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'diger']
         && request.resource.data.status == 'acik'
         && request.resource.data.createdAt == request.time
-        && request.auth.uid in get(chatPath(request.resource.data.chatId)).data.members
+        && (request.auth.uid in get(chatPath(request.resource.data.chatId)).data.members
+            || isBusinessStaff(get(chatPath(request.resource.data.chatId)).data))
         && get(chatMessagePath(request.resource.data.chatId, request.resource.data.messageId)).data.from == request.resource.data.reportedUid
         && request.resource.data.reportedUid != request.auth.uid
         && get(chatMessagePath(request.resource.data.chatId, request.resource.data.messageId)).data.text == request.resource.data.text;

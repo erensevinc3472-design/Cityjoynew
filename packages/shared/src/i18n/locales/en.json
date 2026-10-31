@@ -396,7 +396,8 @@
       "leaveConfirm": "If you stop managing this business you can no longer post as it.",
       "leaveYes": "Stop managing",
       "mine": "Businesses you manage",
-      "youManage": "Manager"
+      "youManage": "Manager",
+      "messages": "Can answer customer messages"
     }
   },
   "reviews": {
@@ -1256,7 +1257,7 @@
     "noMatch": "No chat with this name.",
     "titleUnread": "Messages, unread",
     "business": "My business",
-    "businessIntro": "Messages customers sent to your business. Only a customer can start the chat; you reply.",
+    "businessIntro": "Messages customers sent to your business. Only a customer can start the chat. Staff you give message permission to also see them and reply for the business.",
     "noBusinessChats": "No customer messages yet.",
     "aboutBusiness": "For your business: {{name}}",
     "newBusiness": "Your message goes straight to the business. Never send a deposit or prepayment for something you have not seen.",
@@ -1267,7 +1268,8 @@
     "deleteChat": "Delete chat",
     "deleteChatConfirm": "The chat is removed only from your list; the other person keeps it. If they write again, the chat comes back but older messages stay hidden.",
     "deleteChatYes": "Yes, delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "fromTeam": "Business team"
   },
   "notifications": {
     "title": "Notifications",

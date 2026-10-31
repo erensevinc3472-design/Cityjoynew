@@ -118,8 +118,8 @@ describe('sıralama (Karar, Eren)', () => {
 
   it('yetkili paylaşımı: sahibi doğrudan, yetkili izne göre, izni kapalı ya da yetkisiz paylaşamaz', () => {
     const b = biz({ ownerUid: 'sahip', managers: [
-      { uid: 'ayse', name: 'Ayşe K.', post: 'onayla', edit: false, reply: false },
-      { uid: 'veli', name: 'Veli T.', post: 'kapali', edit: true, reply: true },
+      { uid: 'ayse', name: 'Ayşe K.', post: 'onayla', edit: false, reply: false, messages: false },
+      { uid: 'veli', name: 'Veli T.', post: 'kapali', edit: true, reply: true, messages: false },
     ] });
     expect(postModeFor(b, 'sahip')).toBe('dogrudan');
     expect(postModeFor(b, 'ayse')).toBe('onayla');

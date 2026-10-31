@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { chatTitle, foldForSearch, inboxSection, isHiddenFor, otherMember, type Chat, type InboxSection } from '@cityjoy/shared';
+import { chatTitle, counterpartOf, foldForSearch, inboxSection, isHiddenFor, unreadKey, type Chat, type InboxSection } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { CheckboxRow } from '@/components/checkbox-row';
@@ -35,7 +35,7 @@ export default function MessagesScreen() {
   const lang = language ?? 'tr';
   const { user, profile } = useSession();
   const me = user?.uid ?? '';
-  const { chats, failed } = useChats(user?.uid);
+  const { chats, failed, teamInbox } = useChats(user?.uid);
   const { blocked, me: myProfile } = useSocial();
   const [receipts, setReceipts] = useReadReceipts();
   const [tab, setTab] = useState<InboxSection>('sohbetler');
@@ -47,9 +47,9 @@ export default function MessagesScreen() {
     businessRepository.listMine(me).then((l) => setHasBusiness(l.length > 0), () => {});
   }, [me]);
 
-  const visible = (chats ?? []).filter((x) => !blocked.has(otherMember(x, me)) && !isHiddenFor(x, me));
+  const visible = (chats ?? []).filter((x) => !blocked.has(counterpartOf(x, me)) && !isHiddenFor(x, me));
   const count = (s: InboxSection) => visible.filter((x) => inboxSection(x, me) === s).length;
-  const unreadIn = (s: InboxSection) => visible.some((x) => inboxSection(x, me) === s && (x.unread[me] ?? 0) > 0);
+  const unreadIn = (s: InboxSection) => visible.some((x) => inboxSection(x, me) === s && (x.unread[unreadKey(x, me)] ?? 0) > 0);
   const needle = foldForSearch(find.trim());
   const shown = visible.filter((x) => inboxSection(x, me) === tab && (!needle || foldForSearch(chatTitle(x, me)).includes(needle)));
   const tabLabel = (s: InboxSection, label: string, n?: number) => `${label}${n ? ` (${n})` : ''}${unreadIn(s) && s !== tab ? ' •' : ''}`;
@@ -80,7 +80,7 @@ export default function MessagesScreen() {
           options={[
             { value: 'sohbetler', label: tabLabel('sohbetler', t('messages.chats')) },
             { value: 'istekler', label: tabLabel('istekler', t('messages.requests'), count('istekler')) },
-            ...(hasBusiness || count('isletmem') ? [{ value: 'isletmem' as const, label: tabLabel('isletmem', t('messages.business')) }] : []),
+            ...(hasBusiness || teamInbox || count('isletmem') ? [{ value: 'isletmem' as const, label: tabLabel('isletmem', t('messages.business')) }] : []),
           ]}
         />
         {tab === 'istekler' ? <AppText variant="caption" muted>{t('messages.requestsIntro')}</AppText> : null}
@@ -96,7 +96,7 @@ export default function MessagesScreen() {
             const name = chatTitle(x, me);
             // İşletme sohbetinde: müşteri işletmenin adını, sahibi müşterinin adını ve altında işletmesini görür.
             const about = x.context && x.startedBy !== me ? x.context.title : null;
-            const unread = x.unread[me] ?? 0;
+            const unread = x.unread[unreadKey(x, me)] ?? 0;
             return (
               <Pressable
                 key={x.id}
