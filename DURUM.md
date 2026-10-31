@@ -541,7 +541,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    geri gelir ama silmeden önceki mesajlar görünmez. Panel > Moderasyon > Mesaj şikâyetleri: işletme sohbetinden gelen şikâyet
    işaretli. Bildirimdeki adres işletme sohbetini açar. Testler: kural 8 (2 yeni), ortak 137. Emülatörde web sürümüyle
    baştan sona denendi (müşteri yazdı, sildi; sahip İşletmem'de gördü, cevapladı; sohbet müşteride yalnızca yeni mesajla
-   geri geldi). **Kurallar değişti: birleştirince Eren kuralları yükleyecek.** İlan pazarı (İlanlar bölümü) sıradaki iş.
+   geri geldi). PR #42 birleşti, kurallar 31 Ekim'de yüklendi. İlan pazarı (İlanlar bölümü) sıradaki iş.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -601,6 +601,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
+- **Kurallar ve dizinler 31 Ekim'de yüklendi** (işletmeye mesaj, sohbeti sil; PR #42 birleştikten sonra, Eren'in isteğiyle Claude
+  bu bilgisayardan yükledi).
 - **Kurallar ve dizinler 29 Ekim akşamı yüklendi** (yol üstü tesis, Yoldayım dizini, roadsidePacks; PR #36 sonrası).
 - **Kurallar ve dizinler 28 Ekim'de yüklendi** (etkinlikler ve resmî profiller dahil, PR #6 birleştikten sonra, Eren'in
   bilgisayarından). Derlemedeki 7 "Invalid type ... null" uyarısı `get(..., null)` kalıbından, zararsız.
