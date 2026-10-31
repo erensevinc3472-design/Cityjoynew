@@ -640,7 +640,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 2. ~~Acil duyuru ve duyuruda bölgedeki kişilere telefon bildirimi~~ (31 Ekim).
 3. Mesaj ve yeni takipçi bildirimleri.
    Araya giren (Eren, 31 Ekim): mesajlar. ~~İşletmeye mesaj, İşletmem, sohbeti sil~~ (31 Ekim). Sırada ilan pazarı
-   (Marketplace) ve "İlanlar" bölümü; ilk sürümde eşya ilanı mı, emlak ve araç da mı, Eren'e soruldu.
+   (Marketplace) ve "İlanlar" bölümü; Karar (Eren): önce ikinci el eşya, emlak ve araç sonra.
+   Bölümün adı Eren'e soruldu (öneri: Komşu Pazarı); Mesajlar'daki bölüm de aynı adı alacak.
 4. Günlük sınırlar (aktivite açma, hizmet önerisi) ve hesap silinince önerilerin silinmesi.
 5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.

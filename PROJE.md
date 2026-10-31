@@ -340,7 +340,9 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
   başlatamaz). Engel, yaş kuralı, günlük sınır, şikâyet ve dolandırıcılık uyarısı her sohbette geçerli. "Sohbeti sil"
   yalnızca kişinin kendi listesinden kaldırır (karşı tarafın kopyası kalır); yeniden yazışılırsa eski mesajlar görünmez.
   Mesajlar ekranı: Sohbetler, İstekler, İşletmem (işletmesi olana); İlanlar bölümü ilan pazarıyla gelecek.
-- **İlan pazarı önerisi (Eren'e soruldu, onay bekliyor):** ilk sürümde eşya ilanları (satılık, kiralık, ücretsiz, takas);
+- **Karar (Eren, 31 Ekim 2026): önce ikinci el eşya pazarı**, ev / arsa / tarla / araç satışları sonra açılır. Bölümün
+  satılık / kiralık yerine güzel bir adı olacak ve Mesajlar'daki bölüm de bu adı taşıyacak (ad: SORULACAK, Claude öneri sundu).
+- **İlan pazarı önerisi (eşya kısmı onaylandı):** ilk sürümde eşya ilanları (satılık, kiralık, ücretsiz, takas);
   emlak ve araç ilanları sonra. Neden: Ticaret Bakanlığı'nın emlak ilan düzenlemesi ilan platformundan ilan verenin kimlik
   ve yetki doğrulamasını istiyor; avukat görüşü ve kimlik doğrulama kurulmadan açılmamalı (avukata sorulacak). Fotoğraf
   zorunlu olduğu için Storage, yani Blaze plan gerekir. Daha önceki kararlar geçerli: telefon numarası yok, yazışma
