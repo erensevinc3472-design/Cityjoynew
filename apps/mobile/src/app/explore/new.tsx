@@ -31,6 +31,7 @@ import { businessRepository, postRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useUserLocation } from '@/lib/user-location';
 import { spacing } from '@/theme/tokens';
+import { errorText } from '@/lib/limits';
 
 /**
  * Gönderi paylaş (PROJE.md 5.5): yazı, kategori ve "Nerede paylaşırsın?" (bir ya da birden çok hedef). Gönderi kayıtlı
@@ -62,7 +63,7 @@ export default function NewPostScreen() {
   const [relative, setRelative] = useState(false);
   const [errors, setErrors] = useState<(PostError | 'relative' | 'banned')[]>([]);
   const hasBanned = useBannedWordCheck();
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<string | false>(false);
   const [busy, setBusy] = useState(false);
 
   const biz = author === 'me' ? null : businesses.find((b) => b.id === author) ?? null;
@@ -110,8 +111,8 @@ export default function NewPostScreen() {
       // Onay bekleyen paylaşım akışta görünmez: işletme sayfasında "onay bekliyor" olarak durur.
       if (biz && mode === 'onayla') router.replace({ pathname: '/business/[id]', params: { id: biz.id } });
       else router.replace({ pathname: '/explore/[id]', params: { id } });
-    } catch {
-      setFailed(true);
+    } catch (e) {
+      setFailed(errorText(t, e, 'explore.saveError'));
     } finally {
       setBusy(false);
     }
@@ -151,7 +152,7 @@ export default function NewPostScreen() {
         {targets.includes('mahallem') ? <AppText variant="caption" muted>{t('explore.fields.mahallemNote')}</AppText> : null}
       </View>
       <AppText variant="caption" muted>{t('explore.rules')}</AppText>
-      {failed ? <FormMessage kind="error" text={t('explore.saveError')} /> : null}
+      {failed ? <FormMessage kind="error" text={failed} /> : null}
       <AppButton title={mode === 'onayla' ? t('explore.business.sendForApproval') : t('explore.publish')} onPress={submit} loading={busy} disabled={busy || bizNoHood} />
     </FormScreen>
   );

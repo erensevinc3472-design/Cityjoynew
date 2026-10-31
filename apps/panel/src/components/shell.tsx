@@ -3,7 +3,7 @@ import { canSeeModule, type Module } from '@cityjoy/shared';
 
 import { ScopeLabel } from './scope-label';
 import { hasProfileAccess } from '../pages/profile-page';
-import { useSession } from '../lib/session';
+import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 
 /** Menüde sırasıyla gösterilen bölümler ve hazır olup olmadıkları. */
@@ -41,6 +41,8 @@ export function Shell() {
           <NavLink to="/" end>{t('nav.overview')}</NavLink>
           {/* Resmî profil bir bölüm yetkisi değil: kurum yöneticisi, muhtar ve admin görür. */}
           {hasProfileAccess(user) ? <NavLink to="/profil">{t('nav.profile')}</NavLink> : null}
+          {/* Günlük sınırlar yalnızca admin. */}
+          {isAdminUser(user) ? <NavLink to="/sinirlar">{t('nav.sinirlar')}</NavLink> : null}
           {items.map((m) =>
             m.path ? (
               <NavLink key={m.module} to={m.path}>{t(`nav.${m.module}`)}</NavLink>

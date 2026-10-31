@@ -9,6 +9,7 @@ import { TextField } from '@/components/text-field';
 import { sendServiceSuggestion } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useUserLocation } from '@/lib/user-location';
+import { errorText } from '@/lib/limits';
 
 /** "Eksik hizmet mi var? Bildir" (PROJE.md 5.4). Öneri panelde "Eksik hizmet önerileri" bölümüne düşer. */
 export default function SuggestServiceScreen() {
@@ -29,8 +30,8 @@ export default function SuggestServiceScreen() {
       await sendServiceSuggestion(user.uid, text, location?.provinceCode);
       setSent(true);
       setText('');
-    } catch {
-      setError(t('services.suggestError'));
+    } catch (e) {
+      setError(errorText(t, e, 'services.suggestError'));
     } finally {
       setBusy(false);
     }

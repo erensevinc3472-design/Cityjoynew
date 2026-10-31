@@ -19,7 +19,8 @@
     "kurumlar": "Kurumlar",
     "sehir-rehberi": "Şehir rehberi",
     "profile": "Resmî profil",
-    "seyahat": "Seyahat"
+    "seyahat": "Seyahat",
+    "sinirlar": "Günlük sınırlar"
   },
   "roles": {
     "admin": "Admin",
@@ -1533,5 +1534,54 @@
       "busPerKm": "Otobüs km ücreti 0,1 ile 20 TL arasında olmalı, en az en çoktan büyük olamaz.",
       "month": "Geçerli ayı seçin."
     }
+  },
+  "limits": {
+    "title": "Günlük sınırlar",
+    "intro": "Kişi, işletme, muhtar ve kurumun günde kaç iş yapabileceği. Spam ve kötüye kullanımı önler; sınır dolunca kişiye ne zaman yenileneceği söylenir.",
+    "never": "SOS, 112 araması ve hesap silme hiçbir zaman sınırlanmaz. İl yöneticisi ve admin sınırsızdır, işlemleri kayda geçer. Muhtar ve kurumun sınırı dolunca duyuru engellenmez, onaya gönderilir.",
+    "groups": {
+      "kullanici": "Kullanıcı (günlük)",
+      "isletme": "İşletme (günlük)",
+      "muhtar": "Muhtar",
+      "kurum": "Kurum ve belediye"
+    },
+    "keys": {
+      "gonderi": "Keşfet gönderisi",
+      "gonderiYeni": "Keşfet gönderisi (yeni hesap, ilk 7 gün)",
+      "yorum": "Yorum",
+      "yorumYeni": "Yorum (yeni hesap)",
+      "takip": "Takip",
+      "takipYeni": "Takip (yeni hesap)",
+      "sohbet": "Yeni sohbet",
+      "sohbetYeni": "Yeni sohbet (yeni hesap)",
+      "ilan": "Çarşı ilanı",
+      "ilanYeni": "Çarşı ilanı (yeni hesap)",
+      "aktivite": "Aktivite",
+      "aktiviteYeni": "Aktivite (yeni hesap)",
+      "oneri": "Hizmet önerisi",
+      "oneriYeni": "Hizmet önerisi (yeni hesap)",
+      "sikayet": "Şikâyet",
+      "isletmeGonderi": "İşletme gönderisi",
+      "muhtarDuyuru": "Muhtar duyurusu (günlük)",
+      "muhtarDuyuruHafta": "Muhtar duyurusu (haftalık)",
+      "kurumDuyuru": "Kurum duyuru ve haberi (günlük)",
+      "kurumDuyuruHafta": "Kurum duyuru ve haberi (haftalık)",
+      "acil": "Acil duyuru (günlük, muhtar ve kurum)",
+      "etkinlik": "Kurum etkinliği (günlük)"
+    },
+    "hint": "Her sayı 1 ile 10.000 arasında olmalı. Değişiklik birkaç dakika içinde herkese uygulanır ve işlem kaydına yazılır.",
+    "save": "Kaydet",
+    "saved": "Sınırlar kaydedildi.",
+    "error": "Kaydedilemedi. Bağlantını ve sayıları kontrol edip yeniden dene.",
+    "loading": "Yükleniyor…",
+    "loadError": "Sınırlar yüklenemedi.",
+    "retry": "Yeniden dene",
+    "adminOnly": "Bu sayfayı yalnızca admin değiştirebilir.",
+    "demoReadOnly": "Deneme hesabında yalnızca görüntülenir."
+  },
+  "limitReached": {
+    "daily": "Bugünkü doğrudan yayın sınırı doldu ({{when}} itibarıyla yenilenir). İstersen onaya gönder; onaylanan içerik sınıra sayılmaz.",
+    "weekly": "Bu haftaki doğrudan yayın sınırı doldu ({{when}} itibarıyla yenilenir). İstersen onaya gönder; onaylanan içerik sınıra sayılmaz.",
+    "sendForApproval": "Onaya gönder"
   }
 }

@@ -17,6 +17,7 @@ import { authorHref, cachedPost, patchCachedPost, toggleLike, useLiked } from '@
 import { postRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { spacing } from '@/theme/tokens';
+import { errorText } from '@/lib/limits';
 
 /** Gönderi ayrıntısı: yazının tamamı, beğeni, kaydet, yorumlar, şikâyet; sahibi için yorumları kapatma ve kaldırma. */
 export default function PostScreen() {
@@ -59,8 +60,8 @@ export default function PostScreen() {
     setError(undefined);
     try {
       await fn();
-    } catch {
-      setError(t(errKey));
+    } catch (e) {
+      setError(errorText(t, e, errKey));
     } finally {
       setBusy(false);
     }

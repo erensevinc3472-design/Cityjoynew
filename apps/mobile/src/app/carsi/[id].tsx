@@ -29,6 +29,7 @@ import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import { errorText } from '@/lib/limits';
 
 /**
  * İlan sayfası: görsel (fotoğraf gelene kadar kategori simgesi), fiyat, durum, açıklama, yer; "Mesaj gönder" alıcıyla
@@ -77,8 +78,8 @@ export default function ListingScreen() {
     setError(undefined);
     try {
       await fn();
-    } catch {
-      setError(t(errKey));
+    } catch (e) {
+      setError(errorText(t, e, errKey));
     } finally {
       setBusy(false);
     }

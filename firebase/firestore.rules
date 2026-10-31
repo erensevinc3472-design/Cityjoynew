@@ -1325,6 +1325,8 @@ service cloud.firestore {
               && request.resource.data.reviewNote is string && request.resource.data.reviewNote.size() >= 5
               && request.resource.data.reviewNote.size() <= 300
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewNote', 'reviewedBy', 'updatedAt'])))
+        // Kendi hazırladığını onaylayamaz (günlük yayın sınırını aşmanın yolu olmasın); admin hariç.
+        && (resource.data.preparedBy != request.auth.uid || isAdmin())
         && canReview(resource.data, 'gonderiler');
       // Yayından kaldırma: onaylayan, admin ya da "Sil" yetkisi olan hazırlayan.
       allow update: if resource.data.status == 'yayinda'
@@ -1411,6 +1413,8 @@ service cloud.firestore {
               && request.resource.data.reviewNote is string && request.resource.data.reviewNote.size() >= 5
               && request.resource.data.reviewNote.size() <= 300
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewNote', 'reviewedBy', 'updatedAt'])))
+        // Kendi hazırladığını onaylayamaz (günlük yayın sınırını aşmanın yolu olmasın); admin hariç.
+        && (resource.data.preparedBy != request.auth.uid || isAdmin())
         && canReview(resource.data, 'etkinlikler');
       // İptal (görünür kalır) ve yayından kaldırma: onaylayan, admin ya da hazırlayan (iptal için "Ekle", kaldırma için "Sil").
       allow update: if request.resource.data.reviewedBy == request.auth.uid

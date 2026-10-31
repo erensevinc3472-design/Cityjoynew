@@ -24,6 +24,7 @@ import { OrganizationsPage } from './pages/organizations-page';
 import { ProfilePage } from './pages/profile-page';
 import { ServiceCategoriesPage } from './pages/service-categories-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
+import { LimitsPage } from './pages/limits-page';
 import { NotificationsPage } from './pages/notifications-page';
 import { OverviewPage } from './pages/overview-page';
 import './styles.css';
@@ -53,6 +54,7 @@ const router = createHashRouter([
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
+      { path: 'sinirlar', element: <LimitsPage /> },
       { path: 'bildirimler', element: <NotificationsPage /> },
       { path: 'onaylar', element: <ApprovalsPage /> },
       { path: 'duyurular', element: <AnnouncementsPage /> },

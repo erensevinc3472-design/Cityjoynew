@@ -26,6 +26,7 @@ import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
 import { spacing } from '@/theme/tokens';
+import { errorText } from '@/lib/limits';
 
 const DAYS = 14;
 const HOURS = [1, 2, 3, 4, 6] as const;
@@ -48,7 +49,7 @@ export default function NewActivityScreen() {
   const [description, setDescription] = useState('');
   const [tipsRead, setTipsRead] = useState(false);
   const [errors, setErrors] = useState<(ActivityError | 'time' | 'tips')[]>([]);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<string | false>(false);
   const [busy, setBusy] = useState(false);
   const [nbName, setNbName] = useState<string>();
 
@@ -87,8 +88,8 @@ export default function NewActivityScreen() {
       const id = await activityRepository.create(user.uid, authorNameOf(profile.displayName), input);
       forgetActivities(location.provinceCode);
       router.replace({ pathname: '/activities/[id]', params: { id } });
-    } catch {
-      setFailed(true);
+    } catch (e) {
+      setFailed(errorText(t, e, 'activities.saveError'));
     } finally {
       setBusy(false);
     }
@@ -138,7 +139,7 @@ export default function NewActivityScreen() {
       <CheckboxRow checked={tipsRead} onToggle={() => setTipsRead((x) => !x)} label={t('activities.tipsConfirm')} />
       {errors.includes('tips') ? <FormMessage kind="error" text={t('activities.errors.tips')} /> : null}
       {errors.length && !errors.includes('tips') ? <FormMessage kind="error" text={t('activities.errors.fix')} /> : null}
-      {failed ? <FormMessage kind="error" text={t('activities.saveError')} /> : null}
+      {failed ? <FormMessage kind="error" text={failed} /> : null}
       <AppButton title={t('activities.publish')} onPress={submit} loading={busy} disabled={busy} />
     </FormScreen>
   );

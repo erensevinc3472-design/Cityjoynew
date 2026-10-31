@@ -36,6 +36,7 @@ import { useSettings } from '@/lib/settings';
 import { setBlocked, useSocial } from '@/lib/social';
 import { fonts, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import { errorText } from '@/lib/limits';
 
 /**
  * Birebir sohbet (PROJE.md 5.11). İlk mesaj sohbeti açar: takipleşmiyorlarsa alıcıda "mesaj isteği" olur. Mesaja
@@ -156,8 +157,8 @@ export default function ChatScreen() {
     setError(undefined);
     try {
       await fn();
-    } catch {
-      setError(t('messages.actionError'));
+    } catch (e) {
+      setError(errorText(t, e, 'messages.actionError'));
     } finally {
       setBusy(false);
     }
