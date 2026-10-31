@@ -614,6 +614,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 - Toplu güvenlik taraması (`/security-review`, tüm kod: Firebase kuralları, giriş, yönetici yetkileri): Eren mağazaya
   çıkmadan önce en sonda toplu yapılmasını istedi (29 Ekim 2026).
+- **Genel kontrolde bakılacak (Eren, 31 Ekim):** gönderi beğenileri (`useLiked`, `apps/mobile/src/lib/posts.ts`) sayfa
+  yenilenince boş görünebilir; Çarşı favorilerindeki hatanın aynısı (React Compiler, `useSyncExternalStore` ile çözülür).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
 - Yasal metinler boş (yalnızca "avukat kontrolünden geçecek" notu).
