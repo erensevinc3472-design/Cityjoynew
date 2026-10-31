@@ -518,6 +518,34 @@
       "save": "Kaydet",
       "saved": "Kaydedildi. Uygulama yeni bağlantıyı bir sonraki açılışta kullanır.",
       "invalid": "Bağlantı https:// ile başlamalı ve boşluk içermemeli."
+    },
+    "listings": {
+      "title": "Çarşı şikâyetleri",
+      "intro": "Çarşı ilanlarının şikâyetleri. 3 şikâyet alan ilan siz karar verene kadar uygulamada listeden düşer.",
+      "activity": "İlan",
+      "counts": "{{reports}} şikâyet",
+      "sold": "satıldı",
+      "removed": "Kaldırıldı",
+      "kept": "Yerinde kaldı",
+      "missing": "(ilan bulunamadı)",
+      "remove": "İlanı kaldır",
+      "keep": "Yerinde kalsın",
+      "note": "Dolandırıcılık, yasaklı ürün (silah, ilaç, alkol, canlı hayvan, sahte ya da çalıntı mal), emlak ya da araç ilanı şüphesinde kaldırın. Kaldırılan ilan uygulamada görünmez. Her işlem işlem kaydına yazılır.",
+      "kinds": {
+        "satilik": "Satılık",
+        "kiralik": "Kiralık",
+        "ucretsiz": "Ücretsiz",
+        "takas": "Takas"
+      },
+      "reasons": {
+        "dolandiricilik": "Dolandırıcılık şüphesi",
+        "yasakli": "Yasaklı ürün",
+        "sahte": "Sahte ya da yanıltıcı",
+        "emlak-arac": "Emlak ya da araç ilanı",
+        "uygunsuz": "Uygunsuz içerik",
+        "spam": "Reklam ya da tekrar",
+        "diger": "Diğer"
+      }
     }
   },
   "notifications": {

@@ -10,6 +10,7 @@ import {
   createFirestorePostRepository,
   createFirestoreSocialRepository,
   createFirestoreMessageRepository,
+  createFirestoreListingRepository,
   createFirestoreCityGuideRepository,
   createFirestoreBusinessRepository,
   createRoadsidePackRepository,
@@ -51,6 +52,8 @@ export const postRepository = createFirestorePostRepository(firestore);
 export const socialRepository = createFirestoreSocialRepository(firestore);
 /** Birebir mesajlar (yalnızca iki taraf okur). */
 export const messageRepository = createFirestoreMessageRepository(firestore);
+/** Çarşı ilanları (ikinci el eşya). */
+export const listingRepository = createFirestoreListingRepository(firestore);
 /** İşletme doğrulama isteği: önce il yöneticisi, sonra admin onaylar (PROJE.md 6.5). */
 export const verificationRequests = createVerificationRequests(firestore);
 export const familyRepository = createFirestoreFamilyRepository(firestore);

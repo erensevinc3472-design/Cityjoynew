@@ -5,6 +5,10 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 
 ## 1. Hemen (bugün yarın, kısa işler)
 
+- [ ] **Çarşı PR'ını birleştir, sonra kuralları yükle:** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/carsi-ilan
+  > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra Claude'a "kuralları
+  > yükle" de. (Kurallar ve dizinler yüklenmeden Çarşı canlı uygulamada çalışmaz.)
+
 - [x] **Mesajlar PR'ını birleştir ve kuralları yükle (yapıldı, 31 Ekim):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/mesaj-isletme
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra bu bilgisayarda
   > Claude'a "kuralları yükle komutunu ver" de, ya da terminale şunu yaz:

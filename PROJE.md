@@ -352,6 +352,17 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
   ve yetki doğrulamasını istiyor; avukat görüşü ve kimlik doğrulama kurulmadan açılmamalı (avukata sorulacak). Fotoğraf
   zorunlu olduğu için Storage, yani Blaze plan gerekir. Daha önceki kararlar geçerli: telefon numarası yok, yazışma
   uygulama içinde, konumu doğrulanmamış kişi ilan veremez, günlük ilan sınırı, dolandırıcılık uyarıları.
+- **Çarşı, Claude'un kararları (31 Ekim 2026, yapıldı):** türler satılık / kiralık (gün, hafta, ay) / ücretsiz / takas;
+  kategoriler elektronik, ev ve mobilya, ev aletleri, giyim, bebek ve çocuk, kitap ve hobi, spor, diğer; durum sıfır / az
+  kullanılmış / kullanılmış / tamir gerekli. Fiyat TL, tam sayı (yalnızca satılık ve kiralıkta). İlanı e-postası
+  doğrulanmış 18+ kişi kayıtlı mahallesiyle verir; yeni ilanda telefonun konumu bir kez kayıtlı ille karşılaştırılır
+  (yaklaşık; tek önlem sayılmaz). Günde en çok 5 ilan (ilk 7 gün 2). İlan 30 gün listede kalır, son 3 günde sahibi
+  yeniler. 3 şikâyette listeden düşer, Panel > Moderasyon'da kaldırılır ya da yerinde kalır. İlan sohbeti ayrı sohbettir,
+  istek aşaması yoktur, alıcı başlatır; iki taraf da Mesajlar > Çarşı'da görür. Telefon numarası alanı yok. Fotoğraflar
+  Blaze ile (en çok 6). Formdaki yasaklı ürünler: silah ve mühimmat, ilaç, alkol ve tütün, canlı hayvan, sahte / taklit,
+  çalıntı mal, hesap / kart / kimlik, yetişkin içerik. **Avukata sorulacak:** yasaklı ürün listesi, Çarşı kullanım
+  şartları (CityJoy alışverişin tarafı değildir, ödeme aracılığı yok, sorumluluk sınırı), ilan verenin kimlik bilgisi
+  saklama yükümlülüğü (6563 sayılı Kanun, aracı hizmet sağlayıcı) ve şikâyet üzerine kaldırma süreleri.
 
 ### 5.12 Bildirimler (standart)
 

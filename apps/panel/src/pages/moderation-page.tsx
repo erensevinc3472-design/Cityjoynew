@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { BANNED_WORD_LIMITS, can, isGrantActive, LANGUAGES, SEARCH_LIMITS, type SearchSuggestions } from '@cityjoy/shared';
 import {
   createActivityModeration,
+  createListingModeration,
   createBannedWords,
   createMessageModeration,
   createPostModeration,
@@ -13,6 +14,7 @@ import {
   createSearchSuggestions,
   type ActivityReport,
   type CommentReport,
+  type ListingReport,
   type MessageReport,
   type PostReport,
   type ProfileReport,
@@ -143,6 +145,7 @@ export function ModerationPage() {
       )}
       {user ? <ActivityReports user={user} /> : null}
       {user ? <PostReports user={user} /> : null}
+      {user ? <ListingReports user={user} /> : null}
       {user ? <CommentReports user={user} /> : null}
       {user ? <ProfileReports user={user} /> : null}
       {user ? <MessageReports user={user} /> : null}
@@ -269,6 +272,128 @@ function ActivityReports({ user }: { user: PanelUser }) {
             </tbody>
           </table>
           <p className="count">{t('moderation.activities.note')}</p>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Çarşı şikâyetleri (PROJE.md 5.11): admin hepsini, il yöneticisi ve il düzeyindeki gönüllü moderatör kendi ilini görür.
+ * Üç şikâyet alan ilan uygulamada listeden düşer; "Kaldır" yayından çıkarır, "Yerinde kalsın" geri getirir.
+ */
+function ListingReports({ user }: { user: PanelUser }) {
+  const isAdmin = isAdminUser(user);
+  const provinces = useMemo(
+    () => [...new Set(user.grants.filter((g) => g.scope.level === 'il' && isGrantActive(g, new Date()) && g.modules.moderasyon?.includes('goruntule')).map((g) => (g.scope.level === 'il' ? g.scope.provinceCode : '')))],
+    [user],
+  );
+  const canDecide = !user.isDemo && (isAdmin || user.grants.some((g) => g.scope.level === 'il' && g.modules.moderasyon?.includes('duzenle')));
+  const [list, setList] = useState<ListingReport[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
+  const [busy, setBusy] = useState(false);
+  const mod = useMemo(() => createListingModeration(firestore, user.uid), [user]);
+
+  const load = useCallback(async () => {
+    setLoadError(false);
+    if (user.isDemo || (!isAdmin && !provinces.length)) return setList([]);
+    try {
+      const all = await Promise.all(isAdmin ? [mod.listReports('admin')] : provinces.map((p) => mod.listReports({ provinceCode: p })));
+      setList(all.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+    } catch {
+      setLoadError(true);
+    }
+  }, [user, isAdmin, provinces, mod]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const act = async (fn: () => Promise<void>) => {
+    setBusy(true);
+    setMessage(undefined);
+    try {
+      await fn();
+      setMessage({ kind: 'ok', text: t('moderation.saved') });
+      await load();
+    } catch {
+      setMessage({ kind: 'error', text: t('moderation.error') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!isAdmin && !provinces.length) return null;
+  return (
+    <>
+      <header className="page-head">
+        <div>
+          <h2>{t('moderation.listings.title')}</h2>
+          <p className="meta">{t('moderation.listings.intro')}</p>
+        </div>
+      </header>
+      {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {loadError ? (
+        <div className="state" role="alert">
+          <p>{t('moderation.loadError')}</p>
+          <button className="btn secondary" onClick={load}>{t('moderation.retry')}</button>
+        </div>
+      ) : list === null ? (
+        <div className="state" aria-live="polite">{t('moderation.loading')}</div>
+      ) : list.length === 0 ? (
+        <div className="state">{t('moderation.empty')}</div>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{t('moderation.date')}</th>
+                <th scope="col">{t('moderation.listings.activity')}</th>
+                <th scope="col">{t('moderation.reason')}</th>
+                <th scope="col">{t('moderation.status')}</th>
+                {canDecide ? <th scope="col"><span className="sr-only">{t('moderation.actions')}</span></th> : null}
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((r) => (
+                <tr key={r.id}>
+                  <td className="num">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
+                  <td>
+                    {r.listing ? (
+                      <>
+                        <strong>{r.listing.title}</strong>
+                        <div className="meta">{regionLabel(r.listing.region)} · {r.listing.ownerName || '-'} · {r.listing.price == null ? t(`moderation.listings.kinds.${r.listing.kind}`) : `${r.listing.price.toLocaleString('tr-TR')} TL`}</div>
+                        <div className="meta">{t('moderation.listings.counts', { reports: r.listing.reportCount })}{r.listing.status === 'satildi' ? ` · ${t('moderation.listings.sold')}` : ''}</div>
+                        <details>
+                          <summary>{t('announcements.showBody')}</summary>
+                          <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.listing.description}</p>
+                        </details>
+                        {r.listing.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.listings.removed')}</span> : r.listing.cleared ? <span className="pill ok">{t('moderation.listings.kept')}</span> : null}
+                      </>
+                    ) : (
+                      <span className="meta">{t('moderation.listings.missing')}</span>
+                    )}
+                  </td>
+                  <td>{t(`moderation.listings.reasons.${r.reason}`)}</td>
+                  <td><span className={r.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`moderation.statuses.${r.status}`)}</span></td>
+                  {canDecide ? (
+                    <td>
+                      <div className="row-actions">
+                        {r.listing && r.listing.status !== 'kaldirildi' ? (
+                          <button className="link" disabled={busy} onClick={() => act(() => mod.remove(r))}>{t('moderation.listings.remove')}</button>
+                        ) : null}
+                        {r.listing && r.listing.status !== 'kaldirildi' && !r.listing.cleared ? (
+                          <button className="link" disabled={busy} onClick={() => act(() => mod.keep(r))}>{t('moderation.listings.keep')}</button>
+                        ) : null}
+                      </div>
+                    </td>
+                  ) : null}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="count">{t('moderation.listings.note')}</p>
         </div>
       )}
     </>

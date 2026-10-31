@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import type { ComponentProps } from 'react';
+import { useId, type ComponentProps } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
@@ -11,7 +11,8 @@ type IconName = ComponentProps<typeof MaterialIcons>['name'];
  */
 export function GlossyIcon({ icon, colors, size = 56, dim = false }: { icon: IconName; colors: readonly [string, string]; size?: number; dim?: boolean }) {
   const r = Math.round(size * 0.3);
-  const id = `g-${colors[0].slice(1)}-${colors[1].slice(1)}`;
+  // Her simgeye ayrı kimlik: webde aynı kimlik gizli (önceki) ekrandaki tanıma bağlanınca simge boş görünür.
+  const id = `g${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
     <View style={[styles.wrap, { width: size, height: size, borderRadius: r, shadowColor: colors[1], opacity: dim ? 0.45 : 1 }]}>
       <Svg width={size} height={size} style={StyleSheet.absoluteFill}>

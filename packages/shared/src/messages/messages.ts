@@ -28,18 +28,20 @@ export function chatId(a: string, b: string): string {
 
 /**
  * Sohbetin konusu: işletmeye yazılan sohbet (müşteri başlatır, istek aşaması yok; işletme sahibinde "İşletmem" bölümüne
- * düşer). Aynı iki kişinin konusuz sohbetiyle ve başka işletmeler için açılan sohbetlerle karışmaz.
+ * düşer) ya da Çarşı ilanı için açılan sohbet (alıcı başlatır; iki tarafta da "Çarşı" bölümünde). Aynı iki kişinin
+ * konusuz sohbetiyle ve başka işletme ya da ilanlar için açılan sohbetlerle karışmaz.
  */
 export interface ChatContext {
-  type: 'isletme';
+  type: 'isletme' | 'ilan';
   id: string;
-  /** İşletmenin adı (sohbet açılırken yazılır). */
+  /** İşletmenin adı ya da ilanın başlığı (sohbet açılırken yazılır). */
   title: string;
 }
 
-/** Sohbet kimliği: iki kişi (sıralı), konu varsa sonuna konunun kimliği ("__b_" işletme). */
+/** Sohbet kimliği: iki kişi (sıralı), konu varsa sonuna konunun kimliği ("__b_" işletme, "__l_" ilan). */
 export function threadId(a: string, b: string, context?: Pick<ChatContext, 'type' | 'id'> | null): string {
-  return context ? `${chatId(a, b)}__b_${context.id}` : chatId(a, b);
+  if (!context) return chatId(a, b);
+  return `${chatId(a, b)}${context.type === 'ilan' ? '__l_' : '__b_'}${context.id}`;
 }
 
 export function otherMember(chat: Pick<Chat, 'members'>, me: string): string {
@@ -97,10 +99,14 @@ export function isRequestFor(chat: Pick<Chat, 'accepted' | 'startedBy'>, me: str
   return !chat.accepted && chat.startedBy !== me;
 }
 
-export type InboxSection = 'sohbetler' | 'istekler' | 'isletmem';
+export type InboxSection = 'sohbetler' | 'istekler' | 'isletmem' | 'carsi';
 
-/** Sohbet gelen kutumda hangi bölümde: müşterilerin işletmeme yazdıkları "İşletmem"de, gelen istekler "İstekler"de. */
+/**
+ * Sohbet gelen kutumda hangi bölümde: müşterilerin işletmeme yazdıkları "İşletmem"de, ilan sohbetleri (alıcı ve satıcı)
+ * "Çarşı"da, gelen istekler "İstekler"de.
+ */
 export function inboxSection(chat: Pick<Chat, 'accepted' | 'startedBy' | 'context'>, me: string): InboxSection {
+  if (chat.context?.type === 'ilan') return 'carsi';
   if (chat.context?.type === 'isletme' && chat.startedBy !== me) return 'isletmem';
   return isRequestFor(chat, me) ? 'istekler' : 'sohbetler';
 }
@@ -111,9 +117,9 @@ export function isHiddenFor(chat: Pick<Chat, 'hidden' | 'last'>, me: string): bo
   return !!at && (!chat.last || chat.last.at <= at);
 }
 
-/** Listede görünen ad: müşteri işletmenin adını, diğerleri kişinin adını görür. */
+/** Listede görünen ad: müşteri işletmenin adını, diğerleri (ilan sohbetinde iki taraf da) kişinin adını görür. */
 export function chatTitle(chat: Pick<Chat, 'names' | 'members' | 'context' | 'startedBy'>, me: string): string {
-  if (chat.context && chat.startedBy === me) return chat.context.title;
+  if (chat.context?.type === 'isletme' && chat.startedBy === me) return chat.context.title;
   return chat.names[counterpartOf(chat, me)] ?? '?';
 }
 

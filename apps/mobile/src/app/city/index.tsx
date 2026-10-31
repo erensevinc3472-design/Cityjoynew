@@ -51,7 +51,7 @@ const TILES: Tile[] = [
   { key: 'pharmacy', icon: 'local-pharmacy', hue: 'green' },
   { key: 'ulasim', section: 'ulasim', icon: 'directions-bus', hue: 'blue' },
   { key: 'parkPazar', href: '/city/park-pazar', icon: 'park', hue: 'green' },
-  { key: 'listings', icon: 'sell', hue: 'violet' },
+  { key: 'listings', href: '/carsi', icon: 'sell', hue: 'violet' },
   { key: 'otoparklar', section: 'otoparklar', icon: 'local-parking', hue: 'teal' },
   { key: 'volunteer', icon: 'volunteer-activism', hue: 'rose' },
   { key: 'nasil-yapilir', section: 'nasil-yapilir', icon: 'lightbulb', hue: 'gold' },

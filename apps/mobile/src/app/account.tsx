@@ -11,7 +11,7 @@ import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
-import { activityRepository, authService, businessRepository, eventRepository, familyRepository, messageRepository, postRepository, profileRepository, reviewRepository, socialRepository } from '@/lib/services';
+import { activityRepository, authService, businessRepository, eventRepository, familyRepository, listingRepository, messageRepository, postRepository, profileRepository, reviewRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings, type ThemeMode } from '@/lib/settings';
 import { useSignOut } from '@/lib/sign-out';
@@ -44,7 +44,7 @@ export default function AccountScreen() {
     setError(undefined);
     setBusy(true);
     try {
-      // Kullanıcının aile bağları, SOS kayıtları, değerlendirmeleri, etkinlik ve aktivite katılımları, açtığı aktiviteler, Keşfet gönderileri, beğenileri, takipleri ve profili, mesajları, işletmeleri de silinir (KVKK);
+      // Kullanıcının aile bağları, SOS kayıtları, değerlendirmeleri, etkinlik ve aktivite katılımları, açtığı aktiviteler, Keşfet gönderileri, Çarşı ilanları, beğenileri, takipleri ve profili, mesajları, işletmeleri de silinir (KVKK);
       // sonra profil, en son hesap.
       await authService.deleteAccountAndData(password || undefined, async (uid) => {
         await familyRepository.deleteAllOf(uid);
@@ -54,6 +54,7 @@ export default function AccountScreen() {
         await messageRepository.deleteAllOf(uid);
         await notificationSettings.delete(uid);
         await postRepository.deleteAllOf(uid);
+        await listingRepository.deleteAllOf(uid);
         await socialRepository.deleteAllOf(uid);
         await reviewRepository.deleteAllBy(uid);
         await businessRepository.leaveAllOf(uid);

@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (yetkiliye mesaj izni, dal `claude/carsi`). Önceki: işletmeye mesaj (PR #42 birleşti).
+Son güncelleme: 31 Ekim 2026 (Çarşı: ikinci el eşya ilanları, dal `claude/carsi-ilan`). Önceki: yetkiliye mesaj izni (PR #43 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -547,7 +547,24 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    görür ve işletme adına cevaplar; sohbetin üyesi olmaz. Okunmamış sayısı işletme tarafında ortaktır (sahip ya da yetkili
    okuyunca sıfırlanır). Yetkili "Sohbeti sil" yapamaz, "gördüm" yazmaz, kişisel sohbetleri göremez. Sohbette ekip
    arkadaşının mesajının altında "İşletme ekibi" yazar. Kurallar sunucuda denetler (`isBusinessStaff`); yeni sorgu için yeni
-   dizin. Testler: kural 118, ortak 137 (yeni yetkili testi). **Birleştirince kurallar ve dizin yüklenmeli.**
+   dizin. Testler: kural 118, ortak 137 (yeni yetkili testi). PR #43 birleşti, kurallar 31 Ekim'de yüklendi.
+- **Çarşı: ikinci el eşya ilanları (31 Ekim, dal `claude/carsi-ilan`):** Karar (Eren): önce eşya, adı Çarşı. Benim Şehrim >
+   Çarşı: ildeki ilanlar (istenirse yalnızca ilçe), arama, tür (satılık / kiralık / ücretsiz / takas) ve kategori süzgeci
+   (8 kategori, parlak simgelerle), sayfa sayfa yükleme. İlan sayfası: fiyat, durum, açıklama, yer, "Mesaj gönder",
+   favori, şikâyet (7 neden), güvenli alışveriş önerileri. Sahibi: düzenle, satıldı / yeniden satışa aç, son 3 günde
+   "yenile (30 gün)", kaldır. "İlanlarım" ve "Favorilerim". İlan ver: e-postası doğrulanmış 18+ kişi, kayıtlı mahallesiyle;
+   yeni ilanda telefonun konumu bir kez kayıtlı ille karşılaştırılır (yaklaşık, sahte konumla aşılabilir); yasaklı ürünler
+   formda yazılı; emlak / araç ilanı sezgiyle engelli; yasaklı kelime denetimi. Günlük ilan sınırı (ilk 7 gün 2, sonra 5;
+   `listingQuota`), ilan 30 gün listede, 3 şikâyette moderatöre düşer. Telefon numarası alanı yok. Fotoğraf yok (Blaze
+   ve Storage ile gelecek; kurallar şimdilik boş liste ister), yerine kategori simgesi. **Mesajlar > Çarşı:** ilandan açılan
+   sohbet ayrı (`a_b__l_<ilan>`), istek aşaması yok, alıcı başlatır, iki tarafta Çarşı bölümünde, başlıkta kişinin adı ve
+   altında ilan; sohbette güvenli alışveriş uyarısı ve "İlanı aç". Satılan ya da yayından kalkan ilana yeni sohbet açılmaz.
+   **Panel > Moderasyon > Çarşı şikâyetleri** (admin hepsi, il yöneticisi / gönüllü moderatör kendi ili; kaldır / yerinde
+   kalsın, işlem kaydı). Hesap silinince ilanlar da silinir. 5 dilde metinler. Ortak düzeltme: parlak simgelerin renk
+   geçişi webde bazen boş görünüyordu (aynı kimlik), her simgeye ayrı kimlik verildi. Testler: kural 126 (8 yeni), ortak
+   142. Emülatörde web sürümüyle denendi (liste, favori, ilan sayfası, mesaj, Mesajlar > Çarşı, ilan verme, satıldı,
+   İlanlarım). **Birleştirince kurallar ve 11 yeni dizin yüklenmeli.** Not: Windows'ta Expo'nun ürettiği rota türlerinde
+   `/carsi` yerine `/carsi/index` çıkabiliyor (Expo hatası); `apps/mobile/.expo/types/router.d.ts` içinde düzeltilir.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -650,7 +667,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Araya giren (Eren, 31 Ekim): mesajlar. ~~İşletmeye mesaj, İşletmem, sohbeti sil~~ (31 Ekim). Sırada ilan pazarı
    (Marketplace) ve "İlanlar" bölümü; Karar (Eren): önce ikinci el eşya, emlak ve araç sonra.
    Karar (Eren): bölümün adı **Çarşı**; Benim Şehrim kartı "Satılık & Kiralık" yerine "Çarşı" yapıldı (5 dil),
-   Mesajlar'daki bölüm de "Çarşı" olacak. Sıradaki iş: Çarşı (eşya ilanları) ve Mesajlar > Çarşı.
+   Mesajlar'daki bölüm de "Çarşı" olacak. ~~Çarşı (eşya ilanları) ve Mesajlar > Çarşı~~ (31 Ekim). Çarşı'da kalan:
+   fotoğraflar (Blaze), yeni mesaj bildirimi (3. madde), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. Günlük sınırlar (aktivite açma, hizmet önerisi) ve hesap silinince önerilerin silinmesi.
 5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.

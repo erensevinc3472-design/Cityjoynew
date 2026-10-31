@@ -24,7 +24,7 @@ import { useThemeColors } from '@/theme/use-theme';
 /**
  * Mesajlar (PROJE.md 5.11; profilin sağ üstünden açılır, 13. madde 31): üstte kullanıcı adım ve yeni mesaj düğmesi, altında
  * sohbetlerde arama. Sohbetlerim, mesaj istekleri (takipleşmediğim kişilerden gelen, kabul etmediğim) ve işletmesi olan
- * kişide "İşletmem" (müşterilerin işletmeme yazdıkları). Engellediklerim ve sildiğim sohbetler listede görünmez. Okundu bilgisi buradan kapatılır.
+ * kişide "İşletmem" (müşterilerin işletmeme yazdıkları); Çarşı ilanları için açılan sohbetler (alıcı ve satıcı) "Çarşı"da. Engellediklerim ve sildiğim sohbetler listede görünmez. Okundu bilgisi buradan kapatılır.
  */
 export default function MessagesScreen() {
   const { t } = useTranslation();
@@ -80,22 +80,30 @@ export default function MessagesScreen() {
           options={[
             { value: 'sohbetler', label: tabLabel('sohbetler', t('messages.chats')) },
             { value: 'istekler', label: tabLabel('istekler', t('messages.requests'), count('istekler')) },
+            { value: 'carsi', label: tabLabel('carsi', t('messages.carsi')) },
             ...(hasBusiness || teamInbox || count('isletmem') ? [{ value: 'isletmem' as const, label: tabLabel('isletmem', t('messages.business')) }] : []),
           ]}
         />
         {tab === 'istekler' ? <AppText variant="caption" muted>{t('messages.requestsIntro')}</AppText> : null}
         {tab === 'isletmem' ? <AppText variant="caption" muted>{t('messages.businessIntro')}</AppText> : null}
+        {tab === 'carsi' ? <AppText variant="caption" muted>{t('messages.carsiIntro')}</AppText> : null}
         {failed && !chats?.length ? (
           <StateMessage kind="error" message={t('messages.loadError')} />
         ) : chats === null ? (
           <StateMessage kind="loading" />
         ) : shown.length === 0 ? (
-          <StateMessage kind="empty" message={needle ? t('messages.noMatch') : tab === 'istekler' ? t('messages.noRequests') : tab === 'isletmem' ? t('messages.noBusinessChats') : t('messages.empty')} />
+          <StateMessage kind="empty" message={needle ? t('messages.noMatch') : tab === 'istekler' ? t('messages.noRequests') : tab === 'isletmem' ? t('messages.noBusinessChats') : tab === 'carsi' ? t('messages.noCarsiChats') : t('messages.empty')} />
         ) : (
           shown.map((x) => {
             const name = chatTitle(x, me);
-            // İşletme sohbetinde: müşteri işletmenin adını, sahibi müşterinin adını ve altında işletmesini görür.
-            const about = x.context && x.startedBy !== me ? x.context.title : null;
+            // İşletme sohbetinde: müşteri işletmenin adını, sahibi müşterinin adını ve altında işletmesini görür. İlan
+            // sohbetinde iki taraf da kişinin adını ve altında ilanı görür.
+            const about =
+              x.context?.type === 'ilan'
+                ? t('messages.aboutListing', { title: x.context.title })
+                : x.context && x.startedBy !== me
+                  ? t('messages.aboutBusiness', { name: x.context.title })
+                  : null;
             const unread = x.unread[unreadKey(x, me)] ?? 0;
             return (
               <Pressable
@@ -105,7 +113,7 @@ export default function MessagesScreen() {
                 onPress={() => router.push(chatHref(x, me))}
                 style={({ pressed }) => [styles.row, { backgroundColor: c.surface, borderColor: unread ? c.accentBorder : c.border, opacity: pressed ? 0.85 : 1 }]}>
                 <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
-                  {x.context && x.startedBy === me ? (
+                  {x.context?.type === 'isletme' && x.startedBy === me ? (
                     <MaterialIcons name="storefront" size={20} color={c.textStrong} />
                   ) : (
                     <AppText variant="label">{name.slice(0, 1)}</AppText>
@@ -116,7 +124,7 @@ export default function MessagesScreen() {
                     <AppText variant="label" numberOfLines={1} style={styles.grow}>{name}</AppText>
                     {x.last ? <AppText variant="caption" muted>{when(x.last.at)}</AppText> : null}
                   </View>
-                  {about ? <AppText variant="caption" muted numberOfLines={1}>{t('messages.aboutBusiness', { name: about })}</AppText> : null}
+                  {about ? <AppText variant="caption" muted numberOfLines={1}>{about}</AppText> : null}
                   <View style={styles.line}>
                     <AppText variant="caption" muted={!unread} numberOfLines={1} style={styles.grow}>{preview(x)}</AppText>
                     {unread ? (
