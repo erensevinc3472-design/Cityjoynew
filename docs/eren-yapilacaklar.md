@@ -5,7 +5,7 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 
 ## 1. Hemen (bugün yarın, kısa işler)
 
-- [ ] **Hesap silme + fotoğraflar (Keşfet, etkinlik kapağı, logolar, işletme vitrini) PR'ını birleştir, sonra kuralları yükle:** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/foto
+- [x] **Hesap silme + fotoğraflar (Keşfet, etkinlik kapağı, logolar, işletme vitrini) PR'ını birleştir, sonra kuralları yükle (yapıldı, 31 Ekim):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/foto
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra Claude'a "kuralları
   > yükle" de. (Fotoğraf yükleme Blaze ile çalışır; o zamana kadar yazılı paylaşım aynen çalışır.)
 
