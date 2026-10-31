@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (mesaj ve takip için telefon bildirimi, dal `claude/carsi-belge`). Önceki: Çarşı (PR #44 birleşti, kurallar yüklendi).
+Son güncelleme: 31 Ekim 2026 (mesaj ve takip için telefon bildirimi, PR #47 birleşti). Önceki: Çarşı (PR #44 birleşti, kurallar yüklendi).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -577,7 +577,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    yeniden edilirse 7 gün içinde tekrar gitmez (`pushLog`, günlük temizlik siler). Kişinin tür ayarları ve sessiz saatleri
    geçerli. Bildirime dokununca sohbet, profil ya da (takip isteğinde) kendi profili açılır; o an açık olan sohbetin
    bildirimi uygulama içinde çıkmaz. 5 dilde metinler. Testler: sunucu 17 (8 yeni), ortak 145. Blaze ve işlev yüklemesiyle
-   çalışmaya başlar; gerçek telefonda deneme EAS ile. Kural değişikliği yok.
+   çalışmaya başlar; gerçek telefonda deneme EAS ile. Kural değişikliği yok. PR #47 birleşti (31 Ekim).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
