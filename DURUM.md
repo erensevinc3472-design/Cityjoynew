@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (mesaj ve takip için telefon bildirimi, PR #47 birleşti). Önceki: Çarşı (PR #44 birleşti, kurallar yüklendi).
+Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri, dal `claude/sinirlar`). Önceki: mesaj ve takip için telefon bildirimi (PR #47 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -44,9 +44,9 @@ Son güncelleme: 31 Ekim 2026 (mesaj ve takip için telefon bildirimi, PR #47 bi
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (106)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (98; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (9; Java 21 gerekir)
+npm test                      # ortak paket testleri (148)
+npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (130; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (19; Java 21 gerekir)
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
 npm run typecheck
@@ -578,6 +578,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    geçerli. Bildirime dokununca sohbet, profil ya da (takip isteğinde) kendi profili açılır; o an açık olan sohbetin
    bildirimi uygulama içinde çıkmaz. 5 dilde metinler. Testler: sunucu 17 (8 yeni), ortak 145. Blaze ve işlev yüklemesiyle
    çalışmaya başlar; gerçek telefonda deneme EAS ile. Kural değişikliği yok. PR #47 birleşti (31 Ekim).
+- **Arka uç 4. parça: günlük sınırlar ve bildirim öncelikleri (31 Ekim, dal `claude/sinirlar`).** Eren onayladı
+  (PROJE.md 15.3 ve 5.12). Sınırlar: her iş `usage/{sahip~iş}` sayacıyla aynı toplu yazımda sayılır, kurallar denetler
+  (Blaze gerekmez); sayılar `config/limits` (Panel > Günlük sınırlar, yalnızca admin, işlem kaydı). Ortak kod
+  `packages/shared/src/limits` ve `firebase/limits.ts` (`countUsage`, `LimitReachedError`). Telefonda gönderi, yorum,
+  takip, aktivite, öneri ve şikâyet ekranları sınır dolunca yenilenme saatini söyler (5 dil). Panelde duyuru ve etkinlikte
+  sınır dolunca "Onaya gönder" düğmesi; kimse kendi hazırladığını onaylayamaz (admin hariç). Var olan sohbet ve ilan
+  sınırları da artık panelden. Bildirim öncelikleri: Panel > Bildirimler'de tür başına her zaman / normal / uygulama içi ve
+  günlük sesli tavan (5); sunucu `pushCount/{uid}` ile sayar, tavandan sonra sessiz kanaldan gönderir; admin onayda "bildirim
+  her zaman çalsın" (`ringAlways`). Düzeltilen hata: sunucu panelin kapattığı türleri yanlış alandan okuyordu. Testler:
+  kurallar 130, sunucu 19, ortak 148. **Kurallar değişti: birleşince yüklenmeli.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -648,8 +658,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
 - Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, asistan, taksi durağı (SOS ve hizmetler yapıldı).
-- Hizmet önerileri: admin hepsini, il yöneticisi kendi ilininkileri görür ve inceler. Günlük gönderim
-  sınırı ve hesap silinince kullanıcının önerilerinin silinmesi sunucu işleviyle eklenecek (Blaze plan gerektirir).
+- Hizmet önerileri: admin hepsini, il yöneticisi kendi ilininkileri görür ve inceler. Günlük sınır yapıldı (31 Ekim);
+  hesap silinince kullanıcının önerilerinin silinmesi sunucu işleviyle eklenecek (Blaze plan gerektirir).
 - **SOS bildirimi ve arka plan konumu telefonda denenmedi:** kod hazır, ama Expo push adresi için `app.json` içinde EAS proje
   kimliği (`extra.eas.projectId`) gerekir; `eas init` ile gelir. Telefonda denenecekler: kilitli ekranda bildirim sesi,
   uygulama kapalıyken konum güncellemesi, bildirime dokununca SOS ekranı. Expo push güvenliği: bildirim adresleri yalnızca aile
@@ -684,7 +694,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Karar (Eren): bölümün adı **Çarşı**; Benim Şehrim kartı "Satılık & Kiralık" yerine "Çarşı" yapıldı (5 dil),
    Mesajlar'daki bölüm de "Çarşı" olacak. ~~Çarşı (eşya ilanları) ve Mesajlar > Çarşı~~ (31 Ekim). Çarşı'da kalan:
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
-4. Günlük sınırlar (aktivite açma, hizmet önerisi) ve hesap silinince önerilerin silinmesi.
+4. ~~Günlük sınırlar ve bildirim öncelikleri~~ (31 Ekim). Kalan: hesap silinince hizmet önerilerinin silinmesi.
 5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.

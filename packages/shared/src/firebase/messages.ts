@@ -18,6 +18,7 @@ import {
 
 import { MESSAGE_LIMITS, quotaAfter, threadId, unreadKey, type Chat, type ChatContext, type ChatMessage, type MessageReportReason } from '../messages/messages';
 import { addAudit, iso } from './grants';
+import { countUsage } from './limits';
 
 const CHATS = 'chats';
 const QUOTA = 'chatQuota';
@@ -193,6 +194,7 @@ export function createFirestoreMessageRepository(db: Firestore) {
     /** Karşı tarafın mesajını şikâyet et: mesajın o anki kopyası saklanır, yalnızca admin görür. Kişi başına bir. */
     async report(chat: Chat, message: ChatMessage, me: string, reason: MessageReportReason): Promise<void> {
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: me }, 'sikayet', me);
       batch.set(doc(db, REPORTS, `${me}_${message.id}`), {
         chatId: chat.id,
         messageId: message.id,

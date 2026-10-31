@@ -29,6 +29,7 @@ import {
 import { quotaAfter } from '../messages/messages';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
+import { countUsage } from './limits';
 
 const COLLECTION = 'listings';
 const REPORTS = 'listingReports';
@@ -178,6 +179,7 @@ export function createFirestoreListingRepository(db: Firestore) {
     /** Kişi başına ilan başına bir şikâyet; sayaç aynı yazımda tam bir artar. */
     async report(l: Pick<Listing, 'id' | 'region'>, uid: string, reason: ListingReportReason): Promise<void> {
       const batch = writeBatch(db);
+      await countUsage(db, batch, { type: 'u', id: uid }, 'sikayet', uid);
       batch.set(doc(db, REPORTS, `${l.id}_${uid}`), {
         listingId: l.id,
         reporterUid: uid,

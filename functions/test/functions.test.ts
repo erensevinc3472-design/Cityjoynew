@@ -54,7 +54,8 @@ describe('etkinlik iptali', () => {
     const { sent, deps } = fakeSender();
     await handleEventChange(db, 'e1', before, { ...before, attendeeCount: 3 }, deps);
     await handleEventChange(db, 'e1', before, { ...after, endsAt: Timestamp.fromDate(new Date('2026-10-01T00:00:00Z')) }, deps);
-    await db.doc('config/notificationTriggers').set({ acil: true, sos: true, mesaj: true, takip: true, duyuru: true, haber: true, etkinlik: false });
+    // Panel tetikleyicileri `triggers` alanına kaydeder.
+    await db.doc('config/notificationTriggers').set({ triggers: { acil: true, sos: true, mesaj: true, takip: true, duyuru: true, haber: true, etkinlik: false } });
     await handleEventChange(db, 'e1', before, after, deps);
     expect(sent).toEqual([]);
   });
@@ -247,5 +248,40 @@ describe('temizlik', () => {
       expect((await db.doc(p).get()).exists, p).toBe(false);
     }
     expect((await db.doc('users/u2').get()).exists).toBe(true);
+  });
+});
+
+describe('bildirim öncelikleri', () => {
+  async function resident(uid: string) {
+    await db.doc(`users/${uid}`).set({ uid, location: { provinceCode: '16', districtId: '16-nilufer' } });
+    await db.doc(`pushTokens/${uid}`).set({ tokens: [`T-${uid}`], language: 'tr', updatedAt: Timestamp.now() });
+  }
+  const ann = (author: Record<string, unknown>, over: Record<string, unknown> = {}) => ({
+    kind: 'duyuru', title: 'Pazar yeri taşınıyor', status: 'yayinda', region: { provinceCode: '16', districtId: '16-nilufer' }, author, ...over,
+  });
+  const muhtar = { type: 'kisi', role: 'muhtar', grantKey: 'g1' };
+  const kurum = { type: 'kurum', orgId: 'bld', name: 'Nilüfer Belediyesi' };
+
+  it('normal öncelikte günlük sesli tavandan sonra sessiz gelir; kurum duyurusu her zaman çalar', async () => {
+    await resident('a');
+    await db.doc('config/notificationTriggers').set({ dailySoundCap: 2 });
+    const { sent, deps } = fakeSender();
+    for (const id of ['m1', 'm2', 'm3']) await handleAnnouncementWrite(db, id, undefined, ann(muhtar), deps);
+    expect(sent.map((m) => [m.sound ?? null, m.channelId])).toEqual([['default', 'genel'], ['default', 'genel'], [null, 'sessiz']]);
+    await handleAnnouncementWrite(db, 'k1', undefined, ann(kurum), deps);
+    expect(sent[3]).toMatchObject({ sound: 'default', channelId: 'genel' });
+    // Ertesi gün tavan yeniden başlar.
+    await handleAnnouncementWrite(db, 'm4', undefined, ann(muhtar), { ...deps, now: new Date('2026-11-02T09:00:00Z') });
+    expect(sent[4]).toMatchObject({ sound: 'default' });
+  });
+
+  it('uygulama içi seçilen tür telefona gitmez; admin işaretlediyse her zaman çalar', async () => {
+    await resident('a');
+    await db.doc('config/notificationTriggers').set({ priorities: { 'muhtar-duyuru': 'inapp' }, dailySoundCap: 1 });
+    const { sent, deps } = fakeSender();
+    expect(await handleAnnouncementWrite(db, 'm1', undefined, ann(muhtar), deps)).toBe(0);
+    await db.doc('pushCount/a').set({ day: '2026-11-01', count: 5 });
+    expect(await handleAnnouncementWrite(db, 'm2', undefined, ann(muhtar, { ringAlways: true }), deps)).toBe(1);
+    expect(sent[0]).toMatchObject({ sound: 'default', channelId: 'genel' });
   });
 });

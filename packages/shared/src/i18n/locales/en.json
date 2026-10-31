@@ -1312,7 +1312,8 @@
       "haberTitle": "Official news · {{title}}",
       "muhtar": "Neighbourhood office",
       "cityjoy": "CityJoy",
-      "channel": "General notifications"
+      "channel": "General notifications",
+      "quietChannel": "Silent notifications"
     },
     "categories": {
       "acil": "Urgent announcements",
@@ -1916,5 +1917,8 @@
       "check": "Try and check the item before you take it.",
       "link": "Do not trust links or payment requests that take you outside the app."
     }
+  },
+  "limits": {
+    "reached": "You have reached today’s limit. You can do this again from {{when}}."
   }
 }

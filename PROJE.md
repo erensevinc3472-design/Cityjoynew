@@ -375,6 +375,14 @@ Bildirim merkezi, kategorilere göre (duyuru, etkinlik, mesaj, takip, yarışma,
   mesaj izni olan yetkililer alır. Mesaj isteğinde metin kilit ekranında gösterilmez ve yalnızca ilk mesajda gider (tanımadığı
   kişiden bildirim yağmasın). Takipte yeni takipçi, takip isteği ve isteğin kabulü; aynı takip için 7 günde bir. Kişinin tür
   ayarları ve sessiz saatleri her bildirimde geçerli; açık olan sohbetin bildirimi uygulama içinde çıkmaz.
+- **Bildirim öncelikleri (Eren onayladı, 31 Ekim 2026; yapıldı, telefonda Blaze ile çalışır):** Panel > Bildirimler'de her
+  tür için üç seçenek: **Her zaman çalar**, **Normal** (kişinin günlük sesli tavanına kadar sesli, sonra sessiz gelir; bildirim
+  listesinde ve uygulamadaki zilde yine görünür) ya da **Sadece uygulama içi** (telefona gitmez). Varsayılan: belediye ve
+  kurum duyurusu her zaman; muhtar ve il duyurusu, kurum haberi, etkinlik, mesaj, takip normal. Acil duyuru ve SOS her zaman
+  çalar, değiştirilemez, tavana sayılmaz. Günlük sesli tavan kişi başına 5, panelden 1-50 arası değişir (Türkiye günü).
+  Admin onayda tek bir duyuru için "Onayla, bildirim her zaman çalsın" diyebilir (ör. önemli bir açılış); kurum ve işletme
+  kendisi seçemez. Kullanıcı türleri her zaman kapatabilir. Kampanya ve işletme bildirimleri (yapıldığında) yalnızca izin
+  veren kişilere gider (mağaza ve KVKK). Android'de sessiz gelenler için ayrı "Sessiz bildirimler" kanalı.
 
 ## 6. Roller ve yönetim panelleri
 
@@ -726,6 +734,23 @@ Eren'in kararı: bunlar tartışmasız eklenir. Güncel kurallar yayından önce
 32. Tüm tasarımlarda marka yazımı "CityJoy" olarak birleştirilecek (şu an CityJOY, CityJoy ve TRAVELJOY karışık görünüyor, TravelJoy Seyahat modülünün alt adı olarak kalacak).
 33. `acil-ihtiyaclar.html`: acil numara etiketleri düzeltilecek: 183 Sosyal Destek (su arızası değil), 185 Su Arıza eklenecek, 186 Elektrik, 187 Doğalgaz (tasarımda 186 ve 187 yer değiştirmiş). Uygulamada doğru liste kullanılıyor (bölüm 5.4).
 34. `sos-aile.html`: SOS türü seçimi (Acil, Yardım, Eve Dön, İlaç) kaldırılacak (Eren: mantıklı değil). Tek SOS düğmesi kalır; gönderdikten sonra durum "Güvendeyim" / "Yardım gerek" düğmeleriyle bildirilir.
+
+### 15.3 Günlük sınırlar (spam ve kötüye kullanım; Eren onayladı, 31 Ekim 2026, yapıldı)
+
+Her işlem bir sayaçla sayılır (`usage/{sahip~iş}`, sahip: kişi, işletme, kurum ya da muhtar yetkisi), sınırı veritabanı
+kuralları denetler (ücretsiz planda çalışır, Blaze gerekmez). Sayılar Panel > Günlük sınırlar'dan (yalnızca admin, işlem
+kaydına yazılır) değişir; boşsa varsayılan geçerli. Yeni hesapta (ilk 7 gün) parantezdeki düşük sınır. Sınır dolunca uygulama
+"Bugünlük hakkın doldu, şu saatten itibaren yeniden yapabilirsin" der.
+
+- **Kullanıcı (günlük):** Keşfet gönderisi 10 (3), yorum 100 (30), takip 200 (50), yeni sohbet 30 (10), Çarşı ilanı 5 (2),
+  aktivite 3 (1), hizmet önerisi 5 (2), şikâyet 20.
+- **İşletme:** gönderi günde 5; değerlendirmelere cevap sınırsız.
+- **Muhtar:** duyuru günde 3 ve haftada 10; acil duyuru günde 3.
+- **Kurum ve belediye:** duyuru ve haber günde 5 ve haftada 20; acil günde 3; etkinlik günde 10.
+- Muhtar ve kurumda yalnızca doğrudan yayın sayılır. Sınır dolunca içerik engellenmez: panel "Onaya gönder" önerir, onaylanan
+  sınıra sayılmaz. Kimse kendi hazırladığını onaylayamaz (admin hariç), böylece sınır aşılamaz.
+- İl yöneticisi ve admin sınırsız, işlemleri kayda geçer. SOS, 112 araması ve hesap silme hiçbir zaman sınırlanmaz.
+- İleride üyelik kademeleri sınırı yükseltebilir.
 
 ## 16. Yönetim şeması için çizim maddeleri (Eren çizecek, Claude'un hazırladığı liste)
 

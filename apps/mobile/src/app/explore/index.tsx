@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions, type FlatListProps, type ScrollViewInstance } from 'react-native';
+import { ActivityIndicator, Alert, Animated, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions, type FlatListProps, type ScrollViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { isUnread, POST_CATEGORIES, POST_TARGETS, type Announcement, type Post, type PostCategory, type PostTarget } from '@cityjoy/shared';
@@ -26,6 +26,7 @@ import { toggleFollowAuthor, toggleFollowBusiness, useSocial } from '@/lib/socia
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import { limitText } from '@/lib/limits';
 
 type Tag = PostCategory | 'all';
 const TAGS: Tag[] = ['all', ...POST_CATEGORIES];
@@ -183,7 +184,11 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
   const followOf = (uid: string) => (following?.includes(uid) ? 'aktif' : pending[uid] ?? null);
   const follow = async (uid: string) => {
     if (!user) return;
-    const status = await toggleFollowAuthor(user.uid, uid, followOf(uid) === 'aktif').catch(() => undefined);
+    const status = await toggleFollowAuthor(user.uid, uid, followOf(uid) === 'aktif').catch((e) => {
+      const msg = limitText(t, e);
+      if (msg) Alert.alert(msg);
+      return undefined;
+    });
     if (status !== undefined) setPending((p) => ({ ...p, [uid]: status === 'istek' ? 'istek' : undefined }));
   };
   const followBusiness = (bid: string) => user && toggleFollowBusiness(user.uid, bid, !!followingBusinesses?.includes(bid)).catch(() => {});

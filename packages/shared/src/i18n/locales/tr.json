@@ -1312,7 +1312,8 @@
       "haberTitle": "Kurum haberi · {{title}}",
       "muhtar": "Muhtarlık",
       "cityjoy": "CityJoy",
-      "channel": "Genel bildirimler"
+      "channel": "Genel bildirimler",
+      "quietChannel": "Sessiz bildirimler"
     },
     "categories": {
       "acil": "Acil duyurular",
@@ -1916,5 +1917,8 @@
       "check": "Ürünü teslim almadan önce dene, kontrol et.",
       "link": "Uygulama dışına yönlendiren bağlantılara ve ödeme isteklerine güvenme."
     }
+  },
+  "limits": {
+    "reached": "Bugünlük hakkın doldu. {{when}} itibarıyla yeniden yapabilirsin."
   }
 }

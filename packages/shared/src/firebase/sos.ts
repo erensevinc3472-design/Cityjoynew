@@ -140,6 +140,7 @@ export function createFirestoreFamilyRepository(db: Firestore): FamilyRepository
       const batch = writeBatch(db);
       [...l.docs, ...i.docs, ...a.docs].forEach((d) => batch.delete(d.ref));
       batch.delete(doc(db, 'pushTokens', uid));
+      batch.delete(doc(db, 'pushCount', uid));
       await batch.commit();
     },
   };

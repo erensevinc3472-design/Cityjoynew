@@ -25,6 +25,7 @@ import { useSettings } from '@/lib/settings';
 import { useSocial } from '@/lib/social';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import { errorText } from '@/lib/limits';
 
 interface Props {
   post: Post;
@@ -65,8 +66,8 @@ export function PostComments({ post, uid, displayName, onCount }: Props) {
     setError(undefined);
     try {
       await fn();
-    } catch {
-      setError(t(errKey));
+    } catch (e) {
+      setError(errorText(t, e, errKey));
     } finally {
       setBusy(false);
     }

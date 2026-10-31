@@ -26,6 +26,7 @@ import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import { errorText } from '@/lib/limits';
 
 /**
  * Aktivite ayrıntısı: düzenleyen ("Ayşe K."), tarih, mahalle; tam buluşma yeri yalnızca katılınca. "Katılıyorum"
@@ -98,8 +99,8 @@ export default function ActivityScreen() {
     setError(undefined);
     try {
       await fn();
-    } catch {
-      setError(t(errKey));
+    } catch (e) {
+      setError(errorText(t, e, errKey));
     } finally {
       setBusy(false);
     }

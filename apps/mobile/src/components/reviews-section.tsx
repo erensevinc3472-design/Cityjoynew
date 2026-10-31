@@ -14,6 +14,7 @@ import { FormMessage } from './form-message';
 import { Stars } from './stars';
 import { StateMessage } from './state-message';
 import { TextField } from './text-field';
+import { errorText } from '@/lib/limits';
 
 /**
  * İşletme sayfasındaki değerlendirmeler: ortalama, son yorumlar, işletmenin cevabı, şikâyet.
@@ -56,8 +57,8 @@ export function ReviewsSection({ business: b }: { business: Business }) {
       await fn();
       if (ok) setNotice(ok);
       load();
-    } catch {
-      setNotice(t('reviews.error'));
+    } catch (e) {
+      setNotice(errorText(t, e, 'reviews.error'));
     } finally {
       setBusy(false);
     }

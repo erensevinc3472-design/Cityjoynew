@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { GENERAL_CHANNEL_ID, SOS_CHANNEL_ID, sosPushMessages, type LanguageCode, type PushMessage, type PushNotice, type SosAlert } from '@cityjoy/shared';
+import { GENERAL_CHANNEL_ID, QUIET_CHANNEL_ID, SOS_CHANNEL_ID, sosPushMessages, type LanguageCode, type PushMessage, type PushNotice, type SosAlert } from '@cityjoy/shared';
 
 import i18n from './i18n';
 import { pushTokenRepository } from './services';
@@ -56,6 +56,13 @@ async function ensureChannel() {
     name: i18n.t('notifications.push.channel'),
     importance: Notifications.AndroidImportance.DEFAULT,
     sound: 'default',
+  });
+  // Günlük sesli tavan dolunca gelenler: listede görünür, çalmaz ve titremez.
+  await Notifications.setNotificationChannelAsync(QUIET_CHANNEL_ID, {
+    name: i18n.t('notifications.push.quietChannel'),
+    importance: Notifications.AndroidImportance.LOW,
+    sound: null,
+    enableVibrate: false,
   });
 }
 

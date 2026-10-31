@@ -1312,7 +1312,8 @@
       "haberTitle": "Amtliche Nachricht · {{title}}",
       "muhtar": "Ortsvorsteher",
       "cityjoy": "CityJoy",
-      "channel": "Allgemeine Benachrichtigungen"
+      "channel": "Allgemeine Benachrichtigungen",
+      "quietChannel": "Stille Benachrichtigungen"
     },
     "categories": {
       "acil": "Dringende Meldungen",
@@ -1916,5 +1917,8 @@
       "check": "Ware vor der Übernahme prüfen und testen.",
       "link": "Links und Zahlungsaufforderungen außerhalb der App nicht vertrauen."
     }
+  },
+  "limits": {
+    "reached": "Dein Tageslimit ist erreicht. Ab {{when}} kannst du es wieder tun."
   }
 }

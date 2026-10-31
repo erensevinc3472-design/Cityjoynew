@@ -36,6 +36,7 @@ import { useSettings } from '@/lib/settings';
 import { refreshFollowing, setBlocked, setMyProfile, useSocial } from '@/lib/social';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import { errorText } from '@/lib/limits';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 type Tab = 'gonderiler' | 'kaydedilenler' | 'katildiklarim';
@@ -134,8 +135,8 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     setError(undefined);
     try {
       await fn();
-    } catch {
-      setError(t(errKey));
+    } catch (e) {
+      setError(errorText(t, e, errKey));
     } finally {
       setBusy(false);
     }

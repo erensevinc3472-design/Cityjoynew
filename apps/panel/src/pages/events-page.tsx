@@ -19,8 +19,10 @@ import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { limitText } from '../lib/limits';
 
-type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
+// `retry`: sınır dolunca "Onaya gönder" düğmesi.
+type Msg = { kind: 'ok' | 'error'; text: string; retry?: () => void } | undefined;
 
 /**
  * Etkinlikler (PROJE.md 5.3, 6.2 madde 3): yetkili kurum ve kişiler etkinlik açar; akış duyurularla aynı (hazırla >
@@ -81,7 +83,7 @@ function Events({ user }: { user: PanelUser }) {
     load();
   }, [load]);
 
-  const act = async (fn: () => Promise<unknown>, okText: string) => {
+  const act = async (fn: () => Promise<unknown>, okText: string, onLimit?: () => void) => {
     setBusy(true);
     setMessage(undefined);
     try {
@@ -90,8 +92,9 @@ function Events({ user }: { user: PanelUser }) {
       setDraft(null);
       setRejecting(null);
       await load();
-    } catch {
-      setMessage({ kind: 'error', text: t('events.error') });
+    } catch (e) {
+      const limit = limitText(e);
+      setMessage({ kind: 'error', text: limit ?? t('events.error'), retry: limit ? onLimit : undefined });
     } finally {
       setBusy(false);
     }
@@ -226,7 +229,12 @@ function Events({ user }: { user: PanelUser }) {
       ) : !isAdmin && !reviewProvinces.length ? (
         <p className="note">{t('events.noPublisher')}</p>
       ) : null}
-      {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
+      {message ? (
+        <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>
+          {message.text}
+          {message.retry ? <> <button className="btn secondary" disabled={busy} onClick={message.retry}>{t('limitReached.sendForApproval')}</button></> : null}
+        </p>
+      ) : null}
 
       {draft && publisher ? (
         <EventForm
@@ -235,7 +243,11 @@ function Events({ user }: { user: PanelUser }) {
           busy={busy}
           onCancel={() => setDraft(null)}
           onSave={(input, mode) =>
-            act(() => service.save(publisher, input, mode, draft.existing), t(mode === 'taslak' ? 'announcements.savedDraft' : mode === 'onaya' ? 'events.sent' : 'events.published'))
+            act(
+              () => service.save(publisher, input, mode, draft.existing),
+              t(mode === 'taslak' ? 'announcements.savedDraft' : mode === 'onaya' ? 'events.sent' : 'events.published'),
+              () => act(() => service.save(publisher, input, 'onaya', draft.existing), t('events.sent')),
+            )
           }
         />
       ) : null}

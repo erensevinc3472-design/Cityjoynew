@@ -185,3 +185,47 @@ describe('resmî duyurular', () => {
     await assertFails(getDoc(doc(fs('veli'), 'announcements', draft)));
   });
 });
+
+describe('yayın sınırı', () => {
+  it('kurum günlük doğrudan yayın sınırına takılınca onaya gönderir; kendi hazırladığını onaylayamaz', async () => {
+    // Bugün 5 doğrudan yayın yapılmış.
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'usage', `k-${org.id}~duyuru`), { type: 'k', sid: org.id, kind: 'duyuru', windowStart: now, count: 5 });
+    });
+    const fen = await publisher('fen');
+    await expect(panel('fen').save(fen, input(), 'yayinla')).rejects.toMatchObject({ name: 'LimitReachedError' });
+    // Onaya gönderilen sınıra sayılmaz.
+    const id = await panel('fen').save(fen, input(), 'onaya');
+    // Onay yetkili personel kendi hazırladığını onaylayamaz; başkasınınkini onaylar.
+    const kalemPub = await publisher('kalem');
+    const own = await panel('kalem').save(kalemPub, input({ title: 'Kendi duyurum' }), 'onaya');
+    const pending = await panel('kalem').listPending({ orgId: org.id });
+    await expect(panel('kalem').approve(pending.find((a) => a.id === own)!)).rejects.toThrow();
+    await panel('kalem').approve(pending.find((a) => a.id === id)!);
+    expect((await live()).map((a) => a.id)).toEqual([id]);
+    // İl yöneticisi sınırsız.
+    const ahmet = await publisher('ahmet');
+    for (let i = 0; i < 6; i++) await panel('ahmet').save(ahmet, input({ title: `İl duyurusu ${i}` }), 'yayinla');
+  });
+});
+
+describe('bildirim her zaman çalsın', () => {
+  it('onaylarken yalnızca admin işaretler', async () => {
+    const basin = await publisher('basin');
+    const a = await panel('basin').save(basin, input(), 'onaya');
+    const b = await panel('basin').save(basin, input({ title: 'İkinci duyuru' }), 'onaya');
+    const pending = await panel('kalem').listPending({ orgId: org.id });
+    await expect(panel('kalem').approve(pending.find((x) => x.id === a)!, { ringAlways: true })).rejects.toThrow();
+    await panel('eren').approve(pending.find((x) => x.id === a)!, { ringAlways: true });
+    await panel('kalem').approve(pending.find((x) => x.id === b)!);
+    const ring = async (id: string) => {
+      let v: unknown;
+      await env.withSecurityRulesDisabled(async (ctx) => {
+        v = (await getDoc(doc(ctx.firestore(), 'announcements', id))).get('ringAlways');
+      });
+      return v;
+    };
+    expect(await ring(a)).toBe(true);
+    expect(await ring(b)).toBeUndefined();
+  });
+});

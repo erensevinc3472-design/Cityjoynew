@@ -61,6 +61,54 @@ export function normalizeTriggers(raw: unknown): NotificationTriggers {
   return out;
 }
 
+/**
+ * Telefona giden bildirimin önceliği (PROJE.md 5.12, Eren onayladı 31 Ekim 2026), panelde tür başına seçilir:
+ * "always" her zaman sesli çalar; "normal" kişinin günlük sesli tavanına kadar sesli, sonra sessiz gelir (bildirim
+ * listesinde ve uygulamadaki zilde yine görünür); "inapp" telefona gitmez, yalnızca uygulamadaki bildirim merkezinde.
+ * Acil duyuru ve SOS her zaman çalar, değiştirilemez. Admin tek bir duyuru için "her zaman çalsın" diyebilir.
+ */
+export const PRIORITY_KEYS = ['kurum-duyuru', 'muhtar-duyuru', 'haber', 'etkinlik', 'mesaj', 'takip'] as const;
+export type PriorityKey = (typeof PRIORITY_KEYS)[number];
+export const NOTIFICATION_PRIORITIES = ['always', 'normal', 'inapp'] as const;
+export type NotificationPriority = (typeof NOTIFICATION_PRIORITIES)[number];
+export type NotificationPriorities = Record<PriorityKey, NotificationPriority>;
+
+export const DEFAULT_NOTIFICATION_PRIORITIES: NotificationPriorities = {
+  'kurum-duyuru': 'always',
+  'muhtar-duyuru': 'normal',
+  haber: 'normal',
+  etkinlik: 'normal',
+  mesaj: 'normal',
+  takip: 'normal',
+};
+
+/** Kişi başına günde en çok kaç "normal" bildirim sesli çalar (sonrası sessiz gelir). */
+export const DEFAULT_DAILY_SOUND_CAP = 5;
+export const DAILY_SOUND_CAP_RANGE = [1, 50] as const;
+
+export function normalizePriorities(raw: unknown): NotificationPriorities {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  const out = { ...DEFAULT_NOTIFICATION_PRIORITIES };
+  for (const k of PRIORITY_KEYS) if (NOTIFICATION_PRIORITIES.includes(r[k] as NotificationPriority)) out[k] = r[k] as NotificationPriority;
+  return out;
+}
+
+export function normalizeSoundCap(raw: unknown): number {
+  return Number.isInteger(raw) && (raw as number) >= DAILY_SOUND_CAP_RANGE[0] && (raw as number) <= DAILY_SOUND_CAP_RANGE[1] ? (raw as number) : DEFAULT_DAILY_SOUND_CAP;
+}
+
+/** Panel ayarının tamamı (`config/notificationTriggers`). */
+export interface NotificationSettings {
+  triggers: NotificationTriggers;
+  priorities: NotificationPriorities;
+  dailySoundCap: number;
+}
+
+export function normalizeNotificationSettings(raw: unknown): NotificationSettings {
+  const r = (raw ?? {}) as Record<string, unknown>;
+  return { triggers: normalizeTriggers(r.triggers), priorities: normalizePriorities(r.priorities), dailySoundCap: normalizeSoundCap(r.dailySoundCap) };
+}
+
 /** Sessiz saatlerde mi (telefona bildirim gelince kullanılır; kritik kategoriler sessiz saatte de gelir). */
 export function inQuietHours(q: QuietHours, at: Date): boolean {
   return quietAtHour(q, at.getHours());
