@@ -1269,6 +1269,13 @@
     "messageRequest": "{{name}} отправил(а) вам запрос на переписку",
     "event": "Новое событие: {{title}}",
     "follower": "{{name}} подписался(лась) на вас",
+    "push": {
+      "eventCancelledTitle": "Мероприятие отменено",
+      "eventCancelledBody": "«{{title}}», на которое вы собирались, отменено.",
+      "activityCancelledTitle": "Активность отменена",
+      "activityCancelledBody": "«{{title}}», в которой вы собирались участвовать, отменена.",
+      "channel": "Общие уведомления"
+    },
     "categories": {
       "acil": "Срочные объявления",
       "sos": "SOS (семья)",

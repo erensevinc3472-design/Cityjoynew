@@ -1269,6 +1269,13 @@
     "messageRequest": "أرسل لك {{name}} طلب رسالة",
     "event": "فعالية جديدة: {{title}}",
     "follower": "بدأ {{name}} بمتابعتك",
+    "push": {
+      "eventCancelledTitle": "أُلغيت الفعالية",
+      "eventCancelledBody": "أُلغيت «{{title}}» التي أكدت حضورك لها.",
+      "activityCancelledTitle": "أُلغي النشاط",
+      "activityCancelledBody": "أُلغي «{{title}}» الذي أكدت مشاركتك فيه.",
+      "channel": "إشعارات عامة"
+    },
     "categories": {
       "acil": "إعلانات عاجلة",
       "sos": "SOS (العائلة)",

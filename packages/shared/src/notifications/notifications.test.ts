@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   collectNotifications,
+  GENERAL_CHANNEL_ID,
+  noticePushMessages,
+  turkeyHour,
+  type NoticeTarget,
+  type PushNotice,
   DEFAULT_NOTIFICATION_PREFS,
   DEFAULT_NOTIFICATION_TRIGGERS,
   inQuietHours,
@@ -55,5 +60,34 @@ describe('bildirimler', () => {
     expect(isUnread(n('eski', 'duyuru', 3), read)).toBe(false);
     expect(isUnread(n('yeni', 'duyuru', 1), read)).toBe(true);
     expect(isUnread(n('yeni', 'duyuru', 1), markRead(read, 'yeni'))).toBe(false);
+  });
+});
+
+describe('sunucu olay bildirimi', () => {
+  const notice: PushNotice = { kind: 'eventCancelled', category: 'etkinlik', title: 'Kitap Günü', href: { pathname: '/events/[id]', params: { id: 'e1' } } };
+  const target = (uid: string, over: Partial<NoticeTarget> = {}): NoticeTarget => ({
+    uid, tokens: ['T-' + uid], language: 'tr', prefs: DEFAULT_NOTIFICATION_PREFS, ...over,
+  });
+
+  it('alıcının dilinde, başlık metne yerleşmiş olarak hazırlar; aynı telefona bir kez', () => {
+    const msgs = noticePushMessages([target('a', { tokens: ['T1', 'T1'] }), target('b', { language: 'en' })], notice, DEFAULT_NOTIFICATION_TRIGGERS, 12);
+    expect(msgs).toHaveLength(2);
+    expect(msgs[0]).toMatchObject({ to: 'T1', title: 'Etkinlik iptal edildi', channelId: GENERAL_CHANNEL_ID, data: { href: notice.href } });
+    expect(msgs[0].body).toContain('"Kitap Günü"');
+    expect(msgs[1].title).toBe('Event cancelled');
+  });
+
+  it('admin ya da kişi türü kapattıysa ve sessiz saatte gitmez', () => {
+    const off = { ...DEFAULT_NOTIFICATION_PREFS, categories: { ...DEFAULT_NOTIFICATION_PREFS.categories, etkinlik: false } };
+    const quiet = { ...DEFAULT_NOTIFICATION_PREFS, quietHours: { enabled: true, start: 22, end: 8 } };
+    expect(noticePushMessages([target('a')], notice, { ...DEFAULT_NOTIFICATION_TRIGGERS, etkinlik: false }, 12)).toEqual([]);
+    expect(noticePushMessages([target('a', { prefs: off })], notice, DEFAULT_NOTIFICATION_TRIGGERS, 12)).toEqual([]);
+    expect(noticePushMessages([target('a', { prefs: quiet })], notice, DEFAULT_NOTIFICATION_TRIGGERS, 23)).toEqual([]);
+    expect(noticePushMessages([target('a', { prefs: quiet })], notice, DEFAULT_NOTIFICATION_TRIGGERS, 9)).toHaveLength(1);
+  });
+
+  it('Türkiye saati UTC+3', () => {
+    expect(turkeyHour(new Date('2026-10-31T22:30:00Z'))).toBe(1);
+    expect(turkeyHour(new Date('2026-10-31T09:00:00Z'))).toBe(12);
   });
 });

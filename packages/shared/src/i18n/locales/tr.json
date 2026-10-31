@@ -1269,6 +1269,13 @@
     "messageRequest": "{{name}} sana mesaj isteği gönderdi",
     "event": "Yeni etkinlik: {{title}}",
     "follower": "{{name}} seni takip etmeye başladı",
+    "push": {
+      "eventCancelledTitle": "Etkinlik iptal edildi",
+      "eventCancelledBody": "Katılacağını bildirdiğin \"{{title}}\" iptal edildi.",
+      "activityCancelledTitle": "Aktivite iptal edildi",
+      "activityCancelledBody": "Katılacağını bildirdiğin \"{{title}}\" iptal edildi.",
+      "channel": "Genel bildirimler"
+    },
     "categories": {
       "acil": "Acil duyurular",
       "sos": "SOS (aile)",
