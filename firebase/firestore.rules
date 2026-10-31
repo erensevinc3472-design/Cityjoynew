@@ -2265,10 +2265,13 @@ service cloud.firestore {
         && request.resource.data.bio == ''
         && request.resource.data.isPrivate is bool
         && request.resource.data.updatedAt == request.time;
-      // Kişi adını, tanıtımını ve gizliliğini değiştirir; moderatörün kaldırdığı tanıtımı yeniden yazamaz.
+      // Kişi adını, tanıtımını, fotoğrafını ve gizliliğini değiştirir; moderatörün kaldırdığı tanıtımı yeniden yazamaz,
+      // fotoğrafı kaldırıldıysa yenisini koyamaz. Fotoğraf kendi yüklediği dosya olmalı.
       allow update: if isSelf(uid)
-        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'searchKeys', 'updatedAt'])
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'searchKeys', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'searchKeys', 'updatedAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'searchKeys', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'photo', 'profil')
+        && (resource.data.get('photoRemoved', false) != true || !('photo' in request.resource.data))
         && validSearchKeys(request.resource.data, 40)
         && request.resource.data.displayName is string && request.resource.data.displayName.size() >= 1
         && request.resource.data.displayName.size() <= 40
@@ -2280,6 +2283,11 @@ service cloud.firestore {
       allow update: if isAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio', 'bioRemoved', 'updatedAt'])
         && request.resource.data.bio == '' && request.resource.data.bioRemoved == true
+        && request.resource.data.updatedAt == request.time;
+      // Admin şikâyet üzerine fotoğrafı kaldırır.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'photoRemoved', 'updatedAt'])
+        && !('photo' in request.resource.data) && request.resource.data.photoRemoved == true
         && request.resource.data.updatedAt == request.time;
       allow delete: if isSelf(uid);
     }

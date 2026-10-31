@@ -4,6 +4,7 @@ import { Animated, Pressable, Share, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { Post } from '@cityjoy/shared';
 
+import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
 import { PostPhotos } from '@/components/post-photos';
 import { useReduceMotion } from '@/components/scene-art';
@@ -123,6 +124,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
           <View style={[styles.ring, { borderColor: c.accent }]}>
             <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
               <AppText style={[styles.initial, { color: c.accent }]}>{(item.authorName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+              <AvatarPhoto uid={item.business ? undefined : item.authorUid} size={36} />
             </View>
           </View>
           <View style={styles.who}>

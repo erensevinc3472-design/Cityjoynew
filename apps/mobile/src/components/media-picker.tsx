@@ -26,6 +26,7 @@ export function MediaPicker({
   onChange,
   disabled,
   round,
+  pick,
 }: {
   label: string;
   hint?: string;
@@ -36,6 +37,8 @@ export function MediaPicker({
   onChange(photos: Photo[]): void;
   disabled?: boolean;
   round?: boolean;
+  /** Galeriden kare kırpma (profil fotoğrafı) ve en uzun kenar. */
+  pick?: { square?: boolean; maxEdge?: number };
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -45,7 +48,7 @@ export function MediaPicker({
   const add = async () => {
     setError(undefined);
     try {
-      const picked = await pickPhotos(max - photos.length);
+      const picked = await pickPhotos(max - photos.length, pick);
       if (!picked.length) return;
       setBusy(true);
       const uploaded: Photo[] = [];

@@ -1,3 +1,5 @@
+import type { Photo } from '../media/photo';
+
 /**
  * Keşfet profili, takip ve engelleme (PROJE.md 5.5, 5.8). Herkese açık profil yalnızca "Ayşe K." biçimindeki adı,
  * kısa tanıtımı ve gizli hesap bilgisini taşır; yaş, cinsiyet, meslek ve mahalle gösterilmez (Eren'in kararı).
@@ -13,6 +15,10 @@ export interface PublicProfile {
   isPrivate: boolean;
   /** Moderatör tanıtımı kaldırdı. */
   bioRemoved: boolean;
+  /** Profil fotoğrafı (kare, yuvarlak gösterilir); yoksa adın baş harfi. */
+  photo?: Photo;
+  /** Moderatör fotoğrafı kaldırdı; kişi yenisini koyamaz. */
+  photoRemoved: boolean;
 }
 
 export const PROFILE_LIMITS = {

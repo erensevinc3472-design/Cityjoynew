@@ -107,6 +107,32 @@ describe('Keşfet profili ve takip', () => {
     await assertFails(updateDoc(doc(fs('ayse'), 'publicProfiles', 'ayse'), { bioRemoved: false }));
   });
 
+  it('profil fotoğrafı: yalnızca kendi yüklediği; admin şikâyet üzerine kaldırır, kişi yenisini koyamaz', async () => {
+    const photo = (uid: string, kind = 'profil') => {
+      const p = `media/${uid}/${kind}/abcDEF123456.jpg`;
+      return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 600, height: 600 };
+    };
+    await assertFails(social('ayse').setPhoto('ayse', photo('ali')));
+    await assertFails(social('ayse').setPhoto('ayse', photo('ayse', 'kurum')));
+    await assertFails(social('ali').setPhoto('ayse', photo('ali')));
+    await assertSucceeds(social('ayse').setPhoto('ayse', photo('ayse')));
+    expect((await social('ali').getProfile('ayse'))!.photo?.path).toBe('media/ayse/profil/abcDEF123456.jpg');
+    // Ad değişince fotoğraf kalır.
+    await assertSucceeds(social('ayse').updateProfile('ayse', { displayName: 'Ayşe Kaya', bio: '', isPrivate: false }));
+    const p = (await social('ali').getProfile('ayse'))!;
+    expect(p.photo).toBeDefined();
+    await social('ali').reportProfile(p, 'ali', 'uygunsuz');
+    await assertFails(updateDoc(doc(fs('ali'), 'publicProfiles', 'ayse'), { photoRemoved: true }));
+    const mod = createProfileModeration(fs('eren'), 'eren');
+    const [r] = await mod.listReports();
+    expect(r!.current?.photo).toBeDefined();
+    await assertSucceeds(mod.removePhoto(r!));
+    expect(await social('ali').getProfile('ayse')).toMatchObject({ photoRemoved: true });
+    expect((await social('ali').getProfile('ayse'))!.photo).toBeUndefined();
+    await assertFails(social('ayse').setPhoto('ayse', photo('ayse')));
+    await assertFails(updateDoc(doc(fs('ayse'), 'publicProfiles', 'ayse'), { photoRemoved: false }));
+  });
+
   it('yasaklı kelime listesi: herkes okur, yalnızca admin yazar (işlem kaydıyla)', async () => {
     await assertFails(createBannedWords(fs('ali')).save('ali', ['salak']));
     expect(await createBannedWords(fs('eren')).save('eren', [' Salak ', 'salak', 'aptal'])).toEqual(['salak', 'aptal']);

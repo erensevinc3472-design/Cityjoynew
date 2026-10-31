@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri birleşti, kurallar yüklendi). Önceki: mesaj ve takip için telefon bildirimi (PR #47 birleşti).
+Son güncelleme: 1 Kasım 2026 (kişi profil fotoğrafı, dal `claude/profil-foto`). Önceki: etkinlik/kurum/işletme görselleri ve panelin internete konması (PR #50 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -44,9 +44,9 @@ Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri birl
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (148)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (137; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (24; Java 21 gerekir)
+npm test                      # ortak paket testleri (150)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (138; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (25; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -625,6 +625,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   planda çalışır. Panelde her değişiklikten sonra yeniden yüklenmeli (birleşmiş `main` dalından yüklemek doğrusu;
   ilk yükleme `claude/foto` dalından yapıldı; PR #50 birleşince Firestore kuralları ve panel `main`den yeniden
   yüklendi, 31 Ekim). Storage kuralları ve sunucu işlevleri Blaze bekliyor.
+- **Kişi profil fotoğrafı (1 Kasım, dal `claude/profil-foto`; Blaze ile çalışır).** Herkes (kullanıcı, muhtar, kurum
+  ya da işletme yöneticisi; hepsi aynı kişisel Keşfet profilini kullanır) profil düzenleme formunda fotoğraf seçer:
+  galeriden kare kırpılır, 800 piksele küçültülür, `media/{uid}/profil/` altına yüklenir, hemen kaydedilir
+  (`publicProfiles.photo`). Fotoğraf baş harfin üstünde yuvarlak görünür: profil, gönderi kartı, mesaj listesi ve yeni
+  mesaj, Ara > Kişiler, yan menü, işletme yetkilileri. Başkalarının fotoğrafı oturumda kişi başına bir kez okunur
+  (`lib/profile-photos.ts`). Kurallar: yalnızca kendi yüklediği `profil` dosyası. Moderasyon: panel > Moderasyon >
+  profil şikâyetlerinde fotoğraf küçük görünür, "Fotoğrafı kaldır" siler ve kişinin yenisini koymasını kapatır (işlem
+  kaydına geçer). Sunucu `profilePhotoChanged` eski dosyayı siler (hesap silinince de). Testler: kurallar 138, sunucu
+  25, ortak 150. Resmî profil ve işletme kendi logosunu kullanır (ayrı).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -732,7 +741,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Mesajlar'daki bölüm de "Çarşı" olacak. ~~Çarşı (eşya ilanları) ve Mesajlar > Çarşı~~ (31 Ekim). Çarşı'da kalan:
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
-5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini~~ (31 Ekim, Blaze
+5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini, kişi profil fotoğrafı~~ (31 Ekim - 1 Kasım, Blaze
    bekliyor). Kalan: aktivite görseli, belediye fotoğrafları, "{Şehir}'dan Kareler", Çarşı ilan fotoğrafları.
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.

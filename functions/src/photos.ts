@@ -22,10 +22,11 @@ export interface MediaField {
   owners?: (d: DocumentData) => unknown[];
 }
 
-/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini (`media/{yükleyen}/{tür}/...`). */
+/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı (`media/{yükleyen}/{tür}/...`). */
 export const MEDIA_FIELDS = {
   events: [{ key: 'cover', owners: (d) => [d.preparedBy] }],
   officialProfiles: [{ key: 'logo' }],
+  publicProfiles: [{ key: 'photo' }],
   businesses: [{ key: 'logo' }, { key: 'gallery', owners: (d) => [d.ownerUid, ...(Array.isArray(d.managerUids) ? d.managerUids : [])] }],
 } satisfies Record<string, MediaField[]>;
 

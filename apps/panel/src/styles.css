@@ -156,3 +156,7 @@ td.handle-cell { width: 40px; padding-inline: 4px; }
 .image-field { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
 .image-field img { width: 160px; max-height: 100px; object-fit: cover; border-radius: 8px; display: block; }
 .image-field img.round { width: 72px; height: 72px; border-radius: 50%; }
+
+/* Moderasyonda şikâyet edilen profilin fotoğrafı. */
+.profile-photo { float: inline-start; margin-inline-end: 8px; }
+.profile-photo img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: block; }
