@@ -425,6 +425,7 @@
       "removed": "Kaldırıldı",
       "kept": "Yerinde kaldı",
       "missing": "(gönderi sahibi tarafından silinmiş)",
+      "photo": "Fotoğraf {{n}} (büyütmek için tıkla)",
       "remove": "Gönderiyi kaldır",
       "keep": "Yerinde kalsın",
       "note": "Nefret söylemi, taciz, dolandırıcılık, reklam, uygunsuz içerik ya da emlak ilanında kaldırın. Kaldırılan gönderi uygulamada görünmez. Her işlem işlem kaydına yazılır.",

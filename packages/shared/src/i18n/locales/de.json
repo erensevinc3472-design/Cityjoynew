@@ -1003,13 +1003,14 @@
       "mahallemNote": "Wenn du in Mein Viertel teilst, können Nachbarn erkennen, dass du dort wohnst."
     },
     "errors": {
-      "text": "Schreib etwas (bis zu 2000 Zeichen).",
+      "text": "Schreib etwas oder füge ein Foto hinzu (bis zu 2000 Zeichen).",
       "category": "Wähle eine Kategorie.",
       "targets": "Wähle mindestens einen Ort.",
       "region": "Wähle in deinem Standort dein Viertel.",
       "realEstate": "Anzeigen für Wohnungen, Grundstücke oder Läden zum Kauf oder zur Miete sind in Entdecken nicht erlaubt. Immobilienanzeigen kommen später mit Lizenz in den Basar.",
       "relative": "Nur Angehörige können einen Beileidsbeitrag teilen.",
-      "banned": "Dein Text enthält ein Wort, das gegen die Gemeinschaftsregeln verstößt. Bitte ändere es und versuche es erneut."
+      "banned": "Dein Text enthält ein Wort, das gegen die Gemeinschaftsregeln verstößt. Bitte ändere es und versuche es erneut.",
+      "photos": "Du kannst bis zu 4 Fotos hinzufügen."
     },
     "save": "Speichern",
     "unsave": "Gespeichert ✓",
@@ -1117,6 +1118,17 @@
       "setHood": "Viertel des Betriebs wählen",
       "pendingNote": "Dein Beitrag erscheint, sobald der Inhaber von {{name}} ihn freigibt.",
       "sendForApproval": "Zur Freigabe senden"
+    },
+    "photos": {
+      "add": "Foto hinzufügen",
+      "count": "{{count}}/4 Fotos",
+      "remove": "Foto entfernen",
+      "label": "Foto {{n}} von {{total}}",
+      "note": "Fotos werden vor dem Hochladen verkleinert; Standort- und Geräteangaben werden entfernt.",
+      "uploading": "Fotos werden hochgeladen…",
+      "tooLarge": "Das Foto ist zu groß. Bitte wähle ein anderes.",
+      "uploadError": "Das Foto konnte nicht hochgeladen werden. Prüfe deine Verbindung und versuche es erneut.",
+      "permission": "Zum Auswählen eines Fotos wird Zugriff auf die Fotomediathek benötigt. Du kannst ihn in den Einstellungen deines Telefons erlauben."
     }
   },
   "news": {

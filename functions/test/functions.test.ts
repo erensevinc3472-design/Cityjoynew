@@ -6,6 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { handleAnnouncementWrite } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
+import { handlePostPhotos } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
 
@@ -228,6 +229,31 @@ describe('takip bildirimi', () => {
   });
 });
 
+describe('gönderi fotoğrafları', () => {
+  const photo = { path: 'posts/u1/p1/0.jpg', url: 'https://x', width: 10, height: 10 };
+  it('moderatör kaldırınca dosyalar ve kayıttaki alan silinir; sahibi kaldırınca dosyalar silinir', async () => {
+    const deleted: string[] = [];
+    const del = async (p: string) => void deleted.push(p);
+    const before = { authorUid: 'u1', status: 'aktif', text: 'x', photos: [photo] };
+    await db.doc('posts/p1').set({ ...before, status: 'kaldirildi' });
+    expect(await handlePostPhotos(db, 'p1', before, { ...before, status: 'kaldirildi' }, del)).toBe(true);
+    expect(deleted).toEqual(['posts/u1/p1/']);
+    expect((await db.doc('posts/p1').get()).get('photos')).toBeUndefined();
+    // Sahibi kaldırdı: alan zaten boş.
+    expect(await handlePostPhotos(db, 'p1', before, { authorUid: 'u1', status: 'kaldirildi', text: '' }, del)).toBe(true);
+    expect(deleted).toEqual(['posts/u1/p1/', 'posts/u1/p1/']);
+  });
+
+  it('fotoğrafsız ya da hâlâ yayında gönderide bir şey yapılmaz', async () => {
+    const del = async () => {
+      throw new Error('silinmemeli');
+    };
+    const live = { authorUid: 'u1', status: 'aktif', photos: [photo] };
+    expect(await handlePostPhotos(db, 'p1', live, { ...live, likeCount: 1 }, del)).toBe(false);
+    expect(await handlePostPhotos(db, 'p1', { authorUid: 'u1', status: 'aktif' }, { authorUid: 'u1', status: 'kaldirildi' }, del)).toBe(false);
+  });
+});
+
 describe('temizlik', () => {
   it('süresi dolan SOS kayıtları silinir, diğerleri kalır', async () => {
     await db.doc('sosAlerts/eski').set({ fromUid: 'a', deleteAt: Timestamp.fromDate(new Date('2026-10-01T00:00:00Z')) });
@@ -247,7 +273,9 @@ describe('temizlik', () => {
     await db.doc('serviceSuggestions/s2').set({ uid: 'u2', text: 'Saat tamiri' });
     await db.doc('usage/u-u1~oneri').set({ type: 'u', sid: 'u1', kind: 'oneri', count: 1 });
     await db.doc('users/u2').set({ displayName: 'Ayşe' });
-    await deleteUserLeftovers(db, 'u1');
+    const deleted: string[] = [];
+    await deleteUserLeftovers(db, 'u1', async (p) => void deleted.push(p));
+    expect(deleted).toEqual(['posts/u1/']);
     for (const p of ['users/u1', 'users/u1/settings/notifications', 'pushTokens/u1', 'publicProfiles/u1', 'pushCount/u1', 'serviceSuggestions/s1', 'usage/u-u1~oneri']) {
       expect((await db.doc(p).get()).exists, p).toBe(false);
     }

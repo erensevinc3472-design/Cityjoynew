@@ -1636,7 +1636,7 @@ service cloud.firestore {
     }
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
-             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'createdAt', 'updatedAt'])
+             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
         && validSearchKeys(d, 300)
         && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
@@ -1649,6 +1649,24 @@ service cloud.firestore {
         && d.authorName is string && d.authorName.size() <= 40
         && d.likeCount is int && d.reportCount is int
         && d.updatedAt == request.time;
+    }
+    // Gönderi fotoğrafları (en çok 4): dosya paylaşanın klasöründe, bu gönderinin kimliğiyle ve sırayla adlandırılır;
+    // adres o dosyanın Storage adresidir (yerel denemede emülatör).
+    function validPostPhoto(p, uid, id, i) {
+      return p is map && p.keys().hasOnly(['path', 'url', 'width', 'height'])
+        && p.path == 'posts/' + uid + '/' + id + '/' + string(i) + '.jpg'
+        && p.url is string && p.url.size() <= 600
+        && p.url.matches('(https://firebasestorage[.]googleapis[.]com|http://(127[.]0[.]0[.]1|localhost|10[.]0[.]2[.]2):9199)/v0/b/[^/?]+/o/posts%2F'
+            + uid + '%2F' + id + '%2F' + string(i) + '[.]jpg[?].*')
+        && p.width is int && p.height is int && p.width > 0 && p.width <= 4000 && p.height > 0 && p.height <= 4000;
+    }
+    function validPostPhotos(d, id) {
+      return !('photos' in d)
+        || (d.photos is list && d.photos.size() >= 1 && d.photos.size() <= 4
+            && validPostPhoto(d.photos[0], d.authorUid, id, 0)
+            && (d.photos.size() < 2 || validPostPhoto(d.photos[1], d.authorUid, id, 1))
+            && (d.photos.size() < 3 || validPostPhoto(d.photos[2], d.authorUid, id, 2))
+            && (d.photos.size() < 4 || validPostPhoto(d.photos[3], d.authorUid, id, 3)));
     }
     function canSeePost(d) {
       // Hedefler sabit anahtarlı bir haritada durur ({mahallem, bolgesel, genel}: true/false): akış sorguları bunlarla
@@ -1701,7 +1719,8 @@ service cloud.firestore {
         && !('commentsOff' in request.resource.data) && !('lastComment' in request.resource.data)
         && request.resource.data.createdAt == request.time
         && validPost(request.resource.data)
-        && request.resource.data.text.size() >= 1
+        && (request.resource.data.text.size() >= 1 || 'photos' in request.resource.data)
+        && validPostPhotos(request.resource.data, id)
         && ('business' in request.resource.data
             ? (validBusinessPost(request.resource.data)
                 && usageOk('b-' + request.resource.data.business.id, 'isletme-gonderi', limitOf('isletmeGonderi', 5)))
@@ -1716,13 +1735,14 @@ service cloud.firestore {
         && isBusinessOwner(resource.data.business.id)
         && request.resource.data.status == 'aktif' && request.resource.data.updatedAt == request.time
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
-      // Sahibi (işletme paylaşımında işletme sahibi de) kaldırır: yazı, ad ve arama anahtarları boşaltılır.
+      // Sahibi (işletme paylaşımında işletme sahibi de) kaldırır: yazı, ad, arama anahtarları ve fotoğraflar boşaltılır
+      // (dosyaları sunucu siler).
       allow update: if (resource.data.authorUid == request.auth.uid
             || ('business' in resource.data && isBusinessOwner(resource.data.business.id)))
         && request.resource.data.updatedAt == request.time
         && request.resource.data.status == 'kaldirildi' && request.resource.data.text == '' && request.resource.data.authorName == ''
-        && !('searchKeys' in request.resource.data)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'updatedAt']);
+        && !('searchKeys' in request.resource.data) && !('photos' in request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'updatedAt']);
       // Sahibi yorumları kapatır ya da açar.
       allow update: if resource.data.authorUid == request.auth.uid
         && request.resource.data.updatedAt == request.time

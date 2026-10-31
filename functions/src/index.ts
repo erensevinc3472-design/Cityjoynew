@@ -4,6 +4,7 @@
  */
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 import * as functionsV1 from 'firebase-functions/v1';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
@@ -12,6 +13,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { handleAnnouncementWrite } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
+import { handlePostPhotos, type DeleteFiles } from './photos';
 import { expoSender } from './push';
 import { handleFollowWrite, handleMessageCreate } from './social';
 
@@ -22,6 +24,7 @@ const REGION = 'europe-west1';
 setGlobalOptions({ region: REGION, maxInstances: 5 });
 
 const deps = () => ({ send: expoSender, now: new Date() });
+const deleteFiles: DeleteFiles = (prefix) => getStorage().bucket().deleteFiles({ prefix });
 
 export const eventCancelled = onDocumentUpdated('events/{id}', async (e) => {
   await handleEventChange(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deps());
@@ -44,6 +47,11 @@ export const followChanged = onDocumentWritten('follows/{fid}', async (e) => {
   await handleFollowWrite(db, e.params.fid, e.data?.before.data(), e.data?.after.data(), deps());
 });
 
+// Gönderi kaldırılınca fotoğraf dosyaları silinir.
+export const postPhotosRemoved = onDocumentUpdated('posts/{id}', async (e) => {
+  await handlePostPhotos(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {
   const now = new Date();
   await deleteExpiredSos(db, now);
@@ -54,4 +62,4 @@ export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 
 export const userDeleted = functionsV1
   .region(REGION)
   .auth.user()
-  .onDelete((user) => deleteUserLeftovers(db, user.uid));
+  .onDelete((user) => deleteUserLeftovers(db, user.uid, deleteFiles));

@@ -28,12 +28,31 @@ export interface PostRegion {
   neighbourhoodId: string;
 }
 
+/**
+ * Gönderi fotoğrafı (Storage, Blaze). Telefonda küçültülüp JPEG'e çevrilerek yüklenir (konum ve cihaz bilgisi gibi
+ * EXIF verisi bu sırada atılır). Dosya `posts/{uid}/{postId}/{sıra}.jpg`; yüklenen dosya değiştirilemez, gönderi
+ * kaldırılınca ya da hesap silinince sunucu siler.
+ */
+export interface PostPhoto {
+  path: string;
+  url: string;
+  width: number;
+  height: number;
+}
+
+/** En uzun kenar, JPEG kalitesi ve kuralların kabul ettiği en büyük dosya. */
+export const PHOTO_UPLOAD = { maxEdge: 1600, quality: 0.7, maxBytes: 1_500_000 } as const;
+
+export const postPhotoPath = (uid: string, postId: string, index: number) => `posts/${uid}/${postId}/${index}.jpg`;
+
 export interface PostInput {
+  /** Fotoğraf varsa boş olabilir. */
   text: string;
   category: PostCategory;
   targets: PostTarget[];
   /** Paylaşanın kayıtlı konumu (Mahallem ve Bölgesel buna göre süzülür). */
   region: PostRegion;
+  photos?: PostPhoto[];
 }
 
 export interface Post extends PostInput {
@@ -56,6 +75,8 @@ export interface Post extends PostInput {
 
 export const POST_LIMITS = {
   text: [1, 2000],
+  /** Gönderi başına en çok fotoğraf. */
+  photos: 4,
   /** Bu kadar şikâyette moderatör inceleyene kadar akıştan düşer. */
   reportThreshold: 3,
   /** Akışta bir seferde okunan gönderi (sayfalama, maliyet ilkesi). */
@@ -65,7 +86,7 @@ export const POST_LIMITS = {
 export const POST_REPORT_REASONS = ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger'] as const;
 export type PostReportReason = (typeof POST_REPORT_REASONS)[number];
 
-export type PostError = 'text' | 'category' | 'targets' | 'region' | 'realEstate';
+export type PostError = 'text' | 'category' | 'targets' | 'region' | 'realEstate' | 'photos';
 
 /**
  * Satılık/kiralık taşınmaz ilanı sezgisi (madde 9): "satılık daire", "kiralık ev", "for rent" gibi. Kusursuz değildir;
@@ -79,7 +100,9 @@ export const looksLikeRealEstate = (text: string) => REAL_ESTATE.test(text.toLoc
 export function validatePost(p: PostInput): PostError[] {
   const errors: PostError[] = [];
   const len = p.text.trim().length;
-  if (len < POST_LIMITS.text[0] || len > POST_LIMITS.text[1]) errors.push('text');
+  const photos = p.photos?.length ?? 0;
+  if ((len < POST_LIMITS.text[0] && !photos) || len > POST_LIMITS.text[1]) errors.push('text');
+  if (photos > POST_LIMITS.photos) errors.push('photos');
   if (!POST_CATEGORIES.includes(p.category)) errors.push('category');
   if (!p.targets.length || new Set(p.targets).size !== p.targets.length || p.targets.some((x) => !POST_TARGETS.includes(x))) errors.push('targets');
   const r = p.region;

@@ -1,5 +1,7 @@
 import type { Firestore } from 'firebase-admin/firestore';
 
+import type { DeleteFiles } from './photos';
+
 /**
  * Süresi dolan SOS kayıtlarını siler (gönderilişinden 30 gün sonra, `deleteAt`; PROJE.md 5.12). Günde bir çalışır,
  * Firestore TTL ayarına gerek kalmaz. Silinen sayıyı döndürür.
@@ -29,7 +31,9 @@ async function deleteExpired(db: Firestore, collection: string, now: Date): Prom
  * Hesap silinince geride kalan kişisel kayıtları siler. Uygulama silmeden önce kişinin bütün verisini zaten siler
  * (hesap ekranı); bu, telefon yarıda kapanırsa ya da hesap konsoldan silinirse kalanları temizleyen güvenlik ağıdır.
  */
-export async function deleteUserLeftovers(db: Firestore, uid: string): Promise<void> {
+export async function deleteUserLeftovers(db: Firestore, uid: string, deleteFiles: DeleteFiles): Promise<void> {
+  // Gönderi fotoğrafları (Storage).
+  await deleteFiles(`posts/${uid}/`);
   await db.recursiveDelete(db.doc(`users/${uid}`));
   await Promise.all(['pushTokens', 'publicProfiles', 'chatQuota', 'pushCount'].map((c) => db.doc(`${c}/${uid}`).delete()));
   // Hizmet önerileri ve günlük sınır sayaçları.

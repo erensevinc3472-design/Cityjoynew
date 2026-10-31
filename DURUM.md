@@ -45,10 +45,11 @@ Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri birl
 ```sh
 npm install
 npm test                      # ortak paket testleri (148)
-npm run test:rules            # güvenlik kuralları + depo testleri, emülatörde (130; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (19; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (133; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (21; Java 21 gerekir)
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
+# Dosya deposu kuralları (Blaze + konsolda Storage açılınca): npx firebase-tools@15.34.1 deploy --only storage --project cityjoynew --config firebase/firebase.json
 npm run typecheck
 npm run env:write             # FIREBASE_WEB_CONFIG -> apps/*/.env.local
 npm run locations:build       # PTT verisinden il/ilçe/mahalle dosyalarını üret
@@ -591,6 +592,19 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **Hesap silinince hizmet önerileri ve sınır sayaçları da silinir (31 Ekim, dal `claude/hesap-oneri`).** Kişi kendi
   önerilerini okuyup silebilir (kurallar), hesap ekranı siler; sunucudaki silme güvenlik ağı da öneri, sayaç ve günlük
   bildirim sayacını (`pushCount`) temizler. Testler: kurallar 130, sunucu 19. **Kurallar değişti: birleşince yüklenmeli.**
+- **Keşfet'e fotoğraf (31 Ekim, dal `claude/foto`; hesap silme dalını da içerir).** Gönderiye en çok 4 fotoğraf; fotoğraf
+  varsa yazı boş olabilir. Telefonda galeriden seçilir (`expo-image-picker`), en uzun kenar 1600 piksel JPEG'e küçültülür
+  (`expo-image-manipulator`; konum ve cihaz bilgisi bu sırada atılır), gönderinin kimliğiyle
+  `posts/{uid}/{postId}/{0-3}.jpg` yoluna yüklenir, sonra gönderi kaydedilir (kayıt olmazsa dosyalar geri silinir).
+  Akışta ekran genişliğinde (oran 4:5 ile 1.91:1 arası), çoklu fotoğraf yana kaydırılır ("2/3" ve noktalar); profil
+  ızgarasında ilk fotoğraf kare olur. Panel > Moderasyon şikâyet edilen gönderinin fotoğraflarını gösterir. Kurallar:
+  Storage `firebase/storage.rules` (yalnızca sahibi, yalnızca JPEG, en çok 1,5 MB, üzerine yazma yok, okuma girişliye);
+  Firestore fotoğraf alanını denetler (kendi klasörü, bu gönderinin kimliği, sıra, Storage adresi). Sunucu işlevi
+  `postPhotosRemoved`: gönderi kaldırılınca (sahibi ya da moderatör) dosyaları siler; hesap silinince `posts/{uid}/`
+  klasörü silinir. Testler: kurallar 133 (Storage emülatörüyle; emülatör "üzerine yazma"yı sınayamıyor), sunucu 21,
+  ortak 148. **Henüz çalışmıyor:** Blaze, konsolda Storage'ı açmak, Storage kurallarını ve işlevleri yüklemek gerekir;
+  o zamana kadar fotoğraflı paylaşım "yüklenemedi" der, yazılı paylaşım çalışır. Telefonda denenmedi (Blaze sonrası).
+  Açık: yükleme yarıda kalırsa klasörde artık dosya kalabilir (ileride günlük temizlik).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -698,7 +712,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Mesajlar'daki bölüm de "Çarşı" olacak. ~~Çarşı (eşya ilanları) ve Mesajlar > Çarşı~~ (31 Ekim). Çarşı'da kalan:
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
-5. Fotoğraf yükleme: Storage kuralları ve yükleme (Keşfet, işletme vitrini, etkinlik görseli, belediye fotoğrafları).
+5. Fotoğraf yükleme: ~~Keşfet gönderisi~~ (31 Ekim, Blaze bekliyor). Kalan: işletme vitrini, etkinlik görseli, belediye
+   fotoğrafları, "{Şehir}'dan Kareler" (aynı altyapıyla).
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 
