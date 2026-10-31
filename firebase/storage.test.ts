@@ -46,4 +46,14 @@ describe('Dosya deposu: gönderi fotoğrafları', () => {
     await assertFails(deleteObject(ref(st('ali'), 'posts/ayse/p1/0.jpg')));
     await assertSucceeds(deleteObject(ref(st('ayse'), 'posts/ayse/p1/0.jpg')));
   });
+  it('diğer görseller: kendi klasörüne, bilinen türde, rastgele adla', async () => {
+    await assertSucceeds(put(st('ayse'), 'media/ayse/etkinlik/abcDEF123456.jpg'));
+    await assertSucceeds(put(st('ayse'), 'media/ayse/isletme-vitrin/abcDEF123456xyz.jpg'));
+    await assertFails(put(st('ali'), 'media/ayse/etkinlik/abcDEF1234567.jpg'));
+    await assertFails(put(st('ayse'), 'media/ayse/baska/abcDEF123456.jpg'));
+    await assertFails(put(st('ayse'), 'media/ayse/kurum/kisa.jpg'));
+    await assertFails(put(st('ayse'), 'media/ayse/kurum/abcDEF123456.jpg', jpeg(), 'image/png'));
+    await assertSucceeds(getBytes(ref(st('ali'), 'media/ayse/etkinlik/abcDEF123456.jpg')));
+    await assertFails(deleteObject(ref(st('ali'), 'media/ayse/etkinlik/abcDEF123456.jpg')));
+  });
 });

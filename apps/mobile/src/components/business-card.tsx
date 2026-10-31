@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +44,8 @@ export function BusinessCard({ business: b, featured }: { business: Business; fe
         accessibilityRole="button"
         accessibilityLabel={[featured ? t('business.ad') : null, b.name, verificationText(b, t, i18n.language), ratingText(b, t, i18n.language), district].filter(Boolean).join(', ')}
         onPress={() => router.push({ pathname: '/business/[id]', params: { id: b.id } })}
-        style={({ pressed }) => [styles.body, { opacity: pressed ? 0.8 : 1 }]}>
+        style={({ pressed }) => [styles.body, b.logo ? styles.withLogo : null, { opacity: pressed ? 0.8 : 1 }]}>
+        {b.logo ? <Image source={{ uri: b.logo.url }} style={[styles.logo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
         {featured ? (
           <View style={[styles.adTag, { borderColor: c.accentBorder }]}>
             <AppText variant="caption" style={{ color: c.highlight }}>{t('business.ad')}</AppText>
@@ -104,6 +106,8 @@ export function ContactButtons({ business: b }: { business: Business }) {
 const styles = StyleSheet.create({
   card: { borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8 },
   body: { padding: spacing.md, gap: 4 },
+  withLogo: { paddingEnd: spacing.md + 52 },
+  logo: { position: 'absolute', top: spacing.md, end: spacing.md, width: 44, height: 44, borderRadius: 22 },
   line: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   adTag: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.sm, marginBottom: 2 },
   actions: { flexDirection: 'row', borderTopWidth: StyleSheet.hairlineWidth },

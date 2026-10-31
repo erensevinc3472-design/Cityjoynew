@@ -16,7 +16,9 @@
     "env:write": "node scripts/write-env.mjs",
     "test:rules": "npm test --workspace firebase",
     "test:functions": "npm test --workspace functions",
-    "functions:build": "npm run build --workspace functions"
+    "functions:build": "npm run build --workspace functions",
+    "panel:build": "npm run build --workspace apps/panel",
+    "panel:deploy": "npm run panel:build && npx firebase-tools@15.34.1 deploy --only hosting --project cityjoynew --config firebase/firebase.json"
   },
   "devDependencies": {
     "write-excel-file": "4.1.1"

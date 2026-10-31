@@ -370,7 +370,8 @@
       "trust": "Güven bilgisi",
       "closed": "Kapalı",
       "payment": "Ödeme yöntemleri",
-      "amenities": "Olanaklar"
+      "amenities": "Olanaklar",
+      "gallery": "Vitrin"
     },
     "managers": {
       "title": "Yetkililer",
@@ -398,7 +399,11 @@
       "mine": "Yetkili olduğun işletmeler",
       "youManage": "Yetkilisin",
       "messages": "Müşteri mesajlarına cevap verebilir"
-    }
+    },
+    "logo": "Logo (isteğe bağlı)",
+    "logoHint": "Kare bir logo en iyi görünür; yuvarlak gösterilir.",
+    "gallery": "Vitrin fotoğrafları",
+    "galleryHint": "Dükkânın, ürünlerin, menünün fotoğrafları. Kendi çektiğin ya da kullanma iznin olan fotoğrafları ekle; küçültülerek yüklenir, konum bilgisi silinir."
   },
   "reviews": {
     "title": "Değerlendirmeler",
@@ -1932,5 +1937,8 @@
   },
   "limits": {
     "reached": "Bugünlük hakkın doldu. {{when}} itibarıyla yeniden yapabilirsin."
+  },
+  "media": {
+    "count": "{{count}}/{{max}} fotoğraf"
   }
 }

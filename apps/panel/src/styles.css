@@ -153,3 +153,6 @@ td.handle-cell { width: 40px; padding-inline: 4px; }
 /* Moderasyonda gönderi fotoğraflarının küçük önizlemeleri. */
 .photo-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
 .photo-row img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; display: block; }
+.image-field { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.image-field img { width: 160px; max-height: 100px; object-fit: cover; border-radius: 8px; display: block; }
+.image-field img.round { width: 72px; height: 72px; border-radius: 50%; }

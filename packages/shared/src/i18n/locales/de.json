@@ -370,7 +370,8 @@
       "trust": "Vertrauensinformationen",
       "closed": "Geschlossen",
       "payment": "Zahlungsarten",
-      "amenities": "Ausstattung"
+      "amenities": "Ausstattung",
+      "gallery": "Schaufenster"
     },
     "managers": {
       "title": "Verwalter",
@@ -398,7 +399,11 @@
       "mine": "Betriebe, die du verwaltest",
       "youManage": "Verwalter",
       "messages": "Darf Kundennachrichten beantworten"
-    }
+    },
+    "logo": "Logo (optional)",
+    "logoHint": "Ein quadratisches Logo sieht am besten aus; es wird rund angezeigt.",
+    "gallery": "Schaufenster-Fotos",
+    "galleryHint": "Fotos von Laden, Produkten oder Speisekarte. Füge eigene Fotos oder Fotos mit Nutzungsrecht hinzu; sie werden verkleinert, Standortdaten werden entfernt."
   },
   "reviews": {
     "title": "Bewertungen",
@@ -1932,5 +1937,8 @@
   },
   "limits": {
     "reached": "Dein Tageslimit ist erreicht. Ab {{when}} kannst du es wieder tun."
+  },
+  "media": {
+    "count": "{{count}}/{{max}} Fotos"
   }
 }

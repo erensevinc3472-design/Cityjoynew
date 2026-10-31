@@ -15,6 +15,7 @@ import {
 import { createEventPanel, createFirestoreEventRepository, type SaveMode } from '@cityjoy/shared/firebase';
 
 import { authorLabel, cleanRegion, dateTime, regionComplete, regionLabel, RegionFields, scopeRegion, toLocalInput, useNeighbourhoodNames } from '../components/content-common';
+import { ImageField } from '../components/image-field';
 import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
@@ -238,6 +239,7 @@ function Events({ user }: { user: PanelUser }) {
 
       {draft && publisher ? (
         <EventForm
+          uid={user.uid}
           publisher={publisher}
           draft={draft}
           busy={busy}
@@ -340,15 +342,18 @@ const toInput = (e: CityEvent): EventInput => ({
   ...(e.priceNote ? { priceNote: e.priceNote } : {}),
   ...(e.ticketUrl ? { ticketUrl: e.ticketUrl } : {}),
   ...(e.capacity ? { capacity: e.capacity } : {}),
+  ...(e.cover ? { cover: e.cover } : {}),
 });
 
 function EventForm({
+  uid,
   publisher,
   draft,
   busy,
   onCancel,
   onSave,
 }: {
+  uid: string;
   publisher: Publisher;
   draft: { input: EventInput; existing?: CityEvent };
   busy: boolean;
@@ -455,6 +460,7 @@ function EventForm({
         />
         {err('capacity')}
       </div>
+      <ImageField label={t('events.cover')} hint={t('events.coverHint')} kind="etkinlik" uid={uid} value={input.cover} onChange={(cover) => set({ cover })} disabled={busy} />
       <p className="form-section meta">{t('events.ticketNote')}</p>
 
       <div className="field checkbox form-section">

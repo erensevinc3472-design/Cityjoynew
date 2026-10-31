@@ -1,6 +1,6 @@
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
-import { PHOTO_UPLOAD, POST_LIMITS } from '@cityjoy/shared';
+import { PHOTO_UPLOAD } from '@cityjoy/shared';
 import type { PreparedPhoto } from '@cityjoy/shared/firebase';
 
 export class PhotoPermissionError extends Error {
@@ -20,7 +20,7 @@ export async function pickPhotos(room: number): Promise<PreparedPhoto[]> {
   const res = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ['images'],
     allowsMultipleSelection: room > 1,
-    selectionLimit: Math.min(room, POST_LIMITS.photos),
+    selectionLimit: Math.min(room, 10),
     quality: 1,
     exif: false,
   });

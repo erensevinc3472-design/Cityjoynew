@@ -370,7 +370,8 @@
       "trust": "Trust information",
       "closed": "Closed",
       "payment": "Payment methods",
-      "amenities": "Amenities"
+      "amenities": "Amenities",
+      "gallery": "Showcase"
     },
     "managers": {
       "title": "Managers",
@@ -398,7 +399,11 @@
       "mine": "Businesses you manage",
       "youManage": "Manager",
       "messages": "Can answer customer messages"
-    }
+    },
+    "logo": "Logo (optional)",
+    "logoHint": "A square logo looks best; it is shown as a circle.",
+    "gallery": "Showcase photos",
+    "galleryHint": "Photos of your shop, products or menu. Add photos you took or have permission to use; they are resized and location data is removed."
   },
   "reviews": {
     "title": "Reviews",
@@ -1932,5 +1937,8 @@
   },
   "limits": {
     "reached": "You have reached today’s limit. You can do this again from {{when}}."
+  },
+  "media": {
+    "count": "{{count}}/{{max}} photos"
   }
 }

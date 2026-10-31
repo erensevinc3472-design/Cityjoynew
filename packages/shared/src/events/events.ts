@@ -1,3 +1,4 @@
+import type { Photo } from '../media/photo';
 import { regionWithin, type AnnouncementAuthor, type AnnouncementRegion, type AnnouncementStatus } from '../announcements/announcements';
 import type { RegionScope } from '../permissions/types';
 
@@ -43,6 +44,8 @@ export interface EventInput {
   ticketUrl?: string;
   /** Kontenjan; boşsa sınırsız. "Katılıyorum" sayısı dolunca yeni katılım alınmaz. */
   capacity?: number;
+  /** Kapak görseli (panelden yüklenir; Storage, Blaze). */
+  cover?: Photo;
 }
 
 export interface CityEvent extends EventInput {

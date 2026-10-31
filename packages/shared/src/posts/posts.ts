@@ -5,6 +5,8 @@
  * verilemez (madde 9). Üç şikâyette gönderi moderatör inceleyene kadar akıştan düşer (madde 8).
  */
 
+import type { Photo } from '../media/photo';
+
 /** Takip: yalnızca takipçiler görür (gizli hesapta takip isteği onaylananlar). */
 export const POST_TARGETS = ['mahallem', 'bolgesel', 'genel', 'takip'] as const;
 export type PostTarget = (typeof POST_TARGETS)[number];
@@ -28,20 +30,8 @@ export interface PostRegion {
   neighbourhoodId: string;
 }
 
-/**
- * Gönderi fotoğrafı (Storage, Blaze). Telefonda küçültülüp JPEG'e çevrilerek yüklenir (konum ve cihaz bilgisi gibi
- * EXIF verisi bu sırada atılır). Dosya `posts/{uid}/{postId}/{sıra}.jpg`; yüklenen dosya değiştirilemez, gönderi
- * kaldırılınca ya da hesap silinince sunucu siler.
- */
-export interface PostPhoto {
-  path: string;
-  url: string;
-  width: number;
-  height: number;
-}
-
-/** En uzun kenar, JPEG kalitesi ve kuralların kabul ettiği en büyük dosya. */
-export const PHOTO_UPLOAD = { maxEdge: 1600, quality: 0.7, maxBytes: 1_500_000 } as const;
+/** Gönderi fotoğrafı: dosya `posts/{uid}/{postId}/{sıra}.jpg`; gönderi kaldırılınca ya da hesap silinince sunucu siler. */
+export type PostPhoto = Photo;
 
 export const postPhotoPath = (uid: string, postId: string, index: number) => `posts/${uid}/${postId}/${index}.jpg`;
 

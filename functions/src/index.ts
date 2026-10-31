@@ -13,7 +13,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { handleAnnouncementWrite } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
-import { handlePostPhotos, type DeleteFiles } from './photos';
+import { handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
 import { expoSender } from './push';
 import { handleFollowWrite, handleMessageCreate } from './social';
 
@@ -50,6 +50,17 @@ export const followChanged = onDocumentWritten('follows/{fid}', async (e) => {
 // Gönderi kaldırılınca fotoğraf dosyaları silinir.
 export const postPhotosRemoved = onDocumentUpdated('posts/{id}', async (e) => {
   await handlePostPhotos(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+
+// Etkinlik kapağı, kurum logosu, işletme logosu ve vitrininden çıkan görsellerin dosyaları silinir.
+export const eventMediaChanged = onDocumentWritten('events/{id}', async (e) => {
+  await handleMediaChange(MEDIA_FIELDS.events, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+export const profileMediaChanged = onDocumentWritten('officialProfiles/{id}', async (e) => {
+  await handleMediaChange(MEDIA_FIELDS.officialProfiles, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+export const businessMediaChanged = onDocumentWritten('businesses/{id}', async (e) => {
+  await handleMediaChange(MEDIA_FIELDS.businesses, e.data?.before.data(), e.data?.after.data(), deleteFiles);
 });
 
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {

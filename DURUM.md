@@ -45,8 +45,9 @@ Son güncelleme: 31 Ekim 2026 (günlük sınırlar ve bildirim öncelikleri birl
 ```sh
 npm install
 npm test                      # ortak paket testleri (148)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (133; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (21; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (137; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (24; Java 21 gerekir)
+npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
 # Dosya deposu kuralları (Blaze + konsolda Storage açılınca): npx firebase-tools@15.34.1 deploy --only storage --project cityjoynew --config firebase/firebase.json
@@ -605,6 +606,22 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   ortak 148. **Henüz çalışmıyor:** Blaze, konsolda Storage'ı açmak, Storage kurallarını ve işlevleri yüklemek gerekir;
   o zamana kadar fotoğraflı paylaşım "yüklenemedi" der, yazılı paylaşım çalışır. Telefonda denenmedi (Blaze sonrası).
   Açık: yükleme yarıda kalırsa klasörde artık dosya kalabilir (ileride günlük temizlik).
+- **Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini (31 Ekim, dal `claude/foto`; Blaze ile çalışır).** Ortak
+  altyapı `packages/shared/src/media/photo.ts`: dosyalar `media/{yükleyen}/{tür}/{rastgele}.jpg` (türler: etkinlik,
+  kurum, isletme-logo, isletme-vitrin), seçilince küçültülüp hemen yüklenir, kayıtla birlikte kaydedilir. Panel:
+  Etkinlikler formunda kapak, Profil sayfasında logo (`components/image-field.tsx`, tarayıcıda 1600 piksel JPEG).
+  Uygulama: etkinlik kartında küçük kapak, ayrıntıda tam genişlik; resmî profil kartında yuvarlak logo; İşletmem
+  formunda logo ve vitrin (`components/media-picker.tsx`), işletme sayfasında logo halkada ve vitrin yana kayan
+  şerit, liste kartında küçük logo. **Vitrin sayısı kademeye göre** panel > Sınırlar'dan (öneri: ücretsiz 3, standart 10,
+  pro 20, premium 30; kesin üst sınır 30; kademeler gelir konusunda kesinleşecek). Kurallar: yeni bağlanan logo/kapak
+  bağlayanın kendi dosyası olmalı, değişmeyen kalabilir; vitrinde kural motorunun 1000 işlem sınırı yüzünden yalnızca
+  sayı denetlenir, uygulama yalnızca kendi depomuzdaki (Storage) adresleri gösterir (`photoFrom`). Sunucu işlevleri
+  `eventMediaChanged`, `profileMediaChanged`, `businessMediaChanged`: kayıttan çıkan görselin dosyasını siler
+  (vitrinde yalnızca sahibin ve yetkililerin dosyası). Testler: kurallar 137, sunucu 24, ortak 150. Aktivite görseli
+  ve "{Şehir}'dan Kareler" sonra. Açık: panelde görsel seçip kaydetmeden çıkılırsa dosya artık kalır (günlük temizlik).
+- **Panel internete hazır (31 Ekim).** `firebase/firebase.json` içinde Hosting ayarı (güvenlik başlıkları, arama
+  motorlarına kapalı), `npm run panel:deploy` derleyip yükler. Ücretsiz planda çalışır; adres
+  https://cityjoynew.web.app olacak. Eren onay verince Claude yükler.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -695,7 +712,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
-- Panel ve web sürümü internette yayında değil (Firebase Hosting için dağıtım anahtarı gerekir).
+- Panel internette yayında değil; Hosting ayarı hazır, Eren'in onayıyla `npm run panel:deploy` (Eren'in bilgisayarındaki
+  Firebase girişiyle; ayrı anahtar gerekmez).
 - Ana sayfadaki arama kutusu ve hava durumu ilgili özelliklerle gelecek (duyurular ana sayfada).
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin
   bağlantı bilgilerini içeriyor; Eren'e o projeyi kapatması önerildi.
@@ -712,8 +730,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    Mesajlar'daki bölüm de "Çarşı" olacak. ~~Çarşı (eşya ilanları) ve Mesajlar > Çarşı~~ (31 Ekim). Çarşı'da kalan:
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
-5. Fotoğraf yükleme: ~~Keşfet gönderisi~~ (31 Ekim, Blaze bekliyor). Kalan: işletme vitrini, etkinlik görseli, belediye
-   fotoğrafları, "{Şehir}'dan Kareler" (aynı altyapıyla).
+5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini~~ (31 Ekim, Blaze
+   bekliyor). Kalan: aktivite görseli, belediye fotoğrafları, "{Şehir}'dan Kareler", Çarşı ilan fotoğrafları.
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 
@@ -739,8 +757,8 @@ toplamak olmaz, dron ve Wi-Fi Direct ayrı bir Ar-Ge projesi. Temeli bu duyuru b
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
 2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"
    sayfası ve çekim kodu sahte sağlayıcıyla emülatörde yapılır; anahtarlar gelince bağlanır.
-3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu ve fotoğraf vitrini (Firebase Storage; Blaze plan gerekir).
-4. Paneli internete koyma (Firebase Hosting).
+3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu (Firebase Storage; Blaze plan gerekir). ~~Fotoğraf vitrini~~ (31 Ekim).
+4. Paneli internete koyma: ayar hazır (31 Ekim), Eren onaylayınca yüklenir.
 
 ## PROJE.md bölümleri (gerektiğinde ilgili bölümü oku)
 

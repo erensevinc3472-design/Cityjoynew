@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { CityEvent } from '@cityjoy/shared';
@@ -8,7 +9,7 @@ import { useSettings } from '@/lib/settings';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
-/** Etkinlik kartı: solda gün ve ay, sağda ad, saat, yer, ücret; iptal edilmişse etiket. */
+/** Etkinlik kartı: solda gün ve ay, ortada ad, saat, yer, ücret; kapak görseli varsa sağda küçük; iptal edilmişse etiket. */
 export function EventCard({ item, onPress }: { item: CityEvent; onPress(): void }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -39,6 +40,7 @@ export function EventCard({ item, onPress }: { item: CityEvent; onPress(): void 
           {t(`events.categories.${item.category}`)} · {item.free ? t('events.free') : item.priceNote}
         </AppText>
       </View>
+      {item.cover ? <Image source={{ uri: item.cover.url }} style={[styles.cover, { backgroundColor: c.surfaceStrong }]} contentFit="cover" recyclingKey={item.cover.path} accessibilityIgnoresInvertColors /> : null}
     </Pressable>
   );
 }
@@ -49,4 +51,5 @@ const styles = StyleSheet.create({
   day: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 24 },
   body: { flex: 1, gap: 2 },
   title: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 22 },
+  cover: { width: 64, height: 64, borderRadius: radius.sm, alignSelf: 'center' },
 });

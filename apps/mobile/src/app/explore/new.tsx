@@ -17,7 +17,7 @@ import {
   type PostError,
   type PostTarget,
 } from '@cityjoy/shared';
-import { deletePostPhotos, PhotoTooLargeError, uploadPostPhotos, type PreparedPhoto } from '@cityjoy/shared/firebase';
+import { deletePhotos, PhotoTooLargeError, uploadPostPhotos, type PreparedPhoto } from '@cityjoy/shared/firebase';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
@@ -137,7 +137,7 @@ export default function NewPostScreen() {
       if (biz && mode === 'onayla') router.replace({ pathname: '/business/[id]', params: { id: biz.id } });
       else router.replace({ pathname: '/explore/[id]', params: { id } });
     } catch (e) {
-      if (uploaded.length) await deletePostPhotos(storage, uploaded);
+      if (uploaded.length) await deletePhotos(storage, uploaded);
       setFailed(
         e instanceof PhotoTooLargeError
           ? t('explore.photos.tooLarge')

@@ -6,7 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { handleAnnouncementWrite } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
-import { handlePostPhotos } from '../src/photos';
+import { handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
 
@@ -316,5 +316,42 @@ describe('bildirim öncelikleri', () => {
     await db.doc('pushCount/a').set({ day: '2026-11-01', count: 5 });
     expect(await handleAnnouncementWrite(db, 'm2', undefined, ann(muhtar, { ringAlways: true }), deps)).toBe(1);
     expect(sent[0]).toMatchObject({ sound: 'default', channelId: 'genel' });
+  });
+});
+
+describe('etkinlik, kurum ve işletme görselleri', () => {
+  const m = (uid: string, kind: string, id: string) => ({ path: `media/${uid}/${kind}/${id}.jpg`, url: 'u', width: 10, height: 10 });
+
+  it('değişen ya da kaldırılan görselin dosyası silinir, kalan silinmez', async () => {
+    const deleted: string[] = [];
+    const del = async (p: string) => void deleted.push(p);
+    const a = m('o1', 'isletme-vitrin', 'aaaaaaaaaa');
+    const b = m('o1', 'isletme-vitrin', 'bbbbbbbbbb');
+    const logo = m('o1', 'isletme-logo', 'llllllllll');
+    const before = { ownerUid: 'o1', managerUids: ['m1'], logo, gallery: [a, b] };
+    expect(await handleMediaChange(MEDIA_FIELDS.businesses, before, { ...before, gallery: [b] }, del)).toEqual([a.path]);
+    // Kayıt silinince hepsi.
+    expect(await handleMediaChange(MEDIA_FIELDS.businesses, before, undefined, del)).toEqual([logo.path, a.path, b.path]);
+    expect(deleted).toEqual([a.path, logo.path, a.path, b.path]);
+  });
+
+  it('vitrinde sahibin ve yetkililerin dışındaki kişinin dosyası silinmez', async () => {
+    const deleted: string[] = [];
+    const before = { ownerUid: 'o1', managerUids: ['m1'], gallery: [m('x9', 'isletme-vitrin', 'xxxxxxxxxx'), m('m1', 'isletme-vitrin', 'mmmmmmmmmm')] };
+    expect(await handleMediaChange(MEDIA_FIELDS.businesses, before, { ...before, gallery: [] }, async (p) => void deleted.push(p))).toEqual(['media/m1/isletme-vitrin/mmmmmmmmmm.jpg']);
+    expect(deleted).toEqual(['media/m1/isletme-vitrin/mmmmmmmmmm.jpg']);
+  });
+
+  it('etkinlik kapağı yalnızca hazırlayanın klasöründense silinir; yeni kayıtta bir şey yapılmaz', async () => {
+    const del = async () => {
+      throw new Error('silinmemeli');
+    };
+    const ev = { preparedBy: 'k1', cover: m('k2', 'etkinlik', 'cccccccccc') };
+    expect(await handleMediaChange(MEDIA_FIELDS.events, ev, { preparedBy: 'k1' }, del)).toEqual([]);
+    expect(await handleMediaChange(MEDIA_FIELDS.events, undefined, ev, del)).toEqual([]);
+    const gone: string[] = [];
+    const own = { preparedBy: 'k1', cover: m('k1', 'etkinlik', 'dddddddddd') };
+    expect(await handleMediaChange(MEDIA_FIELDS.officialProfiles, { logo: own.cover }, { logo: own.cover }, del)).toEqual([]);
+    expect(await handleMediaChange(MEDIA_FIELDS.events, own, { preparedBy: 'k1' }, async (p) => void gone.push(p))).toEqual([own.cover.path]);
   });
 });
