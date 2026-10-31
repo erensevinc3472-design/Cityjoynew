@@ -341,7 +341,9 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
   yalnızca kişinin kendi listesinden kaldırır (karşı tarafın kopyası kalır); yeniden yazışılırsa eski mesajlar görünmez.
   Mesajlar ekranı: Sohbetler, İstekler, İşletmem (işletmesi olana); İlanlar bölümü ilan pazarıyla gelecek.
 - **Karar (Eren, 31 Ekim 2026): önce ikinci el eşya pazarı**, ev / arsa / tarla / araç satışları sonra açılır. Bölümün
-  satılık / kiralık yerine güzel bir adı olacak ve Mesajlar'daki bölüm de bu adı taşıyacak (ad: SORULACAK, Claude öneri sundu).
+  satılık / kiralık yerine güzel bir adı olacak ve Mesajlar'daki bölüm de bu adı taşıyacak.
+- **Karar (Eren, 31 Ekim 2026): bölümün adı "Çarşı"** (en Bazaar, de Basar, ar السوق, ru Базар). Benim Şehrim'deki kart da
+  Çarşı, Mesajlar'daki bölüm de Çarşı. Slogan önerisi: "Komşundan al, komşuna sat." Emlak ve araç ileride Çarşı'nın içinde açılır.
 - **İlan pazarı önerisi (eşya kısmı onaylandı):** ilk sürümde eşya ilanları (satılık, kiralık, ücretsiz, takas);
   emlak ve araç ilanları sonra. Neden: Ticaret Bakanlığı'nın emlak ilan düzenlemesi ilan platformundan ilan verenin kimlik
   ve yetki doğrulamasını istiyor; avukat görüşü ve kimlik doğrulama kurulmadan açılmamalı (avukata sorulacak). Fotoğraf
