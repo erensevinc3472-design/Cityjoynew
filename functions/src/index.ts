@@ -6,9 +6,10 @@ import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functionsV1 from 'firebase-functions/v1';
 import { setGlobalOptions } from 'firebase-functions/v2';
-import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
+import { handleAnnouncementWrite } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredSos, deleteUserLeftovers } from './cleanup';
 import { expoSender } from './push';
@@ -27,6 +28,11 @@ export const eventCancelled = onDocumentUpdated('events/{id}', async (e) => {
 
 export const activityCancelled = onDocumentUpdated('activities/{id}', async (e) => {
   await handleActivityChange(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deps());
+});
+
+// Doğrudan yayınlanan duyuru oluşturulurken, onaylanan ise güncellenirken yayına girer.
+export const announcementPublished = onDocumentWritten('announcements/{id}', async (e) => {
+  await handleAnnouncementWrite(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deps());
 });
 
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {

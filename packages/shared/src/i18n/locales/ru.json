@@ -1274,6 +1274,11 @@
       "eventCancelledBody": "«{{title}}», на которое вы собирались, отменено.",
       "activityCancelledTitle": "Активность отменена",
       "activityCancelledBody": "«{{title}}», в которой вы собирались участвовать, отменена.",
+      "acilTitle": "Срочное объявление · {{title}}",
+      "duyuruTitle": "Объявление · {{title}}",
+      "haberTitle": "Официальная новость · {{title}}",
+      "muhtar": "Мухтар квартала",
+      "cityjoy": "CityJoy",
       "channel": "Общие уведомления"
     },
     "categories": {

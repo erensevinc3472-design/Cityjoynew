@@ -3,6 +3,7 @@ import { getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestor
 import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
+import { handleAnnouncementWrite } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
 import type { NotifyDeps } from '../src/push';
@@ -77,6 +78,50 @@ describe('aktivite iptali', () => {
     expect(await handleActivityChange(db, 'a1', before, { ...before, status: 'iptal' }, deps)).toBe(1);
     expect(sent[0]).toMatchObject({ to: 'T-x', title: 'Aktivite iptal edildi' });
     expect(sent[0].body).toContain('Pazar yürüyüşü');
+  });
+});
+
+describe('duyuru bildirimi', () => {
+  async function resident(uid: string, location: Record<string, string>) {
+    await db.doc(`users/${uid}`).set({ uid, location });
+    await db.doc(`pushTokens/${uid}`).set({ tokens: [`T-${uid}`], language: 'tr', updatedAt: Timestamp.now() });
+  }
+  const ann = (over: Record<string, unknown> = {}) => ({
+    kind: 'duyuru', title: 'Pazar yeri taşınıyor', status: 'yayinda', region: { provinceCode: '16', districtId: '16-nilufer' },
+    author: { type: 'kurum', orgId: 'bld-16-nilufer', name: 'Nilüfer Belediyesi' }, ...over,
+  });
+
+  beforeEach(async () => {
+    await resident('n1', { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: 'm1' });
+    await resident('n2', { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: 'm2' });
+    await resident('o1', { provinceCode: '16', districtId: '16-osmangazi' });
+    await resident('i1', { provinceCode: '34', districtId: '34-kadikoy' });
+  });
+
+  it('yayına girince yalnızca bölgedekilere, bir kez gider', async () => {
+    const { sent, deps } = fakeSender();
+    expect(await handleAnnouncementWrite(db, 'd1', { status: 'onay-bekliyor' }, ann(), deps)).toBe(2);
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-n1', 'T-n2']);
+    expect(sent[0]).toMatchObject({ title: 'Duyuru · Nilüfer Belediyesi', body: 'Pazar yeri taşınıyor' });
+    expect(await handleAnnouncementWrite(db, 'd1', { status: 'onay-bekliyor' }, ann(), deps)).toBe(0);
+  });
+
+  it('mahalleye yönelik muhtar duyurusu yalnızca o mahalleye; il geneli acil duyuru herkese, yüksek öncelikle', async () => {
+    const { sent, deps } = fakeSender();
+    await handleAnnouncementWrite(db, 'd2', undefined, ann({ region: { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: 'm1' }, author: { type: 'kisi', role: 'muhtar', grantKey: 'x' } }), deps);
+    expect(sent.map((m) => [m.to, m.title])).toEqual([['T-n1', 'Duyuru · Muhtarlık']]);
+    sent.length = 0;
+    await handleAnnouncementWrite(db, 'd3', undefined, ann({ kind: 'acil', region: { provinceCode: '16' }, endsAt: later }), deps);
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-n1', 'T-n2', 'T-o1']);
+    expect(sent[0].priority).toBe('high');
+  });
+
+  it('taslakta, yayındakinin güncellenmesinde ve süresi geçmişse gitmez', async () => {
+    const { sent, deps } = fakeSender();
+    await handleAnnouncementWrite(db, 'd4', undefined, ann({ status: 'taslak' }), deps);
+    await handleAnnouncementWrite(db, 'd5', ann(), ann({ status: 'kaldirildi' }), deps);
+    await handleAnnouncementWrite(db, 'd6', undefined, ann({ kind: 'acil', endsAt: Timestamp.fromDate(new Date('2026-10-01T00:00:00Z')) }), deps);
+    expect(sent).toEqual([]);
   });
 });
 

@@ -100,7 +100,7 @@ export async function sendSosPush(alert: Pick<SosAlert, 'id' | 'fromName' | 'tes
 }
 
 /** Sunucu bildirimlerinin açabileceği ekranlar (bildirimdeki adres yalnızca bunlardan biri olabilir). */
-const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]']);
+const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]', '/announcements/[id]']);
 
 type Href = PushNotice['href'];
 

@@ -1274,6 +1274,11 @@
       "eventCancelledBody": "\"{{title}}\", which you said you would attend, has been cancelled.",
       "activityCancelledTitle": "Activity cancelled",
       "activityCancelledBody": "\"{{title}}\", which you said you would join, has been cancelled.",
+      "acilTitle": "Urgent notice · {{title}}",
+      "duyuruTitle": "Announcement · {{title}}",
+      "haberTitle": "Official news · {{title}}",
+      "muhtar": "Neighbourhood office",
+      "cityjoy": "CityJoy",
       "channel": "General notifications"
     },
     "categories": {

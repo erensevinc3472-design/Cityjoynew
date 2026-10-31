@@ -1274,6 +1274,11 @@
       "eventCancelledBody": "Katılacağını bildirdiğin \"{{title}}\" iptal edildi.",
       "activityCancelledTitle": "Aktivite iptal edildi",
       "activityCancelledBody": "Katılacağını bildirdiğin \"{{title}}\" iptal edildi.",
+      "acilTitle": "Acil duyuru · {{title}}",
+      "duyuruTitle": "Duyuru · {{title}}",
+      "haberTitle": "Kurum haberi · {{title}}",
+      "muhtar": "Muhtarlık",
+      "cityjoy": "CityJoy",
       "channel": "Genel bildirimler"
     },
     "categories": {
