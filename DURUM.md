@@ -623,7 +623,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   ayarı (güvenlik başlıkları, arama motorlarına kapalı); `npm run panel:deploy` derler, `firebase/panel-dist`
   klasörüne kopyalar (Firebase yalnızca kendi klasörünün içinden yükler; klasör GitHub'a gitmez) ve yükler. Ücretsiz
   planda çalışır. Panelde her değişiklikten sonra yeniden yüklenmeli (birleşmiş `main` dalından yüklemek doğrusu;
-  ilk yükleme `claude/foto` dalından yapıldı).
+  ilk yükleme `claude/foto` dalından yapıldı; PR #50 birleşince Firestore kuralları ve panel `main`den yeniden
+  yüklendi, 31 Ekim). Storage kuralları ve sunucu işlevleri Blaze bekliyor.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
