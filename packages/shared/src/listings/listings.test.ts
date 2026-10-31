@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { chatTitle, inboxSection, threadId } from '../messages/messages';
-import { canRenewListing, isListingLive, parsePrice, pointInProvince, validateListing, type ListingInput } from './listings';
+import { canRenewListing, isListingLive, parsePrice, pointInProvince, provinceCodeFromPlaceName, validateListing, type ListingInput } from './listings';
 
 const input = (patch: Partial<ListingInput> = {}): ListingInput => ({
   kind: 'satilik',
@@ -57,5 +57,21 @@ describe('Çarşı', () => {
     expect(inboxSection(chat, 'b')).toBe('carsi');
     expect(chatTitle(chat, 'a')).toBe('Bora');
     expect(chatTitle(chat, 'b')).toBe('Ali');
+  });
+});
+
+describe('adres çözümlemesinden il', () => {
+  const provinces = [
+    { code: '16', name: 'Bursa' },
+    { code: '34', name: 'İstanbul' },
+    { code: '03', name: 'Afyonkarahisar' },
+  ];
+  it('il adını tanır, tanımazsa null', () => {
+    expect(provinceCodeFromPlaceName('Bursa', provinces)).toBe('16');
+    expect(provinceCodeFromPlaceName('Istanbul', provinces)).toBe('34');
+    expect(provinceCodeFromPlaceName('İSTANBUL İli', provinces)).toBe('34');
+    expect(provinceCodeFromPlaceName('Afyon', provinces)).toBe('03');
+    expect(provinceCodeFromPlaceName('Marmara Region', provinces)).toBeNull();
+    expect(provinceCodeFromPlaceName(null, provinces)).toBeNull();
   });
 });

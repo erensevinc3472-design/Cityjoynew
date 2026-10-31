@@ -563,7 +563,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    kalsın, işlem kaydı). Hesap silinince ilanlar da silinir. 5 dilde metinler. Ortak düzeltme: parlak simgelerin renk
    geçişi webde bazen boş görünüyordu (aynı kimlik), her simgeye ayrı kimlik verildi. Testler: kural 126 (8 yeni), ortak
    142. Emülatörde web sürümüyle denendi (liste, favori, ilan sayfası, mesaj, Mesajlar > Çarşı, ilan verme, satıldı,
-   İlanlarım). PR #44 birleşti, kurallar ve dizinler 31 Ekim'de yüklendi. Not: Windows'ta Expo'nun ürettiği rota türlerinde
+   İlanlarım). PR #44 birleşti, kurallar ve dizinler 31 Ekim'de yüklendi.
+   Eren'in isteği (31 Ekim): Çarşı'nın üstündeki konum değiştirme düğmesi kaldırıldı (il adı düz yazı); başka ile ilan
+   verilemesin diye ilan verirken telefonun adres çözümlemesi (cihazda, ücretsiz) hangi ilde olduğunu söyler, kayıtlı ille
+   aynı değilse ilan verilmez; il adı tanınmazsa ya da web'de il merkezlerine uzaklık denetimi. Ayrıca sayfa yenilenince favori kalplerinin boş görünmesi düzeltildi (React Compiler modül değişkenini izlemiyordu; `useSyncExternalStore`). Beğenilerde (`useLiked`) aynı sorun olabilir, bakılacak (dal `claude/carsi-belge`). Not: Windows'ta Expo'nun ürettiği rota türlerinde
    `/carsi` yerine `/carsi/index` çıkabiliyor (Expo hatası); `apps/mobile/.expo/types/router.d.ts` içinde düzeltilir.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)

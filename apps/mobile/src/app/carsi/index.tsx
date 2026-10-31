@@ -17,7 +17,7 @@ import {
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { Chips } from '@/components/chips';
-import { HeroHeader, LocationChip } from '@/components/hero-header';
+import { HeroHeader } from '@/components/hero-header';
 import { ListingArt, ListingCard } from '@/components/listing-card';
 import { OptionRow } from '@/components/option-row';
 import { Screen } from '@/components/screen';
@@ -34,7 +34,8 @@ import { useThemeColors } from '@/theme/use-theme';
 type KindFilter = ListingKind | 'hepsi';
 
 /**
- * Çarşı (PROJE.md 5.11): ilindeki ikinci el eşya ilanları; istenirse yalnızca ilçesi. Tür ve kategori süzgeci, arama.
+ * Çarşı (PROJE.md 5.11): kayıtlı ildeki ikinci el eşya ilanları; istenirse yalnızca ilçesi. Tür ve kategori süzgeci, arama.
+ * Üstte il adı yazar; konum buradan değiştirilmez (ilan verirken telefonun konumu kayıtlı ille karşılaştırılır).
  * Sağ üstte "İlanlarım" ve "İlan ver". İlanlar uygulama içinden yazışılarak alınır; telefon numarası yoktur.
  */
 export default function CarsiScreen() {
@@ -115,6 +116,7 @@ export default function CarsiScreen() {
   const header = (
     <HeroHeader
       title={t('carsi.title')}
+      subtitle={province}
       onBack={back}
       right={
         user
@@ -123,9 +125,8 @@ export default function CarsiScreen() {
               { icon: 'add', label: t('carsi.new'), onPress: () => router.push('/carsi/new') },
             ]
           : undefined
-      }>
-      <LocationChip label={province ?? t('home.noLocation')} onPress={() => router.push('/location?edit=1')} />
-    </HeroHeader>
+      }
+    />
   );
 
   if (!location) {
