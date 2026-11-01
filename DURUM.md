@@ -633,7 +633,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   (`lib/profile-photos.ts`). Kurallar: yalnızca kendi yüklediği `profil` dosyası. Moderasyon: panel > Moderasyon >
   profil şikâyetlerinde fotoğraf küçük görünür, "Fotoğrafı kaldır" siler ve kişinin yenisini koymasını kapatır (işlem
   kaydına geçer). Sunucu `profilePhotoChanged` eski dosyayı siler (hesap silinince de). Testler: kurallar 138, sunucu
-  25, ortak 150. Resmî profil ve işletme kendi logosunu kullanır (ayrı).
+  25, ortak 150. Resmî profil ve işletme kendi logosunu kullanır (ayrı). PR #52 birleşti; Firestore kuralları ve
+  panel `main`den yüklendi (1 Kasım). Storage kuralları ve işlevler Blaze bekliyor.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
