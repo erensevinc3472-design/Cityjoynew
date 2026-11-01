@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SEARCH_LIMITS, type PublicProfile } from '@cityjoy/shared';
 
+import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
@@ -79,6 +80,7 @@ export default function NewMessageScreen() {
               <View style={[styles.ring, { borderColor: c.accent }]}>
                 <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
                   <AppText style={[styles.initial, { color: c.accent }]}>{(p.displayName || '?').slice(0, 1).toLocaleUpperCase()}</AppText>
+                  <AvatarPhoto photo={p.photo} size={38} />
                 </View>
               </View>
               <View style={styles.grow}>

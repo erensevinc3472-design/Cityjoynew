@@ -14,6 +14,7 @@ import {
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { AvatarPhoto } from '@/components/avatar-photo';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { SearchField } from '@/components/search-field';
@@ -86,6 +87,7 @@ export function BusinessManagers({ business, onSaved }: { business: Business; on
           <View style={styles.row}>
             <View style={[styles.avatar, { backgroundColor: c.accentSoft }]}>
               <AppText style={[styles.initial, { color: c.accent }]}>{m.name.slice(0, 1).toLocaleUpperCase()}</AppText>
+              <AvatarPhoto uid={m.uid} size={36} />
             </View>
             <AppText style={[styles.grow, styles.name, { color: c.textStrong }]} numberOfLines={1}>{m.name}</AppText>
             <Pressable accessibilityRole="button" accessibilityLabel={t('business.managers.remove', { name: m.name })} onPress={() => setList(list.filter((x) => x.uid !== m.uid))} hitSlop={8} style={styles.icon}>

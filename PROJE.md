@@ -310,6 +310,7 @@ Doğrulanmış hesap işareti (mavi tik) ve profil sayfaları var (profil-beledi
 ### 5.8 Profil ve ayarlar (Eren: Instagram'daki profil örneği gibi)
 
 - **Herkese açık (Eren'in kararı):** kullanıcı adı, ad, profil fotoğrafı, kısa tanıtım, gönderi/takipçi/takip sayıları, gönderiler (paylaşırken seçilen hedefe göre), doğrulanmış hesap rozeti, istenirse işletme sayfası bağlantısı.
+- **Profil fotoğrafı (1 Kasım 2026, yapıldı):** her hesap türünde kişinin kendi fotoğrafı; kare kırpılır, küçültülür, konum bilgisi silinir. Şikâyet üzerine admin kaldırır, kişi yenisini koyamaz (tanıtım kaldırma gibi). Resmî profil ve işletme ayrıca kendi logosunu kullanır.
 - **Gizli (Eren'in kararı):** yaş (doğum yılı), cinsiyet, meslek ve **mahalle** diğer kullanıcılara gösterilmez. Bu bilgiler yalnızca bildirim hedefleme ve içerik filtreleme için sistem tarafından kullanılır.
 - **Aile (SOS) listesi** yalnızca sahibine ve listedeki aile üyelerine görünür. İşletme bilgileri işletme sayfasında sahibinin seçtiği kadar görünür.
 - **Not (Mahalle gizliliği):** Mahallem sekmesinde paylaşılan gönderi o mahalledekilere görünür, bu yüzden paylaşan kişinin o mahallede olduğu dolaylı olarak anlaşılır. İlk Mahallem paylaşımında bunu söyleyen kısa bir bilgilendirme gösterilir.

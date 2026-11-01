@@ -720,9 +720,15 @@ function ProfileReports({ user }: { user: PanelUser }) {
                 <tr key={r.id}>
                   <td className="num">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
                   <td>
+                    {r.current?.photo ? (
+                      <a className="profile-photo" href={r.current.photo.url} target="_blank" rel="noreferrer noopener" title={t('moderation.profiles.photo')}>
+                        <img src={r.current.photo.url} alt={t('moderation.profiles.photo')} loading="lazy" />
+                      </a>
+                    ) : null}
                     <strong>{r.displayName}</strong>
                     {r.bio ? <p dir="auto" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{r.bio}</p> : null}
                     {!r.current ? <span className="pill warn">{t('moderation.profiles.deleted')}</span> : r.current.bioRemoved ? <span className="pill warn">{t('moderation.profiles.bioRemoved')}</span> : null}
+                    {r.current?.photoRemoved ? <span className="pill warn">{t('moderation.profiles.photoRemoved')}</span> : null}
                   </td>
                   <td>{t(`moderation.profiles.reasons.${r.reason}`)}</td>
                   <td><span className={r.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`moderation.statuses.${r.status}`)}</span></td>
@@ -730,6 +736,7 @@ function ProfileReports({ user }: { user: PanelUser }) {
                     <td>
                       <div className="row-actions">
                         {r.current && !r.current.bioRemoved && r.current.bio ? <button className="link" disabled={busy} onClick={() => act(() => mod.removeBio(r))}>{t('moderation.profiles.removeBio')}</button> : null}
+                        {r.current?.photo ? <button className="link" disabled={busy} onClick={() => act(() => mod.removePhoto(r))}>{t('moderation.profiles.removePhoto')}</button> : null}
                         {r.status === 'yeni' ? <button className="link" disabled={busy} onClick={() => act(() => mod.dismiss(r))}>{t('moderation.profiles.dismiss')}</button> : null}
                       </div>
                     </td>

@@ -1098,7 +1098,10 @@
       "noJoined": "Katıldığın etkinlik ve aktiviteler burada görünür.",
       "joinedEvent": "Etkinlik",
       "joinedActivity": "Aktivite",
-      "cancelled": "İptal edildi"
+      "cancelled": "İptal edildi",
+      "photo": "Profil fotoğrafı",
+      "photoHint": "Herkese açık görünür. Kare kırpılır, küçültülür; konum bilgisi silinir.",
+      "photoRemoved": "Profil fotoğrafın şikâyet üzerine kaldırıldı; yeni fotoğraf koyamazsın."
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
     "share": "Paylaş",

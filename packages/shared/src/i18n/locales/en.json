@@ -1098,7 +1098,10 @@
       "noJoined": "Events and activities you join appear here.",
       "joinedEvent": "Event",
       "joinedActivity": "Activity",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "photo": "Profile photo",
+      "photoHint": "Visible to everyone. It is cropped square and resized; location data is removed.",
+      "photoRemoved": "Your profile photo was removed after a report; you cannot add a new one."
     },
     "takipFeedHint": "posts shared only with followers by people you follow",
     "share": "Share",

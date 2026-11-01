@@ -59,6 +59,10 @@ export const eventMediaChanged = onDocumentWritten('events/{id}', async (e) => {
 export const profileMediaChanged = onDocumentWritten('officialProfiles/{id}', async (e) => {
   await handleMediaChange(MEDIA_FIELDS.officialProfiles, e.data?.before.data(), e.data?.after.data(), deleteFiles);
 });
+// Profil fotoğrafı değişince, kaldırılınca ya da profil silinince (hesap silme) eski dosya silinir.
+export const profilePhotoChanged = onDocumentWritten('publicProfiles/{uid}', async (e) => {
+  await handleMediaChange(MEDIA_FIELDS.publicProfiles, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
 export const businessMediaChanged = onDocumentWritten('businesses/{id}', async (e) => {
   await handleMediaChange(MEDIA_FIELDS.businesses, e.data?.before.data(), e.data?.after.data(), deleteFiles);
 });

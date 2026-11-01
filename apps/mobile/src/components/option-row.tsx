@@ -13,11 +13,13 @@ interface Props {
   selected?: boolean;
   /** Seçince bir sonraki adıma geçiliyorsa ok gösterilir. */
   showChevron?: boolean;
+  /** Başta küçük görsel (ör. kişinin fotoğrafı). */
+  leading?: ReactNode;
   trailing?: ReactNode;
   onPress(): void;
 }
 
-export function OptionRow({ title, subtitle, selected, showChevron, trailing, onPress }: Props) {
+export function OptionRow({ title, subtitle, selected, showChevron, leading, trailing, onPress }: Props) {
   const c = useThemeColors();
   const { rtl } = useSettings();
   return (
@@ -35,6 +37,7 @@ export function OptionRow({ title, subtitle, selected, showChevron, trailing, on
           opacity: pressed ? 0.85 : 1,
         },
       ]}>
+      {leading}
       <View style={styles.texts}>
         <AppText variant="label">{title}</AppText>
         {subtitle ? <AppText variant="caption" muted>{subtitle}</AppText> : null}

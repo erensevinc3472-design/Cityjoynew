@@ -11,6 +11,7 @@ import { useSignOut } from '@/lib/sign-out';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
+import { AvatarPhoto } from './avatar-photo';
 import { useReduceMotion } from './scene-art';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
@@ -99,6 +100,7 @@ export function SideMenu({ open, onClose }: { open: boolean; onClose(): void }) 
           <View style={styles.head}>
             <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
               <MaterialIcons name="person" size={22} color={c.accent} />
+              <AvatarPhoto uid={user?.uid} size={42} />
             </View>
             <View style={styles.flex}>
               <AppText numberOfLines={1} style={[styles.name, { color: c.textStrong }]}>{name || 'CityJoy'}</AppText>

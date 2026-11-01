@@ -24,6 +24,7 @@ import {
 } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
+import { AvatarPhoto } from '@/components/avatar-photo';
 import { BusinessCard } from '@/components/business-card';
 import { EventCard } from '@/components/event-card';
 import { BottomNav } from '@/components/bottom-nav';
@@ -187,6 +188,12 @@ export default function SearchScreen() {
     section('kisiler', peopleHits, (p) => (
       <OptionRow
         key={p.uid}
+        leading={
+          <View style={[styles.person, { backgroundColor: c.surfaceStrong }]}>
+            <AppText style={[styles.personInitial, { color: c.accent }]}>{(p.displayName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+            <AvatarPhoto photo={p.photo} size={40} />
+          </View>
+        }
         title={p.displayName}
         // Gizli hesapta yalnızca ad görünür (PROJE.md 5.10).
         subtitle={p.isPrivate ? t('search.privateAccount') : p.bio || undefined}
@@ -407,6 +414,8 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
+  person: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  personInitial: { fontFamily: fonts.heading, fontSize: 16 },
   root: { flex: 1 },
   flex: { flex: 1 },
   hero: { borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl, paddingBottom: spacing.md },

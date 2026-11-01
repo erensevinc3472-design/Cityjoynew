@@ -10,6 +10,7 @@ import {
   PROFILE_REPORT_REASONS,
   validateBio,
   type FollowStatus,
+  type Photo,
   type Post,
   type ProfileReportReason,
   type PublicProfile,
@@ -17,12 +18,14 @@ import {
 } from '@cityjoy/shared';
 import type { JoinedItem } from '@cityjoy/shared/firebase';
 
+import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BottomNav } from '@/components/bottom-nav';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
+import { MediaPicker } from '@/components/media-picker';
 import { PostGrid } from '@/components/post-grid';
 import { RoundButton } from '@/components/hero-header';
 import { StateMessage } from '@/components/state-message';
@@ -33,6 +36,7 @@ import { useChats } from '@/lib/messages';
 import { eventRepository, postRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
+import { rememberProfilePhoto } from '@/lib/profile-photos';
 import { refreshFollowing, setBlocked, setMyProfile, useSocial } from '@/lib/social';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -162,6 +166,17 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
       load();
     });
 
+  // Fotoğraf seçilince hemen kaydedilir (eski dosyayı sunucu siler).
+  const changePhoto = (photo: Photo | undefined) =>
+    run(async () => {
+      await socialRepository.setPhoto(uid, photo ?? null);
+      const { photo: _old, ...rest } = profile;
+      const next = photo ? { ...rest, photo } : rest;
+      setProfile(next);
+      setMyProfile(next);
+      rememberProfilePhoto(uid, photo);
+    });
+
   const saveProfile = () => {
     if (!draft.displayName.trim() || !validateBio(draft.bio)) return setError(t('explore.profile.invalid'));
     if (hasBanned(draft.displayName, draft.bio)) return setError(t('explore.errors.banned'));
@@ -276,6 +291,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
             <View style={[styles.ring, { borderColor: c.accent }]}>
               <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
                 <AppText style={[styles.initial, { color: c.accent }]}>{(profile.displayName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                <AvatarPhoto photo={profile.photo} size={76} />
               </View>
             </View>
             <View style={styles.stats}>
@@ -306,6 +322,22 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
           {own ? (
             editing ? (
               <View style={styles.block}>
+                {profile.photoRemoved ? (
+                  <FormMessage kind="info" text={t('explore.profile.photoRemoved')} />
+                ) : (
+                  <MediaPicker
+                    label={t('explore.profile.photo')}
+                    hint={t('explore.profile.photoHint')}
+                    kind="profil"
+                    uid={uid}
+                    photos={profile.photo ? [profile.photo] : []}
+                    max={1}
+                    round
+                    pick={{ square: true, maxEdge: 800 }}
+                    disabled={busy}
+                    onChange={(p) => changePhoto(p[0])}
+                  />
+                )}
                 <TextField label={t('explore.profile.name')} value={draft.displayName} onChangeText={(v) => setDraft((d) => ({ ...d, displayName: v }))} maxLength={40} hint={t('explore.profile.nameHint')} />
                 {profile.bioRemoved ? (
                   <FormMessage kind="info" text={t('explore.profile.bioRemoved')} />

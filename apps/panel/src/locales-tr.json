@@ -464,7 +464,7 @@
     },
     "profiles": {
       "title": "Keşfet profil şikâyetleri",
-      "intro": "Kullanıcı profillerinin (ad ve kısa tanıtım) şikâyetleri. Profilde bölge bilgisi tutulmadığı için yalnızca admin görür.",
+      "intro": "Kullanıcı profillerinin (ad, kısa tanıtım ve fotoğraf) şikâyetleri. Profilde bölge bilgisi tutulmadığı için yalnızca admin görür.",
       "profile": "Profil (şikâyet anındaki hâli)",
       "deleted": "Hesap silinmiş",
       "bioRemoved": "Tanıtım kaldırıldı",
@@ -478,7 +478,10 @@
         "spam": "Spam ya da reklam",
         "uygunsuz": "Uygunsuz içerik",
         "diger": "Diğer"
-      }
+      },
+      "photo": "Profil fotoğrafı (büyütmek için tıkla)",
+      "removePhoto": "Fotoğrafı kaldır",
+      "photoRemoved": "Fotoğraf kaldırıldı"
     },
     "messages": {
       "title": "Mesaj şikâyetleri",

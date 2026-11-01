@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteField,
   doc,
   getCountFromServer,
   getDoc,
@@ -15,6 +16,7 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 
+import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
 import { blockId, followId, PROFILE_LIMITS, type FollowStatus, type ProfileReportReason, type PublicProfile } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
@@ -28,7 +30,16 @@ const REPORTS = 'profileReports';
 const nameKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.profileKeys);
 
 function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
-  return { uid, displayName: d.displayName ?? '', bio: d.bio ?? '', isPrivate: d.isPrivate === true, bioRemoved: d.bioRemoved === true };
+  const photo = photoFrom(d.photo);
+  return {
+    uid,
+    displayName: d.displayName ?? '',
+    bio: d.bio ?? '',
+    isPrivate: d.isPrivate === true,
+    bioRemoved: d.bioRemoved === true,
+    ...(photo ? { photo } : {}),
+    photoRemoved: d.photoRemoved === true,
+  };
 }
 
 /**
@@ -60,7 +71,7 @@ export function createFirestoreSocialRepository(db: Firestore) {
       const batch = writeBatch(db);
       batch.set(profileRef(uid), { displayName: name, bio: '', isPrivate, searchKeys: nameKeys(name), updatedAt: serverTimestamp() });
       await batch.commit();
-      return { uid, displayName: name, bio: '', isPrivate, bioRemoved: false };
+      return { uid, displayName: name, bio: '', isPrivate, bioRemoved: false, photoRemoved: false };
     },
 
     async updateProfile(uid: string, patch: { displayName: string; bio: string; isPrivate: boolean }): Promise<void> {
@@ -73,6 +84,11 @@ export function createFirestoreSocialRepository(db: Firestore) {
         updatedAt: serverTimestamp(),
       });
       await batch.commit();
+    },
+
+    /** Profil fotoğrafını koyar ya da kaldırır (null). Eski dosyayı sunucu siler. */
+    async setPhoto(uid: string, photo: Photo | null): Promise<void> {
+      await updateDoc(profileRef(uid), { photo: photo ? cleanPhoto(photo) : deleteField(), updatedAt: serverTimestamp() });
     },
 
     /**
@@ -233,7 +249,7 @@ export interface ProfileReport {
   targetUid: string;
   reporterUid: string;
   reason: ProfileReportReason;
-  /** Şikâyet anındaki ad ve tanıtım. */
+  /** Şikâyet anındaki ad ve tanıtım (fotoğraf için `current`). */
   displayName: string;
   bio: string;
   status: 'yeni' | 'incelendi';
@@ -243,7 +259,8 @@ export interface ProfileReport {
 
 /**
  * Panel > Moderasyon: şikâyet edilen Keşfet profilleri. Profilde bölge bilgisi tutulmadığı (mahalle gizli) için
- * yalnızca admin görür. "Tanıtımı kaldır" tanıtımı boşaltır ve kişinin yeniden yazmasını kapatır; her işlem kayda geçer.
+ * yalnızca admin görür. "Tanıtımı kaldır" tanıtımı boşaltır ve kişinin yeniden yazmasını kapatır; "Fotoğrafı kaldır"
+ * fotoğrafı siler ve yenisini koymasını kapatır (dosyayı sunucu siler); her işlem kayda geçer.
  */
 export function createProfileModeration(db: Firestore, actorUid: string) {
   return {
@@ -273,6 +290,14 @@ export function createProfileModeration(db: Firestore, actorUid: string) {
       if (r.current) batch.update(doc(db, PROFILES, r.targetUid), { bio: '', bioRemoved: true, updatedAt: serverTimestamp() });
       batch.update(doc(db, REPORTS, r.id), { status: 'incelendi' });
       addAudit(db, batch, { actorUid, module: 'moderasyon', action: 'duzenle', targetId: r.targetUid, summary: `Profil tanıtımı kaldırıldı (şikâyet): ${r.displayName}` });
+      await batch.commit();
+    },
+
+    async removePhoto(r: ProfileReport): Promise<void> {
+      const batch = writeBatch(db);
+      if (r.current) batch.update(doc(db, PROFILES, r.targetUid), { photo: deleteField(), photoRemoved: true, updatedAt: serverTimestamp() });
+      batch.update(doc(db, REPORTS, r.id), { status: 'incelendi' });
+      addAudit(db, batch, { actorUid, module: 'moderasyon', action: 'duzenle', targetId: r.targetUid, summary: `Profil fotoğrafı kaldırıldı (şikâyet): ${r.displayName}` });
       await batch.commit();
     },
 

@@ -342,6 +342,17 @@ describe('etkinlik, kurum ve işletme görselleri', () => {
     expect(deleted).toEqual(['media/m1/isletme-vitrin/mmmmmmmmmm.jpg']);
   });
 
+  it('profil fotoğrafı değişince ya da profil silinince eski dosya silinir', async () => {
+    const gone: string[] = [];
+    const del = async (p: string) => void gone.push(p);
+    const a = m('u1', 'profil', 'aaaaaaaaaa');
+    const b = m('u1', 'profil', 'bbbbbbbbbb');
+    expect(await handleMediaChange(MEDIA_FIELDS.publicProfiles, { photo: a }, { photo: b }, del)).toEqual([a.path]);
+    expect(await handleMediaChange(MEDIA_FIELDS.publicProfiles, { photo: b, displayName: 'A' }, { photo: b, displayName: 'B' }, del)).toEqual([]);
+    expect(await handleMediaChange(MEDIA_FIELDS.publicProfiles, { photo: b }, undefined, del)).toEqual([b.path]);
+    expect(gone).toEqual([a.path, b.path]);
+  });
+
   it('etkinlik kapağı yalnızca hazırlayanın klasöründense silinir; yeni kayıtta bir şey yapılmaz', async () => {
     const del = async () => {
       throw new Error('silinmemeli');

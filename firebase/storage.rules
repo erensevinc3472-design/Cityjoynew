@@ -17,13 +17,14 @@ service firebase.storage {
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
 
-    // Diğer görseller: media/{uid}/{tür}/{rastgele}.jpg (etkinlik kapağı, kurum logosu, işletme logosu ve vitrini).
+    // Diğer görseller: media/{uid}/{tür}/{rastgele}.jpg (etkinlik kapağı, kurum logosu, işletme logosu ve vitrini,
+    // profil fotoğrafı).
     // Yükleyen kendi klasörüne yükler; görseli bir kayda (etkinlik, kurum, işletme) bağlamaya kimin yetkisi olduğunu
     // Firestore kuralı denetler. Kayıttan çıkan dosyayı sunucu siler.
     match /media/{uid}/{kind}/{file} {
       allow read: if request.auth != null;
       allow create: if request.auth != null && request.auth.uid == uid
-        && kind in ['etkinlik', 'kurum', 'isletme-logo', 'isletme-vitrin']
+        && kind in ['etkinlik', 'kurum', 'isletme-logo', 'isletme-vitrin', 'profil']
         && file.matches('[A-Za-z0-9]{10,40}[.]jpg')
         && request.resource.contentType == 'image/jpeg'
         && request.resource.size > 0 && request.resource.size <= 1500000;

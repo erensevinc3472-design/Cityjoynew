@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { chatTitle, counterpartOf, foldForSearch, inboxSection, isHiddenFor, unreadKey, type Chat, type InboxSection } from '@cityjoy/shared';
 
+import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
@@ -116,7 +117,10 @@ export default function MessagesScreen() {
                   {x.context?.type === 'isletme' && x.startedBy === me ? (
                     <MaterialIcons name="storefront" size={20} color={c.textStrong} />
                   ) : (
-                    <AppText variant="label">{name.slice(0, 1)}</AppText>
+                    <>
+                      <AppText variant="label">{name.slice(0, 1)}</AppText>
+                      <AvatarPhoto uid={x.context?.type === 'isletme' ? undefined : counterpartOf(x, me)} size={40} />
+                    </>
                   )}
                 </View>
                 <View style={styles.texts}>
