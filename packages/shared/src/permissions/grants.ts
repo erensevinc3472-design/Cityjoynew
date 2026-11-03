@@ -152,11 +152,14 @@ export interface GrantRecord extends PermissionGrant {
 // ---- Kurumlar ----
 
 /** Kuruma verilebilecek bölümler (kurumun içerik bölümleri). */
-export const ORG_MODULES: Module[] = ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat'];
+export const ORG_MODULES: Module[] = ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat', 'istatistik', 'baskan'];
 
-/** Seyahat (Başkanlarla Keşif tanıtımı ve rotaları) yalnızca belediyelere verilir. */
+/** Yalnızca belediyelere verilen bölümler. */
+export const MUNICIPAL_MODULES: Module[] = ['seyahat', 'baskan'];
+
+/** Seyahat (Başkanlarla Keşif tanıtımı ve rotaları) ve Belediye başkanı yalnızca belediyelere verilir. */
 export function orgModulesFor(kind: Organization['kind']): Module[] {
-  return ORG_MODULES.filter((m) => m !== 'seyahat' || orgRole(kind) === 'belediye');
+  return ORG_MODULES.filter((m) => !MUNICIPAL_MODULES.includes(m) || orgRole(kind) === 'belediye');
 }
 
 /**
@@ -166,6 +169,9 @@ export function orgModulesFor(kind: Organization['kind']): Module[] {
 export const STAFF_ACTIONS: Action[] = ['goruntule', 'ekle', 'duzenle', 'sil', 'onayla', 'yayinla', 'bildirim-gonder'];
 
 export function staffActionsFor(module: Module): Action[] {
+  // Kitle istatistiği yalnızca görülür; başkan bölümünde görüntüle = istatistik, düzenle = başkan profili.
+  if (module === 'istatistik') return ['goruntule'];
+  if (module === 'baskan') return ['goruntule', 'duzenle'];
   return STAFF_ACTIONS.filter((a) => module === 'bildirimler' || a !== 'bildirim-gonder');
 }
 

@@ -149,7 +149,7 @@ function demoMunicipality(): PanelUser {
     name: 'Nilüfer Belediyesi',
     kind: 'ilce-belediyesi',
     scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' },
-    modules: ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat'],
+    modules: ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat', 'istatistik', 'baskan'],
     officialEmail: user.email!,
     status: 'aktif',
     createdBy: 'ornek',
@@ -160,7 +160,7 @@ function demoMunicipality(): PanelUser {
     email: user.email!,
     displayName: user.displayName,
     isOrgAdmin: true,
-    assignments: { seyahat: ['goruntule', 'ekle', 'duzenle', 'sil'] },
+    assignments: { seyahat: ['goruntule', 'ekle', 'duzenle', 'sil'], istatistik: ['goruntule'], baskan: ['goruntule', 'duzenle'] },
   };
   const g = user.grants[0]!;
   return { ...user, memberships: [{ org, member }], grants: [{ ...g, modules: { ...g.modules, seyahat: ['goruntule', 'ekle', 'duzenle', 'sil'] } }] };

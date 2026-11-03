@@ -19,6 +19,7 @@ export * from './organizations/types';
 export * from './organizations/staff';
 export * from './organizations/municipalities';
 export * from './organizations/profiles';
+export * from './organizations/audience';
 export * from './services/types';
 export * from './services/occupations';
 export * from './emergency/numbers';

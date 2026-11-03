@@ -4,6 +4,7 @@ import { canSeeModule, type Module } from '@cityjoy/shared';
 
 import { ScopeLabel } from './scope-label';
 import { hasProfileAccess } from '../pages/profile-page';
+import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
@@ -155,6 +156,7 @@ export function Shell() {
         <nav aria-label={t('menu.label')}>
           {link({ key: 'today', path: '/', icon: 'home' }, t('menu.today'))}
           {canSeeStats(user) ? link({ key: 'stats', path: '/istatistikler', icon: 'chart' }, t('menu.stats')) : null}
+          {canSeeAudience(user, isAdminUser(user)) ? link({ key: 'kitle', path: '/takipciler', icon: 'users' }, t('menu.audience')) : null}
           {showcase ? link({ key: 'vitrin', path: '/sehir-vitrini', icon: 'screen' }, t('menu.showcase')) : null}
 
           {MENU_GROUPS.map((g) => {

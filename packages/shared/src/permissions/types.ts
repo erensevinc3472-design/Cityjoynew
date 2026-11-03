@@ -29,7 +29,11 @@ export type Module =
   | 'kurumlar'
   | 'sehir-rehberi'
   /** Seyahat > Keşfet ve Öğren içeriği (admin, ülke geneli). */
-  | 'seyahat';
+  | 'seyahat'
+  /** Kurumun resmî hesabını takip edenlerin isimsiz toplu istatistiği (kurum personeli görür). */
+  | 'istatistik'
+  /** Belediye başkanının profili ve istatistikleri (yalnızca belediyeler; başkanın yetki verdiği personel). */
+  | 'baskan';
 
 /** yayinla: hazırladığını onay beklemeden yayınlar ("onaysız yayınla", PROJE.md 6.6). */
 export type Action = 'goruntule' | 'ekle' | 'duzenle' | 'sil' | 'onayla' | 'yayinla' | 'bildirim-gonder';

@@ -77,12 +77,12 @@ export function createOfficialProfileAdmin(db: Firestore, actorUid: string) {
       const scope = scopeOf(target);
       addAudit(db, batch, {
         actorUid,
-        module: 'kurumlar',
+        module: target.type === 'baskan' ? 'baskan' : 'kurumlar',
         action: 'duzenle',
         targetId: target.id,
         ...(scope ? { scope } : {}),
         ...(target.orgId ? { orgId: target.orgId } : {}),
-        summary: `Resmî profil güncellendi: ${target.type === 'kurum' ? target.name : target.id}`,
+        summary: `Resmî profil güncellendi: ${target.type === 'kurum' ? target.name : target.type === 'baskan' ? `Belediye başkanı (${target.name})` : target.id}`,
       });
       await batch.commit();
     },

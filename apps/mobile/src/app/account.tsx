@@ -13,7 +13,7 @@ import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
 import { firestore } from '@/lib/firebase';
-import { activityRepository, authService, businessRepository, eventRepository, familyRepository, listingRepository, messageRepository, postRepository, profileRepository, reviewRepository, socialRepository } from '@/lib/services';
+import { activityRepository, authService, businessRepository, eventRepository, familyRepository, listingRepository, messageRepository, officialFollowRepository, postRepository, profileRepository, reviewRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings, type ThemeMode } from '@/lib/settings';
 import { useSignOut } from '@/lib/sign-out';
@@ -46,7 +46,7 @@ export default function AccountScreen() {
     setError(undefined);
     setBusy(true);
     try {
-      // Kullanıcının aile bağları, SOS kayıtları, değerlendirmeleri, etkinlik ve aktivite katılımları, açtığı aktiviteler, Keşfet gönderileri, Çarşı ilanları, beğenileri, takipleri ve profili, mesajları, işletmeleri, hizmet önerileri ve sınır sayaçları da silinir (KVKK);
+      // Kullanıcının aile bağları, SOS kayıtları, değerlendirmeleri, etkinlik ve aktivite katılımları, açtığı aktiviteler, Keşfet gönderileri, Çarşı ilanları, beğenileri, takipleri (resmî hesaplar dahil) ve profili, mesajları, işletmeleri, hizmet önerileri ve sınır sayaçları da silinir (KVKK);
       // sonra profil, en son hesap.
       await authService.deleteAccountAndData(password || undefined, async (uid) => {
         await familyRepository.deleteAllOf(uid);
@@ -60,6 +60,7 @@ export default function AccountScreen() {
         await socialRepository.deleteAllOf(uid);
         await reviewRepository.deleteAllBy(uid);
         await businessRepository.leaveAllOf(uid);
+        await officialFollowRepository.leaveAllOf(uid);
         await businessRepository.deleteAllOf(uid);
         await deleteServiceSuggestionsOf(firestore, uid);
         await deleteUsageOf(firestore, uid);

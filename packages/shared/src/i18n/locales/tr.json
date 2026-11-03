@@ -824,7 +824,13 @@
     "hours": "Çalışma saatleri",
     "address": "Adres",
     "email": "E-posta: {{email}}",
-    "noInfo": "Bu hesap henüz iletişim bilgisi eklemedi."
+    "noInfo": "Bu hesap henüz iletişim bilgisi eklemedi.",
+    "follow": "Takip et",
+    "following": "Takip ediliyor",
+    "followHint": "Takip ettiğinde bu hesaba yalnızca kayıtlı mahallen ve yaş aralığın isimsiz, toplu sayı olarak yansır; adın görünmez.",
+    "followError": "İşlem yapılamadı, tekrar dene.",
+    "mayor": "Belediye Başkanı",
+    "mayorTitle": "Belediye başkanı"
   },
   "neighbourhood": {
     "title": "Mahalle Meydanı",
