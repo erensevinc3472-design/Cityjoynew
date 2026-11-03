@@ -710,6 +710,20 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   emülatörle denerken "mahalle" sayılır). Sahte konumla aşılabilir: güven işaretidir, kanıt değildir (ekranda yazılı).
   Testler: kurallar 146 (3 yeni), ortak 152 (2 yeni). Emülatörde denendi (doğrula > akışta ve profilde rozet > kaldır).
   **Telefonda denenmedi** (gerçek adres çözümlemesi EAS ile). **Kurallar değişti.**
+- **Panel yeni tasarımı, 1. aşama (3 Kasım, `claude/panel-yeni-tasarim`; PROJE.md 6.1 "Panel düzeni").** Görünüm CityJoy
+  kimliğinde (koyu turkuaz zemin, altın vurgu, cam kartlar). Sol menü uygulamanın bölümleriyle gruplu ve açılıp
+  kapanır: Benim Şehrim, Seyahat, Sosyal, Acil, İşletmeler ve profiller, Yönetim (`components/shell.tsx` `MENU_GROUPS`).
+  Menünün üstünde **il seçici** (`lib/city.tsx`): seçilen il bütün sayfalara başlangıç olur (İşletmeler, Onaylar,
+  Şehir rehberi, Şehir Vitrini), il değişince sayfa yeni ille açılır; seçim tarayıcıda saklanır. Önceden gizli kalan
+  Şehir Vitrini, Yol üstü verisi ve Yolculuk fiyatları menüde. **Bugün** (eski Genel bakış): bekleyen işler (onay,
+  şikâyet), sayı kutuları, haftalık paylaşım grafiği, Keşfet kategorileri. **İstatistikler** (7/30/90 gün): paylaşım,
+  yeni işletme, doğrulanmış oranı, şikâyet, 12 haftalık iki grafik, kategori dağılımı. **Profiller** (yalnızca admin):
+  adla arama, yalnızca herkese açık bilgiler + takipçi sayısı. Sayılar yalnızca sayım sorgusuyla
+  (`packages/shared/src/firebase/stats.ts`, 1.000 belge başına 1 okuma); yetki yetmeyen kutu "—". İstatistik yetkisi
+  olmayan (belediye, muhtar) Bugün'de kendi bölümlerine kısayollar görür. Kural değişikliği yok; **4 yeni dizin**
+  (gönderi: il+tarih, kategori+tarih, il+kategori+tarih; işletme: il+tarih). Panel derlendi, tür denetimi geçti;
+  tarayıcıda örnek admin ve Nilüfer Belediyesi hesabıyla denendi (menü, il seçici, sayfalar). Grafikler gerçek veriyle
+  **denenmedi** (örnek hesap veri okumaz).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -812,6 +826,13 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
+- **Panel 2. aşama (Eren istedi, 3 Kasım):** belediye panelinde gönderi istatistikleri (görüntülenme, beğeni, yorum,
+  paylaşım, kaydetme) ve **Belediye Başkanı** kartı + başkan sayfası istatistikleri (video izlenme ve sonuna kadar
+  izlenme oranı, yorum oranı, takipçi, takipten çıkan, Bursa içi / dışı takipçi, en çok takip eden iller). Uygulamada
+  isimsiz ve toplu sayım başlatılmalı (izlenme kişi başına bir kez); sağlam hâli Blaze ile. Parti adı / logosu yok.
+  Başkan istatistiklerini başkan ve yetki verdiği personel görür. Şehir doluluk kartı ve "uygulamada nasıl görünür"
+  önizlemesi de önerildi. "Uygulama görünümü" bölümü sonraya (Eren). Şehir Vitrini panel sayfasındaki "para karşılığı
+  girilmez" metni 3 Kasım kararıyla eskidi; Vitrin yenilenirken değişecek.
 - Panel internette: https://cityjoynew.web.app (31 Ekim). Uygulamanın web sürümü yayında değil.
 - Ana sayfadaki arama kutusu ve hava durumu ilgili özelliklerle gelecek (duyurular ana sayfada).
 - `tasarim/firebase-config.js` ve `tasarim/belediye-panel-osmangazi.html` eski `cityjoy-d5d29` projesinin

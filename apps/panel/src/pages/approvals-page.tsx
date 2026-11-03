@@ -19,6 +19,7 @@ import { createApprovalAdmin } from '@cityjoy/shared/firebase';
 
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
+import { useCity } from '../lib/city';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 
@@ -34,6 +35,7 @@ const date = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('tr-TR') 
  */
 export function ApprovalsPage() {
   const { user } = useSession();
+  const city = useCity();
   const isAdmin = isAdminUser(user);
   const live = !!user && !user.isDemo;
   const admin = useMemo(
@@ -51,7 +53,7 @@ export function ApprovalsPage() {
     [isAdmin, provinceCodes],
   );
 
-  const [provinceCode, setProvinceCode] = useState(() => (isAdmin ? '' : (provinceCodes[0] ?? '')));
+  const [provinceCode, setProvinceCode] = useState(() => (isAdmin || provinceCodes.includes(city.provinceCode) ? city.provinceCode : (provinceCodes[0] ?? '')));
   const [districtId, setDistrictId] = useState('');
   const [module, setModule] = useState<Module | ''>('');
   const [view, setView] = useState<View>(isAdmin ? 'admin-onayi-bekliyor' : 'il-onayi-bekliyor');

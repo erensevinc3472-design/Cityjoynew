@@ -19,6 +19,7 @@ import { createCityGuideAdmin } from '@cityjoy/shared/firebase';
 
 import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
+import { useCity } from '../lib/city';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 
@@ -41,6 +42,7 @@ const districtName = (id?: string) => (id ? (repo.getDistrict(id)?.name ?? id) :
  */
 export function CityGuidePage() {
   const { user } = useSession();
+  const city = useCity();
   const admin = isAdminUser(user);
   const service = useMemo(() => (user ? createCityGuideAdmin(firestore, user.uid) : null), [user]);
   const editable = useMemo(() => {
@@ -53,7 +55,7 @@ export function CityGuidePage() {
   const canEdit = (p: string) =>
     !!user && !user.isDemo && (admin || (p !== NATIONAL && can(user.grants, { module: 'sehir-rehberi', action: 'duzenle', region: { provinceCode: p } })));
 
-  const [provinceCode, setProvinceCode] = useState(() => (admin ? '16' : (editable[0] ?? '')));
+  const [provinceCode, setProvinceCode] = useState(() => (city.provinceCode && (admin || editable.includes(city.provinceCode)) ? city.provinceCode : admin ? '16' : (editable[0] ?? '')));
   const [meta, setMeta] = useState<CityGuideMeta | null | undefined>(undefined);
   const [loadError, setLoadError] = useState(false);
   const [open, setOpen] = useState<CityGuideSectionId | null>(null);

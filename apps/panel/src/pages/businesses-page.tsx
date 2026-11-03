@@ -13,6 +13,7 @@ import { createApprovalAdmin, createBusinessAdmin } from '@cityjoy/shared/fireba
 
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
+import { useCity } from '../lib/city';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
 
@@ -25,6 +26,7 @@ const DAY = 86400000;
  */
 export function BusinessesPage() {
   const { user } = useSession();
+  const city = useCity();
   const canEdit = !!user && !user.isDemo && can(user.grants, { module: 'isletme-dogrulama', action: 'onayla' }) && user.grants.some((g) => g.role === 'admin');
   const admin = user ? createBusinessAdmin(firestore, user.uid) : null;
   // İl yöneticisi doğrulamayı kendisi yapmaz, admin'e önerir (PROJE.md 6.5: iki aşamalı onay).
@@ -41,7 +43,7 @@ export function BusinessesPage() {
     [national, allowedKey],
   );
 
-  const [provinceCode, setProvinceCode] = useState(() => (national ? '' : (provinces[0]?.code ?? '')));
+  const [provinceCode, setProvinceCode] = useState(() => (provinces.some((p) => p.code === city.provinceCode) || (national && !city.provinceCode) ? city.provinceCode : national ? '' : (provinces[0]?.code ?? '')));
   const [list, setList] = useState<Business[] | null>(null);
   const [pending, setPending] = useState<Map<string, Approval>>(new Map());
   const [loadError, setLoadError] = useState(false);

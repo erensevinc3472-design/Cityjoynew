@@ -61,3 +61,4 @@ export { countUsage, createLimitsAdmin, deleteUsageOf, vitrinLimit } from './lim
 export { createFirestoreTravelRepository, createMunicipalTravel, createTravelAdmin, type TravelAdminKind } from './travel';
 export { createRoadsidePackAdmin, createRoadsidePackRepository, type RoadsidePackSummary } from './roadside';
 export { createTravelPrices } from './travel-prices';
+export { createFirebaseStats, type FirebaseStats, type StatsRange } from './stats';

@@ -16,6 +16,7 @@ import { createFirestoreBusinessRepository, createFirestoreTravelRepository, cre
 import { GripIcon, moveId, useDragSort } from '../components/sortable';
 import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
+import { useCity } from '../lib/city';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 
@@ -40,6 +41,7 @@ const emptyStory = (): StoryDraft => ({ key: key(), title: '', subtitle: '', bod
  */
 export function ShowcasePage() {
   const { user } = useSession();
+  const city = useCity();
   const admin = isAdminUser(user);
   const provinces = useMemo(() => {
     if (!user) return [] as string[];
@@ -48,7 +50,7 @@ export function ShowcasePage() {
       .filter((g) => isGrantActive(g, new Date()) && g.scope.level === 'il' && g.modules['sehir-rehberi']?.includes('goruntule'))
       .map((g) => (g.scope.level === 'il' ? g.scope.provinceCode : ''));
   }, [user, admin]);
-  const [provinceCode, setProvinceCode] = useState(() => (admin ? '16' : (provinces[0] ?? '')));
+  const [provinceCode, setProvinceCode] = useState(() => (city.provinceCode && (admin || provinces.includes(city.provinceCode)) ? city.provinceCode : admin ? '16' : (provinces[0] ?? '')));
   const canEdit = !!user && !user.isDemo && (admin || can(user.grants, { module: 'sehir-rehberi', action: 'duzenle', region: { provinceCode } }));
   const service = useMemo(() => (user ? createShowcaseAdmin(firestore, user.uid) : null), [user]);
   const [issues, setIssues] = useState<CityShowcase[] | null>(null);
