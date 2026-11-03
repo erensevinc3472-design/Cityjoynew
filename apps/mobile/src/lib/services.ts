@@ -4,6 +4,7 @@ import {
   createFirestoreAnnouncementRepository,
   createFirestoreEventRepository,
   createFirestoreOfficialProfileRepository,
+  createFirestoreOfficialFollowRepository,
   createFirestoreActivityRepository,
   createFirestoreShowcaseRepository,
   createFirestoreTravelRepository,
@@ -44,6 +45,8 @@ export const announcementRepository = createFirestoreAnnouncementRepository(fire
 export const eventRepository = createFirestoreEventRepository(firestore);
 /** Kurum ve muhtarlık künyeleri (herkese açık). */
 export const officialProfileRepository = createFirestoreOfficialProfileRepository(firestore);
+/** Resmî profil takibi (kitle istatistiği isimsiz, toplu sayılır). */
+export const officialFollowRepository = createFirestoreOfficialFollowRepository(firestore);
 /** Kullanıcı aktiviteleri (tam buluşma yeri yalnızca düzenleyene ve katılanlara). */
 export const activityRepository = createFirestoreActivityRepository(firestore);
 /** Keşfet gönderileri (Mahallem yalnızca o mahalleye, Bölgesel yalnızca o ile görünür). */

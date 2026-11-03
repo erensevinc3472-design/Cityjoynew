@@ -18,21 +18,30 @@ export function Change({ now, before }: { now: number | null; before: number | n
   );
 }
 
-/** Büyük sayı kutusu. */
-export function StatTile({ label, value, hint, highlight, children }: {
+/** Büyük sayı kutusu. onClick verilirse ayrıntı grafiğini açan düğme olur. */
+export function StatTile({ label, value, hint, highlight, children, onClick, display }: {
   label: string;
   value: number | null;
   hint?: ReactNode;
   highlight?: boolean;
   children?: ReactNode;
+  onClick?: () => void;
+  /** Sayı yerine gösterilecek metin (örn. yüzde). */
+  display?: string;
 }) {
-  return (
-    <div className={highlight ? 'card stat highlight' : 'card stat'}>
+  const body = (
+    <>
       <span className="stat-label">{label}</span>
-      <span className="stat-value">{show(value)}</span>
+      <span className="stat-value">{display ?? show(value)}</span>
       {hint ? <span className="stat-hint">{hint}</span> : null}
       {children}
-    </div>
+    </>
+  );
+  const cls = highlight ? 'card stat highlight' : 'card stat';
+  return onClick ? (
+    <button type="button" className={`${cls} clickable`} onClick={onClick}>{body}<span className="stat-more" aria-hidden="true">›</span></button>
+  ) : (
+    <div className={cls}>{body}</div>
   );
 }
 
@@ -115,3 +124,47 @@ export function lastWeeks(n: number, now = new Date()): { label: string; from: D
 }
 
 export const daysAgo = (days: number, now = new Date()) => new Date(now.getTime() - days * 86400000);
+
+export interface DrillRow {
+  key: string;
+  label: string;
+  value: number;
+  /** Verilirse satır ayrıntıyı açan düğme olur. */
+  onOpen?: () => void;
+  /** Soluk gösterilen satır (Diğer, konum belirtmemiş). */
+  muted?: boolean;
+}
+
+/**
+ * Tıklanabilir yatay çubuklar (kitle ayrıntısı): değer ve toplam içindeki payı. Ekran okuyucu için satırlar düğme ya da
+ * düz metin olarak okunur; ayrı tablo gerekmez.
+ */
+export function DrillList({ title, rows, total, tone = 'teal', empty }: { title: string; rows: DrillRow[]; total: number; tone?: 'gold' | 'teal'; empty?: string }) {
+  const max = Math.max(1, ...rows.map((r) => r.value));
+  return (
+    <figure className="chart">
+      <figcaption>{title}</figcaption>
+      {rows.length ? null : <p className="meta">{empty ?? t('charts.empty')}</p>}
+      <ul className={`bars drill ${tone}`}>
+        {rows.map((r) => {
+          const pct = total > 0 ? Math.round((r.value / total) * 100) : 0;
+          const inner = (
+            <>
+              <span className="bar-label">{r.label}</span>
+              <span className="bar-track" aria-hidden="true">
+                <span className="bar-fill" style={{ width: `${(r.value / max) * 100}%` }} />
+              </span>
+              <span className="bar-value">{fmt(r.value)} <small>%{pct}</small></span>
+              {r.onOpen ? <span className="bar-more" aria-hidden="true">›</span> : <span />}
+            </>
+          );
+          return (
+            <li key={r.key} className={r.muted ? 'muted' : undefined}>
+              {r.onOpen ? <button type="button" onClick={r.onOpen}>{inner}</button> : <div>{inner}</div>}
+            </li>
+          );
+        })}
+      </ul>
+    </figure>
+  );
+}

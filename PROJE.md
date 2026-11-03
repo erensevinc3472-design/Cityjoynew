@@ -417,6 +417,29 @@ Eren'in kuralı: **herkes yalnızca kendi panelinden, kendine yetkilendirilen ka
   istatistikleri (video izlenme, yorum oranı, takipçi, takipten çıkan, il içi / il dışı takipçi). Sayımlar isimsiz ve
   toplu tutulur (KVKK); parti adı / logosu gösterilmez (Claude önerisi, tarafsızlık). "Uygulama görünümü" bölümü
   (ana sayfa kutularının sırası, il bazında aç/kapa, kapak görseli) sonraya bırakıldı (Eren).
+- **Karar (Eren, 3 Kasım 2026): resmî hesap takibi ve kitle istatistiği (yapıldı, 2. aşama).** Kurum, muhtarlık ve
+  belediye başkanı sayfaları uygulamada takip edilebilir. Panelde **Takipçiler** sayfası: takipçi, yeni takip, takipten
+  çıkan, net değişim, il içi / il dışı oranı, haftalık grafik; her kutuya dokununca ayrıntı açılır (il içi > ilçe >
+  mahalle; il dışı > iller; yaş aralığı 18-24, 25-34, 35-44, 45-54, 55+; günlük takip / bırakma).
+  - **Nasıl sayılır (Eren onayladı):** kişinin uygulamada kayıtlı mahallesi (GPS değil) ve doğum yılından yaş aralığı.
+    Kurallar sayacın anahtarını kişinin kayıtlı mahallesiyle karşılaştırır, sahte konum ya da yaş yazılamaz, sayaç elle
+    şişirilemez. Kişi mahalle değiştirince sayımı yeni mahalleye taşınır. Sayım takip anından başlar, geriye dönük yok.
+    18 yaş altı toplamda sayılır, yaş grafiğinde gösterilmez. Hesap silinince takipler ve sayımları düşer.
+  - **Gizlilik:** 10 kişiden küçük gruplar ayrı gösterilmez, "Diğer"e katılır ("Diğer" de 10'dan küçükse gösterilmez).
+    Kimlik, telefon, tam adres hiçbir zaman paylaşılmaz. Parti adı / logosu yok.
+  - **Belediye başkanı:** belediyeye "Belediye başkanı" bölümü açılınca (yalnızca belediyeler) başkan profili (ad,
+    tanıtım, fotoğraf) panelden girilir, uygulamada belediye sayfasında başkan kartı görünür. Başkanın istatistiğini
+    yalnızca "Belediye başkanı > görüntüle" görevi verilen kişiler görür; kurum yöneticisi ve CityJoy admin göremez
+    (kurallarda). Kurum istatistiği için "Kitle istatistikleri" bölümü: kurum yöneticisi ve görevli personel; muhtar
+    kendi mahallesini görür.
+  - **Sonraya kalan:** gönderi istatistikleri (tekil görüntülenme, kaydetme, paylaşım, videonun sonuna kadar izlenme,
+    yorum oranı) "kurum / başkan adına gönderi" özelliği gelince yapılır; resmî hesaplar şimdilik gönderi paylaşmıyor.
+    10 kişi eşiği şimdilik panelde uygulanır; yetkili personel ham sayıları okuyabilir, sunucuda eşik Blaze ve sunucu
+    işlevleriyle gelir. Takip / bırakma tekrarına sınır sonra eklenebilir. Seçim dönemi başkan gizleme (Başkanlarla
+    Keşif'teki gibi) resmî başkan profiline henüz uygulanmadı.
+  - **Avukata sorulacak:** bu istatistiklerin siyasi amaçla kullanımı (seçim dönemi, başkanın kendi kampanyası) ve
+    bunun kullanım şartlarında nasıl sınırlanacağı. **Aydınlatma metnine eklenecek satır:** "Takip ettiğiniz kurum ve
+    kişilere isimsiz, toplu istatistik verilir (mahalle ve yaş aralığı; 10 kişiden küçük gruplar gösterilmez)."
 - **Karar (Eren, 29 Ekim 2026): sürükleyerek sıralama.** Sırası olan her listede (gezilecek yerler, hazır rotalar, yöresel, rota durakları, acil numaralar, meslekler, hizmet kategorileri) satırın solundaki tutamaktan tutup sürükleyerek sıra değiştirilir; fare, dokunmatik ve klavye (↑ ↓) ile çalışır. Yeni sıra "Yeni sıralamayı kaydet" ile yazılır ve işlem kaydına girer. Yeni sıralı liste eklenince aynı bileşen kullanılır. Başkanlarla Keşif bilerek dışarıda: sıralama nüfusa göre (Karar, Eren). Bölgeler ve iller coğrafi, elle sıralanmaz.
 - **Her özelliğin "bitti" tanımı:** (1) uygulamada çalışır, (2) panelde yönetilebilir, (3) yetki kuralı tanımlı, (4) yapılan işlem kayıt altına alınır, (5) gerekiyorsa bildirim tetikleyicisi vardır, (6) KVKK/mağaza etkisi kontrol edilmiştir.
 - **Gerçekçi beklenti:** İçerik yönetimi ve yetkilendirme ekranlarının büyük kısmı bu şekilde kendiliğinden oluşur. Ama bazı özel ekranlar ayrıca yapılmalı: işletme doğrulama inceleme kuyruğu, ücret/fatura ve ödeme takibi, anket siparişleri, istatistik ve raporlar, şikâyet/moderasyon kuyruğu. Bunlar ilgili özellikle birlikte planlanır.
@@ -576,6 +599,7 @@ Paneller şu filtrelerle bildirim gönderebilecek: **il, ilçe, mahalle, yaş, c
 
 Tümü yayından önce avukat tarafından kontrol edilmelidir.
 - KVKK aydınlatma metni, açık rıza metinleri, gizlilik politikası, kullanım şartları, çerez/izin metinleri
+  (aydınlatma metninde: kurumlara isimsiz, toplu takipçi istatistiği verildiği; bölüm 6.1)
 - Hesabı uygulama içinden silme (Apple için zorunlu), veri indirme/silme talepleri
 - Konum, bildirim, kamera/galeri izin açıklamaları
 - Kullanıcı içeriği için: şikâyet etme, kullanıcı engelleme, içerik denetimi ve kaldırma süreci, topluluk kuralları

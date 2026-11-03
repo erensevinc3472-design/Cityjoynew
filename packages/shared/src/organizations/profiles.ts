@@ -1,4 +1,5 @@
 import type { Photo } from '../media/photo';
+import { mayorProfileId } from './audience';
 import type { AnnouncementAuthor, AnnouncementRegion } from '../announcements/announcements';
 import { isGrantActive } from '../permissions/can';
 import { scopeKey } from '../permissions/grants';
@@ -15,7 +16,8 @@ import type { Organization, OrganizationMember } from './types';
  * Logo sonra (Storage, Blaze).
  */
 
-export type OfficialProfileType = 'kurum' | 'muhtar';
+/** baskan: belediye başkanının profili (kimlik `baskan-{belediye}`); belediyenin yöneticisi ya da başkan yetkilisi yazar. */
+export type OfficialProfileType = 'kurum' | 'muhtar' | 'baskan';
 
 export interface OfficialProfileInput {
   about?: string;
@@ -32,7 +34,7 @@ export interface OfficialProfileInput {
 export interface OfficialProfile extends OfficialProfileInput {
   id: string;
   type: OfficialProfileType;
-  /** Kurumda kurumun adı; muhtarlıkta muhtarın adı (isteğe bağlı, boşsa "X Mahallesi Muhtarlığı" yazılır). */
+  /** Kurumda kurumun adı; muhtarlıkta muhtarın adı (isteğe bağlı, boşsa "X Mahallesi Muhtarlığı" yazılır); başkanda başkanın adı. */
   name: string;
   /** Ülke geneli kurumda yok. */
   region?: AnnouncementRegion;
@@ -52,6 +54,7 @@ export function validateOfficialProfile(p: OfficialProfileInput & { name?: strin
   const v = (s: string | undefined) => (s ?? '').trim();
   const L = OFFICIAL_PROFILE_LIMITS;
   if (type === 'muhtar' && v(p.name).length > L.name) errors.push('name');
+  if (type === 'baskan' && (v(p.name).length < 2 || v(p.name).length > L.name)) errors.push('name');
   if (v(p.about).length > L.about) errors.push('about');
   if (v(p.phone) && !PHONE_PATTERN.test(v(p.phone))) errors.push('phone');
   if (v(p.email) && (!EMAIL_PATTERN.test(v(p.email)) || v(p.email).length > L.email)) errors.push('email');
@@ -111,7 +114,8 @@ export function regionOfScope(scope: RegionScope): AnnouncementRegion | undefine
 }
 
 /**
- * Kişinin düzenleyebildiği resmî profiller: kurum yöneticisi olduğu (çalışan) kurumlar ve geçerli muhtar yetkileri.
+ * Kişinin düzenleyebildiği resmî profiller: kurum yöneticisi olduğu (çalışan) kurumlar, belediyede "Belediye başkanı"
+ * bölümü açıksa başkan profili (kurum yöneticisi ya da bu bölümde düzenleme görevi olan) ve geçerli muhtar yetkileri.
  * Admin kurumları ayrıca listeden seçer.
  */
 export function profileTargetsFor(
@@ -121,8 +125,10 @@ export function profileTargetsFor(
 ): ProfileTarget[] {
   const out: ProfileTarget[] = [];
   for (const { org, member } of memberships) {
-    if (!member.isOrgAdmin || !isMemberActive(member, now) || !isOrganizationActive(org, now)) continue;
-    out.push(orgProfileTarget(org));
+    if (!isMemberActive(member, now) || !isOrganizationActive(org, now)) continue;
+    if (member.isOrgAdmin) out.push(orgProfileTarget(org));
+    const mayor = mayorProfileTarget(org);
+    if (mayor && (member.isOrgAdmin || member.assignments.baskan?.includes('duzenle'))) out.push(mayor);
   }
   for (const g of grants) {
     if (g.orgId || g.role !== 'muhtar' || g.scope.level !== 'mahalle' || !isGrantActive(g, now)) continue;
@@ -135,4 +141,11 @@ export function profileTargetsFor(
 export function orgProfileTarget(org: Organization): ProfileTarget {
   const region = regionOfScope(org.scope);
   return { id: org.id, type: 'kurum', name: org.name, ...(region ? { region } : {}), orgId: org.id };
+}
+
+/** Belediye başkanının profili: yalnızca belediyede ve "Belediye başkanı" bölümü açıksa. Ad panelde girilir. */
+export function mayorProfileTarget(org: Organization): ProfileTarget | null {
+  if (!org.id.startsWith('bld-') || !org.modules.includes('baskan')) return null;
+  const region = regionOfScope(org.scope);
+  return { id: mayorProfileId(org.id), type: 'baskan', name: org.name, ...(region ? { region } : {}), orgId: org.id };
 }

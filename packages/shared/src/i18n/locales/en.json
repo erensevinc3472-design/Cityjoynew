@@ -824,7 +824,13 @@
     "hours": "Opening hours",
     "address": "Address",
     "email": "Email: {{email}}",
-    "noInfo": "This account has not added contact details yet."
+    "noInfo": "This account has not added contact details yet.",
+    "follow": "Follow",
+    "following": "Following",
+    "followHint": "When you follow, this account only sees your saved neighbourhood and age range as an anonymous total; your name is never shown.",
+    "followError": "Could not complete, please try again.",
+    "mayor": "Mayor",
+    "mayorTitle": "Mayor"
   },
   "neighbourhood": {
     "title": "Neighbourhood Square",

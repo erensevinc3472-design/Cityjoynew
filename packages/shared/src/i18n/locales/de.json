@@ -824,7 +824,13 @@
     "hours": "Öffnungszeiten",
     "address": "Adresse",
     "email": "E-Mail: {{email}}",
-    "noInfo": "Dieses Konto hat noch keine Kontaktdaten hinterlegt."
+    "noInfo": "Dieses Konto hat noch keine Kontaktdaten hinterlegt.",
+    "follow": "Folgen",
+    "following": "Du folgst",
+    "followHint": "Wenn du folgst, sieht dieses Konto nur dein gespeichertes Viertel und deine Altersgruppe als anonyme Gesamtzahl; dein Name wird nie angezeigt.",
+    "followError": "Das hat nicht geklappt, bitte erneut versuchen.",
+    "mayor": "Bürgermeister/in",
+    "mayorTitle": "Bürgermeister/in"
   },
   "neighbourhood": {
     "title": "Viertelplatz",

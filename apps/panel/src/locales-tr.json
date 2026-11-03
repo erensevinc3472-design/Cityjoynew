@@ -20,6 +20,8 @@
     "sehir-rehberi": "Şehir rehberi",
     "profile": "Resmî profil",
     "seyahat": "Seyahat",
+    "istatistik": "Kitle istatistikleri",
+    "baskan": "Belediye başkanı",
     "sinirlar": "Günlük sınırlar"
   },
   "roles": {
@@ -1210,10 +1212,12 @@
       "website": "Web sitesi",
       "address": "Adres",
       "hours": "Çalışma saatleri",
-      "logo": "Logo (isteğe bağlı)"
+      "logo": "Logo (isteğe bağlı)",
+      "mayorName": "Başkanın adı",
+      "photo": "Fotoğraf (isteğe bağlı)"
     },
     "errors": {
-      "name": "En çok 80 karakter.",
+      "name": "Ad 2-80 karakter olmalı (muhtar adı en çok 80).",
       "about": "En çok 600 karakter.",
       "phone": "Geçerli bir telefon numarası yazın (yalnızca rakam, boşluk, +, -, parantez).",
       "email": "Geçerli bir e-posta adresi yazın.",
@@ -1229,7 +1233,11 @@
     "loading": "Yükleniyor...",
     "none": "Düzenleyebileceğiniz bir resmî profil yok. Kurum yöneticileri kendi kurumunun, muhtarlar kendi mahallesinin profilini düzenler.",
     "demoReadOnly": "Örnek hesapla yalnızca görüntülenir, kaydedilemez.",
-    "logoHint": "Kare bir logo en iyi görünür. Uygulamada yuvarlak gösterilir."
+    "logoHint": "Kare bir logo en iyi görünür. Uygulamada yuvarlak gösterilir.",
+    "mayorOf": "{{org}} · Belediye başkanı",
+    "mayorProfile": "Belediye başkanı profili",
+    "mayorNameHint": "Uygulamada belediyenin sayfasında \"Belediye Başkanı\" kartında görünür. Parti adı ya da işareti yazılmaz.",
+    "photoHint": "Kare, yüzün ortada olduğu bir fotoğraf en iyi görünür. Uygulamada yuvarlak gösterilir."
   },
   "travel": {
     "title": "Seyahat: Keşfet ve Öğren",
@@ -1678,7 +1686,8 @@
       "yetkiler": "Yetkiler",
       "islem-kayitlari": "İşlem kayıtları",
       "sinirlar": "Günlük sınırlar"
-    }
+    },
+    "audience": "Takipçiler"
   },
   "today": {
     "morning": "Günaydın",
@@ -1745,5 +1754,53 @@
     "verified": "Konum rozeti",
     "empty": "Bu adla profil bulunamadı.",
     "moderationNote": "Uygunsuz profil şikâyetle incelenir:"
+  },
+  "audience": {
+    "title": "Takipçiler",
+    "intro": "Resmî hesabınızı takip edenlerin isimsiz, toplu istatistiği. Kişilerin kayıtlı mahallesi ve yaş aralığı sayılır; kimlik görünmez. Sayım takip anından başlar.",
+    "sample": "Örnek veri",
+    "which": "Hesap",
+    "noTargets": "Görebileceğiniz bir hesap yok. Kurum yöneticisi ya da \"Kitle istatistikleri\" görevi olan personel kurumunun, muhtar mahallesinin istatistiğini görür.",
+    "error": "İstatistik okunamadı. Bu hesabın istatistiğini görme yetkiniz olmayabilir.",
+    "mayorOf": "{{org}} · Belediye başkanı",
+    "muhtarOf": "Muhtarlık ({{id}})",
+    "followers": "Takipçi",
+    "netHint": "Son {{count}} günde net {{net}}",
+    "newFollows": "Yeni takip ({{count}} gün)",
+    "unfollows": "Takipten çıkan ({{count}} gün)",
+    "unfollowsTotal": "Başlangıçtan beri {{total}}",
+    "insideShare": "{{place}} içinden",
+    "insideHint": "{{count}} takipçi · ilçe ve mahalleye göre gör",
+    "weekly": "Haftalık yeni takip",
+    "where": "Takipçiler nereden?",
+    "inside": "{{place}} içi",
+    "outside": "{{place}} dışı",
+    "byProvince": "İllere göre",
+    "noLocation": "Konum belirtmemiş",
+    "age": "Yaş aralığı",
+    "ageBand": "{{band}} yaş",
+    "ageNote": "18 yaş altı takipçiler toplam sayıya dahildir ama yaş grafiğinde gösterilmez.",
+    "overview": "Genel bakış",
+    "crumbs": "Ayrıntı yolu",
+    "byDistrict": "{{place}} içi takipçiler, ilçelere göre",
+    "byNeighbourhood": "{{place}} takipçileri, mahallelere göre",
+    "topProvinces": "{{place}} dışından en çok takip eden iller",
+    "noDistrict": "İlçe belirtmemiş",
+    "noNeighbourhood": "Mahalle belirtmemiş",
+    "other": "Diğer (10 kişiden küçük gruplar)",
+    "tooFew": "Gösterilecek yeterli takipçi yok. Her grupta en az {{min}} kişi olunca görünür.",
+    "daily": "Son {{count}} gün, günlük",
+    "today": "Bugün",
+    "dailyFollows": "Günlük yeni takip",
+    "dailyUnfollows": "Günlük takipten çıkma",
+    "mayor": "Belediye Başkanı",
+    "mayorLabel": "{{org}} · Belediye Başkanı",
+    "mayorNoProfile": "Başkan profili henüz girilmedi",
+    "mayorOnly": "Bu istatistiği yalnızca başkanın yetki verdiği kişiler görür.",
+    "mayorHint": "Başkanın takipçi istatistiği ayrı sayılır.",
+    "mayorLocked": "Başkanın istatistiğini yalnızca \"Belediye başkanı\" bölümünde görevlendirilen kişiler görür.",
+    "mayorOpen": "Başkanın istatistikleri",
+    "sampleMayor": "Erkan Aydın (örnek)",
+    "privacy": "Gizlilik: {{min}} kişiden küçük gruplar ayrı gösterilmez, \"Diğer\"e katılır. Kimlik, telefon ya da tam adres hiçbir zaman paylaşılmaz. Konum, kişinin uygulamada kayıtlı mahallesidir (GPS değil)."
   }
 }

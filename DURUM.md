@@ -725,6 +725,19 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   tarayıcıda örnek admin ve Nilüfer Belediyesi hesabıyla denendi (menü, il seçici, sayfalar). PR #58 birleşti; dizinler
   Firebase'e ve panel cityjoynew.web.app'e yüklendi (3 Kasım, Claude). Grafikler gerçek veriyle
   **denenmedi** (örnek hesap veri okumaz).
+- **Panel 2. aşama: resmî hesap takibi, Takipçiler sayfası, belediye başkanı (3 Kasım, `claude/panel-istatistik-2`;
+  PROJE.md 6.1).** Uygulamada kurum / muhtarlık / başkan sayfasında "Takip et" düğmesi; belediye sayfasında başkan kartı
+  (başkan profili girildiyse), başkanın kendi sayfası. Veri: `officialFollows/{uid}__{profil}` (yalnızca sahibi okur:
+  mahalle, ilçe, il, yaş aralığı) + `officialStats/{profil}` (toplam, takipten çıkan, il / ilçe / mahalle / yaş ve
+  günlük sayaçlar). İkisi aynı yazımda değişir; kurallar anahtarları kişinin profiliyle karşılaştırır, her sayacın tam
+  ±1 değiştiğini denetler (sunucu işlevi gerekmez). Mahalle değişince uygulama açılışta sayımı taşır
+  (`apps/mobile/src/lib/official-follow-sync.ts`, yalnızca değişince). Yeni modüller: **Kitle istatistikleri**
+  (`istatistik`) ve **Belediye başkanı** (`baskan`, yalnızca belediye; görüntüle = istatistik, düzenle = profil).
+  Panel: **Takipçiler** (`/takipciler`): genel bakış kutuları tıklanır, ayrıntıya iner (ilçe > mahalle, iller, yaş,
+  günlük), 10 kişiden küçük gruplar "Diğer"; belediye hesabında başkan kartı ve "Başkanın istatistikleri". Profiller
+  sayfasında başkan profili. Örnek hesaplarda tutarlı örnek sayılar ("Örnek veri" etiketi). Testler: kurallar 8 yeni,
+  ortak 6 yeni; panel derlendi, mobil tür denetimi geçti; tarayıcıda belediye, muhtar, admin örnek hesaplarıyla ve
+  375 px genişlikte denendi. **Telefonda denenmedi. Kurallar değişti** (yüklenmeli). Gönderi istatistikleri sonraki adım.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -763,6 +776,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Açık işler ve bilinen eksikler
 
+- **Kitle istatistiği (3 Kasım):** gönderi istatistikleri "kurum / başkan adına gönderi" ile gelecek; 10 kişi eşiği şimdilik
+  panelde (sunucuda Blaze ile); takip / bırakma tekrarına sınır yok; seçim dönemi başkan gizleme resmî profile
+  uygulanmadı; avukat: verinin siyasi kullanımı; aydınlatma metnine "isimsiz, toplu istatistik" satırı (PROJE.md 6.1).
 - **Blaze'e geçince Claude'un yapacakları:** Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu (uygulama + kurallar; Karar
   Eren 3 Kasım); fotoğraflı akışları gerçek projede deneme.
 - **Eren'in yapacakları tek listede:** `docs/eren-yapilacaklar.md` (31 Ekim). Eren bir maddeyi bitirdim deyince işaretle.

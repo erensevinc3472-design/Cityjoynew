@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type Props
 import type { AuthUser, UserProfile } from '@cityjoy/shared';
 
 import { isFirebaseConfigured } from './firebase-config';
+import { reconcileOfficialFollows } from './official-follow-sync';
 import { authService, profileRepository } from './services';
 
 interface SessionValue {
@@ -30,6 +31,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
     try {
       const p = await profileRepository.get(uid);
       setProfile(p);
+      // Konum değiştiyse resmî takiplerin sayıları arka planda yeni mahalleye taşınır.
+      if (p) void reconcileOfficialFollows(p);
       setProfileError(false);
       return p;
     } catch {

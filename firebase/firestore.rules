@@ -1014,9 +1014,9 @@ service cloud.firestore {
         && (d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi']) == id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
         && (id.matches('^bld-.+') || id.matches('^krm-[a-z0-9-]{2,80}$'))
         && validScope(d.scope)
-        && d.modules is list && d.modules.hasOnly(['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat'])
-        // Seyahat (Başkanlarla Keşif) yalnızca belediyelere.
-        && (!d.modules.hasAny(['seyahat']) || d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi'])
+        && d.modules is list && d.modules.hasOnly(['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat', 'istatistik', 'baskan'])
+        // Seyahat (Başkanlarla Keşif) ve Belediye başkanı yalnızca belediyelere.
+        && (!d.modules.hasAny(['seyahat', 'baskan']) || d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi'])
         && validEmail(d.officialEmail)
         && d.status in ['aktif', 'pasif']
         && (!('contractEndsAt' in d) || d.contractEndsAt is timestamp)
@@ -1053,7 +1053,8 @@ service cloud.firestore {
         && d.assignments is map && d.assignments.keys().hasOnly(getAfter(orgPath(d.orgId)).data.modules)
         && validAssignment(d.assignments, 'gonderiler') && validAssignment(d.assignments, 'etkinlikler')
         && validAssignment(d.assignments, 'bildirimler') && validAssignment(d.assignments, 'hizmetler')
-        && validAssignment(d.assignments, 'seyahat')
+        && validAssignment(d.assignments, 'seyahat') && validAssignment(d.assignments, 'istatistik')
+        && validAssignment(d.assignments, 'baskan')
         && (!('expiresAt' in d) || d.expiresAt is timestamp)
         && d.addedBy == request.auth.uid
         && d.updatedAt == request.time;
@@ -2487,11 +2488,115 @@ service cloud.firestore {
         && (isAdmin() || isMuhtarOf(id));
     }
 
+    // Belediye başkanının profili (baskan-{belediye}): ad başkanın adı, bölge belediyenin bölgesi. Belediyenin kurum
+    // yöneticisi, "Belediye başkanı" bölümünde düzenleme görevi olan personel ya da admin yazar.
+    function mayorProfileOk(id, d) {
+      let orgId = id.replace('^baskan-', '');
+      let org = get(orgPath(orgId)).data;
+      return d.type == 'baskan' && d.name.size() >= 2 && d.name.size() <= 80
+        && org.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi']
+        && d.region == regionOfScope(org.scope)
+        && (isAdmin() || isOrgAdminOf(orgId) || staffCan(orgId, 'baskan', 'duzenle'));
+    }
+
     match /officialProfiles/{id} {
       allow read: if true;
       allow create, update: if validOfficialProfile(request.resource.data)
         && ((id.matches('^(bld|krm)-.+') && exists(orgPath(id)) && orgProfileOk(id, request.resource.data))
-            || (id.matches('^mahalle-.+') && muhtarProfileOk(id, request.resource.data)));
+            || (id.matches('^mahalle-.+') && muhtarProfileOk(id, request.resource.data))
+            || (id.matches('^baskan-bld-.+') && exists(orgPath(id.replace('^baskan-', ''))) && mayorProfileOk(id, request.resource.data)));
+      allow delete: if false;
+    }
+
+    // ---- Resmî hesap takibi ve kitle istatistiği (PROJE.md 6.1, Karar Eren 3 Kasım 2026). Kişi belediye, kurum,
+    // muhtarlık ya da başkan profilini takip eder. Takip kaydı kişinin kayıtlı konumunu (GPS değil) ve doğum yılından
+    // yaş aralığını taşır; kayıt ile sayaç aynı toplu yazımda değişir. Sayaçlar isimsizdir, kayıtları yalnızca kişi görür.
+    function officialStatsPath(pid) {
+      return /databases/$(database)/documents/officialStats/$(pid);
+    }
+    function officialFollowPath(pid) {
+      return /databases/$(database)/documents/officialFollows/$(request.auth.uid + '__' + pid);
+    }
+    function ageBandFor(by) {
+      let age = request.time.year() - by;
+      return age < 18 ? 'u18' : age < 25 ? '18-24' : age < 35 ? '25-34' : age < 45 ? '35-44' : age < 55 ? '45-54' : '55+';
+    }
+    function followMatchesUser(f) {
+      let u = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      let loc = u.get('location', {});
+      return f.provinceCode == loc.get('provinceCode', null)
+        && f.districtId == loc.get('districtId', null)
+        && f.neighbourhoodId == loc.get('neighbourhoodId', null)
+        && f.ageBand == ageBandFor(u.birthYear);
+    }
+    // Sayaç belgesi bu yazımda değişti mi (doğruluğunu officialStats kuralı denetler).
+    function statsTouched(pid) {
+      return getAfter(officialStatsPath(pid)).data.updatedAt == request.time;
+    }
+
+    match /officialFollows/{fid} {
+      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'profileId', 'provinceCode', 'districtId', 'neighbourhoodId', 'ageBand', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.profileId is string
+        && fid == request.auth.uid + '__' + request.resource.data.profileId
+        && exists(/databases/$(database)/documents/officialProfiles/$(request.resource.data.profileId))
+        && followMatchesUser(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && statsTouched(request.resource.data.profileId);
+      // Mahalle değişince (ya da yaş aralığı geçince) sayılar eski yerden yeniye taşınır.
+      allow update: if signedIn() && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['provinceCode', 'districtId', 'neighbourhoodId', 'ageBand'])
+        && followMatchesUser(request.resource.data)
+        && statsTouched(resource.data.profileId);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid && statsTouched(resource.data.profileId);
+    }
+
+    // Haritada tek bir sayaç tam bir azalır (o) ve / veya tam bir artar (n); başka hiçbir anahtar değişmez.
+    function countStep(b, a, o, n) {
+      return o == n ? a == b
+        : a.diff(b).affectedKeys().hasOnly([o, n].removeAll([null]))
+          && (o == null || a.get(o, 0) == b.get(o, 0) - 1)
+          && (n == null || a.get(n, 0) == b.get(n, 0) + 1);
+    }
+    function utcDay() {
+      let t = request.time;
+      return string(t.year()) + (t.month() < 10 ? '0' : '') + string(t.month()) + (t.day() < 10 ? '0' : '') + string(t.day());
+    }
+    // b / a: sayaç belgesi önce / sonra; o / n: kişinin takip kaydı önce / sonra (yoksa null).
+    function statsStep(b, a, o, n) {
+      let none = {'provinceCode': null, 'districtId': null, 'neighbourhoodId': null, 'ageBand': null};
+      let x = o == null ? none : o;
+      let y = n == null ? none : n;
+      return a.keys().hasOnly(['total', 'unfollows', 'p', 'd', 'n', 'a', 'f', 'u', 'updatedAt'])
+        && a.updatedAt == request.time
+        && a.get('total', 0) == b.get('total', 0) + (n == null ? 0 : 1) - (o == null ? 0 : 1)
+        && a.get('unfollows', 0) == b.get('unfollows', 0) + (o != null && n == null ? 1 : 0)
+        && countStep(b.get('p', {}), a.get('p', {}), x.provinceCode, y.provinceCode)
+        && countStep(b.get('d', {}), a.get('d', {}), x.districtId, y.districtId)
+        && countStep(b.get('n', {}), a.get('n', {}), x.neighbourhoodId, y.neighbourhoodId)
+        && countStep(b.get('a', {}), a.get('a', {}), x.ageBand, y.ageBand)
+        && countStep(b.get('f', {}), a.get('f', {}), null, o == null && n != null ? utcDay() : null)
+        && countStep(b.get('u', {}), a.get('u', {}), null, o != null && n == null ? utcDay() : null);
+    }
+    // Kurumun istatistiğini kurum yöneticisi ve görevlendirilen personel, muhtarlığınkini muhtar, ikisini de admin görür.
+    // Başkanın istatistiğini yalnızca belediyenin "Belediye başkanı" bölümünde görevlendirilen kişiler görür (admin dahil değil).
+    function officialStatsReader(pid) {
+      return pid.matches('^baskan-bld-.+')
+        ? staffCan(pid.replace('^baskan-', ''), 'baskan', 'goruntule')
+        : pid.matches('^(bld|krm)-.+')
+          ? isAdmin() || staffCan(pid, 'istatistik', 'goruntule')
+            || (isOrgAdminOf(pid) && get(orgPath(pid)).data.modules.hasAny(['istatistik']))
+          : pid.matches('^mahalle-.+') && (isAdmin() || isMuhtarOf(pid));
+    }
+
+    match /officialStats/{pid} {
+      allow read: if signedIn() && officialStatsReader(pid);
+      allow create, update: if signedIn()
+        && statsStep(resource == null ? {} : resource.data, request.resource.data,
+             exists(officialFollowPath(pid)) ? get(officialFollowPath(pid)).data : null,
+             existsAfter(officialFollowPath(pid)) ? getAfter(officialFollowPath(pid)).data : null);
       allow delete: if false;
     }
 
@@ -2645,14 +2750,14 @@ service cloud.firestore {
                 && grantAllows('mahalle-' + request.resource.data.region.neighbourhoodId, request.resource.data.module,
                      request.resource.data.action))
             // Kurum yöneticisi kendi kurumunda (personel işlemleri).
-            || (request.resource.data.get('orgId', null) is string && request.resource.data.module == 'kurumlar'
+            || (request.resource.data.get('orgId', null) is string && request.resource.data.module in ['kurumlar', 'baskan']
                 && isOrgAdminOf(request.resource.data.orgId))
             // Muhtar kendi mahallesinin resmî profilini düzenler.
             || (request.resource.data.module == 'kurumlar' && request.resource.data.action == 'duzenle'
                 && request.resource.data.targetId is string && request.resource.data.targetId.matches('^mahalle-.+')
                 && isMuhtarOf(request.resource.data.targetId))
             // Kurum personeli kurumun bölümlerinde (duyuru hazırlama, onay).
-            || (request.resource.data.get('orgId', null) is string && request.resource.data.module in ['gonderiler', 'etkinlikler', 'seyahat']
+            || (request.resource.data.get('orgId', null) is string && request.resource.data.module in ['gonderiler', 'etkinlikler', 'seyahat', 'baskan']
                 && staffCan(request.resource.data.orgId, request.resource.data.module, request.resource.data.action)));
       allow update, delete: if false;
     }

@@ -29,6 +29,7 @@ import { NotificationsPage } from './pages/notifications-page';
 import { TodayPage } from './pages/today-page';
 import { StatsPage } from './pages/stats-page';
 import { ProfilesPage } from './pages/profiles-page';
+import { AudiencePage } from './pages/audience-page';
 import { CityProvider } from './lib/city';
 import './styles.css';
 
@@ -52,6 +53,7 @@ const router = createHashRouter([
       { index: true, element: <TodayPage /> },
       { path: 'istatistikler', element: <StatsPage /> },
       { path: 'profiller', element: <ProfilesPage /> },
+      { path: 'takipciler', element: <AudiencePage /> },
       { path: 'konumlar', element: <LocationsPage /> },
       { path: 'meslekler', element: <OccupationsPage /> },
       { path: 'acil-numaralar', element: <EmergencyNumbersPage /> },

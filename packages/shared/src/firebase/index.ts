@@ -47,6 +47,7 @@ export {
 export { createAnnouncementPanel, createFirestoreAnnouncementRepository, type SaveMode } from './announcements';
 export { createEventPanel, createFirestoreEventRepository, type JoinedItem } from './events';
 export { createFirestoreOfficialProfileRepository, createOfficialProfileAdmin } from './official-profiles';
+export { createFirestoreOfficialFollowRepository, getOfficialStats, type OfficialFollowRepository } from './official-follows';
 export { createActivityModeration, createFirestoreActivityRepository, type ActivityReport } from './activities';
 export { deletePhotos, PhotoTooLargeError, uploadMedia, uploadPostPhotos, uploadPostVideo, VideoTooLargeError, type PreparedPhoto, type PreparedVideo } from './photos';
 export { createFirestorePostRepository, createFramesAdmin, createPostModeration, type CommentReport, type FeedFilter, type FeedPage, type PostReport } from './posts';

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
+  mayorProfileTarget,
   OFFICIAL_PROFILE_LIMITS,
   orgProfileTarget,
   profileTargetsFor,
@@ -25,6 +26,7 @@ export const hasProfileAccess = (user: PanelUser) => isAdminUser(user) || profil
 /**
  * Resmî profil (PROJE.md 6.2 madde 2): kurumun ya da muhtarlığın uygulamada görünen künyesi. Kurum yöneticisi kendi
  * kurumunu, muhtar kendi mahallesini, admin her kurumu düzenler. Kurumun adı ve bölgesi kurum kaydından gelir.
+ * Belediyede "Belediye başkanı" bölümü açıksa başkanın profili de buradan girilir (ad, tanıtım, fotoğraf).
  */
 export function ProfilePage() {
   const { user } = useSession();
@@ -52,7 +54,7 @@ function Profiles({ user }: { user: PanelUser }) {
     if (!isAdmin || !live) return;
     createOrganizationAdmin(firestore, user.uid)
       .listAll()
-      .then((list) => setOrgTargets(list.map(orgProfileTarget)))
+      .then((list) => setOrgTargets(list.flatMap((o) => [orgProfileTarget(o), mayorProfileTarget(o)].filter((x): x is ProfileTarget => !!x))))
       .catch(() => setMessage({ kind: 'error', text: t('profile.loadError') }));
   }, [isAdmin, live, user.uid]);
 
@@ -72,7 +74,11 @@ function Profiles({ user }: { user: PanelUser }) {
   }, [target, live, service]);
 
   const label = (x: ProfileTarget) =>
-    x.type === 'kurum' ? x.name : t('announcements.muhtarOf', { place: (x.region && nameOf({ region: x.region })) ?? x.region?.neighbourhoodId ?? '' });
+    x.type === 'kurum'
+      ? x.name
+      : x.type === 'baskan'
+        ? t('profile.mayorOf', { org: x.name })
+        : t('announcements.muhtarOf', { place: (x.region && nameOf({ region: x.region })) ?? x.region?.neighbourhoodId ?? '' });
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -93,9 +99,9 @@ function Profiles({ user }: { user: PanelUser }) {
     }
   };
 
-  const field = (key: Exclude<keyof Form, 'logo'>, opts: { multiline?: boolean; type?: string; max: number; hint?: string }) => (
+  const field = (key: Exclude<keyof Form, 'logo'>, opts: { multiline?: boolean; type?: string; max: number; hint?: string; label?: string }) => (
     <div className="field">
-      <label htmlFor={`pr-${key}`}>{t(`profile.fields.${key}`)}</label>
+      <label htmlFor={`pr-${key}`}>{opts.label ?? t(`profile.fields.${key}`)}</label>
       {opts.multiline ? (
         <textarea id={`pr-${key}`} rows={4} dir="auto" maxLength={opts.max} disabled={!live} value={form![key] ?? ''} onChange={(e) => setForm({ ...form!, [key]: e.target.value })} aria-invalid={errors.includes(key as OfficialProfileError)} />
       ) : (
@@ -133,19 +139,20 @@ function Profiles({ user }: { user: PanelUser }) {
       ) : (
         <form className="form panel-form" onSubmit={submit}>
           <div className="field">
-            <span className="label">{target.type === 'kurum' ? t('profile.orgName') : t('profile.muhtarlik')}</span>
+            <span className="label">{target.type === 'kurum' ? t('profile.orgName') : target.type === 'baskan' ? t('profile.mayorProfile') : t('profile.muhtarlik')}</span>
             <strong>{label(target)}</strong>
             <span className="meta">{target.region ? regionLabel(target.region, nameOf({ region: target.region })) : t('profile.national')}</span>
             {target.type === 'kurum' ? <span className="meta">{t('profile.nameLocked')}</span> : null}
           </div>
           {target.type === 'muhtar' ? field('name', { max: L.name, hint: t('profile.muhtarNameHint') }) : null}
+          {target.type === 'baskan' ? field('name', { max: L.name, hint: t('profile.mayorNameHint'), label: t('profile.fields.mayorName') }) : null}
           {field('about', { multiline: true, max: L.about })}
           {field('phone', { type: 'tel', max: L.phone[1], hint: t('profile.phoneHint') })}
           {field('email', { type: 'email', max: L.email })}
           {field('website', { type: 'url', max: L.website, hint: t('profile.websiteHint') })}
           {field('address', { max: L.address })}
           {field('hours', { max: L.hours, hint: t('profile.hoursHint') })}
-          <ImageField label={t('profile.fields.logo')} hint={t('profile.logoHint')} kind="kurum" uid={user.uid} value={form.logo} onChange={(logo) => setForm({ ...form, logo })} disabled={!live || busy} round />
+          <ImageField label={target.type === 'baskan' ? t('profile.fields.photo') : t('profile.fields.logo')} hint={target.type === 'baskan' ? t('profile.photoHint') : t('profile.logoHint')} kind="kurum" uid={user.uid} value={form.logo} onChange={(logo) => setForm({ ...form, logo })} disabled={!live || busy} round />
           <p className="meta">{t('profile.publicNote')}</p>
           {live ? (
             <div className="actions">
