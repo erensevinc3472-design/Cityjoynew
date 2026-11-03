@@ -814,7 +814,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   (geri: liste). Koda geçerken: Belediye Hizmetleri'ndeki son duyuru satırı kaldırılacak (`city/belediyeler.tsx`), bildirim
   yönlendirmesi ve geri tuşu buna göre.
   Giriş akışı (Eren): karşılama > dil > giriş/kayıt > izinler > ana sayfa; resimler şimdilik çizim, Panel > Uygulama
-  görselleri'nden değişir (yükleme Blaze ile). G-* panoları ve P-Gorseller hazır, görünüm onayı bekliyor (PROJE 13, madde 35).
+  görselleri'nden değişir (yükleme Blaze ile). G-* panoları ve P-Gorseller Eren onayladı (buzlu cam kart) (PROJE 13, madde 35).
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.

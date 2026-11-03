@@ -751,7 +751,7 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
       resimli şerit. Resimler şimdilik çizim (fotoğraf lisansı derdi yok); Panel > Uygulama görselleri'nden değiştirilir (karşılama
       slaytları ve slogan yazıları dile göre, beş dil şeridi, giriş arka planı; sıra, aç/kapat, varsayılan çizime dön, işlem kaydı;
       yalnızca Admin). Resim yükleme Blaze ile açılır, o zamana kadar çizimler. Önizleme: G-Karsilama, G-Dil, G-Giris, G-Kayit,
-      G-IzinKonum, G-Mahalle, G-IzinBildirim panoları ve P-Gorseller (görünüm onayı bekliyor).
+      G-IzinKonum, G-Mahalle, G-IzinBildirim panoları ve P-Gorseller (Eren onayladı, 3 Kasım). Giriş ve kayıt kartı Eren'in tasarımındaki açık buzlu cam (beyaz yarı saydam, bulanık arka plan), düğme marka altını.
       - Giriş seçenekleri: e-posta, Apple ve Google (Facebook yok). Apple, Google varken mağaza kuralı gereği şart.
       - Kayıtta doğum yılı ve iki onay (kullanım şartları, aydınlatma metni) kalır.
       - İzin ekranları nedenini anlatır, tek düğme "Devam et" telefonun kendi izin sorusunu açar (Apple kuralı: özel ekranda
