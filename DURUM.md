@@ -722,7 +722,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   (`packages/shared/src/firebase/stats.ts`, 1.000 belge başına 1 okuma); yetki yetmeyen kutu "—". İstatistik yetkisi
   olmayan (belediye, muhtar) Bugün'de kendi bölümlerine kısayollar görür. Kural değişikliği yok; **4 yeni dizin**
   (gönderi: il+tarih, kategori+tarih, il+kategori+tarih; işletme: il+tarih). Panel derlendi, tür denetimi geçti;
-  tarayıcıda örnek admin ve Nilüfer Belediyesi hesabıyla denendi (menü, il seçici, sayfalar). Grafikler gerçek veriyle
+  tarayıcıda örnek admin ve Nilüfer Belediyesi hesabıyla denendi (menü, il seçici, sayfalar). PR #58 birleşti; dizinler
+  Firebase'e ve panel cityjoynew.web.app'e yüklendi (3 Kasım, Claude). Grafikler gerçek veriyle
   **denenmedi** (örnek hesap veri okumaz).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
