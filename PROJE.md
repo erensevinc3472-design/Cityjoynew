@@ -746,6 +746,8 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
       **Karar (Eren, 3 Kasım 2026): duyuruların tek yeri Mahalle Meydanı > Duyurular** (mahalle, ilçe, il geneli, acil olanlar
       dahil; "Tüm duyurular" tam listeyi açar). Ana sayfadaki acil şeridi kalır (dokununca aynı duyuru açılır). Bildirime
       dokununca duyuru açılır, geri tuşu Duyurular listesine döner. Belediye Hizmetleri'ndeki "son duyuru" satırı kalkar.
+    - **Giriş akışı (3 Kasım 2026, önizleme, onay bekliyor):** G-Dil, G-Hosgeldin, G-Kayit, G-Giris, G-Tanis, G-Konum. Sıra
+      koddaki gibi (dil > hoş geldin > kayıt/giriş > seni biraz tanıyalım > konum), yazılar dil dosyasından, yalnızca görünüm yeni.
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
 
