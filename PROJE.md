@@ -743,6 +743,9 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
     - **Duyurular (3 Kasım 2026, önizleme, onay bekliyor):** D-Nerede (Ana sayfa acil şeridi, Mahalle Meydanı "Tüm duyurular",
       Belediye Hizmetleri son duyuru), D-Liste (konum çipi, acil kırmızı, sabit altın, kurum haberi kategori etiketiyle) ve D-Detay
       (112 uyarısı, resmî hesap satırı, Bölge / Yayın / Bitiş). İçerik ve mantık koddaki gibi, yalnızca görünüm yeni.
+      **Karar (Eren, 3 Kasım 2026): duyuruların tek yeri Mahalle Meydanı > Duyurular** (mahalle, ilçe, il geneli, acil olanlar
+      dahil; "Tüm duyurular" tam listeyi açar). Ana sayfadaki acil şeridi kalır (dokununca aynı duyuru açılır). Bildirime
+      dokununca duyuru açılır, geri tuşu Duyurular listesine döner. Belediye Hizmetleri'ndeki "son duyuru" satırı kalkar.
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
 
