@@ -411,7 +411,10 @@
     "logo": "Logo (optional)",
     "logoHint": "A square logo looks best; it is shown as a circle.",
     "gallery": "Showcase photos",
-    "galleryHint": "Photos of your shop, products or menu. Add photos you took or have permission to use; they are resized and location data is removed."
+    "galleryHint": "Photos of your shop, products or menu. Add photos you took or have permission to use; they are resized and location data is removed.",
+    "new": "New",
+    "directions": "Directions",
+    "directionsLabel": "Directions to {{name}}"
   },
   "reviews": {
     "title": "Reviews",
@@ -689,7 +692,12 @@
       "waste": "Waste and cleaning",
       "police": "Municipal police",
       "funeral": "Funeral services"
-    }
+    },
+    "district": "District",
+    "featured": "Featured",
+    "nearFirst": "Nearest first",
+    "noPrice": "No price info",
+    "listAll": "All ({{count}})"
   },
   "announcements": {
     "title": "Announcements",
@@ -1650,7 +1658,9 @@
     "empty": "No cafés or restaurants are listed in {{province}} yet. Owners can join for free from My business.",
     "inviteTitle": "Get your venue listed here",
     "inviteBody": "Own a café or restaurant? Join for free from My business so your menu, hours and reviews show here.",
-    "inviteCta": "Add my business"
+    "inviteCta": "Add my business",
+    "sortNear": "Nearest",
+    "sortLiked": "Most liked"
   },
   "showcase": {
     "title": "{{city}} Showcase",

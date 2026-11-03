@@ -411,7 +411,10 @@
     "logo": "Logo (isteğe bağlı)",
     "logoHint": "Kare bir logo en iyi görünür; yuvarlak gösterilir.",
     "gallery": "Vitrin fotoğrafları",
-    "galleryHint": "Dükkânın, ürünlerin, menünün fotoğrafları. Kendi çektiğin ya da kullanma iznin olan fotoğrafları ekle; küçültülerek yüklenir, konum bilgisi silinir."
+    "galleryHint": "Dükkânın, ürünlerin, menünün fotoğrafları. Kendi çektiğin ya da kullanma iznin olan fotoğrafları ekle; küçültülerek yüklenir, konum bilgisi silinir.",
+    "new": "Yeni",
+    "directions": "Yol",
+    "directionsLabel": "{{name}} için yol tarifi"
   },
   "reviews": {
     "title": "Değerlendirmeler",
@@ -689,7 +692,12 @@
       "waste": "Çöp ve temizlik",
       "police": "Zabıta",
       "funeral": "Cenaze hizmetleri"
-    }
+    },
+    "district": "İlçe",
+    "featured": "Öne çıkan",
+    "nearFirst": "Yakına göre",
+    "noPrice": "Ücret bilgisi yok",
+    "listAll": "Tümü ({{count}})"
   },
   "announcements": {
     "title": "Duyurular",
@@ -1650,7 +1658,9 @@
     "empty": "{{province}} için henüz kayıtlı kafe ya da restoran yok. Mekân sahipleri İşletmem'den ücretsiz kaydolabilir.",
     "inviteTitle": "Mekânın burada görünsün",
     "inviteBody": "Kafe ya da restoran sahibiysen İşletmem'den ücretsiz kaydol; menün, saatlerin ve yorumların burada görünsün.",
-    "inviteCta": "İşletmemi ekle"
+    "inviteCta": "İşletmemi ekle",
+    "sortNear": "En yakın",
+    "sortLiked": "En beğenilen"
   },
   "showcase": {
     "title": "{{city}} Vitrini",

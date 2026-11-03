@@ -6,7 +6,9 @@ import { CityGuideList } from '@/components/city-guide-list';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { INSTITUTION_GROUPS, LOOK, type Look } from '@/lib/city-look';
+import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
+import { useUserLocation } from '@/lib/user-location';
 
 const SECTION_LOOK: Partial<Record<CityGuideSectionId, Look>> = {
   'belediye-hizmetleri': LOOK.belediye,
@@ -31,10 +33,12 @@ export default function CitySectionScreen() {
   const lang = language ?? 'tr';
   const g = group ? INSTITUTION_GROUPS.find((x) => x.id === group) : undefined;
   const title = g ? t(`city.groups.${g.id}.title`) : def ? (def.names[lang] ?? def.names.tr) : '';
+  const { location } = useUserLocation();
+  const place = location?.provinceCode ? repo.getProvince(location.provinceCode)?.name : undefined;
   const back = () => (router.canGoBack() ? router.back() : router.replace(g ? '/city/kurumlar' : '/city'));
 
   return (
-    <Screen header={<HeroHeader title={title} onBack={back} />}>
+    <Screen header={<HeroHeader title={title} subtitle={place} onBack={back} />}>
       <CityGuideList section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} />
     </Screen>
   );

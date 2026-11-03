@@ -411,7 +411,10 @@
     "logo": "Logo (optional)",
     "logoHint": "Ein quadratisches Logo sieht am besten aus; es wird rund angezeigt.",
     "gallery": "Schaufenster-Fotos",
-    "galleryHint": "Fotos von Laden, Produkten oder Speisekarte. Füge eigene Fotos oder Fotos mit Nutzungsrecht hinzu; sie werden verkleinert, Standortdaten werden entfernt."
+    "galleryHint": "Fotos von Laden, Produkten oder Speisekarte. Füge eigene Fotos oder Fotos mit Nutzungsrecht hinzu; sie werden verkleinert, Standortdaten werden entfernt.",
+    "new": "Neu",
+    "directions": "Route",
+    "directionsLabel": "Route zu {{name}}"
   },
   "reviews": {
     "title": "Bewertungen",
@@ -689,7 +692,12 @@
       "waste": "Müll und Reinigung",
       "police": "Ordnungsamt",
       "funeral": "Bestattungsdienste"
-    }
+    },
+    "district": "Bezirk",
+    "featured": "Empfohlen",
+    "nearFirst": "Nächste zuerst",
+    "noPrice": "Keine Preisangabe",
+    "listAll": "Alle ({{count}})"
   },
   "announcements": {
     "title": "Bekanntmachungen",
@@ -1650,7 +1658,9 @@
     "empty": "In {{province}} sind noch keine Cafés oder Restaurants eingetragen. Inhaber können sich kostenlos unter Mein Unternehmen eintragen.",
     "inviteTitle": "Dein Lokal hier zeigen",
     "inviteBody": "Du hast ein Café oder Restaurant? Trag dich kostenlos unter Mein Unternehmen ein, dann erscheinen Speisekarte, Öffnungszeiten und Bewertungen hier.",
-    "inviteCta": "Unternehmen eintragen"
+    "inviteCta": "Unternehmen eintragen",
+    "sortNear": "Am nächsten",
+    "sortLiked": "Beliebteste"
   },
   "showcase": {
     "title": "{{city}} Schaufenster",

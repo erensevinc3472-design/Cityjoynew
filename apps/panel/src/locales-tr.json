@@ -1464,8 +1464,8 @@
   },
   "showcase": {
     "title": "Şehir Vitrini",
-    "intro": "Benim Şehrim > Şehir Vitrini: ilin haftalık seçkisi. Uygulama en son yayındaki sayıyı açar, eski sayılar arşivde kalır.",
-    "rules": "Editör seçkisidir: para karşılığı girilmez (ücretli öne çıkarma İşletmeler sayfasında, \"Reklam\" etiketiyle). Seçilen işletmenin bilgilerinin doğru olduğundan emin olun.",
+    "intro": "Benim Şehrim > İl Vitrini: şehirdeki reklam panoları gibi bir reklam vitrini (Eren, 3 Kasım 2026). Panolar yana kaydırılır; uygulama en son yayındaki sayıyı açar, son 6 sayı eski dergi gibi altta kalır.",
+    "rules": "Ücretli her panoda \"Reklam\" işaretini açın: uygulamada panonun üstünde açıkça \"Reklam\" yazar (reklam mevzuatı ve mağaza kuralları). Fiyat ve satış akışı gelir modeliyle belirlenecek. Seçilen işletmenin bilgilerinin doğru olduğundan emin olun.",
     "province": "İl",
     "add": "Yeni sayı",
     "editIssue": "Sayı {{n}}",
@@ -1531,7 +1531,9 @@
       "week": "Hafta tarihini seçin.",
       "stories": "1-8 konu olmalı.",
       "story": "Her konunun başlığı olmalı; konuda seçim yoksa en az birkaç cümle yazı olmalı."
-    }
+    },
+    "sponsored": "Reklam (ücretli pano)",
+    "sponsoredHint": "Açıksa uygulamada bu panonun üstünde \"Reklam\" yazar."
   },
   "roadside": {
     "title": "Yol üstü verisi",

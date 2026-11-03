@@ -85,7 +85,8 @@ export default function CityItemScreen() {
     : address
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${item.name}, ${address}, ${place}`)}`
       : undefined;
-  const details = def?.columns.filter((col) => !HIDDEN.has(col.key) && v[col.key] !== undefined) ?? [];
+  // Otoparkta kapasite ve doluluk gösterilmez (Eren, 3 Kasım 2026): canlı takip yok, eski sayı yanıltır.
+  const details = def?.columns.filter((col) => !HIDDEN.has(col.key) && !(section === 'otoparklar' && col.key === 'kapasite') && v[col.key] !== undefined) ?? [];
   const steps = Array.isArray(v.adimlar) ? v.adimlar : [];
 
   return (

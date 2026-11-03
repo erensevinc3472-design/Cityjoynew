@@ -22,7 +22,7 @@ import { t } from '../lib/t';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
 type ItemDraft = ShowcaseItem & { key: string };
-type StoryDraft = { key: string; title: string; subtitle: string; body: string; theme: ShowcaseTheme; items: ItemDraft[] };
+type StoryDraft = { key: string; title: string; subtitle: string; body: string; theme: ShowcaseTheme; items: ItemDraft[]; sponsored?: boolean };
 type Draft = { id: string | null; issue: number; title: string; intro: string; weekOf: string; stories: StoryDraft[] };
 
 let seq = 0;
@@ -101,7 +101,7 @@ export function ShowcasePage() {
             title: s.title,
             intro: s.intro,
             weekOf: s.weekOf,
-            stories: s.stories.map((x) => ({ key: key(), title: x.title, subtitle: x.subtitle ?? '', body: x.body ?? '', theme: x.theme, items: x.items.map((i) => ({ ...i, key: key() })) })),
+            stories: s.stories.map((x) => ({ key: key(), title: x.title, subtitle: x.subtitle ?? '', body: x.body ?? '', theme: x.theme, sponsored: x.sponsored, items: x.items.map((i) => ({ ...i, key: key() })) })),
           }
         : {
             id: null,
@@ -286,6 +286,13 @@ function IssueEditor({
               <div className="field">
                 <label htmlFor={`st-body-${s.key}`}>{t('showcase.body')}</label>
                 <textarea id={`st-body-${s.key}`} rows={3} maxLength={800} value={s.body} onChange={(e) => setStory(s.key, { body: e.target.value })} />
+              </div>
+              <div className="field checkbox">
+                <label>
+                  <input type="checkbox" checked={!!s.sponsored} onChange={(e) => setStory(s.key, { sponsored: e.target.checked || undefined })} />
+                  {t('showcase.sponsored')}
+                </label>
+                <span className="meta">{t('showcase.sponsoredHint')}</span>
               </div>
               <StoryItems items={s.items} onChange={(items) => setStory(s.key, { items })} businesses={businesses} places={places} />
               <div className="actions">
