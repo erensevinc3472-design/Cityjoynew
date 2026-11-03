@@ -1,47 +1,96 @@
 import { useEffect, useState } from 'react';
 import type { Photo } from '@cityjoy/shared';
 
-import { socialRepository } from './services';
+import { businessRepository, socialRepository } from './services';
 
-// Kişilerin profil fotoğrafı oturum boyunca bir kez okunur (gönderi, mesaj, arama listelerinde aynı kişi tekrar okunmaz).
-const cache = new Map<string, Promise<Photo | undefined>>();
+/**
+ * Kişilerin herkese açık profili (güncel ad ve fotoğraf) oturum boyunca bir kez okunur: gönderi, mesaj, arama
+ * listelerinde aynı kişi tekrar okunmaz. Böylece ad değişikliği eski gönderilerde de görünür (gönderide yazılı ad
+ * yalnızca profil okunamazsa kullanılır).
+ */
+type Author = { photo?: Photo; displayName?: string };
+const cache = new Map<string, Promise<Author>>();
 const listeners = new Set<() => void>();
 
-function load(uid: string): Promise<Photo | undefined> {
+function load(uid: string): Promise<Author> {
   if (!cache.has(uid)) {
     cache.set(
       uid,
       socialRepository.getProfile(uid).then(
-        (p) => p?.photo,
-        () => undefined,
+        (p) => (p ? { photo: p.photo, displayName: p.displayName } : {}),
+        () => ({}),
       ),
     );
   }
   return cache.get(uid)!;
 }
 
-/** Kendi fotoğrafını değiştirince listelerdeki eski görsel hemen yenilenir. */
-export function rememberProfilePhoto(uid: string, photo: Photo | undefined) {
-  cache.set(uid, Promise.resolve(photo));
+/** Kendi fotoğrafını ya da adını değiştirince listelerdeki eski bilgi hemen yenilenir. */
+export function rememberProfile(uid: string, patch: Author) {
+  const prev = cache.get(uid) ?? Promise.resolve({} as Author);
+  cache.set(
+    uid,
+    prev.then((p) => ({ ...p, ...patch })),
+  );
   listeners.forEach((l) => l());
 }
 
-/** Kişinin profil fotoğrafı; yoksa (ya da okunamazsa) undefined, ekran baş harfi gösterir. */
-export function useProfilePhoto(uid: string | undefined): Photo | undefined {
-  const [photo, setPhoto] = useState<Photo>();
+export const rememberProfilePhoto = (uid: string, photo: Photo | undefined) => rememberProfile(uid, { photo });
+
+function useVersion() {
   const [version, setVersion] = useState(0);
   useEffect(() => {
     const l = () => setVersion((v) => v + 1);
     listeners.add(l);
     return () => void listeners.delete(l);
   }, []);
+  return version;
+}
+
+/** Kişinin güncel herkese açık bilgisi; okunamazsa boş (ekran gönderideki adı ve baş harfi gösterir). */
+export function useAuthor(uid: string | undefined): Author {
+  const [author, setAuthor] = useState<Author>({});
+  const version = useVersion();
   useEffect(() => {
     let live = true;
-    setPhoto(undefined);
-    if (uid) load(uid).then((p) => live && setPhoto(p));
+    setAuthor({});
+    if (uid) load(uid).then((a) => live && setAuthor(a));
     return () => {
       live = false;
     };
   }, [uid, version]);
-  return photo;
+  return author;
+}
+
+/** Kişinin profil fotoğrafı; yoksa (ya da okunamazsa) undefined, ekran baş harfi gösterir. */
+export function useProfilePhoto(uid: string | undefined): Photo | undefined {
+  return useAuthor(uid).photo;
+}
+
+// İşletmelerin güncel adı ve doğrulama durumu da oturumda bir kez okunur (işletme adına paylaşımlarda rozet).
+type BizInfo = { name?: string; verified: boolean };
+const bizCache = new Map<string, Promise<BizInfo>>();
+
+/** İşletme adına paylaşımın güncel adı ve "doğrulanmış" rozeti. */
+export function useBusinessInfo(id: string | undefined): BizInfo {
+  const [info, setInfo] = useState<BizInfo>({ verified: false });
+  useEffect(() => {
+    let live = true;
+    setInfo({ verified: false });
+    if (!id) return;
+    if (!bizCache.has(id)) {
+      bizCache.set(
+        id,
+        businessRepository.get(id).then(
+          (b) => (b ? { name: b.name, verified: b.verification.status === 'dogrulandi' } : { verified: false }),
+          () => ({ verified: false }),
+        ),
+      );
+    }
+    bizCache.get(id)!.then((x) => live && setInfo(x));
+    return () => {
+      live = false;
+    };
+  }, [id]);
+  return info;
 }

@@ -26,6 +26,7 @@ import { useSocial } from '@/lib/social';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { errorText } from '@/lib/limits';
+import { useAuthor } from '@/lib/profile-photos';
 
 interface Props {
   post: Post;
@@ -122,7 +123,7 @@ export function PostComments({ post, uid, displayName, onCount }: Props) {
           return (
             <View key={cm.id} style={[styles.item, { backgroundColor: c.surface, borderColor: c.border }]}>
               <AppText variant="caption" muted>
-                {cm.authorName} · {at.toLocaleDateString(lang, { day: 'numeric', month: 'short' })} {at.toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })}
+                <AuthorName uid={cm.authorUid} fallback={cm.authorName} /> · {at.toLocaleDateString(lang, { day: 'numeric', month: 'short' })} {at.toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })}
               </AppText>
               <AppText selectable>{cm.text}</AppText>
               {reporting?.id === cm.id ? (
@@ -169,3 +170,8 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
   block: { gap: spacing.xs },
 });
+
+/** Yorumu yazanın güncel adı (oturumda kişi başına bir okuma); okunamazsa yorumdaki ad. */
+function AuthorName({ uid, fallback }: { uid: string; fallback: string }) {
+  return <>{useAuthor(uid).displayName || fallback}</>;
+}

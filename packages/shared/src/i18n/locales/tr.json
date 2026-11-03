@@ -1152,7 +1152,8 @@
       "note": "En çok {{max}} saniye ve 40 MB. Video ya da fotoğraf eklenir, ikisi birlikte olmaz.",
       "tooLong": "Video en çok {{max}} saniye olabilir. Kırpıp yeniden seç.",
       "tooLarge": "Video çok büyük (en çok 40 MB). Daha kısa ya da düşük çözünürlüklü bir video seç."
-    }
+    },
+    "verifiedBusiness": "Doğrulanmış işletme"
   },
   "news": {
     "title": "Haberler",

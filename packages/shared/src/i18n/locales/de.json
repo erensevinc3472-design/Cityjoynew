@@ -1152,7 +1152,8 @@
       "note": "Bis zu {{max}} Sekunden und 40 MB. Entweder ein Video oder Fotos, nicht beides.",
       "tooLong": "Videos dürfen höchstens {{max}} Sekunden lang sein. Kürze es und wähle es erneut.",
       "tooLarge": "Das Video ist zu groß (max. 40 MB). Wähle ein kürzeres Video oder eine geringere Auflösung."
-    }
+    },
+    "verifiedBusiness": "Verifiziertes Unternehmen"
   },
   "news": {
     "title": "Nachrichten",

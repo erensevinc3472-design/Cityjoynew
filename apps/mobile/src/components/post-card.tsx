@@ -10,6 +10,7 @@ import { PostPhotos } from '@/components/post-photos';
 import { PostVideoView } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { locationRepository as repo } from '@/lib/locations';
+import { useAuthor, useBusinessInfo } from '@/lib/profile-photos';
 import { useSettings } from '@/lib/settings';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -56,6 +57,10 @@ export function useRelativeTime() {
  * en altta kategori etiketi. Fotoğraf varsa ekran genişliğinde üstte durur, yazı altında. Yazıya ya da fotoğrafa iki kez dokunmak beğenir (kalp belirir), bir kez dokunmak gönderiyi açar.
  */
 export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow, onFollow, saved, onSave }: Props) {
+  // Ad ve rozet güncel profilden (oturumda kişi başına bir okuma): ad değişikliği eski gönderilerde de görünür.
+  const author = useAuthor(item.business ? undefined : item.authorUid);
+  const biz = useBusinessInfo(item.business?.id);
+  const name = (item.business ? biz.name : author.displayName) || item.authorName;
   const { t } = useTranslation();
   const c = useThemeColors();
   const { language } = useSettings();
@@ -103,7 +108,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
     lastTap.current = now;
     if (onPress) single.current = setTimeout(onPress, DOUBLE_TAP_MS);
   };
-  const share = () => Share.share({ message: `${item.authorName}: ${item.text}\n\nCityJoy` }).catch(() => {});
+  const share = () => Share.share({ message: `${name}: ${item.text}\n\nCityJoy` }).catch(() => {});
 
   const action = (icon: IconName, label: string, onAct: (() => void) | undefined, color: string, count?: number) => (
     <Pressable accessibilityRole="button" accessibilityLabel={label} disabled={!onAct} onPress={onAct} hitSlop={6} style={({ pressed }) => [styles.action, { opacity: pressed ? 0.6 : 1 }]}>
@@ -118,20 +123,23 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
       <View style={styles.top}>
         <Pressable
           accessibilityRole={onAuthor ? 'link' : undefined}
-          accessibilityLabel={onAuthor ? t('explore.profile.open', { name: item.authorName }) : undefined}
+          accessibilityLabel={onAuthor ? t('explore.profile.open', { name: name }) : undefined}
           disabled={!onAuthor}
           onPress={onAuthor}
           style={styles.author}>
           <View style={[styles.ring, { borderColor: c.accent }]}>
             <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
-              <AppText style={[styles.initial, { color: c.accent }]}>{(item.authorName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+              <AppText style={[styles.initial, { color: c.accent }]}>{(name || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
               <AvatarPhoto uid={item.business ? undefined : item.authorUid} size={36} />
             </View>
           </View>
           <View style={styles.who}>
             <View style={styles.nameRow}>
-              <AppText style={[styles.name, styles.shrink, { color: c.textStrong }]} numberOfLines={1}>{item.authorName}</AppText>
+              <AppText style={[styles.name, styles.shrink, { color: c.textStrong }]} numberOfLines={1}>{name}</AppText>
               {/* İşletme adına paylaşım: ad işletmenin, dokununca işletme sayfası açılır. */}
+              {item.business && biz.verified ? (
+                <MaterialIcons name="verified" size={15} color={c.accent} accessibilityLabel={t('explore.verifiedBusiness')} />
+              ) : null}
               {item.business ? (
                 <View style={[styles.bizTag, { backgroundColor: c.accentSoft }]}>
                   <MaterialIcons name="storefront" size={11} color={c.accent} />
@@ -145,7 +153,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
         {follow !== undefined && onFollow ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`${followLabel}: ${item.authorName}`}
+            accessibilityLabel={`${followLabel}: ${name}`}
             onPress={onFollow}
             hitSlop={6}
             style={({ pressed }) => [
@@ -162,7 +170,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
         accessibilityRole={onPress ? 'button' : undefined}
         accessibilityLabel={
           onPress
-            ? [item.authorName, t(`explore.categories.${item.category}`), photos.length ? t('explore.photos.count', { count: photos.length }) : item.video ? t('explore.video.label') : '', item.text.slice(0, 120)].filter(Boolean).join('. ')
+            ? [name, t(`explore.categories.${item.category}`), photos.length ? t('explore.photos.count', { count: photos.length }) : item.video ? t('explore.video.label') : '', item.text.slice(0, 120)].filter(Boolean).join('. ')
             : undefined
         }
         accessibilityHint={onLike ? t('explore.doubleTapHint') : undefined}

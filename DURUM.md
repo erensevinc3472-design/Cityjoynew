@@ -320,7 +320,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    uygulama emülatörde tarayıcıda denendi (profil, takip, Takip sekmesi, engelleme, Profilim). Panel derlendi, panel
    bölümü tarayıcıda açılmadı. Bilinen sınırlar: gizli hesabın Genel'e paylaştığı gönderi Genel akışında yine görünür
    (kişi Genel'i kendisi seçer); takip edilen 30'dan fazla hesap varsa Takip akışı ilk 30'u okur; ad değişikliği eski
-   gönderilerdeki ada yansımaz. PR #11 birleşti, kurallar yüklendi (Eren, 28 Ekim).
+   gönderilerdeki ada yansımaz (3 Kasım'da giderildi). PR #11 birleşti, kurallar yüklendi (Eren, 28 Ekim).
 
 26. **Keşfet, 4. aşama: resmî duyurular akışta ve yasaklı kelime süzgeci** (PROJE.md 5.5 akış sıralaması ve madde 8).
    Mahallem'de mahalleye ve ilçeye yönelik, Bölgesel'de ildeki (ilçe süzgecine uyan) resmî duyurular (muhtar, belediye,
@@ -693,6 +693,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `postPhotosRemoved` videoyu da siler ve alanı boşaltır. Testler: kurallar 143, sunucu 30, ortak 150. Emülatörde web
   sürümüyle denendi (75 sn reddedildi, 12 sn paylaşıldı, başka kullanıcıda dokununca oynadı). **Telefonda denenmedi**
   (EAS). Süreyi telefon bildirir (kural sunucuda dosyayı açamaz); maliyeti 40 MB sınırı korur. **Kurallar değişti.**
+- **Keşfet: güncel ad ve doğrulanmış işletme rozeti (3 Kasım, aynı dal).** Gönderi kartında ve yorumlarda yazarın adı
+  güncel herkese açık profilden gelir (`lib/profile-photos.ts`: `useAuthor`, profil fotoğrafıyla aynı tek okuma, oturumda
+  kişi başına bir); ad değişikliği eski gönderilerde de görünür (bilinen sınır kapandı), kendi adını değiştirince hemen
+  yenilenir. İşletme adına paylaşımda işletmenin güncel adı ve doğrulanmışsa yanında doğrulanmış işareti
+  (`useBusinessInfo`, işletme başına bir okuma). Kural değişikliği yok. Emülatörde denendi (ad değişince eski gönderide
+  yeni ad).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
