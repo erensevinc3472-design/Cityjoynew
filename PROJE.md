@@ -737,6 +737,9 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
       kendiliğinden kalkar; şart değişirse "güncellendi" yazar; görüntülenme, kod açılma, arama sayıları. Yalnızca doğrulanmış
       işletme; şikâyet düğmesi; panelde il yöneticisi kendi ilinin fırsatlarını görür ve gizler (işlem kaydı). Yalnızca doğrulanmış işletme, geçerlilik ve şartlar, "Sponsorlu"). Etkinlikler Benim Şehrim'deki
       önizlemeyle aynı. Ana Sosyal Harmoni ekranı (iki sayfa, kaydırmalı kartlar) olduğu gibi kalır.
+    - **Profil, Mesajlar, Yeni gönderi, İşletmem (Eren, 3 Kasım 2026):** içerik ve mantık aynı kalır, yalnızca görünüm yeni dile
+      geçer (önizleme U-Profil, U-Mesajlar, U-Gonderi, U-Isletmem). İşletmem önizlemesinde küçük eklemeler: son 30 gün sayıları,
+      Yorumlar (cevap bekleyen), Doğrulama durumu, "Sayfamı gör" ve fotoğraf bölümünde "Kapak" işareti (ilk fotoğraf kapak olur).
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
 
