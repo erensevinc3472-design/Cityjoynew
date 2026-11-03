@@ -807,6 +807,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   (önceki "para karşılığı girilmez" notunun yerine).
   Eklendi (3 Kasım akşam): Acil alt sayfaları (H-Veteriner, H-Taksi, H-Diger) ve Sosyal Harmoni iç sayfaları (SH-*),
   onay bekliyor. Seyahat şimdiki hâliyle kalır (Eren).
+  Fırsatlar (Eren): kaydırmalı kategori kartları, kategori sayfası, fırsattan işletme sayfasına (geri: listeye), İşletmem >
+  Fırsatlarım; fırsat sınırı Ücretsiz 1, Pro 5 (PROJE.md 13 madde 35 ve 15 madde 2).
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.

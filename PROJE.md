@@ -729,7 +729,13 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
     - **Sosyal Harmoni iç sayfaları (önizleme, onay bekliyor):** Aktiviteler (tam yer katılınca, ilk buluşma ipuçları),
       Haberler (Bölgesel/Genel, kaynak adı ve "kaynağa git"), Yarışmalar (il > bölge > Türkiye, oy kuralları, şartname),
       Anketler (hazırlayan adı, gizli oy, sonuç oy verince), Şehir Kulüpleri (üstte il yöneticisinin seçtiği kulüp, fikstür
-      kulüpten), Fırsatlar (Eren: Sosyal Harmoni'nin altında, aşağı kaydırınca; her kategori ayrı kart, yana kaydırılır; karta dokununca o kategorinin kendi sayfası açılır. Kartın üstündeki yazı kart değiştikçe değişir (Eren): Yemek "Bugün ne yesek? Şehrin sofrası indirimde.", Market "Sepet hafifler, cüzdan sevinir.", Spor "Formda kalmanın en tatlı bahanesi.", Eğlence "Akşam planın hazır.", Esnaf "Mahallenin ustası, sana özel fiyatla.", Sağlık "Kendine iyi bak, bu kez daha uygun.", Eğitim "Yeni bir şey öğrenmenin tam zamanı." (5 dilde dil dosyasından). Yalnızca doğrulanmış işletme, geçerlilik ve şartlar, "Sponsorlu"). Etkinlikler Benim Şehrim'deki
+      kulüpten), Fırsatlar (Eren: Sosyal Harmoni'nin altında, aşağı kaydırınca; her kategori ayrı kart, yana kaydırılır; karta dokununca o kategorinin kendi sayfası açılır. Kartın üstündeki yazı kart değiştikçe değişir (Eren): Yemek "Bugün ne yesek? Şehrin sofrası indirimde.", Market "Sepet hafifler, cüzdan sevinir.", Spor "Formda kalmanın en tatlı bahanesi.", Eğlence "Akşam planın hazır.", Esnaf "Mahallenin ustası, sana özel fiyatla.", Sağlık "Kendine iyi bak, bu kez daha uygun.", Eğitim "Yeni bir şey öğrenmenin tam zamanı." (5 dilde dil dosyasından).
+      **Karar (Eren, 3 Kasım 2026): fırsata dokununca işletmenin kendi sayfası açılır** (ayrı fırsat sayfası yok); geri tuşu
+      kullanıcıyı geldiği fırsat listesine döndürür. Fırsat kutusu işletme sayfasında kapağın altında (oran, geçerlilik, Kodu
+      göster, Şartlar). İşletme sayfasını ve fırsatları işletme kendisi Profil > İşletmem > Fırsatlarım'dan yönetir: yeni fırsat
+      (tür, neyde geçerli, gün/saat, zorunlu bitiş tarihi en çok 90 gün, şartlar, kullanım), düzenle / durdur / bitir; bitişte
+      kendiliğinden kalkar; şart değişirse "güncellendi" yazar; görüntülenme, kod açılma, arama sayıları. Yalnızca doğrulanmış
+      işletme; şikâyet düğmesi; panelde il yöneticisi kendi ilinin fırsatlarını görür ve gizler (işlem kaydı). Yalnızca doğrulanmış işletme, geçerlilik ve şartlar, "Sponsorlu"). Etkinlikler Benim Şehrim'deki
       önizlemeyle aynı. Ana Sosyal Harmoni ekranı (iki sayfa, kaydırmalı kartlar) olduğu gibi kalır.
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
@@ -740,6 +746,7 @@ Eren'in kararları: kullanıcılar ücretsiz, güven bilgisi ücretsiz, SOS ve a
 1. **İşletme doğrulama ücreti** (Eren'in örneği: yaklaşık 1000 TL). Hem gelir hem sahte ilan filtresi. Ücret incelemenin bedelidir, rozet otomatik satılmaz.
 2. **İşletme üyelik kademeleri** (yinelenen gelir). **Karar (Eren, 3 Kasım 2026): iki kademe, Ücretsiz ve Pro.**
    - Ücretsiz: işletme hesabı açan herkes kendi kategorisinin listesine kendiliğinden düşer; 1 fotoğraf, Ara ve WhatsApp.
+   - Fırsat (Karar Eren, 3 Kasım 2026): aynı anda Ücretsiz 1, Pro 5; "Sponsorlu" öne çıkma yalnızca Pro.
    - Pro: en çok 10 fotoğraf (Eren: "çok fazla olmasın"), adres ve yol tarifi, detaylı tanıtım yazısı, hizmetler ve
      ücretler, yorumlar ve puan, video, listede fotoğraf şeridi, sayfa istatistiği, öne çıkma hakkı.
    - Öne çıkma ("Reklam"): her listede en çok 2; yalnızca belgeleri doğrulanmış Pro işletmeler arasında sırayla
