@@ -1966,5 +1966,38 @@
   },
   "media": {
     "count": "{{count}}/{{max}} Fotos"
+  },
+  "locationBadge": {
+    "title": "Standortabzeichen",
+    "hint": "Viertel bestätigen, Abzeichen erhalten",
+    "intro": "Bestätige deinen Standort einmal, dann erscheint ein Abzeichen in deinem Entdecken-Profil und bei deinen Beiträgen. Nachbarn sehen, dass deine Beiträge wirklich aus der Gegend kommen.",
+    "signIn": "Melde dich an, um ein Standortabzeichen zu erhalten.",
+    "none": "Noch nicht bestätigt",
+    "at": "Bestätigt: {{date}}",
+    "verify": "Standort bestätigen",
+    "again": "Erneut bestätigen",
+    "remove": "Abzeichen entfernen",
+    "needLocation": "Wähle zuerst unter Konto > Standort deine Provinz, deinen Bezirk und dein Viertel.",
+    "badge": {
+      "mahalle": "Viertel bestätigt",
+      "ilce": "Bezirk bestätigt"
+    },
+    "done": {
+      "mahalle": "Dein Viertel ist bestätigt, dein Abzeichen wurde hinzugefügt.",
+      "ilce": "Dein Bezirk ist bestätigt, dein Abzeichen wurde hinzugefügt. Dein Telefon hat keinen Viertelnamen geliefert, daher gilt das Abzeichen auf Bezirksebene."
+    },
+    "fail": {
+      "elsewhere": "Dein aktueller Standort passt nicht zu deinem gespeicherten Bezirk. Versuche es in deinem Viertel erneut oder aktualisiere deinen Standort.",
+      "denied": "Keine Standortberechtigung. Erlaube sie in den Einstellungen und versuche es erneut.",
+      "unavailable": "Standort konnte nicht ermittelt werden. Versuche es im Freien oder mit Internetverbindung erneut.",
+      "web": "Die Standortbestätigung erfolgt in der App auf dem Telefon.",
+      "error": "Speichern fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "notes": {
+      "how": "Der Standort deines Telefons wird einmal gelesen, die Adresse wird auf dem Telefon ermittelt.",
+      "privacy": "Dein Standort wird nirgends gespeichert; andere sehen nur das Abzeichen, nicht den Namen deines Viertels.",
+      "change": "Wenn du dein Viertel änderst, wird das Abzeichen automatisch entfernt.",
+      "limit": "Das Abzeichen ist ein Vertrauenszeichen; mit Apps für falsche Standorte lässt es sich umgehen, daher ist es allein kein Beweis."
+    }
   }
 }

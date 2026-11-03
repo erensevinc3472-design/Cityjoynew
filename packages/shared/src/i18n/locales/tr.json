@@ -1966,5 +1966,38 @@
   },
   "media": {
     "count": "{{count}}/{{max}} fotoğraf"
+  },
+  "locationBadge": {
+    "title": "Konum rozeti",
+    "hint": "Mahalleni doğrula, rozet al",
+    "intro": "Konumunu bir kez doğrula; Keşfet profilinde ve paylaşımlarında rozet görünsün. Komşuların paylaşımın gerçekten mahalleden geldiğini bilir.",
+    "signIn": "Konum rozeti için giriş yap.",
+    "none": "Henüz doğrulanmadı",
+    "at": "Doğrulama: {{date}}",
+    "verify": "Konumumu doğrula",
+    "again": "Yeniden doğrula",
+    "remove": "Rozeti kaldır",
+    "needLocation": "Önce Hesabım > Konum'dan ilini, ilçeni ve mahalleni seç.",
+    "badge": {
+      "mahalle": "Mahallesi doğrulandı",
+      "ilce": "İlçesi doğrulandı"
+    },
+    "done": {
+      "mahalle": "Mahallen doğrulandı, rozetin eklendi.",
+      "ilce": "İlçen doğrulandı, rozetin eklendi. Telefon mahalle adını vermediği için rozet ilçe düzeyinde."
+    },
+    "fail": {
+      "elsewhere": "Şu anki konumun kayıtlı ilçenle eşleşmedi. Mahallendeyken yeniden dene ya da konumunu güncelle.",
+      "denied": "Konum izni verilmedi. Ayarlardan izin verip yeniden dene.",
+      "unavailable": "Konum alınamadı. Açık havada ya da internete bağlıyken yeniden dene.",
+      "web": "Konum doğrulaması telefondaki uygulamadan yapılır.",
+      "error": "Kaydedilemedi. Lütfen yeniden dene."
+    },
+    "notes": {
+      "how": "Telefonun konumu bir kez alınır, adres telefonun içinde bulunur.",
+      "privacy": "Konumun hiçbir yere kaydedilmez; başkaları yalnızca rozeti görür, mahallenin adını görmez.",
+      "change": "Mahalleni değiştirince rozet kendiliğinden kalkar.",
+      "limit": "Rozet bir güven işaretidir; sahte konum uygulamalarıyla aşılabileceği için tek başına kanıt sayılmaz."
+    }
   }
 }

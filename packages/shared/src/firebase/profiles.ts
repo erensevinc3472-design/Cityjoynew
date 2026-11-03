@@ -9,6 +9,7 @@ import {
   setDoc,
   Timestamp,
   updateDoc,
+  writeBatch,
   type Firestore,
 } from 'firebase/firestore';
 
@@ -20,6 +21,7 @@ const iso = (v: unknown): string | undefined => (v instanceof Timestamp ? v.toDa
 
 export function createFirestoreProfileRepository(db: Firestore): ProfileRepository {
   const ref = (uid: string) => doc(db, 'users', uid);
+  const publicRef = (uid: string) => doc(db, 'publicProfiles', uid);
 
   return {
     async get(uid) {
@@ -30,6 +32,7 @@ export function createFirestoreProfileRepository(db: Firestore): ProfileReposito
         ...(d as Omit<UserProfile, 'createdAt' | 'locationChangedAt'>),
         createdAt: iso(d.createdAt) ?? new Date().toISOString(),
         locationChangedAt: iso(d.locationChangedAt),
+        ...(d.locationCheck ? { locationCheck: { ...d.locationCheck, at: iso(d.locationCheck.at) ?? '' } } : {}),
       };
     },
 
@@ -61,11 +64,32 @@ export function createFirestoreProfileRepository(db: Firestore): ProfileReposito
           : deleteField();
         if ((loc?.neighbourhoodId ?? null) !== (current.location?.neighbourhoodId ?? null)) {
           data.locationChangedAt = serverTimestamp();
+          // Mahalle değişince konum rozeti düşer (kurallar ikisinin birlikte değişmesini ister).
+          if (current.locationCheck) {
+            data.locationCheck = deleteField();
+            const batch = writeBatch(db);
+            batch.update(ref(uid), data);
+            if ((await getDoc(publicRef(uid))).exists()) batch.update(publicRef(uid), { locationVerified: deleteField(), updatedAt: serverTimestamp() });
+            await batch.commit();
+            return;
+          }
         }
       }
       if (patch.targeting) data['consents.targeting'] = patch.targeting;
       if (patch.commercialMessages) data['consents.commercialMessages'] = patch.commercialMessages;
       await updateDoc(ref(uid), data);
+    },
+
+    async setLocationCheck(uid, check) {
+      const batch = writeBatch(db);
+      batch.update(ref(uid), {
+        locationCheck: check ? { neighbourhoodId: check.neighbourhoodId, level: check.level, at: serverTimestamp() } : deleteField(),
+        updatedAt: serverTimestamp(),
+      });
+      if ((await getDoc(publicRef(uid))).exists()) {
+        batch.update(publicRef(uid), { locationVerified: check ? check.level : deleteField(), updatedAt: serverTimestamp() });
+      }
+      await batch.commit();
     },
 
     async delete(uid) {

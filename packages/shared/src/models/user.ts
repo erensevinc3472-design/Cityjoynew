@@ -1,5 +1,6 @@
 import type { LanguageCode } from '../i18n/languages';
 import type { UserLocation } from '../locations/types';
+import type { LocationCheck } from '../locations/location-badge';
 
 export type Gender = 'kadin' | 'erkek' | 'belirtmek-istemiyorum';
 
@@ -35,6 +36,8 @@ export interface UserProfile {
   location?: UserLocation;
   /** Mahalle en son ne zaman değişti (ayda bir kez kuralı), ISO tarih. */
   locationChangedAt?: string;
+  /** Konum rozeti için yapılan doğrulama (yalnızca kişi görür); mahalle değişince silinir. */
+  locationCheck?: LocationCheck;
   /** Yaş kilidi: kayıttan sonra değiştirilemez. */
   birthYear: number;
   gender?: Gender;

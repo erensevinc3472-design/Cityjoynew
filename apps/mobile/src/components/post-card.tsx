@@ -137,6 +137,9 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
             <View style={styles.nameRow}>
               <AppText style={[styles.name, styles.shrink, { color: c.textStrong }]} numberOfLines={1}>{name}</AppText>
               {/* İşletme adına paylaşım: ad işletmenin, dokununca işletme sayfası açılır. */}
+              {!item.business && author.locationVerified ? (
+                <MaterialIcons name="where-to-vote" size={14} color={c.accent} accessibilityLabel={t(`locationBadge.badge.${author.locationVerified}`)} />
+              ) : null}
               {item.business && biz.verified ? (
                 <MaterialIcons name="verified" size={15} color={c.accent} accessibilityLabel={t('explore.verifiedBusiness')} />
               ) : null}

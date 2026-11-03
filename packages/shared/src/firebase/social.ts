@@ -39,6 +39,7 @@ function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
     bioRemoved: d.bioRemoved === true,
     ...(photo ? { photo } : {}),
     photoRemoved: d.photoRemoved === true,
+    ...(d.locationVerified === 'mahalle' || d.locationVerified === 'ilce' ? { locationVerified: d.locationVerified } : {}),
   };
 }
 

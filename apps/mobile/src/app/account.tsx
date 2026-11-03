@@ -86,6 +86,7 @@ export default function AccountScreen() {
       <OptionRow title={t('business.myTitle')} subtitle={t('business.myHint')} showChevron onPress={() => router.push('/business')} />
       <OptionRow title={t('home.changeLanguage')} subtitle={LANGUAGES.find((l) => l.code === language)?.nativeName} showChevron onPress={() => router.push('/language')} />
       <OptionRow title={t('home.changeLocation')} showChevron onPress={() => router.push('/location?edit=1')} />
+      <OptionRow title={t('locationBadge.title')} subtitle={profile?.locationCheck ? t(`locationBadge.badge.${profile.locationCheck.level}`) : t('locationBadge.hint')} showChevron onPress={() => router.push('/location-badge')} />
 
       <AppText variant="label">{t('account.appearance')}</AppText>
       <View style={{ gap: spacing.sm }} accessibilityRole="radiogroup" accessibilityLabel={t('account.appearance')}>

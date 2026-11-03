@@ -1966,5 +1966,38 @@
   },
   "media": {
     "count": "{{count}}/{{max}} photos"
+  },
+  "locationBadge": {
+    "title": "Location badge",
+    "hint": "Verify your neighbourhood, get a badge",
+    "intro": "Verify your location once and a badge appears on your Explore profile and posts. Neighbours can tell your posts really come from the area.",
+    "signIn": "Sign in to get a location badge.",
+    "none": "Not verified yet",
+    "at": "Verified: {{date}}",
+    "verify": "Verify my location",
+    "again": "Verify again",
+    "remove": "Remove badge",
+    "needLocation": "First choose your province, district and neighbourhood in Account > Location.",
+    "badge": {
+      "mahalle": "Neighbourhood verified",
+      "ilce": "District verified"
+    },
+    "done": {
+      "mahalle": "Your neighbourhood is verified and your badge has been added.",
+      "ilce": "Your district is verified and your badge has been added. Your phone did not report the neighbourhood name, so the badge is at district level."
+    },
+    "fail": {
+      "elsewhere": "Your current location does not match your registered district. Try again while in your neighbourhood, or update your location.",
+      "denied": "Location permission was not granted. Allow it in Settings and try again.",
+      "unavailable": "Could not get your location. Try again outdoors or when connected to the internet.",
+      "web": "Location verification is done in the phone app.",
+      "error": "Could not save. Please try again."
+    },
+    "notes": {
+      "how": "Your phone's location is read once and the address is looked up on your phone.",
+      "privacy": "Your location is not stored anywhere; others only see the badge, not your neighbourhood's name.",
+      "change": "If you change your neighbourhood, the badge is removed automatically.",
+      "limit": "The badge is a sign of trust; it can be bypassed with fake-location apps, so it is not proof on its own."
+    }
   }
 }

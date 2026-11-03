@@ -82,10 +82,11 @@ export function municipalityIdsFor(loc: { provinceCode: string; districtId?: str
 
 /**
  * İki mahalle adı aynı yer mi? Konum listesinde "Ataevler Mahallesi", Excel'de "Ataevler" ya da "Ataevler Mah."
- * yazılabilir; büyük/küçük harf, Türkçe harf ve "mahallesi / mah. / köyü" eki fark etmez.
+ * yazılabilir (telefonun adres çözümlemesi "Ataevler Mh."); büyük/küçük harf, Türkçe harf ve "mahallesi / mah. / mh. / köyü"
+ * eki fark etmez.
  */
 export function sameNeighbourhoodName(a: string, b: string): boolean {
-  const core = (s: string) => normalizeName(s).replace(/ (mahallesi|mahalle|mah|koyu|koy)$/, '').trim();
+  const core = (s: string) => normalizeName(s).replace(/ (mahallesi|mahalle|mah|mh|koyu|koy)$/, '').trim();
   return !!core(a) && core(a) === core(b);
 }
 

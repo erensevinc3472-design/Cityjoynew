@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Photo } from '@cityjoy/shared';
+import type { LocationBadge, Photo } from '@cityjoy/shared';
 
 import { businessRepository, socialRepository } from './services';
 
@@ -8,7 +8,7 @@ import { businessRepository, socialRepository } from './services';
  * listelerinde aynı kişi tekrar okunmaz. Böylece ad değişikliği eski gönderilerde de görünür (gönderide yazılı ad
  * yalnızca profil okunamazsa kullanılır).
  */
-type Author = { photo?: Photo; displayName?: string };
+type Author = { photo?: Photo; displayName?: string; locationVerified?: LocationBadge };
 const cache = new Map<string, Promise<Author>>();
 const listeners = new Set<() => void>();
 
@@ -17,7 +17,7 @@ function load(uid: string): Promise<Author> {
     cache.set(
       uid,
       socialRepository.getProfile(uid).then(
-        (p) => (p ? { photo: p.photo, displayName: p.displayName } : {}),
+        (p) => (p ? { photo: p.photo, displayName: p.displayName, locationVerified: p.locationVerified } : {}),
         () => ({}),
       ),
     );

@@ -266,7 +266,7 @@ Sekmeler:
 2. **Gönderi sınırları:** albümde en fazla 10 fotoğraf. Video süre sınırı: gönderi videosu 60 sn, Reels 90 sn (depolama maliyeti nedeniyle).
 3. **Yorumlar:** gönderi sahibi yorumları kapatabilir. Belediye gönderilerinde yorum modu açık, onaylı ya da kapalı seçilebilir.
 4. **Mesajlaşma:** takipleşilmeyen kişilerden gelen mesaj "istek" olarak düşer. 18 yaş altı kullanıcılara yetişkin yabancılar mesaj atamaz.
-5. **Mahalle istismarı önlemi:** mahalle değişikliği ayda bir kez yapılabilir. İsteyen konumunu doğrulayıp rozet alabilir.
+5. **Mahalle istismarı önlemi:** mahalle değişikliği ayda bir kez yapılabilir. İsteyen konumunu doğrulayıp rozet alabilir. **Yapıldı (3 Kasım 2026):** Hesabım > Konum rozeti; telefonun konumu bir kez alınır, adres telefonda çözülür, "Mahallesi / İlçesi doğrulandı"; koordinat saklanmaz, mahalle adı görünmez, mahalle değişince düşer; sahte konumla aşılabileceği ekranda yazılı.
 6. **Gönderi kategorileri:** Duyuru, Etkinlik, Fırsat, Soru/Yardım, Kayıp-Buluntu, Taziye, Genel. Taziye gönderisini yalnızca muhtar ya da yakını paylaşabilir.
 7. **Anonim paylaşım yoktur.**
 8. **Moderasyon:** otomatik kelime filtresi, şikâyet düğmesi, birkaç şikâyette gönderi geçici gizlenir ve il yöneticisinin kuyruğuna düşer. Yasaklı içerik: nefret söylemi, taciz, dolandırıcılık, spam reklam, uygunsuz görsel.

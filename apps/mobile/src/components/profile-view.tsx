@@ -316,6 +316,12 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                 <AppText variant="caption" muted>{t('explore.profile.private')}</AppText>
               </View>
             ) : null}
+            {profile.locationVerified ? (
+              <View style={styles.privateRow}>
+                <MaterialIcons name="where-to-vote" size={13} color={c.accent} />
+                <AppText variant="caption" style={{ color: c.accent }}>{t(`locationBadge.badge.${profile.locationVerified}`)}</AppText>
+              </View>
+            ) : null}
             {profile.bio ? <AppText selectable style={styles.bioText}>{profile.bio}</AppText> : null}
           </View>
           {error ? <FormMessage kind="error" text={error} /> : null}

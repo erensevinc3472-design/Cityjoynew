@@ -69,7 +69,7 @@ service cloud.firestore {
     // Kullanıcının özel profili (yaş, cinsiyet, meslek, mahalle). Yalnızca sahibi okur ve yazar.
     function validProfile(d) {
       return d.keys().hasOnly([
-          'uid', 'displayName', 'language', 'location', 'locationChangedAt', 'birthYear', 'gender',
+          'uid', 'displayName', 'language', 'location', 'locationChangedAt', 'locationCheck', 'birthYear', 'gender',
           'occupationId', 'interests', 'phoneVerified', 'emailVerified', 'isPrivate', 'consents',
           'createdAt', 'updatedAt'])
         && d.displayName is string && d.displayName.size() >= 2 && d.displayName.size() <= 60
@@ -79,6 +79,10 @@ service cloud.firestore {
         && (!('occupationId' in d) || (d.occupationId is string && d.occupationId.size() <= 60))
         && (!('interests' in d) || (d.interests is list && d.interests.size() <= 20))
         && (!('location' in d) || validLocation(d.location))
+        // Konum rozeti doğrulaması yalnızca şimdiki mahalle için geçerlidir (mahalle değişince silinmelidir).
+        && (!('locationCheck' in d) || (d.locationCheck is map && d.locationCheck.keys().hasOnly(['neighbourhoodId', 'level', 'at'])
+            && d.locationCheck.level in ['mahalle', 'ilce'] && d.locationCheck.at is timestamp
+            && 'location' in d && d.locationCheck.neighbourhoodId == d.location.get('neighbourhoodId', '')))
         && d.isPrivate is bool
         // 13-17 yaş hesapları gizli kalır.
         && (ageOf(d.birthYear) >= 18 || d.isPrivate == true)
@@ -107,6 +111,18 @@ service cloud.firestore {
               || request.time > before.locationChangedAt + duration.value(30, 'd'));
     }
 
+    // Konum rozeti: kişinin kaydındaki doğrulama ile herkese açık profildeki rozet aynı yazımda birlikte değişir.
+    function publicProfilePath(uid) {
+      return /databases/$(database)/documents/publicProfiles/$(uid);
+    }
+    function locationCheckPaired(uid) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['locationCheck'])
+        || ((!('locationCheck' in request.resource.data) || request.resource.data.locationCheck.at == request.time)
+            && (!exists(publicProfilePath(uid))
+                || getAfter(publicProfilePath(uid)).data.get('locationVerified', null)
+                   == request.resource.data.get('locationCheck', {}).get('level', null)));
+    }
+
     match /users/{uid} {
       allow read: if isSelf(uid);
       allow create: if isSelf(uid)
@@ -121,7 +137,8 @@ service cloud.firestore {
         // Değiştirilemeyen alanlar: kimlik, doğum yılı (yaş kilidi), oluşturma tarihi, doğrulama durumları.
         && !request.resource.data.diff(resource.data).affectedKeys()
               .hasAny(['uid', 'birthYear', 'createdAt', 'phoneVerified', 'emailVerified'])
-        && neighbourhoodChangeAllowed(resource.data, request.resource.data);
+        && neighbourhoodChangeAllowed(resource.data, request.resource.data)
+        && locationCheckPaired(uid);
       // Hesap silme uygulama içinden yapılır (mağaza zorunluluğu).
       allow delete: if isSelf(uid);
 
@@ -2314,8 +2331,12 @@ service cloud.firestore {
       // Kişi adını, tanıtımını, fotoğrafını ve gizliliğini değiştirir; moderatörün kaldırdığı tanıtımı yeniden yazamaz,
       // fotoğrafı kaldırıldıysa yenisini koyamaz. Fotoğraf kendi yüklediği dosya olmalı.
       allow update: if isSelf(uid)
-        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'searchKeys', 'updatedAt'])
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'searchKeys', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'searchKeys', 'updatedAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'locationVerified', 'searchKeys', 'updatedAt'])
+        // Konum rozeti yalnızca kişinin kaydındaki doğrulamayla aynı yazımda ve aynı düzeyde.
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['locationVerified'])
+            || request.resource.data.get('locationVerified', null)
+               == getAfter(/databases/$(database)/documents/users/$(uid)).data.get('locationCheck', {}).get('level', null))
         && mediaKeptOrOwn(request.resource.data, 'photo', 'profil')
         && (resource.data.get('photoRemoved', false) != true || !('photo' in request.resource.data))
         && validSearchKeys(request.resource.data, 40)

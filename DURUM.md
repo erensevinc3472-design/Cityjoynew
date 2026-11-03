@@ -44,8 +44,8 @@ Son güncelleme: 3 Kasım 2026 ("{Şehir} kareleri", Seyahat ve belediye kapakla
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (150)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (143; Java 21 gerekir)
+npm test                      # ortak paket testleri (152)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (146; Java 21 gerekir)
 npm run test:functions        # sunucu işlevleri, emülatörde (30; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
@@ -699,6 +699,17 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   yenilenir. İşletme adına paylaşımda işletmenin güncel adı ve doğrulanmışsa yanında doğrulanmış işareti
   (`useBusinessInfo`, işletme başına bir okuma). Kural değişikliği yok. Emülatörde denendi (ad değişince eski gönderide
   yeni ad).
+- **Keşfet: konum rozeti (3 Kasım, aynı dal; PROJE.md 5.5 madde 5).** Hesabım > "Konum rozeti" (`/location-badge`):
+  "Konumumu doğrula" telefonun konumunu bir kez alır, adresi telefonun içinde çözer (`lib/location-badge.ts`,
+  `locationBadgeFor`): il + ilçe tutarsa "İlçesi doğrulandı", mahalle adı da tutarsa "Mahallesi doğrulandı". Koordinat
+  saklanmaz; herkese yalnızca rozet görünür (Keşfet profilinde adın altında, gönderide adın yanında simge), mahallenin
+  adı görünmez. Kişi rozeti kaldırabilir; mahalle değişince rozet düşer. Veri: `users.locationCheck` (kişiye özel:
+  mahalle, düzey, tarih) + `publicProfiles.locationVerified`. Kurallar: ikisi aynı yazımda ve aynı düzeyde değişir,
+  doğrulama yalnızca şimdiki mahalle için geçerli (rozeti bırakarak mahalle değiştirilemez), tek başına sahte rozet
+  yazılamaz. Ortak düzeltme: mahalle adı karşılaştırması "Mh." kısaltmasını da tanır. Web'de yapılamaz (telefonda;
+  emülatörle denerken "mahalle" sayılır). Sahte konumla aşılabilir: güven işaretidir, kanıt değildir (ekranda yazılı).
+  Testler: kurallar 146 (3 yeni), ortak 152 (2 yeni). Emülatörde denendi (doğrula > akışta ve profilde rozet > kaldır).
+  **Telefonda denenmedi** (gerçek adres çözümlemesi EAS ile). **Kurallar değişti.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
