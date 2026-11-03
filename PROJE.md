@@ -729,7 +729,7 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
     - **Sosyal Harmoni iç sayfaları (önizleme, onay bekliyor):** Aktiviteler (tam yer katılınca, ilk buluşma ipuçları),
       Haberler (Bölgesel/Genel, kaynak adı ve "kaynağa git"), Yarışmalar (il > bölge > Türkiye, oy kuralları, şartname),
       Anketler (hazırlayan adı, gizli oy, sonuç oy verince), Şehir Kulüpleri (üstte il yöneticisinin seçtiği kulüp, fikstür
-      kulüpten), Fırsatlar (Eren: Sosyal Harmoni'nin altında, aşağı kaydırınca; her kategori ayrı kart, yana kaydırılır; karta dokununca o kategorinin kendi sayfası açılır. Yalnızca doğrulanmış işletme, geçerlilik ve şartlar, "Sponsorlu"). Etkinlikler Benim Şehrim'deki
+      kulüpten), Fırsatlar (Eren: Sosyal Harmoni'nin altında, aşağı kaydırınca; her kategori ayrı kart, yana kaydırılır; karta dokununca o kategorinin kendi sayfası açılır. Kartın üstündeki yazı kart değiştikçe değişir (Eren): Yemek "Bugün ne yesek? Şehrin sofrası indirimde.", Market "Sepet hafifler, cüzdan sevinir.", Spor "Formda kalmanın en tatlı bahanesi.", Eğlence "Akşam planın hazır.", Esnaf "Mahallenin ustası, sana özel fiyatla.", Sağlık "Kendine iyi bak, bu kez daha uygun.", Eğitim "Yeni bir şey öğrenmenin tam zamanı." (5 dilde dil dosyasından). Yalnızca doğrulanmış işletme, geçerlilik ve şartlar, "Sponsorlu"). Etkinlikler Benim Şehrim'deki
       önizlemeyle aynı. Ana Sosyal Harmoni ekranı (iki sayfa, kaydırmalı kartlar) olduğu gibi kalır.
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
