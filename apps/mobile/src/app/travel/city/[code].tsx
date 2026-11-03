@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { regionOfProvince, TRAVEL_CATEGORIES, videoEmbedUrl, type TravelCategory } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
-import { SceneArt, sceneSky } from '@/components/scene-art';
+import { CoverArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { VideoModal } from '@/components/video-modal';
@@ -22,7 +22,7 @@ type Filter = 'all' | TravelCategory;
 
 /**
  * Şehir sayfası (tasarım: bursa.html): kapak, kısa tanıtım, kaynaklı bilgiler (UNESCO, rakım...), Kareler / Başkanlarla
- * Keşif / Yöresel kutuları ve Hazır Rotalar (Kareler 3. aşamada, şimdilik "yakında"), kategoriye göre gezilecek yerler.
+ * Keşif / Yöresel kutuları ve Hazır Rotalar, kategoriye göre gezilecek yerler.
  * Puan, nüfus gibi kaynaksız sayılar yok; yapay zekâ rehberi bilgi tabanı dolunca gelecek.
  */
 export default function TravelCityScreen() {
@@ -58,9 +58,8 @@ export default function TravelCityScreen() {
     if (embed) setPlaying(embed);
     else WebBrowser.openBrowserAsync(url).catch(() => {});
   };
-  // Kareler 3. aşamada (fotoğraf paylaşımıyla); Başkanlarla Keşif ve Yöresel açık.
   const boxes: { icon: IconName; title: string; hint: string; go?: () => void }[] = [
-    { icon: 'photo-library', title: t('travel.frames', { name }), hint: t('travel.framesHint') },
+    { icon: 'photo-library', title: t('travel.frames', { name }), hint: t('travel.framesHint'), go: () => router.push({ pathname: '/travel/frames/[code]', params: { code } }) },
     { icon: 'explore', title: t('travel.mayors'), hint: t('travel.mayorsHint'), go: () => router.push({ pathname: '/travel/mayors/[code]', params: { code } }) },
     { icon: 'diversity-3', title: t('travel.local', { name }), hint: t('travel.localHint'), go: () => router.push({ pathname: '/travel/local/[code]', params: { code } }) },
   ];
@@ -72,7 +71,7 @@ export default function TravelCityScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={[styles.hero, { height: Math.round(width * 0.8), backgroundColor: sceneSky(scene) }]}>
           <View style={StyleSheet.absoluteFill}>
-            <SceneArt kind={scene} />
+            <CoverArt photo={city?.cover} kind={scene} />
           </View>
           <View style={[StyleSheet.absoluteFill, styles.heroShade]} />
           <View style={styles.heroText}>
@@ -185,7 +184,7 @@ export default function TravelCityScreen() {
                 onPress={() => router.push({ pathname: '/travel/place/[id]', params: { id: p.id } })}
                 style={({ pressed }) => [styles.place, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.9 : 1 }]}>
                 <View style={[styles.placeArt, { backgroundColor: sceneSky(sc) }]}>
-                  <SceneArt kind={sc} />
+                  <CoverArt photo={p.cover} kind={sc} />
                 </View>
                 <View style={styles.placeBody}>
                   <View style={styles.placeTop}>

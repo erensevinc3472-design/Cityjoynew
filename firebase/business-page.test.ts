@@ -150,5 +150,14 @@ describe('işletme sayfası', () => {
     // Sahibi yetkilinin paylaşımını kaldırabilir.
     await posts('cengiz').remove(waiting);
     expect(await posts('ali').byBusiness(id, { following: false })).toHaveLength(2);
+    // Yetkili onaylı paylaşımda da albüm (10 fotoğraf) kural sınırına takılmaz.
+    const albumId = posts('mehmet').newId();
+    const shot = (i: number) => ({
+      path: `posts/mehmet/${albumId}/${i}.jpg`,
+      url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fmehmet%2F${albumId}%2F${i}.jpg?alt=media&token=t`,
+      width: 1600,
+      height: 1200,
+    });
+    await posts('mehmet').create('mehmet', 'Mehmet S.', { ...post(['genel', 'takip'], ''), photos: Array.from({ length: 10 }, (_, i) => shot(i)) }, as(false), albumId);
   }, 30000);
 });

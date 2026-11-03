@@ -18,6 +18,7 @@ import {
   type ListingCondition,
   type ListingError,
   type ListingKind,
+  type Photo,
   type RentUnit,
 } from '@cityjoy/shared';
 
@@ -26,6 +27,7 @@ import { AppText } from '@/components/app-text';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
+import { MediaPicker } from '@/components/media-picker';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { useBannedWordCheck } from '@/lib/banned-words';
@@ -39,7 +41,7 @@ import { spacing } from '@/theme/tokens';
 type FormError = ListingError | 'banned';
 
 /**
- * İlan ver ve düzenle (`?id=`). İlanı e-postası doğrulanmış yetişkin, kayıtlı mahallesiyle verir; yeni ilanda telefonun
+ * İlan ver ve düzenle (`?id=`). En çok 6 fotoğraf: seçilince küçültülüp hemen yüklenir, ilanla birlikte kaydedilir. İlanı e-postası doğrulanmış yetişkin, kayıtlı mahallesiyle verir; yeni ilanda telefonun
  * konumu bir kez kayıtlı ille karşılaştırılır. Yasaklı ürünler formda yazılı; emlak ve araç şimdilik yok. Günlük sınır
  * dolduysa kurallar reddeder ve kişiye söylenir.
  */
@@ -60,6 +62,7 @@ export default function NewListingScreen() {
   const [price, setPrice] = useState('');
   const [rentUnit, setRentUnit] = useState<RentUnit>('gun');
   const [swapFor, setSwapFor] = useState('');
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [errors, setErrors] = useState<FormError[]>([]);
   const [place, setPlace] = useState<PlaceCheck | null>(null);
   const [failed, setFailed] = useState<string>();
@@ -79,6 +82,7 @@ export default function NewListingScreen() {
         setPrice(l.price == null ? '' : String(l.price));
         setRentUnit(l.rentUnit ?? 'gun');
         setSwapFor(l.swapFor);
+        setPhotos(l.photos);
       },
       () => setEditing(null),
     );
@@ -135,6 +139,7 @@ export default function NewListingScreen() {
       rentUnit: kind === 'kiralik' ? rentUnit : null,
       swapFor: kind === 'takas' ? swapFor.trim() : '',
       region,
+      photos,
     };
     const errs: FormError[] = [...validateListing(input), ...(hasBanned(`${input.title} ${input.description} ${input.swapFor}`) ? ['banned' as const] : [])];
     setErrors(errs);
@@ -168,6 +173,16 @@ export default function NewListingScreen() {
         <AppText variant="label">{t('carsi.kind')}</AppText>
         <Chips<ListingKind> label={t('carsi.kind')} value={kind} onChange={setKind} options={LISTING_KINDS.map((k) => ({ value: k, label: t(`carsi.kinds.${k}`) }))} />
       </View>
+      <MediaPicker
+        label={t('carsi.fields.photos')}
+        hint={t('carsi.fields.photosHint')}
+        kind="ilan"
+        uid={user.uid}
+        photos={photos}
+        max={LISTING_LIMITS.photos}
+        onChange={setPhotos}
+        disabled={busy}
+      />
       <View style={styles.block}>
         <AppText variant="label">{t('carsi.fields.category')}</AppText>
         <Chips<ListingCategory> label={t('carsi.fields.category')} value={category} onChange={setCategory} options={LISTING_CATEGORIES.map((x) => ({ value: x, label: t(`carsi.categories.${x}`) }))} />

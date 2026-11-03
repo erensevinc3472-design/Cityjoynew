@@ -884,7 +884,9 @@
       "capacity": "Kaç kişi katılabilir?",
       "capacityHint": "Sen hariç, en çok {{max}}.",
       "description": "Açıklama",
-      "descriptionHint": "Ne yapılacak, ne getirilmeli, kimler için uygun?"
+      "descriptionHint": "Ne yapılacak, ne getirilmeli, kimler için uygun?",
+      "cover": "Kapak fotoğrafı (isteğe bağlı)",
+      "coverHint": "Buluşmayı anlatan bir fotoğraf. Sonradan değiştirilemez. Kişi, plaka ya da ev adresi görünmesin."
     },
     "safetyTitle": "İlk buluşma ipuçları",
     "safetyTips": "Herkese açık, kalabalık bir yerde buluş. Ev adresini ve kişisel bilgilerini paylaşma. Nereye gittiğini bir yakınına söyle. Para ya da ödeme isteyen olursa katılma ve şikâyet et. Kendini rahatsız hissedersen ayrıl; acil durumda 112'yi ara.",
@@ -1005,7 +1007,9 @@
       "category": "Kategori",
       "relative": "Vefat eden kişinin yakınıyım.",
       "where": "Nerede paylaşırsın? (birden çok seçebilirsin)",
-      "mahallemNote": "Mahallem'de paylaştığında mahallendekiler o mahallede oturduğunu anlayabilir."
+      "mahallemNote": "Mahallem'de paylaştığında mahallendekiler o mahallede oturduğunu anlayabilir.",
+      "frames": "{{name}} karelerinde de görünsün",
+      "framesHint": "Fotoğrafın Seyahat'teki şehir sayfasında, karelerde de görünür; ek yükleme yok. Kişi yüzü, plaka ya da ev adresi olmayan fotoğraflar uygundur."
     },
     "errors": {
       "text": "Bir şeyler yaz ya da fotoğraf ekle (en çok 2000 karakter).",
@@ -1015,7 +1019,8 @@
       "realEstate": "Satılık ya da kiralık ev, arsa, dükkân ilanları Keşfet'te paylaşılamaz. Emlak ilanları ileride yetki belgesiyle Çarşı'dan verilecek.",
       "relative": "Taziye gönderisini yalnızca yakınları paylaşabilir.",
       "banned": "Yazında topluluk kurallarına uymayan bir ifade var. Lütfen düzeltip tekrar dene.",
-      "photos": "En çok 4 fotoğraf ekleyebilirsin."
+      "photos": "En çok 10 fotoğraf ekleyebilirsin.",
+      "video": "Video en çok 60 saniye olabilir ve fotoğrafla birlikte eklenemez."
     },
     "save": "Kaydet",
     "unsave": "Kaydedildi ✓",
@@ -1129,7 +1134,7 @@
     },
     "photos": {
       "add": "Fotoğraf ekle",
-      "count": "{{count}}/4 fotoğraf",
+      "count": "{{count}}/10 fotoğraf",
       "remove": "Fotoğrafı kaldır",
       "label": "Fotoğraf {{n}}/{{total}}",
       "note": "Fotoğraflar küçültülerek yüklenir; konum ve cihaz bilgisi silinir.",
@@ -1137,7 +1142,18 @@
       "tooLarge": "Fotoğraf çok büyük. Başka bir fotoğraf seç.",
       "uploadError": "Fotoğraf yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.",
       "permission": "Fotoğraf seçmek için galeri izni gerekiyor. Telefonun Ayarlar bölümünden izin verebilirsin."
-    }
+    },
+    "video": {
+      "add": "Video ekle",
+      "remove": "Videoyu kaldır",
+      "label": "Video",
+      "play": "Videoyu oynat, {{duration}}",
+      "selected": "Seçilen video, {{duration}}",
+      "note": "En çok {{max}} saniye ve 40 MB. Video ya da fotoğraf eklenir, ikisi birlikte olmaz.",
+      "tooLong": "Video en çok {{max}} saniye olabilir. Kırpıp yeniden seç.",
+      "tooLarge": "Video çok büyük (en çok 40 MB). Daha kısa ya da düşük çözünürlüklü bir video seç."
+    },
+    "verifiedBusiness": "Doğrulanmış işletme"
   },
   "news": {
     "title": "Haberler",
@@ -1455,7 +1471,7 @@
     "soonCities": "Yakında eklenecek iller",
     "cityPreparing": "{{name}} tanıtımı hazırlanıyor.",
     "frames": "{{name}} kareleri",
-    "framesHint": "Fotoğraf ve videolar",
+    "framesHint": "Şehrin fotoğrafları",
     "mayors": "Başkanlarla keşif",
     "mayorsHint": "İlçe rotaları",
     "local": "Yöresel {{name}}",
@@ -1579,7 +1595,13 @@
       "ova": "Ova"
     },
     "orderNote": "Sıralama ilçe nüfusuna göredir (TÜİK).",
-    "orderNoteYear": "Sıralama ilçe nüfusuna göredir (TÜİK, {{year}})."
+    "orderNoteYear": "Sıralama ilçe nüfusuna göredir (TÜİK, {{year}}).",
+    "framesIntro": "Keşfet'te bu ilde paylaşılan ve karelere eklenen fotoğraflar. Yıldızlı olanları CityJoy öne çıkardı. Fotoğrafa dokununca paylaşım açılır.",
+    "framesEmpty": "{{name}} için henüz kare yok. Keşfet'te bu ilde fotoğraf paylaşırken \"Genel\" ve \"karelerinde de görünsün\" kutucuklarını işaretle.",
+    "framesShare": "Fotoğraf paylaş",
+    "framesSignIn": "Kareleri görmek için giriş yap.",
+    "framesFeatured": "Öne çıkan",
+    "frameN": "Kare {{n}}"
   },
   "food": {
     "kinds": {
@@ -1850,7 +1872,6 @@
     "notListed": "Listede görünmüyor (süresi doldu ya da inceleniyor)",
     "favorite": "Favorilere ekle",
     "unfavorite": "Favorilerden çıkar",
-    "photosSoon": "Fotoğraf ekleme yakında",
     "gone": "Bu ilan artık yok.",
     "saveError": "Kaydedilemedi. Bağlantını kontrol edip tekrar dene.",
     "createError": "İlan verilemedi. Günlük ilan sınırın dolmuş olabilir (yeni hesaplarda günde 2, sonra 5).",
@@ -1891,7 +1912,9 @@
       "swapForHint": "İsteğe bağlı",
       "condition": "Durumu",
       "description": "Açıklama",
-      "descriptionHint": "Kusurları, ölçüleri, teslim biçimini yaz. Telefon numarası yazma."
+      "descriptionHint": "Kusurları, ölçüleri, teslim biçimini yaz. Telefon numarası yazma.",
+      "photos": "Fotoğraflar",
+      "photosHint": "En çok 6 fotoğraf; ilki listede görünür. Ürünün kendi fotoğrafını ekle. Kişi, plaka ya da adres görünmesin."
     },
     "errors": {
       "kind": "İlan türünü seç.",
@@ -1943,5 +1966,38 @@
   },
   "media": {
     "count": "{{count}}/{{max}} fotoğraf"
+  },
+  "locationBadge": {
+    "title": "Konum rozeti",
+    "hint": "Mahalleni doğrula, rozet al",
+    "intro": "Konumunu bir kez doğrula; Keşfet profilinde ve paylaşımlarında rozet görünsün. Komşuların paylaşımın gerçekten mahalleden geldiğini bilir.",
+    "signIn": "Konum rozeti için giriş yap.",
+    "none": "Henüz doğrulanmadı",
+    "at": "Doğrulama: {{date}}",
+    "verify": "Konumumu doğrula",
+    "again": "Yeniden doğrula",
+    "remove": "Rozeti kaldır",
+    "needLocation": "Önce Hesabım > Konum'dan ilini, ilçeni ve mahalleni seç.",
+    "badge": {
+      "mahalle": "Mahallesi doğrulandı",
+      "ilce": "İlçesi doğrulandı"
+    },
+    "done": {
+      "mahalle": "Mahallen doğrulandı, rozetin eklendi.",
+      "ilce": "İlçen doğrulandı, rozetin eklendi. Telefon mahalle adını vermediği için rozet ilçe düzeyinde."
+    },
+    "fail": {
+      "elsewhere": "Şu anki konumun kayıtlı ilçenle eşleşmedi. Mahallendeyken yeniden dene ya da konumunu güncelle.",
+      "denied": "Konum izni verilmedi. Ayarlardan izin verip yeniden dene.",
+      "unavailable": "Konum alınamadı. Açık havada ya da internete bağlıyken yeniden dene.",
+      "web": "Konum doğrulaması telefondaki uygulamadan yapılır.",
+      "error": "Kaydedilemedi. Lütfen yeniden dene."
+    },
+    "notes": {
+      "how": "Telefonun konumu bir kez alınır, adres telefonun içinde bulunur.",
+      "privacy": "Konumun hiçbir yere kaydedilmez; başkaları yalnızca rozeti görür, mahallenin adını görmez.",
+      "change": "Mahalleni değiştirince rozet kendiliğinden kalkar.",
+      "limit": "Rozet bir güven işaretidir; sahte konum uygulamalarıyla aşılabileceği için tek başına kanıt sayılmaz."
+    }
   }
 }

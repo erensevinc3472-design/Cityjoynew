@@ -69,7 +69,7 @@ service cloud.firestore {
     // Kullanıcının özel profili (yaş, cinsiyet, meslek, mahalle). Yalnızca sahibi okur ve yazar.
     function validProfile(d) {
       return d.keys().hasOnly([
-          'uid', 'displayName', 'language', 'location', 'locationChangedAt', 'birthYear', 'gender',
+          'uid', 'displayName', 'language', 'location', 'locationChangedAt', 'locationCheck', 'birthYear', 'gender',
           'occupationId', 'interests', 'phoneVerified', 'emailVerified', 'isPrivate', 'consents',
           'createdAt', 'updatedAt'])
         && d.displayName is string && d.displayName.size() >= 2 && d.displayName.size() <= 60
@@ -79,6 +79,10 @@ service cloud.firestore {
         && (!('occupationId' in d) || (d.occupationId is string && d.occupationId.size() <= 60))
         && (!('interests' in d) || (d.interests is list && d.interests.size() <= 20))
         && (!('location' in d) || validLocation(d.location))
+        // Konum rozeti doğrulaması yalnızca şimdiki mahalle için geçerlidir (mahalle değişince silinmelidir).
+        && (!('locationCheck' in d) || (d.locationCheck is map && d.locationCheck.keys().hasOnly(['neighbourhoodId', 'level', 'at'])
+            && d.locationCheck.level in ['mahalle', 'ilce'] && d.locationCheck.at is timestamp
+            && 'location' in d && d.locationCheck.neighbourhoodId == d.location.get('neighbourhoodId', '')))
         && d.isPrivate is bool
         // 13-17 yaş hesapları gizli kalır.
         && (ageOf(d.birthYear) >= 18 || d.isPrivate == true)
@@ -107,6 +111,18 @@ service cloud.firestore {
               || request.time > before.locationChangedAt + duration.value(30, 'd'));
     }
 
+    // Konum rozeti: kişinin kaydındaki doğrulama ile herkese açık profildeki rozet aynı yazımda birlikte değişir.
+    function publicProfilePath(uid) {
+      return /databases/$(database)/documents/publicProfiles/$(uid);
+    }
+    function locationCheckPaired(uid) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['locationCheck'])
+        || ((!('locationCheck' in request.resource.data) || request.resource.data.locationCheck.at == request.time)
+            && (!exists(publicProfilePath(uid))
+                || getAfter(publicProfilePath(uid)).data.get('locationVerified', null)
+                   == request.resource.data.get('locationCheck', {}).get('level', null)));
+    }
+
     match /users/{uid} {
       allow read: if isSelf(uid);
       allow create: if isSelf(uid)
@@ -121,7 +137,8 @@ service cloud.firestore {
         // Değiştirilemeyen alanlar: kimlik, doğum yılı (yaş kilidi), oluşturma tarihi, doğrulama durumları.
         && !request.resource.data.diff(resource.data).affectedKeys()
               .hasAny(['uid', 'birthYear', 'createdAt', 'phoneVerified', 'emailVerified'])
-        && neighbourhoodChangeAllowed(resource.data, request.resource.data);
+        && neighbourhoodChangeAllowed(resource.data, request.resource.data)
+        && locationCheckPaired(uid);
       // Hesap silme uygulama içinden yapılır (mağaza zorunluluğu).
       allow delete: if isSelf(uid);
 
@@ -1509,7 +1526,7 @@ service cloud.firestore {
     }
     function validActivity(d) {
       return d.keys().hasOnly(['title', 'description', 'category', 'startsAt', 'endsAt', 'region', 'capacity', 'status',
-             'organizerUid', 'organizerName', 'attendeeCount', 'reportCount', 'cleared', 'moderatedBy', 'createdAt', 'updatedAt'])
+             'organizerUid', 'organizerName', 'attendeeCount', 'reportCount', 'cleared', 'moderatedBy', 'cover', 'createdAt', 'updatedAt'])
         && d.title is string && d.title.size() >= 3 && d.title.size() <= 80
         && d.description is string && d.description.size() >= 10 && d.description.size() <= 1000
         && d.category in ['yuruyus-doga', 'spor', 'kahve-sohbet', 'oyun', 'kitap-kultur', 'cocuk-aile', 'ogrenme', 'gonullu', 'diger']
@@ -1526,8 +1543,10 @@ service cloud.firestore {
       allow read: if signedIn()
         && (resource.data.status in ['aktif', 'iptal'] || resource.data.organizerUid == request.auth.uid
             || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
-      // Açma: yetişkin, kendi adına, kendi ilinde, en çok 30 gün sonrası için; tam adres aynı yazımda.
+      // Açma: yetişkin, kendi adına, kendi ilinde, en çok 30 gün sonrası için; tam adres aynı yazımda. Kapak fotoğrafı
+      // isteğe bağlı ve açanın kendi `aktivite` dosyası; sonradan değişmez.
       allow create: if request.resource.data.organizerUid == request.auth.uid
+        && (!('cover' in request.resource.data) || validMediaBy(request.resource.data.cover, 'aktivite', request.auth.uid))
         && usageOk('u-' + request.auth.uid, 'aktivite', userLimit('aktivite', 3, 1))
         && request.resource.data.status == 'aktif'
         && request.resource.data.attendeeCount == 0 && request.resource.data.reportCount == 0
@@ -1539,13 +1558,14 @@ service cloud.firestore {
         && isAdultUser()
         && get(myUserPath()).data.get('location', {}).get('provinceCode', '') == request.resource.data.region.provinceCode
         && existsAfter(/databases/$(database)/documents/activities/$(id)/private/details);
-      // Düzenleyen: iptal eder ya da (hesap silmede) kaldırır; başka bir şey değişmez.
+      // Düzenleyen: iptal eder ya da (hesap silmede) kaldırır, kapak da silinir; başka bir şey değişmez.
       allow update: if resource.data.organizerUid == request.auth.uid
         && request.resource.data.updatedAt == request.time
         && ((resource.data.status == 'aktif' && request.resource.data.status == 'iptal'
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']))
             || (request.resource.data.status == 'kaldirildi' && request.resource.data.organizerName == ''
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'organizerName', 'updatedAt'])));
+              && !('cover' in request.resource.data)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'organizerName', 'cover', 'updatedAt'])));
       // "Katılıyorum" sayacı: yalnızca kendi katılım kaydıyla tam bir artar (yetişkin, düzenleyen değil, aktif, başlamamış,
       // kontenjan içinde) ya da azalır.
       allow update: if signedIn()
@@ -1640,8 +1660,12 @@ service cloud.firestore {
     }
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
-             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'createdAt', 'updatedAt'])
+             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'video', 'frames',
+             'framesFeatured', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
+        // Kareler: yalnızca fotoğraflı ve Genel'e açık gönderi (Seyahat > "{Şehir} kareleri").
+        && (!('frames' in d) || (d.frames is bool && (d.frames == false || ('photos' in d && d.targets.genel == true))))
+        && (!('framesFeatured' in d) || d.framesFeatured is bool)
         && validSearchKeys(d, 300)
         && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
         && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip'])
@@ -1654,17 +1678,8 @@ service cloud.firestore {
         && d.likeCount is int && d.reportCount is int
         && d.updatedAt == request.time;
     }
-    // Gönderi fotoğrafları (en çok 4): dosya paylaşanın klasöründe, bu gönderinin kimliğiyle ve sırayla adlandırılır;
-    // adres o dosyanın Storage adresidir (yerel denemede emülatör).
-    function validPostPhoto(p, uid, id, i) {
-      return p is map && p.keys().hasOnly(['path', 'url', 'width', 'height'])
-        && p.path == 'posts/' + uid + '/' + id + '/' + string(i) + '.jpg'
-        && p.url is string && p.url.size() <= 600
-        && p.url.matches('(https://firebasestorage[.]googleapis[.]com|http://(127[.]0[.]0[.]1|localhost|10[.]0[.]2[.]2):9199)/v0/b/[^/?]+/o/posts%2F'
-            + uid + '%2F' + id + '%2F' + string(i) + '[.]jpg[?].*')
-        && p.width is int && p.height is int && p.width > 0 && p.width <= 4000 && p.height > 0 && p.height <= 4000;
-    }
-    // Diğer görseller (etkinlik kapağı, kurum logosu, işletme logosu/vitrini): media/{yükleyen}/{tür}/{rastgele}.jpg.
+    // Diğer görseller (etkinlik kapağı, kurum logosu, işletme logosu/vitrini, profil, Seyahat kapakları):
+    // media/{yükleyen}/{tür}/{rastgele}.jpg.
     // Yeni bağlanan görsel bağlayanın kendi klasöründen olmalı (başkasının dosyası bağlanıp kaldırılarak sunucuya
     // sildirilemesin); değişmeden kalan görsel başka bir yetkilinin yüklediği olabilir.
     function storageUrlOk(u, encodedPath) {
@@ -1694,13 +1709,36 @@ service cloud.firestore {
         || (l.size() <= 30 && l.size() <= limitOf({'ucretsiz': 'vitrinUcretsiz', 'standart': 'vitrinStandart', 'pro': 'vitrinPro', 'premium': 'vitrinPremium'}[tier],
               {'ucretsiz': 3, 'standart': 10, 'pro': 20, 'premium': 30}[tier])));
     }
+    // Gönderi fotoğrafları (en çok 10, albüm): dosya paylaşanın klasöründe, bu gönderinin kimliğiyle ve sırayla
+    // adlandırılır. Kural motorunun işlem sınırı (1000) yüzünden yalnızca yol denetlenir; biçimi ve adresin o dosyayı
+    // gösterdiğini uygulama denetler (yalnızca kendi depomuzdaki adres gösterilir).
     function validPostPhotos(d, id) {
+      let l = d.get('photos', []);
+      let b = 'posts/' + d.authorUid + '/' + id + '/';
       return !('photos' in d)
-        || (d.photos is list && d.photos.size() >= 1 && d.photos.size() <= 4
-            && validPostPhoto(d.photos[0], d.authorUid, id, 0)
-            && (d.photos.size() < 2 || validPostPhoto(d.photos[1], d.authorUid, id, 1))
-            && (d.photos.size() < 3 || validPostPhoto(d.photos[2], d.authorUid, id, 2))
-            && (d.photos.size() < 4 || validPostPhoto(d.photos[3], d.authorUid, id, 3)));
+        || (l is list && l.size() >= 1 && l.size() <= 10
+            && l[0].path == b + '0.jpg'
+            && (l.size() < 2 || l[1].path == b + '1.jpg')
+            && (l.size() < 3 || l[2].path == b + '2.jpg')
+            && (l.size() < 4 || l[3].path == b + '3.jpg')
+            && (l.size() < 5 || l[4].path == b + '4.jpg')
+            && (l.size() < 6 || l[5].path == b + '5.jpg')
+            && (l.size() < 7 || l[6].path == b + '6.jpg')
+            && (l.size() < 8 || l[7].path == b + '7.jpg')
+            && (l.size() < 9 || l[8].path == b + '8.jpg')
+            && (l.size() < 10 || l[9].path == b + '9.jpg'));
+    }
+    // Gönderi videosu (en çok 60 sn): fotoğrafla birlikte olmaz; dosya bu gönderinin klasöründe `video.mp4` ya da `.mov`.
+    // Süreyi telefon bildirir; dosya boyutunu (40 MB) Storage kuralı sınırlar.
+    function validPostVideo(d, id) {
+      let v = d.get('video', null);
+      let b = 'posts/' + d.authorUid + '/' + id + '/video.';
+      return !('video' in d)
+        || (!('photos' in d) && v is map && v.keys().hasOnly(['path', 'url', 'width', 'height', 'durationSec'])
+            && (v.path == b + 'mp4' || v.path == b + 'mov')
+            && v.url is string && v.url.size() <= 600
+            && v.width is int && v.height is int
+            && v.durationSec is int && v.durationSec >= 1 && v.durationSec <= 60);
     }
     function canSeePost(d) {
       // Hedefler sabit anahtarlı bir haritada durur ({mahallem, bolgesel, genel}: true/false): akış sorguları bunlarla
@@ -1751,10 +1789,12 @@ service cloud.firestore {
         && request.resource.data.get('commentCount', 0) == 0
         && !('cleared' in request.resource.data) && !('moderatedBy' in request.resource.data)
         && !('commentsOff' in request.resource.data) && !('lastComment' in request.resource.data)
+        && !('framesFeatured' in request.resource.data)
         && request.resource.data.createdAt == request.time
         && validPost(request.resource.data)
-        && (request.resource.data.text.size() >= 1 || 'photos' in request.resource.data)
+        && (request.resource.data.text.size() >= 1 || 'photos' in request.resource.data || 'video' in request.resource.data)
         && validPostPhotos(request.resource.data, id)
+        && validPostVideo(request.resource.data, id)
         && ('business' in request.resource.data
             ? (validBusinessPost(request.resource.data)
                 && usageOk('b-' + request.resource.data.business.id, 'isletme-gonderi', limitOf('isletmeGonderi', 5)))
@@ -1764,19 +1804,25 @@ service cloud.firestore {
                 && myLocation().get('neighbourhoodId', '') == request.resource.data.region.neighbourhoodId
                 && myLocation().get('districtId', '') == request.resource.data.region.districtId
                 && myLocation().get('provinceCode', '') == request.resource.data.region.provinceCode));
+      // Kareler (admin): öne çıkar / kaldır. Karelere girmeyi yalnızca paylaşan seçer; admin geri açamaz.
+      allow update: if isAdmin() && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['frames', 'framesFeatured', 'updatedAt'])
+        && request.resource.data.get('frames', false) is bool && request.resource.data.get('framesFeatured', false) is bool
+        && (request.resource.data.get('frames', false) == false || resource.data.get('frames', false) == true)
+        && (request.resource.data.get('framesFeatured', false) == false || request.resource.data.get('frames', false) == true);
       // İşletme sahibi yetkilinin bekleyen paylaşımını onaylar.
       allow update: if 'business' in resource.data && resource.data.status == 'onay-bekliyor'
         && isBusinessOwner(resource.data.business.id)
         && request.resource.data.status == 'aktif' && request.resource.data.updatedAt == request.time
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
-      // Sahibi (işletme paylaşımında işletme sahibi de) kaldırır: yazı, ad, arama anahtarları ve fotoğraflar boşaltılır
+      // Sahibi (işletme paylaşımında işletme sahibi de) kaldırır: yazı, ad, arama anahtarları, fotoğraflar ve video boşaltılır
       // (dosyaları sunucu siler).
       allow update: if (resource.data.authorUid == request.auth.uid
             || ('business' in resource.data && isBusinessOwner(resource.data.business.id)))
         && request.resource.data.updatedAt == request.time
         && request.resource.data.status == 'kaldirildi' && request.resource.data.text == '' && request.resource.data.authorName == ''
-        && !('searchKeys' in request.resource.data) && !('photos' in request.resource.data)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'updatedAt']);
+        && !('searchKeys' in request.resource.data) && !('photos' in request.resource.data) && !('video' in request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'video', 'updatedAt']);
       // Sahibi yorumları kapatır ya da açar.
       allow update: if resource.data.authorUid == request.auth.uid
         && request.resource.data.updatedAt == request.time
@@ -2149,13 +2195,29 @@ service cloud.firestore {
             ? (d.price is int && d.price >= 1 && d.price <= 10000000)
             : d.price == null)
         && (d.kind == 'kiralik' ? d.rentUnit in ['gun', 'hafta', 'ay'] : d.rentUnit == null)
-        && d.photos is list && d.photos.size() == 0
+        && validListingPhotos(d)
         && validLocation(d.region) && 'neighbourhoodId' in d.region
         && validSearchKeys(d, 100)
         && d.updatedAt == request.time;
     }
+    // İlan fotoğrafları (en çok 6): hepsi ilan sahibinin kendi yüklediği `media/{sahip}/ilan/...` dosyaları (ilanı yalnızca
+    // sahibi düzenler; başkasının dosyası bağlanıp kaldırılarak sunucuya sildirilemez). Kural motorunun işlem sınırı
+    // (1000) yüzünden yalnızca dosya yolu denetlenir; adresin o dosyayı gösterdiğini ve biçimi uygulama denetler (yalnızca
+    // kendi depomuzdaki adres gösterilir). Fotoğraflar değişmediyse yeniden denetlenmez.
+    function validListingPhotos(d) {
+      let l = d.photos;
+      let re = 'media/' + d.ownerUid + '/ilan/[A-Za-z0-9]{10,40}[.]jpg';
+      return l is list && l.size() <= 6
+        && ((resource != null && resource.data.get('photos', []) == l)
+            || ((l.size() < 1 || l[0].path.matches(re))
+                && (l.size() < 2 || l[1].path.matches(re))
+                && (l.size() < 3 || l[2].path.matches(re))
+                && (l.size() < 4 || l[3].path.matches(re))
+                && (l.size() < 5 || l[4].path.matches(re))
+                && (l.size() < 6 || l[5].path.matches(re))));
+    }
     function listingContentKeys() {
-      return ['kind', 'category', 'condition', 'title', 'description', 'price', 'rentUnit', 'swapFor', 'searchKeys', 'updatedAt'];
+      return ['kind', 'category', 'condition', 'title', 'description', 'price', 'rentUnit', 'swapFor', 'photos', 'searchKeys', 'updatedAt'];
     }
     // Günlük ilan sayacı bu yazımda değişti (sayacın kendi kuralı yalnızca +1 ya da süresi dolunca sıfırlamaya izin verir).
     function listingQuotaCounted() {
@@ -2194,13 +2256,14 @@ service cloud.firestore {
         && resource.data.listedAt <= request.time - duration.value(27, 'd')
         && request.resource.data.listedAt == request.time && request.resource.data.updatedAt == request.time
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['listedAt', 'updatedAt']);
-      // Sahibi kaldırır: yazılar, ad ve arama anahtarları boşaltılır.
+      // Sahibi kaldırır: yazılar, ad, fotoğraflar ve arama anahtarları boşaltılır (dosyaları sunucu siler).
       allow update: if resource.data.ownerUid == request.auth.uid
         && request.resource.data.updatedAt == request.time
         && request.resource.data.status == 'kaldirildi' && request.resource.data.title == ''
         && request.resource.data.description == '' && request.resource.data.swapFor == '' && request.resource.data.ownerName == ''
+        && request.resource.data.photos == []
         && !('searchKeys' in request.resource.data)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'title', 'description', 'swapFor', 'ownerName', 'searchKeys', 'updatedAt']);
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'title', 'description', 'swapFor', 'ownerName', 'photos', 'searchKeys', 'updatedAt']);
       // Şikâyet sayacı: yalnızca kendi şikâyet kaydıyla tam bir artar.
       allow update: if signedIn()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])
@@ -2268,8 +2331,12 @@ service cloud.firestore {
       // Kişi adını, tanıtımını, fotoğrafını ve gizliliğini değiştirir; moderatörün kaldırdığı tanıtımı yeniden yazamaz,
       // fotoğrafı kaldırıldıysa yenisini koyamaz. Fotoğraf kendi yüklediği dosya olmalı.
       allow update: if isSelf(uid)
-        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'searchKeys', 'updatedAt'])
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'searchKeys', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'searchKeys', 'updatedAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'locationVerified', 'searchKeys', 'updatedAt'])
+        // Konum rozeti yalnızca kişinin kaydındaki doğrulamayla aynı yazımda ve aynı düzeyde.
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['locationVerified'])
+            || request.resource.data.get('locationVerified', null)
+               == getAfter(/databases/$(database)/documents/users/$(uid)).data.get('locationCheck', {}).get('level', null))
         && mediaKeptOrOwn(request.resource.data, 'photo', 'profil')
         && (resource.data.get('photoRemoved', false) != true || !('photo' in request.resource.data))
         && validSearchKeys(request.resource.data, 40)
@@ -2440,7 +2507,8 @@ service cloud.firestore {
     match /travelRegions/{id} {
       allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
       allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
-        && request.resource.data.keys().hasOnly(['tagline', 'description', 'videoUrl', 'status', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['tagline', 'description', 'videoUrl', 'cover', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'cover', 'seyahat')
         && request.resource.data.get('tagline', '') is string && request.resource.data.get('tagline', '').size() <= 60
         && request.resource.data.description is string && request.resource.data.description.size() <= 600
         && travelUrlOk(request.resource.data, 'videoUrl');
@@ -2450,7 +2518,8 @@ service cloud.firestore {
       allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
       allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
         && id.matches('^[0-8][0-9]$')
-        && request.resource.data.keys().hasOnly(['regionId', 'tagline', 'description', 'categories', 'highlights', 'facts', 'videoUrl', 'status', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['regionId', 'tagline', 'description', 'categories', 'highlights', 'facts', 'videoUrl', 'cover', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'cover', 'seyahat')
         && request.resource.data.regionId is string
         && request.resource.data.description is string && request.resource.data.description.size() <= 600
         && request.resource.data.get('categories', []) is list && request.resource.data.get('categories', []).size() <= 6
@@ -2464,7 +2533,8 @@ service cloud.firestore {
       allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
         && request.resource.data.keys().hasOnly(['cityId', 'districtId', 'name', 'kind', 'category', 'summary', 'about', 'history',
              'architecture', 'visitingHours', 'entranceFee', 'suggestedDuration', 'address', 'howToGet', 'nearby', 'tips',
-             'accessibility', 'phone', 'website', 'videoUrl', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
+             'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'cover', 'seyahat')
         && request.resource.data.cityId is string && request.resource.data.cityId.matches('^[0-8][0-9]$')
         && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 80
         && request.resource.data.category in ['tarih', 'doga', 'deniz', 'lezzet', 'kultur', 'alisveris']
@@ -2491,7 +2561,8 @@ service cloud.firestore {
     }
     function validTravelRoute(d) {
       return d.keys().hasOnly(['cityId', 'municipalityId', 'theme', 'length', 'title', 'summary', 'durationMinutes', 'stops', 'tips',
-             'order', 'status', 'updatedAt'])
+             'cover', 'order', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(d, 'cover', 'seyahat')
         && d.cityId is string && d.cityId.matches('^[0-8][0-9]$')
         && d.theme in ['tarih', 'manevi', 'lezzet', 'doga', 'alisveris', 'kultur', 'aile', 'aksam']
         && d.length in ['kisa', 'yarim', 'tam']
@@ -2518,7 +2589,8 @@ service cloud.firestore {
     match /travelLocal/{id} {
       allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
       allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
-        && request.resource.data.keys().hasOnly(['cityId', 'kind', 'title', 'subtitle', 'body', 'badges', 'facts', 'source', 'order', 'status', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['cityId', 'kind', 'title', 'subtitle', 'body', 'badges', 'facts', 'cover', 'source', 'order', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'cover', 'seyahat')
         && request.resource.data.cityId is string && request.resource.data.cityId.matches('^[0-8][0-9]$')
         && request.resource.data.kind in ['miras', 'el-sanati', 'lezzet', 'gelenek']
         && request.resource.data.title is string && request.resource.data.title.size() >= 2 && request.resource.data.title.size() <= 80
@@ -2529,8 +2601,9 @@ service cloud.firestore {
     }
     function validMunicipal(id, d) {
       return id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
-        && d.keys().hasOnly(['cityId', 'districtId', 'slogan', 'description', 'videoUrl', 'mayorName', 'showMayor', 'zone',
+        && d.keys().hasOnly(['cityId', 'districtId', 'slogan', 'description', 'videoUrl', 'mayorName', 'cover', 'showMayor', 'zone',
              'population', 'populationYear', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(d, 'cover', 'seyahat')
         && d.cityId is string && d.cityId.matches('^[0-8][0-9]$')
         && d.slogan is string && d.slogan.size() >= 2 && d.slogan.size() <= 60
         && d.description is string && d.description.size() <= 600

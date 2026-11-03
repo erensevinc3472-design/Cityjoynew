@@ -43,6 +43,7 @@ export * from './media/photo';
 export * from './media/video';
 export * from './messages/messages';
 export * from './listings/listings';
+export * from './locations/location-badge';
 export * from './notifications/notifications';
 export * from './notifications/push';
 export * from './limits/limits';

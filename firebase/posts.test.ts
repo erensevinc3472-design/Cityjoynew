@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import type { PostInput } from '@cityjoy/shared';
-import { createFirestorePostRepository, createPostModeration } from '@cityjoy/shared/firebase';
-import { doc, getDoc, increment, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
+import { createFirestorePostRepository, createFramesAdmin, createPostModeration } from '@cityjoy/shared/firebase';
+import { doc, getDoc, increment, serverTimestamp, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -55,6 +55,41 @@ const input = (patch: Partial<PostInput> = {}): PostInput => ({
 });
 
 describe('Keşfet gönderileri', () => {
+  it('Kareler: yalnızca fotoğraflı ve Genel gönderi; ildeki herkes listeler; admin öne çıkarır ve kaldırır, geri açamaz', async () => {
+    const r = repo('ayse');
+    const photo = (id: string) => ({
+      path: `posts/ayse/${id}/0.jpg`,
+      url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${id}%2F0.jpg?alt=media&token=t`,
+      width: 1600,
+      height: 1200,
+    });
+    const id = r.newId();
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', targets: ['genel'], photos: [photo(id)], frames: true }), undefined, id));
+    // Fotoğrafsız ya da Genel'e açık olmayan gönderi Karelere giremez (doğrudan yazımda kurallar reddeder).
+    const plain = r.newId();
+    await assertFails(setDoc(doc(fs('ayse'), 'posts', plain), {
+      text: 'Yazı', category: 'genel', targets: { mahallem: false, bolgesel: false, genel: true }, region: ataevler, status: 'aktif', authorUid: 'ayse',
+      authorName: 'Ayşe K.', likeCount: 0, commentCount: 0, reportCount: 0, frames: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    }));
+    const local = r.newId();
+    await r.create('ayse', 'Ayşe K.', input({ text: '', targets: ['mahallem'], photos: [photo(local)], frames: true }), undefined, local);
+    expect((await r.get(local))?.frames).toBeUndefined();
+    // Başka ildeki kişi de listeler (Genel).
+    const page = await repo('istanbul').frames('16');
+    expect(page.posts.map((p) => p.id)).toEqual([id]);
+    expect(page.featured).toEqual([]);
+    // Yalnızca admin öne çıkarır; kaldırınca listeden çıkar, admin geri açamaz, paylaşan da öne çıkaramaz.
+    const post = (await r.get(id))!;
+    await assertFails(createFramesAdmin(fs('ali'), 'ali').setFeatured(post, true));
+    await assertFails(updateDoc(doc(fs('ayse'), 'posts', id), { framesFeatured: true, updatedAt: serverTimestamp() }));
+    const admin = createFramesAdmin(fs('eren'), 'eren');
+    await assertSucceeds(admin.setFeatured(post, true));
+    expect((await repo('istanbul').frames('16')).featured.map((p) => p.id)).toEqual([id]);
+    await assertSucceeds(admin.remove(post));
+    expect((await repo('istanbul').frames('16')).posts).toEqual([]);
+    await assertFails(updateDoc(doc(fs('eren'), 'posts', id), { frames: true, updatedAt: serverTimestamp() }));
+  });
+
   it('kendi kayıtlı mahallesiyle paylaşır; başka mahalle, başkası adına, girişsiz, boş yazı olmaz', async () => {
     await assertSucceeds(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['mahallem', 'bolgesel', 'genel'] })));
     await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ region: fethiye })));
@@ -64,7 +99,7 @@ describe('Keşfet gönderileri', () => {
     await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['herkes' as never] })));
   });
 
-  it('fotoğraf: kendi klasöründen, bu gönderinin kimliğiyle, en çok dört; yazısız olabilir; kaldırınca alan silinir', async () => {
+  it('fotoğraf: kendi klasöründen, bu gönderinin kimliğiyle, en çok on; yazısız olabilir; kaldırınca alan silinir', async () => {
     const r = repo('ayse');
     const photo = (uid: string, id: string, i: number) => ({
       path: `posts/${uid}/${id}/${i}.jpg`,
@@ -75,7 +110,7 @@ describe('Keşfet gönderileri', () => {
     const ok = r.newId();
     await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', photos: [photo('ayse', ok, 0), photo('ayse', ok, 1)] }), undefined, ok));
     expect((await r.get(ok))?.photos?.map((p) => p.path)).toEqual([`posts/ayse/${ok}/0.jpg`, `posts/ayse/${ok}/1.jpg`]);
-    // Başkasının klasörü, başka gönderinin kimliği, sıra atlama, beşinci fotoğraf, yabancı adres olmaz.
+    // Başkasının klasörü, başka gönderinin kimliği, sıra atlama, on birinci fotoğraf olmaz.
     const id = () => r.newId();
     let x = id();
     await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [photo('ali', x, 0)] }), undefined, x));
@@ -84,13 +119,56 @@ describe('Keşfet gönderileri', () => {
     x = id();
     await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [photo('ayse', x, 1)] }), undefined, x));
     x = id();
-    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [0, 1, 2, 3, 4].map((i) => photo('ayse', x, i)) }), undefined, x));
+    await assertFails(setDoc(doc(fs('ayse'), 'posts', x), {
+      text: '', category: 'genel', targets: { mahallem: true, bolgesel: false, genel: false }, region: ataevler, status: 'aktif', authorUid: 'ayse',
+      authorName: 'Ayşe K.', likeCount: 0, commentCount: 0, reportCount: 0, photos: Array.from({ length: 11 }, (_, i) => photo('ayse', x, i)),
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    }));
+    // Albüm: on fotoğraf olur.
     x = id();
-    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [{ ...photo('ayse', x, 0), url: 'https://kotu.example/posts%2Fayse%2F' + x + '%2F0.jpg?a' }] }), undefined, x));
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', photos: Array.from({ length: 10 }, (_, i) => photo('ayse', x, i)) }), undefined, x));
+    expect((await r.get(x))?.photos).toHaveLength(10);
+    // Yabancı adresli fotoğraf uygulamada gösterilmez (adresi uygulama denetler).
+    x = id();
+    await r.create('ayse', 'Ayşe K.', input({ photos: [{ ...photo('ayse', x, 0), url: 'https://kotu.example/posts%2Fayse%2F' + x + '%2F0.jpg?a' }] }), undefined, x);
+    expect((await r.get(x))?.photos).toBeUndefined();
     // Sahibi kaldırınca fotoğraf alanı da boşalır.
     await assertSucceeds(r.remove(ok));
     await env.withSecurityRulesDisabled(async (ctx) => {
       expect('photos' in ((await getDoc(doc(ctx.firestore(), 'posts', ok))).data() ?? {})).toBe(false);
+    });
+  });
+
+  it('video: tek video, en çok 60 sn, bu gönderinin klasöründe; fotoğrafla birlikte olmaz; kaldırınca alan silinir', async () => {
+    const r = repo('ayse');
+    const video = (id: string, patch: Record<string, unknown> = {}) => ({
+      path: `posts/ayse/${id}/video.mp4`,
+      url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${id}%2Fvideo.mp4?alt=media&token=t`,
+      width: 720,
+      height: 1280,
+      durationSec: 42,
+      ...patch,
+    });
+    const ok = r.newId();
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', video: video(ok) }), undefined, ok));
+    expect((await r.get(ok))?.video?.durationSec).toBe(42);
+    const raw = (id: string, extra: Record<string, unknown>) =>
+      setDoc(doc(fs('ayse'), 'posts', id), {
+        text: '', category: 'genel', targets: { mahallem: true, bolgesel: false, genel: false }, region: ataevler, status: 'aktif', authorUid: 'ayse',
+        authorName: 'Ayşe K.', likeCount: 0, commentCount: 0, reportCount: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...extra,
+      });
+    let x = r.newId();
+    await assertFails(raw(x, { video: video(x, { durationSec: 61 }) }));
+    x = r.newId();
+    await assertFails(raw(x, { video: video(ok) }));
+    x = r.newId();
+    await assertFails(raw(x, { video: { ...video(x), path: `posts/ayse/${x}/video.avi` } }));
+    x = r.newId();
+    const photo = { path: `posts/ayse/${x}/0.jpg`, url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${x}%2F0.jpg?alt=media&token=t`, width: 10, height: 10 };
+    await assertFails(raw(x, { video: video(x), photos: [photo] }));
+    await assertSucceeds(r.remove(ok));
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      expect('video' in ((await getDoc(doc(ctx.firestore(), 'posts', ok))).data() ?? {})).toBe(false);
     });
   });
 

@@ -4,15 +4,16 @@ import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/fi
 export type DeleteFiles = (prefix: string) => Promise<void>;
 
 /**
- * Gönderi kaldırılınca (sahibi ya da moderatör) fotoğraf dosyaları silinir; moderatör kaldırdıysa kayıttaki fotoğraf
- * alanı da boşaltılır. Fotoğrafı olmayan ya da zaten temizlenmiş gönderide bir şey yapmaz.
+ * Gönderi kaldırılınca (sahibi ya da moderatör) fotoğraf ve video dosyaları silinir; moderatör kaldırdıysa kayıttaki
+ * fotoğraf ve video alanları da boşaltılır. Dosyası olmayan ya da zaten temizlenmiş gönderide bir şey yapmaz.
  */
 export async function handlePostPhotos(db: Firestore, id: string, before: DocumentData | undefined, after: DocumentData | undefined, deleteFiles: DeleteFiles): Promise<boolean> {
-  if (!before || !Array.isArray(before.photos) || !before.photos.length) return false;
-  const removed = !after || after.status === 'kaldirildi' || !Array.isArray(after.photos);
+  const hadFiles = !!before && ((Array.isArray(before.photos) && before.photos.length > 0) || !!before.video);
+  if (!hadFiles) return false;
+  const removed = !after || after.status === 'kaldirildi' || (!Array.isArray(after.photos) && !after.video);
   if (!removed) return false;
-  await deleteFiles(`posts/${before.authorUid}/${id}/`);
-  if (after && 'photos' in after) await db.doc(`posts/${id}`).update({ photos: FieldValue.delete() });
+  await deleteFiles(`posts/${before!.authorUid}/${id}/`);
+  if (after && ('photos' in after || 'video' in after)) await db.doc(`posts/${id}`).update({ photos: FieldValue.delete(), video: FieldValue.delete() });
   return true;
 }
 
@@ -22,12 +23,16 @@ export interface MediaField {
   owners?: (d: DocumentData) => unknown[];
 }
 
-/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı (`media/{yükleyen}/{tür}/...`). */
+/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı, ilan fotoğrafları, aktivite kapağı, Seyahat kapakları (`media/{yükleyen}/{tür}/...`). */
 export const MEDIA_FIELDS = {
   events: [{ key: 'cover', owners: (d) => [d.preparedBy] }],
   officialProfiles: [{ key: 'logo' }],
   publicProfiles: [{ key: 'photo' }],
   businesses: [{ key: 'logo' }, { key: 'gallery', owners: (d) => [d.ownerUid, ...(Array.isArray(d.managerUids) ? d.managerUids : [])] }],
+  listings: [{ key: 'photos', owners: (d) => [d.ownerUid] }],
+  activities: [{ key: 'cover', owners: (d) => [d.organizerUid] }],
+  // Seyahat kapakları (bölge, şehir, yer, rota, yöresel, belediye tanıtımı): yükleyen admin ya da belediye personeli.
+  travel: [{ key: 'cover' }],
 } satisfies Record<string, MediaField[]>;
 
 const pathsOf = (v: unknown): string[] =>
@@ -49,5 +54,25 @@ export async function handleMediaChange(fields: MediaField[], before: DocumentDa
     }
   }
   await Promise.all(gone.map((p) => deleteFiles(p)));
+  return gone;
+}
+
+/**
+ * Çarşı ilanı: kayıttan çıkan fotoğrafların dosyaları silinir. Moderatör ilanı kaldırınca (sahibi kaldırırken alanı
+ * kendisi boşaltır) fotoğraf alanı da boşaltılır; bu yazım işlevi yeniden tetikler ve dosyalar o zaman silinir.
+ */
+export async function handleListingPhotos(db: Firestore, id: string, before: DocumentData | undefined, after: DocumentData | undefined, deleteFiles: DeleteFiles): Promise<string[]> {
+  const gone = await handleMediaChange(MEDIA_FIELDS.listings, before, after, deleteFiles);
+  if (after?.status === 'kaldirildi' && Array.isArray(after.photos) && after.photos.length) await db.doc(`listings/${id}`).update({ photos: [] });
+  return gone;
+}
+
+/**
+ * Aktivite kapağı: aktivite kaldırılınca (moderatör ya da hesap silme) kapak alanı silinir; bu yazım işlevi yeniden
+ * tetikler ve dosya o zaman silinir. İptal edilen aktivite bitişine kadar görünür, kapağı kalır.
+ */
+export async function handleActivityCover(db: Firestore, id: string, before: DocumentData | undefined, after: DocumentData | undefined, deleteFiles: DeleteFiles): Promise<string[]> {
+  const gone = await handleMediaChange(MEDIA_FIELDS.activities, before, after, deleteFiles);
+  if (after?.status === 'kaldirildi' && after.cover) await db.doc(`activities/${id}`).update({ cover: FieldValue.delete() });
   return gone;
 }

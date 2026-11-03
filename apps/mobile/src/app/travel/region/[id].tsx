@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { TR_REGIONS, TRAVEL_CATEGORIES, videoEmbedUrl, type TravelCategory } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
-import { SceneArt, sceneSky } from '@/components/scene-art';
+import { CoverArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { VideoModal } from '@/components/video-modal';
@@ -69,7 +69,7 @@ export default function TravelRegionScreen() {
         {/* Kapak */}
         <View style={[styles.hero, { height: Math.round(width * 0.95), backgroundColor: sceneSky(scene) }]}>
           <View style={StyleSheet.absoluteFill}>
-            <SceneArt kind={scene} />
+            <CoverArt photo={content?.cover} kind={scene} />
           </View>
           <View style={[StyleSheet.absoluteFill, styles.heroShade]} />
           <View style={styles.heroText}>
@@ -130,7 +130,7 @@ export default function TravelRegionScreen() {
                 onPress={() => router.push({ pathname: '/travel/city/[code]', params: { code: x.id } })}
                 style={({ pressed }) => [styles.card, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.9 : 1 }]}>
                 <View style={[styles.cardArt, { backgroundColor: sceneSky(sc) }]}>
-                  <SceneArt kind={sc} />
+                  <CoverArt photo={x.cover} kind={sc} />
                   <View style={styles.cats}>
                     {x.categories.slice(0, 2).map((k) => (
                       <View key={k} style={styles.catTag}>

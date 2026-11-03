@@ -1,7 +1,7 @@
 import { deleteObject, getDownloadURL, ref, uploadBytes, type FirebaseStorage } from 'firebase/storage';
 
 import { mediaPath, PHOTO_UPLOAD, type MediaKind, type Photo } from '../media/photo';
-import { postPhotoPath, type PostPhoto } from '../posts/posts';
+import { POST_LIMITS, POST_VIDEO_TYPES, postPhotoPath, postVideoPath, type PostPhoto, type PostVideo, type PostVideoExt } from '../posts/posts';
 
 /** Küçültülmüş JPEG: telefonda yerel dosya adresi (`uri`), panelde tarayıcıdaki veri (`blob`). */
 export interface PreparedPhoto {
@@ -24,6 +24,31 @@ async function put(storage: FirebaseStorage, path: string, p: PreparedPhoto): Pr
   const r = ref(storage, path);
   await uploadBytes(r, blob, { contentType: 'image/jpeg' });
   return { path, url: await getDownloadURL(r), width: Math.round(p.width), height: Math.round(p.height) };
+}
+
+/** Telefonda seçilen video: yerel dosya adresi, uzantı, boyutlar ve süre (saniye). */
+export interface PreparedVideo {
+  uri: string;
+  ext: PostVideoExt;
+  width: number;
+  height: number;
+  durationSec: number;
+}
+
+export class VideoTooLargeError extends Error {
+  constructor() {
+    super('video-too-large');
+  }
+}
+
+/** Gönderi videosunu yükler (`posts/{uid}/{postId}/video.mp4|mov`); 40 MB'tan büyükse yüklemeden durur. */
+export async function uploadPostVideo(storage: FirebaseStorage, uid: string, postId: string, v: PreparedVideo): Promise<PostVideo> {
+  const blob = await (await fetch(v.uri)).blob();
+  if (blob.size > POST_LIMITS.videoBytes) throw new VideoTooLargeError();
+  const path = postVideoPath(uid, postId, v.ext);
+  const r = ref(storage, path);
+  await uploadBytes(r, blob, { contentType: POST_VIDEO_TYPES[v.ext] });
+  return { path, url: await getDownloadURL(r), width: Math.round(v.width), height: Math.round(v.height), durationSec: Math.round(v.durationSec) };
 }
 
 /** Gönderi fotoğraflarını sırayla yükler (`posts/{uid}/{postId}/{sıra}.jpg`). */

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { ROUTE_LENGTHS, type RouteLength } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
-import { SceneArt, sceneSky } from '@/components/scene-art';
+import { CoverArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { locationRepository as repo } from '@/lib/locations';
@@ -78,7 +78,7 @@ export default function TravelRoutesScreen() {
                 style={({ pressed }) => [styles.card, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.92 : 1 }]}>
                 <View style={[styles.art, { backgroundColor: sceneSky(scene) }]}>
                   <View style={[StyleSheet.absoluteFill, styles.artInner]}>
-                    <SceneArt kind={scene} />
+                    <CoverArt photo={r.cover} kind={scene} />
                   </View>
                   <View style={[StyleSheet.absoluteFill, styles.shade]} />
                   <View style={styles.artRow}>

@@ -884,7 +884,9 @@
       "capacity": "How many people can join?",
       "capacityHint": "Not counting you, at most {{max}}.",
       "description": "Description",
-      "descriptionHint": "What will you do, what to bring, who is it for?"
+      "descriptionHint": "What will you do, what to bring, who is it for?",
+      "cover": "Cover photo (optional)",
+      "coverHint": "A photo that shows what the meetup is about. It cannot be changed later. Keep people, plates and home addresses out of shot."
     },
     "safetyTitle": "First meeting tips",
     "safetyTips": "Meet in a public, busy place. Do not share your home address or personal details. Tell someone close where you are going. If anyone asks for money or payment, do not join and report it. Leave if you feel uncomfortable; in an emergency call 112.",
@@ -1005,7 +1007,9 @@
       "category": "Category",
       "relative": "I am a relative of the deceased.",
       "where": "Where do you want to share? (you can choose more than one)",
-      "mahallemNote": "When you share in My Neighbourhood, neighbours can tell that you live there."
+      "mahallemNote": "When you share in My Neighbourhood, neighbours can tell that you live there.",
+      "frames": "Also show in Snapshots of {{name}}",
+      "framesHint": "Your photo also appears in the snapshots on the {{name}} page in Travel; nothing is uploaded again. Photos without faces, number plates or home addresses work best."
     },
     "errors": {
       "text": "Write something or add a photo (up to 2000 characters).",
@@ -1015,7 +1019,8 @@
       "realEstate": "Listings for homes, land or shops for sale or rent can't be shared on Explore. Real estate listings will later be posted in the Bazaar with a licence.",
       "relative": "Only relatives can share a condolence post.",
       "banned": "Your text contains a word that breaks the community rules. Please edit it and try again.",
-      "photos": "You can add up to 4 photos."
+      "photos": "You can add up to 10 photos.",
+      "video": "A video can be up to 60 seconds and cannot be combined with photos."
     },
     "save": "Save",
     "unsave": "Saved ✓",
@@ -1129,7 +1134,7 @@
     },
     "photos": {
       "add": "Add photo",
-      "count": "{{count}}/4 photos",
+      "count": "{{count}}/10 photos",
       "remove": "Remove photo",
       "label": "Photo {{n}} of {{total}}",
       "note": "Photos are resized before upload; location and device details are removed.",
@@ -1137,7 +1142,18 @@
       "tooLarge": "This photo is too large. Please choose another one.",
       "uploadError": "The photo could not be uploaded. Check your connection and try again.",
       "permission": "Photo library access is needed to choose a photo. You can allow it in your phone’s Settings."
-    }
+    },
+    "video": {
+      "add": "Add video",
+      "remove": "Remove video",
+      "label": "Video",
+      "play": "Play video, {{duration}}",
+      "selected": "Selected video, {{duration}}",
+      "note": "Up to {{max}} seconds and 40 MB. Add a video or photos, not both.",
+      "tooLong": "Videos can be up to {{max}} seconds. Trim it and choose again.",
+      "tooLarge": "The video is too large (max 40 MB). Choose a shorter or lower-resolution video."
+    },
+    "verifiedBusiness": "Verified business"
   },
   "news": {
     "title": "News",
@@ -1455,7 +1471,7 @@
     "soonCities": "Provinces coming soon",
     "cityPreparing": "The {{name}} guide is being prepared.",
     "frames": "Snapshots of {{name}}",
-    "framesHint": "Photos and videos",
+    "framesHint": "Photos of the city",
     "mayors": "Discover with mayors",
     "mayorsHint": "District routes",
     "local": "Local {{name}}",
@@ -1579,7 +1595,13 @@
       "ova": "Plain"
     },
     "orderNote": "Sorted by district population (TurkStat).",
-    "orderNoteYear": "Sorted by district population (TurkStat, {{year}})."
+    "orderNoteYear": "Sorted by district population (TurkStat, {{year}}).",
+    "framesIntro": "Photos shared in this province on Explore and added to snapshots. CityJoy featured the starred ones. Tap a photo to open the post.",
+    "framesEmpty": "No snapshots of {{name}} yet. When you share a photo in this province on Explore, tick \"General\" and \"Also show in snapshots\".",
+    "framesShare": "Share a photo",
+    "framesSignIn": "Sign in to see the snapshots.",
+    "framesFeatured": "Featured",
+    "frameN": "Snapshot {{n}}"
   },
   "food": {
     "kinds": {
@@ -1850,7 +1872,6 @@
     "notListed": "Not shown in the list (expired or under review)",
     "favorite": "Add to favourites",
     "unfavorite": "Remove from favourites",
-    "photosSoon": "Photos coming soon",
     "gone": "This listing no longer exists.",
     "saveError": "Could not save. Check your connection and try again.",
     "createError": "Listing could not be posted. You may have reached your daily limit (2 a day for new accounts, then 5).",
@@ -1891,7 +1912,9 @@
       "swapForHint": "Optional",
       "condition": "Condition",
       "description": "Description",
-      "descriptionHint": "Mention flaws, size and how it will be handed over. Do not add a phone number."
+      "descriptionHint": "Mention flaws, size and how it will be handed over. Do not add a phone number.",
+      "photos": "Photos",
+      "photosHint": "Up to 6 photos; the first one is shown in the list. Add real photos of the item. Keep people, plates and addresses out of shot."
     },
     "errors": {
       "kind": "Choose a listing type.",
@@ -1943,5 +1966,38 @@
   },
   "media": {
     "count": "{{count}}/{{max}} photos"
+  },
+  "locationBadge": {
+    "title": "Location badge",
+    "hint": "Verify your neighbourhood, get a badge",
+    "intro": "Verify your location once and a badge appears on your Explore profile and posts. Neighbours can tell your posts really come from the area.",
+    "signIn": "Sign in to get a location badge.",
+    "none": "Not verified yet",
+    "at": "Verified: {{date}}",
+    "verify": "Verify my location",
+    "again": "Verify again",
+    "remove": "Remove badge",
+    "needLocation": "First choose your province, district and neighbourhood in Account > Location.",
+    "badge": {
+      "mahalle": "Neighbourhood verified",
+      "ilce": "District verified"
+    },
+    "done": {
+      "mahalle": "Your neighbourhood is verified and your badge has been added.",
+      "ilce": "Your district is verified and your badge has been added. Your phone did not report the neighbourhood name, so the badge is at district level."
+    },
+    "fail": {
+      "elsewhere": "Your current location does not match your registered district. Try again while in your neighbourhood, or update your location.",
+      "denied": "Location permission was not granted. Allow it in Settings and try again.",
+      "unavailable": "Could not get your location. Try again outdoors or when connected to the internet.",
+      "web": "Location verification is done in the phone app.",
+      "error": "Could not save. Please try again."
+    },
+    "notes": {
+      "how": "Your phone's location is read once and the address is looked up on your phone.",
+      "privacy": "Your location is not stored anywhere; others only see the badge, not your neighbourhood's name.",
+      "change": "If you change your neighbourhood, the badge is removed automatically.",
+      "limit": "The badge is a sign of trust; it can be bypassed with fake-location apps, so it is not proof on its own."
+    }
   }
 }

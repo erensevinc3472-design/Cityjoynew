@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/app-text';
-import { SceneArt, sceneSky } from '@/components/scene-art';
+import { CoverArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { locationRepository as repo } from '@/lib/locations';
@@ -95,7 +95,7 @@ export default function TravelRouteScreen() {
           <>
             <View style={[styles.hero, { backgroundColor: sceneSky(scene) }]}>
               <View style={StyleSheet.absoluteFill}>
-                <SceneArt kind={scene} />
+                <CoverArt photo={route.cover} kind={scene} />
               </View>
               <View style={[StyleSheet.absoluteFill, styles.shade]} />
               <View style={styles.heroText}>
@@ -167,7 +167,7 @@ export default function TravelRouteScreen() {
           <>
             <View style={[styles.stopHero, { backgroundColor: sceneSky(place ? CATEGORY_SCENES[place.category] : scene) }]}>
               <View style={StyleSheet.absoluteFill}>
-                <SceneArt kind={place ? CATEGORY_SCENES[place.category] : scene} />
+                <CoverArt photo={place?.cover} kind={place ? CATEGORY_SCENES[place.category] : scene} />
               </View>
               <View style={[StyleSheet.absoluteFill, styles.shade]} />
               <View style={styles.heroText}>

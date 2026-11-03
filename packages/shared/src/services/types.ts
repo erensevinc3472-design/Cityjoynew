@@ -1,6 +1,7 @@
 import type { LanguageCode } from '../i18n/languages';
 import type { UserLocation } from '../locations/types';
 import type { ConsentRecord, Gender, UserProfile } from '../models/user';
+import type { LocationBadge } from '../locations/location-badge';
 
 /**
  * Uygulamanın kullandığı veri hizmetleri. Ekranlar yalnızca bu arayüzleri bilir; Firebase
@@ -76,6 +77,8 @@ export interface ProfileRepository {
   get(uid: string): Promise<UserProfile | null>;
   create(input: NewProfileInput): Promise<void>;
   update(uid: string, patch: ProfilePatch, current: UserProfile): Promise<void>;
+  /** Konum rozeti: doğrulamayı kişinin kaydına ve rozeti herkese açık profiline birlikte yazar (null kaldırır). */
+  setLocationCheck(uid: string, check: { level: LocationBadge; neighbourhoodId: string } | null): Promise<void>;
   delete(uid: string): Promise<void>;
 }
 

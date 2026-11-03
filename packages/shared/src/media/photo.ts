@@ -17,9 +17,10 @@ export const PHOTO_UPLOAD = { maxEdge: 1600, quality: 0.7, maxBytes: 1_500_000 }
 
 /**
  * Gönderi dışındaki görseller `media/{yükleyen}/{tür}/{rastgele}.jpg` yolundadır: etkinlik kapağı, kurum logosu,
- * işletme logosu ve vitrini, kişinin profil fotoğrafı. Kim hangi kayda bağlayabilir, o kaydın kuralı denetler.
+ * işletme logosu ve vitrini, kişinin profil fotoğrafı, Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat
+ * içeriklerinin kapakları (bölge, şehir, gezilecek yer, rota, yöresel, belediye tanıtımı). Kim hangi kayda bağlayabilir, o kaydın kuralı denetler.
  */
-export const MEDIA_KINDS = ['etkinlik', 'kurum', 'isletme-logo', 'isletme-vitrin', 'profil'] as const;
+export const MEDIA_KINDS = ['etkinlik', 'kurum', 'isletme-logo', 'isletme-vitrin', 'profil', 'ilan', 'aktivite', 'seyahat'] as const;
 export type MediaKind = (typeof MEDIA_KINDS)[number];
 
 export const mediaPath = (uid: string, kind: MediaKind, fileId: string) => `media/${uid}/${kind}/${fileId}.jpg`;

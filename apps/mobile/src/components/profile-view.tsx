@@ -36,7 +36,7 @@ import { useChats } from '@/lib/messages';
 import { eventRepository, postRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
-import { rememberProfilePhoto } from '@/lib/profile-photos';
+import { rememberProfile, rememberProfilePhoto } from '@/lib/profile-photos';
 import { refreshFollowing, setBlocked, setMyProfile, useSocial } from '@/lib/social';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -183,6 +183,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     run(async () => {
       await socialRepository.updateProfile(uid, draft);
       const next = { ...profile, displayName: draft.displayName.trim().slice(0, 40), bio: draft.bio.trim(), isPrivate: draft.isPrivate };
+      rememberProfile(uid, { displayName: next.displayName });
       setProfile(next);
       setMyProfile(next);
       setEditing(false);
@@ -313,6 +314,12 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
               <View style={styles.privateRow}>
                 <MaterialIcons name="lock-outline" size={13} color={c.textMuted} />
                 <AppText variant="caption" muted>{t('explore.profile.private')}</AppText>
+              </View>
+            ) : null}
+            {profile.locationVerified ? (
+              <View style={styles.privateRow}>
+                <MaterialIcons name="where-to-vote" size={13} color={c.accent} />
+                <AppText variant="caption" style={{ color: c.accent }}>{t(`locationBadge.badge.${profile.locationVerified}`)}</AppText>
               </View>
             ) : null}
             {profile.bio ? <AppText selectable style={styles.bioText}>{profile.bio}</AppText> : null}

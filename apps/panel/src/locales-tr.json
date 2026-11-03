@@ -451,7 +451,8 @@
         "uygunsuz": "Uygunsuz içerik",
         "emlak": "Emlak ilanı",
         "diger": "Diğer"
-      }
+      },
+      "video": "Gönderi videosu ({{seconds}} sn)"
     },
     "comments": {
       "title": "Keşfet yorum şikâyetleri",
@@ -1244,7 +1245,8 @@
       "yer": "Gezilecek yerler",
       "rota": "Hazır rotalar",
       "yoresel": "Yöresel",
-      "belediye": "Başkanlarla Keşif"
+      "belediye": "Başkanlarla Keşif",
+      "kareler": "Kareler"
     },
     "status": {
       "yok": "Yazılmadı",
@@ -1427,7 +1429,21 @@
     "submit": "Onaya gönder",
     "saveDraft": "Taslak kaydet",
     "submitted": "Onaya gönderildi. CityJoy kontrol edince yayına alınacak.",
-    "municipalDemo": "Örnek hesap: belediye panelinin nasıl göründüğünü gösterir, kaydetme kapalı. Gerçek belediye hesabı Kurumlar sayfasından açılır."
+    "municipalDemo": "Örnek hesap: belediye panelinin nasıl göründüğünü gösterir, kaydetme kapalı. Gerçek belediye hesabı Kurumlar sayfasından açılır.",
+    "cover": "Kapak fotoğrafı",
+    "coverHint": "Uygulamada çizimin yerine görünür. Telif hakkı size ya da kuruma ait ya da kullanım izni olan bir fotoğraf seçin; tanınabilir kişi yüzü olmasın. Dosya Blaze plan ile yüklenir.",
+    "framesTabIntro": "Keşfet'te bu ilde fotoğrafla ve Genel'e paylaşılıp \"karelerde de görünsün\" işaretlenen gönderiler. Öne çıkardıklarınız uygulamada en üstte, yıldızlı görünür (en çok 6). \"Karelerden kaldır\" gönderiyi yalnızca karelerden çıkarır, Keşfet'te kalır; uygunsuz içerik için Moderasyon'u kullanın. Karelere eklemeyi yalnızca paylaşan seçer.",
+    "framesNone": "Bu ilde henüz kare yok.",
+    "framesCount": "{{count}} kare, {{featured}} öne çıkan",
+    "framePhoto": "{{name}} paylaşımının fotoğrafı",
+    "framesFeaturedPill": "Öne çıkan",
+    "framesFeature": "Öne çıkar",
+    "framesUnfeature": "Öne çıkarmayı kaldır",
+    "framesFeaturedDone": "Öne çıkarıldı.",
+    "framesUnfeatured": "Öne çıkarma kaldırıldı.",
+    "framesRemove": "Karelerden kaldır",
+    "framesRemoveConfirm": "Bu gönderi karelerden çıkarılsın mı? Keşfet'te kalır ve geri eklenemez.",
+    "framesRemoved": "Karelerden kaldırıldı."
   },
   "sort": {
     "column": "Sırala",

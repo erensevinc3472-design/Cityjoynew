@@ -27,6 +27,7 @@ import type {
   TravelRoute,
   TravelRouteInput,
 } from '../travel/travel';
+import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
 import { addAudit, iso } from './grants';
 
 const REGIONS = 'travelRegions';
@@ -36,15 +37,32 @@ const ROUTES = 'travelRoutes';
 const LOCAL = 'travelLocal';
 const MUNICIPAL = 'travelMunicipal';
 
-/** Boş isteğe bağlı alanlar belgeye yazılmaz (güncellemede silinir). */
+/** Boş isteğe bağlı alanlar belgeye yazılmaz (güncellemede silinir). Kapak yalnızca dört alanıyla yazılır. */
 const clean = <T extends Record<string, unknown>>(o: T) =>
-  Object.fromEntries(Object.entries(o).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v]).filter(([, v]) => v !== undefined && v !== '')) as T;
+  Object.fromEntries(
+    Object.entries(o)
+      .map(([k, v]) => [k, k === 'cover' && v ? cleanPhoto(v as Photo) : typeof v === 'string' ? v.trim() : v])
+      .filter(([, v]) => v !== undefined && v !== ''),
+  ) as T;
+
+/** Ham belgeden kapak alanı ayrılır (yerine `coverOf` doğrulanmış olanı koyar). */
+const withoutCover = (d: DocumentData) => {
+  const { cover: _cover, ...rest } = d;
+  return rest;
+};
+
+/** Okunan kapak yalnızca kendi depomuzdaki geçerli bir görselse alınır. */
+const coverOf = (d: DocumentData) => {
+  const cover = photoFrom(d.cover);
+  return cover ? { cover } : {};
+};
 
 const region = (id: string, d: DocumentData): TravelRegionContent => ({
   id,
   tagline: d.tagline ?? '',
   description: d.description ?? '',
   ...(d.videoUrl ? { videoUrl: d.videoUrl } : {}),
+  ...coverOf(d),
   status: d.status,
   updatedAt: iso(d.updatedAt) ?? '',
 });
@@ -58,13 +76,15 @@ const city = (id: string, d: DocumentData): TravelCityContent => ({
   highlights: d.highlights ?? [],
   facts: d.facts ?? [],
   ...(d.videoUrl ? { videoUrl: d.videoUrl } : {}),
+  ...coverOf(d),
   status: d.status,
   updatedAt: iso(d.updatedAt) ?? '',
 });
 
 const placeOf = (id: string, d: DocumentData): TravelPlace => ({
-  ...(d as TravelPlace),
+  ...(withoutCover(d) as TravelPlace),
   id,
+  ...coverOf(d),
   howToGet: d.howToGet ?? [],
   nearby: d.nearby ?? [],
   tips: d.tips ?? [],
@@ -76,16 +96,18 @@ const placeOf = (id: string, d: DocumentData): TravelPlace => ({
 const byOrder = (a: TravelPlace, b: TravelPlace) => a.order - b.order || a.name.localeCompare(b.name, 'tr');
 
 const routeOf = (id: string, d: DocumentData): TravelRoute => ({
-  ...(d as TravelRoute),
+  ...(withoutCover(d) as TravelRoute),
   id,
+  ...coverOf(d),
   stops: d.stops ?? [],
   tips: d.tips ?? [],
   order: d.order ?? 0,
   updatedAt: iso(d.updatedAt) ?? '',
 });
 const localOf = (id: string, d: DocumentData): TravelLocalItem => ({
-  ...(d as TravelLocalItem),
+  ...(withoutCover(d) as TravelLocalItem),
   id,
+  ...coverOf(d),
   subtitle: d.subtitle ?? '',
   badges: d.badges ?? [],
   facts: d.facts ?? [],
@@ -93,8 +115,9 @@ const localOf = (id: string, d: DocumentData): TravelLocalItem => ({
   updatedAt: iso(d.updatedAt) ?? '',
 });
 const municipalOf = (id: string, d: DocumentData): TravelMunicipal => ({
-  ...(d as TravelMunicipal),
+  ...(withoutCover(d) as TravelMunicipal),
   id,
+  ...coverOf(d),
   showMayor: d.showMayor !== false,
   updatedAt: iso(d.updatedAt) ?? '',
 });
@@ -313,6 +336,7 @@ export function createMunicipalTravel(db: Firestore, actorUid: string, org: { id
           description: text.description.trim(),
           videoUrl: text.videoUrl?.trim() ? text.videoUrl.trim() : deleteField(),
           mayorName: text.mayorName?.trim() ? text.mayorName.trim() : deleteField(),
+          cover: text.cover ? cleanPhoto(text.cover) : deleteField(),
           status: submit ? 'onay-bekliyor' : 'taslak',
           updatedAt: serverTimestamp(),
         },

@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
   canRenewListing,
@@ -20,6 +20,7 @@ import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
 import { ListingArt } from '@/components/listing-card';
 import { useRelativeTime } from '@/components/post-card';
+import { PostPhotos } from '@/components/post-photos';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { priceText, useFavorites } from '@/lib/listings';
@@ -27,12 +28,12 @@ import { locationRepository as repo } from '@/lib/locations';
 import { listingRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
-import { radius, spacing } from '@/theme/tokens';
+import { GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { errorText } from '@/lib/limits';
 
 /**
- * İlan sayfası: görsel (fotoğraf gelene kadar kategori simgesi), fiyat, durum, açıklama, yer; "Mesaj gönder" alıcıyla
+ * İlan sayfası: fotoğraflar (yana kaydırılır; yoksa kategori simgesi), fiyat, durum, açıklama, yer; "Mesaj gönder" alıcıyla
  * satıcıyı Mesajlar > Çarşı'da buluşturur. Sahibi düzenler, satıldı işaretler, süresi dolmak üzereyken yeniler, kaldırır.
  * Başkası favoriye ekler ya da şikâyet eder. Altta güvenli alışveriş önerileri.
  */
@@ -42,6 +43,7 @@ export default function ListingScreen() {
   const c = useThemeColors();
   const { language } = useSettings();
   const ago = useRelativeTime();
+  const { width: screenWidth } = useWindowDimensions();
   const { user } = useSession();
   const { id } = useLocalSearchParams<{ id: string }>();
   const fav = useFavorites(user?.uid);
@@ -116,10 +118,15 @@ export default function ListingScreen() {
   return (
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={[styles.art, { backgroundColor: c.surface, borderColor: c.border }]}>
-          <ListingArt category={item.category} size={96} />
-          <AppText variant="caption" muted>{t('carsi.photosSoon')}</AppText>
-        </View>
+        {item.photos.length ? (
+          <View style={styles.photos}>
+            <PostPhotos photos={item.photos} maxWidth={Math.min(screenWidth, 640) - 2 * GUTTER} />
+          </View>
+        ) : (
+          <View style={[styles.art, { backgroundColor: c.surface, borderColor: c.border }]}>
+            <ListingArt category={item.category} size={96} />
+          </View>
+        )}
         <View style={styles.block}>
           <AppText variant="title">{item.title}</AppText>
           <View style={styles.row}>
@@ -215,6 +222,7 @@ const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
   block: { gap: spacing.xs },
   row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm },
+  photos: { borderRadius: radius.lg, overflow: 'hidden' },
   art: { alignItems: 'center', justifyContent: 'center', gap: spacing.sm, paddingVertical: spacing.lg, borderRadius: radius.lg, borderWidth: 1 },
   tag: { paddingHorizontal: spacing.sm, borderRadius: radius.pill, borderWidth: 1 },
   safety: { gap: spacing.xs, borderWidth: 1, borderRadius: radius.md, padding: spacing.md },

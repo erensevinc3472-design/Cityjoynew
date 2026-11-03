@@ -99,6 +99,23 @@ describe('aktiviteler', () => {
     expect((await repo('ayse').get(id))?.attendeeCount).toBe(1);
   });
 
+  it('kapak fotoğrafı: isteğe bağlı, açanın kendi aktivite dosyası; sonradan eklenemez; hesap silmede kalkar', async () => {
+    const media = (uid: string, kind = 'aktivite', id = 'kapakFoto0001') => {
+      const p = `media/${uid}/${kind}/${id}.jpg`;
+      return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 800, height: 600 };
+    };
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ cover: media('ayse') }));
+    expect((await repo('ali').get(id))?.cover?.path).toBe('media/ayse/aktivite/kapakFoto0001.jpg');
+    await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ cover: media('ali') })));
+    await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ cover: media('ayse', 'profil') })));
+    const plain = await repo('ayse').create('ayse', 'Ayşe K.', input());
+    await assertFails(updateDoc(doc(fs('ayse'), 'activities', plain), { cover: media('ayse'), updatedAt: Timestamp.now() }));
+    await assertSucceeds(repo('ayse').cancel(id));
+    expect((await repo('ali').get(id))?.cover).toBeDefined();
+    await assertSucceeds(repo('ayse').deleteAllOf('ayse'));
+    expect((await repo('ayse').get(id))?.cover).toBeUndefined();
+  });
+
   it('düzenleyen iptal eder, tarih / yer değiştiremez; başkası iptal edemez', async () => {
     const id = await repo('ayse').create('ayse', 'Ayşe K.', input());
     await assertFails(repo('ali').cancel(id));

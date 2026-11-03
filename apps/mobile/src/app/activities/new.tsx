@@ -10,6 +10,7 @@ import {
   validateActivity,
   type ActivityCategory,
   type ActivityError,
+  type Photo,
 } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
@@ -18,6 +19,7 @@ import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
+import { MediaPicker } from '@/components/media-picker';
 import { TextField } from '@/components/text-field';
 import { forgetActivities } from '@/lib/activities';
 import { locationRepository as repo } from '@/lib/locations';
@@ -47,6 +49,7 @@ export default function NewActivityScreen() {
   const [address, setAddress] = useState('');
   const [capacity, setCapacity] = useState('8');
   const [description, setDescription] = useState('');
+  const [cover, setCover] = useState<Photo[]>([]);
   const [tipsRead, setTipsRead] = useState(false);
   const [errors, setErrors] = useState<(ActivityError | 'time' | 'tips')[]>([]);
   const [failed, setFailed] = useState<string | false>(false);
@@ -78,6 +81,7 @@ export default function NewActivityScreen() {
       region: { provinceCode: location.provinceCode, districtId: location.districtId, neighbourhoodId: location.neighbourhoodId },
       address,
       capacity: Number(capacity),
+      ...(cover[0] ? { cover: cover[0] } : {}),
     };
     const errs: (ActivityError | 'time' | 'tips')[] = [...(m ? [] : ['time' as const]), ...validateActivity(input), ...(tipsRead ? [] : ['tips' as const])];
     setErrors(errs);
@@ -111,6 +115,9 @@ export default function NewActivityScreen() {
   return (
     <FormScreen title={t('activities.create')} subtitle={t('activities.createIntro')}>
       <TextField label={t('activities.fields.title')} value={title} onChangeText={setTitle} maxLength={L.title[1]} error={err('title')} hint={t('activities.fields.titleHint')} />
+      {user ? (
+        <MediaPicker label={t('activities.fields.cover')} hint={t('activities.fields.coverHint')} kind="aktivite" uid={user.uid} photos={cover} max={1} onChange={setCover} disabled={busy} />
+      ) : null}
       <View style={styles.block}>
         <AppText variant="label">{t('activities.fields.category')}</AppText>
         <Chips<ActivityCategory> label={t('activities.fields.category')} value={category} onChange={setCategory} options={ACTIVITY_CATEGORIES.map((c) => ({ value: c, label: t(`activities.categories.${c}`) }))} />

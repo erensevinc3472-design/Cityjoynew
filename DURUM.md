@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 3 Kasım 2026 (Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
+Son güncelleme: 3 Kasım 2026 ("{Şehir} kareleri", Seyahat ve belediye kapakları, aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -44,9 +44,9 @@ Son güncelleme: 3 Kasım 2026 (Keşfet beğeni ve kaydet işaretleri düzeltmes
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (150)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (138; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (25; Java 21 gerekir)
+npm test                      # ortak paket testleri (152)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (146; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (30; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -320,7 +320,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    uygulama emülatörde tarayıcıda denendi (profil, takip, Takip sekmesi, engelleme, Profilim). Panel derlendi, panel
    bölümü tarayıcıda açılmadı. Bilinen sınırlar: gizli hesabın Genel'e paylaştığı gönderi Genel akışında yine görünür
    (kişi Genel'i kendisi seçer); takip edilen 30'dan fazla hesap varsa Takip akışı ilk 30'u okur; ad değişikliği eski
-   gönderilerdeki ada yansımaz. PR #11 birleşti, kurallar yüklendi (Eren, 28 Ekim).
+   gönderilerdeki ada yansımaz (3 Kasım'da giderildi). PR #11 birleşti, kurallar yüklendi (Eren, 28 Ekim).
 
 26. **Keşfet, 4. aşama: resmî duyurular akışta ve yasaklı kelime süzgeci** (PROJE.md 5.5 akış sıralaması ve madde 8).
    Mahallem'de mahalleye ve ilçeye yönelik, Bölgesel'de ildeki (ilçe süzgecine uyan) resmî duyurular (muhtar, belediye,
@@ -491,7 +491,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    filtresi), rota ekranı (`/travel/route/[id]`: özet, "Rotayı başlat", durak durak ilerleme, yerin saat/ücret/ulaşım
    bilgisi, sonraki durağa nasıl gidilir), Yöresel (`/travel/local/[code]`: tür filtresi, açılır kartlar, rozet), Başkanlarla
    Keşif (`/travel/mayors/[code]`: il tanıtımı üstte, bütün ilçeler eşit kart, nüfusa göre sıra, bölge filtresi, "Belediye
-   tanıtımı", rota ve video). Şehir sayfasındaki kutular açıldı (Kareler hâlâ yakında). Veri: `travelRoutes`, `travelLocal`,
+   tanıtımı", rota ve video). Şehir sayfasındaki kutular açıldı (Kareler 3 Kasım'da açıldı). Veri: `travelRoutes`, `travelLocal`,
    `travelMunicipal` (kimlik = kurum kimliği). Panel > Seyahat: Hazır rotalar (durak düzenleyici), Yöresel, Başkanlarla
    Keşif (nüfus, bölge, başkan adı gösterimi, yayına alma) sekmeleri; başlangıç içeriğine 6 Bursa rotası ve 6 yöresel
    eklendi. Belediye paneli: kuruma "Seyahat" bölümü yalnızca belediyelere verilir; personel tanıtım ve rotalarını "Onaya
@@ -640,6 +640,76 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   her değişiklikte yeni nesne, `useSyncExternalStore`; açılışta okuma reddedilirse 2 sn sonra bir kez daha). Önceden
   sayfa yenilenince boş görünebiliyor, ilk okuma başarısız olursa oturum boyunca boş kalıyordu. Emülatörde web
   sürümüyle denendi (beğeni + kaydet, sayfa yenileme sonrası doğru). Kural değişikliği yok.
+- **Çarşı ilan fotoğrafları (3 Kasım, aynı dal; Blaze ile çalışır).** İlan formunda en çok 6 fotoğraf (`MediaPicker`, tür
+  `ilan`: `media/{sahip}/ilan/...`); seçilince küçültülüp hemen yüklenir, ilanla kaydedilir; düzenlerken eklenir/çıkarılır.
+  Listede ilk fotoğraf kapak (yoksa kategori simgesi), ilan sayfasında yana kaydırılan fotoğraflar ("1/2", noktalar).
+  Panel > Moderasyon > Çarşı şikâyetlerinde fotoğraflar küçük görünür. Kurallar: en çok 6, her dosya yolu ilan sahibinin
+  `ilan` klasöründe (kural motorunun 1000 işlem sınırı yüzünden yalnızca yol; adresi uygulama denetler, `photoFrom`);
+  fotoğraflar değişmediyse yeniden denetlenmez; sahibi kaldırırken fotoğraflar boşaltılır. Storage kurallarına `ilan`
+  türü eklendi. Sunucu `listingPhotosChanged`: ilandan çıkan dosyayı siler; moderatör kaldırınca alanı boşaltır (dosyalar
+  ardından silinir); hesap silinince `media/{uid}/ilan/` silinir. Fotoğraf şimdilik isteğe bağlı. **Karar (Eren, 3 Kasım):**
+  Blaze sonrası yeni ilanda en az bir fotoğraf zorunlu olacak (Blaze'e geçişte yapılacaklar listesinde). Testler: kurallar 139, sunucu 27, ortak 150. Emülatörde web sürümüyle denendi (iki
+  fotoğrafla ilan, düzenleyip birini değiştirme, başka kullanıcıda liste ve ilan sayfası). **Kurallar değişti:
+  birleşince Firestore kuralları yüklenmeli;** Storage kuralları ve işlevler Blaze bekliyor.
+- **Aktivite kapak fotoğrafı (3 Kasım, aynı dal; Blaze ile çalışır).** "Aktivite aç" formunda isteğe bağlı tek kapak
+  (`MediaPicker`, tür `aktivite`); aktivite düzenlenemediği için yalnızca açarken eklenir. Kartta sağda küçük kapak,
+  aktivite sayfasında üstte büyük kapak (etkinliklerle aynı görünüm); panel > Moderasyon > Aktivite şikâyetlerinde kapak
+  görünür. Kurallar: kapak açanın kendi `aktivite` dosyası, sonradan eklenemez; hesap silmede kapak alanı da silinir.
+  Sunucu `activityCoverChanged`: aktivite kaldırılınca (moderatör / hesap silme) alanı boşaltır ve dosyayı siler; iptalde
+  kapak kalır. Hesap silinince `media/{uid}/aktivite/` silinir. Testler: kurallar 140, sunucu 28, ortak 150. Emülatörde
+  web sürümüyle denendi (kapaklı aktivite açma, başka kullanıcıda liste ve sayfa). **Kurallar değişti.**
+- **Seyahat ve belediye kapak fotoğrafları (3 Kasım, aynı dal; Blaze ile çalışır).** Bölge, şehir, gezilecek yer, hazır
+  rota, yöresel ve Başkanlarla Keşif (belediye tanıtımı) kayıtlarına isteğe bağlı kapak (`cover`, tür `seyahat`). Panel >
+  Seyahat'in altı formunda "Kapak fotoğrafı" (`ImageField`); belediye personeli kendi tanıtımına ve rotalarına Belediye
+  paneli > Seyahat'ten koyar (onaya gönderilir). Uygulamada fotoğraf çizimin yerine geçer (`CoverArt`: Keşfet ve Öğren
+  bölge kartları, bölge / şehir / yer / rota kapağı, şehir sayfasındaki yer kartları, rota kartları, rota durakları);
+  yöresel ve belediye kartı açılınca üstte kapak. Fotoğraf yoksa çizim kalır. Kurallar: altı koleksiyonda `cover`, yeni
+  bağlanan kapak bağlayanın kendi `seyahat` dosyası (`mediaKeptOrOwn`), değişmeyen kalır (admin belediyenin kapağını
+  koruyarak yayına alır). Sunucu `travelCoverChanged-*` (6 işlev): kayıttan çıkan kapağın dosyasını siler. Testler:
+  kurallar 141, sunucu 29, ortak 150. Emülatörde denendi: panelde Bursa'ya kapak yüklenip yayına alındı, uygulamada
+  Bursa sayfasında göründü. **Kurallar değişti.**
+- **"{Şehir} kareleri" (3 Kasım, aynı dal; PROJE.md 13. madde 34, Eren'in onayladığı biçim).** Keşfet'te fotoğraflı ve
+  Genel'e açık paylaşımda "{İl} karelerinde de görünsün" kutucuğu (isteğe bağlı, işaretsiz başlar); gönderide
+  `frames: true`, ek yükleme ya da kopya yok. Seyahat > şehir sayfasındaki Kareler kutusu açıldı: `/travel/frames/[kod]`
+  üçlü ızgara, 30'ar (aşağı kaydırdıkça), üstte CityJoy'un öne çıkardıkları (yıldız, en çok 6), birden çok fotoğraflıda
+  simge, dokununca gönderi; şikâyetle düşen görünmez; boşken "Fotoğraf paylaş". Panel > Seyahat > **Kareler** sekmesi
+  (il seç): öne çıkar / öne çıkarmayı kaldır / karelerden kaldır (gönderi Keşfet'te kalır), işlem kaydı (modül `seyahat`).
+  Kurallar: `frames` yalnızca fotoğraflı ve Genel gönderide; `framesFeatured` yalnızca admin; admin Karelere geri
+  ekleyemez (yalnızca paylaşan seçer). **2 yeni dizin** (`firestore.indexes.json`). Türkçe başlık "Bursa kareleri"
+  biçiminde (ek sorunu yok). Testler: kurallar 142, sunucu 29, ortak 150. Emülatörde denendi: iki fotoğraflı paylaşım
+  kutucukla Karelere düştü, başka kullanıcı gördü, panelde öne çıkarılan yıldızla en üste geçti. **Kurallar ve dizinler
+  değişti: birleşince yüklenmeli.** Fotoğraf yükleme Blaze ile çalışır.
+- **Keşfet albümü 10 fotoğraf (3 Kasım, aynı dal; PROJE.md 5.5 madde 2).** Sınır 4'ten 10'a (`POST_LIMITS.photos`).
+  Kurallar her fotoğrafta tam yolu (`posts/{uid}/{gönderi}/{sıra}.jpg`) denetler; kural motorunun 1000 işlem sınırı
+  yüzünden biçim ve adres uygulamada denetlenir (`photoFrom`, yalnızca kendi depomuzdaki adres gösterilir). Storage'da
+  dosya adı 0-9. İşletme adına 10 fotoğraflı paylaşım da denendi (kural testi). **Kurallar değişti.**
+- **Keşfet videosu (3 Kasım, aynı dal; PROJE.md 5.5 madde 2; Blaze ile çalışır).** Gönderiye fotoğraf yerine tek video:
+  en çok 60 sn ve 40 MB; `posts/{uid}/{gönderi}/video.mp4` (iPhone'da `.mov`). Paylaşım formunda "Video ekle" (fotoğraf
+  yokken), seçilen videonun süresi ve kaldır; iPhone'da seçici 60 sn ile sınırlar ve 720p'ye sıkıştırır; uzun ya da büyük
+  video seçilince uyarı. Web'de süre dosyanın kendi bilgisinden okunur (seçicinin değeri yanlış geliyordu, denemede
+  bulundu). Akışta kendiliğinden oynamaz: süreli oynat düğmesi, dokununca oynatıcı (`expo-video`, yeni paket) açılır ve
+  başlar. Profil ızgarasında video simgesi. Panel > Moderasyon şikâyet edilen videoyu oynatır. Kurallar: video fotoğrafla
+  birlikte olmaz, yol bu gönderinin klasörü, süre 1-60; Storage: `video.mp4|mov`, video türü, en çok 40 MB. Sunucu
+  `postPhotosRemoved` videoyu da siler ve alanı boşaltır. Testler: kurallar 143, sunucu 30, ortak 150. Emülatörde web
+  sürümüyle denendi (75 sn reddedildi, 12 sn paylaşıldı, başka kullanıcıda dokununca oynadı). **Telefonda denenmedi**
+  (EAS). Süreyi telefon bildirir (kural sunucuda dosyayı açamaz); maliyeti 40 MB sınırı korur. **Kurallar değişti.**
+- **Keşfet: güncel ad ve doğrulanmış işletme rozeti (3 Kasım, aynı dal).** Gönderi kartında ve yorumlarda yazarın adı
+  güncel herkese açık profilden gelir (`lib/profile-photos.ts`: `useAuthor`, profil fotoğrafıyla aynı tek okuma, oturumda
+  kişi başına bir); ad değişikliği eski gönderilerde de görünür (bilinen sınır kapandı), kendi adını değiştirince hemen
+  yenilenir. İşletme adına paylaşımda işletmenin güncel adı ve doğrulanmışsa yanında doğrulanmış işareti
+  (`useBusinessInfo`, işletme başına bir okuma). Kural değişikliği yok. Emülatörde denendi (ad değişince eski gönderide
+  yeni ad).
+- **Keşfet: konum rozeti (3 Kasım, aynı dal; PROJE.md 5.5 madde 5).** Hesabım > "Konum rozeti" (`/location-badge`):
+  "Konumumu doğrula" telefonun konumunu bir kez alır, adresi telefonun içinde çözer (`lib/location-badge.ts`,
+  `locationBadgeFor`): il + ilçe tutarsa "İlçesi doğrulandı", mahalle adı da tutarsa "Mahallesi doğrulandı". Koordinat
+  saklanmaz; herkese yalnızca rozet görünür (Keşfet profilinde adın altında, gönderide adın yanında simge), mahallenin
+  adı görünmez. Kişi rozeti kaldırabilir; mahalle değişince rozet düşer. Veri: `users.locationCheck` (kişiye özel:
+  mahalle, düzey, tarih) + `publicProfiles.locationVerified`. Kurallar: ikisi aynı yazımda ve aynı düzeyde değişir,
+  doğrulama yalnızca şimdiki mahalle için geçerli (rozeti bırakarak mahalle değiştirilemez), tek başına sahte rozet
+  yazılamaz. Ortak düzeltme: mahalle adı karşılaştırması "Mh." kısaltmasını da tanır. Web'de yapılamaz (telefonda;
+  emülatörle denerken "mahalle" sayılır). Sahte konumla aşılabilir: güven işaretidir, kanıt değildir (ekranda yazılı).
+  Testler: kurallar 146 (3 yeni), ortak 152 (2 yeni). Emülatörde denendi (doğrula > akışta ve profilde rozet > kaldır).
+  **Telefonda denenmedi** (gerçek adres çözümlemesi EAS ile). **Kurallar değişti.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -678,6 +748,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Açık işler ve bilinen eksikler
 
+- **Blaze'e geçince Claude'un yapacakları:** Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu (uygulama + kurallar; Karar
+  Eren 3 Kasım); fotoğraflı akışları gerçek projede deneme.
 - **Eren'in yapacakları tek listede:** `docs/eren-yapilacaklar.md` (31 Ekim). Eren bir maddeyi bitirdim deyince işaretle.
 - **Mağaza öncesi kontrol listesi (30 Ekim 2026, 20 maddelik liste üzerinden):** Claude'un üç işi yapıldı (konum izni metni,
   çökme ekranı, "Bağlantı yok" bildirimi; Yapılanlar'da). EAS ile gelecekler: çökme
@@ -747,7 +819,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
 5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini, kişi profil fotoğrafı~~ (31 Ekim - 1 Kasım, Blaze
-   bekliyor). Kalan: aktivite görseli, belediye fotoğrafları, "{Şehir}'dan Kareler", Çarşı ilan fotoğrafları.
+   bekliyor), ~~Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat ve belediye kapakları, "{Şehir} kareleri"~~ (3 Kasım).
+   Fotoğraf işleri tamam (Blaze ile çalışır). Video sonra.
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 

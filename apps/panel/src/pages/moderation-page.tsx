@@ -247,6 +247,13 @@ function ActivityReports({ user }: { user: PanelUser }) {
                           <summary>{t('announcements.showBody')}</summary>
                           <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.activity.description}</p>
                         </details>
+                        {r.activity.cover ? (
+                          <div className="photo-row">
+                            <a href={r.activity.cover.url} target="_blank" rel="noreferrer noopener" title={t('moderation.posts.photo', { n: 1 })}>
+                              <img src={r.activity.cover.url} alt={t('moderation.posts.photo', { n: 1 })} loading="lazy" />
+                            </a>
+                          </div>
+                        ) : null}
                         {r.activity.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.activities.removed')}</span> : r.activity.cleared ? <span className="pill ok">{t('moderation.activities.kept')}</span> : null}
                       </>
                     ) : (
@@ -369,6 +376,15 @@ function ListingReports({ user }: { user: PanelUser }) {
                           <summary>{t('announcements.showBody')}</summary>
                           <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.listing.description}</p>
                         </details>
+                        {r.listing.photos.length ? (
+                          <div className="photo-row">
+                            {r.listing.photos.map((p, i) => (
+                              <a key={p.path} href={p.url} target="_blank" rel="noreferrer noopener" title={t('moderation.posts.photo', { n: i + 1 })}>
+                                <img src={p.url} alt={t('moderation.posts.photo', { n: i + 1 })} loading="lazy" />
+                              </a>
+                            ))}
+                          </div>
+                        ) : null}
                         {r.listing.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.listings.removed')}</span> : r.listing.cleared ? <span className="pill ok">{t('moderation.listings.kept')}</span> : null}
                       </>
                     ) : (
@@ -499,6 +515,9 @@ function PostReports({ user }: { user: PanelUser }) {
                               </a>
                             ))}
                           </div>
+                        ) : null}
+                        {r.post.video ? (
+                          <video className="mod-video" src={r.post.video.url} controls preload="metadata" aria-label={t('moderation.posts.video', { seconds: r.post.video.durationSec })} />
                         ) : null}
                         {r.post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : r.post.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
                       </>

@@ -13,7 +13,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { handleAnnouncementWrite } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
-import { handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
+import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
 import { expoSender } from './push';
 import { handleFollowWrite, handleMessageCreate } from './social';
 
@@ -65,6 +65,26 @@ export const profilePhotoChanged = onDocumentWritten('publicProfiles/{uid}', asy
 });
 export const businessMediaChanged = onDocumentWritten('businesses/{id}', async (e) => {
   await handleMediaChange(MEDIA_FIELDS.businesses, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+
+// Çarşı ilanından çıkan ya da ilan kaldırılınca fotoğraf dosyaları silinir.
+export const listingPhotosChanged = onDocumentWritten('listings/{id}', async (e) => {
+  await handleListingPhotos(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+
+// Seyahat içeriklerinden çıkan kapakların dosyaları silinir.
+export const travelCoverChanged = Object.fromEntries(
+  ['travelRegions', 'travelCities', 'travelPlaces', 'travelRoutes', 'travelLocal', 'travelMunicipal'].map((col) => [
+    col,
+    onDocumentWritten(`${col}/{id}`, async (e) => {
+      await handleMediaChange(MEDIA_FIELDS.travel, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+    }),
+  ]),
+);
+
+// Kaldırılan aktivitenin kapak dosyası silinir.
+export const activityCoverChanged = onDocumentWritten('activities/{id}', async (e) => {
+  await handleActivityCover(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);
 });
 
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {

@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -101,6 +102,7 @@ export default function TravelLocalScreen() {
                 </Pressable>
                 {expanded ? (
                   <View style={styles.body}>
+                    {x.cover ? <Image source={{ uri: x.cover.url }} style={[styles.cover, { aspectRatio: Math.min(2, Math.max(1, x.cover.width / x.cover.height)), backgroundColor: c.surfaceStrong }]} contentFit="cover" recyclingKey={x.cover.path} accessibilityIgnoresInvertColors /> : null}
                     <AppText style={[styles.text, { color: c.text }]}>{x.body}</AppText>
                     {x.facts.map((f) => (
                       <View key={f.label} style={[styles.fact, { backgroundColor: c.background, borderColor: c.border }]}>
@@ -138,6 +140,7 @@ const styles = StyleSheet.create({
   card: { borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden' },
   head: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, minHeight: MIN_TOUCH },
   icon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  cover: { width: '100%', borderRadius: radius.md },
   badges: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   kind: { fontFamily: fonts.bodySemi, fontSize: 9, letterSpacing: 1 },
   badge: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: radius.pill, borderWidth: 1 },

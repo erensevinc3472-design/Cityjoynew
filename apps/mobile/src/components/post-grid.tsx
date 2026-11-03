@@ -28,13 +28,20 @@ export function PostGrid({ list, empty }: { list: Post[] | null; empty: string }
         <Pressable
           key={p.id}
           accessibilityRole="button"
-          accessibilityLabel={[t(`explore.categories.${p.category}`), p.photos?.length ? t('explore.photos.count', { count: p.photos.length }) : '', p.text.slice(0, 100)].filter(Boolean).join('. ')}
+          accessibilityLabel={[t(`explore.categories.${p.category}`), p.photos?.length ? t('explore.photos.count', { count: p.photos.length }) : p.video ? t('explore.video.label') : '', p.text.slice(0, 100)].filter(Boolean).join('. ')}
           onPress={() => router.push({ pathname: '/explore/[id]', params: { id: p.id } })}
           style={({ pressed }) => [styles.tile, { width: size, height: size, backgroundColor: tileColor(p), opacity: pressed ? 0.85 : 1 }]}>
           {p.photos?.length ? (
             <>
               <Image source={{ uri: p.photos[0].url }} style={StyleSheet.absoluteFill} contentFit="cover" recyclingKey={p.photos[0].path} />
               {p.photos.length > 1 ? <MaterialIcons name="collections" size={16} color="#FFFFFF" style={styles.multi} /> : <View />}
+            </>
+          ) : p.video ? (
+            <>
+              <View style={styles.videoTile}>
+                <MaterialIcons name="play-circle-outline" size={36} color="#FFFFFF" />
+              </View>
+              <MaterialIcons name="videocam" size={16} color="#FFFFFF" style={styles.multi} />
             </>
           ) : (
             <AppText numberOfLines={5} style={styles.text}>{p.text}</AppText>
@@ -50,6 +57,7 @@ export function PostGrid({ list, empty }: { list: Post[] | null; empty: string }
 }
 
 const styles = StyleSheet.create({
+  videoTile: { position: 'absolute', top: 0, bottom: 0, start: 0, end: 0, backgroundColor: '#0B1F24', alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 2, paddingTop: 2 },
   tile: { padding: 8, justifyContent: 'space-between', overflow: 'hidden' },
   text: { color: '#FFFFFF', fontFamily: fonts.bodyMedium, fontSize: 12, lineHeight: 16 },

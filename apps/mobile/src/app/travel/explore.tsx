@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { TR_REGIONS, TRAVEL_COUNTRIES } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
-import { SceneArt, sceneSky } from '@/components/scene-art';
+import { CoverArt, SceneArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { locationRepository as repo } from '@/lib/locations';
@@ -105,7 +105,7 @@ export default function TravelExploreScreen() {
                     onPress={() => router.push({ pathname: '/travel/region/[id]', params: { id: r.id } })}
                     style={({ pressed }) => [styles.card, { borderColor: c.border, backgroundColor: sceneSky(REGION_SCENES[r.id]), opacity: pressed ? 0.9 : 1 }]}>
                     <View style={[StyleSheet.absoluteFill, styles.cardArt]}>
-                      <SceneArt kind={REGION_SCENES[r.id]} />
+                      <CoverArt photo={content?.cover} kind={REGION_SCENES[r.id]} />
                     </View>
                     <View style={[StyleSheet.absoluteFill, styles.shade]} />
                     <View style={styles.cardTop}>

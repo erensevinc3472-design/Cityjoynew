@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
@@ -134,6 +135,14 @@ export default function ActivityScreen() {
   return (
     <Screen header={header}>
       <ScrollView contentContainerStyle={styles.content}>
+        {item.cover ? (
+          <Image
+            source={{ uri: item.cover.url }}
+            style={[styles.cover, { aspectRatio: Math.min(2, Math.max(1, item.cover.width / item.cover.height)), backgroundColor: c.surfaceStrong }]}
+            contentFit="cover"
+            accessibilityIgnoresInvertColors
+          />
+        ) : null}
         {cancelled ? <FormMessage kind="error" text={t('activities.cancelledNote')} /> : null}
         <AppText variant="caption" muted>{t(`activities.categories.${item.category}`)}</AppText>
         <AppText accessibilityRole="header" style={[styles.title, { color: c.textStrong }]}>{item.title}</AppText>
@@ -211,6 +220,7 @@ export default function ActivityScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
   title: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26 },
+  cover: { width: '100%', borderRadius: radius.lg },
   meta: { gap: spacing.xs },
   card: { borderRadius: radius.lg, borderWidth: 1, padding: spacing.md, gap: spacing.xs },
 });

@@ -31,7 +31,14 @@ describe('Dosya deposu: gönderi fotoğrafları', () => {
     await assertFails(put(guest(), 'posts/ayse/p1/1.jpg'));
     await assertFails(put(st('ayse'), 'posts/ayse/p1/1.jpg', jpeg(), 'image/png'));
     await assertFails(put(st('ayse'), 'posts/ayse/p1/1.jpg', jpeg(1_500_001)));
-    await assertFails(put(st('ayse'), 'posts/ayse/p1/4.jpg'));
+    await assertSucceeds(put(st('ayse'), 'posts/ayse/p1/9.jpg'));
+    await assertFails(put(st('ayse'), 'posts/ayse/p1/10.jpg'));
+    // Gönderi videosu: video.mp4 / video.mov, video türünde; başka ad ya da tür olmaz.
+    await assertSucceeds(put(st('ayse'), 'posts/ayse/p2/video.mp4', jpeg(5000), 'video/mp4'));
+    await assertSucceeds(put(st('ayse'), 'posts/ayse/p3/video.mov', jpeg(5000), 'video/quicktime'));
+    await assertFails(put(st('ayse'), 'posts/ayse/p4/video.mp4', jpeg(5000), 'image/jpeg'));
+    await assertFails(put(st('ayse'), 'posts/ayse/p4/klip.mp4', jpeg(5000), 'video/mp4'));
+    await assertFails(put(st('ali'), 'posts/ayse/p4/video.mp4', jpeg(5000), 'video/mp4'));
     await assertFails(put(st('ayse'), 'posts/ayse/p1/0.png'));
     // Üzerine yazma kapalıdır (allow update: false). Emülatör var olan dosyaya yüklemeyi de "create" saydığı için bu
     // denetim burada sınanamaz; gerçek Firebase'de geçerlidir.
@@ -50,6 +57,10 @@ describe('Dosya deposu: gönderi fotoğrafları', () => {
     await assertSucceeds(put(st('ayse'), 'media/ayse/etkinlik/abcDEF123456.jpg'));
     await assertSucceeds(put(st('ayse'), 'media/ayse/isletme-vitrin/abcDEF123456xyz.jpg'));
     await assertSucceeds(put(st('ayse'), 'media/ayse/profil/abcDEF123456.jpg'));
+    await assertSucceeds(put(st('ayse'), 'media/ayse/ilan/abcDEF123456.jpg'));
+    await assertSucceeds(put(st('ayse'), 'media/ayse/aktivite/abcDEF123456.jpg'));
+    await assertSucceeds(put(st('ayse'), 'media/ayse/seyahat/abcDEF123456.jpg'));
+    await assertFails(put(st('ali'), 'media/ayse/ilan/abcDEF1234567.jpg'));
     await assertFails(put(st('ali'), 'media/ayse/etkinlik/abcDEF1234567.jpg'));
     await assertFails(put(st('ayse'), 'media/ayse/baska/abcDEF123456.jpg'));
     await assertFails(put(st('ayse'), 'media/ayse/kurum/kisa.jpg'));

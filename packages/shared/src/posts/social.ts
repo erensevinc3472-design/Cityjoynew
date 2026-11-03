@@ -1,4 +1,5 @@
 import type { Photo } from '../media/photo';
+import type { LocationBadge } from '../locations/location-badge';
 
 /**
  * Keşfet profili, takip ve engelleme (PROJE.md 5.5, 5.8). Herkese açık profil yalnızca "Ayşe K." biçimindeki adı,
@@ -19,6 +20,8 @@ export interface PublicProfile {
   photo?: Photo;
   /** Moderatör fotoğrafı kaldırdı; kişi yenisini koyamaz. */
   photoRemoved: boolean;
+  /** Konum rozeti (madde 5): mahallesi ya da ilçesi telefonun konumuyla doğrulandı; mahallenin adı görünmez. */
+  locationVerified?: LocationBadge;
 }
 
 export const PROFILE_LIMITS = {

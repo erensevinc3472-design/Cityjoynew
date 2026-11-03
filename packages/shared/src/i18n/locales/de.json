@@ -884,7 +884,9 @@
       "capacity": "Wie viele können teilnehmen?",
       "capacityHint": "Ohne dich, höchstens {{max}}.",
       "description": "Beschreibung",
-      "descriptionHint": "Was wird gemacht, was mitbringen, für wen geeignet?"
+      "descriptionHint": "Was wird gemacht, was mitbringen, für wen geeignet?",
+      "cover": "Titelbild (optional)",
+      "coverHint": "Ein Foto, das zeigt, worum es beim Treffen geht. Es kann später nicht geändert werden. Keine Personen, Kennzeichen oder Wohnadressen zeigen."
     },
     "safetyTitle": "Tipps für das erste Treffen",
     "safetyTips": "Triff dich an einem öffentlichen, belebten Ort. Teile weder deine Wohnadresse noch persönliche Daten. Sag einer vertrauten Person, wohin du gehst. Wenn jemand Geld oder eine Zahlung verlangt, nimm nicht teil und melde es. Geh, wenn du dich unwohl fühlst; im Notfall wähle 112.",
@@ -1005,7 +1007,9 @@
       "category": "Kategorie",
       "relative": "Ich bin ein Angehöriger der verstorbenen Person.",
       "where": "Wo möchtest du teilen? (Mehrfachauswahl möglich)",
-      "mahallemNote": "Wenn du in Mein Viertel teilst, können Nachbarn erkennen, dass du dort wohnst."
+      "mahallemNote": "Wenn du in Mein Viertel teilst, können Nachbarn erkennen, dass du dort wohnst.",
+      "frames": "Auch in „{{name}} in Bildern“ zeigen",
+      "framesHint": "Dein Foto erscheint auch auf der Seite von {{name}} unter Reisen; es wird nichts erneut hochgeladen. Am besten ohne Gesichter, Kennzeichen oder Wohnadressen."
     },
     "errors": {
       "text": "Schreib etwas oder füge ein Foto hinzu (bis zu 2000 Zeichen).",
@@ -1015,7 +1019,8 @@
       "realEstate": "Anzeigen für Wohnungen, Grundstücke oder Läden zum Kauf oder zur Miete sind in Entdecken nicht erlaubt. Immobilienanzeigen kommen später mit Lizenz in den Basar.",
       "relative": "Nur Angehörige können einen Beileidsbeitrag teilen.",
       "banned": "Dein Text enthält ein Wort, das gegen die Gemeinschaftsregeln verstößt. Bitte ändere es und versuche es erneut.",
-      "photos": "Du kannst bis zu 4 Fotos hinzufügen."
+      "photos": "Du kannst bis zu 10 Fotos hinzufügen.",
+      "video": "Ein Video darf höchstens 60 Sekunden lang sein und nicht mit Fotos kombiniert werden."
     },
     "save": "Speichern",
     "unsave": "Gespeichert ✓",
@@ -1129,7 +1134,7 @@
     },
     "photos": {
       "add": "Foto hinzufügen",
-      "count": "{{count}}/4 Fotos",
+      "count": "{{count}}/10 Fotos",
       "remove": "Foto entfernen",
       "label": "Foto {{n}} von {{total}}",
       "note": "Fotos werden vor dem Hochladen verkleinert; Standort- und Geräteangaben werden entfernt.",
@@ -1137,7 +1142,18 @@
       "tooLarge": "Das Foto ist zu groß. Bitte wähle ein anderes.",
       "uploadError": "Das Foto konnte nicht hochgeladen werden. Prüfe deine Verbindung und versuche es erneut.",
       "permission": "Zum Auswählen eines Fotos wird Zugriff auf die Fotomediathek benötigt. Du kannst ihn in den Einstellungen deines Telefons erlauben."
-    }
+    },
+    "video": {
+      "add": "Video hinzufügen",
+      "remove": "Video entfernen",
+      "label": "Video",
+      "play": "Video abspielen, {{duration}}",
+      "selected": "Ausgewähltes Video, {{duration}}",
+      "note": "Bis zu {{max}} Sekunden und 40 MB. Entweder ein Video oder Fotos, nicht beides.",
+      "tooLong": "Videos dürfen höchstens {{max}} Sekunden lang sein. Kürze es und wähle es erneut.",
+      "tooLarge": "Das Video ist zu groß (max. 40 MB). Wähle ein kürzeres Video oder eine geringere Auflösung."
+    },
+    "verifiedBusiness": "Verifiziertes Unternehmen"
   },
   "news": {
     "title": "Nachrichten",
@@ -1455,7 +1471,7 @@
     "soonCities": "Provinzen folgen bald",
     "cityPreparing": "Der Führer für {{name}} wird vorbereitet.",
     "frames": "Momente aus {{name}}",
-    "framesHint": "Fotos und Videos",
+    "framesHint": "Fotos der Stadt",
     "mayors": "Mit Bürgermeistern entdecken",
     "mayorsHint": "Bezirksrouten",
     "local": "Traditionelles {{name}}",
@@ -1579,7 +1595,13 @@
       "ova": "Ebene"
     },
     "orderNote": "Sortiert nach Einwohnerzahl der Bezirke (TÜİK).",
-    "orderNoteYear": "Sortiert nach Einwohnerzahl der Bezirke (TÜİK, {{year}})."
+    "orderNoteYear": "Sortiert nach Einwohnerzahl der Bezirke (TÜİK, {{year}}).",
+    "framesIntro": "Fotos, die in dieser Provinz unter Entdecken geteilt und hinzugefügt wurden. Die mit Stern hat CityJoy hervorgehoben. Tippe auf ein Foto, um den Beitrag zu öffnen.",
+    "framesEmpty": "Noch keine Bilder von {{name}}. Wenn du in dieser Provinz unter Entdecken ein Foto teilst, wähle „Allgemein“ und „Auch in Bildern zeigen“.",
+    "framesShare": "Foto teilen",
+    "framesSignIn": "Melde dich an, um die Bilder zu sehen.",
+    "framesFeatured": "Hervorgehoben",
+    "frameN": "Bild {{n}}"
   },
   "food": {
     "kinds": {
@@ -1850,7 +1872,6 @@
     "notListed": "Nicht in der Liste (abgelaufen oder in Prüfung)",
     "favorite": "Zu Favoriten hinzufügen",
     "unfavorite": "Aus Favoriten entfernen",
-    "photosSoon": "Fotos folgen bald",
     "gone": "Diese Anzeige gibt es nicht mehr.",
     "saveError": "Speichern fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.",
     "createError": "Anzeige konnte nicht aufgegeben werden. Vielleicht ist dein Tageslimit erreicht (neue Konten 2 pro Tag, danach 5).",
@@ -1891,7 +1912,9 @@
       "swapForHint": "Optional",
       "condition": "Zustand",
       "description": "Beschreibung",
-      "descriptionHint": "Nenne Mängel, Maße und Übergabe. Keine Telefonnummer angeben."
+      "descriptionHint": "Nenne Mängel, Maße und Übergabe. Keine Telefonnummer angeben.",
+      "photos": "Fotos",
+      "photosHint": "Bis zu 6 Fotos; das erste wird in der Liste gezeigt. Füge echte Fotos des Artikels hinzu. Keine Personen, Kennzeichen oder Adressen zeigen."
     },
     "errors": {
       "kind": "Wähle eine Anzeigenart.",
@@ -1943,5 +1966,38 @@
   },
   "media": {
     "count": "{{count}}/{{max}} Fotos"
+  },
+  "locationBadge": {
+    "title": "Standortabzeichen",
+    "hint": "Viertel bestätigen, Abzeichen erhalten",
+    "intro": "Bestätige deinen Standort einmal, dann erscheint ein Abzeichen in deinem Entdecken-Profil und bei deinen Beiträgen. Nachbarn sehen, dass deine Beiträge wirklich aus der Gegend kommen.",
+    "signIn": "Melde dich an, um ein Standortabzeichen zu erhalten.",
+    "none": "Noch nicht bestätigt",
+    "at": "Bestätigt: {{date}}",
+    "verify": "Standort bestätigen",
+    "again": "Erneut bestätigen",
+    "remove": "Abzeichen entfernen",
+    "needLocation": "Wähle zuerst unter Konto > Standort deine Provinz, deinen Bezirk und dein Viertel.",
+    "badge": {
+      "mahalle": "Viertel bestätigt",
+      "ilce": "Bezirk bestätigt"
+    },
+    "done": {
+      "mahalle": "Dein Viertel ist bestätigt, dein Abzeichen wurde hinzugefügt.",
+      "ilce": "Dein Bezirk ist bestätigt, dein Abzeichen wurde hinzugefügt. Dein Telefon hat keinen Viertelnamen geliefert, daher gilt das Abzeichen auf Bezirksebene."
+    },
+    "fail": {
+      "elsewhere": "Dein aktueller Standort passt nicht zu deinem gespeicherten Bezirk. Versuche es in deinem Viertel erneut oder aktualisiere deinen Standort.",
+      "denied": "Keine Standortberechtigung. Erlaube sie in den Einstellungen und versuche es erneut.",
+      "unavailable": "Standort konnte nicht ermittelt werden. Versuche es im Freien oder mit Internetverbindung erneut.",
+      "web": "Die Standortbestätigung erfolgt in der App auf dem Telefon.",
+      "error": "Speichern fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "notes": {
+      "how": "Der Standort deines Telefons wird einmal gelesen, die Adresse wird auf dem Telefon ermittelt.",
+      "privacy": "Dein Standort wird nirgends gespeichert; andere sehen nur das Abzeichen, nicht den Namen deines Viertels.",
+      "change": "Wenn du dein Viertel änderst, wird das Abzeichen automatisch entfernt.",
+      "limit": "Das Abzeichen ist ein Vertrauenszeichen; mit Apps für falsche Standorte lässt es sich umgehen, daher ist es allein kein Beweis."
+    }
   }
 }
