@@ -727,6 +727,13 @@ Eren'in kararları: kullanıcılar ücretsiz, güven bilgisi ücretsiz, SOS ve a
 **Gelir kaynakları (tahmini öncelik sırasıyla):**
 1. **İşletme doğrulama ücreti** (Eren'in örneği: yaklaşık 1000 TL). Hem gelir hem sahte ilan filtresi. Ücret incelemenin bedelidir, rozet otomatik satılmaz.
 2. **İşletme üyelik kademeleri** (yinelenen gelir): Ücretsiz, Standart, Pro, Premium. Fark vitrin kapasitesidir: fotoğraf sayısı, video, iş galerisi, istatistik, öne çıkma ("reklam" etiketli).
+   - **Karar (Eren, 3 Kasım 2026):** ücretsiz kademede yalnızca 1 fotoğraf, Ara ve WhatsApp. Öne çıkma, video, detaylı
+     yazı, ücretler ve yorumlar üst kademelerde açılır. **Claude'un dağıtımı (onay bekliyor):** Standart: 10 fotoğraf,
+     adres ve yol tarifi, tanıtım yazısı, 10 satır ücret, yorumlar ve puan, temel istatistik. Pro: 20 fotoğraf, sınırsız
+     ücret, video, listede fotoğraf şeridi, tam istatistik. Premium: 30 fotoğraf ve öne çıkma ("Reklam", en çok 2,
+     yalnızca belgeleri doğrulanmış işletme). Sıralama kuralı değişmez; yorumlar açıldığında işletme seçemez, silemez.
+     "Doğrulanmış" rozeti kademeden ayrıdır. Önizleme: tasarım tuvali, "Kademe farkları" panosu (bölüm 13 madde 35).
+     Not: ücretsiz işletmede yorum ve puan olmadığı için listede "Yeni" görünür; sıralamada puanlılardan sonra gelir.
 3. **Belediye reklam ve tanıtım protokolü** (yıllık, Eren'in kararı): Belediyelerle reklam ve tanıtım amaçlı yıllık protokol imzalanır, panel bu protokole göre verilir. Kamu mevzuatı (alım usulü, bütçe, ihale/doğrudan temin sınırları, çıkar çatışması) avukatla netleştirilecek.
 4. **Anket siparişleri** (Eren'in kararı: ücretli).
 5. **Konaklama sayfaları**: doğrulama, vitrin, öne çıkma. Daha sonra resmi bilet/rezervasyon sitelerine yönlendirme ortaklığı (sıralamayı etkilemeden, "ortaklık" etiketiyle).
