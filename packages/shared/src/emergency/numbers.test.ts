@@ -25,6 +25,10 @@ describe('acil numaralar', () => {
     expect(byNumber['185']).toMatch(/Su/);
     expect(byNumber['186']).toMatch(/Elektrik/);
     expect(byNumber['187']).toMatch(/Doğalgaz/);
+    expect(byNumber['114']).toMatch(/Zehir/);
+    // 155, 156, 110, 122, 177, 158 artık 112'ye bağlanıyor: ayrı satır değil, 112'nin açıklamasında.
+    for (const old of ['155', '156', '110', '122', '177', '158']) expect(byNumber[old]).toBeUndefined();
+    expect(DEFAULT_EMERGENCY_NUMBERS[0].notes?.tr).toMatch(/155.*112/);
     for (const n of DEFAULT_EMERGENCY_NUMBERS) {
       expect(Object.keys(n.names).sort()).toEqual(['ar', 'de', 'en', 'ru', 'tr']);
       expect(EMERGENCY_ICONS).toContain(n.icon);

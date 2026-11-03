@@ -1,31 +1,13 @@
 [
   {
     "id": "112", "number": "112", "icon": "emergency",
-    "names": { "tr": "Ambulans ve acil çağrı", "en": "Ambulance & emergency", "de": "Rettungsdienst & Notruf", "ar": "الإسعاف والطوارئ", "ru": "Скорая и экстренный вызов" },
-    "notes": { "tr": "Tüm acil durumlar için", "en": "For all emergencies", "de": "Für alle Notfälle", "ar": "لجميع حالات الطوارئ", "ru": "Для всех экстренных случаев" }
+    "names": { "tr": "Ambulans, polis, itfaiye, jandarma", "en": "Ambulance, police, fire, gendarmerie", "de": "Rettung, Polizei, Feuerwehr, Gendarmerie", "ar": "الإسعاف، الشرطة، الإطفاء، الدرك", "ru": "Скорая, полиция, пожарные, жандармерия" },
+    "notes": { "tr": "Tek acil numara. 155, 156, 110, 122, 177 ve 158 de 112'ye bağlanır", "en": "Single emergency number. 155, 156, 110, 122, 177 and 158 also connect to 112", "de": "Einheitliche Notrufnummer. 155, 156, 110, 122, 177 und 158 werden ebenfalls mit 112 verbunden", "ar": "رقم الطوارئ الموحد. الأرقام 155 و156 و110 و122 و177 و158 تُحوَّل أيضًا إلى 112", "ru": "Единый номер экстренных служб. 155, 156, 110, 122, 177 и 158 тоже соединяют со 112" }
   },
   {
-    "id": "155", "number": "155", "icon": "local-police",
-    "names": { "tr": "Polis", "en": "Police", "de": "Polizei", "ar": "الشرطة", "ru": "Полиция" },
-    "notes": { "tr": "112'ye bağlanır", "en": "Connects to 112", "de": "Wird mit 112 verbunden", "ar": "يتم التحويل إلى 112", "ru": "Соединяет со 112" }
-  },
-  {
-    "id": "110", "number": "110", "icon": "fire-truck",
-    "names": { "tr": "İtfaiye", "en": "Fire brigade", "de": "Feuerwehr", "ar": "الإطفاء", "ru": "Пожарная служба" },
-    "notes": { "tr": "112'ye bağlanır", "en": "Connects to 112", "de": "Wird mit 112 verbunden", "ar": "يتم التحويل إلى 112", "ru": "Соединяет со 112" }
-  },
-  {
-    "id": "156", "number": "156", "icon": "security",
-    "names": { "tr": "Jandarma", "en": "Gendarmerie", "de": "Gendarmerie", "ar": "الدرك", "ru": "Жандармерия" },
-    "notes": { "tr": "112'ye bağlanır", "en": "Connects to 112", "de": "Wird mit 112 verbunden", "ar": "يتم التحويل إلى 112", "ru": "Соединяет со 112" }
-  },
-  {
-    "id": "183", "number": "183", "icon": "support-agent",
-    "names": { "tr": "Sosyal destek (aile, kadın, çocuk)", "en": "Social support (family, women, children)", "de": "Sozialhilfe (Familie, Frauen, Kinder)", "ar": "الدعم الاجتماعي (الأسرة، المرأة، الطفل)", "ru": "Социальная поддержка (семья, женщины, дети)" }
-  },
-  {
-    "id": "185", "number": "185", "icon": "water-drop",
-    "names": { "tr": "Su arızası", "en": "Water outage", "de": "Wasserstörung", "ar": "أعطال المياه", "ru": "Аварии водоснабжения" }
+    "id": "114", "number": "114", "icon": "local-hospital",
+    "names": { "tr": "Zehir danışma", "en": "Poison control", "de": "Giftnotruf", "ar": "مركز السموم", "ru": "Токсикологическая помощь" },
+    "notes": { "tr": "Zehirlenme şüphesinde, 7/24", "en": "If poisoning is suspected, 24/7", "de": "Bei Verdacht auf Vergiftung, rund um die Uhr", "ar": "عند الاشتباه بالتسمم، على مدار الساعة", "ru": "При подозрении на отравление, круглосуточно" }
   },
   {
     "id": "186", "number": "186", "icon": "electric-bolt",
@@ -34,5 +16,13 @@
   {
     "id": "187", "number": "187", "icon": "local-fire-department",
     "names": { "tr": "Doğalgaz acil", "en": "Natural gas emergency", "de": "Gas-Notdienst", "ar": "طوارئ الغاز الطبيعي", "ru": "Аварийная газовая служба" }
+  },
+  {
+    "id": "185", "number": "185", "icon": "water-drop",
+    "names": { "tr": "Su arızası", "en": "Water outage", "de": "Wasserstörung", "ar": "أعطال المياه", "ru": "Аварии водоснабжения" }
+  },
+  {
+    "id": "183", "number": "183", "icon": "support-agent",
+    "names": { "tr": "Sosyal destek (aile, kadın, çocuk)", "en": "Social support (family, women, children)", "de": "Sozialhilfe (Familie, Frauen, Kinder)", "ar": "الدعم الاجتماعي (الأسرة، المرأة، الطفل)", "ru": "Социальная поддержка (семья, женщины, дети)" }
   }
 ]
