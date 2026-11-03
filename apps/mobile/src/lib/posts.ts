@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { isPostListed, type Post } from '@cityjoy/shared';
 import type { FeedFilter } from '@cityjoy/shared/firebase';
 
@@ -104,75 +104,92 @@ export function forgetFeeds() {
   feedListeners.forEach((f) => f());
 }
 
-/** Kişinin beğendikleri: oturum başına tek sorgu, sonra yerelde güncellenir. */
-let liked: { uid: string; ids: Set<string> } | null = null;
-const listeners = new Set<() => void>();
-
-export function useLiked(uid: string | undefined) {
-  const [, force] = useState(0);
-  useEffect(() => {
-    const l = () => force((n) => n + 1);
+/**
+ * Kişinin beğendikleri ve kaydettikleri: oturum başına tek sorgu, sonra yerelde güncellenir. Her değişiklikte yeni nesne
+ * yazılır ve ekranlar useSyncExternalStore ile haber alır (React Compiler modül değişkenindeki değişikliği kendiliğinden
+ * görmez; yoksa sayfa yenilenince kalpler boş kalabiliyordu). Açılışta okuma reddedilirse kısa süre sonra bir kez daha denenir.
+ */
+function idStore(read: (uid: string) => Promise<Set<string>>) {
+  let state: { uid: string; ids: Set<string> } | null = null;
+  const loading = new Set<string>();
+  const listeners = new Set<() => void>();
+  const subscribe = (l: () => void) => {
     listeners.add(l);
-    if (uid && liked?.uid !== uid) {
-      liked = { uid, ids: new Set() };
-      postRepository.likedIds(uid).then((ids) => {
-        if (liked?.uid === uid) liked.ids = ids;
-        listeners.forEach((f) => f());
-      }, () => {});
-    }
     return () => {
       listeners.delete(l);
     };
-  }, [uid]);
-  return (id: string) => (!!uid && liked?.uid === uid && liked.ids.has(id));
+  };
+  const snapshot = () => state;
+  const publish = (next: { uid: string; ids: Set<string> }) => {
+    state = next;
+    listeners.forEach((l) => l());
+  };
+  const EMPTY = new Set<string>();
+
+  return {
+    use(uid: string | undefined) {
+      const current = useSyncExternalStore(subscribe, snapshot, snapshot);
+      useEffect(() => {
+        let retry: ReturnType<typeof setTimeout> | undefined;
+        const load = (again: boolean) => {
+          if (!uid || state?.uid === uid || loading.has(uid)) return;
+          loading.add(uid);
+          read(uid).then(
+            (ids) => {
+              loading.delete(uid);
+              publish({ uid, ids });
+            },
+            () => {
+              loading.delete(uid);
+              if (again) retry = setTimeout(() => load(false), 2000);
+            },
+          );
+        };
+        load(true);
+        return () => {
+          if (retry) clearTimeout(retry);
+        };
+      }, [uid]);
+      const ids = uid && current?.uid === uid ? current.ids : EMPTY;
+      return (id: string) => ids.has(id);
+    },
+    set(uid: string, id: string, on: boolean) {
+      if (state?.uid !== uid) return;
+      const next = new Set(state.ids);
+      if (on) next.add(id);
+      else next.delete(id);
+      publish({ uid, ids: next });
+    },
+  };
+}
+
+const likedStore = idStore((uid) => postRepository.likedIds(uid));
+const savedStore = idStore((uid) => postRepository.savedIds(uid));
+
+export function useLiked(uid: string | undefined) {
+  return likedStore.use(uid);
 }
 
 /** Beğen / geri al: veritabanı, önbellek ve kalpler birlikte. Döner: yeni sayı. */
 export async function toggleLike(post: Pick<Post, 'id' | 'likeCount'>, uid: string, isLiked: boolean): Promise<number> {
   if (isLiked) await postRepository.unlike(post.id, uid);
   else await postRepository.like(post.id, uid);
-  if (liked?.uid === uid) {
-    if (isLiked) liked.ids.delete(post.id);
-    else liked.ids.add(post.id);
-  }
   const count = Math.max(0, post.likeCount + (isLiked ? -1 : 1));
   patchCachedPost(post.id, { likeCount: count });
-  listeners.forEach((f) => f());
+  likedStore.set(uid, post.id, !isLiked);
   return count;
 }
 
-/** Kaydettiklerim: oturum başına tek sorgu, sonra yerelde güncellenir (akıştaki kaydet işareti). */
-let saved: { uid: string; ids: Set<string> } | null = null;
-const savedListeners = new Set<() => void>();
-
+/** Akıştaki kaydet işareti (Kaydettiklerim). */
 export function useSaved(uid: string | undefined) {
-  const [, force] = useState(0);
-  useEffect(() => {
-    const l = () => force((n) => n + 1);
-    savedListeners.add(l);
-    if (uid && saved?.uid !== uid) {
-      saved = { uid, ids: new Set() };
-      postRepository.savedIds(uid).then((ids) => {
-        if (saved?.uid === uid) saved.ids = ids;
-        savedListeners.forEach((f) => f());
-      }, () => {});
-    }
-    return () => {
-      savedListeners.delete(l);
-    };
-  }, [uid]);
-  return (id: string) => (!!uid && saved?.uid === uid && saved.ids.has(id));
+  return savedStore.use(uid);
 }
 
 /** Kaydet / kaldır: veritabanı ve işaret birlikte. */
 export async function toggleSave(postId: string, uid: string, isSaved: boolean): Promise<void> {
   if (isSaved) await postRepository.unsave(uid, postId);
   else await postRepository.save(uid, postId);
-  if (saved?.uid === uid) {
-    if (isSaved) saved.ids.delete(postId);
-    else saved.ids.add(postId);
-  }
-  savedListeners.forEach((f) => f());
+  savedStore.set(uid, postId, !isSaved);
 }
 
 /** Gönderiyi paylaşanın sayfası: işletme adına paylaşıldıysa işletme sayfası, değilse kişinin profili. */
