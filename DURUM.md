@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 3 Kasım 2026 ("{Şehir} kareleri", Seyahat ve belediye kapakları, aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
+Son güncelleme: 3 Kasım 2026 (PR #55 kuralları ve dizinleri yüklendi; "{Şehir} kareleri", Seyahat ve belediye kapakları, aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -772,6 +772,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   are currently unavailable for this project", 27 Ekim). Bu yüzden panel ve uygulama Firebase'in hazır şablonunun Türkçesini
   ister (`languageCode = 'tr'`); gönderen adı ve metin CityJoy'a özel değil. Kalıcı çözüm: ileride kendi e-posta sunucusu
   (SMTP settings) ya da Firebase Destek'ten şablon izni. Proje ayarlarındaki "Herkese açık ad" CityJoy olmalı (%APP_NAME%).
+- **PR #55 kuralları ve 2 yeni dizin yüklendi (3 Kasım 2026)** (Çarşı ilan fotoğrafları, aktivite ve Seyahat/belediye
+  kapakları, "{Şehir} kareleri", Keşfet albümü 10 fotoğraf ve video, konum rozeti; Eren'in isteğiyle Claude bu bilgisayardan
+  yükledi; ilk denemede Google tarafında geçici 503 hatası, ikincisinde "Deploy complete!"). Storage kuralları ve sunucu
+  işlevleri Blaze bekliyor. Panel (Seyahat > Kareler sekmesi) henüz yeniden yüklenmedi: `npm run panel:deploy`.
 - **Kurallar ve dizinler 31 Ekim'de yüklendi** (işletmeye mesaj, sohbeti sil; PR #42 birleştikten sonra, Eren'in isteğiyle Claude
   bu bilgisayardan yükledi).
 - **Kurallar ve dizinler 29 Ekim akşamı yüklendi** (yol üstü tesis, Yoldayım dizini, roadsidePacks; PR #36 sonrası).
