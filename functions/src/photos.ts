@@ -22,12 +22,13 @@ export interface MediaField {
   owners?: (d: DocumentData) => unknown[];
 }
 
-/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı (`media/{yükleyen}/{tür}/...`). */
+/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı, ilan fotoğrafları (`media/{yükleyen}/{tür}/...`). */
 export const MEDIA_FIELDS = {
   events: [{ key: 'cover', owners: (d) => [d.preparedBy] }],
   officialProfiles: [{ key: 'logo' }],
   publicProfiles: [{ key: 'photo' }],
   businesses: [{ key: 'logo' }, { key: 'gallery', owners: (d) => [d.ownerUid, ...(Array.isArray(d.managerUids) ? d.managerUids : [])] }],
+  listings: [{ key: 'photos', owners: (d) => [d.ownerUid] }],
 } satisfies Record<string, MediaField[]>;
 
 const pathsOf = (v: unknown): string[] =>
@@ -49,5 +50,15 @@ export async function handleMediaChange(fields: MediaField[], before: DocumentDa
     }
   }
   await Promise.all(gone.map((p) => deleteFiles(p)));
+  return gone;
+}
+
+/**
+ * Çarşı ilanı: kayıttan çıkan fotoğrafların dosyaları silinir. Moderatör ilanı kaldırınca (sahibi kaldırırken alanı
+ * kendisi boşaltır) fotoğraf alanı da boşaltılır; bu yazım işlevi yeniden tetikler ve dosyalar o zaman silinir.
+ */
+export async function handleListingPhotos(db: Firestore, id: string, before: DocumentData | undefined, after: DocumentData | undefined, deleteFiles: DeleteFiles): Promise<string[]> {
+  const gone = await handleMediaChange(MEDIA_FIELDS.listings, before, after, deleteFiles);
+  if (after?.status === 'kaldirildi' && Array.isArray(after.photos) && after.photos.length) await db.doc(`listings/${id}`).update({ photos: [] });
   return gone;
 }

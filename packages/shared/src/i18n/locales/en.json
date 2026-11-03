@@ -1850,7 +1850,6 @@
     "notListed": "Not shown in the list (expired or under review)",
     "favorite": "Add to favourites",
     "unfavorite": "Remove from favourites",
-    "photosSoon": "Photos coming soon",
     "gone": "This listing no longer exists.",
     "saveError": "Could not save. Check your connection and try again.",
     "createError": "Listing could not be posted. You may have reached your daily limit (2 a day for new accounts, then 5).",
@@ -1891,7 +1890,9 @@
       "swapForHint": "Optional",
       "condition": "Condition",
       "description": "Description",
-      "descriptionHint": "Mention flaws, size and how it will be handed over. Do not add a phone number."
+      "descriptionHint": "Mention flaws, size and how it will be handed over. Do not add a phone number.",
+      "photos": "Photos",
+      "photosHint": "Up to 6 photos; the first one is shown in the list. Add real photos of the item. Keep people, plates and addresses out of shot."
     },
     "errors": {
       "kind": "Choose a listing type.",

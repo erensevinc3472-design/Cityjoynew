@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +16,7 @@ import { useRelativeTime } from './post-card';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
-/** Kategori başına renk çifti [açık, koyu]; fotoğraf gelene kadar ilanın görseli kategori simgesidir. */
+/** Kategori başına renk çifti [açık, koyu]; fotoğrafı olmayan ilanın görseli kategori simgesidir. */
 export const CATEGORY_COLORS: Record<ListingCategory, readonly [string, string]> = {
   elektronik: ['#7FB2F0', '#3E6FC2'],
   'ev-mobilya': ['#E3B47A', '#B07A3C'],
@@ -31,7 +32,7 @@ export function ListingArt({ category, size = 64 }: { category: ListingCategory;
   return <GlossyIcon icon={LISTING_CATEGORY_ICONS[category] as IconName} colors={CATEGORY_COLORS[category]} size={size} />;
 }
 
-/** Çarşı listesindeki ilan: kategori görseli, başlık, fiyat, ilçe ve zaman; sağda favori kalbi. */
+/** Çarşı listesindeki ilan: ilk fotoğraf (yoksa kategori görseli), başlık, fiyat, ilçe ve zaman; sağda favori kalbi. */
 export function ListingCard({ item, favorite, onFavorite, onPress }: { item: Listing; favorite?: boolean; onFavorite?(): void; onPress(): void }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -48,7 +49,18 @@ export function ListingCard({ item, favorite, onFavorite, onPress }: { item: Lis
         accessibilityLabel={[item.title, price, sold ? t('carsi.sold') : null, district, ago(item.listedAt)].filter(Boolean).join(', ')}
         onPress={onPress}
         style={({ pressed }) => [styles.body, { opacity: pressed ? 0.85 : 1 }]}>
-        <ListingArt category={item.category} />
+        {item.photos[0] ? (
+          <Image
+            source={{ uri: item.photos[0].url }}
+            style={[styles.photo, { backgroundColor: c.surfaceStrong }]}
+            contentFit="cover"
+            transition={150}
+            recyclingKey={item.photos[0].path}
+            accessibilityIgnoresInvertColors
+          />
+        ) : (
+          <ListingArt category={item.category} />
+        )}
         <View style={styles.texts}>
           <AppText variant="label" numberOfLines={2}>{item.title}</AppText>
           <View style={styles.line}>
@@ -80,6 +92,7 @@ export function ListingCard({ item, favorite, onFavorite, onPress }: { item: Lis
 const styles = StyleSheet.create({
   card: { flexDirection: 'row', alignItems: 'center', borderRadius: radius.lg, borderWidth: 1, shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } },
   body: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md },
+  photo: { width: 64, height: 64, borderRadius: radius.md },
   texts: { flex: 1, gap: 2 },
   line: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' },
   tag: { paddingHorizontal: spacing.sm, borderRadius: radius.pill, borderWidth: 1 },

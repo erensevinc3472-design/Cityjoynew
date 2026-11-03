@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 3 Kasım 2026 (Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
+Son güncelleme: 3 Kasım 2026 (Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -45,8 +45,8 @@ Son güncelleme: 3 Kasım 2026 (Keşfet beğeni ve kaydet işaretleri düzeltmes
 ```sh
 npm install
 npm test                      # ortak paket testleri (150)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (138; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (25; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (139; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (27; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -640,6 +640,17 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   her değişiklikte yeni nesne, `useSyncExternalStore`; açılışta okuma reddedilirse 2 sn sonra bir kez daha). Önceden
   sayfa yenilenince boş görünebiliyor, ilk okuma başarısız olursa oturum boyunca boş kalıyordu. Emülatörde web
   sürümüyle denendi (beğeni + kaydet, sayfa yenileme sonrası doğru). Kural değişikliği yok.
+- **Çarşı ilan fotoğrafları (3 Kasım, aynı dal; Blaze ile çalışır).** İlan formunda en çok 6 fotoğraf (`MediaPicker`, tür
+  `ilan`: `media/{sahip}/ilan/...`); seçilince küçültülüp hemen yüklenir, ilanla kaydedilir; düzenlerken eklenir/çıkarılır.
+  Listede ilk fotoğraf kapak (yoksa kategori simgesi), ilan sayfasında yana kaydırılan fotoğraflar ("1/2", noktalar).
+  Panel > Moderasyon > Çarşı şikâyetlerinde fotoğraflar küçük görünür. Kurallar: en çok 6, her dosya yolu ilan sahibinin
+  `ilan` klasöründe (kural motorunun 1000 işlem sınırı yüzünden yalnızca yol; adresi uygulama denetler, `photoFrom`);
+  fotoğraflar değişmediyse yeniden denetlenmez; sahibi kaldırırken fotoğraflar boşaltılır. Storage kurallarına `ilan`
+  türü eklendi. Sunucu `listingPhotosChanged`: ilandan çıkan dosyayı siler; moderatör kaldırınca alanı boşaltır (dosyalar
+  ardından silinir); hesap silinince `media/{uid}/ilan/` silinir. Fotoğraf şimdilik isteğe bağlı (en az bir fotoğraf
+  zorunlu mu, Eren'e soruldu). Testler: kurallar 139, sunucu 27, ortak 150. Emülatörde web sürümüyle denendi (iki
+  fotoğrafla ilan, düzenleyip birini değiştirme, başka kullanıcıda liste ve ilan sayfası). **Kurallar değişti:
+  birleşince Firestore kuralları yüklenmeli;** Storage kuralları ve işlevler Blaze bekliyor.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -747,7 +758,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
 5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini, kişi profil fotoğrafı~~ (31 Ekim - 1 Kasım, Blaze
-   bekliyor). Kalan: aktivite görseli, belediye fotoğrafları, "{Şehir}'dan Kareler", Çarşı ilan fotoğrafları.
+   bekliyor), ~~Çarşı ilan fotoğrafları~~ (3 Kasım). Kalan: aktivite görseli, belediye fotoğrafları, "{Şehir}'dan Kareler".
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 

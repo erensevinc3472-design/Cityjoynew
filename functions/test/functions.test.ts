@@ -6,7 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { handleAnnouncementWrite } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
-import { handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
+import { handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
 
@@ -275,7 +275,7 @@ describe('temizlik', () => {
     await db.doc('users/u2').set({ displayName: 'Ayşe' });
     const deleted: string[] = [];
     await deleteUserLeftovers(db, 'u1', async (p) => void deleted.push(p));
-    expect(deleted).toEqual(['posts/u1/']);
+    expect(deleted).toEqual(['posts/u1/', 'media/u1/ilan/']);
     for (const p of ['users/u1', 'users/u1/settings/notifications', 'pushTokens/u1', 'publicProfiles/u1', 'pushCount/u1', 'serviceSuggestions/s1', 'usage/u-u1~oneri']) {
       expect((await db.doc(p).get()).exists, p).toBe(false);
     }
@@ -364,5 +364,31 @@ describe('etkinlik, kurum ve işletme görselleri', () => {
     const own = { preparedBy: 'k1', cover: m('k1', 'etkinlik', 'dddddddddd') };
     expect(await handleMediaChange(MEDIA_FIELDS.officialProfiles, { logo: own.cover }, { logo: own.cover }, del)).toEqual([]);
     expect(await handleMediaChange(MEDIA_FIELDS.events, own, { preparedBy: 'k1' }, async (p) => void gone.push(p))).toEqual([own.cover.path]);
+  });
+});
+
+describe('Çarşı ilan fotoğrafları', () => {
+  const m = (uid: string, id: string) => ({ path: `media/${uid}/ilan/${id}.jpg`, url: 'u', width: 10, height: 10 });
+
+  it('ilandan çıkan fotoğrafın dosyası silinir; başkasının klasöründeki dosyaya dokunulmaz', async () => {
+    const deleted: string[] = [];
+    const del = async (p: string) => void deleted.push(p);
+    const a = m('s1', 'aaaaaaaaaa');
+    const b = m('s1', 'bbbbbbbbbb');
+    const before = { ownerUid: 's1', status: 'yayinda', photos: [a, b] };
+    expect(await handleListingPhotos(db, 'l1', before, { ...before, photos: [b] }, del)).toEqual([a.path]);
+    expect(await handleListingPhotos(db, 'l1', before, before, del)).toEqual([]);
+    expect(await handleListingPhotos(db, 'l1', { ...before, photos: [m('x9', 'cccccccccc')] }, { ...before, photos: [] }, del)).toEqual([]);
+    expect(deleted).toEqual([a.path]);
+  });
+
+  it('moderatör kaldırınca fotoğraf alanı boşaltılır; sahibi kaldırınca dosyalar silinir', async () => {
+    const a = m('s1', 'aaaaaaaaaa');
+    const live = { ownerUid: 's1', status: 'yayinda', photos: [a] };
+    await db.doc('listings/l2').set({ ...live, status: 'kaldirildi' });
+    expect(await handleListingPhotos(db, 'l2', live, { ...live, status: 'kaldirildi' }, async () => {})).toEqual([]);
+    expect((await db.doc('listings/l2').get()).get('photos')).toEqual([]);
+    const deleted: string[] = [];
+    expect(await handleListingPhotos(db, 'l2', { ...live, status: 'kaldirildi' }, { ...live, status: 'kaldirildi', photos: [] }, async (p) => void deleted.push(p))).toEqual([a.path]);
   });
 });

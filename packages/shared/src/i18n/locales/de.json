@@ -1850,7 +1850,6 @@
     "notListed": "Nicht in der Liste (abgelaufen oder in Prüfung)",
     "favorite": "Zu Favoriten hinzufügen",
     "unfavorite": "Aus Favoriten entfernen",
-    "photosSoon": "Fotos folgen bald",
     "gone": "Diese Anzeige gibt es nicht mehr.",
     "saveError": "Speichern fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.",
     "createError": "Anzeige konnte nicht aufgegeben werden. Vielleicht ist dein Tageslimit erreicht (neue Konten 2 pro Tag, danach 5).",
@@ -1891,7 +1890,9 @@
       "swapForHint": "Optional",
       "condition": "Zustand",
       "description": "Beschreibung",
-      "descriptionHint": "Nenne Mängel, Maße und Übergabe. Keine Telefonnummer angeben."
+      "descriptionHint": "Nenne Mängel, Maße und Übergabe. Keine Telefonnummer angeben.",
+      "photos": "Fotos",
+      "photosHint": "Bis zu 6 Fotos; das erste wird in der Liste gezeigt. Füge echte Fotos des Artikels hinzu. Keine Personen, Kennzeichen oder Adressen zeigen."
     },
     "errors": {
       "kind": "Wähle eine Anzeigenart.",

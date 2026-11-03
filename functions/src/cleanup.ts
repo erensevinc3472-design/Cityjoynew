@@ -32,8 +32,9 @@ async function deleteExpired(db: Firestore, collection: string, now: Date): Prom
  * (hesap ekranı); bu, telefon yarıda kapanırsa ya da hesap konsoldan silinirse kalanları temizleyen güvenlik ağıdır.
  */
 export async function deleteUserLeftovers(db: Firestore, uid: string, deleteFiles: DeleteFiles): Promise<void> {
-  // Gönderi fotoğrafları (Storage).
+  // Gönderi ve Çarşı ilan fotoğrafları (Storage; ilan fotoğrafını yalnızca sahibi bağlar).
   await deleteFiles(`posts/${uid}/`);
+  await deleteFiles(`media/${uid}/ilan/`);
   await db.recursiveDelete(db.doc(`users/${uid}`));
   await Promise.all(['pushTokens', 'publicProfiles', 'chatQuota', 'pushCount'].map((c) => db.doc(`${c}/${uid}`).delete()));
   // Hizmet önerileri ve günlük sınır sayaçları.

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { inboxSection, threadId, type ChatContext, type ListingInput } from '@cityjoy/shared';
 import { createFirestoreListingRepository, createFirestoreMessageRepository, createListingModeration } from '@cityjoy/shared/firebase';
-import { collection, doc, getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where, type Firestore } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -58,6 +58,12 @@ const input = (patch: Partial<ListingInput> = {}): ListingInput => ({
   ...patch,
 });
 
+const media = (uid: string, id: string, kind = 'ilan') => {
+  const p = `media/${uid}/${kind}/${id}.jpg`;
+  return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 800, height: 600 };
+};
+const photos = (n: number, uid = 'ali') => Array.from({ length: n }, (_, i) => media(uid, `ilanFoto${String(i).padStart(4, '0')}`));
+
 /** Kuralları atlayarak ilanın yayın tarihini geri alır (yenileme ve süre denemeleri). */
 const age = (id: string, days: number) =>
   env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), 'listings', id), { listedAt: Timestamp.fromDate(new Date(Date.now() - days * 86400000)) }));
@@ -74,7 +80,7 @@ describe('Çarşı ilanları', () => {
     await assertFails(repo('veli').create('veli', 'Ayşe K.', input()));
   });
 
-  it('fiyat türe uyar: satılık ve kiralıkta zorunlu, ücretsiz ve takasta yok; kiralıkta süre birimi; fotoğraf şimdilik yok', async () => {
+  it('fiyat türe uyar: satılık ve kiralıkta zorunlu, ücretsiz ve takasta yok; kiralıkta süre birimi; düz adresle fotoğraf olmaz', async () => {
     await assertFails(repo('ali').create('ali', 'Ali Y.', input({ price: null })));
     await assertFails(repo('ali').create('ali', 'Ali Y.', input({ kind: 'ucretsiz', price: 100 })));
     await assertFails(repo('ali').create('ali', 'Ali Y.', input({ kind: 'kiralik', price: 200, rentUnit: null })));
@@ -110,6 +116,26 @@ describe('Çarşı ilanları', () => {
     await repo('ali').remove(id);
     await assertFails(getDoc(doc(fs('ayse'), 'listings', id)));
     expect(await repo('ali').listMine('ali')).toHaveLength(0);
+  });
+
+  it('fotoğraflar: en çok 6, yalnızca sahibinin kendi ilan dosyaları; düzenlenir; kaldırınca boşalır', async () => {
+    const id = await repo('ali').create('ali', 'Ali Y.', input({ photos: photos(2) }));
+    expect((await repo('ayse').get(id))?.photos.map((p) => p.path)).toEqual([photos(2)[0].path, photos(2)[1].path]);
+    await assertSucceeds(repo('ali').create('ali', 'Ali Y.', input({ photos: photos(6) })));
+    // Yedinci fotoğraf, başkasının dosyası, başka türdeki dosya olmaz.
+    // (Uygulama 6'dan fazlasını göndermez; kural da doğrudan yazımı reddeder.)
+    await assertFails(updateDoc(doc(fs('ali'), 'listings', id), { photos: photos(7), updatedAt: serverTimestamp() }));
+    await assertFails(repo('ali').create('ali', 'Ali Y.', input({ photos: [media('ayse', 'baskasininFoto')] })));
+    await assertFails(repo('ali').create('ali', 'Ali Y.', input({ photos: [media('ali', 'profilFotosu1', 'profil')] })));
+    // Sahibi ekler, çıkarır; başkasının dosyasını ekleyemez.
+    await assertSucceeds(repo('ali').update(id, input({ photos: photos(3) })));
+    await assertSucceeds(repo('ali').update(id, input({ photos: [] })));
+    await assertFails(repo('ali').update(id, input({ photos: [media('ayse', 'baskasininFoto')] })));
+    // Kaldırırken fotoğraflar boşaltılmalı (dosyaları sunucu siler).
+    await assertSucceeds(repo('ali').update(id, input({ photos: photos(1) })));
+    await assertFails(updateDoc(doc(fs('ali'), 'listings', id), { status: 'kaldirildi', title: '', description: '', swapFor: '', ownerName: '', updatedAt: serverTimestamp() }));
+    await assertSucceeds(repo('ali').remove(id));
+    expect((await repo('ali').get(id))?.photos).toEqual([]);
   });
 
   it('sahibi düzenler, satıldı işaretler, son günlerde yeniler; başkası dokunamaz', async () => {

@@ -361,7 +361,8 @@ Ayrı Reels sekmesi ilk sürümde yoktur (video depolama ve aktarım maliyeti, m
   konum değiştirme düğmesi yok (Eren, 31 Ekim): kişi yalnızca kayıtlı ilini görür ve oraya ilan verir. Günde en çok 5 ilan (ilk 7 gün 2). İlan 30 gün listede kalır, son 3 günde sahibi
   yeniler. 3 şikâyette listeden düşer, Panel > Moderasyon'da kaldırılır ya da yerinde kalır. İlan sohbeti ayrı sohbettir,
   istek aşaması yoktur, alıcı başlatır; iki taraf da Mesajlar > Çarşı'da görür. Telefon numarası alanı yok. Fotoğraflar
-  Blaze ile (en çok 6). Formdaki yasaklı ürünler: silah ve mühimmat, ilaç, alkol ve tütün, canlı hayvan, sahte / taklit,
+  en çok 6 (3 Kasım 2026 yapıldı, Blaze ile çalışır; ilki listede kapak; şimdilik isteğe bağlı, "gerçek fotoğraf
+  zorunluluğu" (5.1 madde 3) için en az bir fotoğraf istenip istenmeyeceği SORULACAK). Formdaki yasaklı ürünler: silah ve mühimmat, ilaç, alkol ve tütün, canlı hayvan, sahte / taklit,
   çalıntı mal, hesap / kart / kimlik, yetişkin içerik. **Avukata sorulacak:** yasaklı ürün listesi, Çarşı kullanım
   şartları (CityJoy alışverişin tarafı değildir, ödeme aracılığı yok, sorumluluk sınırı), ilan verenin kimlik bilgisi
   saklama yükümlülüğü (6563 sayılı Kanun, aracı hizmet sağlayıcı) ve şikâyet üzerine kaldırma süreleri.

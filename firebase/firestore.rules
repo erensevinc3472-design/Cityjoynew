@@ -2149,13 +2149,29 @@ service cloud.firestore {
             ? (d.price is int && d.price >= 1 && d.price <= 10000000)
             : d.price == null)
         && (d.kind == 'kiralik' ? d.rentUnit in ['gun', 'hafta', 'ay'] : d.rentUnit == null)
-        && d.photos is list && d.photos.size() == 0
+        && validListingPhotos(d)
         && validLocation(d.region) && 'neighbourhoodId' in d.region
         && validSearchKeys(d, 100)
         && d.updatedAt == request.time;
     }
+    // İlan fotoğrafları (en çok 6): hepsi ilan sahibinin kendi yüklediği `media/{sahip}/ilan/...` dosyaları (ilanı yalnızca
+    // sahibi düzenler; başkasının dosyası bağlanıp kaldırılarak sunucuya sildirilemez). Kural motorunun işlem sınırı
+    // (1000) yüzünden yalnızca dosya yolu denetlenir; adresin o dosyayı gösterdiğini ve biçimi uygulama denetler (yalnızca
+    // kendi depomuzdaki adres gösterilir). Fotoğraflar değişmediyse yeniden denetlenmez.
+    function validListingPhotos(d) {
+      let l = d.photos;
+      let re = 'media/' + d.ownerUid + '/ilan/[A-Za-z0-9]{10,40}[.]jpg';
+      return l is list && l.size() <= 6
+        && ((resource != null && resource.data.get('photos', []) == l)
+            || ((l.size() < 1 || l[0].path.matches(re))
+                && (l.size() < 2 || l[1].path.matches(re))
+                && (l.size() < 3 || l[2].path.matches(re))
+                && (l.size() < 4 || l[3].path.matches(re))
+                && (l.size() < 5 || l[4].path.matches(re))
+                && (l.size() < 6 || l[5].path.matches(re))));
+    }
     function listingContentKeys() {
-      return ['kind', 'category', 'condition', 'title', 'description', 'price', 'rentUnit', 'swapFor', 'searchKeys', 'updatedAt'];
+      return ['kind', 'category', 'condition', 'title', 'description', 'price', 'rentUnit', 'swapFor', 'photos', 'searchKeys', 'updatedAt'];
     }
     // Günlük ilan sayacı bu yazımda değişti (sayacın kendi kuralı yalnızca +1 ya da süresi dolunca sıfırlamaya izin verir).
     function listingQuotaCounted() {
@@ -2194,13 +2210,14 @@ service cloud.firestore {
         && resource.data.listedAt <= request.time - duration.value(27, 'd')
         && request.resource.data.listedAt == request.time && request.resource.data.updatedAt == request.time
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['listedAt', 'updatedAt']);
-      // Sahibi kaldırır: yazılar, ad ve arama anahtarları boşaltılır.
+      // Sahibi kaldırır: yazılar, ad, fotoğraflar ve arama anahtarları boşaltılır (dosyaları sunucu siler).
       allow update: if resource.data.ownerUid == request.auth.uid
         && request.resource.data.updatedAt == request.time
         && request.resource.data.status == 'kaldirildi' && request.resource.data.title == ''
         && request.resource.data.description == '' && request.resource.data.swapFor == '' && request.resource.data.ownerName == ''
+        && request.resource.data.photos == []
         && !('searchKeys' in request.resource.data)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'title', 'description', 'swapFor', 'ownerName', 'searchKeys', 'updatedAt']);
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'title', 'description', 'swapFor', 'ownerName', 'photos', 'searchKeys', 'updatedAt']);
       // Şikâyet sayacı: yalnızca kendi şikâyet kaydıyla tam bir artar.
       allow update: if signedIn()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])

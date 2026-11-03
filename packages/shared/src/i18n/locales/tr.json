@@ -1850,7 +1850,6 @@
     "notListed": "Listede görünmüyor (süresi doldu ya da inceleniyor)",
     "favorite": "Favorilere ekle",
     "unfavorite": "Favorilerden çıkar",
-    "photosSoon": "Fotoğraf ekleme yakında",
     "gone": "Bu ilan artık yok.",
     "saveError": "Kaydedilemedi. Bağlantını kontrol edip tekrar dene.",
     "createError": "İlan verilemedi. Günlük ilan sınırın dolmuş olabilir (yeni hesaplarda günde 2, sonra 5).",
@@ -1891,7 +1890,9 @@
       "swapForHint": "İsteğe bağlı",
       "condition": "Durumu",
       "description": "Açıklama",
-      "descriptionHint": "Kusurları, ölçüleri, teslim biçimini yaz. Telefon numarası yazma."
+      "descriptionHint": "Kusurları, ölçüleri, teslim biçimini yaz. Telefon numarası yazma.",
+      "photos": "Fotoğraflar",
+      "photosHint": "En çok 6 fotoğraf; ilki listede görünür. Ürünün kendi fotoğrafını ekle. Kişi, plaka ya da adres görünmesin."
     },
     "errors": {
       "kind": "İlan türünü seç.",

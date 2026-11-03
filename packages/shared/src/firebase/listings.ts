@@ -26,6 +26,7 @@ import {
   type ListingKind,
   type ListingReportReason,
 } from '../listings/listings';
+import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
 import { quotaAfter } from '../messages/messages';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
@@ -50,7 +51,8 @@ function fromDoc(id: string, d: DocumentData): Listing {
     ownerUid: d.ownerUid,
     ownerName: d.ownerName ?? '',
     status: d.status,
-    photos: d.photos ?? [],
+    // Yalnızca kendi depomuzdaki geçerli görseller gösterilir.
+    photos: Array.isArray(d.photos) ? (d.photos as unknown[]).map(photoFrom).filter((p): p is Photo => !!p) : [],
     reportCount: d.reportCount ?? 0,
     cleared: d.cleared === true,
     // Sunucu zamanı henüz yazılmadıysa (yerel önbellek) şimdiki zaman sayılır.
@@ -68,6 +70,7 @@ const content = (l: ListingInput) => ({
   price: l.price,
   rentUnit: l.rentUnit,
   swapFor: l.kind === 'takas' ? l.swapFor.trim() : '',
+  photos: (l.photos ?? []).slice(0, LISTING_LIMITS.photos).map(cleanPhoto),
   searchKeys: searchKeys(`${l.title} ${l.description}`, LISTING_LIMITS.searchKeys, SEARCH_LIMITS.minPost),
 });
 
@@ -138,7 +141,6 @@ export function createFirestoreListingRepository(db: Firestore) {
         ownerUid: uid,
         ownerName: ownerName.slice(0, 40),
         status: 'yayinda',
-        photos: [],
         reportCount: 0,
         listedAt: serverTimestamp(),
         createdAt: serverTimestamp(),
@@ -169,10 +171,13 @@ export function createFirestoreListingRepository(db: Firestore) {
       await batch.commit();
     },
 
-    /** Sahibi kaldırır: yazılar ve ad boşaltılır (şikâyet kaydı varsa moderatör "kaldırıldı" görür). */
+    /**
+     * Sahibi kaldırır: yazılar, ad ve fotoğraflar boşaltılır (şikâyet kaydı varsa moderatör "kaldırıldı" görür).
+     * Fotoğraf dosyalarını sunucu siler.
+     */
     async remove(id: string): Promise<void> {
       const batch = writeBatch(db);
-      batch.update(ref(id), { status: 'kaldirildi', title: '', description: '', swapFor: '', ownerName: '', searchKeys: deleteField(), updatedAt: serverTimestamp() });
+      batch.update(ref(id), { status: 'kaldirildi', title: '', description: '', swapFor: '', ownerName: '', photos: [], searchKeys: deleteField(), updatedAt: serverTimestamp() });
       await batch.commit();
     },
 
@@ -228,7 +233,7 @@ export function createFirestoreListingRepository(db: Firestore) {
       for (const d of mine.docs) {
         if (d.get('status') === 'kaldirildi' && !d.get('title')) continue;
         const batch = writeBatch(db);
-        batch.update(d.ref, { status: 'kaldirildi', title: '', description: '', swapFor: '', ownerName: '', searchKeys: deleteField(), updatedAt: serverTimestamp() });
+        batch.update(d.ref, { status: 'kaldirildi', title: '', description: '', swapFor: '', ownerName: '', photos: [], searchKeys: deleteField(), updatedAt: serverTimestamp() });
         await batch.commit();
       }
     },

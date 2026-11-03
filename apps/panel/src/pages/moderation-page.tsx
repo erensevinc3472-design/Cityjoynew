@@ -369,6 +369,15 @@ function ListingReports({ user }: { user: PanelUser }) {
                           <summary>{t('announcements.showBody')}</summary>
                           <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.listing.description}</p>
                         </details>
+                        {r.listing.photos.length ? (
+                          <div className="photo-row">
+                            {r.listing.photos.map((p, i) => (
+                              <a key={p.path} href={p.url} target="_blank" rel="noreferrer noopener" title={t('moderation.posts.photo', { n: i + 1 })}>
+                                <img src={p.url} alt={t('moderation.posts.photo', { n: i + 1 })} loading="lazy" />
+                              </a>
+                            ))}
+                          </div>
+                        ) : null}
                         {r.listing.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.listings.removed')}</span> : r.listing.cleared ? <span className="pill ok">{t('moderation.listings.kept')}</span> : null}
                       </>
                     ) : (

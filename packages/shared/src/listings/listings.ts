@@ -1,4 +1,5 @@
 import { distanceKm } from '../business/business';
+import type { Photo } from '../media/photo';
 import { looksLikeRealEstate } from '../posts/posts';
 import { PROVINCE_CENTERS } from '../travel/plan';
 
@@ -7,7 +8,8 @@ import { PROVINCE_CENTERS } from '../travel/plan';
  * sonra; adı "Çarşı"). İlanda telefon numarası yoktur, alıcı ile satıcı uygulama içinden yazışır (Mesajlar > Çarşı).
  * İlanı yalnızca e-postası doğrulanmış yetişkin, kayıtlı mahallesiyle verir; ilan verirken telefonun konumu kayıtlı ille
  * karşılaştırılır (sahte konumla aşılabilir, tek önlem sayılmaz). Günlük ilan sınırı, üç şikâyette moderatöre düşme,
- * dolandırıcılık uyarıları. İlan 30 gün yayında kalır, sahibi yeniler. Fotoğraflar Storage (Blaze) ile gelecek.
+ * dolandırıcılık uyarıları. İlan 30 gün yayında kalır, sahibi yeniler. En çok 6 fotoğraf
+ * (Storage, Blaze ile çalışır).
  */
 
 export const LISTING_KINDS = ['satilik', 'kiralik', 'ucretsiz', 'takas'] as const;
@@ -58,6 +60,8 @@ export interface ListingInput {
   swapFor: string;
   /** İlan verenin kayıtlı konumu (kurallar denetler). */
   region: ListingRegion;
+  /** Ürün fotoğrafları (en çok 6, `media/{sahip}/ilan/...`); ilk fotoğraf listede kapak olur. Boş olabilir. */
+  photos?: Photo[];
 }
 
 export interface Listing extends ListingInput {
@@ -66,8 +70,7 @@ export interface Listing extends ListingInput {
   /** "Ayşe K." biçiminde, Keşfet adı. */
   ownerName: string;
   status: ListingStatus;
-  /** Storage yolları; Blaze gelene kadar boş. */
-  photos: string[];
+  photos: Photo[];
   reportCount: number;
   /** Moderatör şikâyetleri inceleyip "yerinde kalsın" dedi. */
   cleared: boolean;
