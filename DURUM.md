@@ -737,7 +737,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   günlük), 10 kişiden küçük gruplar "Diğer"; belediye hesabında başkan kartı ve "Başkanın istatistikleri". Profiller
   sayfasında başkan profili. Örnek hesaplarda tutarlı örnek sayılar ("Örnek veri" etiketi). Testler: kurallar 8 yeni,
   ortak 6 yeni; panel derlendi, mobil tür denetimi geçti; tarayıcıda belediye, muhtar, admin örnek hesaplarıyla ve
-  375 px genişlikte denendi. **Telefonda denenmedi. Kurallar değişti** (yüklenmeli). Gönderi istatistikleri sonraki adım.
+  375 px genişlikte denendi. **Telefonda denenmedi.** PR #60 birleşti; kurallar Firebase'e, panel cityjoynew.web.app'e yüklendi (3 Kasım, Claude). Gönderi istatistikleri sonraki adım.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.
