@@ -68,8 +68,8 @@
     "exploreHint": "Was dein Viertel und deine Stadt teilen"
   },
   "auth": {
-    "welcomeTitle": "Willkommen bei CityJoy",
-    "welcomeSubtitle": "Informationen, Ankündigungen und Dienste für deine Provinz, deinen Bezirk und dein Viertel an einem Ort.",
+    "welcomeTitle": "Alles in deiner Nachbarschaft an einem Ort",
+    "welcomeSubtitle": "Bekanntmachungen, Notdienstapotheken, Veranstaltungen und Dienste in der Nähe.",
     "signIn": "Anmelden",
     "signUp": "Registrieren",
     "email": "E-Mail",
@@ -87,8 +87,16 @@
     "acceptTerms": "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie.",
     "readPrivacy": "Ich habe die Datenschutzhinweise zur Verarbeitung personenbezogener Daten gelesen.",
     "read": "Lesen",
-    "slideToStart": "Zum Starten schieben",
-    "slideToStartHint": "Öffnet die Registrierung; du kannst auch tippen."
+    "slideToStart": "Wischen und loslegen",
+    "slideToStartHint": "Öffnet die Sprachauswahl; du kannst auch tippen.",
+    "welcomeKicker": "WILLKOMMEN",
+    "signInTitle": "Willkommen zurück",
+    "signInSubtitle": "Melde dich bei deinem Konto an.",
+    "signUpTitle": "Konto erstellen",
+    "signUpSubtitle": "Mit wenigen Angaben sofort loslegen.",
+    "forgotPasswordShort": "Passwort vergessen",
+    "noAccountLead": "Noch kein Konto?",
+    "haveAccountLead": "Schon ein Konto?"
   },
   "errors": {
     "required": "Dieses Feld ist erforderlich.",
@@ -657,8 +665,12 @@
         "hint": "Öffentliche Bibliotheken"
       },
       "banka": {
-        "title": "Banken",
-        "hint": "Bankfilialen"
+        "title": "Banken und Geldautomaten",
+        "hint": "Bankfilialen und Geldautomaten"
+      },
+      "ibadethane": {
+        "title": "Gotteshäuser",
+        "hint": "Moscheen, Kirchen, Synagogen und Cemevis"
       }
     },
     "townhallIntro": "Alle städtischen Dienste an einem Ort",
@@ -670,7 +682,14 @@
     "serviceGuide": "Dienstleistungsführer",
     "otherMunicipalities": "Andere Bezirksgemeinden",
     "districtCount_one": "{{count}} Bezirk",
-    "districtCount_other": "{{count}} Bezirke"
+    "districtCount_other": "{{count}} Bezirke",
+    "frequent": "Häufig genutzt",
+    "frequentItem": {
+      "water": "Wasserstörung",
+      "waste": "Müll und Reinigung",
+      "police": "Ordnungsamt",
+      "funeral": "Bestattungsdienste"
+    }
   },
   "announcements": {
     "title": "Bekanntmachungen",
@@ -849,7 +868,8 @@
     "gatheringDistrict": "Für Ihr Viertel ist kein Sammelplatz eingetragen; es werden die in {{place}} gezeigt. Verbindliche Angaben finden Sie bei e-Devlet oder AFAD.",
     "noGathering": "Angaben zu Sammelplätzen wurden noch nicht hinzugefügt. Sie finden sie bei e-Devlet (Suche „Notfall-Sammelplatz“).",
     "municipalities": "Meine Gemeinde",
-    "feedSoon": "Der Viertel-Feed (Beiträge der Nachbarn) kommt mit „Entdecken“."
+    "feedSoon": "Der Viertel-Feed (Beiträge der Nachbarn) kommt mit „Entdecken“.",
+    "places": "In deinem Viertel"
   },
   "activities": {
     "title": "Aktivitäten",
@@ -2005,5 +2025,23 @@
       "change": "Wenn du dein Viertel änderst, wird das Abzeichen automatisch entfernt.",
       "limit": "Das Abzeichen ist ein Vertrauenszeichen; mit Apps für falsche Standorte lässt es sich umgehen, daher ist es allein kein Beweis."
     }
+  },
+  "onboarding": {
+    "step": "Schritt {{n}} von {{total}}",
+    "locationTitle": "Wir zeigen dir, was in deiner Nähe ist",
+    "locationDesc": "Mit deinem Standort finden wir dein Viertel und passen die Inhalte an.",
+    "locationWhy1": "Bekanntmachungen für Viertel und Bezirk",
+    "locationWhy2": "Notdienstapotheken und Dienste in der Nähe",
+    "locationWhy3": "Im Notfall deinen Standort an Angehörige senden (SOS)",
+    "locationNote": "Dein Standort wird mit niemandem geteilt. Ohne Erlaubnis wählst du dein Viertel aus einer Liste.",
+    "locationFound": "Anhand deines Standorts: {{place}}.",
+    "change": "Ändern",
+    "notifyTitle": "Verpasse keine wichtigen Meldungen",
+    "notifyDesc": "Wir senden nur Benachrichtigungen, die dir nützen.",
+    "notifySample1": "Dringend · Geplante Wasserabschaltung in deinem Viertel",
+    "notifySample2": "Ortsvorsteher · Öffnungszeiten geändert",
+    "notifySample3": "Neue Nachricht · Ist das Fahrrad noch zu haben?",
+    "targetingConsent": "Sende mir passende Benachrichtigungen nach meinem Alter und optional Geschlecht und Beruf.",
+    "notifyNote": "Beides ist freiwillig und jederzeit in den Einstellungen abschaltbar."
   }
 }

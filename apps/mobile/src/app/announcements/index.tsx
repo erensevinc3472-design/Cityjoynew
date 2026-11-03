@@ -25,7 +25,7 @@ export default function AnnouncementsScreen() {
   const place = [location?.districtId ? repo.getDistrict(location.districtId)?.name : null, location ? repo.getProvince(location.provinceCode)?.name : null].filter(Boolean).join(', ');
 
   const header = (
-    <HeroHeader title={t('announcements.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))}>
+    <HeroHeader title={t('announcements.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/neighbourhood'))}>
       <LocationChip label={place || t('home.noLocation')} onPress={() => router.push('/location?edit=1')} />
     </HeroHeader>
   );

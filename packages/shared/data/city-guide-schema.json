@@ -40,6 +40,9 @@
       "kutuphane",
       "okul",
       "halk-egitim",
+      "ibadethane",
+      "banka",
+      "atm",
       "diger"
      ]
     },
@@ -2316,6 +2319,27 @@
    "de": "Bildung",
    "ar": "التعليم",
    "ru": "Образование"
+  },
+  "ibadethane": {
+   "tr": "İbadethane",
+   "en": "Place of worship",
+   "de": "Gotteshaus",
+   "ar": "دار عبادة",
+   "ru": "Место поклонения"
+  },
+  "banka": {
+   "tr": "Banka şubesi",
+   "en": "Bank branch",
+   "de": "Bankfiliale",
+   "ar": "فرع بنك",
+   "ru": "Отделение банка"
+  },
+  "atm": {
+   "tr": "ATM",
+   "en": "ATM",
+   "de": "Geldautomat",
+   "ar": "صراف آلي",
+   "ru": "Банкомат"
   }
  }
 }

@@ -27,13 +27,19 @@ interface Props {
   left?: HeaderAction;
   /** Sağdaki işlem; iki işlem de olabilir (ör. Keşfet: Mesajlar ve yeni gönderi). */
   right?: HeaderAction | HeaderAction[];
+  /** Eski ortalı küçük başlık (yalnızca ana sekmelerde). İç ekranlar büyük altın başlığı kullanır (13. madde 35). */
+  compact?: boolean;
 }
 
-/** Üst bant: geri düğmesi, ortada başlık, sağda işlem; altında isteğe bağlı içerik (konum çipi vb.). */
-export function HeroHeader({ title, subtitle, onBack, left, right, children }: PropsWithChildren<Props>) {
+/**
+ * Üst bant: geri düğmesi ve sağda işlemler; altında sola yaslı büyük altın başlık ve konum / açıklama (iç ekranların
+ * ortak dili, 13. madde 35); en altta isteğe bağlı içerik (konum çipi, filtre satırı vb.).
+ */
+export function HeroHeader({ title, subtitle, onBack, left, right, compact, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
   const { rtl } = useSettings();
   const { t } = useTranslation();
+  const large = !!title && !compact;
   return (
     <View style={styles.wrap}>
       <View style={styles.top}>
@@ -44,7 +50,7 @@ export function HeroHeader({ title, subtitle, onBack, left, right, children }: P
         ) : (
           <View style={styles.spacer} />
         )}
-        {title ? (
+        {title && !large ? (
           <AppText accessibilityRole="header" numberOfLines={1} style={[styles.title, { color: c.heroText }]}>{title}</AppText>
         ) : (
           <View style={styles.flex} />
@@ -61,7 +67,14 @@ export function HeroHeader({ title, subtitle, onBack, left, right, children }: P
           <View style={styles.spacer} />
         )}
       </View>
-      {subtitle ? <AppText style={[styles.subtitle, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
+      {large ? (
+        <View style={styles.big}>
+          <AppText accessibilityRole="header" style={[styles.bigTitle, { color: c.heroAccent }]}>{title}</AppText>
+          {subtitle ? <AppText style={[styles.bigSub, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
+        </View>
+      ) : subtitle ? (
+        <AppText style={[styles.subtitle, { color: c.heroMuted }]}>{subtitle}</AppText>
+      ) : null}
       {children}
     </View>
   );
@@ -95,6 +108,9 @@ const styles = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 40 },
   title: { flex: 1, textAlign: 'center', fontFamily: fonts.heading, fontSize: 17, lineHeight: 24 },
   subtitle: { fontSize: 14, lineHeight: 20, marginTop: -spacing.xs },
+  big: { gap: 2, marginTop: -spacing.xs },
+  bigTitle: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 35, letterSpacing: -0.3 },
+  bigSub: { fontSize: 14, lineHeight: 20 },
   spacer: { width: 40 },
   badge: { position: 'absolute', top: 7, right: 7, width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },
   row: { flexDirection: 'row', gap: spacing.xs },

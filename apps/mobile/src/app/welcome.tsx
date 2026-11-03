@@ -49,7 +49,8 @@ export default function WelcomeScreen() {
     Animated.parallel(fades.map((v, i) => Animated.timing(v, { toValue: i === slide ? 1 : 0, duration: 1200, useNativeDriver: true }))).start();
   }, [slide, fades]);
 
-  const start = () => router.push('/sign-up');
+  // Sıra (13. madde 35): karşılama > dil seçimi > kayıt.
+  const start = () => router.push({ pathname: '/language', params: { next: 'sign-up' } });
   const pan = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 4,
@@ -89,6 +90,7 @@ export default function WelcomeScreen() {
           <AppText accessibilityRole="header" style={styles.logo}>
             City<AppText style={[styles.logo, { color: c.heroAccent }]}>Joy</AppText>
           </AppText>
+          <AppText style={[styles.kicker, { color: c.heroAccent }]}>{t('auth.welcomeKicker')}</AppText>
           <AppText style={styles.title}>{t('auth.welcomeTitle')}</AppText>
           <AppText style={styles.subtitle}>{t('auth.welcomeSubtitle')}</AppText>
         </View>
@@ -130,7 +132,8 @@ const styles = StyleSheet.create({
   content: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: GUTTER + 8, justifyContent: 'space-between' },
   brand: { gap: spacing.sm, paddingTop: spacing.xl },
   logo: { fontFamily: fonts.heading, fontSize: 44, lineHeight: 52, color: white, letterSpacing: -0.5 },
-  title: { fontFamily: fonts.heading, fontSize: 22, lineHeight: 28, color: white },
+  kicker: { fontFamily: fonts.bodySemi, fontSize: 12.5, letterSpacing: 1.6, paddingTop: spacing.md },
+  title: { fontFamily: fonts.heading, fontSize: 30, lineHeight: 37, color: white },
   subtitle: { fontSize: 15, lineHeight: 22, color: '#D5E2E3' },
   bottom: { gap: spacing.md },
   bars: { flexDirection: 'row', gap: 6 },

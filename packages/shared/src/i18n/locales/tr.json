@@ -68,8 +68,8 @@
     "exploreHint": "Mahallen ve şehrin neler paylaşıyor"
   },
   "auth": {
-    "welcomeTitle": "CityJoy'a hoş geldin",
-    "welcomeSubtitle": "İlin, ilçen ve mahallen için bilgi, duyuru ve hizmetler tek yerde.",
+    "welcomeTitle": "Mahallendeki her şey tek yerde",
+    "welcomeSubtitle": "Duyurular, nöbetçi eczane, etkinlikler ve yakındaki hizmetler.",
     "signIn": "Giriş yap",
     "signUp": "Kayıt ol",
     "email": "E-posta",
@@ -87,8 +87,16 @@
     "acceptTerms": "Kullanım şartlarını okudum ve kabul ediyorum.",
     "readPrivacy": "Kişisel verilerin işlenmesine ilişkin aydınlatma metnini okudum.",
     "read": "Metni oku",
-    "slideToStart": "Kaydırarak başla",
-    "slideToStartHint": "Kayıt ekranını açar; dokunarak da başlayabilirsin."
+    "slideToStart": "Kaydırarak keşfetmeye başla",
+    "slideToStartHint": "Dil seçimini açar; dokunarak da başlayabilirsin.",
+    "welcomeKicker": "HOŞ GELDİN",
+    "signInTitle": "Tekrar hoş geldin",
+    "signInSubtitle": "Hesabına giriş yap.",
+    "signUpTitle": "Hesap oluştur",
+    "signUpSubtitle": "Birkaç bilgiyle hemen başla.",
+    "forgotPasswordShort": "Şifremi unuttum",
+    "noAccountLead": "Hesabın yok mu?",
+    "haveAccountLead": "Zaten hesabın var mı?"
   },
   "errors": {
     "required": "Bu alan zorunlu.",
@@ -657,8 +665,12 @@
         "hint": "Halk kütüphaneleri"
       },
       "banka": {
-        "title": "Bankalar",
-        "hint": "Kamu ve özel banka şubeleri"
+        "title": "Bankalar ve ATM'ler",
+        "hint": "Banka şubeleri ve ATM'ler"
+      },
+      "ibadethane": {
+        "title": "İbadethaneler",
+        "hint": "Cami, kilise, sinagog ve cemevleri"
       }
     },
     "townhallIntro": "Tüm belediye hizmetleri tek noktada",
@@ -670,7 +682,14 @@
     "serviceGuide": "Hizmet rehberi",
     "otherMunicipalities": "Diğer ilçe belediyeleri",
     "districtCount_one": "{{count}} ilçe",
-    "districtCount_other": "{{count}} ilçe"
+    "districtCount_other": "{{count}} ilçe",
+    "frequent": "Sık kullanılanlar",
+    "frequentItem": {
+      "water": "Su arızası",
+      "waste": "Çöp ve temizlik",
+      "police": "Zabıta",
+      "funeral": "Cenaze hizmetleri"
+    }
   },
   "announcements": {
     "title": "Duyurular",
@@ -849,7 +868,8 @@
     "gatheringDistrict": "Mahallenize kayıtlı toplanma alanı bulunamadı; {{place}} ilçesindekiler gösteriliyor. Kesin bilgi için e-Devlet ya da AFAD'a bakın.",
     "noGathering": "Toplanma alanı bilgisi henüz eklenmedi. e-Devlet'te \"Acil Toplanma Alanı Sorgulama\" ile öğrenebilirsiniz.",
     "municipalities": "Belediyem",
-    "feedSoon": "Mahallem akışı (komşu paylaşımları) Keşfet ile gelecek."
+    "feedSoon": "Mahallem akışı (komşu paylaşımları) Keşfet ile gelecek.",
+    "places": "Mahallende"
   },
   "activities": {
     "title": "Aktiviteler",
@@ -2005,5 +2025,23 @@
       "change": "Mahalleni değiştirince rozet kendiliğinden kalkar.",
       "limit": "Rozet bir güven işaretidir; sahte konum uygulamalarıyla aşılabileceği için tek başına kanıt sayılmaz."
     }
+  },
+  "onboarding": {
+    "step": "Adım {{n}} / {{total}}",
+    "locationTitle": "Yakınındakileri gösterelim",
+    "locationDesc": "Konumunla mahalleni bulur, içeriği sana göre hazırlarız.",
+    "locationWhy1": "Mahallenin ve ilçenin duyuruları",
+    "locationWhy2": "Nöbetçi eczane ve yakındaki hizmetler",
+    "locationWhy3": "Acil durumda yakınlarına konumunu göndermek (SOS)",
+    "locationNote": "Konumun kimseyle paylaşılmaz. İzin vermezsen mahalleni listeden seçersin.",
+    "locationFound": "Konumuna göre {{place}} bulundu.",
+    "change": "Değiştir",
+    "notifyTitle": "Önemli duyuruları kaçırma",
+    "notifyDesc": "Yalnızca işine yarayacak bildirimler gönderilir.",
+    "notifySample1": "Acil duyuru · Mahallende planlı su kesintisi",
+    "notifySample2": "Muhtarlık · Çalışma saatleri değişti",
+    "notifySample3": "Yeni mesaj · Bisiklet hâlâ satılık mı?",
+    "targetingConsent": "Yaşıma ve isteğe bağlı olarak cinsiyetime ve mesleğime göre bana uygun bildirimler gönderilsin.",
+    "notifyNote": "İkisi de isteğe bağlı, Ayarlar'dan istediğin zaman kapatabilirsin."
   }
 }

@@ -68,8 +68,8 @@
     "exploreHint": "What your neighbourhood and city are sharing"
   },
   "auth": {
-    "welcomeTitle": "Welcome to CityJoy",
-    "welcomeSubtitle": "Information, announcements and services for your province, district and neighbourhood in one place.",
+    "welcomeTitle": "Everything in your neighbourhood, in one place",
+    "welcomeSubtitle": "Announcements, on-duty pharmacies, events and nearby services.",
     "signIn": "Sign in",
     "signUp": "Sign up",
     "email": "Email",
@@ -87,8 +87,16 @@
     "acceptTerms": "I have read and accept the terms of use.",
     "readPrivacy": "I have read the privacy notice on the processing of personal data.",
     "read": "Read",
-    "slideToStart": "Slide to start",
-    "slideToStartHint": "Opens sign-up; you can also tap to start."
+    "slideToStart": "Slide to start exploring",
+    "slideToStartHint": "Opens language selection; you can also tap to start.",
+    "welcomeKicker": "WELCOME",
+    "signInTitle": "Welcome back",
+    "signInSubtitle": "Sign in to your account.",
+    "signUpTitle": "Create an account",
+    "signUpSubtitle": "Get started with just a few details.",
+    "forgotPasswordShort": "Forgot password",
+    "noAccountLead": "No account?",
+    "haveAccountLead": "Already have an account?"
   },
   "errors": {
     "required": "This field is required.",
@@ -657,8 +665,12 @@
         "hint": "Public libraries"
       },
       "banka": {
-        "title": "Banks",
-        "hint": "Public and private bank branches"
+        "title": "Banks and ATMs",
+        "hint": "Bank branches and ATMs"
+      },
+      "ibadethane": {
+        "title": "Places of worship",
+        "hint": "Mosques, churches, synagogues and cemevis"
       }
     },
     "townhallIntro": "All municipal services in one place",
@@ -670,7 +682,14 @@
     "serviceGuide": "Service guide",
     "otherMunicipalities": "Other district municipalities",
     "districtCount_one": "{{count}} district",
-    "districtCount_other": "{{count}} districts"
+    "districtCount_other": "{{count}} districts",
+    "frequent": "Frequently used",
+    "frequentItem": {
+      "water": "Water fault",
+      "waste": "Waste and cleaning",
+      "police": "Municipal police",
+      "funeral": "Funeral services"
+    }
   },
   "announcements": {
     "title": "Announcements",
@@ -849,7 +868,8 @@
     "gatheringDistrict": "No assembly area is listed for your neighbourhood; showing those in {{place}}. Check e-Devlet or AFAD for official information.",
     "noGathering": "Assembly area details have not been added yet. You can look them up on e-Devlet (\"Emergency Assembly Area\" search).",
     "municipalities": "My municipality",
-    "feedSoon": "The neighbourhood feed (posts from neighbours) will come with Discover."
+    "feedSoon": "The neighbourhood feed (posts from neighbours) will come with Discover.",
+    "places": "In your neighbourhood"
   },
   "activities": {
     "title": "Activities",
@@ -2005,5 +2025,23 @@
       "change": "If you change your neighbourhood, the badge is removed automatically.",
       "limit": "The badge is a sign of trust; it can be bypassed with fake-location apps, so it is not proof on its own."
     }
+  },
+  "onboarding": {
+    "step": "Step {{n}} of {{total}}",
+    "locationTitle": "Let us show what's near you",
+    "locationDesc": "We use your location to find your neighbourhood and tailor content for you.",
+    "locationWhy1": "Announcements for your neighbourhood and district",
+    "locationWhy2": "On-duty pharmacies and nearby services",
+    "locationWhy3": "Sending your location to loved ones in an emergency (SOS)",
+    "locationNote": "Your location isn't shared with anyone. If you don't allow it, you can pick your neighbourhood from a list.",
+    "locationFound": "Based on your location: {{place}}.",
+    "change": "Change",
+    "notifyTitle": "Don't miss important announcements",
+    "notifyDesc": "We only send notifications that are useful to you.",
+    "notifySample1": "Urgent · Planned water outage in your neighbourhood",
+    "notifySample2": "Mukhtar's office · Opening hours changed",
+    "notifySample3": "New message · Is the bike still for sale?",
+    "targetingConsent": "Send me notifications suited to my age and, optionally, my gender and occupation.",
+    "notifyNote": "Both are optional; you can turn them off in Settings at any time."
   }
 }

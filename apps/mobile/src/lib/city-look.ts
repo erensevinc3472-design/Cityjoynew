@@ -44,5 +44,6 @@ export const INSTITUTION_GROUPS: { id: string; look: Look; categories?: string[]
   { id: 'asm', categories: ['aile-sagligi-merkezi'], look: { icon: 'local-hospital', colors: ['#F48A8A', '#E04848'] } },
   { id: 'egitim', categories: ['okul', 'halk-egitim'], look: { icon: 'school', colors: ['#D59CF0', '#8B3FC8'] } },
   { id: 'kutuphane', categories: ['kutuphane'], look: { icon: 'menu-book', colors: ['#C9A27A', '#8A5A35'] } },
-  { id: 'banka', look: { icon: 'account-balance-wallet', colors: ['#7FDB86', '#2E9B48'] } },
+  { id: 'ibadethane', categories: ['ibadethane'], look: { icon: 'mosque', colors: ['#7FD7C4', '#1F8C78'] } },
+  { id: 'banka', categories: ['banka', 'atm'], look: { icon: 'account-balance-wallet', colors: ['#7FDB86', '#2E9B48'] } },
 ];

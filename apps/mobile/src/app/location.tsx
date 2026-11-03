@@ -29,16 +29,20 @@ export default function LocationScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   // Ana sayfa ya da hesap ekranından açıldıysa iş bitince geri dönülür; ilk kurulumda açılış akışı sürer.
-  const editing = useLocalSearchParams<{ edit?: string }>().edit === '1';
+  const params = useLocalSearchParams<{ edit?: string; province?: string; district?: string }>();
+  const editing = params.edit === '1';
+  // Konum izniyle bulunan il/ilçe (permission-location): doğrudan mahalle listesi açılır, "Değiştir" ile il listesine dönülür.
+  const detected = !editing && params.province && repo.getProvince(params.province) ? params : undefined;
   const c = useThemeColors();
   const { setLocation } = useSettings();
   const { location } = useUserLocation();
   const { user, profile, refreshProfile } = useSession();
   const [saveError, setSaveError] = useState<string>();
 
-  const [provinceCode, setProvinceCode] = useState(location?.provinceCode);
-  const [districtId, setDistrictId] = useState(location?.districtId);
-  const [step, setStep] = useState<Step>('province');
+  const [provinceCode, setProvinceCode] = useState(detected?.province ?? location?.provinceCode);
+  const [districtId, setDistrictId] = useState(detected ? detected.district : location?.districtId);
+  const [step, setStep] = useState<Step>(detected ? (detected.district ? 'neighbourhood' : 'district') : 'province');
+  const [showDetected, setShowDetected] = useState(!!detected);
   const [query, setQuery] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -105,6 +109,7 @@ export default function LocationScreen() {
 
   const goTo = (next: Step) => {
     setQuery('');
+    if (next === 'province') setShowDetected(false);
     setStep(next);
   };
 
@@ -148,6 +153,14 @@ export default function LocationScreen() {
         <MaterialIcons name="info-outline" size={20} color={c.primary} />
         <AppText variant="caption" style={styles.noticeText}>{t('location.fullCapacityWarning')}</AppText>
       </View>
+
+      {showDetected ? (
+        <View style={[styles.notice, { backgroundColor: c.accentSoft }]}>
+          <MaterialIcons name="my-location" size={20} color={c.primary} />
+          <AppText variant="caption" style={styles.noticeText}>{t('onboarding.locationFound', { place: crumbs.join(' › ') })}</AppText>
+          <AppText accessibilityRole="button" onPress={() => goTo('province')} style={{ color: c.primary, fontWeight: '600' }}>{t('onboarding.change')}</AppText>
+        </View>
+      ) : null}
 
       {saveError ? <FormMessage kind="error" text={saveError} /> : null}
 

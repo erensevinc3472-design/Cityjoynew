@@ -180,6 +180,7 @@ export default function ChatScreen() {
   const title = chat ? chatTitle(chat, me) : asCustomer ? context!.title : profile?.displayName ?? t('messages.title');
   const header = (
     <HeroHeader
+      compact
       title={title}
       subtitle={isListing ? t('messages.aboutListing', { title: context!.title }) : businessSide ? t('messages.aboutBusiness', { name: context!.title }) : undefined}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/messages'))}

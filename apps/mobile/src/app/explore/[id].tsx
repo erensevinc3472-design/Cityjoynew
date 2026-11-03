@@ -43,7 +43,7 @@ export default function PostScreen() {
     postRepository.isSaved(user.uid, id).then(setSaved);
   }, [id, user]);
 
-  const header = <HeroHeader title={t('explore.post')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/explore'))} />;
+  const header = <HeroHeader compact title={t('explore.post')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/explore'))} />;
 
   if (!user || item === undefined || !item || !(isPostListed(item) || (mine && item.status === 'aktif'))) {
     return (
