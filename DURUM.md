@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 1 Kasım 2026 (kişi profil fotoğrafı, dal `claude/profil-foto`). Önceki: etkinlik/kurum/işletme görselleri ve panelin internete konması (PR #50 birleşti).
+Son güncelleme: 3 Kasım 2026 (Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -635,6 +635,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   kaydına geçer). Sunucu `profilePhotoChanged` eski dosyayı siler (hesap silinince de). Testler: kurallar 138, sunucu
   25, ortak 150. Resmî profil ve işletme kendi logosunu kullanır (ayrı). PR #52 birleşti; Firestore kuralları ve
   panel `main`den yüklendi (1 Kasım). Storage kuralları ve işlevler Blaze bekliyor.
+- **Beğeni ve kaydet işaretleri düzeltmesi (3 Kasım, dal `claude/pensive-mccarthy-xm0n7c`).** Keşfet'te kalpler ve
+  kaydet işaretleri Çarşı favorileriyle aynı yöntemle tutuluyor (`apps/mobile/src/lib/posts.ts` içindeki `idStore`:
+  her değişiklikte yeni nesne, `useSyncExternalStore`; açılışta okuma reddedilirse 2 sn sonra bir kez daha). Önceden
+  sayfa yenilenince boş görünebiliyor, ilk okuma başarısız olursa oturum boyunca boş kalıyordu. Emülatörde web
+  sürümüyle denendi (beğeni + kaydet, sayfa yenileme sonrası doğru). Kural değişikliği yok.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -681,8 +686,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 - Toplu güvenlik taraması (`/security-review`, tüm kod: Firebase kuralları, giriş, yönetici yetkileri): Eren mağazaya
   çıkmadan önce en sonda toplu yapılmasını istedi (29 Ekim 2026).
-- **Genel kontrolde bakılacak (Eren, 31 Ekim):** gönderi beğenileri (`useLiked`, `apps/mobile/src/lib/posts.ts`) sayfa
-  yenilenince boş görünebilir; Çarşı favorilerindeki hatanın aynısı (React Compiler, `useSyncExternalStore` ile çözülür).
+- ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
 - Yasal metinler boş (yalnızca "avukat kontrolünden geçecek" notu).
