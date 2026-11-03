@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -16,6 +17,7 @@ import {
 } from 'firebase/firestore';
 
 import { ACTIVITY_LIMITS, type Activity, type ActivityInput, type ActivityReportReason } from '../activities/activities';
+import { cleanPhoto, photoFrom } from '../media/photo';
 import { addAudit, iso } from './grants';
 import { countUsage } from './limits';
 
@@ -32,6 +34,7 @@ function fromDoc(id: string, d: DocumentData): Activity {
     endsAt: iso(d.endsAt) ?? '',
     region: d.region,
     capacity: d.capacity,
+    ...(photoFrom(d.cover) ? { cover: photoFrom(d.cover) } : {}),
     status: d.status,
     organizerUid: d.organizerUid,
     organizerName: d.organizerName ?? '',
@@ -99,6 +102,7 @@ export function createFirestoreActivityRepository(db: Firestore) {
         endsAt: Timestamp.fromDate(new Date(input.endsAt)),
         region: { provinceCode: r.provinceCode, districtId: r.districtId, neighbourhoodId: r.neighbourhoodId },
         capacity: input.capacity,
+        ...(input.cover ? { cover: cleanPhoto(input.cover) } : {}),
         status: 'aktif',
         organizerUid: uid,
         organizerName: organizerName.slice(0, 40),
@@ -165,14 +169,14 @@ export function createFirestoreActivityRepository(db: Firestore) {
     },
 
     /**
-     * Hesap silmede (KVKK): kişinin açtığı aktiviteler kaldırılır, adı ve tam adres silinir. Belge silinmez; katılanların
+     * Hesap silmede (KVKK): kişinin açtığı aktiviteler kaldırılır, adı, kapak fotoğrafı ve tam adres silinir (dosyayı sunucu siler). Belge silinmez; katılanların
      * kayıtları ona bağlı ve onlar da kendi hesaplarını silebilmeli.
      */
     async deleteAllOf(uid: string): Promise<void> {
       const snap = await getDocs(query(collection(db, COLLECTION), where('organizerUid', '==', uid), limit(500)));
       for (const d of snap.docs) {
         const batch = writeBatch(db);
-        batch.update(d.ref, { status: 'kaldirildi', organizerName: '', updatedAt: serverTimestamp() });
+        batch.update(d.ref, { status: 'kaldirildi', organizerName: '', cover: deleteField(), updatedAt: serverTimestamp() });
         batch.delete(detailsRef(db, d.id));
         await batch.commit();
       }

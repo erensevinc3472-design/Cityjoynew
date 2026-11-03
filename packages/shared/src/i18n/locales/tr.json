@@ -884,7 +884,9 @@
       "capacity": "Kaç kişi katılabilir?",
       "capacityHint": "Sen hariç, en çok {{max}}.",
       "description": "Açıklama",
-      "descriptionHint": "Ne yapılacak, ne getirilmeli, kimler için uygun?"
+      "descriptionHint": "Ne yapılacak, ne getirilmeli, kimler için uygun?",
+      "cover": "Kapak fotoğrafı (isteğe bağlı)",
+      "coverHint": "Buluşmayı anlatan bir fotoğraf. Sonradan değiştirilemez. Kişi, plaka ya da ev adresi görünmesin."
     },
     "safetyTitle": "İlk buluşma ipuçları",
     "safetyTips": "Herkese açık, kalabalık bir yerde buluş. Ev adresini ve kişisel bilgilerini paylaşma. Nereye gittiğini bir yakınına söyle. Para ya da ödeme isteyen olursa katılma ve şikâyet et. Kendini rahatsız hissedersen ayrıl; acil durumda 112'yi ara.",

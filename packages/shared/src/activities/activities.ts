@@ -1,4 +1,5 @@
 import { ageGroup } from '../models/user';
+import type { Photo } from '../media/photo';
 
 /**
  * Kullanıcı aktiviteleri (PROJE.md 5.3, Eren'in kararı): her kullanıcı "+" ile bir araya gelme çağrısı açar
@@ -33,6 +34,8 @@ export interface ActivityInput {
   /** Tam buluşma yeri: yalnızca düzenleyen ve katılanlar görür. */
   address: string;
   capacity: number;
+  /** İsteğe bağlı kapak fotoğrafı (`media/{düzenleyen}/aktivite/...`); yalnızca açarken eklenir. */
+  cover?: Photo;
 }
 
 export interface Activity extends Omit<ActivityInput, 'address'> {

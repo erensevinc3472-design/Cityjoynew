@@ -247,6 +247,13 @@ function ActivityReports({ user }: { user: PanelUser }) {
                           <summary>{t('announcements.showBody')}</summary>
                           <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.activity.description}</p>
                         </details>
+                        {r.activity.cover ? (
+                          <div className="photo-row">
+                            <a href={r.activity.cover.url} target="_blank" rel="noreferrer noopener" title={t('moderation.posts.photo', { n: 1 })}>
+                              <img src={r.activity.cover.url} alt={t('moderation.posts.photo', { n: 1 })} loading="lazy" />
+                            </a>
+                          </div>
+                        ) : null}
                         {r.activity.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.activities.removed')}</span> : r.activity.cleared ? <span className="pill ok">{t('moderation.activities.kept')}</span> : null}
                       </>
                     ) : (

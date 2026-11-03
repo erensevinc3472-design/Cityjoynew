@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 3 Kasım 2026 (Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
+Son güncelleme: 3 Kasım 2026 (aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -45,8 +45,8 @@ Son güncelleme: 3 Kasım 2026 (Çarşı ilan fotoğrafları; Keşfet beğeni ve
 ```sh
 npm install
 npm test                      # ortak paket testleri (150)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (139; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (27; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (140; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (28; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -651,6 +651,13 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Blaze sonrası yeni ilanda en az bir fotoğraf zorunlu olacak (Blaze'e geçişte yapılacaklar listesinde). Testler: kurallar 139, sunucu 27, ortak 150. Emülatörde web sürümüyle denendi (iki
   fotoğrafla ilan, düzenleyip birini değiştirme, başka kullanıcıda liste ve ilan sayfası). **Kurallar değişti:
   birleşince Firestore kuralları yüklenmeli;** Storage kuralları ve işlevler Blaze bekliyor.
+- **Aktivite kapak fotoğrafı (3 Kasım, aynı dal; Blaze ile çalışır).** "Aktivite aç" formunda isteğe bağlı tek kapak
+  (`MediaPicker`, tür `aktivite`); aktivite düzenlenemediği için yalnızca açarken eklenir. Kartta sağda küçük kapak,
+  aktivite sayfasında üstte büyük kapak (etkinliklerle aynı görünüm); panel > Moderasyon > Aktivite şikâyetlerinde kapak
+  görünür. Kurallar: kapak açanın kendi `aktivite` dosyası, sonradan eklenemez; hesap silmede kapak alanı da silinir.
+  Sunucu `activityCoverChanged`: aktivite kaldırılınca (moderatör / hesap silme) alanı boşaltır ve dosyayı siler; iptalde
+  kapak kalır. Hesap silinince `media/{uid}/aktivite/` silinir. Testler: kurallar 140, sunucu 28, ortak 150. Emülatörde
+  web sürümüyle denendi (kapaklı aktivite açma, başka kullanıcıda liste ve sayfa). **Kurallar değişti.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -760,7 +767,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
 5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini, kişi profil fotoğrafı~~ (31 Ekim - 1 Kasım, Blaze
-   bekliyor), ~~Çarşı ilan fotoğrafları~~ (3 Kasım). Kalan: aktivite görseli, belediye fotoğrafları, "{Şehir}'dan Kareler".
+   bekliyor), ~~Çarşı ilan fotoğrafları, aktivite kapağı~~ (3 Kasım). Kalan: belediye fotoğrafları, "{Şehir}'dan Kareler".
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 

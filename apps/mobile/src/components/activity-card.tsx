@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { Activity } from '@cityjoy/shared';
@@ -8,7 +9,7 @@ import { useSettings } from '@/lib/settings';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
-/** Aktivite kartı: solda gün ve ay, sağda ad, saat, mahalle (tam adres yok), kalan yer; iptal etiketi. */
+/** Aktivite kartı: solda gün ve ay, ortada ad, saat, mahalle (tam adres yok), kalan yer, iptal etiketi; varsa sağda kapak. */
 export function ActivityCard({ item, neighbourhood, onPress }: { item: Activity; neighbourhood?: string; onPress(): void }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -41,6 +42,7 @@ export function ActivityCard({ item, neighbourhood, onPress }: { item: Activity;
           {t(`activities.categories.${item.category}`)} · {left ? t('activities.seatsLeft', { count: left }) : t('activities.full')}
         </AppText>
       </View>
+      {item.cover ? <Image source={{ uri: item.cover.url }} style={[styles.cover, { backgroundColor: c.surfaceStrong }]} contentFit="cover" recyclingKey={item.cover.path} accessibilityIgnoresInvertColors /> : null}
     </Pressable>
   );
 }
@@ -50,5 +52,6 @@ const styles = StyleSheet.create({
   date: { width: 56, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xs },
   day: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 24 },
   body: { flex: 1, gap: 2 },
+  cover: { width: 64, height: 64, borderRadius: radius.sm, alignSelf: 'center' },
   title: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 22 },
 });

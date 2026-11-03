@@ -1509,7 +1509,7 @@ service cloud.firestore {
     }
     function validActivity(d) {
       return d.keys().hasOnly(['title', 'description', 'category', 'startsAt', 'endsAt', 'region', 'capacity', 'status',
-             'organizerUid', 'organizerName', 'attendeeCount', 'reportCount', 'cleared', 'moderatedBy', 'createdAt', 'updatedAt'])
+             'organizerUid', 'organizerName', 'attendeeCount', 'reportCount', 'cleared', 'moderatedBy', 'cover', 'createdAt', 'updatedAt'])
         && d.title is string && d.title.size() >= 3 && d.title.size() <= 80
         && d.description is string && d.description.size() >= 10 && d.description.size() <= 1000
         && d.category in ['yuruyus-doga', 'spor', 'kahve-sohbet', 'oyun', 'kitap-kultur', 'cocuk-aile', 'ogrenme', 'gonullu', 'diger']
@@ -1526,8 +1526,10 @@ service cloud.firestore {
       allow read: if signedIn()
         && (resource.data.status in ['aktif', 'iptal'] || resource.data.organizerUid == request.auth.uid
             || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
-      // Açma: yetişkin, kendi adına, kendi ilinde, en çok 30 gün sonrası için; tam adres aynı yazımda.
+      // Açma: yetişkin, kendi adına, kendi ilinde, en çok 30 gün sonrası için; tam adres aynı yazımda. Kapak fotoğrafı
+      // isteğe bağlı ve açanın kendi `aktivite` dosyası; sonradan değişmez.
       allow create: if request.resource.data.organizerUid == request.auth.uid
+        && (!('cover' in request.resource.data) || validMediaBy(request.resource.data.cover, 'aktivite', request.auth.uid))
         && usageOk('u-' + request.auth.uid, 'aktivite', userLimit('aktivite', 3, 1))
         && request.resource.data.status == 'aktif'
         && request.resource.data.attendeeCount == 0 && request.resource.data.reportCount == 0
@@ -1539,13 +1541,14 @@ service cloud.firestore {
         && isAdultUser()
         && get(myUserPath()).data.get('location', {}).get('provinceCode', '') == request.resource.data.region.provinceCode
         && existsAfter(/databases/$(database)/documents/activities/$(id)/private/details);
-      // Düzenleyen: iptal eder ya da (hesap silmede) kaldırır; başka bir şey değişmez.
+      // Düzenleyen: iptal eder ya da (hesap silmede) kaldırır, kapak da silinir; başka bir şey değişmez.
       allow update: if resource.data.organizerUid == request.auth.uid
         && request.resource.data.updatedAt == request.time
         && ((resource.data.status == 'aktif' && request.resource.data.status == 'iptal'
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']))
             || (request.resource.data.status == 'kaldirildi' && request.resource.data.organizerName == ''
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'organizerName', 'updatedAt'])));
+              && !('cover' in request.resource.data)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'organizerName', 'cover', 'updatedAt'])));
       // "Katılıyorum" sayacı: yalnızca kendi katılım kaydıyla tam bir artar (yetişkin, düzenleyen değil, aktif, başlamamış,
       // kontenjan içinde) ya da azalır.
       allow update: if signedIn()

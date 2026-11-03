@@ -51,6 +51,7 @@ describe('Dosya deposu: gönderi fotoğrafları', () => {
     await assertSucceeds(put(st('ayse'), 'media/ayse/isletme-vitrin/abcDEF123456xyz.jpg'));
     await assertSucceeds(put(st('ayse'), 'media/ayse/profil/abcDEF123456.jpg'));
     await assertSucceeds(put(st('ayse'), 'media/ayse/ilan/abcDEF123456.jpg'));
+    await assertSucceeds(put(st('ayse'), 'media/ayse/aktivite/abcDEF123456.jpg'));
     await assertFails(put(st('ali'), 'media/ayse/ilan/abcDEF1234567.jpg'));
     await assertFails(put(st('ali'), 'media/ayse/etkinlik/abcDEF1234567.jpg'));
     await assertFails(put(st('ayse'), 'media/ayse/baska/abcDEF123456.jpg'));

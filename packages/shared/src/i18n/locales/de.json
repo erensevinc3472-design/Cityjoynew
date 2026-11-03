@@ -884,7 +884,9 @@
       "capacity": "Wie viele können teilnehmen?",
       "capacityHint": "Ohne dich, höchstens {{max}}.",
       "description": "Beschreibung",
-      "descriptionHint": "Was wird gemacht, was mitbringen, für wen geeignet?"
+      "descriptionHint": "Was wird gemacht, was mitbringen, für wen geeignet?",
+      "cover": "Titelbild (optional)",
+      "coverHint": "Ein Foto, das zeigt, worum es beim Treffen geht. Es kann später nicht geändert werden. Keine Personen, Kennzeichen oder Wohnadressen zeigen."
     },
     "safetyTitle": "Tipps für das erste Treffen",
     "safetyTips": "Triff dich an einem öffentlichen, belebten Ort. Teile weder deine Wohnadresse noch persönliche Daten. Sag einer vertrauten Person, wohin du gehst. Wenn jemand Geld oder eine Zahlung verlangt, nimm nicht teil und melde es. Geh, wenn du dich unwohl fühlst; im Notfall wähle 112.",

@@ -884,7 +884,9 @@
       "capacity": "How many people can join?",
       "capacityHint": "Not counting you, at most {{max}}.",
       "description": "Description",
-      "descriptionHint": "What will you do, what to bring, who is it for?"
+      "descriptionHint": "What will you do, what to bring, who is it for?",
+      "cover": "Cover photo (optional)",
+      "coverHint": "A photo that shows what the meetup is about. It cannot be changed later. Keep people, plates and home addresses out of shot."
     },
     "safetyTitle": "First meeting tips",
     "safetyTips": "Meet in a public, busy place. Do not share your home address or personal details. Tell someone close where you are going. If anyone asks for money or payment, do not join and report it. Leave if you feel uncomfortable; in an emergency call 112.",

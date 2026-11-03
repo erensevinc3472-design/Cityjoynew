@@ -22,13 +22,14 @@ export interface MediaField {
   owners?: (d: DocumentData) => unknown[];
 }
 
-/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı, ilan fotoğrafları (`media/{yükleyen}/{tür}/...`). */
+/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı, ilan fotoğrafları, aktivite kapağı (`media/{yükleyen}/{tür}/...`). */
 export const MEDIA_FIELDS = {
   events: [{ key: 'cover', owners: (d) => [d.preparedBy] }],
   officialProfiles: [{ key: 'logo' }],
   publicProfiles: [{ key: 'photo' }],
   businesses: [{ key: 'logo' }, { key: 'gallery', owners: (d) => [d.ownerUid, ...(Array.isArray(d.managerUids) ? d.managerUids : [])] }],
   listings: [{ key: 'photos', owners: (d) => [d.ownerUid] }],
+  activities: [{ key: 'cover', owners: (d) => [d.organizerUid] }],
 } satisfies Record<string, MediaField[]>;
 
 const pathsOf = (v: unknown): string[] =>
@@ -60,5 +61,15 @@ export async function handleMediaChange(fields: MediaField[], before: DocumentDa
 export async function handleListingPhotos(db: Firestore, id: string, before: DocumentData | undefined, after: DocumentData | undefined, deleteFiles: DeleteFiles): Promise<string[]> {
   const gone = await handleMediaChange(MEDIA_FIELDS.listings, before, after, deleteFiles);
   if (after?.status === 'kaldirildi' && Array.isArray(after.photos) && after.photos.length) await db.doc(`listings/${id}`).update({ photos: [] });
+  return gone;
+}
+
+/**
+ * Aktivite kapağı: aktivite kaldırılınca (moderatör ya da hesap silme) kapak alanı silinir; bu yazım işlevi yeniden
+ * tetikler ve dosya o zaman silinir. İptal edilen aktivite bitişine kadar görünür, kapağı kalır.
+ */
+export async function handleActivityCover(db: Firestore, id: string, before: DocumentData | undefined, after: DocumentData | undefined, deleteFiles: DeleteFiles): Promise<string[]> {
+  const gone = await handleMediaChange(MEDIA_FIELDS.activities, before, after, deleteFiles);
+  if (after?.status === 'kaldirildi' && after.cover) await db.doc(`activities/${id}`).update({ cover: FieldValue.delete() });
   return gone;
 }

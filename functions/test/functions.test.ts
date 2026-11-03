@@ -6,7 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { handleAnnouncementWrite } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
-import { handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
+import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
 
@@ -275,7 +275,7 @@ describe('temizlik', () => {
     await db.doc('users/u2').set({ displayName: 'Ayşe' });
     const deleted: string[] = [];
     await deleteUserLeftovers(db, 'u1', async (p) => void deleted.push(p));
-    expect(deleted).toEqual(['posts/u1/', 'media/u1/ilan/']);
+    expect(deleted).toEqual(['posts/u1/', 'media/u1/ilan/', 'media/u1/aktivite/']);
     for (const p of ['users/u1', 'users/u1/settings/notifications', 'pushTokens/u1', 'publicProfiles/u1', 'pushCount/u1', 'serviceSuggestions/s1', 'usage/u-u1~oneri']) {
       expect((await db.doc(p).get()).exists, p).toBe(false);
     }
@@ -390,5 +390,21 @@ describe('Çarşı ilan fotoğrafları', () => {
     expect((await db.doc('listings/l2').get()).get('photos')).toEqual([]);
     const deleted: string[] = [];
     expect(await handleListingPhotos(db, 'l2', { ...live, status: 'kaldirildi' }, { ...live, status: 'kaldirildi', photos: [] }, async (p) => void deleted.push(p))).toEqual([a.path]);
+  });
+});
+
+describe('aktivite kapağı', () => {
+  it('iptalde kalır; kaldırılınca alan silinir, ardından dosya silinir', async () => {
+    const cover = { path: 'media/o1/aktivite/kkkkkkkkkk.jpg', url: 'u', width: 10, height: 10 };
+    const live = { organizerUid: 'o1', status: 'aktif', cover };
+    const deleted: string[] = [];
+    const del = async (p: string) => void deleted.push(p);
+    expect(await handleActivityCover(db, 'a1', live, { ...live, status: 'iptal' }, del)).toEqual([]);
+    await db.doc('activities/a1').set({ ...live, status: 'kaldirildi' });
+    expect(await handleActivityCover(db, 'a1', live, { ...live, status: 'kaldirildi' }, del)).toEqual([]);
+    expect((await db.doc('activities/a1').get()).get('cover')).toBeUndefined();
+    const { cover: _, ...removed } = { ...live, status: 'kaldirildi' };
+    expect(await handleActivityCover(db, 'a1', { ...live, status: 'kaldirildi' }, removed, del)).toEqual([cover.path]);
+    expect(deleted).toEqual([cover.path]);
   });
 });
