@@ -737,7 +737,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   günlük), 10 kişiden küçük gruplar "Diğer"; belediye hesabında başkan kartı ve "Başkanın istatistikleri". Profiller
   sayfasında başkan profili. Örnek hesaplarda tutarlı örnek sayılar ("Örnek veri" etiketi). Testler: kurallar 8 yeni,
   ortak 6 yeni; panel derlendi, mobil tür denetimi geçti; tarayıcıda belediye, muhtar, admin örnek hesaplarıyla ve
-  375 px genişlikte denendi. **Telefonda denenmedi. Kurallar değişti** (yüklenmeli). Gönderi istatistikleri sonraki adım.
+  375 px genişlikte denendi. **Telefonda denenmedi.** PR #60 birleşti; kurallar Firebase'e, panel cityjoynew.web.app'e yüklendi (3 Kasım, Claude). Gönderi istatistikleri sonraki adım.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
