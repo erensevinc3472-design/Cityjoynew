@@ -746,8 +746,20 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
       **Karar (Eren, 3 Kasım 2026): duyuruların tek yeri Mahalle Meydanı > Duyurular** (mahalle, ilçe, il geneli, acil olanlar
       dahil; "Tüm duyurular" tam listeyi açar). Ana sayfadaki acil şeridi kalır (dokununca aynı duyuru açılır). Bildirime
       dokununca duyuru açılır, geri tuşu Duyurular listesine döner. Belediye Hizmetleri'ndeki "son duyuru" satırı kalkar.
-    - **Giriş akışı (3 Kasım 2026, önizleme, onay bekliyor):** G-Dil, G-Hosgeldin, G-Kayit, G-Giris, G-Tanis, G-Konum. Sıra
-      koddaki gibi (dil > hoş geldin > kayıt/giriş > seni biraz tanıyalım > konum), yazılar dil dosyasından, yalnızca görünüm yeni.
+    - **Giriş akışı (Karar Eren, 3 Kasım 2026):** sıra kaydırmalı karşılama > dil seçimi > giriş/kayıt > izinler (konum, sonra
+      mahalle seçimi; bildirim) > ana sayfa. Eren'in tasarımları temel: giriş/kayıtta sahne üstünde cam kart, dil seçiminde her dil için
+      resimli şerit. Resimler şimdilik çizim (fotoğraf lisansı derdi yok); Panel > Uygulama görselleri'nden değiştirilir (karşılama
+      slaytları ve slogan yazıları dile göre, beş dil şeridi, giriş arka planı; sıra, aç/kapat, varsayılan çizime dön, işlem kaydı;
+      yalnızca Admin). Resim yükleme Blaze ile açılır, o zamana kadar çizimler. Önizleme: G-Karsilama, G-Dil, G-Giris, G-Kayit,
+      G-IzinKonum, G-Mahalle, G-IzinBildirim panoları ve P-Gorseller (görünüm onayı bekliyor).
+      - Giriş seçenekleri: e-posta, Apple ve Google (Facebook yok). Apple, Google varken mağaza kuralı gereği şart.
+      - Kayıtta doğum yılı ve iki onay (kullanım şartları, aydınlatma metni) kalır.
+      - İzin ekranları nedenini anlatır, tek düğme "Devam et" telefonun kendi izin sorusunu açar (Apple kuralı: özel ekranda
+        "İzin ver/Atla" düğmesi olmaz). Konum izni verilmezse mahalle listeden seçilir; bildirim izni verilmezse uygulama çalışır.
+      - Eski "Seni biraz tanıyalım" adımı kalktı: meslek, cinsiyet ve kişiye uygun bildirim/kampanya onayları bildirim izni ekranında,
+        isteğe bağlı.
+      - Koda geçerken: `app/index.tsx` yönlendirme sırası (karşılama dilden önce), `complete-profile` içeriğinin bildirim
+        ekranına taşınması, Apple ile giriş (geliştirme derlemesi gerekir).
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
 
