@@ -612,7 +612,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Etkinlikler formunda kapak, Profil sayfasında logo (`components/image-field.tsx`, tarayıcıda 1600 piksel JPEG).
   Uygulama: etkinlik kartında küçük kapak, ayrıntıda tam genişlik; resmî profil kartında yuvarlak logo; İşletmem
   formunda logo ve vitrin (`components/media-picker.tsx`), işletme sayfasında logo halkada ve vitrin yana kayan
-  şerit, liste kartında küçük logo. **Vitrin sayısı kademeye göre** panel > Sınırlar'dan (öneri: ücretsiz 3, standart 10,
+  şerit, liste kartında küçük logo. **Vitrin sayısı kademeye göre** panel > Sınırlar'dan (karar 3 Kasım: ücretsiz 1, pro 10; eski öneri ücretsiz 3, standart 10,
   pro 20, premium 30; kesin üst sınır 30; kademeler gelir konusunda kesinleşecek). Kurallar: yeni bağlanan logo/kapak
   bağlayanın kendi dosyası olmalı, değişmeyen kalabilir; vitrinde kural motorunun 1000 işlem sınırı yüzünden yalnızca
   sayı denetlenir, uygulama yalnızca kendi depomuzdaki (Storage) adresleri gösterir (`photoFrom`). Sunucu işlevleri
@@ -738,6 +738,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sayfasında başkan profili. Örnek hesaplarda tutarlı örnek sayılar ("Örnek veri" etiketi). Testler: kurallar 8 yeni,
   ortak 6 yeni; panel derlendi, mobil tür denetimi geçti; tarayıcıda belediye, muhtar, admin örnek hesaplarıyla ve
   375 px genişlikte denendi. **Telefonda denenmedi.** PR #60 birleşti; kurallar Firebase'e, panel cityjoynew.web.app'e yüklendi (3 Kasım, Claude). Gönderi istatistikleri sonraki adım.
+- **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
+  bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
+  Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.
+  Testler güncellendi. Uygulama güncellenince telefonda görünür.
+- **İşletme kademeleri: iki kademe (Karar Eren, 3 Kasım; PROJE.md 15 madde 2).** Ücretsiz: listeye kendiliğinden düşer,
+  1 fotoğraf, Ara, WhatsApp. Pro: 10 fotoğraf, adres/yol, detaylı yazı, ücretler, yorumlar ve puan, video, istatistik,
+  öne çıkma hakkı (en çok 2 Reklam, doğrulanmış Pro işletmeler sırayla). Önizleme tuvalde (H-Cekici, H-Isletme, H-Kademe).
+  **Açık iş:** kodda MembershipTier hâlâ dört değerli ve panel Sınırlar vitrin önerisi 3/10/20/30; iç ekranlar uygulanırken
+  ikiye (ucretsiz, pro) ve 1/10 sınırına indirilecek.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
