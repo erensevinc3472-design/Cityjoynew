@@ -806,42 +806,42 @@
     },
     "toDeals": "Fırsatları keşfet",
     "backToSocial": "Sosyal Harmoni'ye dön",
-    "dealsNote": "Doğrulanmış işletmelerin indirimleri yakında burada.",
+    "dealsNote": "Doğrulanmış işletmelerin indirimleri",
     "deals": {
       "food": {
         "name": "Yemek",
         "tag": "Restoran ve kafe",
-        "desc": "Restoran ve kafelerde indirimler."
+        "desc": "Bugün ne yesek? Şehrin sofrası indirimde."
       },
       "market": {
         "name": "Market",
         "tag": "Günlük ihtiyaç",
-        "desc": "Market ve günlük alışverişte indirimler."
+        "desc": "Sepet hafifler, cüzdan sevinir."
       },
       "sport": {
         "name": "Spor",
         "tag": "Salon ve kurs",
-        "desc": "Spor salonu, havuz ve kurslarda indirimler."
+        "desc": "Formda kalmanın en tatlı bahanesi."
       },
       "fun": {
         "name": "Eğlence",
         "tag": "Sinema ve oyun",
-        "desc": "Sinema, tiyatro ve oyun alanlarında indirimler."
+        "desc": "Akşam planın hazır."
       },
       "craft": {
         "name": "Esnaf",
         "tag": "Mahallenin esnafı",
-        "desc": "Mahallendeki esnaftan indirimler."
+        "desc": "Mahallenin ustası, sana özel fiyatla."
       },
       "health": {
         "name": "Sağlık",
         "tag": "Bakım ve sağlık",
-        "desc": "Sağlık ve bakım hizmetlerinde indirimler."
+        "desc": "Kendine iyi bak, bu kez daha uygun."
       },
       "education": {
         "name": "Eğitim",
         "tag": "Kurs ve kitap",
-        "desc": "Kurs, kitap ve kırtasiyede indirimler."
+        "desc": "Yeni bir şey öğrenmenin tam zamanı."
       }
     }
   },
@@ -1187,7 +1187,10 @@
       "tooLong": "Video en çok {{max}} saniye olabilir. Kırpıp yeniden seç.",
       "tooLarge": "Video çok büyük (en çok 40 MB). Daha kısa ya da düşük çözünürlüklü bir video seç."
     },
-    "verifiedBusiness": "Doğrulanmış işletme"
+    "verifiedBusiness": "Doğrulanmış işletme",
+    "seeComments": "{{count}} yorumun tümünü gör",
+    "seen": "Gördüm",
+    "seenHint": "Nerede gördüğünü yorumla yaz"
   },
   "news": {
     "title": "Haberler",
@@ -2053,5 +2056,91 @@
     "notifySample3": "Yeni mesaj · Bisiklet hâlâ satılık mı?",
     "targetingConsent": "Yaşıma ve isteğe bağlı olarak cinsiyetime ve mesleğime göre bana uygun bildirimler gönderilsin.",
     "notifyNote": "İkisi de isteğe bağlı, Ayarlar'dan istediğin zaman kapatabilirsin."
+  },
+  "deals": {
+    "title": "Fırsatlar",
+    "empty": "Bu kategoride şu an açık fırsat yok.",
+    "ownerHint": "İşletmen mi var? Doğrulanmış işletmeler Profil > İşletmem > Fırsatlarım'dan ücretsiz fırsat açar.",
+    "loadError": "Fırsatlar yüklenemedi.",
+    "sponsored": "Sponsorlu",
+    "updated": "Güncellendi",
+    "daysLeft": "{{count}} gün kaldı",
+    "lastDay": "Son gün",
+    "until": "{{date}} tarihine kadar",
+    "showCode": "Kodu göster",
+    "codeLabel": "Kasada bu kodu söyle",
+    "showScreen": "Kasada bu ekranı göster",
+    "terms": "Şartlar",
+    "noTerms": "Ek şart yok.",
+    "always": "Her gün, çalışma saatlerinde",
+    "report": "Şikâyet et",
+    "reportTitle": "Bu fırsatta sorun ne?",
+    "reportDone": "Teşekkürler, şikâyetin il yöneticisine iletildi.",
+    "reportReasons": {
+      "yaniltici": "Yanıltıcı",
+      "gecersiz": "İşletme uygulamadı",
+      "uygunsuz": "Uygunsuz içerik",
+      "diger": "Diğer"
+    },
+    "kinds": {
+      "yuzde": "Yüzde indirim",
+      "tutar": "Tutar indirimi",
+      "hediye": "Hediye",
+      "ozel-fiyat": "Özel fiyat"
+    },
+    "mine": {
+      "title": "Fırsatlarım",
+      "add": "Yeni fırsat",
+      "empty": "Henüz fırsat açmadın. Fırsatın Sosyal Harmoni > Fırsatlar'da ve işletme sayfanda görünür.",
+      "needVerified": "Fırsat açmak için işletmenin doğrulanmış olması gerekir.",
+      "limit": "Aynı anda en çok {{count}} açık fırsatın olabilir. Birini durdur ya da bitir.",
+      "stats": "{{views}} görüntülenme · {{codes}} kod · {{calls}} arama",
+      "edit": "Düzenle",
+      "pause": "Durdur",
+      "resume": "Yeniden aç",
+      "end": "Bitir",
+      "endConfirm": "Fırsat bitirilsin mi? Bitirilen fırsat yeniden açılmaz.",
+      "status": {
+        "aktif": "Yayında",
+        "durduruldu": "Durduruldu",
+        "bitti": "Bitti",
+        "gizlendi": "Yönetim kaldırdı"
+      },
+      "expired": "Süresi doldu"
+    },
+    "form": {
+      "titleNew": "Yeni fırsat",
+      "titleEdit": "Fırsatı düzenle",
+      "category": "Kategori",
+      "kind": "Fırsat türü",
+      "value": "Oran ya da değer",
+      "valueHint": "Örnek: %20, 50 TL, 1 alana 1 bedava",
+      "dealTitle": "Neyde geçerli?",
+      "dealTitleHint": "Örnek: Tüm kahvaltı menüsü",
+      "when": "Gün ve saat (isteğe bağlı)",
+      "whenHint": "Örnek: Hafta içi 12:00-15:00. Boşsa her gün.",
+      "endsOn": "Bitiş tarihi (en çok 90 gün)",
+      "endsOnHint": "YYYY-AA-GG, örnek {{date}}. Bu günün sonunda kendiliğinden kalkar.",
+      "terms": "Şartlar (isteğe bağlı)",
+      "termsHint": "Örnek: Masa başına bir kez, paket serviste geçmez.",
+      "usage": "Nasıl kullanılır?",
+      "usageKod": "Kasada kod söylenir",
+      "usageEkran": "Ekran gösterilir",
+      "code": "Kod",
+      "codeHint": "3-16 harf ya da rakam, örnek KAHVE20",
+      "changedNote": "Yayındaki fırsatın değerini ya da şartını değiştirirsen kullanıcılara \"Güncellendi\" yazar.",
+      "legal": "Fırsatın doğruluğundan işletme sorumludur. Yanıltıcı fırsat şikâyetle kaldırılır.",
+      "save": "Yayınla",
+      "saveEdit": "Kaydet",
+      "errors": {
+        "value": "Oran ya da değeri yaz (en çok 24 karakter).",
+        "title": "Neyde geçerli olduğunu yaz (3-80 karakter).",
+        "when": "Gün ve saat en çok 80 karakter olabilir.",
+        "terms": "Şartlar en çok 400 karakter olabilir.",
+        "code": "Kod 3-16 harf ya da rakam olmalı.",
+        "endsOn": "Bitiş tarihi bugünden sonraki 90 gün içinde olmalı.",
+        "save": "Kaydedilemedi. İşletmen doğrulanmış mı, bağlantın açık mı?"
+      }
+    }
   }
 }

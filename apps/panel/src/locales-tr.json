@@ -1687,7 +1687,8 @@
       "kurumlar": "Kurumlar",
       "yetkiler": "Yetkiler",
       "islem-kayitlari": "İşlem kayıtları",
-      "sinirlar": "Günlük sınırlar"
+      "sinirlar": "Günlük sınırlar",
+      "firsatlar": "Fırsatlar"
     },
     "audience": "Takipçiler"
   },
@@ -1804,5 +1805,47 @@
     "mayorOpen": "Başkanın istatistikleri",
     "sampleMayor": "Erkan Aydın (örnek)",
     "privacy": "Gizlilik: {{min}} kişiden küçük gruplar ayrı gösterilmez, \"Diğer\"e katılır. Kimlik, telefon ya da tam adres hiçbir zaman paylaşılmaz. Konum, kişinin uygulamada kayıtlı mahallesidir (GPS değil)."
+  },
+  "deals": {
+    "title": "Fırsatlar",
+    "intro": "İlinizdeki işletmelerin açtığı fırsatlar. Şikâyet alanlar üstte.",
+    "rules": "Fırsatı yalnızca doğrulanmış işletme açar; bitiş en çok 90 gün sonradır ve süresi dolan fırsat uygulamada kendiliğinden kalkar. Yanıltıcı ya da uygunsuz fırsatı gizleyin; gizlenen fırsatı işletme açamaz. Geri açtığınız fırsatı işletme kendisi yeniden başlatır. Sponsorlu öne çıkma yalnızca Pro işletmeye, admin tarafından verilir. Her işlem işlem kaydına yazılır.",
+    "province": "İl",
+    "loading": "Yükleniyor…",
+    "loadError": "Fırsatlar yüklenemedi.",
+    "retry": "Yeniden dene",
+    "empty": "Bu ilde henüz fırsat yok.",
+    "error": "İşlem yapılamadı. Yetkinizi ve bağlantınızı kontrol edin.",
+    "dealCol": "Fırsat",
+    "businessCol": "İşletme",
+    "statusCol": "Durum",
+    "reportsCol": "Şikâyet",
+    "actionsCol": "İşlemler",
+    "hide": "Gizle",
+    "restore": "Geri aç",
+    "hidden": "Fırsat gizlendi.",
+    "restored": "Fırsat geri açıldı; işletme yeniden başlatabilir.",
+    "saved": "Kaydedildi.",
+    "reasonPrompt": "Gizleme nedeni (işlem kaydına yazılır):",
+    "sponsor": "Sponsorlu yap",
+    "unsponsor": "Sponsorluğu kaldır",
+    "sponsored": "Sponsorlu",
+    "endsOn": "{{date}} tarihine kadar",
+    "status": {
+      "aktif": "Yayında",
+      "durduruldu": "Durduruldu",
+      "bitti": "Bitti",
+      "gizlendi": "Gizlendi",
+      "expired": "Süresi doldu"
+    },
+    "categories": {
+      "food": "Yemek",
+      "market": "Market",
+      "sport": "Spor",
+      "fun": "Eğlence",
+      "craft": "Esnaf",
+      "health": "Sağlık",
+      "education": "Eğitim"
+    }
   }
 }

@@ -12,6 +12,7 @@ import { CityGuidePage } from './pages/city-guide-page';
 import { RoadsidePage } from './pages/roadside-page';
 import { TravelPricesPage } from './pages/travel-prices-page';
 import { ShowcasePage } from './pages/showcase-page';
+import { DealsPage } from './pages/deals-page';
 import { TravelPage } from './pages/travel-page';
 import { EmergencyNumbersPage } from './pages/emergency-numbers-page';
 import { EventsPage } from './pages/events-page';
@@ -68,6 +69,7 @@ const router = createHashRouter([
       { path: 'etkinlikler', element: <EventsPage /> },
       { path: 'sehir-rehberi', element: <CityGuidePage /> },
       { path: 'sehir-vitrini', element: <ShowcasePage /> },
+      { path: 'firsatlar', element: <DealsPage /> },
       { path: 'yol-ustu-verisi', element: <RoadsidePage /> },
       { path: 'seyahat', element: <TravelPage /> },
       { path: 'yolculuk-fiyatlari', element: <TravelPricesPage /> },

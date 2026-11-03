@@ -37,17 +37,18 @@ const SOCIAL: Card[] = [
 ];
 
 /**
- * Fırsatlar (ikinci sayfa; tasarımdaki indirim türleri). İndirimler doğrulanmış işletmelerin kampanyalarıyla gelecek
- * (13. madde 13-17: geçerlilik, şartlar, "sponsorlu" işareti); o zamana kadar hepsi "yakında". Örnek oran ve marka yok.
+ * Fırsatlar (ikinci sayfa; 13. madde 35): her kategori ayrı kart, dokununca kategorinin kendi sayfası açılır. Kartın
+ * üstündeki söz kart değiştikçe değişir (Eren'in yazıları, dil dosyasında). Fırsatları doğrulanmış işletmeler açar.
  */
+const deal = (category: string): Href => ({ pathname: '/deals/[category]', params: { category } });
 const DEALS: Card[] = [
-  { key: 'food', icon: 'restaurant', scene: 'food' },
-  { key: 'market', icon: 'shopping-cart', scene: 'market' },
-  { key: 'sport', icon: 'fitness-center', scene: 'clubs' },
-  { key: 'fun', icon: 'theater-comedy', scene: 'events' },
-  { key: 'craft', icon: 'storefront', scene: 'neighbourhood' },
-  { key: 'health', icon: 'health-and-safety', scene: 'health' },
-  { key: 'education', icon: 'school', scene: 'education' },
+  { key: 'food', icon: 'restaurant', scene: 'food', href: deal('food') },
+  { key: 'market', icon: 'shopping-cart', scene: 'market', href: deal('market') },
+  { key: 'sport', icon: 'fitness-center', scene: 'clubs', href: deal('sport') },
+  { key: 'fun', icon: 'theater-comedy', scene: 'events', href: deal('fun') },
+  { key: 'craft', icon: 'storefront', scene: 'neighbourhood', href: deal('craft') },
+  { key: 'health', icon: 'health-and-safety', scene: 'health', href: deal('health') },
+  { key: 'education', icon: 'school', scene: 'education', href: deal('education') },
 ];
 
 /**

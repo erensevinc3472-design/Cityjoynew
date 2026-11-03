@@ -49,7 +49,7 @@ export default function SignInScreen() {
       <GlassCard title={t('auth.signInTitle')} subtitle={t('auth.signInSubtitle')}>
         <TextField label={t('auth.email')} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email" textContentType="emailAddress" />
         <TextField label={t('auth.password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" textContentType="password" onSubmitEditing={submit} />
-        <AuthLink lead="" action={t('auth.forgotPasswordShort')} onPress={() => router.push({ pathname: '/reset-password', params: { email } })} />
+        <AuthLink end lead="" action={t('auth.forgotPasswordShort')} onPress={() => router.push({ pathname: '/reset-password', params: { email } })} />
         {error ? <FormMessage kind="error" text={error} /> : null}
         <AppButton title={t('auth.signIn')} onPress={submit} loading={busy} />
         {supportsGoogleSignIn ? (

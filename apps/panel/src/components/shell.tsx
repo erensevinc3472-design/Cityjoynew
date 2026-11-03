@@ -62,6 +62,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
     items: [
       { key: 'isletme-dogrulama', module: 'isletme-dogrulama', path: '/isletmeler', icon: 'store' },
       { key: 'onaylar', module: 'onaylar', path: '/onaylar', icon: 'check' },
+      { key: 'firsatlar', module: 'moderasyon', path: '/firsatlar', icon: 'ticket' },
       { key: 'profiller', show: admin, path: '/profiller', icon: 'users' },
       { key: 'hizmet-kategorileri', module: 'hizmet-kategorileri', path: '/hizmet-kategorileri', icon: 'grid' },
       { key: 'meslekler', module: 'meslekler', path: '/meslekler', icon: 'briefcase' },

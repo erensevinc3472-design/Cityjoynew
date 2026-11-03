@@ -7,6 +7,7 @@ import {
   createFirestoreOfficialFollowRepository,
   createFirestoreActivityRepository,
   createFirestoreShowcaseRepository,
+  createFirestoreDealRepository,
   createFirestoreTravelRepository,
   createFirestorePostRepository,
   createFirestoreSocialRepository,
@@ -63,6 +64,8 @@ export const familyRepository = createFirestoreFamilyRepository(firestore);
 export const sosRepository = createFirestoreSosRepository(firestore);
 export const travelRepository = createFirestoreTravelRepository(firestore);
 export const showcaseRepository = createFirestoreShowcaseRepository(firestore);
+/** Fırsatlar (Sosyal Harmoni > Fırsatlar, işletme sayfası, Fırsatlarım). */
+export const dealRepository = createFirestoreDealRepository(firestore);
 export const pushTokenRepository = createFirestorePushTokenRepository(firestore);
 /** Benim Şehrim sabit bilgileri: il başına özet tek okuma, bölüm yalnızca değişince indirilir. */
 export const cityGuide = createCityGuideStore(createFirestoreCityGuideRepository(firestore), deviceStorage);

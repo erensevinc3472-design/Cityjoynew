@@ -88,9 +88,9 @@ export function SocialButton({ icon, title, onPress, disabled }: { icon: 'apple'
 }
 
 /** Alt satırdaki altın bağlantı ("Hesabın yok mu? Kayıt ol"). */
-export function AuthLink({ lead, action, onPress }: { lead: string; action: string; onPress(): void }) {
+export function AuthLink({ lead, action, onPress, end }: { lead: string; action: string; onPress(): void; end?: boolean }) {
   return (
-    <Pressable accessibilityRole="link" onPress={onPress} hitSlop={8} style={styles.link}>
+    <Pressable accessibilityRole="link" onPress={onPress} hitSlop={8} style={[styles.link, end && { alignSelf: 'flex-end', minHeight: 32, marginTop: -6 }]}>
       <AppText style={styles.linkText}>
         {lead} <AppText style={[styles.linkText, { color: GOLD, fontFamily: fonts.bodySemi }]}>{action}</AppText>
       </AppText>

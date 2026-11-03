@@ -38,6 +38,7 @@ export {
 } from './organizations';
 export { CITY_PACK_SIZE, createCityGuideAdmin, createFirestoreCityGuideRepository } from './city-guide';
 export { createFirestoreShowcaseRepository, createShowcaseAdmin } from './showcase';
+export { createDealModeration, createFirestoreDealRepository, deleteDealsOf } from './deals';
 export {
   createApprovalAdmin,
   createVerificationRequests,

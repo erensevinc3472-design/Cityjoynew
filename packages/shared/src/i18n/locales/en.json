@@ -806,42 +806,42 @@
     },
     "toDeals": "Explore deals",
     "backToSocial": "Back to Social Harmony",
-    "dealsNote": "Discounts from verified businesses are coming here soon.",
+    "dealsNote": "Discounts from verified businesses",
     "deals": {
       "food": {
         "name": "Food",
         "tag": "Restaurants and cafés",
-        "desc": "Discounts at restaurants and cafés."
+        "desc": "What shall we eat today? The city's table is on sale."
       },
       "market": {
         "name": "Market",
         "tag": "Daily needs",
-        "desc": "Discounts on groceries and daily shopping."
+        "desc": "A lighter basket, a happier wallet."
       },
       "sport": {
         "name": "Sports",
         "tag": "Gyms and classes",
-        "desc": "Discounts at gyms, pools and classes."
+        "desc": "The sweetest excuse to stay fit."
       },
       "fun": {
         "name": "Fun",
         "tag": "Cinema and games",
-        "desc": "Discounts at cinemas, theatres and play areas."
+        "desc": "Your evening plan is ready."
       },
       "craft": {
         "name": "Local shops",
         "tag": "Your neighbourhood",
-        "desc": "Discounts from shops in your neighbourhood."
+        "desc": "Your neighbourhood's craftspeople, at a price just for you."
       },
       "health": {
         "name": "Health",
         "tag": "Care and health",
-        "desc": "Discounts on health and care services."
+        "desc": "Take care of yourself, for less this time."
       },
       "education": {
         "name": "Education",
         "tag": "Courses and books",
-        "desc": "Discounts on courses, books and stationery."
+        "desc": "The perfect time to learn something new."
       }
     }
   },
@@ -1187,7 +1187,10 @@
       "tooLong": "Videos can be up to {{max}} seconds. Trim it and choose again.",
       "tooLarge": "The video is too large (max 40 MB). Choose a shorter or lower-resolution video."
     },
-    "verifiedBusiness": "Verified business"
+    "verifiedBusiness": "Verified business",
+    "seeComments": "View all {{count}} comments",
+    "seen": "I saw it",
+    "seenHint": "Write where you saw it in a comment"
   },
   "news": {
     "title": "News",
@@ -2053,5 +2056,91 @@
     "notifySample3": "New message · Is the bike still for sale?",
     "targetingConsent": "Send me notifications suited to my age and, optionally, my gender and occupation.",
     "notifyNote": "Both are optional; you can turn them off in Settings at any time."
+  },
+  "deals": {
+    "title": "Deals",
+    "empty": "There are no open deals in this category right now.",
+    "ownerHint": "Own a business? Verified businesses add deals for free in Profile > My business > My deals.",
+    "loadError": "Couldn't load deals.",
+    "sponsored": "Sponsored",
+    "updated": "Updated",
+    "daysLeft": "{{count}} days left",
+    "lastDay": "Last day",
+    "until": "Until {{date}}",
+    "showCode": "Show code",
+    "codeLabel": "Say this code at the till",
+    "showScreen": "Show this screen at the till",
+    "terms": "Terms",
+    "noTerms": "No extra terms.",
+    "always": "Every day, during opening hours",
+    "report": "Report",
+    "reportTitle": "What's wrong with this deal?",
+    "reportDone": "Thanks, your report was sent to the city moderators.",
+    "reportReasons": {
+      "yaniltici": "Misleading",
+      "gecersiz": "The business didn't honour it",
+      "uygunsuz": "Inappropriate content",
+      "diger": "Other"
+    },
+    "kinds": {
+      "yuzde": "Percentage off",
+      "tutar": "Amount off",
+      "hediye": "Freebie",
+      "ozel-fiyat": "Special price"
+    },
+    "mine": {
+      "title": "My deals",
+      "add": "New deal",
+      "empty": "You haven't added a deal yet. Deals appear in Social Harmony > Deals and on your business page.",
+      "needVerified": "Your business must be verified to add deals.",
+      "limit": "You can have at most {{count}} open deals at once. Pause or end one first.",
+      "stats": "{{views}} views · {{codes}} codes · {{calls}} calls",
+      "edit": "Edit",
+      "pause": "Pause",
+      "resume": "Resume",
+      "end": "End",
+      "endConfirm": "End this deal? An ended deal can't be reopened.",
+      "status": {
+        "aktif": "Live",
+        "durduruldu": "Paused",
+        "bitti": "Ended",
+        "gizlendi": "Removed by moderators"
+      },
+      "expired": "Expired"
+    },
+    "form": {
+      "titleNew": "New deal",
+      "titleEdit": "Edit deal",
+      "category": "Category",
+      "kind": "Deal type",
+      "value": "Rate or value",
+      "valueHint": "E.g. 20%, 50 TL, buy one get one free",
+      "dealTitle": "What is it valid on?",
+      "dealTitleHint": "E.g. The whole breakfast menu",
+      "when": "Days and hours (optional)",
+      "whenHint": "E.g. Weekdays 12:00-15:00. Leave empty for every day.",
+      "endsOn": "End date (up to 90 days)",
+      "endsOnHint": "YYYY-MM-DD, e.g. {{date}}. It is removed automatically at the end of that day.",
+      "terms": "Terms (optional)",
+      "termsHint": "E.g. Once per table, not valid for takeaway.",
+      "usage": "How is it used?",
+      "usageKod": "A code is said at the till",
+      "usageEkran": "The screen is shown",
+      "code": "Code",
+      "codeHint": "3-16 letters or digits, e.g. COFFEE20",
+      "changedNote": "If you change the value or terms of a live deal, users will see \"Updated\".",
+      "legal": "The business is responsible for the deal being accurate. Misleading deals are removed after reports.",
+      "save": "Publish",
+      "saveEdit": "Save",
+      "errors": {
+        "value": "Enter the rate or value (up to 24 characters).",
+        "title": "Say what it is valid on (3-80 characters).",
+        "when": "Days and hours can be up to 80 characters.",
+        "terms": "Terms can be up to 400 characters.",
+        "code": "The code must be 3-16 letters or digits.",
+        "endsOn": "The end date must be within the next 90 days.",
+        "save": "Couldn't save. Is your business verified and are you online?"
+      }
+    }
   }
 }

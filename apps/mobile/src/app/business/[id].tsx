@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   averageRating,
+  dealLive,
   findCategory,
   isFoodKind,
   isRoadsideKind,
@@ -17,11 +18,13 @@ import {
   telUrl,
   whatsappUrl,
   type Business,
+  type Deal,
   type Post,
 } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { verificationText } from '@/components/business-card';
+import { DealBox } from '@/components/deal-box';
 import { RoundButton } from '@/components/hero-header';
 import { PostGrid } from '@/components/post-grid';
 import { ReviewsSection } from '@/components/reviews-section';
@@ -29,7 +32,8 @@ import { StateMessage } from '@/components/state-message';
 import { TopBar } from '@/components/top-bar';
 import { locationRepository } from '@/lib/locations';
 import { useServiceCategories } from '@/lib/service-categories';
-import { businessRepository, postRepository, reviewRepository } from '@/lib/services';
+import { countDeal } from '@/lib/deals';
+import { businessRepository, dealRepository, postRepository, reviewRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { toggleFollowBusiness, useSocial } from '@/lib/social';
@@ -65,6 +69,7 @@ export default function BusinessScreen() {
   const [error, setError] = useState(false);
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [pending, setPending] = useState<Post[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
   const [tab, setTab] = useState<Tab>('gonderiler');
   const [busy, setBusy] = useState(false);
   const following = !!followingBusinesses?.includes(id);
@@ -74,6 +79,7 @@ export default function BusinessScreen() {
     businessRepository.get(id).then(
       (biz) => {
         setB(biz);
+        if (biz) dealRepository.listForBusiness(biz.id).then((l) => setDeals(l.filter((d) => dealLive(d))), () => setDeals([]));
         if (!biz || !user) return setPosts([]);
         postRepository.byBusiness(id, { provinceCode: location?.provinceCode, following }).then((l) => setPosts(l.filter(isPostListed)), () => setPosts([]));
         if (biz.ownerUid === user.uid || biz.managers.some((m) => m.uid === user.uid)) postRepository.pendingOf(id).then(setPending, () => setPending([]));
@@ -111,6 +117,8 @@ export default function BusinessScreen() {
   const postMode = user ? postModeFor(b, user.uid) : null;
 
   const contact = (url: string) => {
+    // Fırsatı görüp arayan: fırsatın arama sayacı (Fırsatlarım istatistiği).
+    if (!team) deals.forEach((d) => countDeal(d.id, 'calls'));
     // Arama kaydı değerlendirme yazabilmenin şartı (PROJE.md 13 madde 17).
     if (user && !team) reviewRepository.recordContact(b.id, user.uid).catch(() => {});
     Linking.openURL(url).catch(() => {});
@@ -228,6 +236,9 @@ export default function BusinessScreen() {
             {b.status !== 'yayinda' ? <AppText variant="caption" style={{ color: c.danger }}>{b.status === 'gizli' ? t('business.statusHidden') : t('business.statusRemoved')}</AppText> : null}
           </View>
 
+          {/* Fırsat kutusu kapağın altında (13. madde 35). */}
+          {deals.map((d) => <DealBox key={d.id} deal={d} own={team} />)}
+
           {b.gallery?.length ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery} accessibilityLabel={t('business.page.gallery')}>
               {b.gallery.map((p, i) => (
@@ -263,6 +274,13 @@ export default function BusinessScreen() {
               ) : (
                 <AppText variant="caption" muted>{t('business.page.noPostPermission')}</AppText>
               )}
+              {isOwner ? (
+                <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/business/deals', params: { id: b.id } })} style={({ pressed }) => [styles.teamRow, { opacity: pressed ? 0.75 : 1 }]}>
+                  <MaterialIcons name="local-offer" size={22} color={c.accent} />
+                  <AppText style={[styles.grow, styles.teamText, { color: c.textStrong }]}>{t('deals.mine.title')}</AppText>
+                  <MaterialIcons name="chevron-right" size={20} color={c.textSoft} />
+                </Pressable>
+              ) : null}
               {pending.length ? (
                 <View style={styles.pending}>
                   <AppText variant="label">{t('business.page.pendingTitle', { count: pending.length })}</AppText>
