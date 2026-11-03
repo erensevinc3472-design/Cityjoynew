@@ -760,6 +760,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   çıkmadan önce en sonda toplu yapılmasını istedi (29 Ekim 2026).
 - **Sonra bakılacak (Eren, 3 Kasım):** Keşfet konum rozeti (Hesabım > "Konum rozeti", `/location-badge`). Eren
   daha sonra birlikte gözden geçirmek istedi; ne değişeceği henüz konuşulmadı.
+- **İç ekranların yeni tasarımı, Eren'in kararları (3 Kasım 2026):** PROJE.md 13. madde 35. Tüm iç ekranlar (Müzeler, Keşfet,
+  Cafe ve Restoran, Benim Şehrim'in 12 alt sayfası) hepsi birlikte koda geçecek; Eren tekrar önizleme istemedi. Önizleme:
+  https://claude.ai/artifact/KtJc51bopnoZd2DSHY625r. Öne çıkanlar: Büyükşehir de büyük kartta, Mahalle Meydanı'nın yeni içeriği,
+  Otoparkta kapasite / canlı takip yok, Satılık ve Kiralık için Çarşı tasarımı, **il Vitrini reklam panosu ve gelir kaynağı**
+  (önceki "para karşılığı girilmez" notunun yerine).
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
