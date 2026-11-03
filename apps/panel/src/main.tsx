@@ -26,7 +26,10 @@ import { ServiceCategoriesPage } from './pages/service-categories-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { LimitsPage } from './pages/limits-page';
 import { NotificationsPage } from './pages/notifications-page';
-import { OverviewPage } from './pages/overview-page';
+import { TodayPage } from './pages/today-page';
+import { StatsPage } from './pages/stats-page';
+import { ProfilesPage } from './pages/profiles-page';
+import { CityProvider } from './lib/city';
 import './styles.css';
 
 function RequireUser({ children }: { children: React.ReactNode }) {
@@ -46,7 +49,9 @@ const router = createHashRouter([
       </RequireUser>
     ),
     children: [
-      { index: true, element: <OverviewPage /> },
+      { index: true, element: <TodayPage /> },
+      { path: 'istatistikler', element: <StatsPage /> },
+      { path: 'profiller', element: <ProfilesPage /> },
       { path: 'konumlar', element: <LocationsPage /> },
       { path: 'meslekler', element: <OccupationsPage /> },
       { path: 'acil-numaralar', element: <EmergencyNumbersPage /> },
@@ -76,7 +81,9 @@ const router = createHashRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SessionProvider>
-      <RouterProvider router={router} />
+      <CityProvider>
+        <RouterProvider router={router} />
+      </CityProvider>
     </SessionProvider>
   </StrictMode>,
 );
