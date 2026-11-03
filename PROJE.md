@@ -150,23 +150,26 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
     6. *Varışta:* "Ziyaretçi Modu" (aşağıda, Benim Şehrim): gezilecek yerler, yemek, nöbetçi eczane, acil numaralar, ulaşım, yerel etkinlikler ve yerel dolandırıcılık uyarıları.
     7. *Dönüş:* deneyimi Keşfet'te paylaşma, kaydedilenler.
   - **Yapıldı (29 Ekim 2026), ilk sürüm (Eren onayladı: tek ekran; ücretler panelden ayda bir elle):** Planla ekranı nereden-nereye, tarih, yolcu, araç türüne göre tahmini süre ve ücret (il merkezleri arası mesafe, ücretli harita servisi yok), güzergâh çevresindeki mola yerleri, varılan şehrin sayfaları, hazırlık listesi ve "Yola çık" (Yoldayım, varış ve kalan km). Planlar telefonda. Panel > Seyahat > Yolculuk fiyatları. Sonra: hava durumu, Ziyaretçi Modu, konaklama rehberi, paketler.
-  - **Karar (Eren, 3 Kasım 2026): Yoldayım aynen kalır** (gece yolu animasyonuyla, Seyahat'te ayrı düğme). **Planla yeniden
-    odaklanır:** araca göre ortalama maliyet, konaklama, hazır rotalar ve tatil fikirleri. Hazır rotalar Planla'da yeniden
-    yapılmaz, gidilecek şehrin şehir sayfasındaki rotalara bağlanır. Önizleme (PL-* panoları, onay bekliyor): 1) Planla:
-    "Nereye gidiyorsun?" (nereden konum, nereye, gece, kişi), "Nereye gideceğine karar veremedin mi?" tatil fikirleri
-    (Deniz, Kayak, Termal, Kültür, Doğa, Lezzet, Aileyle, Balayı), ilinden 3 saat içindeki hafta sonu önerileri, kayıtlı
-    planlar; 2) tatil fikri (ör. Termal): şehir kartları, en iyi dönem, süre, yol ve gece başı tutar aralığı, Şehri tanı /
-    Planla; 3) plan: araç türlerine göre ortalama maliyet (kendi araç, otobüs, tren, uçak; yoksa "doğrudan uçuş yok"),
-    "Nerede kalırsın?" iki tesis ve Tümü, şehrin hazır rotaları (şehir sayfasına gider), tahmini toplam aralığı (yol +
-    konaklama × gece; yeme içme ve giriş dahil değil), Planı kaydet; 4) konaklama listesi: tür ve aile ölçütü süzgeçleri,
-    belgeli rozeti, gece fiyat aralığı ve güncelleme tarihi, doğrulanmış konaklayan geri bildirim oranları, "Reklam"
-    etiketi; 5) tesis: sezonluk ücret tablosu, ek ücret, depozito, iptal, aile ölçütleri, belge no, Web sitesi / Tesisi ara
-    (rezervasyon tesisle doğrudan, CityJoy aracılık etmez). Panel > Seyahat > Tatil fikirleri (P-Tatil): temalar ve
-    sıraları, temadaki şehirler (dönem, kısa not, taslak/yayında), konaklama verisi özeti, işlem kaydı. Tutarlar elle
-    yazılmaz: yol "Yol tutarları"ndan (eski Yolculuk fiyatları), gece aralığı o şehirdeki belgeli konaklama işletmelerinin
-    fiyat tablolarından hesaplanır. Konaklama İşletmeler'den gelir (tür konaklama), fiyatı işletme kendi panelinden
-    günceller, belgeyi yönetici doğrular; 60 günden eski fiyatta "fiyatı güncel değil" yazar. Kapak resmi Blaze ile.
-    Eski T-* önerisi (beş adımlı Planla ve Yola Çık akışı) bu kararla kaldırıldı.
+  - **Karar (Eren, 3 Kasım 2026): Yoldayım aynen kalır** (gece yolu animasyonuyla, Seyahat'te ayrı düğme). **Planla bir
+    tatil keşfi bölümü olur** ("Türkiye'nin görülmesi gereken yerleri" gibi); araç başına yakıt/maliyet hesabı çıkarıldı.
+    Akış: Türkiye / Yurt dışı > tatil fikri (Deniz, Kayak, Termal, Kültür, Doğa, Lezzet, Aileyle, Balayı, Görülmesi
+    gerekenler) > o temaya uyan şehirler/yerler > seçilen yerin konaklaması > tesis sayfası (Web sitesi / Tesisi ara;
+    rezervasyon tesisle doğrudan). Yer kartında il, uzaklık, en iyi dönem, tesis sayısı ve gece fiyat aralığı. Konaklama
+    listesinin üstünde "{Şehir}'i tanı" (şehir sayfası, hazır rotalar orada). Ayrıca hafta sonu önerileri (ilinden 3 saat
+    içi) ve kaydedilenler. **Yurt dışı** sonraki sürüm: ülke > şehir > rota ve güzel yerler; içeriği hazırlanmayan ülke
+    gösterilmez (13. madde 34).
+  - **Konaklama işletmelerden kendiliğinden gelir (Eren, 3 Kasım 2026):** İşletme ekle'deki "Konaklama" türünün adı
+    **"Otel ve konaklama"** olur (Claude seçimi: "tatil" işletmeyi değil kullanıcının amacını anlatır; pansiyon, apart,
+    günlük kiralık ev de bu türe girer). İşletme tesis türünü (otel, butik otel, termal otel, pansiyon, apart, günlük
+    kiralık ev, bungalov, kamp) ve "Hangi tatil fikirlerinde görünsün?" etiketlerini seçer, belge ve ücret tablosunu girer;
+    belgesi onaylanınca kendi il/ilçesinin listesine ve seçtiği temalara düşer. Bir yer, o temayla işaretli en az bir
+    belgeli tesisi varsa temanın listesine kendiliğinden girer; ekip panelden sıralar, gizler, dönem ve not yazar, uymayan
+    etiketi kaldırır. **Kademe diğer işletmelerle aynı (Ücretsiz / Pro, bölüm 15 madde 2):** Ücretsiz: ad, belge rozeti,
+    fiyat aralığı, Ara ve WhatsApp ("Yeni"); Pro: 10 fotoğraf, tanıtım, tam ücret tablosu, aile ölçütleri, web sitesi,
+    geri bildirimler, öne çıkma ("Reklam", her listede en çok 2). Gelir kaynağı: Pro ve öne çıkma (15 madde 5).
+    Önizleme (onay bekliyor): PL-Giris, PL-Tema, PL-Konaklama, PL-Tesis, PL-Isletme, PL-Yurtdisi ve Panel > Seyahat >
+    Tatil fikirleri (P-Tatil). Eski T-* önerisi ve "Planla ve Yola Çık" sorusu kaldırıldı. Koda geçerken eski Planla
+    ekranındaki yol ücreti tahmini ve Panel > Yolculuk fiyatları kaldırılır ya da gizlenir.
   - **"Paketler" (öneri):** satış paketi değil, **hazır yolculuk planları** (aile, balayı vb.): çocuk dostu yerler, romantik rotalar gibi derlenmiş bilgi. "Tahmini Toplam" kesin fiyat değil, **tahmini maliyet aralığı** olarak ve kaynak/tarihle gösterilir. Örneklerdeki marka adları (Metro Turizm, Hilton) ortaklık olmadıkça kullanılmaz, "otobüs firması", "otel" gibi kategorilerle gösterilir.
   - **İhtiyaç keşfi (öneri):** İnsanların yolculukta en çok ne istediği tahmindir (ne kadar tutar, güvenilir mi, ne zaman gitmeli, nasıl giderim, ne yapılır, sorun çıkarsa ne olur). Doğrulamak için birkaç kişiyle konuşulabilir, ayrıca asistanın cevaplayamadığı sorular otomatik bir ihtiyaç listesine dönüşür (panelde görünür).
   - **Gelir fikri (sonra):** Resmi bilet ve konaklama sitelerine yönlendirme ortaklıkları olabilir. Sıralamayı etkilemez, "ortaklık/reklam" diye işaretlenir.
