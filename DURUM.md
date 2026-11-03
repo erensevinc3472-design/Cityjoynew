@@ -809,7 +809,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   onay bekliyor. Seyahat şimdiki hâliyle kalır (Eren).
   Fırsatlar (Eren): kaydırmalı kategori kartları, kategori sayfası, fırsattan işletme sayfasına (geri: listeye), İşletmem >
   Fırsatlarım; fırsat sınırı Ücretsiz 1, Pro 5 (PROJE.md 13 madde 35 ve 15 madde 2).
-  Profil, Mesajlar, Yeni gönderi, İşletmem: içerik aynı, yeni görünüm önizlemesi (U-* panoları), onay bekliyor.
+  Profil, Mesajlar, İşletme ekle, Gönderi paylaş: Expo'daki hâli iyi, aynen kalır (Eren); U-* panoları o hâli gösterir.
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
