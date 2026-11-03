@@ -740,6 +740,9 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
     - **Profil, Mesajlar, İşletme ekle, Gönderi paylaş (Karar Eren, 3 Kasım 2026):** Expo'daki şimdiki tasarımları iyi, aynen
       kalır (Profil'deki Ailem (SOS) / İşletmem kısayolları, Mesajlar'daki İşletmem sekmesi, İşletme ekle formu dahil). Önizleme
       panoları (U-*) Expo'daki hâli birebir gösterir; koda geçerken yalnızca yeni renk ve kart dili uygulanır, sıra ve içerik değişmez.
+    - **Duyurular (3 Kasım 2026, önizleme, onay bekliyor):** D-Nerede (Ana sayfa acil şeridi, Mahalle Meydanı "Tüm duyurular",
+      Belediye Hizmetleri son duyuru), D-Liste (konum çipi, acil kırmızı, sabit altın, kurum haberi kategori etiketiyle) ve D-Detay
+      (112 uyarısı, resmî hesap satırı, Bölge / Yayın / Bitiş). İçerik ve mantık koddaki gibi, yalnızca görünüm yeni.
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
 

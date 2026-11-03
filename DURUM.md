@@ -810,6 +810,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Fırsatlar (Eren): kaydırmalı kategori kartları, kategori sayfası, fırsattan işletme sayfasına (geri: listeye), İşletmem >
   Fırsatlarım; fırsat sınırı Ücretsiz 1, Pro 5 (PROJE.md 13 madde 35 ve 15 madde 2).
   Profil, Mesajlar, İşletme ekle, Gönderi paylaş: Expo'daki hâli iyi, aynen kalır (Eren); U-* panoları o hâli gösterir.
+  Duyurular önizlemesi (D-Nerede, D-Liste, D-Detay), onay bekliyor.
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
