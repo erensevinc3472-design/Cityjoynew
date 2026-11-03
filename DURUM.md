@@ -816,7 +816,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Giriş akışı (Eren): karşılama > dil > giriş/kayıt > izinler > ana sayfa; resimler şimdilik çizim, Panel > Uygulama
   görselleri'nden değişir (yükleme Blaze ile). G-* panoları ve P-Gorseller Eren onayladı (buzlu cam kart) (PROJE 13, madde 35).
   Seyahat (Eren): Yoldayım aynen kalır. Planla = tatil keşfi: Türkiye / Yurt dışı (sonra) > tatil fikri > yerler >
-  konaklama (İşletme ekle > "Otel ve konaklama"dan kendiliğinden, Ücretsiz / Pro). PL-* (6) ve P-Tatil onay bekliyor (PROJE 5.2).
+  konaklama (İşletme ekle > "Otel ve konaklama"dan kendiliğinden, Ücretsiz / Pro). PL-* (6) ve P-Tatil Eren onayladı (PROJE 5.2).
+  Panel > Seyahat: Keşfet ve Öğren (kodda var, P-Sy* panoları eklendi; yeni: Ülkeler sekmesi) ve Tatil fikirleri.
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.

@@ -167,9 +167,14 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
     etiketi kaldırır. **Kademe diğer işletmelerle aynı (Ücretsiz / Pro, bölüm 15 madde 2):** Ücretsiz: ad, belge rozeti,
     fiyat aralığı, Ara ve WhatsApp ("Yeni"); Pro: 10 fotoğraf, tanıtım, tam ücret tablosu, aile ölçütleri, web sitesi,
     geri bildirimler, öne çıkma ("Reklam", her listede en çok 2). Gelir kaynağı: Pro ve öne çıkma (15 madde 5).
-    Önizleme (onay bekliyor): PL-Giris, PL-Tema, PL-Konaklama, PL-Tesis, PL-Isletme, PL-Yurtdisi ve Panel > Seyahat >
+    Önizleme **(Eren onayladı, 3 Kasım 2026)**: PL-Giris, PL-Tema, PL-Konaklama, PL-Tesis, PL-Isletme, PL-Yurtdisi ve Panel > Seyahat >
     Tatil fikirleri (P-Tatil). Eski T-* önerisi ve "Planla ve Yola Çık" sorusu kaldırıldı. Koda geçerken eski Planla
     ekranındaki yol ücreti tahmini ve Panel > Yolculuk fiyatları kaldırılır ya da gizlenir.
+  - **Panel > Seyahat menüsü (3 Kasım 2026, Eren istedi):** iki alt başlık: **Keşfet ve Öğren** ve **Tatil fikirleri**.
+    Keşfet ve Öğren kodda zaten var (`apps/panel/src/pages/travel-page.tsx`, 28-29 Ekim): Bölgeler, Şehirler, Gezilecek
+    yerler, Hazır rotalar, Yöresel, Başkanlarla Keşif, Kareler sekmeleri; tasarım tuvaline P-Sy* panoları olarak eklendi.
+    Yeni: ilk sekme **Ülkeler ve bölgeler**. Ülke şu an kodda sabit açılıp kapanıyor (`TRAVEL_COUNTRIES.open`); koda
+    geçerken admin panelden "Açık" yapar (en az bir şehri yayındayken), Planla > Yurt dışı da buradan beslenir.
   - **"Paketler" (öneri):** satış paketi değil, **hazır yolculuk planları** (aile, balayı vb.): çocuk dostu yerler, romantik rotalar gibi derlenmiş bilgi. "Tahmini Toplam" kesin fiyat değil, **tahmini maliyet aralığı** olarak ve kaynak/tarihle gösterilir. Örneklerdeki marka adları (Metro Turizm, Hilton) ortaklık olmadıkça kullanılmaz, "otobüs firması", "otel" gibi kategorilerle gösterilir.
   - **İhtiyaç keşfi (öneri):** İnsanların yolculukta en çok ne istediği tahmindir (ne kadar tutar, güvenilir mi, ne zaman gitmeli, nasıl giderim, ne yapılır, sorun çıkarsa ne olur). Doğrulamak için birkaç kişiyle konuşulabilir, ayrıca asistanın cevaplayamadığı sorular otomatik bir ihtiyaç listesine dönüşür (panelde görünür).
   - **Gelir fikri (sonra):** Resmi bilet ve konaklama sitelerine yönlendirme ortaklıkları olabilir. Sıralamayı etkilemez, "ortaklık/reklam" diye işaretlenir.
