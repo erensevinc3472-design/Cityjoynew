@@ -150,6 +150,15 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
     6. *Varışta:* "Ziyaretçi Modu" (aşağıda, Benim Şehrim): gezilecek yerler, yemek, nöbetçi eczane, acil numaralar, ulaşım, yerel etkinlikler ve yerel dolandırıcılık uyarıları.
     7. *Dönüş:* deneyimi Keşfet'te paylaşma, kaydedilenler.
   - **Yapıldı (29 Ekim 2026), ilk sürüm (Eren onayladı: tek ekran; ücretler panelden ayda bir elle):** Planla ekranı nereden-nereye, tarih, yolcu, araç türüne göre tahmini süre ve ücret (il merkezleri arası mesafe, ücretli harita servisi yok), güzergâh çevresindeki mola yerleri, varılan şehrin sayfaları, hazırlık listesi ve "Yola çık" (Yoldayım, varış ve kalan km). Planlar telefonda. Panel > Seyahat > Yolculuk fiyatları. Sonra: hava durumu, Ziyaretçi Modu, konaklama rehberi, paketler.
+  - **Yeniden düzen önerisi (3 Kasım 2026, onay bekliyor; Eren: Planla ve Navigasyon "oturmadı").** Sorun: Planla her şeyi
+    tek uzun ekrana yığıyor, Yoldayım ayrı düğme ve bağı belli değil, "Navigasyon" adı kendi yol tarifimiz varmış gibi
+    algılanıyor. Öneri, beş adımlı akış (T-* panoları): 1) giriş: "Nereye gidiyorsun?" kartı, yaklaşan yolculuk (Planı aç,
+    Yola çık), "Zaten yoldayım" kısayolu, ilinden sık gidilen şehirler; 2) "Nasıl gideceksin?": araç türleri yan yana
+    (süre, ücret, "en esnek / en ucuz" etiketi, ücretin nasıl hesaplandığı); 3) yolculuk planı: bilet kartı ve Yol /
+    Hazırlık / Varınca sekmeleri, Ailem ile konum paylaşma seçeneği, "Yola çık" (otobüs, uçak, trende "Resmî siteden sefer
+    bak"); 4) Yoldayım: plandan gelince ilerleme çubuğu ve kalan yol; 5) Vardın: Ziyaretçi Modu (nöbetçi eczane, acil
+    numaralar, şehir içi ulaşım, gezilecek yerler, yöresel, etkinlik, yerel uyarı, dönüşü planla). **SORULACAK:** bölümün
+    adı "Planla ve Yola Çık" olsun mu?
   - **"Paketler" (öneri):** satış paketi değil, **hazır yolculuk planları** (aile, balayı vb.): çocuk dostu yerler, romantik rotalar gibi derlenmiş bilgi. "Tahmini Toplam" kesin fiyat değil, **tahmini maliyet aralığı** olarak ve kaynak/tarihle gösterilir. Örneklerdeki marka adları (Metro Turizm, Hilton) ortaklık olmadıkça kullanılmaz, "otobüs firması", "otel" gibi kategorilerle gösterilir.
   - **İhtiyaç keşfi (öneri):** İnsanların yolculukta en çok ne istediği tahmindir (ne kadar tutar, güvenilir mi, ne zaman gitmeli, nasıl giderim, ne yapılır, sorun çıkarsa ne olur). Doğrulamak için birkaç kişiyle konuşulabilir, ayrıca asistanın cevaplayamadığı sorular otomatik bir ihtiyaç listesine dönüşür (panelde görünür).
   - **Gelir fikri (sonra):** Resmi bilet ve konaklama sitelerine yönlendirme ortaklıkları olabilir. Sıralamayı etkilemez, "ortaklık/reklam" diye işaretlenir.
