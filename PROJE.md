@@ -150,6 +150,31 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
     6. *Varışta:* "Ziyaretçi Modu" (aşağıda, Benim Şehrim): gezilecek yerler, yemek, nöbetçi eczane, acil numaralar, ulaşım, yerel etkinlikler ve yerel dolandırıcılık uyarıları.
     7. *Dönüş:* deneyimi Keşfet'te paylaşma, kaydedilenler.
   - **Yapıldı (29 Ekim 2026), ilk sürüm (Eren onayladı: tek ekran; ücretler panelden ayda bir elle):** Planla ekranı nereden-nereye, tarih, yolcu, araç türüne göre tahmini süre ve ücret (il merkezleri arası mesafe, ücretli harita servisi yok), güzergâh çevresindeki mola yerleri, varılan şehrin sayfaları, hazırlık listesi ve "Yola çık" (Yoldayım, varış ve kalan km). Planlar telefonda. Panel > Seyahat > Yolculuk fiyatları. Sonra: hava durumu, Ziyaretçi Modu, konaklama rehberi, paketler.
+  - **Karar (Eren, 3 Kasım 2026): Yoldayım aynen kalır** (gece yolu animasyonuyla, Seyahat'te ayrı düğme). **Planla bir
+    tatil keşfi bölümü olur** ("Türkiye'nin görülmesi gereken yerleri" gibi); araç başına yakıt/maliyet hesabı çıkarıldı.
+    Akış: Türkiye / Yurt dışı > tatil fikri (Deniz, Kayak, Termal, Kültür, Doğa, Lezzet, Aileyle, Balayı, Görülmesi
+    gerekenler) > o temaya uyan şehirler/yerler > seçilen yerin konaklaması > tesis sayfası (Web sitesi / Tesisi ara;
+    rezervasyon tesisle doğrudan). Yer kartında il, uzaklık, en iyi dönem, tesis sayısı ve gece fiyat aralığı. Konaklama
+    listesinin üstünde "{Şehir}'i tanı" (şehir sayfası, hazır rotalar orada). Ayrıca hafta sonu önerileri (ilinden 3 saat
+    içi) ve kaydedilenler. **Yurt dışı** sonraki sürüm: ülke > şehir > rota ve güzel yerler; içeriği hazırlanmayan ülke
+    gösterilmez (13. madde 34).
+  - **Konaklama işletmelerden kendiliğinden gelir (Eren, 3 Kasım 2026):** İşletme ekle'deki "Konaklama" türünün adı
+    **"Otel ve konaklama"** olur (Claude seçimi: "tatil" işletmeyi değil kullanıcının amacını anlatır; pansiyon, apart,
+    günlük kiralık ev de bu türe girer). İşletme tesis türünü (otel, butik otel, termal otel, pansiyon, apart, günlük
+    kiralık ev, bungalov, kamp) ve "Hangi tatil fikirlerinde görünsün?" etiketlerini seçer, belge ve ücret tablosunu girer;
+    belgesi onaylanınca kendi il/ilçesinin listesine ve seçtiği temalara düşer. Bir yer, o temayla işaretli en az bir
+    belgeli tesisi varsa temanın listesine kendiliğinden girer; ekip panelden sıralar, gizler, dönem ve not yazar, uymayan
+    etiketi kaldırır. **Kademe diğer işletmelerle aynı (Ücretsiz / Pro, bölüm 15 madde 2):** Ücretsiz: ad, belge rozeti,
+    fiyat aralığı, Ara ve WhatsApp ("Yeni"); Pro: 10 fotoğraf, tanıtım, tam ücret tablosu, aile ölçütleri, web sitesi,
+    geri bildirimler, öne çıkma ("Reklam", her listede en çok 2). Gelir kaynağı: Pro ve öne çıkma (15 madde 5).
+    Önizleme **(Eren onayladı, 3 Kasım 2026)**: PL-Giris, PL-Tema, PL-Konaklama, PL-Tesis, PL-Isletme, PL-Yurtdisi ve Panel > Seyahat >
+    Tatil fikirleri (P-Tatil). Eski T-* önerisi ve "Planla ve Yola Çık" sorusu kaldırıldı. Koda geçerken eski Planla
+    ekranındaki yol ücreti tahmini ve Panel > Yolculuk fiyatları kaldırılır ya da gizlenir.
+  - **Panel > Seyahat menüsü (3 Kasım 2026, Eren istedi):** iki alt başlık: **Keşfet ve Öğren** ve **Tatil fikirleri**.
+    Keşfet ve Öğren kodda zaten var (`apps/panel/src/pages/travel-page.tsx`, 28-29 Ekim): Bölgeler, Şehirler, Gezilecek
+    yerler, Hazır rotalar, Yöresel, Başkanlarla Keşif, Kareler sekmeleri; tasarım tuvaline P-Sy* panoları olarak eklendi.
+    Yeni: ilk sekme **Ülkeler ve bölgeler**. Ülke şu an kodda sabit açılıp kapanıyor (`TRAVEL_COUNTRIES.open`); koda
+    geçerken admin panelden "Açık" yapar (en az bir şehri yayındayken), Planla > Yurt dışı da buradan beslenir.
   - **"Paketler" (öneri):** satış paketi değil, **hazır yolculuk planları** (aile, balayı vb.): çocuk dostu yerler, romantik rotalar gibi derlenmiş bilgi. "Tahmini Toplam" kesin fiyat değil, **tahmini maliyet aralığı** olarak ve kaynak/tarihle gösterilir. Örneklerdeki marka adları (Metro Turizm, Hilton) ortaklık olmadıkça kullanılmaz, "otobüs firması", "otel" gibi kategorilerle gösterilir.
   - **İhtiyaç keşfi (öneri):** İnsanların yolculukta en çok ne istediği tahmindir (ne kadar tutar, güvenilir mi, ne zaman gitmeli, nasıl giderim, ne yapılır, sorun çıkarsa ne olur). Doğrulamak için birkaç kişiyle konuşulabilir, ayrıca asistanın cevaplayamadığı sorular otomatik bir ihtiyaç listesine dönüşür (panelde görünür).
   - **Gelir fikri (sonra):** Resmi bilet ve konaklama sitelerine yönlendirme ortaklıkları olabilir. Sıralamayı etkilemez, "ortaklık/reklam" diye işaretlenir.
@@ -737,6 +762,29 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
       kendiliğinden kalkar; şart değişirse "güncellendi" yazar; görüntülenme, kod açılma, arama sayıları. Yalnızca doğrulanmış
       işletme; şikâyet düğmesi; panelde il yöneticisi kendi ilinin fırsatlarını görür ve gizler (işlem kaydı). Yalnızca doğrulanmış işletme, geçerlilik ve şartlar, "Sponsorlu"). Etkinlikler Benim Şehrim'deki
       önizlemeyle aynı. Ana Sosyal Harmoni ekranı (iki sayfa, kaydırmalı kartlar) olduğu gibi kalır.
+    - **Profil, Mesajlar, İşletme ekle, Gönderi paylaş (Karar Eren, 3 Kasım 2026):** Expo'daki şimdiki tasarımları iyi, aynen
+      kalır (Profil'deki Ailem (SOS) / İşletmem kısayolları, Mesajlar'daki İşletmem sekmesi, İşletme ekle formu dahil). Önizleme
+      panoları (U-*) Expo'daki hâli birebir gösterir; koda geçerken yalnızca yeni renk ve kart dili uygulanır, sıra ve içerik değişmez.
+    - **Duyurular (3 Kasım 2026, önizleme, onay bekliyor):** D-Nerede (Ana sayfa acil şeridi, Mahalle Meydanı "Tüm duyurular",
+      Belediye Hizmetleri son duyuru), D-Liste (konum çipi, acil kırmızı, sabit altın, kurum haberi kategori etiketiyle) ve D-Detay
+      (112 uyarısı, resmî hesap satırı, Bölge / Yayın / Bitiş). İçerik ve mantık koddaki gibi, yalnızca görünüm yeni.
+      **Karar (Eren, 3 Kasım 2026): duyuruların tek yeri Mahalle Meydanı > Duyurular** (mahalle, ilçe, il geneli, acil olanlar
+      dahil; "Tüm duyurular" tam listeyi açar). Ana sayfadaki acil şeridi kalır (dokununca aynı duyuru açılır). Bildirime
+      dokununca duyuru açılır, geri tuşu Duyurular listesine döner. Belediye Hizmetleri'ndeki "son duyuru" satırı kalkar.
+    - **Giriş akışı (Karar Eren, 3 Kasım 2026):** sıra kaydırmalı karşılama > dil seçimi > giriş/kayıt > izinler (konum, sonra
+      mahalle seçimi; bildirim) > ana sayfa. Eren'in tasarımları temel: giriş/kayıtta sahne üstünde cam kart, dil seçiminde her dil için
+      resimli şerit. Resimler şimdilik çizim (fotoğraf lisansı derdi yok); Panel > Uygulama görselleri'nden değiştirilir (karşılama
+      slaytları ve slogan yazıları dile göre, beş dil şeridi, giriş arka planı; sıra, aç/kapat, varsayılan çizime dön, işlem kaydı;
+      yalnızca Admin). Resim yükleme Blaze ile açılır, o zamana kadar çizimler. Önizleme: G-Karsilama, G-Dil, G-Giris, G-Kayit,
+      G-IzinKonum, G-Mahalle, G-IzinBildirim panoları ve P-Gorseller (Eren onayladı, 3 Kasım). Giriş ve kayıt kartı Eren'in tasarımındaki açık buzlu cam (beyaz yarı saydam, bulanık arka plan), düğme marka altını.
+      - Giriş seçenekleri: e-posta, Apple ve Google (Facebook yok). Apple, Google varken mağaza kuralı gereği şart.
+      - Kayıtta doğum yılı ve iki onay (kullanım şartları, aydınlatma metni) kalır.
+      - İzin ekranları nedenini anlatır, tek düğme "Devam et" telefonun kendi izin sorusunu açar (Apple kuralı: özel ekranda
+        "İzin ver/Atla" düğmesi olmaz). Konum izni verilmezse mahalle listeden seçilir; bildirim izni verilmezse uygulama çalışır.
+      - Eski "Seni biraz tanıyalım" adımı kalktı: meslek, cinsiyet ve kişiye uygun bildirim/kampanya onayları bildirim izni ekranında,
+        isteğe bağlı.
+      - Koda geçerken: `app/index.tsx` yönlendirme sırası (karşılama dilden önce), `complete-profile` içeriğinin bildirim
+        ekranına taşınması, Apple ile giriş (geliştirme derlemesi gerekir).
 
 ## 14. Gelir modeli taslağı (1-6. kaynaklar Eren onayladı; fiyatlar ve il yöneticisi payı açık)
 

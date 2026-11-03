@@ -809,6 +809,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   onay bekliyor. Seyahat şimdiki hâliyle kalır (Eren).
   Fırsatlar (Eren): kaydırmalı kategori kartları, kategori sayfası, fırsattan işletme sayfasına (geri: listeye), İşletmem >
   Fırsatlarım; fırsat sınırı Ücretsiz 1, Pro 5 (PROJE.md 13 madde 35 ve 15 madde 2).
+  Profil, Mesajlar, İşletme ekle, Gönderi paylaş: Expo'daki hâli iyi, aynen kalır (Eren); U-* panoları o hâli gösterir.
+  Duyurular (Eren): sayfa olmuş; tek yeri Mahalle Meydanı > Duyurular, Ana sayfa acil şeridi kalır, bildirim duyuruyu açar
+  (geri: liste). Koda geçerken: Belediye Hizmetleri'ndeki son duyuru satırı kaldırılacak (`city/belediyeler.tsx`), bildirim
+  yönlendirmesi ve geri tuşu buna göre.
+  Giriş akışı (Eren): karşılama > dil > giriş/kayıt > izinler > ana sayfa; resimler şimdilik çizim, Panel > Uygulama
+  görselleri'nden değişir (yükleme Blaze ile). G-* panoları ve P-Gorseller Eren onayladı (buzlu cam kart) (PROJE 13, madde 35).
+  Seyahat (Eren): Yoldayım aynen kalır. Planla = tatil keşfi: Türkiye / Yurt dışı (sonra) > tatil fikri > yerler >
+  konaklama (İşletme ekle > "Otel ve konaklama"dan kendiliğinden, Ücretsiz / Pro). PL-* (6) ve P-Tatil Eren onayladı (PROJE 5.2).
+  Panel > Seyahat: Keşfet ve Öğren (kodda var, P-Sy* panoları eklendi; yeni: Ülkeler sekmesi) ve Tatil fikirleri.
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
