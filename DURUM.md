@@ -679,6 +679,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   biçiminde (ek sorunu yok). Testler: kurallar 142, sunucu 29, ortak 150. Emülatörde denendi: iki fotoğraflı paylaşım
   kutucukla Karelere düştü, başka kullanıcı gördü, panelde öne çıkarılan yıldızla en üste geçti. **Kurallar ve dizinler
   değişti: birleşince yüklenmeli.** Fotoğraf yükleme Blaze ile çalışır.
+- **Keşfet albümü 10 fotoğraf (3 Kasım, aynı dal; PROJE.md 5.5 madde 2).** Sınır 4'ten 10'a (`POST_LIMITS.photos`).
+  Kurallar her fotoğrafta tam yolu (`posts/{uid}/{gönderi}/{sıra}.jpg`) denetler; kural motorunun 1000 işlem sınırı
+  yüzünden biçim ve adres uygulamada denetlenir (`photoFrom`, yalnızca kendi depomuzdaki adres gösterilir). Storage'da
+  dosya adı 0-9. İşletme adına 10 fotoğraflı paylaşım da denendi (kural testi). **Kurallar değişti.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

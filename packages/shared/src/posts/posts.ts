@@ -79,7 +79,7 @@ export const canShowInFrames = (p: Pick<PostInput, 'photos' | 'targets'>) => !!p
 export const POST_LIMITS = {
   text: [1, 2000],
   /** Gönderi başına en çok fotoğraf. */
-  photos: 4,
+  photos: 10,
   /** Bu kadar şikâyette moderatör inceleyene kadar akıştan düşer. */
   reportThreshold: 3,
   /** Akışta bir seferde okunan gönderi (sayfalama, maliyet ilkesi). */

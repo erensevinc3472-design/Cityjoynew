@@ -1019,7 +1019,7 @@
       "realEstate": "Listings for homes, land or shops for sale or rent can't be shared on Explore. Real estate listings will later be posted in the Bazaar with a licence.",
       "relative": "Only relatives can share a condolence post.",
       "banned": "Your text contains a word that breaks the community rules. Please edit it and try again.",
-      "photos": "You can add up to 4 photos."
+      "photos": "You can add up to 10 photos."
     },
     "save": "Save",
     "unsave": "Saved ✓",
@@ -1133,7 +1133,7 @@
     },
     "photos": {
       "add": "Add photo",
-      "count": "{{count}}/4 photos",
+      "count": "{{count}}/10 photos",
       "remove": "Remove photo",
       "label": "Photo {{n}} of {{total}}",
       "note": "Photos are resized before upload; location and device details are removed.",

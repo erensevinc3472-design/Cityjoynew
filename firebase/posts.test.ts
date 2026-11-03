@@ -99,7 +99,7 @@ describe('Keşfet gönderileri', () => {
     await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['herkes' as never] })));
   });
 
-  it('fotoğraf: kendi klasöründen, bu gönderinin kimliğiyle, en çok dört; yazısız olabilir; kaldırınca alan silinir', async () => {
+  it('fotoğraf: kendi klasöründen, bu gönderinin kimliğiyle, en çok on; yazısız olabilir; kaldırınca alan silinir', async () => {
     const r = repo('ayse');
     const photo = (uid: string, id: string, i: number) => ({
       path: `posts/${uid}/${id}/${i}.jpg`,
@@ -110,7 +110,7 @@ describe('Keşfet gönderileri', () => {
     const ok = r.newId();
     await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', photos: [photo('ayse', ok, 0), photo('ayse', ok, 1)] }), undefined, ok));
     expect((await r.get(ok))?.photos?.map((p) => p.path)).toEqual([`posts/ayse/${ok}/0.jpg`, `posts/ayse/${ok}/1.jpg`]);
-    // Başkasının klasörü, başka gönderinin kimliği, sıra atlama, beşinci fotoğraf, yabancı adres olmaz.
+    // Başkasının klasörü, başka gönderinin kimliği, sıra atlama, on birinci fotoğraf olmaz.
     const id = () => r.newId();
     let x = id();
     await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [photo('ali', x, 0)] }), undefined, x));
@@ -119,9 +119,19 @@ describe('Keşfet gönderileri', () => {
     x = id();
     await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [photo('ayse', x, 1)] }), undefined, x));
     x = id();
-    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [0, 1, 2, 3, 4].map((i) => photo('ayse', x, i)) }), undefined, x));
+    await assertFails(setDoc(doc(fs('ayse'), 'posts', x), {
+      text: '', category: 'genel', targets: { mahallem: true, bolgesel: false, genel: false }, region: ataevler, status: 'aktif', authorUid: 'ayse',
+      authorName: 'Ayşe K.', likeCount: 0, commentCount: 0, reportCount: 0, photos: Array.from({ length: 11 }, (_, i) => photo('ayse', x, i)),
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    }));
+    // Albüm: on fotoğraf olur.
     x = id();
-    await assertFails(r.create('ayse', 'Ayşe K.', input({ photos: [{ ...photo('ayse', x, 0), url: 'https://kotu.example/posts%2Fayse%2F' + x + '%2F0.jpg?a' }] }), undefined, x));
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', photos: Array.from({ length: 10 }, (_, i) => photo('ayse', x, i)) }), undefined, x));
+    expect((await r.get(x))?.photos).toHaveLength(10);
+    // Yabancı adresli fotoğraf uygulamada gösterilmez (adresi uygulama denetler).
+    x = id();
+    await r.create('ayse', 'Ayşe K.', input({ photos: [{ ...photo('ayse', x, 0), url: 'https://kotu.example/posts%2Fayse%2F' + x + '%2F0.jpg?a' }] }), undefined, x);
+    expect((await r.get(x))?.photos).toBeUndefined();
     // Sahibi kaldırınca fotoğraf alanı da boşalır.
     await assertSucceeds(r.remove(ok));
     await env.withSecurityRulesDisabled(async (ctx) => {

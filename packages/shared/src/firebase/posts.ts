@@ -36,6 +36,7 @@ import {
 } from '../posts/posts';
 import { PROFILE_LIMITS } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
+import { photoFrom } from '../media/photo';
 import { addAudit, iso } from './grants';
 import { countUsage } from './limits';
 
@@ -46,6 +47,12 @@ const REPORTS = 'postReports';
 // bununla süzülür ve güvenlik kuralları sorgunun yalnızca görülebilecek gönderileri istediğini doğrulayabilir.
 const targetsToMap = (targets: PostTarget[]) => Object.fromEntries(POST_TARGETS.map((x) => [x, targets.includes(x)]));
 const targetsFromMap = (m: Record<string, boolean> | undefined) => POST_TARGETS.filter((x) => m?.[x] === true);
+
+/** Yalnızca kendi depomuzdaki, bu gönderinin klasöründeki geçerli fotoğraflar gösterilir (kurallar yolu denetler). */
+function postPhotosOf(d: DocumentData): { photos?: PostPhoto[] } {
+  const photos = Array.isArray(d.photos) ? (d.photos as unknown[]).map(photoFrom).filter((p): p is PostPhoto => !!p) : [];
+  return photos.length ? { photos } : {};
+}
 
 function fromDoc(id: string, d: DocumentData): Post {
   return {
@@ -63,7 +70,7 @@ function fromDoc(id: string, d: DocumentData): Post {
     commentsOff: d.commentsOff === true,
     reportCount: d.reportCount ?? 0,
     cleared: d.cleared === true,
-    ...(Array.isArray(d.photos) && d.photos.length ? { photos: d.photos as PostPhoto[] } : {}),
+    ...postPhotosOf(d),
     ...(d.frames === true ? { frames: true } : {}),
     ...(d.framesFeatured === true ? { framesFeatured: true } : {}),
     createdAt: iso(d.createdAt) ?? '',

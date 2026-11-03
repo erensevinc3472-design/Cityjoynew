@@ -1661,16 +1661,6 @@ service cloud.firestore {
         && d.likeCount is int && d.reportCount is int
         && d.updatedAt == request.time;
     }
-    // Gönderi fotoğrafları (en çok 4): dosya paylaşanın klasöründe, bu gönderinin kimliğiyle ve sırayla adlandırılır;
-    // adres o dosyanın Storage adresidir (yerel denemede emülatör).
-    function validPostPhoto(p, uid, id, i) {
-      return p is map && p.keys().hasOnly(['path', 'url', 'width', 'height'])
-        && p.path == 'posts/' + uid + '/' + id + '/' + string(i) + '.jpg'
-        && p.url is string && p.url.size() <= 600
-        && p.url.matches('(https://firebasestorage[.]googleapis[.]com|http://(127[.]0[.]0[.]1|localhost|10[.]0[.]2[.]2):9199)/v0/b/[^/?]+/o/posts%2F'
-            + uid + '%2F' + id + '%2F' + string(i) + '[.]jpg[?].*')
-        && p.width is int && p.height is int && p.width > 0 && p.width <= 4000 && p.height > 0 && p.height <= 4000;
-    }
     // Diğer görseller (etkinlik kapağı, kurum logosu, işletme logosu/vitrini, profil, Seyahat kapakları):
     // media/{yükleyen}/{tür}/{rastgele}.jpg.
     // Yeni bağlanan görsel bağlayanın kendi klasöründen olmalı (başkasının dosyası bağlanıp kaldırılarak sunucuya
@@ -1702,13 +1692,24 @@ service cloud.firestore {
         || (l.size() <= 30 && l.size() <= limitOf({'ucretsiz': 'vitrinUcretsiz', 'standart': 'vitrinStandart', 'pro': 'vitrinPro', 'premium': 'vitrinPremium'}[tier],
               {'ucretsiz': 3, 'standart': 10, 'pro': 20, 'premium': 30}[tier])));
     }
+    // Gönderi fotoğrafları (en çok 10, albüm): dosya paylaşanın klasöründe, bu gönderinin kimliğiyle ve sırayla
+    // adlandırılır. Kural motorunun işlem sınırı (1000) yüzünden yalnızca yol denetlenir; biçimi ve adresin o dosyayı
+    // gösterdiğini uygulama denetler (yalnızca kendi depomuzdaki adres gösterilir).
     function validPostPhotos(d, id) {
+      let l = d.get('photos', []);
+      let b = 'posts/' + d.authorUid + '/' + id + '/';
       return !('photos' in d)
-        || (d.photos is list && d.photos.size() >= 1 && d.photos.size() <= 4
-            && validPostPhoto(d.photos[0], d.authorUid, id, 0)
-            && (d.photos.size() < 2 || validPostPhoto(d.photos[1], d.authorUid, id, 1))
-            && (d.photos.size() < 3 || validPostPhoto(d.photos[2], d.authorUid, id, 2))
-            && (d.photos.size() < 4 || validPostPhoto(d.photos[3], d.authorUid, id, 3)));
+        || (l is list && l.size() >= 1 && l.size() <= 10
+            && l[0].path == b + '0.jpg'
+            && (l.size() < 2 || l[1].path == b + '1.jpg')
+            && (l.size() < 3 || l[2].path == b + '2.jpg')
+            && (l.size() < 4 || l[3].path == b + '3.jpg')
+            && (l.size() < 5 || l[4].path == b + '4.jpg')
+            && (l.size() < 6 || l[5].path == b + '5.jpg')
+            && (l.size() < 7 || l[6].path == b + '6.jpg')
+            && (l.size() < 8 || l[7].path == b + '7.jpg')
+            && (l.size() < 9 || l[8].path == b + '8.jpg')
+            && (l.size() < 10 || l[9].path == b + '9.jpg'));
     }
     function canSeePost(d) {
       // Hedefler sabit anahtarlı bir haritada durur ({mahallem, bolgesel, genel}: true/false): akış sorguları bunlarla
