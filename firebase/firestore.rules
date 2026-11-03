@@ -1667,7 +1667,8 @@ service cloud.firestore {
             + uid + '%2F' + id + '%2F' + string(i) + '[.]jpg[?].*')
         && p.width is int && p.height is int && p.width > 0 && p.width <= 4000 && p.height > 0 && p.height <= 4000;
     }
-    // Diğer görseller (etkinlik kapağı, kurum logosu, işletme logosu/vitrini): media/{yükleyen}/{tür}/{rastgele}.jpg.
+    // Diğer görseller (etkinlik kapağı, kurum logosu, işletme logosu/vitrini, profil, Seyahat kapakları):
+    // media/{yükleyen}/{tür}/{rastgele}.jpg.
     // Yeni bağlanan görsel bağlayanın kendi klasöründen olmalı (başkasının dosyası bağlanıp kaldırılarak sunucuya
     // sildirilemesin); değişmeden kalan görsel başka bir yetkilinin yüklediği olabilir.
     function storageUrlOk(u, encodedPath) {
@@ -2460,7 +2461,8 @@ service cloud.firestore {
     match /travelRegions/{id} {
       allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
       allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
-        && request.resource.data.keys().hasOnly(['tagline', 'description', 'videoUrl', 'status', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['tagline', 'description', 'videoUrl', 'cover', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'cover', 'seyahat')
         && request.resource.data.get('tagline', '') is string && request.resource.data.get('tagline', '').size() <= 60
         && request.resource.data.description is string && request.resource.data.description.size() <= 600
         && travelUrlOk(request.resource.data, 'videoUrl');
@@ -2470,7 +2472,8 @@ service cloud.firestore {
       allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
       allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
         && id.matches('^[0-8][0-9]$')
-        && request.resource.data.keys().hasOnly(['regionId', 'tagline', 'description', 'categories', 'highlights', 'facts', 'videoUrl', 'status', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['regionId', 'tagline', 'description', 'categories', 'highlights', 'facts', 'videoUrl', 'cover', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'cover', 'seyahat')
         && request.resource.data.regionId is string
         && request.resource.data.description is string && request.resource.data.description.size() <= 600
         && request.resource.data.get('categories', []) is list && request.resource.data.get('categories', []).size() <= 6
@@ -2484,7 +2487,8 @@ service cloud.firestore {
       allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
         && request.resource.data.keys().hasOnly(['cityId', 'districtId', 'name', 'kind', 'category', 'summary', 'about', 'history',
              'architecture', 'visitingHours', 'entranceFee', 'suggestedDuration', 'address', 'howToGet', 'nearby', 'tips',
-             'accessibility', 'phone', 'website', 'videoUrl', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
+             'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'cover', 'seyahat')
         && request.resource.data.cityId is string && request.resource.data.cityId.matches('^[0-8][0-9]$')
         && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 80
         && request.resource.data.category in ['tarih', 'doga', 'deniz', 'lezzet', 'kultur', 'alisveris']
@@ -2511,7 +2515,8 @@ service cloud.firestore {
     }
     function validTravelRoute(d) {
       return d.keys().hasOnly(['cityId', 'municipalityId', 'theme', 'length', 'title', 'summary', 'durationMinutes', 'stops', 'tips',
-             'order', 'status', 'updatedAt'])
+             'cover', 'order', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(d, 'cover', 'seyahat')
         && d.cityId is string && d.cityId.matches('^[0-8][0-9]$')
         && d.theme in ['tarih', 'manevi', 'lezzet', 'doga', 'alisveris', 'kultur', 'aile', 'aksam']
         && d.length in ['kisa', 'yarim', 'tam']
@@ -2538,7 +2543,8 @@ service cloud.firestore {
     match /travelLocal/{id} {
       allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
       allow create, update: if isAdmin() && validTravelStatus(request.resource.data)
-        && request.resource.data.keys().hasOnly(['cityId', 'kind', 'title', 'subtitle', 'body', 'badges', 'facts', 'source', 'order', 'status', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['cityId', 'kind', 'title', 'subtitle', 'body', 'badges', 'facts', 'cover', 'source', 'order', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(request.resource.data, 'cover', 'seyahat')
         && request.resource.data.cityId is string && request.resource.data.cityId.matches('^[0-8][0-9]$')
         && request.resource.data.kind in ['miras', 'el-sanati', 'lezzet', 'gelenek']
         && request.resource.data.title is string && request.resource.data.title.size() >= 2 && request.resource.data.title.size() <= 80
@@ -2549,8 +2555,9 @@ service cloud.firestore {
     }
     function validMunicipal(id, d) {
       return id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
-        && d.keys().hasOnly(['cityId', 'districtId', 'slogan', 'description', 'videoUrl', 'mayorName', 'showMayor', 'zone',
+        && d.keys().hasOnly(['cityId', 'districtId', 'slogan', 'description', 'videoUrl', 'mayorName', 'cover', 'showMayor', 'zone',
              'population', 'populationYear', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(d, 'cover', 'seyahat')
         && d.cityId is string && d.cityId.matches('^[0-8][0-9]$')
         && d.slogan is string && d.slogan.size() >= 2 && d.slogan.size() <= 60
         && d.description is string && d.description.size() <= 600

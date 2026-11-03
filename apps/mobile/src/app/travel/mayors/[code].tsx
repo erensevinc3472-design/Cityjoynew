@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
@@ -96,6 +97,7 @@ export default function TravelMayorsScreen() {
         </Pressable>
         {expanded && intro ? (
           <View style={styles.body}>
+            {intro.cover ? <Image source={{ uri: intro.cover.url }} style={[styles.cover, { aspectRatio: Math.min(2, Math.max(1, intro.cover.width / intro.cover.height)), backgroundColor: c.surfaceStrong }]} contentFit="cover" recyclingKey={intro.cover.path} accessibilityIgnoresInvertColors /> : null}
             <AppText style={[styles.text, { color: c.text }]}>{intro.description}</AppText>
             {m.routes.length ? <AppText style={[styles.h3, { color: c.textStrong }]}>{t('travel.municipalRoutes')}</AppText> : null}
             {m.routes.map((r) => (
@@ -178,6 +180,7 @@ export default function TravelMayorsScreen() {
 }
 
 const styles = StyleSheet.create({
+  cover: { width: '100%', borderRadius: radius.md },
   root: { flex: 1 },
   flex: { flex: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },

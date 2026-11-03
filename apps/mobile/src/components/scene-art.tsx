@@ -1,10 +1,11 @@
+import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, StyleSheet } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 /**
- * Kartların arkasındaki çizim sahneleri (13. madde 29). Gerçek fotoğraflar panelden yüklenebilir olunca (Storage,
- * Blaze) yerlerini fotoğraflar alacak; o zamana kadar her modülün kendi renginde sade bir çizim yavaşça kayar.
+ * Kartların arkasındaki çizim sahneleri (13. madde 29). Seyahat içeriğine panelden kapak fotoğrafı yüklenmişse onun
+ * yerini fotoğraf alır (`CoverArt`; Storage, Blaze); yoksa her modülün kendi renginde sade bir çizim yavaşça kayar.
  */
 export type SceneKind =
   | 'city' | 'travel' | 'social' | 'urgent' | 'townhall' | 'neighbourhood' | 'showcase' | 'cover'
@@ -196,3 +197,13 @@ export const sceneSky = (kind: SceneKind) => SCENES[kind].sky;
 
 /** Kartın kenar rengi: sahnenin vurgu rengi, hafif. */
 export const sceneRim = (kind: SceneKind) => `${SCENES[kind].sun}59`;
+
+/**
+ * Seyahat kapağı: panelden yüklenmiş fotoğraf varsa onu, yoksa çizimi gösterir. Kapsayan kutuyu tamamen doldurur.
+ */
+export function CoverArt({ photo, kind, still }: { photo?: { url: string; path: string }; kind: SceneKind; still?: boolean }) {
+  if (photo) {
+    return <Image source={{ uri: photo.url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={150} recyclingKey={photo.path} accessibilityIgnoresInvertColors />;
+  }
+  return <SceneArt kind={kind} still={still} />;
+}

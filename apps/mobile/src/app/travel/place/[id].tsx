@@ -10,7 +10,7 @@ import { videoEmbedUrl } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { RoundButton } from '@/components/hero-header';
-import { SceneArt, sceneSky } from '@/components/scene-art';
+import { CoverArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { VideoModal } from '@/components/video-modal';
@@ -86,7 +86,7 @@ export default function TravelPlaceScreen() {
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}>
         <View style={[styles.hero, { height: Math.round(width * 0.62), backgroundColor: sceneSky(scene) }]}>
           <View style={StyleSheet.absoluteFill}>
-            <SceneArt kind={scene} />
+            <CoverArt photo={p.cover} kind={scene} />
           </View>
           <View style={[StyleSheet.absoluteFill, styles.heroShade]} />
           <View style={styles.heroTags}>

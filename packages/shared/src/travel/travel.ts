@@ -1,3 +1,4 @@
+import type { Photo } from '../media/photo';
 /**
  * Seyahat > Keşfet ve Öğren (PROJE.md 5.2; 13. madde 34). Coğrafya (ülke, 7 bölge, bölgelerin illeri) sabittir ve
  * koddadır; tanıtım içeriği (bölge ve şehir yazıları, gezilecek yerler) panelden girilir, önce taslak olarak kaydedilir,
@@ -60,6 +61,8 @@ export interface TravelRegionContent {
   tagline: string;
   description: string;
   videoUrl?: string;
+  /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
+  cover?: Photo;
   status: TravelStatus;
   updatedAt: string;
 }
@@ -75,6 +78,8 @@ export interface TravelCityContent {
   highlights: string[];
   facts: TravelFact[];
   videoUrl?: string;
+  /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
+  cover?: Photo;
   status: TravelStatus;
   updatedAt: string;
 }
@@ -115,6 +120,8 @@ export interface TravelPlace {
   phone?: string;
   website?: string;
   videoUrl?: string;
+  /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
+  cover?: Photo;
   /** "Mutlaka gör" işareti (puan değildir). */
   mustSee: boolean;
   /** Bilginin kaynağı (ör. "Kültür ve Turizm Bakanlığı"). */
@@ -239,6 +246,8 @@ export interface TravelRoute {
   /** Toplam süre (dakika). */
   durationMinutes: number;
   stops: TravelRouteStop[];
+  /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
+  cover?: Photo;
   tips: string[];
   order: number;
   status: TravelReviewStatus;
@@ -262,6 +271,8 @@ export interface TravelLocalItem {
   /** "UNESCO", "Coğrafi işaret" gibi rozetler (en çok 4). */
   badges: string[];
   facts: TravelFact[];
+  /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
+  cover?: Photo;
   source?: string;
   order: number;
   status: TravelStatus;
@@ -287,6 +298,8 @@ export interface TravelMunicipal {
   slogan: string;
   description: string;
   videoUrl?: string;
+  /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
+  cover?: Photo;
   mayorName?: string;
   /** Admin: seçim döneminde false (yalnızca "Belediye" görünür). */
   showMayor: boolean;
@@ -299,7 +312,7 @@ export interface TravelMunicipal {
 }
 
 /** Belediyenin değiştirebildiği alanlar. */
-export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'mayorName'>;
+export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'mayorName' | 'cover'>;
 
 export const ROUTE_LIMITS = { title: 60, summary: 300, stops: 12, note: 300, tips: 6 } as const;
 

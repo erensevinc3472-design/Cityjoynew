@@ -72,6 +72,16 @@ export const listingPhotosChanged = onDocumentWritten('listings/{id}', async (e)
   await handleListingPhotos(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);
 });
 
+// Seyahat içeriklerinden çıkan kapakların dosyaları silinir.
+export const travelCoverChanged = Object.fromEntries(
+  ['travelRegions', 'travelCities', 'travelPlaces', 'travelRoutes', 'travelLocal', 'travelMunicipal'].map((col) => [
+    col,
+    onDocumentWritten(`${col}/{id}`, async (e) => {
+      await handleMediaChange(MEDIA_FIELDS.travel, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+    }),
+  ]),
+);
+
 // Kaldırılan aktivitenin kapak dosyası silinir.
 export const activityCoverChanged = onDocumentWritten('activities/{id}', async (e) => {
   await handleActivityCover(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);

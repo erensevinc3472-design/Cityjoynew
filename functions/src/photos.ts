@@ -22,7 +22,7 @@ export interface MediaField {
   owners?: (d: DocumentData) => unknown[];
 }
 
-/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı, ilan fotoğrafları, aktivite kapağı (`media/{yükleyen}/{tür}/...`). */
+/** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı, ilan fotoğrafları, aktivite kapağı, Seyahat kapakları (`media/{yükleyen}/{tür}/...`). */
 export const MEDIA_FIELDS = {
   events: [{ key: 'cover', owners: (d) => [d.preparedBy] }],
   officialProfiles: [{ key: 'logo' }],
@@ -30,6 +30,8 @@ export const MEDIA_FIELDS = {
   businesses: [{ key: 'logo' }, { key: 'gallery', owners: (d) => [d.ownerUid, ...(Array.isArray(d.managerUids) ? d.managerUids : [])] }],
   listings: [{ key: 'photos', owners: (d) => [d.ownerUid] }],
   activities: [{ key: 'cover', owners: (d) => [d.organizerUid] }],
+  // Seyahat kapakları (bölge, şehir, yer, rota, yöresel, belediye tanıtımı): yükleyen admin ya da belediye personeli.
+  travel: [{ key: 'cover' }],
 } satisfies Record<string, MediaField[]>;
 
 const pathsOf = (v: unknown): string[] =>

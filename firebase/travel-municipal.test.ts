@@ -123,6 +123,30 @@ describe('seyahat 2. aşama', () => {
     expect(log.docs.filter((d) => d.data().orgId === nilufer.id).length).toBeGreaterThanOrEqual(3);
   }, 30000);
 
+  it('kapak fotoğrafı: herkes yalnızca kendi seyahat dosyasını bağlar; değişmeyen kapak başkasınınki olabilir', async () => {
+    const media = (uid: string, kind = 'seyahat', id = 'kapakFoto0001') => {
+      const p = `media/${uid}/${kind}/${id}.jpg`;
+      return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 800, height: 600 };
+    };
+    const bld = createMunicipalTravel(fs('basin'), 'basin', nilufer);
+    const admin = createTravelAdmin(fs('eren'), 'eren');
+    const text = { slogan: 'Modern Bursa', description: 'Göller, köyler ve kültür merkezleriyle Nilüfer.' };
+    await expect(bld.saveText({ ...text, cover: media('eren') }, true)).rejects.toThrow();
+    await expect(bld.saveText({ ...text, cover: media('basin', 'profil') }, true)).rejects.toThrow();
+    await bld.saveText({ ...text, cover: media('basin') }, true);
+    expect((await bld.get())?.cover?.path).toBe('media/basin/seyahat/kapakFoto0001.jpg');
+    // Admin belediyenin kapağına dokunmadan yayına alır ve kendi alanlarını değiştirir.
+    await admin.setStatus('belediye', nilufer.id, 'yayinda', 'Nilüfer');
+    const { updatedAt: _u, ...rest } = (await admin.listAll()).municipal[0]!;
+    await admin.saveMunicipal({ ...rest, population: 560000 }, 'Nilüfer');
+    expect((await createFirestoreTravelRepository(fs('ali')).listMunicipal('16'))[0]?.cover?.path).toBe('media/basin/seyahat/kapakFoto0001.jpg');
+    // Rota kapağı belediyenin kendi dosyası; bölge kapağı adminin.
+    await expect(bld.saveRoute(null, { ...route, cover: media('basin', 'seyahat', 'rotaKapak001') }, false)).resolves.toBeTruthy();
+    await expect(bld.saveRoute(null, { ...route, cover: media('ali') }, false)).rejects.toThrow();
+    await expect(admin.saveRegion({ id: 'marmara', tagline: 'Metropol', description: 'Marmara.', cover: media('eren'), status: 'taslak' }, true)).resolves.toBeUndefined();
+    await expect(admin.saveRegion({ id: 'ege', tagline: 'Ege', description: 'Ege.', cover: media('basin'), status: 'taslak' }, true)).rejects.toThrow();
+  });
+
   it('seyahat bölümü yalnızca belediyeye verilebilir', async () => {
     const kulup = (modules: string[]) => ({
       name: 'Kulüp', kind: 'kulup', scope: { level: 'il', provinceCode: '16' }, modules,

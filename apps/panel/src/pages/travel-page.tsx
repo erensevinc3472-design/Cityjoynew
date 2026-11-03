@@ -11,6 +11,7 @@ import {
   type NearbyKind,
   type TravelCategory,
   type TravelCityContent,
+  type Photo,
   type TravelFact,
   type TravelMode,
   type TravelPlace,
@@ -25,14 +26,15 @@ import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { ImageField } from '../components/image-field';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 import { LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
 
 type Tab = TravelAdminKind;
 type Data = Awaited<ReturnType<ReturnType<typeof createTravelAdmin>['listAll']>>;
 const TABS: Tab[] = ['bolge', 'sehir', 'yer', 'rota', 'yoresel', 'belediye'];
-type RegionDraft = { id: string; tagline: string; description: string; videoUrl: string; isNew: boolean; status: TravelStatus };
-type CityDraft = { id: string; regionId: string; tagline: string; description: string; videoUrl: string; categories: TravelCategory[]; highlights: string; facts: string; isNew: boolean; status: TravelStatus };
+type RegionDraft = { id: string; tagline: string; description: string; videoUrl: string; cover?: Photo; isNew: boolean; status: TravelStatus };
+type CityDraft = { id: string; regionId: string; tagline: string; description: string; videoUrl: string; cover?: Photo; categories: TravelCategory[]; highlights: string; facts: string; isNew: boolean; status: TravelStatus };
 type PlaceDraft = Omit<TravelPlaceInput, 'howToGet' | 'nearby' | 'tips'> & { id: string | null; howToGet: string; nearby: string; tips: string };
 
 const provinceName = (code: string) => locationRepository.getProvince(code)?.name ?? code;
@@ -114,7 +116,7 @@ function AdminTravelPage() {
     const errs = validateTravelText({ tagline: d.tagline, description: d.description, videoUrl: d.videoUrl || undefined });
     if (errs.length) return setMessage({ kind: 'error', text: t(`travel.errors.${errs[0]}`) });
     act(async () => {
-      await admin!.saveRegion({ id: d.id, tagline: d.tagline, description: d.description, ...(d.videoUrl.trim() ? { videoUrl: d.videoUrl } : {}), status: d.status }, d.isNew);
+      await admin!.saveRegion({ id: d.id, tagline: d.tagline, description: d.description, ...(d.videoUrl.trim() ? { videoUrl: d.videoUrl } : {}), ...(d.cover ? { cover: d.cover } : {}), status: d.status }, d.isNew);
       return t('travel.saved');
     }, () => setRegionDraft(null));
   };
@@ -142,6 +144,7 @@ function AdminTravelPage() {
           highlights: d.highlights.split(',').map((x) => x.trim()).filter(Boolean).slice(0, 6),
           facts,
           ...(d.videoUrl.trim() ? { videoUrl: d.videoUrl } : {}),
+          ...(d.cover ? { cover: d.cover } : {}),
           status: d.status,
         },
         d.isNew,
@@ -267,6 +270,7 @@ function AdminTravelPage() {
               {field('r-tag', t('travel.tagline'), regionDraft.tagline, (v) => setRegionDraft({ ...regionDraft, tagline: v }), { max: 60 })}
               {field('r-desc', t('travel.description'), regionDraft.description, (v) => setRegionDraft({ ...regionDraft, description: v }), { multiline: true, max: 600 })}
               {field('r-video', t('travel.videoUrl'), regionDraft.videoUrl, (v) => setRegionDraft({ ...regionDraft, videoUrl: v }), { hint: t('travel.videoHint') })}
+              {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={regionDraft.cover} onChange={(cover) => setRegionDraft({ ...regionDraft, cover })} disabled={busy} /> : null}
               <div className="actions">
                 <button className="btn" type="submit" disabled={busy}>{t('travel.save')}</button>
                 <button className="btn ghost" type="button" onClick={() => setRegionDraft(null)}>{t('travel.cancel')}</button>
@@ -294,7 +298,7 @@ function AdminTravelPage() {
                       <td>{statusPill(c?.status)}</td>
                       <td className="row-actions">
                         {canEdit ? (
-                          <button className="link" onClick={() => setRegionDraft({ id: r.id, tagline: c?.tagline ?? '', description: c?.description ?? '', videoUrl: c?.videoUrl ?? '', isNew: !c, status: c?.status ?? 'taslak' })}>
+                          <button className="link" onClick={() => setRegionDraft({ id: r.id, tagline: c?.tagline ?? '', description: c?.description ?? '', videoUrl: c?.videoUrl ?? '', cover: c?.cover, isNew: !c, status: c?.status ?? 'taslak' })}>
                             {c ? t('travel.edit') : t('travel.write')}
                           </button>
                         ) : null}
@@ -338,6 +342,7 @@ function AdminTravelPage() {
               {field('c-hl', t('travel.highlights'), cityDraft.highlights, (v) => setCityDraft({ ...cityDraft, highlights: v }), { hint: t('travel.highlightsHint') })}
               {field('c-facts', t('travel.facts'), cityDraft.facts, (v) => setCityDraft({ ...cityDraft, facts: v }), { multiline: true, hint: t('travel.factsHint') })}
               {field('c-video', t('travel.videoUrl'), cityDraft.videoUrl, (v) => setCityDraft({ ...cityDraft, videoUrl: v }), { hint: t('travel.videoHint') })}
+              {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={cityDraft.cover} onChange={(cover) => setCityDraft({ ...cityDraft, cover })} disabled={busy} /> : null}
               <div className="actions">
                 <button className="btn" type="submit" disabled={busy}>{t('travel.save')}</button>
                 <button className="btn ghost" type="button" onClick={() => setCityDraft(null)}>{t('travel.cancel')}</button>
@@ -375,6 +380,7 @@ function AdminTravelPage() {
                                 tagline: c?.tagline ?? '',
                                 description: c?.description ?? '',
                                 videoUrl: c?.videoUrl ?? '',
+                                cover: c?.cover,
                                 categories: c?.categories ?? [],
                                 highlights: (c?.highlights ?? []).join(', '),
                                 facts: (c?.facts ?? []).map((f) => [f.label, f.value, f.source ?? '', f.asOf ?? ''].join(' | ')).join('\n'),
@@ -458,6 +464,7 @@ function AdminTravelPage() {
               {field('p-phone', t('travel.phone'), P.phone ?? '', (v) => setP({ phone: v }), { max: 40 })}
               {field('p-web', t('travel.website'), P.website ?? '', (v) => setP({ website: v }), { hint: t('travel.httpsHint') })}
               {field('p-video', t('travel.videoUrl'), P.videoUrl ?? '', (v) => setP({ videoUrl: v }), { hint: t('travel.videoHint') })}
+              {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={P.cover} onChange={(cover) => setP({ cover })} disabled={busy} /> : null}
               {field('p-source', t('travel.source'), P.source ?? '', (v) => setP({ source: v }), { max: 200 })}
               <div className="field">
                 <label htmlFor="p-order">{t('travel.order')}</label>

@@ -24,13 +24,15 @@ import {
   type TravelRoute,
   type TravelRouteInput,
   type TravelRouteStop,
+  type Photo,
 } from '@cityjoy/shared';
 import { createFirestoreTravelRepository, createMunicipalTravel, type createTravelAdmin } from '@cityjoy/shared/firebase';
 
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
-import type { PanelUser } from '../lib/session';
+import { useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { ImageField } from '../components/image-field';
 import { GripIcon, moveId, SortBar, useDragSort, useSortableList } from '../components/sortable';
 
 type Admin = ReturnType<typeof createTravelAdmin>;
@@ -77,6 +79,7 @@ export type RouteDraft = {
   stops: StopDraft[];
   tips: string;
   order: number;
+  cover?: Photo;
 };
 
 const emptyStop = (): StopDraft => ({ key: stopKey(), placeId: '', name: '', note: '', stay: '', mode: '', next: '' });
@@ -93,6 +96,7 @@ export function routeDraftOf(r?: TravelRoute, order = 1): RouteDraft {
         stops: r.stops.map((s) => ({ key: stopKey(), placeId: s.placeId ?? '', name: s.name, note: s.note, stay: s.stayMinutes ? String(s.stayMinutes) : '', mode: s.next?.mode ?? '', next: s.next?.text ?? '' })),
         tips: r.tips.join('\n'),
         order: r.order,
+        cover: r.cover,
       }
     : { id: null, title: '', theme: 'tarih', length: 'yarim', hours: '', summary: '', stops: [emptyStop(), emptyStop()], tips: '', order };
 }
@@ -117,6 +121,7 @@ export function routeInputOf(d: RouteDraft): Omit<TravelRouteInput, 'cityId' | '
     stops,
     tips: lines(d.tips),
     order: d.order,
+    ...(d.cover ? { cover: d.cover } : {}),
   };
 }
 
@@ -139,6 +144,7 @@ export function RouteEditor({
   submitLabel: string;
   extraAction?: ReactNode;
 }) {
+  const { user } = useSession();
   const D = draft;
   const set = (patch: Partial<RouteDraft>) => setDraft({ ...D, ...patch });
   const setStop = (i: number, patch: Partial<StopDraft>) => set({ stops: D.stops.map((s, j) => (j === i ? { ...s, ...patch } : s)) });
@@ -166,6 +172,7 @@ export function RouteEditor({
       </div>
       <Field id="r-hours" label={t('travel.routeHours')} value={D.hours} onChange={(v) => set({ hours: v })} max={5} hint={t('travel.routeHoursHint')} />
       <Field id="r-summary" label={t('travel.summary')} value={D.summary} onChange={(v) => set({ summary: v })} multiline rows={3} max={300} />
+      {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={D.cover} onChange={(cover) => set({ cover })} disabled={busy || !!user.isDemo} /> : null}
 
       <fieldset className="form-section">
         <legend>{t('travel.stopsLegend')}</legend>
@@ -380,6 +387,7 @@ export function LocalTab({
   toggle(id: string, s: TravelReviewStatus, label: string): ReactNode;
   onError(text: string): void;
 }) {
+  const { user } = useSession();
   const [draft, setDraft] = useState<LocalDraft | null>(null);
   const own = items.filter((x) => x.cityId === cityId);
   const sort = useSortableList(own);
@@ -418,6 +426,7 @@ export function LocalTab({
           </div>
           <Field id="l-title" label={t('travel.localTitle')} value={D.title} onChange={(v) => set({ title: v })} max={80} />
           <Field id="l-sub" label={t('travel.localSubtitle')} value={D.subtitle} onChange={(v) => set({ subtitle: v })} max={200} />
+          {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={D.cover} onChange={(cover) => set({ cover })} disabled={busy} /> : null}
           <Field id="l-body" label={t('travel.about')} value={D.body} onChange={(v) => set({ body: v })} multiline max={2000} />
           <Field id="l-badges" label={t('travel.badges')} value={D.badges} onChange={(v) => set({ badges: v })} hint={t('travel.badgesHint')} />
           <Field id="l-facts" label={t('travel.facts')} value={D.facts} onChange={(v) => set({ facts: v })} multiline hint={t('travel.factsHint')} />
@@ -509,6 +518,7 @@ export function MunicipalTab({
   toggle(id: string, s: TravelReviewStatus, label: string): ReactNode;
   onError(text: string): void;
 }) {
+  const { user } = useSession();
   const [draft, setDraft] = useState<MunicipalDraft | null>(null);
   const list = municipalitiesOf(cityId);
   const D = draft;
@@ -523,6 +533,7 @@ export function MunicipalTab({
       description: m?.description ?? '',
       videoUrl: m?.videoUrl ?? '',
       mayorName: m?.mayorName ?? '',
+      cover: m?.cover,
       showMayor: m?.showMayor ?? true,
       zone: m?.zone,
       population: m?.population != null ? String(m.population) : '',
@@ -553,6 +564,7 @@ export function MunicipalTab({
           <Field id="m-slogan" label={t('travel.slogan')} value={D.slogan} onChange={(v) => set({ slogan: v })} max={60} />
           <Field id="m-desc" label={t('travel.description')} value={D.description} onChange={(v) => set({ description: v })} multiline max={600} />
           <Field id="m-video" label={t('travel.videoUrl')} value={D.videoUrl ?? ''} onChange={(v) => set({ videoUrl: v })} hint={t('travel.videoHint')} />
+          {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={D.cover} onChange={(cover) => set({ cover })} disabled={busy} /> : null}
           <Field id="m-mayor" label={t('travel.mayorName')} value={D.mayorName ?? ''} onChange={(v) => set({ mayorName: v })} max={80} />
           <label className="check">
             <input type="checkbox" checked={D.showMayor} onChange={(e) => set({ showMayor: e.target.checked })} /> {t('travel.showMayor')}
@@ -660,7 +672,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
   const canDelete = !demo && actions.includes('sil');
   const api = createMunicipalTravel(firestore, user.uid, { id: org.id, name: org.name, cityId, ...(districtId ? { districtId } : {}) });
   const [intro, setIntro] = useState<TravelMunicipal | null>(null);
-  const [text, setText] = useState({ slogan: '', description: '', videoUrl: '', mayorName: '' });
+  const [text, setText] = useState<{ slogan: string; description: string; videoUrl: string; mayorName: string; cover?: Photo }>({ slogan: '', description: '', videoUrl: '', mayorName: '' });
   const [routes, setRoutes] = useState<TravelRoute[]>([]);
   const [places, setPlaces] = useState<TravelPlace[]>([]);
   const [draft, setDraft] = useState<RouteDraft | null>(null);
@@ -674,7 +686,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
       const places = createFirestoreTravelRepository(firestore).listPlaces(cityId).catch(() => []);
       const [m, r, p] = demo ? [null, [], await places] : await Promise.all([api.get(), api.listRoutes(), places]);
       setIntro(m);
-      setText({ slogan: m?.slogan ?? '', description: m?.description ?? '', videoUrl: m?.videoUrl ?? '', mayorName: m?.mayorName ?? '' });
+      setText({ slogan: m?.slogan ?? '', description: m?.description ?? '', videoUrl: m?.videoUrl ?? '', mayorName: m?.mayorName ?? '', cover: m?.cover });
       setRoutes(r);
       setPlaces(p);
     } catch {
@@ -737,6 +749,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
         <Field id="mi-slogan" label={t('travel.slogan')} value={text.slogan} onChange={(v) => setText({ ...text, slogan: v })} max={60} hint={t('travel.sloganHint')} />
         <Field id="mi-desc" label={t('travel.description')} value={text.description} onChange={(v) => setText({ ...text, description: v })} multiline max={600} />
         <Field id="mi-video" label={t('travel.videoUrl')} value={text.videoUrl} onChange={(v) => setText({ ...text, videoUrl: v })} hint={t('travel.videoHint')} />
+        <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={text.cover} onChange={(cover) => setText({ ...text, cover })} disabled={busy || demo || !canWrite} />
         <Field id="mi-mayor" label={t('travel.mayorName')} value={text.mayorName} onChange={(v) => setText({ ...text, mayorName: v })} max={80} hint={t('travel.mayorNameHint')} />
         {canWrite ? (
           <div className="actions">

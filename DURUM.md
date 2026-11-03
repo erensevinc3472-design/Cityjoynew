@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 3 Kasım 2026 (aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
+Son güncelleme: 3 Kasım 2026 (Seyahat ve belediye kapakları, aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -45,8 +45,8 @@ Son güncelleme: 3 Kasım 2026 (aktivite kapağı, Çarşı ilan fotoğrafları;
 ```sh
 npm install
 npm test                      # ortak paket testleri (150)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (140; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (28; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (141; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (29; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -658,6 +658,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Sunucu `activityCoverChanged`: aktivite kaldırılınca (moderatör / hesap silme) alanı boşaltır ve dosyayı siler; iptalde
   kapak kalır. Hesap silinince `media/{uid}/aktivite/` silinir. Testler: kurallar 140, sunucu 28, ortak 150. Emülatörde
   web sürümüyle denendi (kapaklı aktivite açma, başka kullanıcıda liste ve sayfa). **Kurallar değişti.**
+- **Seyahat ve belediye kapak fotoğrafları (3 Kasım, aynı dal; Blaze ile çalışır).** Bölge, şehir, gezilecek yer, hazır
+  rota, yöresel ve Başkanlarla Keşif (belediye tanıtımı) kayıtlarına isteğe bağlı kapak (`cover`, tür `seyahat`). Panel >
+  Seyahat'in altı formunda "Kapak fotoğrafı" (`ImageField`); belediye personeli kendi tanıtımına ve rotalarına Belediye
+  paneli > Seyahat'ten koyar (onaya gönderilir). Uygulamada fotoğraf çizimin yerine geçer (`CoverArt`: Keşfet ve Öğren
+  bölge kartları, bölge / şehir / yer / rota kapağı, şehir sayfasındaki yer kartları, rota kartları, rota durakları);
+  yöresel ve belediye kartı açılınca üstte kapak. Fotoğraf yoksa çizim kalır. Kurallar: altı koleksiyonda `cover`, yeni
+  bağlanan kapak bağlayanın kendi `seyahat` dosyası (`mediaKeptOrOwn`), değişmeyen kalır (admin belediyenin kapağını
+  koruyarak yayına alır). Sunucu `travelCoverChanged-*` (6 işlev): kayıttan çıkan kapağın dosyasını siler. Testler:
+  kurallar 141, sunucu 29, ortak 150. Emülatörde denendi: panelde Bursa'ya kapak yüklenip yayına alındı, uygulamada
+  Bursa sayfasında göründü. **Kurallar değişti.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -767,7 +777,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
 5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini, kişi profil fotoğrafı~~ (31 Ekim - 1 Kasım, Blaze
-   bekliyor), ~~Çarşı ilan fotoğrafları, aktivite kapağı~~ (3 Kasım). Kalan: belediye fotoğrafları, "{Şehir}'dan Kareler".
+   bekliyor), ~~Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat ve belediye kapakları~~ (3 Kasım). Kalan: "{Şehir}'dan Kareler".
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 

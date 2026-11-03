@@ -408,3 +408,14 @@ describe('aktivite kapağı', () => {
     expect(deleted).toEqual([cover.path]);
   });
 });
+
+describe('Seyahat kapakları', () => {
+  it('değişen ya da silinen kaydın kapağı silinir; değişmeyen kalır', async () => {
+    const a = { path: 'media/eren/seyahat/aaaaaaaaaa.jpg', url: 'u', width: 10, height: 10 };
+    const b = { path: 'media/basin/seyahat/bbbbbbbbbb.jpg', url: 'u', width: 10, height: 10 };
+    const del = async () => {};
+    expect(await handleMediaChange(MEDIA_FIELDS.travel, { cover: a, slogan: 'x' }, { cover: a, slogan: 'y' }, del)).toEqual([]);
+    expect(await handleMediaChange(MEDIA_FIELDS.travel, { cover: a }, { cover: b }, del)).toEqual([a.path]);
+    expect(await handleMediaChange(MEDIA_FIELDS.travel, { cover: b }, undefined, del)).toEqual([b.path]);
+  });
+});
