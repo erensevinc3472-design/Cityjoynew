@@ -647,8 +647,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `ilan` klasöründe (kural motorunun 1000 işlem sınırı yüzünden yalnızca yol; adresi uygulama denetler, `photoFrom`);
   fotoğraflar değişmediyse yeniden denetlenmez; sahibi kaldırırken fotoğraflar boşaltılır. Storage kurallarına `ilan`
   türü eklendi. Sunucu `listingPhotosChanged`: ilandan çıkan dosyayı siler; moderatör kaldırınca alanı boşaltır (dosyalar
-  ardından silinir); hesap silinince `media/{uid}/ilan/` silinir. Fotoğraf şimdilik isteğe bağlı (en az bir fotoğraf
-  zorunlu mu, Eren'e soruldu). Testler: kurallar 139, sunucu 27, ortak 150. Emülatörde web sürümüyle denendi (iki
+  ardından silinir); hesap silinince `media/{uid}/ilan/` silinir. Fotoğraf şimdilik isteğe bağlı. **Karar (Eren, 3 Kasım):**
+  Blaze sonrası yeni ilanda en az bir fotoğraf zorunlu olacak (Blaze'e geçişte yapılacaklar listesinde). Testler: kurallar 139, sunucu 27, ortak 150. Emülatörde web sürümüyle denendi (iki
   fotoğrafla ilan, düzenleyip birini değiştirme, başka kullanıcıda liste ve ilan sayfası). **Kurallar değişti:
   birleşince Firestore kuralları yüklenmeli;** Storage kuralları ve işlevler Blaze bekliyor.
 
@@ -689,6 +689,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 ## Açık işler ve bilinen eksikler
 
+- **Blaze'e geçince Claude'un yapacakları:** Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu (uygulama + kurallar; Karar
+  Eren 3 Kasım); fotoğraflı akışları gerçek projede deneme.
 - **Eren'in yapacakları tek listede:** `docs/eren-yapilacaklar.md` (31 Ekim). Eren bir maddeyi bitirdim deyince işaretle.
 - **Mağaza öncesi kontrol listesi (30 Ekim 2026, 20 maddelik liste üzerinden):** Claude'un üç işi yapıldı (konum izni metni,
   çökme ekranı, "Bağlantı yok" bildirimi; Yapılanlar'da). EAS ile gelecekler: çökme
