@@ -806,7 +806,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Otoparkta kapasite / canlı takip yok, Satılık ve Kiralık için Çarşı tasarımı, **il Vitrini reklam panosu ve gelir kaynağı**
   (önceki "para karşılığı girilmez" notunun yerine).
   Eklendi (3 Kasım akşam): Acil alt sayfaları (H-Veteriner, H-Taksi, H-Diger) ve Sosyal Harmoni iç sayfaları (SH-*),
-  onay bekliyor. Seyahat şimdiki hâliyle kalır (Eren).
+  Eren onayladı (3 Kasım). Hepsi koda geçiyor (dal claude/ic-ekranlar). Seyahat şimdiki hâliyle kalır (Eren).
   Fırsatlar (Eren): kaydırmalı kategori kartları, kategori sayfası, fırsattan işletme sayfasına (geri: listeye), İşletmem >
   Fırsatlarım; fırsat sınırı Ücretsiz 1, Pro 5 (PROJE.md 13 madde 35 ve 15 madde 2).
   Profil, Mesajlar, İşletme ekle, Gönderi paylaş: Expo'daki hâli iyi, aynen kalır (Eren); U-* panoları o hâli gösterir.

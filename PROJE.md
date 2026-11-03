@@ -749,9 +749,9 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
       yol yardım aynı hizmet listesi kalıbını kullanır (kategoriye göre değişen yalnızca üst uyarı, arama ipucu ve filtreler;
       tuvalde Veteriner örneği). Taksi durakları: en yakın durak büyük kartta, telefonu olmayan duraklar harita kaydı
       (OSM, doğrulanmadı), tarife yalnızca panelden girilirse. Diğer İhtiyaçlar: durum kartları (yeni taşındım, yoğunum,
-      tatil, hasta, yaşlı yakın, özel gün) ilgili hizmet listelerine götürür; eşleşmeyi admin panelden belirler. Önizleme,
-      onay bekliyor.
-    - **Sosyal Harmoni iç sayfaları (önizleme, onay bekliyor):** Aktiviteler (tam yer katılınca, ilk buluşma ipuçları),
+      tatil, hasta, yaşlı yakın, özel gün) ilgili hizmet listelerine götürür; eşleşmeyi admin panelden belirler. **Eren onayladı**
+      (3 Kasım 2026).
+    - **Sosyal Harmoni iç sayfaları (Eren onayladı, 3 Kasım 2026):** Aktiviteler (tam yer katılınca, ilk buluşma ipuçları),
       Haberler (Bölgesel/Genel, kaynak adı ve "kaynağa git"), Yarışmalar (il > bölge > Türkiye, oy kuralları, şartname),
       Anketler (hazırlayan adı, gizli oy, sonuç oy verince), Şehir Kulüpleri (üstte il yöneticisinin seçtiği kulüp, fikstür
       kulüpten), Fırsatlar (Eren: Sosyal Harmoni'nin altında, aşağı kaydırınca; her kategori ayrı kart, yana kaydırılır; karta dokununca o kategorinin kendi sayfası açılır. Kartın üstündeki yazı kart değiştikçe değişir (Eren): Yemek "Bugün ne yesek? Şehrin sofrası indirimde.", Market "Sepet hafifler, cüzdan sevinir.", Spor "Formda kalmanın en tatlı bahanesi.", Eğlence "Akşam planın hazır.", Esnaf "Mahallenin ustası, sana özel fiyatla.", Sağlık "Kendine iyi bak, bu kez daha uygun.", Eğitim "Yeni bir şey öğrenmenin tam zamanı." (5 dilde dil dosyasından).
