@@ -758,6 +758,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 - Toplu güvenlik taraması (`/security-review`, tüm kod: Firebase kuralları, giriş, yönetici yetkileri): Eren mağazaya
   çıkmadan önce en sonda toplu yapılmasını istedi (29 Ekim 2026).
+- **Sonra bakılacak (Eren, 3 Kasım):** Keşfet konum rozeti (Hesabım > "Konum rozeti", `/location-badge`). Eren
+  daha sonra birlikte gözden geçirmek istedi; ne değişeceği henüz konuşulmadı.
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
