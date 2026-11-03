@@ -1643,7 +1643,7 @@ service cloud.firestore {
     }
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
-             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'frames',
+             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'video', 'frames',
              'framesFeatured', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
         // Kareler: yalnızca fotoğraflı ve Genel'e açık gönderi (Seyahat > "{Şehir} kareleri").
@@ -1711,6 +1711,18 @@ service cloud.firestore {
             && (l.size() < 9 || l[8].path == b + '8.jpg')
             && (l.size() < 10 || l[9].path == b + '9.jpg'));
     }
+    // Gönderi videosu (en çok 60 sn): fotoğrafla birlikte olmaz; dosya bu gönderinin klasöründe `video.mp4` ya da `.mov`.
+    // Süreyi telefon bildirir; dosya boyutunu (40 MB) Storage kuralı sınırlar.
+    function validPostVideo(d, id) {
+      let v = d.get('video', null);
+      let b = 'posts/' + d.authorUid + '/' + id + '/video.';
+      return !('video' in d)
+        || (!('photos' in d) && v is map && v.keys().hasOnly(['path', 'url', 'width', 'height', 'durationSec'])
+            && (v.path == b + 'mp4' || v.path == b + 'mov')
+            && v.url is string && v.url.size() <= 600
+            && v.width is int && v.height is int
+            && v.durationSec is int && v.durationSec >= 1 && v.durationSec <= 60);
+    }
     function canSeePost(d) {
       // Hedefler sabit anahtarlı bir haritada durur ({mahallem, bolgesel, genel}: true/false): akış sorguları bunlarla
       // süzülür ve kurallar sorguyu doğrulayabilir.
@@ -1763,8 +1775,9 @@ service cloud.firestore {
         && !('framesFeatured' in request.resource.data)
         && request.resource.data.createdAt == request.time
         && validPost(request.resource.data)
-        && (request.resource.data.text.size() >= 1 || 'photos' in request.resource.data)
+        && (request.resource.data.text.size() >= 1 || 'photos' in request.resource.data || 'video' in request.resource.data)
         && validPostPhotos(request.resource.data, id)
+        && validPostVideo(request.resource.data, id)
         && ('business' in request.resource.data
             ? (validBusinessPost(request.resource.data)
                 && usageOk('b-' + request.resource.data.business.id, 'isletme-gonderi', limitOf('isletmeGonderi', 5)))
@@ -1785,14 +1798,14 @@ service cloud.firestore {
         && isBusinessOwner(resource.data.business.id)
         && request.resource.data.status == 'aktif' && request.resource.data.updatedAt == request.time
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
-      // Sahibi (işletme paylaşımında işletme sahibi de) kaldırır: yazı, ad, arama anahtarları ve fotoğraflar boşaltılır
+      // Sahibi (işletme paylaşımında işletme sahibi de) kaldırır: yazı, ad, arama anahtarları, fotoğraflar ve video boşaltılır
       // (dosyaları sunucu siler).
       allow update: if (resource.data.authorUid == request.auth.uid
             || ('business' in resource.data && isBusinessOwner(resource.data.business.id)))
         && request.resource.data.updatedAt == request.time
         && request.resource.data.status == 'kaldirildi' && request.resource.data.text == '' && request.resource.data.authorName == ''
-        && !('searchKeys' in request.resource.data) && !('photos' in request.resource.data)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'updatedAt']);
+        && !('searchKeys' in request.resource.data) && !('photos' in request.resource.data) && !('video' in request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'video', 'updatedAt']);
       // Sahibi yorumları kapatır ya da açar.
       allow update: if resource.data.authorUid == request.auth.uid
         && request.resource.data.updatedAt == request.time

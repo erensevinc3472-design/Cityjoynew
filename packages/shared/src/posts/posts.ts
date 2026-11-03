@@ -35,6 +35,23 @@ export type PostPhoto = Photo;
 
 export const postPhotoPath = (uid: string, postId: string, index: number) => `posts/${uid}/${postId}/${index}.jpg`;
 
+/**
+ * Gönderi videosu (PROJE.md 5.5 madde 2: en çok 60 sn): dosya `posts/{uid}/{postId}/video.mp4` (iPhone'da `.mov`).
+ * Telefonda seçilirken süre ve boyut denetlenir; akışta kendiliğinden oynamaz (veri ve depolama maliyeti).
+ */
+export interface PostVideo {
+  path: string;
+  url: string;
+  width: number;
+  height: number;
+  /** Saniye (1-60). */
+  durationSec: number;
+}
+
+export const POST_VIDEO_TYPES = { mp4: 'video/mp4', mov: 'video/quicktime' } as const;
+export type PostVideoExt = keyof typeof POST_VIDEO_TYPES;
+export const postVideoPath = (uid: string, postId: string, ext: PostVideoExt) => `posts/${uid}/${postId}/video.${ext}`;
+
 export interface PostInput {
   /** Fotoğraf varsa boş olabilir. */
   text: string;
@@ -43,6 +60,8 @@ export interface PostInput {
   /** Paylaşanın kayıtlı konumu (Mahallem ve Bölgesel buna göre süzülür). */
   region: PostRegion;
   photos?: PostPhoto[];
+  /** Fotoğrafın yerine tek video (ikisi birlikte olmaz). */
+  video?: PostVideo;
   /**
    * "{Şehir} kareleri"nde de görünsün (Seyahat; PROJE.md 13. madde 34): yalnızca fotoğraflı ve Genel'e paylaşılan
    * gönderide. Ek yükleme ya da kopya yok; aynı gönderi iki yerde görünür.
@@ -80,6 +99,9 @@ export const POST_LIMITS = {
   text: [1, 2000],
   /** Gönderi başına en çok fotoğraf. */
   photos: 10,
+  /** Gönderi videosu: en çok 60 saniye ve 40 MB (depolama maliyeti). */
+  videoSeconds: 60,
+  videoBytes: 40_000_000,
   /** Bu kadar şikâyette moderatör inceleyene kadar akıştan düşer. */
   reportThreshold: 3,
   /** Akışta bir seferde okunan gönderi (sayfalama, maliyet ilkesi). */
@@ -89,7 +111,7 @@ export const POST_LIMITS = {
 export const POST_REPORT_REASONS = ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger'] as const;
 export type PostReportReason = (typeof POST_REPORT_REASONS)[number];
 
-export type PostError = 'text' | 'category' | 'targets' | 'region' | 'realEstate' | 'photos';
+export type PostError = 'text' | 'category' | 'targets' | 'region' | 'realEstate' | 'photos' | 'video';
 
 /**
  * Satılık/kiralık taşınmaz ilanı sezgisi (madde 9): "satılık daire", "kiralık ev", "for rent" gibi. Kusursuz değildir;
@@ -104,8 +126,9 @@ export function validatePost(p: PostInput): PostError[] {
   const errors: PostError[] = [];
   const len = p.text.trim().length;
   const photos = p.photos?.length ?? 0;
-  if ((len < POST_LIMITS.text[0] && !photos) || len > POST_LIMITS.text[1]) errors.push('text');
+  if ((len < POST_LIMITS.text[0] && !photos && !p.video) || len > POST_LIMITS.text[1]) errors.push('text');
   if (photos > POST_LIMITS.photos) errors.push('photos');
+  if (p.video && (photos || !(p.video.durationSec >= 1 && p.video.durationSec <= POST_LIMITS.videoSeconds))) errors.push('video');
   if (!POST_CATEGORIES.includes(p.category)) errors.push('category');
   if (!p.targets.length || new Set(p.targets).size !== p.targets.length || p.targets.some((x) => !POST_TARGETS.includes(x))) errors.push('targets');
   const r = p.region;

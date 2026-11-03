@@ -1019,7 +1019,8 @@
       "realEstate": "Anzeigen für Wohnungen, Grundstücke oder Läden zum Kauf oder zur Miete sind in Entdecken nicht erlaubt. Immobilienanzeigen kommen später mit Lizenz in den Basar.",
       "relative": "Nur Angehörige können einen Beileidsbeitrag teilen.",
       "banned": "Dein Text enthält ein Wort, das gegen die Gemeinschaftsregeln verstößt. Bitte ändere es und versuche es erneut.",
-      "photos": "Du kannst bis zu 10 Fotos hinzufügen."
+      "photos": "Du kannst bis zu 10 Fotos hinzufügen.",
+      "video": "Ein Video darf höchstens 60 Sekunden lang sein und nicht mit Fotos kombiniert werden."
     },
     "save": "Speichern",
     "unsave": "Gespeichert ✓",
@@ -1141,6 +1142,16 @@
       "tooLarge": "Das Foto ist zu groß. Bitte wähle ein anderes.",
       "uploadError": "Das Foto konnte nicht hochgeladen werden. Prüfe deine Verbindung und versuche es erneut.",
       "permission": "Zum Auswählen eines Fotos wird Zugriff auf die Fotomediathek benötigt. Du kannst ihn in den Einstellungen deines Telefons erlauben."
+    },
+    "video": {
+      "add": "Video hinzufügen",
+      "remove": "Video entfernen",
+      "label": "Video",
+      "play": "Video abspielen, {{duration}}",
+      "selected": "Ausgewähltes Video, {{duration}}",
+      "note": "Bis zu {{max}} Sekunden und 40 MB. Entweder ein Video oder Fotos, nicht beides.",
+      "tooLong": "Videos dürfen höchstens {{max}} Sekunden lang sein. Kürze es und wähle es erneut.",
+      "tooLarge": "Das Video ist zu groß (max. 40 MB). Wähle ein kürzeres Video oder eine geringere Auflösung."
     }
   },
   "news": {

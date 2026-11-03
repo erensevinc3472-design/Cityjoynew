@@ -10,9 +10,13 @@ service firebase.storage {
     match /posts/{uid}/{postId}/{file} {
       allow read: if request.auth != null;
       allow create: if request.auth != null && request.auth.uid == uid
-        && file.matches('[0-9][.]jpg')
-        && request.resource.contentType == 'image/jpeg'
-        && request.resource.size > 0 && request.resource.size <= 1500000;
+        && ((file.matches('[0-9][.]jpg')
+              && request.resource.contentType == 'image/jpeg'
+              && request.resource.size > 0 && request.resource.size <= 1500000)
+            // Gönderi videosu (en çok 60 sn, 40 MB): video.mp4 ya da iPhone'da video.mov.
+            || (file.matches('video[.](mp4|mov)')
+              && request.resource.contentType in ['video/mp4', 'video/quicktime']
+              && request.resource.size > 0 && request.resource.size <= 40000000));
       allow update: if false;
       allow delete: if request.auth != null && request.auth.uid == uid;
     }

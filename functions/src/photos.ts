@@ -4,15 +4,16 @@ import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/fi
 export type DeleteFiles = (prefix: string) => Promise<void>;
 
 /**
- * Gönderi kaldırılınca (sahibi ya da moderatör) fotoğraf dosyaları silinir; moderatör kaldırdıysa kayıttaki fotoğraf
- * alanı da boşaltılır. Fotoğrafı olmayan ya da zaten temizlenmiş gönderide bir şey yapmaz.
+ * Gönderi kaldırılınca (sahibi ya da moderatör) fotoğraf ve video dosyaları silinir; moderatör kaldırdıysa kayıttaki
+ * fotoğraf ve video alanları da boşaltılır. Dosyası olmayan ya da zaten temizlenmiş gönderide bir şey yapmaz.
  */
 export async function handlePostPhotos(db: Firestore, id: string, before: DocumentData | undefined, after: DocumentData | undefined, deleteFiles: DeleteFiles): Promise<boolean> {
-  if (!before || !Array.isArray(before.photos) || !before.photos.length) return false;
-  const removed = !after || after.status === 'kaldirildi' || !Array.isArray(after.photos);
+  const hadFiles = !!before && ((Array.isArray(before.photos) && before.photos.length > 0) || !!before.video);
+  if (!hadFiles) return false;
+  const removed = !after || after.status === 'kaldirildi' || (!Array.isArray(after.photos) && !after.video);
   if (!removed) return false;
-  await deleteFiles(`posts/${before.authorUid}/${id}/`);
-  if (after && 'photos' in after) await db.doc(`posts/${id}`).update({ photos: FieldValue.delete() });
+  await deleteFiles(`posts/${before!.authorUid}/${id}/`);
+  if (after && ('photos' in after || 'video' in after)) await db.doc(`posts/${id}`).update({ photos: FieldValue.delete(), video: FieldValue.delete() });
   return true;
 }
 

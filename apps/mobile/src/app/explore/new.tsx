@@ -17,7 +17,7 @@ import {
   type PostError,
   type PostTarget,
 } from '@cityjoy/shared';
-import { deletePhotos, PhotoTooLargeError, uploadPostPhotos, type PreparedPhoto } from '@cityjoy/shared/firebase';
+import { deletePhotos, PhotoTooLargeError, uploadPostPhotos, uploadPostVideo, VideoTooLargeError, type PreparedPhoto, type PreparedVideo } from '@cityjoy/shared/firebase';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
@@ -29,7 +29,8 @@ import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { storage } from '@/lib/firebase';
-import { PhotoPermissionError, pickPhotos } from '@/lib/photos';
+import { PhotoPermissionError, pickPhotos, pickVideo, VideoFileTooLargeError, VideoTooLongError } from '@/lib/photos';
+import { formatDuration } from '@/components/post-video';
 import { locationRepository } from '@/lib/locations';
 import { forgetFeeds } from '@/lib/posts';
 import { forgetSearches } from '@/lib/search';
@@ -55,6 +56,7 @@ export default function NewPostScreen() {
   const [text, setText] = useState('');
   const [photos, setPhotos] = useState<PreparedPhoto[]>([]);
   const [photoNote, setPhotoNote] = useState<string | false>(false);
+  const [video, setVideo] = useState<PreparedVideo | null>(null);
   const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState<PostCategory>('genel');
   // Keşfet'te hangi sekmedeyken + düğmesine basıldıysa o hedef seçili gelir; kişi istediği yerleri işaretler.
@@ -108,7 +110,7 @@ export default function NewPostScreen() {
     const region = biz
       ? { provinceCode: biz.location.provinceCode, districtId: biz.location.districtId, neighbourhoodId: biz.location.neighbourhoodId! }
       : { provinceCode: location!.provinceCode, districtId: location!.districtId!, neighbourhoodId: location!.neighbourhoodId! };
-    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), frames: frames && !!photos.length && targets.includes('genel') };
+    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), frames: frames && !!photos.length && targets.includes('genel') };
     const errs: (PostError | 'relative' | 'banned')[] = [
       ...validatePost(input),
       ...(category === 'taziye' && !relative ? ['relative' as const] : []),
@@ -119,6 +121,7 @@ export default function NewPostScreen() {
     if (errs.length) return;
     setBusy(true);
     let uploaded: Awaited<ReturnType<typeof uploadPostPhotos>> = [];
+    let uploadedVideo: Awaited<ReturnType<typeof uploadPostVideo>> | null = null;
     let stage: 'upload' | 'save' = 'upload';
     try {
       const newId = postRepository.newId();
@@ -126,12 +129,16 @@ export default function NewPostScreen() {
         setUploading(true);
         uploaded = await uploadPostPhotos(storage, user.uid, newId, photos);
         setUploading(false);
+      } else if (video) {
+        setUploading(true);
+        uploadedVideo = await uploadPostVideo(storage, user.uid, newId, video);
+        setUploading(false);
       }
       stage = 'save';
       const id = await postRepository.create(
         user.uid,
         authorNameOf(profile.displayName),
-        { ...input, photos: uploaded },
+        { ...input, photos: uploaded, ...(uploadedVideo ? { video: uploadedVideo } : {}) },
         biz ? { business: { id: biz.id, name: biz.name }, pending: mode === 'onayla' } : undefined,
         newId,
       );
@@ -142,10 +149,13 @@ export default function NewPostScreen() {
       else router.replace({ pathname: '/explore/[id]', params: { id } });
     } catch (e) {
       if (uploaded.length) await deletePhotos(storage, uploaded);
+      if (uploadedVideo) await deletePhotos(storage, [uploadedVideo]);
       setFailed(
         e instanceof PhotoTooLargeError
           ? t('explore.photos.tooLarge')
-          : stage === 'upload' && photos.length
+          : e instanceof VideoTooLargeError
+            ? t('explore.video.tooLarge')
+          : stage === 'upload' && (photos.length || video)
             ? t('explore.photos.uploadError')
             : errorText(t, e, 'explore.saveError'),
       );
@@ -165,6 +175,24 @@ export default function NewPostScreen() {
     }
   };
 
+  const addVideo = async () => {
+    setPhotoNote(false);
+    try {
+      const v = await pickVideo();
+      if (v) setVideo(v);
+    } catch (e) {
+      setPhotoNote(
+        e instanceof PhotoPermissionError
+          ? t('explore.photos.permission')
+          : e instanceof VideoTooLongError
+            ? t('explore.video.tooLong', { max: POST_LIMITS.videoSeconds })
+            : e instanceof VideoFileTooLargeError
+              ? t('explore.video.tooLarge')
+              : t('explore.photos.uploadError'),
+      );
+    }
+  };
+
   const err = (k: PostError | 'relative') => (errors.includes(k) ? t(`explore.errors.${k}`) : undefined);
 
   return (
@@ -178,7 +206,12 @@ export default function NewPostScreen() {
       ) : null}
       {mode === 'onayla' ? <FormMessage kind="info" text={t('explore.business.pendingNote', { name: biz!.name })} /> : null}
       <TextField label={t('explore.fields.text')} value={text} onChangeText={setText} maxLength={POST_LIMITS.text[1]} multiline error={err('text')} hint={t('explore.fields.textHint')} />
-      <PhotoPicker photos={photos} onAdd={addPhotos} onRemove={(i) => setPhotos((cur) => cur.filter((_, k) => k !== i))} disabled={busy} />
+      {video ? (
+        <VideoPicked video={video} onRemove={() => setVideo(null)} disabled={busy} />
+      ) : (
+        <PhotoPicker photos={photos} onAdd={addPhotos} onAddVideo={photos.length ? undefined : addVideo} onRemove={(i) => setPhotos((cur) => cur.filter((_, k) => k !== i))} disabled={busy} />
+      )}
+      {err('video') ? <FormMessage kind="error" text={err('video')!} /> : null}
       {photoNote ? <FormMessage kind="error" text={photoNote} /> : null}
       {errors.includes('photos') ? <FormMessage kind="error" text={t('explore.errors.photos')} /> : null}
       {errors.includes('realEstate') ? <FormMessage kind="error" text={t('explore.errors.realEstate')} /> : null}
@@ -226,8 +259,28 @@ function AuthorPicker({ businesses, value, onChange }: { businesses: Business[];
   );
 }
 
-/** Seçilen fotoğrafların küçük önizlemeleri (her birinde kaldır düğmesi) ve "Fotoğraf ekle". */
-function PhotoPicker({ photos, onAdd, onRemove, disabled }: { photos: PreparedPhoto[]; onAdd(): void; onRemove(i: number): void; disabled: boolean }) {
+/** Seçilen video: süresi ve kaldır düğmesi (fotoğrafla birlikte olmaz). */
+function VideoPicked({ video, onRemove, disabled }: { video: PreparedVideo; onRemove(): void; disabled: boolean }) {
+  const { t } = useTranslation();
+  const c = useThemeColors();
+  return (
+    <View style={styles.block}>
+      <View style={styles.thumbs}>
+        <View style={[styles.thumb, styles.videoThumb]} accessible accessibilityLabel={t('explore.video.selected', { duration: formatDuration(video.durationSec) })}>
+          <MaterialIcons name="videocam" size={26} color="#FFFFFF" />
+          <AppText style={styles.videoTime}>{formatDuration(video.durationSec)}</AppText>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('explore.video.remove')} disabled={disabled} onPress={onRemove} hitSlop={10} style={styles.remove}>
+            <MaterialIcons name="close" size={16} color="#FFFFFF" />
+          </Pressable>
+        </View>
+      </View>
+      <AppText variant="caption" style={{ color: c.textMuted }}>{t('explore.video.note', { max: POST_LIMITS.videoSeconds })}</AppText>
+    </View>
+  );
+}
+
+/** Seçilen fotoğrafların küçük önizlemeleri (her birinde kaldır düğmesi), "Fotoğraf ekle" ve fotoğraf yokken "Video ekle". */
+function PhotoPicker({ photos, onAdd, onAddVideo, onRemove, disabled }: { photos: PreparedPhoto[]; onAdd(): void; onAddVideo?(): void; onRemove(i: number): void; disabled: boolean }) {
   const { t } = useTranslation();
   const c = useThemeColors();
   return (
@@ -258,6 +311,17 @@ function PhotoPicker({ photos, onAdd, onRemove, disabled }: { photos: PreparedPh
             <AppText style={[styles.addText, { color: c.accent }]}>{t('explore.photos.add')}</AppText>
           </Pressable>
         ) : null}
+        {onAddVideo ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('explore.video.add')}
+            disabled={disabled}
+            onPress={onAddVideo}
+            style={({ pressed }) => [styles.thumb, styles.add, { borderColor: c.accent, opacity: pressed ? 0.7 : 1 }]}>
+            <MaterialIcons name="video-call" size={24} color={c.accent} />
+            <AppText style={[styles.addText, { color: c.accent }]}>{t('explore.video.add')}</AppText>
+          </Pressable>
+        ) : null}
       </View>
       <AppText variant="caption" muted>
         {photos.length ? `${t('explore.photos.count', { count: photos.length })} · ` : ''}
@@ -274,4 +338,6 @@ const styles = StyleSheet.create({
   remove: { position: 'absolute', top: 4, end: 4, width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' },
   add: { borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', gap: 2, padding: 4 },
   addText: { fontSize: 11, lineHeight: 14, textAlign: 'center' },
+  videoThumb: { backgroundColor: '#0B1F24', alignItems: 'center', justifyContent: 'center', gap: 2 },
+  videoTime: { color: '#FFFFFF', fontSize: 12, lineHeight: 16 },
 });

@@ -45,8 +45,8 @@ Son güncelleme: 3 Kasım 2026 ("{Şehir} kareleri", Seyahat ve belediye kapakla
 ```sh
 npm install
 npm test                      # ortak paket testleri (150)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (142; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (29; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (143; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (30; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -683,6 +683,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Kurallar her fotoğrafta tam yolu (`posts/{uid}/{gönderi}/{sıra}.jpg`) denetler; kural motorunun 1000 işlem sınırı
   yüzünden biçim ve adres uygulamada denetlenir (`photoFrom`, yalnızca kendi depomuzdaki adres gösterilir). Storage'da
   dosya adı 0-9. İşletme adına 10 fotoğraflı paylaşım da denendi (kural testi). **Kurallar değişti.**
+- **Keşfet videosu (3 Kasım, aynı dal; PROJE.md 5.5 madde 2; Blaze ile çalışır).** Gönderiye fotoğraf yerine tek video:
+  en çok 60 sn ve 40 MB; `posts/{uid}/{gönderi}/video.mp4` (iPhone'da `.mov`). Paylaşım formunda "Video ekle" (fotoğraf
+  yokken), seçilen videonun süresi ve kaldır; iPhone'da seçici 60 sn ile sınırlar ve 720p'ye sıkıştırır; uzun ya da büyük
+  video seçilince uyarı. Web'de süre dosyanın kendi bilgisinden okunur (seçicinin değeri yanlış geliyordu, denemede
+  bulundu). Akışta kendiliğinden oynamaz: süreli oynat düğmesi, dokununca oynatıcı (`expo-video`, yeni paket) açılır ve
+  başlar. Profil ızgarasında video simgesi. Panel > Moderasyon şikâyet edilen videoyu oynatır. Kurallar: video fotoğrafla
+  birlikte olmaz, yol bu gönderinin klasörü, süre 1-60; Storage: `video.mp4|mov`, video türü, en çok 40 MB. Sunucu
+  `postPhotosRemoved` videoyu da siler ve alanı boşaltır. Testler: kurallar 143, sunucu 30, ortak 150. Emülatörde web
+  sürümüyle denendi (75 sn reddedildi, 12 sn paylaşıldı, başka kullanıcıda dokununca oynadı). **Telefonda denenmedi**
+  (EAS). Süreyi telefon bildirir (kural sunucuda dosyayı açamaz); maliyeti 40 MB sınırı korur. **Kurallar değişti.**
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

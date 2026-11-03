@@ -139,6 +139,39 @@ describe('Keşfet gönderileri', () => {
     });
   });
 
+  it('video: tek video, en çok 60 sn, bu gönderinin klasöründe; fotoğrafla birlikte olmaz; kaldırınca alan silinir', async () => {
+    const r = repo('ayse');
+    const video = (id: string, patch: Record<string, unknown> = {}) => ({
+      path: `posts/ayse/${id}/video.mp4`,
+      url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${id}%2Fvideo.mp4?alt=media&token=t`,
+      width: 720,
+      height: 1280,
+      durationSec: 42,
+      ...patch,
+    });
+    const ok = r.newId();
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', video: video(ok) }), undefined, ok));
+    expect((await r.get(ok))?.video?.durationSec).toBe(42);
+    const raw = (id: string, extra: Record<string, unknown>) =>
+      setDoc(doc(fs('ayse'), 'posts', id), {
+        text: '', category: 'genel', targets: { mahallem: true, bolgesel: false, genel: false }, region: ataevler, status: 'aktif', authorUid: 'ayse',
+        authorName: 'Ayşe K.', likeCount: 0, commentCount: 0, reportCount: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...extra,
+      });
+    let x = r.newId();
+    await assertFails(raw(x, { video: video(x, { durationSec: 61 }) }));
+    x = r.newId();
+    await assertFails(raw(x, { video: video(ok) }));
+    x = r.newId();
+    await assertFails(raw(x, { video: { ...video(x), path: `posts/ayse/${x}/video.avi` } }));
+    x = r.newId();
+    const photo = { path: `posts/ayse/${x}/0.jpg`, url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${x}%2F0.jpg?alt=media&token=t`, width: 10, height: 10 };
+    await assertFails(raw(x, { video: video(x), photos: [photo] }));
+    await assertSucceeds(r.remove(ok));
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      expect('video' in ((await getDoc(doc(ctx.firestore(), 'posts', ok))).data() ?? {})).toBe(false);
+    });
+  });
+
   it('görünürlük: Mahallem yalnızca o mahallede, Bölgesel yalnızca o ilde, Genel herkese (sorgular da)', async () => {
     const m = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['mahallem'] }));
     const b = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['bolgesel'] }));

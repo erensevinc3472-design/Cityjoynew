@@ -33,10 +33,11 @@ import {
   type PostTarget,
   canShowInFrames,
   FRAMES_LIMITS,
+  type PostVideo,
 } from '../posts/posts';
 import { PROFILE_LIMITS } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
-import { photoFrom } from '../media/photo';
+import { isStoredPhoto, photoFrom } from '../media/photo';
 import { addAudit, iso } from './grants';
 import { countUsage } from './limits';
 
@@ -47,6 +48,15 @@ const REPORTS = 'postReports';
 // bununla süzülür ve güvenlik kuralları sorgunun yalnızca görülebilecek gönderileri istediğini doğrulayabilir.
 const targetsToMap = (targets: PostTarget[]) => Object.fromEntries(POST_TARGETS.map((x) => [x, targets.includes(x)]));
 const targetsFromMap = (m: Record<string, boolean> | undefined) => POST_TARGETS.filter((x) => m?.[x] === true);
+
+/** Video yalnızca kendi depomuzdaki dosyaysa ve süresi sınırdaysa gösterilir. */
+function postVideoOf(d: DocumentData): { video?: PostVideo } {
+  const v = d.video as Partial<PostVideo> | undefined;
+  return v && typeof v.path === 'string' && typeof v.url === 'string' && isStoredPhoto({ path: v.path, url: v.url })
+    && typeof v.durationSec === 'number' && v.durationSec > 0 && v.durationSec <= POST_LIMITS.videoSeconds
+    ? { video: { path: v.path, url: v.url, width: Math.round(v.width ?? 0), height: Math.round(v.height ?? 0), durationSec: Math.round(v.durationSec) } }
+    : {};
+}
 
 /** Yalnızca kendi depomuzdaki, bu gönderinin klasöründeki geçerli fotoğraflar gösterilir (kurallar yolu denetler). */
 function postPhotosOf(d: DocumentData): { photos?: PostPhoto[] } {
@@ -71,6 +81,7 @@ function fromDoc(id: string, d: DocumentData): Post {
     reportCount: d.reportCount ?? 0,
     cleared: d.cleared === true,
     ...postPhotosOf(d),
+    ...postVideoOf(d),
     ...(d.frames === true ? { frames: true } : {}),
     ...(d.framesFeatured === true ? { framesFeatured: true } : {}),
     createdAt: iso(d.createdAt) ?? '',
@@ -262,6 +273,9 @@ export function createFirestorePostRepository(db: Firestore) {
         ...(input.photos?.length
           ? { photos: input.photos.map((p) => ({ path: p.path, url: p.url, width: Math.round(p.width), height: Math.round(p.height) })) }
           : {}),
+        ...(input.video && !input.photos?.length
+          ? { video: { path: input.video.path, url: input.video.url, width: Math.round(input.video.width), height: Math.round(input.video.height), durationSec: Math.round(input.video.durationSec) } }
+          : {}),
         searchKeys: searchKeys(input.text, SEARCH_LIMITS.postKeys, SEARCH_LIMITS.minPost),
         ...(input.frames && canShowInFrames(input) ? { frames: true } : {}),
         createdAt: serverTimestamp(),
@@ -277,7 +291,7 @@ export function createFirestorePostRepository(db: Firestore) {
      */
     async remove(id: string): Promise<void> {
       const batch = writeBatch(db);
-      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), updatedAt: serverTimestamp() });
+      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), updatedAt: serverTimestamp() });
       await batch.commit();
     },
 
@@ -419,9 +433,9 @@ export function createFirestorePostRepository(db: Firestore) {
       }
       const mine = await getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), limit(500)));
       for (const d of mine.docs) {
-        if (d.get('status') === 'kaldirildi' && !d.get('text') && !d.get('photos')) continue;
+        if (d.get('status') === 'kaldirildi' && !d.get('text') && !d.get('photos') && !d.get('video')) continue;
         const batch = writeBatch(db);
-        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), updatedAt: serverTimestamp() });
+        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), updatedAt: serverTimestamp() });
         await batch.commit();
       }
       const likes = await getDocs(query(collectionGroup(db, 'likes'), where('uid', '==', uid), limit(500)));

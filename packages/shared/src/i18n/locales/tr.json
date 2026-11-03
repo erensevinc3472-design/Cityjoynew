@@ -1019,7 +1019,8 @@
       "realEstate": "Satılık ya da kiralık ev, arsa, dükkân ilanları Keşfet'te paylaşılamaz. Emlak ilanları ileride yetki belgesiyle Çarşı'dan verilecek.",
       "relative": "Taziye gönderisini yalnızca yakınları paylaşabilir.",
       "banned": "Yazında topluluk kurallarına uymayan bir ifade var. Lütfen düzeltip tekrar dene.",
-      "photos": "En çok 10 fotoğraf ekleyebilirsin."
+      "photos": "En çok 10 fotoğraf ekleyebilirsin.",
+      "video": "Video en çok 60 saniye olabilir ve fotoğrafla birlikte eklenemez."
     },
     "save": "Kaydet",
     "unsave": "Kaydedildi ✓",
@@ -1141,6 +1142,16 @@
       "tooLarge": "Fotoğraf çok büyük. Başka bir fotoğraf seç.",
       "uploadError": "Fotoğraf yüklenemedi. İnternet bağlantını kontrol edip tekrar dene.",
       "permission": "Fotoğraf seçmek için galeri izni gerekiyor. Telefonun Ayarlar bölümünden izin verebilirsin."
+    },
+    "video": {
+      "add": "Video ekle",
+      "remove": "Videoyu kaldır",
+      "label": "Video",
+      "play": "Videoyu oynat, {{duration}}",
+      "selected": "Seçilen video, {{duration}}",
+      "note": "En çok {{max}} saniye ve 40 MB. Video ya da fotoğraf eklenir, ikisi birlikte olmaz.",
+      "tooLong": "Video en çok {{max}} saniye olabilir. Kırpıp yeniden seç.",
+      "tooLarge": "Video çok büyük (en çok 40 MB). Daha kısa ya da düşük çözünürlüklü bir video seç."
     }
   },
   "news": {

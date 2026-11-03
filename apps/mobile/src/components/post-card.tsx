@@ -7,6 +7,7 @@ import type { Post } from '@cityjoy/shared';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
 import { PostPhotos } from '@/components/post-photos';
+import { PostVideoView } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
@@ -161,7 +162,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
         accessibilityRole={onPress ? 'button' : undefined}
         accessibilityLabel={
           onPress
-            ? [item.authorName, t(`explore.categories.${item.category}`), photos.length ? t('explore.photos.count', { count: photos.length }) : '', item.text.slice(0, 120)].filter(Boolean).join('. ')
+            ? [item.authorName, t(`explore.categories.${item.category}`), photos.length ? t('explore.photos.count', { count: photos.length }) : item.video ? t('explore.video.label') : '', item.text.slice(0, 120)].filter(Boolean).join('. ')
             : undefined
         }
         accessibilityHint={onLike ? t('explore.doubleTapHint') : undefined}
@@ -171,9 +172,13 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
           <View style={styles.photos}>
             <PostPhotos photos={photos} maxWidth={640} />
           </View>
+        ) : item.video ? (
+          <View style={styles.photos}>
+            <PostVideoView video={item.video} maxWidth={640} />
+          </View>
         ) : null}
         {item.text ? (
-          <AppText selectable={full} numberOfLines={full ? undefined : photos.length ? 3 : 8} style={[short ? styles.textBig : styles.text, { color: c.text }]}>{item.text}</AppText>
+          <AppText selectable={full} numberOfLines={full ? undefined : photos.length || item.video ? 3 : 8} style={[short ? styles.textBig : styles.text, { color: c.text }]}>{item.text}</AppText>
         ) : null}
         <Animated.View pointerEvents="none" style={[styles.heart, { opacity: heart, transform: [{ scale: heart.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }] }]}>
           <MaterialIcons name="favorite" size={76} color={c.danger} />

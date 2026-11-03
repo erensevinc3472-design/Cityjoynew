@@ -451,7 +451,8 @@
         "uygunsuz": "Uygunsuz içerik",
         "emlak": "Emlak ilanı",
         "diger": "Diğer"
-      }
+      },
+      "video": "Gönderi videosu ({{seconds}} sn)"
     },
     "comments": {
       "title": "Keşfet yorum şikâyetleri",

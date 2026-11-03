@@ -252,6 +252,16 @@ describe('gönderi fotoğrafları', () => {
     expect(await handlePostPhotos(db, 'p1', live, { ...live, likeCount: 1 }, del)).toBe(false);
     expect(await handlePostPhotos(db, 'p1', { authorUid: 'u1', status: 'aktif' }, { authorUid: 'u1', status: 'kaldirildi' }, del)).toBe(false);
   });
+
+  it('videolu gönderi kaldırılınca klasör silinir, video alanı boşaltılır', async () => {
+    const deleted: string[] = [];
+    const video = { path: 'posts/u1/p2/video.mp4', url: 'https://x', width: 720, height: 1280, durationSec: 30 };
+    const before = { authorUid: 'u1', status: 'aktif', text: '', video };
+    await db.doc('posts/p2').set({ ...before, status: 'kaldirildi' });
+    expect(await handlePostPhotos(db, 'p2', before, { ...before, status: 'kaldirildi' }, async (p) => void deleted.push(p))).toBe(true);
+    expect(deleted).toEqual(['posts/u1/p2/']);
+    expect((await db.doc('posts/p2').get()).get('video')).toBeUndefined();
+  });
 });
 
 describe('temizlik', () => {

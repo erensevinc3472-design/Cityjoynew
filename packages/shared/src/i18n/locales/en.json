@@ -1019,7 +1019,8 @@
       "realEstate": "Listings for homes, land or shops for sale or rent can't be shared on Explore. Real estate listings will later be posted in the Bazaar with a licence.",
       "relative": "Only relatives can share a condolence post.",
       "banned": "Your text contains a word that breaks the community rules. Please edit it and try again.",
-      "photos": "You can add up to 10 photos."
+      "photos": "You can add up to 10 photos.",
+      "video": "A video can be up to 60 seconds and cannot be combined with photos."
     },
     "save": "Save",
     "unsave": "Saved ✓",
@@ -1141,6 +1142,16 @@
       "tooLarge": "This photo is too large. Please choose another one.",
       "uploadError": "The photo could not be uploaded. Check your connection and try again.",
       "permission": "Photo library access is needed to choose a photo. You can allow it in your phone’s Settings."
+    },
+    "video": {
+      "add": "Add video",
+      "remove": "Remove video",
+      "label": "Video",
+      "play": "Play video, {{duration}}",
+      "selected": "Selected video, {{duration}}",
+      "note": "Up to {{max}} seconds and 40 MB. Add a video or photos, not both.",
+      "tooLong": "Videos can be up to {{max}} seconds. Trim it and choose again.",
+      "tooLarge": "The video is too large (max 40 MB). Choose a shorter or lower-resolution video."
     }
   },
   "news": {

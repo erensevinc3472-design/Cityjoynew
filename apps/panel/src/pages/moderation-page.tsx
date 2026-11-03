@@ -516,6 +516,9 @@ function PostReports({ user }: { user: PanelUser }) {
                             ))}
                           </div>
                         ) : null}
+                        {r.post.video ? (
+                          <video className="mod-video" src={r.post.video.url} controls preload="metadata" aria-label={t('moderation.posts.video', { seconds: r.post.video.durationSec })} />
+                        ) : null}
                         {r.post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : r.post.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
                       </>
                     ) : (
