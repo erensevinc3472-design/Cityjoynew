@@ -805,6 +805,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   https://claude.ai/artifact/KtJc51bopnoZd2DSHY625r. Öne çıkanlar: Büyükşehir de büyük kartta, Mahalle Meydanı'nın yeni içeriği,
   Otoparkta kapasite / canlı takip yok, Satılık ve Kiralık için Çarşı tasarımı, **il Vitrini reklam panosu ve gelir kaynağı**
   (önceki "para karşılığı girilmez" notunun yerine).
+  Eklendi (3 Kasım akşam): Acil alt sayfaları (H-Veteriner, H-Taksi, H-Diger) ve Sosyal Harmoni iç sayfaları (SH-*),
+  onay bekliyor. Seyahat şimdiki hâliyle kalır (Eren).
 - ~~Gönderi beğenileri sayfa yenilenince boş görünebilir~~ (3 Kasım düzeltildi, Yapılanlar'ın sonunda).
 - Telefonda Google ile giriş ve "Apple ile giriş" yok: geliştirme derlemesi (EAS, Expo hesabı) gerekiyor.
 - Yönetici iki aşamalı doğrulaması: Firebase Blaze (ücretli) plan gerekiyor.
