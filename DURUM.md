@@ -722,6 +722,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sahiplik doğrulaması (SMS, Blaze), belge yükleme ve ücretli doğrulama, aynı işletmenin ikinci kaydını engelleme, kategoriye
   özel alanlar (konaklama, yeme-içme...), mobil ustalar için hizmet verdiği ilçeler, "bilgileriniz hâlâ doğru mu?" hatırlatması,
   işletme başına günlük ekleme sınırı. (İl yöneticisi kendi ilinin işletmelerini panelde görür, doğrulama admin'de.)
+- BEKLİYOR (Eren, 3 Kasım): Cafe & Restoran ve yemek indirimlerinde "Sipariş ver" düğmesi (Migros Yemek, Yemeksepeti,
+  Trendyol Yemek, Getir sayfasına yönlendirme; uygulama içi sipariş bu firmaların anlaşması olmadan mümkün değil).
+  Eren önce firmalarla görüşecek (ortaklık/komisyon dahil), sonra karar verilecek. Logolar izinsiz kullanılmaz.
 - SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
