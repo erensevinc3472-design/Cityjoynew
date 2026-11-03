@@ -49,7 +49,7 @@ export { createEventPanel, createFirestoreEventRepository, type JoinedItem } fro
 export { createFirestoreOfficialProfileRepository, createOfficialProfileAdmin } from './official-profiles';
 export { createActivityModeration, createFirestoreActivityRepository, type ActivityReport } from './activities';
 export { deletePhotos, PhotoTooLargeError, uploadMedia, uploadPostPhotos, type PreparedPhoto } from './photos';
-export { createFirestorePostRepository, createPostModeration, type CommentReport, type FeedFilter, type FeedPage, type PostReport } from './posts';
+export { createFirestorePostRepository, createFramesAdmin, createPostModeration, type CommentReport, type FeedFilter, type FeedPage, type PostReport } from './posts';
 export { createFirestoreSocialRepository, createProfileModeration, type ProfileReport } from './social';
 export { createBannedWords } from './word-filter';
 export { createSearchSuggestions } from './search';

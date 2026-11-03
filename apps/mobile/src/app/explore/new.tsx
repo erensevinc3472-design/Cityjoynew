@@ -30,6 +30,7 @@ import { TextField } from '@/components/text-field';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { storage } from '@/lib/firebase';
 import { PhotoPermissionError, pickPhotos } from '@/lib/photos';
+import { locationRepository } from '@/lib/locations';
 import { forgetFeeds } from '@/lib/posts';
 import { forgetSearches } from '@/lib/search';
 import { businessRepository, postRepository } from '@/lib/services';
@@ -71,12 +72,15 @@ export default function NewPostScreen() {
   }, [user]);
   const [targets, setTargets] = useState<PostTarget[]>([POST_TARGETS.includes(target as PostTarget) ? (target as PostTarget) : 'mahallem']);
   const [relative, setRelative] = useState(false);
+  const [frames, setFrames] = useState(false);
   const [errors, setErrors] = useState<(PostError | 'relative' | 'banned')[]>([]);
   const hasBanned = useBannedWordCheck();
   const [failed, setFailed] = useState<string | false>(false);
   const [busy, setBusy] = useState(false);
 
   const biz = author === 'me' ? null : businesses.find((b) => b.id === author) ?? null;
+  const provinceCode = biz ? biz.location.provinceCode : location?.provinceCode;
+  const provinceName = (provinceCode && locationRepository.getProvince(provinceCode)?.name) || '';
   if (author !== 'me' && !biz) {
     return (
       <FormScreen title={t('explore.newPost')}>
@@ -104,7 +108,7 @@ export default function NewPostScreen() {
     const region = biz
       ? { provinceCode: biz.location.provinceCode, districtId: biz.location.districtId, neighbourhoodId: biz.location.neighbourhoodId! }
       : { provinceCode: location!.provinceCode, districtId: location!.districtId!, neighbourhoodId: location!.neighbourhoodId! };
-    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })) };
+    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), frames: frames && !!photos.length && targets.includes('genel') };
     const errs: (PostError | 'relative' | 'banned')[] = [
       ...validatePost(input),
       ...(category === 'taziye' && !relative ? ['relative' as const] : []),
@@ -197,6 +201,12 @@ export default function NewPostScreen() {
         {err('targets') ? <FormMessage kind="error" text={err('targets')!} /> : null}
         {targets.includes('mahallem') ? <AppText variant="caption" muted>{t('explore.fields.mahallemNote')}</AppText> : null}
       </View>
+      {photos.length && targets.includes('genel') ? (
+        <View style={styles.block}>
+          <CheckboxRow checked={frames} onToggle={() => setFrames((x) => !x)} label={t('explore.fields.frames', { name: provinceName })} />
+          <AppText variant="caption" muted>{t('explore.fields.framesHint')}</AppText>
+        </View>
+      ) : null}
       <AppText variant="caption" muted>{t('explore.rules')}</AppText>
       {failed ? <FormMessage kind="error" text={failed} /> : null}
       {uploading ? <AppText variant="caption" muted>{t('explore.photos.uploading')}</AppText> : null}

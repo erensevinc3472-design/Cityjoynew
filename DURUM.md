@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 3 Kasım 2026 (Seyahat ve belediye kapakları, aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
+Son güncelleme: 3 Kasım 2026 ("{Şehir} kareleri", Seyahat ve belediye kapakları, aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -45,7 +45,7 @@ Son güncelleme: 3 Kasım 2026 (Seyahat ve belediye kapakları, aktivite kapağ�
 ```sh
 npm install
 npm test                      # ortak paket testleri (150)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (141; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (142; Java 21 gerekir)
 npm run test:functions        # sunucu işlevleri, emülatörde (29; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
@@ -491,7 +491,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    filtresi), rota ekranı (`/travel/route/[id]`: özet, "Rotayı başlat", durak durak ilerleme, yerin saat/ücret/ulaşım
    bilgisi, sonraki durağa nasıl gidilir), Yöresel (`/travel/local/[code]`: tür filtresi, açılır kartlar, rozet), Başkanlarla
    Keşif (`/travel/mayors/[code]`: il tanıtımı üstte, bütün ilçeler eşit kart, nüfusa göre sıra, bölge filtresi, "Belediye
-   tanıtımı", rota ve video). Şehir sayfasındaki kutular açıldı (Kareler hâlâ yakında). Veri: `travelRoutes`, `travelLocal`,
+   tanıtımı", rota ve video). Şehir sayfasındaki kutular açıldı (Kareler 3 Kasım'da açıldı). Veri: `travelRoutes`, `travelLocal`,
    `travelMunicipal` (kimlik = kurum kimliği). Panel > Seyahat: Hazır rotalar (durak düzenleyici), Yöresel, Başkanlarla
    Keşif (nüfus, bölge, başkan adı gösterimi, yayına alma) sekmeleri; başlangıç içeriğine 6 Bursa rotası ve 6 yöresel
    eklendi. Belediye paneli: kuruma "Seyahat" bölümü yalnızca belediyelere verilir; personel tanıtım ve rotalarını "Onaya
@@ -668,6 +668,17 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   koruyarak yayına alır). Sunucu `travelCoverChanged-*` (6 işlev): kayıttan çıkan kapağın dosyasını siler. Testler:
   kurallar 141, sunucu 29, ortak 150. Emülatörde denendi: panelde Bursa'ya kapak yüklenip yayına alındı, uygulamada
   Bursa sayfasında göründü. **Kurallar değişti.**
+- **"{Şehir} kareleri" (3 Kasım, aynı dal; PROJE.md 13. madde 34, Eren'in onayladığı biçim).** Keşfet'te fotoğraflı ve
+  Genel'e açık paylaşımda "{İl} karelerinde de görünsün" kutucuğu (isteğe bağlı, işaretsiz başlar); gönderide
+  `frames: true`, ek yükleme ya da kopya yok. Seyahat > şehir sayfasındaki Kareler kutusu açıldı: `/travel/frames/[kod]`
+  üçlü ızgara, 30'ar (aşağı kaydırdıkça), üstte CityJoy'un öne çıkardıkları (yıldız, en çok 6), birden çok fotoğraflıda
+  simge, dokununca gönderi; şikâyetle düşen görünmez; boşken "Fotoğraf paylaş". Panel > Seyahat > **Kareler** sekmesi
+  (il seç): öne çıkar / öne çıkarmayı kaldır / karelerden kaldır (gönderi Keşfet'te kalır), işlem kaydı (modül `seyahat`).
+  Kurallar: `frames` yalnızca fotoğraflı ve Genel gönderide; `framesFeatured` yalnızca admin; admin Karelere geri
+  ekleyemez (yalnızca paylaşan seçer). **2 yeni dizin** (`firestore.indexes.json`). Türkçe başlık "Bursa kareleri"
+  biçiminde (ek sorunu yok). Testler: kurallar 142, sunucu 29, ortak 150. Emülatörde denendi: iki fotoğraflı paylaşım
+  kutucukla Karelere düştü, başka kullanıcı gördü, panelde öne çıkarılan yıldızla en üste geçti. **Kurallar ve dizinler
+  değişti: birleşince yüklenmeli.** Fotoğraf yükleme Blaze ile çalışır.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -777,7 +788,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
    fotoğraflar (Blaze), emlak ve araç (avukat ve kimlik doğrulama sonrası).
 4. ~~Günlük sınırlar ve bildirim öncelikleri; hesap silinince hizmet önerileri ve sayaçların silinmesi~~ (31 Ekim).
 5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini, kişi profil fotoğrafı~~ (31 Ekim - 1 Kasım, Blaze
-   bekliyor), ~~Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat ve belediye kapakları~~ (3 Kasım). Kalan: "{Şehir}'dan Kareler".
+   bekliyor), ~~Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat ve belediye kapakları, "{Şehir} kareleri"~~ (3 Kasım).
+   Fotoğraf işleri tamam (Blaze ile çalışır). Video sonra.
 6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 

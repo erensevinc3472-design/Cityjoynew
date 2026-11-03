@@ -1007,7 +1007,9 @@
       "category": "Kategorie",
       "relative": "Ich bin ein Angehöriger der verstorbenen Person.",
       "where": "Wo möchtest du teilen? (Mehrfachauswahl möglich)",
-      "mahallemNote": "Wenn du in Mein Viertel teilst, können Nachbarn erkennen, dass du dort wohnst."
+      "mahallemNote": "Wenn du in Mein Viertel teilst, können Nachbarn erkennen, dass du dort wohnst.",
+      "frames": "Auch in „{{name}} in Bildern“ zeigen",
+      "framesHint": "Dein Foto erscheint auch auf der Seite von {{name}} unter Reisen; es wird nichts erneut hochgeladen. Am besten ohne Gesichter, Kennzeichen oder Wohnadressen."
     },
     "errors": {
       "text": "Schreib etwas oder füge ein Foto hinzu (bis zu 2000 Zeichen).",
@@ -1457,7 +1459,7 @@
     "soonCities": "Provinzen folgen bald",
     "cityPreparing": "Der Führer für {{name}} wird vorbereitet.",
     "frames": "Momente aus {{name}}",
-    "framesHint": "Fotos und Videos",
+    "framesHint": "Fotos der Stadt",
     "mayors": "Mit Bürgermeistern entdecken",
     "mayorsHint": "Bezirksrouten",
     "local": "Traditionelles {{name}}",
@@ -1581,7 +1583,13 @@
       "ova": "Ebene"
     },
     "orderNote": "Sortiert nach Einwohnerzahl der Bezirke (TÜİK).",
-    "orderNoteYear": "Sortiert nach Einwohnerzahl der Bezirke (TÜİK, {{year}})."
+    "orderNoteYear": "Sortiert nach Einwohnerzahl der Bezirke (TÜİK, {{year}}).",
+    "framesIntro": "Fotos, die in dieser Provinz unter Entdecken geteilt und hinzugefügt wurden. Die mit Stern hat CityJoy hervorgehoben. Tippe auf ein Foto, um den Beitrag zu öffnen.",
+    "framesEmpty": "Noch keine Bilder von {{name}}. Wenn du in dieser Provinz unter Entdecken ein Foto teilst, wähle „Allgemein“ und „Auch in Bildern zeigen“.",
+    "framesShare": "Foto teilen",
+    "framesSignIn": "Melde dich an, um die Bilder zu sehen.",
+    "framesFeatured": "Hervorgehoben",
+    "frameN": "Bild {{n}}"
   },
   "food": {
     "kinds": {

@@ -22,7 +22,7 @@ type Filter = 'all' | TravelCategory;
 
 /**
  * Şehir sayfası (tasarım: bursa.html): kapak, kısa tanıtım, kaynaklı bilgiler (UNESCO, rakım...), Kareler / Başkanlarla
- * Keşif / Yöresel kutuları ve Hazır Rotalar (Kareler 3. aşamada, şimdilik "yakında"), kategoriye göre gezilecek yerler.
+ * Keşif / Yöresel kutuları ve Hazır Rotalar, kategoriye göre gezilecek yerler.
  * Puan, nüfus gibi kaynaksız sayılar yok; yapay zekâ rehberi bilgi tabanı dolunca gelecek.
  */
 export default function TravelCityScreen() {
@@ -58,9 +58,8 @@ export default function TravelCityScreen() {
     if (embed) setPlaying(embed);
     else WebBrowser.openBrowserAsync(url).catch(() => {});
   };
-  // Kareler 3. aşamada (fotoğraf paylaşımıyla); Başkanlarla Keşif ve Yöresel açık.
   const boxes: { icon: IconName; title: string; hint: string; go?: () => void }[] = [
-    { icon: 'photo-library', title: t('travel.frames', { name }), hint: t('travel.framesHint') },
+    { icon: 'photo-library', title: t('travel.frames', { name }), hint: t('travel.framesHint'), go: () => router.push({ pathname: '/travel/frames/[code]', params: { code } }) },
     { icon: 'explore', title: t('travel.mayors'), hint: t('travel.mayorsHint'), go: () => router.push({ pathname: '/travel/mayors/[code]', params: { code } }) },
     { icon: 'diversity-3', title: t('travel.local', { name }), hint: t('travel.localHint'), go: () => router.push({ pathname: '/travel/local/[code]', params: { code } }) },
   ];

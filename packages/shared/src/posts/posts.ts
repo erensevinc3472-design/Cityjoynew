@@ -43,6 +43,11 @@ export interface PostInput {
   /** Paylaşanın kayıtlı konumu (Mahallem ve Bölgesel buna göre süzülür). */
   region: PostRegion;
   photos?: PostPhoto[];
+  /**
+   * "{Şehir} kareleri"nde de görünsün (Seyahat; PROJE.md 13. madde 34): yalnızca fotoğraflı ve Genel'e paylaşılan
+   * gönderide. Ek yükleme ya da kopya yok; aynı gönderi iki yerde görünür.
+   */
+  frames?: boolean;
 }
 
 export interface Post extends PostInput {
@@ -60,8 +65,16 @@ export interface Post extends PostInput {
   reportCount: number;
   /** Moderatör şikâyetleri inceleyip "yerinde kalsın" dedi. */
   cleared: boolean;
+  /** CityJoy (admin) Karelerde öne çıkardı. */
+  framesFeatured?: boolean;
   createdAt: string;
 }
+
+/** Kareler: sayfa başına küçük önizleme ve en üstteki öne çıkanlar. */
+export const FRAMES_LIMITS = { pageSize: 30, featured: 6 } as const;
+
+/** Gönderi Karelere girebilir mi: fotoğraflı ve herkese açık (Genel). */
+export const canShowInFrames = (p: Pick<PostInput, 'photos' | 'targets'>) => !!p.photos?.length && p.targets.includes('genel');
 
 export const POST_LIMITS = {
   text: [1, 2000],

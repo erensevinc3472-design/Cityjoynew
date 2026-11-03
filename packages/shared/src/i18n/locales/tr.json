@@ -1007,7 +1007,9 @@
       "category": "Kategori",
       "relative": "Vefat eden kişinin yakınıyım.",
       "where": "Nerede paylaşırsın? (birden çok seçebilirsin)",
-      "mahallemNote": "Mahallem'de paylaştığında mahallendekiler o mahallede oturduğunu anlayabilir."
+      "mahallemNote": "Mahallem'de paylaştığında mahallendekiler o mahallede oturduğunu anlayabilir.",
+      "frames": "{{name}} karelerinde de görünsün",
+      "framesHint": "Fotoğrafın Seyahat'teki şehir sayfasında, karelerde de görünür; ek yükleme yok. Kişi yüzü, plaka ya da ev adresi olmayan fotoğraflar uygundur."
     },
     "errors": {
       "text": "Bir şeyler yaz ya da fotoğraf ekle (en çok 2000 karakter).",
@@ -1457,7 +1459,7 @@
     "soonCities": "Yakında eklenecek iller",
     "cityPreparing": "{{name}} tanıtımı hazırlanıyor.",
     "frames": "{{name}} kareleri",
-    "framesHint": "Fotoğraf ve videolar",
+    "framesHint": "Şehrin fotoğrafları",
     "mayors": "Başkanlarla keşif",
     "mayorsHint": "İlçe rotaları",
     "local": "Yöresel {{name}}",
@@ -1581,7 +1583,13 @@
       "ova": "Ova"
     },
     "orderNote": "Sıralama ilçe nüfusuna göredir (TÜİK).",
-    "orderNoteYear": "Sıralama ilçe nüfusuna göredir (TÜİK, {{year}})."
+    "orderNoteYear": "Sıralama ilçe nüfusuna göredir (TÜİK, {{year}}).",
+    "framesIntro": "Keşfet'te bu ilde paylaşılan ve karelere eklenen fotoğraflar. Yıldızlı olanları CityJoy öne çıkardı. Fotoğrafa dokununca paylaşım açılır.",
+    "framesEmpty": "{{name}} için henüz kare yok. Keşfet'te bu ilde fotoğraf paylaşırken \"Genel\" ve \"karelerinde de görünsün\" kutucuklarını işaretle.",
+    "framesShare": "Fotoğraf paylaş",
+    "framesSignIn": "Kareleri görmek için giriş yap.",
+    "framesFeatured": "Öne çıkan",
+    "frameN": "Kare {{n}}"
   },
   "food": {
     "kinds": {

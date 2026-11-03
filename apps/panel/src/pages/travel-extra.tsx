@@ -25,8 +25,9 @@ import {
   type TravelRouteInput,
   type TravelRouteStop,
   type Photo,
+  type Post,
 } from '@cityjoy/shared';
-import { createFirestoreTravelRepository, createMunicipalTravel, type createTravelAdmin } from '@cityjoy/shared/firebase';
+import { createFirestoreTravelRepository, createFramesAdmin, createMunicipalTravel, type createTravelAdmin } from '@cityjoy/shared/firebase';
 
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
@@ -791,6 +792,85 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
           </>
         )}
       />
+    </>
+  );
+}
+
+/**
+ * Seyahat > Kareler (PROJE.md 13. madde 34): ildeki "{Şehir} kareleri". Admin öne çıkarır (uygulamada en üstte, yıldızlı)
+ * ya da Karelerden kaldırır (gönderi Keşfet'te kalır; uygunsuz içerik için Moderasyon kullanılır). Karelere girmeyi
+ * yalnızca paylaşan seçer. Her işlem kayda geçer.
+ */
+export function FramesTab({ cityId, canEdit, busy, act }: { cityId: string; canEdit: boolean; busy: boolean; act: Act }) {
+  const { user } = useSession();
+  const [list, setList] = useState<Post[] | null>(null);
+  const [failed, setFailed] = useState(false);
+  const api = user && !user.isDemo ? createFramesAdmin(firestore, user.uid) : null;
+  const load = useCallback(async () => {
+    if (!api) return setList([]);
+    setFailed(false);
+    try {
+      setList(await api.list(cityId));
+    } catch {
+      setFailed(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cityId, user?.uid]);
+  useEffect(() => {
+    setList(null);
+    load();
+  }, [load]);
+  const run = (fn: () => Promise<void>, ok: string) => act(async () => (await fn(), ok), load);
+  const featured = (list ?? []).filter((p) => p.framesFeatured).length;
+
+  return (
+    <>
+      <p className="meta">{t('travel.framesTabIntro')}</p>
+      {failed ? (
+        <div className="state" role="alert">
+          <p>{t('travel.loadError')}</p>
+          <button className="btn secondary" onClick={load}>{t('travel.retry')}</button>
+        </div>
+      ) : list === null ? (
+        <p className="meta">{t('travel.loading')}</p>
+      ) : !list.length ? (
+        <p className="meta">{t('travel.framesNone')}</p>
+      ) : (
+        <>
+          <p className="count">{t('travel.framesCount', { count: list.length, featured })}</p>
+          <div className="frames-grid">
+            {list.map((p) => {
+              const photo = p.photos?.[0];
+              return (
+                <figure key={p.id} className="frame-card">
+                  {photo ? (
+                    <a href={photo.url} target="_blank" rel="noreferrer noopener">
+                      <img src={photo.url} alt={t('travel.framePhoto', { name: p.authorName || '-' })} loading="lazy" />
+                    </a>
+                  ) : null}
+                  <figcaption>
+                    <div className="meta">
+                      {p.authorName || '-'} · {new Date(p.createdAt).toLocaleDateString('tr-TR')}
+                      {p.framesFeatured ? <span className="pill ok">{t('travel.framesFeaturedPill')}</span> : null}
+                    </div>
+                    {p.text ? <p dir="auto" className="frame-text">{p.text}</p> : null}
+                    {canEdit ? (
+                      <div className="row-actions">
+                        <button className="link" disabled={busy} onClick={() => run(() => api!.setFeatured(p, !p.framesFeatured), t(p.framesFeatured ? 'travel.framesUnfeatured' : 'travel.framesFeaturedDone'))}>
+                          {p.framesFeatured ? t('travel.framesUnfeature') : t('travel.framesFeature')}
+                        </button>
+                        <button className="link" disabled={busy} onClick={() => window.confirm(t('travel.framesRemoveConfirm')) && run(() => api!.remove(p), t('travel.framesRemoved'))}>
+                          {t('travel.framesRemove')}
+                        </button>
+                      </div>
+                    ) : null}
+                  </figcaption>
+                </figure>
+              );
+            })}
+          </div>
+        </>
+      )}
     </>
   );
 }

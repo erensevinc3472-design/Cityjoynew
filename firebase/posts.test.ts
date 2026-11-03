@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import type { PostInput } from '@cityjoy/shared';
-import { createFirestorePostRepository, createPostModeration } from '@cityjoy/shared/firebase';
-import { doc, getDoc, increment, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
+import { createFirestorePostRepository, createFramesAdmin, createPostModeration } from '@cityjoy/shared/firebase';
+import { doc, getDoc, increment, serverTimestamp, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -55,6 +55,41 @@ const input = (patch: Partial<PostInput> = {}): PostInput => ({
 });
 
 describe('Keşfet gönderileri', () => {
+  it('Kareler: yalnızca fotoğraflı ve Genel gönderi; ildeki herkes listeler; admin öne çıkarır ve kaldırır, geri açamaz', async () => {
+    const r = repo('ayse');
+    const photo = (id: string) => ({
+      path: `posts/ayse/${id}/0.jpg`,
+      url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${id}%2F0.jpg?alt=media&token=t`,
+      width: 1600,
+      height: 1200,
+    });
+    const id = r.newId();
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', targets: ['genel'], photos: [photo(id)], frames: true }), undefined, id));
+    // Fotoğrafsız ya da Genel'e açık olmayan gönderi Karelere giremez (doğrudan yazımda kurallar reddeder).
+    const plain = r.newId();
+    await assertFails(setDoc(doc(fs('ayse'), 'posts', plain), {
+      text: 'Yazı', category: 'genel', targets: { mahallem: false, bolgesel: false, genel: true }, region: ataevler, status: 'aktif', authorUid: 'ayse',
+      authorName: 'Ayşe K.', likeCount: 0, commentCount: 0, reportCount: 0, frames: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    }));
+    const local = r.newId();
+    await r.create('ayse', 'Ayşe K.', input({ text: '', targets: ['mahallem'], photos: [photo(local)], frames: true }), undefined, local);
+    expect((await r.get(local))?.frames).toBeUndefined();
+    // Başka ildeki kişi de listeler (Genel).
+    const page = await repo('istanbul').frames('16');
+    expect(page.posts.map((p) => p.id)).toEqual([id]);
+    expect(page.featured).toEqual([]);
+    // Yalnızca admin öne çıkarır; kaldırınca listeden çıkar, admin geri açamaz, paylaşan da öne çıkaramaz.
+    const post = (await r.get(id))!;
+    await assertFails(createFramesAdmin(fs('ali'), 'ali').setFeatured(post, true));
+    await assertFails(updateDoc(doc(fs('ayse'), 'posts', id), { framesFeatured: true, updatedAt: serverTimestamp() }));
+    const admin = createFramesAdmin(fs('eren'), 'eren');
+    await assertSucceeds(admin.setFeatured(post, true));
+    expect((await repo('istanbul').frames('16')).featured.map((p) => p.id)).toEqual([id]);
+    await assertSucceeds(admin.remove(post));
+    expect((await repo('istanbul').frames('16')).posts).toEqual([]);
+    await assertFails(updateDoc(doc(fs('eren'), 'posts', id), { frames: true, updatedAt: serverTimestamp() }));
+  });
+
   it('kendi kayıtlı mahallesiyle paylaşır; başka mahalle, başkası adına, girişsiz, boş yazı olmaz', async () => {
     await assertSucceeds(repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['mahallem', 'bolgesel', 'genel'] })));
     await assertFails(repo('ayse').create('ayse', 'Ayşe K.', input({ region: fethiye })));

@@ -28,11 +28,11 @@ import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { ImageField } from '../components/image-field';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
-import { LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
+import { FramesTab, LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
 
-type Tab = TravelAdminKind;
+type Tab = TravelAdminKind | 'kareler';
 type Data = Awaited<ReturnType<ReturnType<typeof createTravelAdmin>['listAll']>>;
-const TABS: Tab[] = ['bolge', 'sehir', 'yer', 'rota', 'yoresel', 'belediye'];
+const TABS: Tab[] = ['bolge', 'sehir', 'yer', 'rota', 'yoresel', 'belediye', 'kareler'];
 type RegionDraft = { id: string; tagline: string; description: string; videoUrl: string; cover?: Photo; isNew: boolean; status: TravelStatus };
 type CityDraft = { id: string; regionId: string; tagline: string; description: string; videoUrl: string; cover?: Photo; categories: TravelCategory[]; highlights: string; facts: string; isNew: boolean; status: TravelStatus };
 type PlaceDraft = Omit<TravelPlaceInput, 'howToGet' | 'nearby' | 'tips'> & { id: string | null; howToGet: string; nearby: string; tips: string };
@@ -103,7 +103,7 @@ function AdminTravelPage() {
     }
   };
   const statusPill = (s?: TravelReviewStatus) => <StatusPill status={s} />;
-  const toggle = (kind: Tab, id: string, s: TravelReviewStatus, label: string) =>
+  const toggle = (kind: TravelAdminKind, id: string, s: TravelReviewStatus, label: string) =>
     canEdit ? (
       <button className="link" disabled={busy} onClick={() => act(async () => (await admin!.setStatus(kind, id, s === 'yayinda' ? 'taslak' : 'yayinda', label), t(s === 'yayinda' ? 'travel.unpublished' : 'travel.published')))}>
         {s === 'yayinda' ? t('travel.unpublish') : t('travel.publish')}
@@ -408,6 +408,8 @@ function AdminTravelPage() {
             <RoutesTab cityId={cityId} routes={data.routes} places={data.places} canEdit={canEdit} admin={admin} busy={busy} act={act} toggle={(id, s, label) => toggle('rota', id, s, label)} onError={onError} />
           ) : tab === 'yoresel' ? (
             <LocalTab cityId={cityId} items={data.local} canEdit={canEdit} admin={admin} busy={busy} act={act} toggle={(id, s, label) => toggle('yoresel', id, s, label)} onError={onError} />
+          ) : tab === 'kareler' ? (
+            <FramesTab cityId={cityId} canEdit={canEdit} busy={busy} act={act} />
           ) : (
             <MunicipalTab cityId={cityId} items={data.municipal} canEdit={canEdit} admin={admin} busy={busy} act={act} toggle={(id, s, label) => toggle('belediye', id, s, label)} onError={onError} />
           )}

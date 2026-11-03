@@ -1643,8 +1643,12 @@ service cloud.firestore {
     }
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
-             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'createdAt', 'updatedAt'])
+             'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'frames',
+             'framesFeatured', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
+        // Kareler: yalnızca fotoğraflı ve Genel'e açık gönderi (Seyahat > "{Şehir} kareleri").
+        && (!('frames' in d) || (d.frames is bool && (d.frames == false || ('photos' in d && d.targets.genel == true))))
+        && (!('framesFeatured' in d) || d.framesFeatured is bool)
         && validSearchKeys(d, 300)
         && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
         && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip'])
@@ -1755,6 +1759,7 @@ service cloud.firestore {
         && request.resource.data.get('commentCount', 0) == 0
         && !('cleared' in request.resource.data) && !('moderatedBy' in request.resource.data)
         && !('commentsOff' in request.resource.data) && !('lastComment' in request.resource.data)
+        && !('framesFeatured' in request.resource.data)
         && request.resource.data.createdAt == request.time
         && validPost(request.resource.data)
         && (request.resource.data.text.size() >= 1 || 'photos' in request.resource.data)
@@ -1768,6 +1773,12 @@ service cloud.firestore {
                 && myLocation().get('neighbourhoodId', '') == request.resource.data.region.neighbourhoodId
                 && myLocation().get('districtId', '') == request.resource.data.region.districtId
                 && myLocation().get('provinceCode', '') == request.resource.data.region.provinceCode));
+      // Kareler (admin): öne çıkar / kaldır. Karelere girmeyi yalnızca paylaşan seçer; admin geri açamaz.
+      allow update: if isAdmin() && request.resource.data.updatedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['frames', 'framesFeatured', 'updatedAt'])
+        && request.resource.data.get('frames', false) is bool && request.resource.data.get('framesFeatured', false) is bool
+        && (request.resource.data.get('frames', false) == false || resource.data.get('frames', false) == true)
+        && (request.resource.data.get('framesFeatured', false) == false || request.resource.data.get('frames', false) == true);
       // İşletme sahibi yetkilinin bekleyen paylaşımını onaylar.
       allow update: if 'business' in resource.data && resource.data.status == 'onay-bekliyor'
         && isBusinessOwner(resource.data.business.id)
