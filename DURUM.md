@@ -18,6 +18,13 @@ Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yüklem
 > işlevi (eski `regionAllows(..., null)` yerine), `countStep` / `statsStep` içinde "yok" `''` ve boş harita `{}` ile
 > gösteriliyor, `orgAuthorActions` / `personAuthorActions` içinde `null` yerine `{}`. Davranış aynı; 156 kural testi geçti.
 > Yeni kural yazarken işlev çağrısına `null` (ya da `koşul ? x : null`) verme.
+> **Boyut sınırı (4 Kasım, giderildi):** Panelde "Bilinmeyen hata" görünen asıl sebep: derlenmiş kurallar 279.296 bayt,
+> Firebase sınırı 256.000. `scripts/rules-compact.py` ile 141 kural kısa işleve taşındı (`_kN(nw[, od])`,
+> `nw` = request.resource.data, `od` = resource.data); sınırın altına indi, 156 test geçti ve kurallar Claude tarafından
+> yayına alındı (4 Kasım 21:09). Dizinler zaten yüklüydü (58/58). **Yeni kural yazarken** yeni kayıt 2+ kez geçiyorsa
+> aynı kalıpla işlev içine yaz; dosya sınıra yakın. Not: hizmet hesabıyla `firebase deploy` yetki hatası veriyor
+> (serviceusage); kurallar firebase-admin `releaseFirestoreRulesetFromSource` ile yüklendi. Eren anahtarı sohbete
+> yapıştırdı; konsoldan silmesi istendi.
 
 ## Depo ve ortam
 
