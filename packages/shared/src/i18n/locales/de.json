@@ -2310,34 +2310,6 @@
     "votes_one": "{{count}} Stimme",
     "votes_other": "{{count}} Stimmen"
   },
-  "clubs": {
-    "title": "Stadtvereine",
-    "subtitle": "Vereine und Spiele in {{place}}",
-    "needLocation": "Wähle deine Provinz, um Vereine zu sehen.",
-    "loadError": "Vereine konnten nicht geladen werden.",
-    "empty": "In deiner Provinz gibt es noch keine Vereine.",
-    "all": "Vereine",
-    "cityClub": "Verein der Stadt",
-    "verified": "Verifiziert",
-    "nextMatch": "Nächstes Spiel",
-    "noFixture": "Noch kein Spielplan.",
-    "home": "Heim",
-    "away": "Auswärts",
-    "follow": "Folgen",
-    "following": "Folge ich",
-    "ticket": "Tickets",
-    "signIn": "Melde dich an, um dem Verein zu folgen.",
-    "followError": "Aktion fehlgeschlagen.",
-    "applyTitle": "Hast du einen Verein? Bewirb dich",
-    "applyText": "Vereine bewerben sich mit Nachweisen und pflegen danach ihren Spielplan selbst.",
-    "sports": {
-      "futbol": "Fußball",
-      "basketbol": "Basketball",
-      "voleybol": "Volleyball",
-      "amator": "Amateurliga",
-      "diger": "Andere"
-    }
-  },
   "lodging": {
     "kinds": {
       "konak-otel": "Hotel",

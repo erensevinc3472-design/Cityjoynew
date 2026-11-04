@@ -25,7 +25,6 @@ export * from './services/occupations';
 export * from './services/needs';
 export * from './polls/polls';
 export * from './polls/contests';
-export * from './polls/clubs';
 export * from './emergency/numbers';
 export * from './categories/service-categories';
 export * from './business/business';

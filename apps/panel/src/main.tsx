@@ -25,7 +25,7 @@ import { OrganizationsPage } from './pages/organizations-page';
 import { ProfilePage } from './pages/profile-page';
 import { ServiceCategoriesPage } from './pages/service-categories-page';
 import { NeedsPage } from './pages/needs-page';
-import { ClubsPage, ContestsPage, PollsPage } from './pages/community-page';
+import { ContestsPage, PollsPage } from './pages/community-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { LimitsPage } from './pages/limits-page';
 import { NotificationsPage } from './pages/notifications-page';
@@ -64,7 +64,6 @@ const router = createHashRouter([
       { path: 'diger-ihtiyaclar', element: <NeedsPage /> },
       { path: 'anketler', element: <PollsPage /> },
       { path: 'yarismalar', element: <ContestsPage /> },
-      { path: 'kulupler', element: <ClubsPage /> },
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
