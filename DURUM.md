@@ -24,7 +24,9 @@ Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yüklem
 > yayına alındı (4 Kasım 21:09). Dizinler zaten yüklüydü (58/58). **Yeni kural yazarken** yeni kayıt 2+ kez geçiyorsa
 > aynı kalıpla işlev içine yaz; dosya sınıra yakın. Not: hizmet hesabıyla `firebase deploy` yetki hatası veriyor
 > (serviceusage); kurallar firebase-admin `releaseFirestoreRulesetFromSource` ile yüklendi. Eren anahtarı sohbete
-> yapıştırdı; konsoldan silmesi istendi.
+> yapıştırdı; Eren konsoldan sildiğini söyledi (4 Kasım).
+> **Bilgisayar bozuk (4 Kasım):** Expo Go için sunucu çalıştıracak bilgisayar yok; bulut oturumundan Expo/ngrok kapalı.
+> Önerildi, Eren "sonra bakarız" dedi: GitHub Actions ile EAS Update (Eren GitHub'a EXPO_TOKEN ve FIREBASE_WEB_CONFIG ekler).
 
 ## Depo ve ortam
 
