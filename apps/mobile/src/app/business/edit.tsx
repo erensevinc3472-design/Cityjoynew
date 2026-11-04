@@ -6,12 +6,16 @@ import {
   AMENITIES,
   BUSINESS_LIMITS,
   BUSINESS_TYPES,
+  HOLIDAY_THEMES,
   HOME_BASED_TYPES,
+  LODGING_KINDS,
+  LODGING_LIMITS,
   PAYMENT_METHODS,
   ROADSIDE_FEATURES,
   ROADSIDE_KINDS,
   geoPoint,
   validateBusiness,
+  validateLodging,
   type Approval,
   type Business,
   type BusinessError,
@@ -45,7 +49,9 @@ import { useThemeColors } from '@/theme/use-theme';
 type Form = Omit<BusinessInput, 'location'> & { provinceCode?: string; districtId?: string; neighbourhoodId?: string };
 const DEFAULT_DAY: DayHours = { open: '09:00', close: '18:00' };
 /** Kategori listesi türe göre değişir (yeme-içme ve yol üstü kendi çeşitlerinden seçer); grup değişince seçim sıfırlanır. */
-const kindGroup = (type: BusinessType) => (type === 'yeme-icme' || type === 'yol-ustu' ? type : 'hizmet');
+const kindGroup = (type: BusinessType) => (type === 'yeme-icme' || type === 'yol-ustu' || type === 'konaklama' ? type : 'hizmet');
+const EMPTY_LODGING = { themes: [], licenseNo: '' };
+const toPrice = (v: string) => (v.replace(/D/g, '') ? Number(v.replace(/D/g, '')) : undefined);
 
 /**
  * Profil > İşletme ekle / düzenle (PROJE.md 5.7). Bilgiler bir kez girilir; seçilen hizmetlerin listesinde, işletmenin
@@ -146,6 +152,7 @@ export default function EditBusinessScreen() {
       ...(roadsideOn ? { roadside: form.roadside ?? [] } : { roadside: undefined, geo: undefined }),
       phone: form.phone.replace(/\D/g, ''),
       ...(homeBased ? { address: undefined } : {}),
+      lodging: form.type === 'konaklama' ? (form.lodging ?? EMPTY_LODGING) : undefined,
       location: { provinceCode: provinceCode ?? '', districtId: districtId ?? '', ...(neighbourhoodId ? { neighbourhoodId } : {}) },
     };
   };
@@ -216,7 +223,7 @@ export default function EditBusinessScreen() {
       <TextField label={t('business.name')} value={form.name} onChangeText={(name) => set({ name })} maxLength={BUSINESS_LIMITS.name[1]} error={err('name')} />
 
       <AppText variant="label" accessibilityRole="header">{t('business.categories')}</AppText>
-      <AppText variant="caption" muted>{form.type === 'yeme-icme' ? t('food.kindsHint') : form.type === 'yol-ustu' ? t('roadside.kindsHint') : t('business.categoriesHint')}</AppText>
+      <AppText variant="caption" muted>{form.type === 'yeme-icme' ? t('food.kindsHint') : form.type === 'yol-ustu' ? t('roadside.kindsHint') : form.type === 'konaklama' ? t('lodging.kindsHint') : t('business.categoriesHint')}</AppText>
       {form.type === 'yeme-icme' ? (
         <FoodKindPicker selected={form.categoryIds} max={BUSINESS_LIMITS.categories[1]} onChange={(categoryIds) => set({ categoryIds })} />
       ) : form.type === 'yol-ustu' ? (
@@ -224,6 +231,13 @@ export default function EditBusinessScreen() {
           options={ROADSIDE_KINDS.map((k) => ({ id: k.id, icon: k.icon, label: t(`roadside.kinds.${k.id}`) }))}
           selected={form.categoryIds}
           max={BUSINESS_LIMITS.categories[1]}
+          onChange={(categoryIds) => set({ categoryIds })}
+        />
+      ) : form.type === 'konaklama' ? (
+        <IconChipPicker
+          options={LODGING_KINDS.map((k) => ({ id: k.id, icon: k.icon, label: t(`lodging.kinds.${k.id}`) }))}
+          selected={form.categoryIds}
+          max={2}
           onChange={(categoryIds) => set({ categoryIds })}
         />
       ) : (
@@ -262,6 +276,9 @@ export default function EditBusinessScreen() {
       <AppText variant="label" accessibilityRole="header">{t('business.page.amenities')}</AppText>
       <ToggleChips options={AMENITIES.map((m) => ({ value: m, label: t(`business.amenity.${m}`) }))} selected={form.amenities ?? []} onToggle={(m) => set({ amenities: toggleIn(form.amenities, m) })} />
 
+      {/* Otel ve konaklama (Seyahat > Planla): tatil fikirleri, belge, gece fiyatı; belge onaylanınca listelere düşer. */}
+      {form.type === 'konaklama' ? <LodgingSection value={form.lodging ?? EMPTY_LODGING} onChange={(lodging) => set({ lodging })} showErrors={errors.includes('lodging')} /> : null}
+
       {/* Yol Arkadaşı: yolcular ihtiyacına göre (tuvalet, yakıt, şarj…) yakındaki tesisleri bulur. */}
       <AppText variant="label" accessibilityRole="header">{t('roadside.title')}</AppText>
       {form.type === 'yol-ustu' ? null : (
@@ -299,8 +316,8 @@ export default function EditBusinessScreen() {
         </>
       ) : null}
 
-      <AppText variant="label" accessibilityRole="header">{form.type === 'yeme-icme' ? t('business.page.tabMenu') : t('business.priceList')}</AppText>
-      <AppText variant="caption" muted>{t('business.priceNote')}</AppText>
+      <AppText variant="label" accessibilityRole="header">{form.type === 'yeme-icme' ? t('business.page.tabMenu') : form.type === 'konaklama' ? t('lodging.priceTable') : t('business.priceList')}</AppText>
+      <AppText variant="caption" muted>{form.type === 'konaklama' ? t('lodging.priceTableNote') : t('business.priceNote')}</AppText>
       {form.priceList.map((p, i) => (
         <View key={i} style={[styles.priceRow, { borderColor: c.border }]}>
           <TextField label={t('business.priceName')} value={p.name} onChangeText={(name) => setPrice(i, { name })} maxLength={BUSINESS_LIMITS.priceName} />
@@ -520,3 +537,29 @@ const styles = StyleSheet.create({
   chip: { minHeight: 38, justifyContent: 'center', paddingHorizontal: 12, borderRadius: radius.pill, borderWidth: 1 },
   chipText: { fontFamily: fonts.bodyMedium, fontSize: 13 },
 });
+
+/** Konaklama bilgileri: tatil fikirleri (en çok 4), belge numarası, gece fiyat aralığı, web sitesi. */
+function LodgingSection({ value, onChange, showErrors }: { value: NonNullable<BusinessInput['lodging']>; onChange(v: NonNullable<BusinessInput['lodging']>): void; showErrors: boolean }) {
+  const { t } = useTranslation();
+  const c = useThemeColors();
+  const errs = showErrors ? validateLodging(value) : [];
+  const e = (k: (typeof errs)[number]) => (errs.includes(k) ? t(`lodging.errors.${k}`) : undefined);
+  return (
+    <>
+      <AppText variant="label" accessibilityRole="header">{t('lodging.title')}</AppText>
+      <AppText variant="caption" muted>{t('lodging.hint')}</AppText>
+      <AppText variant="label">{t('lodging.themes')}</AppText>
+      <IconChipPicker
+        options={HOLIDAY_THEMES.map((x) => ({ id: x.id, icon: x.icon, label: t(`holiday.themes.${x.id}`) }))}
+        selected={value.themes}
+        max={LODGING_LIMITS.themes}
+        onChange={(ids) => onChange({ ...value, themes: ids as typeof value.themes })}
+      />
+      {e('themes') ? <AppText variant="caption" style={{ color: c.danger }}>{e('themes')}</AppText> : null}
+      <TextField label={t('lodging.license')} hint={t('lodging.licenseHint')} value={value.licenseNo} onChangeText={(licenseNo) => onChange({ ...value, licenseNo })} maxLength={LODGING_LIMITS.license[1]} error={e('license')} />
+      <TextField label={t('lodging.nightMin')} value={value.nightMin ? String(value.nightMin) : ''} onChangeText={(v) => onChange({ ...value, nightMin: toPrice(v) })} keyboardType="number-pad" maxLength={7} error={e('price')} />
+      <TextField label={t('lodging.nightMax')} value={value.nightMax ? String(value.nightMax) : ''} onChangeText={(v) => onChange({ ...value, nightMax: toPrice(v) })} keyboardType="number-pad" maxLength={7} />
+      <TextField label={t('lodging.website')} hint={t('lodging.websiteHint')} value={value.website ?? ''} onChangeText={(website) => onChange({ ...value, website })} autoCapitalize="none" keyboardType="url" maxLength={LODGING_LIMITS.url} error={e('website')} />
+    </>
+  );
+}

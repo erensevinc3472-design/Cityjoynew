@@ -6,10 +6,12 @@ import { useTranslation } from 'react-i18next';
 import {
   buildCategoryTree,
   localized,
+  NEED_SITUATIONS,
   searchCategoryTree,
   telUrl,
   type EmergencyNumber,
   type LanguageCode,
+  type NeedSituation,
   type ServiceCategory,
 } from '@cityjoy/shared';
 
@@ -22,6 +24,7 @@ import { SearchField } from '@/components/search-field';
 import { StateMessage } from '@/components/state-message';
 import { isFirebaseConfigured } from '@/lib/firebase-config';
 import { locationRepository } from '@/lib/locations';
+import { useNeedMap } from '@/lib/needs';
 import { useServiceCategories } from '@/lib/service-categories';
 import { emergencyNumbers } from '@/lib/services';
 import { useSettings } from '@/lib/settings';
@@ -33,6 +36,14 @@ type IconName = ComponentProps<typeof MaterialIcons>['name'];
 const iconOf = (c: ServiceCategory) => (c.icon in MaterialIcons.glyphMap ? c.icon : 'handyman') as IconName;
 
 /** İlk açılışta gösterilen ana kategori sayısı; kalanı "Diğer N kategori" ile açılır. */
+const NEED_ICONS: Record<NeedSituation, IconName> = {
+  'yeni-tasindim': 'local-shipping',
+  yogunum: 'schedule',
+  tatil: 'beach-access',
+  hasta: 'healing',
+  'yasli-yakin': 'elderly',
+  'ozel-gun': 'celebration',
+};
 const FIRST_CATEGORIES = 3;
 /** "Hemen lazım olabilir" kutucuk sınırı (panelde "acil" işaretli alt kategoriler, panel sırasıyla). */
 const QUICK_LIMIT = 11;
@@ -51,6 +62,7 @@ export default function UrgentScreen() {
   const lang: LanguageCode = language ?? 'tr';
   const { location } = useUserLocation();
   const { all } = useServiceCategories();
+  const needs = useNeedMap(all);
   const [numbers, setNumbers] = useState<EmergencyNumber[]>([]);
   const [stale, setStale] = useState(false);
   const [callError, setCallError] = useState<string>();
@@ -258,6 +270,25 @@ export default function UrgentScreen() {
               {quick.map((x) => tile(x.id, iconOf(x), localized(x.names, lang) ?? x.names.tr, () => openService(x)))}
             </View>
 
+            {/* Diğer İhtiyaçlar: durum kartları (13. madde 35); eşleşmeyi admin panelden belirler. */}
+            <AppText variant="subtitle" accessibilityRole="header">{t('needs.title')}</AppText>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.needs}>
+              {NEED_SITUATIONS.filter((s) => needs[s].length > 0).map((s) => (
+                <Pressable
+                  key={s}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${t(`needs.items.${s}.title`)}. ${t(`needs.items.${s}.hint`)}`}
+                  onPress={() => router.push({ pathname: '/services/need', params: { id: s } })}
+                  style={({ pressed }) => [styles.need, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.75 : 1 }]}>
+                  <View style={[styles.tileIcon, { backgroundColor: c.accentSoft }]}>
+                    <MaterialIcons name={NEED_ICONS[s]} size={22} color={c.icon} />
+                  </View>
+                  <AppText style={[styles.tileText, { color: c.text }]} numberOfLines={2}>{t(`needs.items.${s}.title`)}</AppText>
+                  <AppText style={[styles.needHint, { color: c.textMuted }]} numberOfLines={2}>{t(`needs.items.${s}.hint`)}</AppText>
+                </Pressable>
+              ))}
+            </ScrollView>
+
             {/* Tüm hizmetler: açılır kategoriler, içinde simgeli alt hizmetler */}
             <AppText variant="subtitle" accessibilityRole="header">{t('urgent.allTitle')}</AppText>
             <View style={[styles.list, { backgroundColor: c.surface, borderColor: c.border }]}>
@@ -367,6 +398,9 @@ const styles = StyleSheet.create({
   childText: { fontSize: 11, lineHeight: 14, textAlign: 'center' },
   dot: { width: 8, height: 8, borderRadius: 4 },
   childDot: { position: 'absolute', top: 8, end: 8 },
+  needs: { gap: spacing.sm, paddingEnd: spacing.md },
+  need: { width: 148, gap: 6, padding: spacing.md, borderRadius: radius.lg, borderWidth: 1 },
+  needHint: { fontSize: 12, lineHeight: 16 },
   missing: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: MIN_TOUCH, borderRadius: radius.pill, borderWidth: 1, borderStyle: 'dashed' },
   missingText: { fontFamily: fonts.bodySemi, fontSize: 13 },
 });

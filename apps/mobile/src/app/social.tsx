@@ -31,9 +31,9 @@ const SOCIAL: Card[] = [
   { key: 'events', icon: 'event', scene: 'events', href: '/events' },
   { key: 'activities', icon: 'groups', scene: 'activities', href: '/activities' },
   { key: 'news', icon: 'newspaper', scene: 'news', href: '/news' },
-  { key: 'contests', icon: 'emoji-events', scene: 'contests' },
-  { key: 'polls', icon: 'poll', scene: 'polls' },
-  { key: 'clubs', icon: 'sports-soccer', scene: 'clubs' },
+  { key: 'contests', icon: 'emoji-events', scene: 'contests', href: '/contests' },
+  { key: 'polls', icon: 'poll', scene: 'polls', href: '/polls' },
+  { key: 'clubs', icon: 'sports-soccer', scene: 'clubs', href: '/clubs' },
 ];
 
 /**

@@ -56,6 +56,9 @@ export { createFirestoreSocialRepository, createProfileModeration, type ProfileR
 export { createBannedWords } from './word-filter';
 export { createSearchSuggestions } from './search';
 export { cleanVideoUrl, createIntroVideo, INTRO_VIDEO_URL_MAX } from './intro';
+export { createNeedsConfig } from './needs';
+export { createCommunityAdmin, createFirestoreCommunityRepository } from './community';
+export { createHolidayAdmin, createHolidayRepository, readOpenCountries } from './holiday';
 export { createFirestoreMessageRepository, createMessageModeration, type MessageReport } from './messages';
 export { createFirestoreListingRepository, createListingModeration, type ListingFilter, type ListingPage, type ListingReport } from './listings';
 export { createNotificationSettings, createNotificationTriggers } from './notifications';

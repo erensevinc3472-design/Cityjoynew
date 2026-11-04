@@ -214,7 +214,25 @@
     "suggestSignIn": "Melden Sie sich an, um einen Vorschlag zu senden.",
     "suggestError": "Senden fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "cachedNote": "Die aktuelle Liste konnte nicht geladen werden; die gespeicherte Liste wird angezeigt.",
-    "subcategories": "{{count}} Dienste"
+    "subcategories": "{{count}} Dienste",
+    "searchIn": "In {{name}} suchen",
+    "openNow": "Jetzt geöffnet",
+    "verifiedOnly": "Verifiziert",
+    "noFilterMatch": "Kein Betrieb passt zu diesen Filtern. Entferne sie und sieh erneut nach.",
+    "callNumber": "{{number}} anrufen",
+    "taxiCompanies": "Noch kein registriertes Taxiunternehmen",
+    "profiles": {
+      "veteriner": "Atmet das Tier nicht, blutet es stark oder wurde es vergiftet, ruf die Praxis an, bevor du losfährst. Nachts hilft der Filter \"Jetzt geöffnet\".",
+      "yol": "Fahr das Auto an eine sichere Stelle, schalte die Warnblinker ein, stell das Warndreieck auf und warte abseits der Straße. Bei Verletzten zuerst 112.",
+      "cilingir": "Der Schlüsseldienst kann vor dem Öffnen Ausweis und Wohnsitznachweis verlangen. Ist ein Kind, ein Kranker oder ein eingeschalteter Herd drinnen, ruf 112.",
+      "dogalgaz": "Riechst du Gas, berühre keine Schalter oder Klingel, dreh Herd und Haupthahn zu, öffne die Fenster, verlass das Gebäude und ruf draußen 187 an.",
+      "elektrik": "Bei Funken, Rauch oder Brandgeruch die Sicherung ausschalten und die Steckdose nicht berühren. Bei Feuer 112.",
+      "tesisat": "Bei Wasserschaden zuerst den Haupthahn schließen; erreicht das Wasser Steckdosen, auch die Sicherung. Bei Rohrbruch auf der Straße die städtischen Wasserwerke anrufen.",
+      "ambulans": "In Lebensgefahr 112 anrufen, keinen privaten Krankenwagen; 112 ist kostenlos. Private Krankenwagen sind für geplante Transporte.",
+      "taksi": "Prüfe vor dem Einsteigen Kennzeichen und Taxameter. Nachts schick das Kennzeichen an eine vertraute Person.",
+      "sigorta": "Nach einem Unfall zuerst an Verletzte und Sicherheit denken (112). Protokoll, Fotos und Policennummer bereithalten; vor dem Zahlen die Zulassung des Vermittlers prüfen.",
+      "tamirat": "Lass dir Preis, Dauer und Material vor Arbeitsbeginn schriftlich geben; sei vorsichtig bei voller Vorkasse."
+    }
   },
   "business": {
     "myTitle": "Mein Betrieb",
@@ -230,7 +248,7 @@
       "esnaf": "Geschäft / Laden",
       "evden-uretim": "Hausgemachtes / Verkauf von zu Hause",
       "yeme-icme": "Essen & Trinken",
-      "konaklama": "Unterkunft",
+      "konaklama": "Hotels und Unterkünfte",
       "yol-ustu": "Raststätte",
       "emlak": "Immobilienbüro"
     },
@@ -272,7 +290,8 @@
       "reservedName": "Dieser Name ist offiziellen Einrichtungen vorbehalten (Gemeinde, Gouverneursamt, CityJoy usw.). Für ein Behördenkonto wenden Sie sich an CityJoy.",
       "hours": "Uhrzeiten wie 09:00 eingeben; Öffnung und Schließung dürfen nicht gleich sein.",
       "roadside": "Wähle mindestens eine Einrichtung (WC, Kraftstoff…).",
-      "geo": "Standort festlegen: Tippe vor Ort auf \"Standort übernehmen\"."
+      "geo": "Standort festlegen: Tippe vor Ort auf \"Standort übernehmen\".",
+      "lodging": "Prüfe die Unterkunftsangaben."
     },
     "hide": "Nicht mehr anzeigen",
     "show": "Wieder veröffentlichen",
@@ -977,7 +996,15 @@
       "ogrenme": "Lernen",
       "gonullu": "Ehrenamt",
       "diger": "Sonstiges"
-    }
+    },
+    "subtitle": "{{place}} · Leute treffen",
+    "thisWeek": "Diese Woche",
+    "exactOnJoin": "Genauer Ort nach Zusage sichtbar",
+    "join": "Ich bin dabei",
+    "upcoming": "Kommende Aktivitäten",
+    "countIn": "{{place}} · {{count}} Aktivitäten",
+    "firstMeetTitle": "Fürs erste Treffen",
+    "firstMeetTips": "Triff dich an einem belebten, öffentlichen Ort. Sag einer vertrauten Person, wohin du gehst. Fühlst du dich unwohl, melde die Aktivität mit einem Tipp."
   },
   "explore": {
     "title": "Entdecken",
@@ -1204,8 +1231,8 @@
     "needLocation": "Wähle deinen Standort, um lokale Nachrichten zu sehen.",
     "empty": "In deiner Region gibt es noch keine offiziellen Nachrichten.",
     "loadError": "Nachrichten konnten nicht geladen werden.",
-    "readingTime_one": "{{count}} Minute Lesezeit",
-    "readingTime_other": "{{count}} Minuten Lesezeit",
+    "readingTime_one": "{{count}} Min. Lesezeit",
+    "readingTime_other": "{{count}} Min. Lesezeit",
     "smaller": "A− Kleinere Schrift",
     "larger": "A+ Größere Schrift",
     "share": "Teilen",
@@ -1219,7 +1246,12 @@
       "saglik": "Gesundheit",
       "cevre": "Umwelt",
       "ekonomi": "Wirtschaft"
-    }
+    },
+    "subtitle": "{{place}} · mit Quelle",
+    "official": "Behördenmeldung",
+    "sourceNote": "Jede Meldung nennt ihre Quelle. Bei Verlagsmeldungen gibt es nur Titel und Kurztext, der Rest steht auf der Seite der Quelle. Das Label \"Eilmeldung\" setzt die App nie selbst.",
+    "publisherTitle": "Betreibst du eine lokale Nachrichtenseite?",
+    "publisherText": "Bewirb dich als Verlag, dann erscheinen deine Meldungen hier."
   },
   "search": {
     "title": "Suche",
@@ -2142,5 +2174,244 @@
         "save": "Speichern fehlgeschlagen. Ist dein Betrieb geprüft und bist du online?"
       }
     }
+  },
+  "taxi": {
+    "stands": "Taxistände",
+    "nearest": "Nächster Taxistand",
+    "findNear": "Nächsten finden",
+    "finding": "Standort wird ermittelt…",
+    "distance": "{{km}} km",
+    "unverified": "Nicht verifiziert",
+    "call": "Anrufen",
+    "route": "Route",
+    "fare": "Tarif: {{fare}}",
+    "noPhone": "Die Telefonnummer dieses Stands ist unbekannt; der Eintrag stammt aus der Karte. Du kannst per Route hinfahren.",
+    "source": "Die Angaben stammen aus OpenStreetMap und amtlichen Einträgen und können sich geändert haben.",
+    "empty": "In dieser Provinz sind noch keine Taxistände erfasst.",
+    "loadError": "Taxistände konnten nicht geladen werden."
+  },
+  "needs": {
+    "title": "Weitere Anliegen",
+    "empty": "Für diese Situation sind noch keine Dienste ausgewählt.",
+    "note": "Die Listen zeigen die in dieser Lage meistgesuchten Dienste. Findest du nichts, nutze die Suche unter Dringende Anliegen.",
+    "items": {
+      "yeni-tasindim": {
+        "title": "Neu eingezogen",
+        "hint": "Umzug, Handwerk, Reinigung",
+        "intro": "Dienste, die du beim Einzug ins neue Zuhause brauchen könntest."
+      },
+      "yogunum": {
+        "title": "Keine Zeit",
+        "hint": "Reinigung, Wasser, Einkauf",
+        "intro": "Dienste, die dir den Alltag erleichtern, wenn die Zeit knapp ist."
+      },
+      "tatil": {
+        "title": "Ich fahre in Urlaub",
+        "hint": "Haustier, Garten, Sicherheit",
+        "intro": "Für dein Zuhause und dein Haustier, während du weg bist."
+      },
+      "hasta": {
+        "title": "Ich bin krank",
+        "hint": "Pflege, Transport, Reinigung",
+        "intro": "Dienste, die dich bei der Genesung unterstützen. In Lebensgefahr 112."
+      },
+      "yasli-yakin": {
+        "title": "Ältere Angehörige",
+        "hint": "Pflege, Physiotherapie, Transport",
+        "intro": "Für Pflege und Alltag älterer Angehöriger."
+      },
+      "ozel-gun": {
+        "title": "Besonderer Anlass",
+        "hint": "Feier, Torte, Fotos",
+        "intro": "Für Hochzeit, Geburtstag oder Feier."
+      }
+    }
+  },
+  "polls": {
+    "title": "Umfragen",
+    "subtitle": "Offene Umfragen für {{place}}",
+    "needLocation": "Wähle deine Provinz, um Umfragen zu sehen.",
+    "loadError": "Umfragen konnten nicht geladen werden.",
+    "empty": "Zurzeit keine offenen Umfragen.",
+    "signIn": "Melde dich an, um abzustimmen.",
+    "verifyEmail": "Bestätige deine E-Mail, um abzustimmen.",
+    "finished": "Abgeschlossene Umfragen",
+    "note": "Institutionen und Unternehmen veröffentlichen Umfragen über das CityJoy-Team; jede Umfrage nennt ihren Urheber.",
+    "lastDay": "Heute letzter Tag",
+    "closed": "Beendet",
+    "by": "Von {{name}}",
+    "send": "Stimme abgeben",
+    "secret": "Deine Stimme ist geheim; Ergebnisse siehst du nach der Abstimmung.",
+    "youVoted": "Du hast abgestimmt. Nur du siehst deine Wahl.",
+    "voteError": "Stimme konnte nicht gesendet werden.",
+    "daysLeft_one": "Noch {{count}} Tag",
+    "daysLeft_other": "Noch {{count}} Tage",
+    "voters_one": "{{count}} Teilnehmer",
+    "voters_other": "{{count}} Teilnehmende"
+  },
+  "contests": {
+    "title": "Wettbewerbe",
+    "one": "Wettbewerb",
+    "subtitle": "{{place}} und landesweit",
+    "needLocation": "Wähle deine Provinz, um Wettbewerbe zu sehen.",
+    "loadError": "Wettbewerbe konnten nicht geladen werden.",
+    "empty": "Zurzeit keine Wettbewerbe. Neue werden hier angekündigt.",
+    "gone": "Wettbewerb nicht gefunden.",
+    "prized": "Mit Preis",
+    "prize": "Preis: {{prize}}",
+    "joinOpen": "Teilnahme offen",
+    "voteOpen": "Abstimmung offen",
+    "results": "Ergebnisse",
+    "joinUntil": "Teilnahme bis {{date}}",
+    "voteUntil": "Abstimmung endet {{date}}",
+    "finished": "Abgeschlossene Wettbewerbe",
+    "note": "Die Teilnahme ist kostenlos. Der Sieger jeder Stufe kommt weiter.",
+    "stages": {
+      "il": "Provinz",
+      "bolge": "Region",
+      "turkiye": "Türkei"
+    },
+    "entry": {
+      "bekliyor": "Deine Teilnahme ist eingegangen und wird geprüft.",
+      "onayli": "Deine Teilnahme wurde bestätigt.",
+      "diskalifiye": "Deine Teilnahme entsprach nicht den Bedingungen."
+    },
+    "signIn": "Melde dich an, um teilzunehmen und abzustimmen.",
+    "verifyEmail": "Bestätige deine E-Mail, um teilzunehmen und abzustimmen.",
+    "join": "Teilnehmen",
+    "terms": "Bedingungen",
+    "hideTerms": "Bedingungen ausblenden",
+    "leaders": "Spitzenreiter",
+    "ranking": "Endstand",
+    "noEntries": "Noch keine bestätigten Teilnahmen.",
+    "vote": "Abstimmen",
+    "voted": "Abgestimmt",
+    "voteError": "Abstimmung fehlgeschlagen.",
+    "rulesTitle": "Abstimmungsregeln",
+    "rules": "Anmeldung und bestätigte E-Mail erforderlich. Eine Stimme pro Teilnehmer, nicht für dich selbst. Es gibt ein Tageslimit; verdächtige Stimmen zählen nicht.",
+    "fields": {
+      "name": "Anzeigename",
+      "url": "Video-Link",
+      "urlHint": "Lade dein Video auf eine Videoseite und füge den Link ein (https://).",
+      "note": "Kurze Notiz (optional)",
+      "accept": "Ich habe die Bedingungen gelesen und akzeptiere sie."
+    },
+    "errors": {
+      "name": "Name: 2-40 Zeichen.",
+      "url": "Gib einen Video-Link mit https:// ein.",
+      "note": "Notiz höchstens 200 Zeichen.",
+      "terms": "Akzeptiere die Bedingungen, um teilzunehmen."
+    },
+    "joinError": "Teilnahme konnte nicht gesendet werden.",
+    "send": "Teilnahme senden",
+    "cancel": "Abbrechen",
+    "entrants_one": "{{count}} Teilnahme",
+    "entrants_other": "{{count}} Teilnahmen",
+    "votes_one": "{{count}} Stimme",
+    "votes_other": "{{count}} Stimmen"
+  },
+  "clubs": {
+    "title": "Stadtvereine",
+    "subtitle": "Vereine und Spiele in {{place}}",
+    "needLocation": "Wähle deine Provinz, um Vereine zu sehen.",
+    "loadError": "Vereine konnten nicht geladen werden.",
+    "empty": "In deiner Provinz gibt es noch keine Vereine.",
+    "all": "Vereine",
+    "cityClub": "Verein der Stadt",
+    "verified": "Verifiziert",
+    "nextMatch": "Nächstes Spiel",
+    "noFixture": "Noch kein Spielplan.",
+    "home": "Heim",
+    "away": "Auswärts",
+    "follow": "Folgen",
+    "following": "Folge ich",
+    "ticket": "Tickets",
+    "signIn": "Melde dich an, um dem Verein zu folgen.",
+    "followError": "Aktion fehlgeschlagen.",
+    "applyTitle": "Hast du einen Verein? Bewirb dich",
+    "applyText": "Vereine bewerben sich mit Nachweisen und pflegen danach ihren Spielplan selbst.",
+    "sports": {
+      "futbol": "Fußball",
+      "basketbol": "Basketball",
+      "voleybol": "Volleyball",
+      "amator": "Amateurliga",
+      "diger": "Andere"
+    }
+  },
+  "lodging": {
+    "kinds": {
+      "konak-otel": "Hotel",
+      "konak-butik": "Boutique-Hotel",
+      "konak-termal": "Thermalhotel",
+      "konak-pansiyon": "Pension",
+      "konak-apart": "Aparthotel",
+      "konak-gunluk-ev": "Ferienhaus",
+      "konak-bungalov": "Bungalow",
+      "konak-kamp": "Camping und Glamping"
+    },
+    "kindsHint": "Art der Unterkunft (höchstens 2).",
+    "title": "Unterkunftsangaben",
+    "hint": "Diese Angaben sind nötig, damit deine Unterkunft unter Reisen > Planen erscheint. Nur verifizierte Unterkünfte werden gelistet.",
+    "themes": "Zu welchen Urlaubsideen passt sie? (höchstens 4)",
+    "license": "Tourismus-Lizenznummer",
+    "licenseHint": "Nummer der Tourismusbetriebslizenz oder der kommunalen Genehmigung. Unser Team prüft sie.",
+    "nightMin": "Niedrigster Preis pro Nacht (TL)",
+    "nightMax": "Höchster Preis pro Nacht (TL)",
+    "website": "Buchungsseite (optional)",
+    "websiteHint": "Deine eigene Seite, beginnend mit https://.",
+    "errors": {
+      "themes": "Wähle 1 bis 4 Urlaubsideen.",
+      "license": "Die Lizenznummer muss 3-40 Zeichen haben.",
+      "price": "Prüfe die Preise (der niedrigste darf den höchsten nicht übersteigen).",
+      "website": "Die Adresse muss mit https:// beginnen."
+    },
+    "priceTable": "Zimmer und Preise",
+    "priceTableNote": "Zum Beispiel „Doppelzimmer mit Frühstück: 2.400 TL\".",
+    "nightPrice": "Preis pro Nacht",
+    "perNight": "{{price}} TL / Nacht",
+    "bookDirect": "Du buchst direkt bei der Unterkunft (Telefon oder eigene Seite). CityJoy vermittelt nicht und nimmt keine Zahlungen an."
+  },
+  "holiday": {
+    "themes": {
+      "deniz": "Meer",
+      "kayak": "Ski",
+      "termal": "Thermal",
+      "kultur": "Kultur",
+      "doga": "Natur",
+      "lezzet": "Kulinarik",
+      "aile": "Familie",
+      "balayi": "Flitterwochen",
+      "gorulmesi-gereken": "Sehenswert"
+    },
+    "hints": {
+      "deniz": "Buchten, Strände, Blaue Flagge",
+      "kayak": "Schnee, Pisten, Hütten",
+      "termal": "Heilquellen und Erholung",
+      "kultur": "Antike Städte, Museen, Basare",
+      "doga": "Hochebenen, Wälder, Wasserfälle",
+      "lezzet": "Regionale Küche, Weinberge, Märkte",
+      "aile": "Kinderfreundliche Unterkünfte",
+      "balayi": "Romantische, ruhige Auszeiten",
+      "gorulmesi-gereken": "Die bekanntesten Orte der Türkei"
+    },
+    "title": "Urlaub planen",
+    "subtitle": "TravelJoy",
+    "turkiye": "Türkei",
+    "abroad": "Ausland",
+    "pickTheme": "Was für einen Urlaub möchtest du?",
+    "note": "Orte stammen aus verifizierten Unterkünften und der Auswahl unseres Teams.",
+    "abroadSoon": "Urlaubsideen im Ausland folgen bald. Länder öffnen, sobald Inhalte bereit sind.",
+    "abroadHint": "Urlaubsideen in Vorbereitung",
+    "km": "{{km}} km",
+    "from": "{{price}} TL / Nacht",
+    "noPlaces": "Für diese Idee gibt es noch keine verifizierten Unterkünfte.",
+    "placesNote": "Die Entfernung ist eine ungefähre Straßenentfernung.",
+    "knowCity": "{{name}} kennenlernen",
+    "knowCityHint": "Sehenswertes, Routen, lokale Küche",
+    "staysTitle": "Unterkünfte",
+    "noStays": "Hier gibt es noch keine verifizierten Unterkünfte.",
+    "ad": "Anzeige",
+    "stays_one": "{{count}} Unterkunft",
+    "stays_other": "{{count}} Unterkünfte"
   }
 }

@@ -170,6 +170,11 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
     Önizleme **(Eren onayladı, 3 Kasım 2026)**: PL-Giris, PL-Tema, PL-Konaklama, PL-Tesis, PL-Isletme, PL-Yurtdisi ve Panel > Seyahat >
     Tatil fikirleri (P-Tatil). Eski T-* önerisi ve "Planla ve Yola Çık" sorusu kaldırıldı. Koda geçerken eski Planla
     ekranındaki yol ücreti tahmini ve Panel > Yolculuk fiyatları kaldırılır ya da gizlenir.
+    **Koda geçti (4 Kasım 2026):** eski yol ücreti tahmini ve Panel > Yolculuk fiyatları kaldırıldı. Teknik kararlar (Claude):
+    tesis türleri işletmenin kategorilerinde ("konak-" önekli, en çok 2), tatil fikri etiketleri en çok 4; belge numarası
+    zorunlu (3-40 karakter); yalnızca doğrulanmış tesis listelenir; yer mesafesi il merkezleri arası yol tahmini; ekibin
+    düzenlemesi tema başına tek belge (holidayThemes/{tema}); açık ülkeler config/travelCountries (Türkiye hep açık).
+    Rezervasyon ve ödeme uygulamada yok ("tesisle doğrudan").
   - **Panel > Seyahat menüsü (3 Kasım 2026, Eren istedi):** iki alt başlık: **Keşfet ve Öğren** ve **Tatil fikirleri**.
     Keşfet ve Öğren kodda zaten var (`apps/panel/src/pages/travel-page.tsx`, 28-29 Ekim): Bölgeler, Şehirler, Gezilecek
     yerler, Hazır rotalar, Yöresel, Başkanlarla Keşif, Kareler sekmeleri; tasarım tuvaline P-Sy* panoları olarak eklendi.

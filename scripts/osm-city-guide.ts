@@ -48,6 +48,7 @@ area(${3600000000 + relId})->.x;
   nwr["leisure"="park"]["name"](area.x);
   nwr["amenity"="parking"]["access"!~"private|customers|no"](area.x);
   nwr["amenity"="marketplace"](area.x);
+  nwr["amenity"="taxi"](area.x);
   nwr["amenity"~"^(townhall|hospital|police|fire_station|courthouse|post_office|library)$"]["name"](area.x);
   nwr["amenity"~"^(clinic|doctors)$"]["name"~"Aile Sağlığı",i](area.x);
   nwr["office"="government"]["name"](area.x);
@@ -182,6 +183,10 @@ function toRow(e: OsmElement, ilce: string): { section: CityGuideSectionId; row:
     if (!name) return { skip: 'adsız pazar yeri' };
     const tur = has(name, /köylü/i) ? 'koylu-pazari' : has(name, /balık/i) ? 'balik-pazari' : has(name, /organik/i) ? 'organik-pazar' : has(name, /bit pazar/i) ? 'bit-pazari' : 'semt-pazari';
     return { section: 'pazarlar', row: { ...base, tur, ad: name, gunler: daysOf(t.opening_hours), saatler: hoursTr(t.opening_hours) } };
+  }
+  if (t.amenity === 'taxi') {
+    // Durakların çoğunun telefonu haritada yok; uygulama bunları "doğrulanmadı" diye gösterir, tarife yalnızca panelden.
+    return { section: 'onemli-kurumlar', row: { ...base, ...contact, kategori: 'taksi-duragi', ad: name || 'Taksi durağı' } };
   }
   if (t.emergency === 'assembly_point') {
     if (!name) return { skip: 'adsız toplanma alanı' };

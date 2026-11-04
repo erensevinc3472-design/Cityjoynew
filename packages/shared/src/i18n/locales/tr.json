@@ -214,7 +214,25 @@
     "suggestSignIn": "Öneri göndermek için giriş yapın.",
     "suggestError": "Gönderilemedi. Bağlantınızı kontrol edip tekrar deneyin.",
     "cachedNote": "Güncel liste alınamadı; telefonda saklı liste gösteriliyor.",
-    "subcategories": "{{count}} hizmet"
+    "subcategories": "{{count}} hizmet",
+    "searchIn": "{{name}} içinde ara",
+    "openNow": "Şu an açık",
+    "verifiedOnly": "Doğrulanmış",
+    "noFilterMatch": "Bu filtrelere uyan işletme yok. Filtreleri kaldırıp tekrar bak.",
+    "callNumber": "{{number}} numarasını ara",
+    "taxiCompanies": "Kayıtlı taksi işletmesi yok",
+    "profiles": {
+      "veteriner": "Hayvan nefes almıyorsa, çok kanıyorsa ya da zehirlendiyse yola çıkmadan önce kliniği arayıp geldiğini haber ver. Gece için \"Şu an açık\" filtresini kullan.",
+      "yol": "Aracı güvenli bir yere çek, dörtlüleri yak, reflektörü koy ve yol kenarında bekle. Yaralı varsa önce 112.",
+      "cilingir": "Çilingir kapıyı açmadan önce kimlik ve ikamet belgesi isteyebilir. İçeride çocuk, hasta ya da açık ocak varsa 112'yi ara.",
+      "dogalgaz": "Gaz kokusu varsa elektrik düğmelerine ve zile dokunma, ocağı ve vanayı kapat, pencereleri aç, binadan çık ve dışarıdan 187'yi ara.",
+      "elektrik": "Kıvılcım, duman ya da yanık kokusu varsa sigortayı kapat ve prize dokunma. Yangında 112.",
+      "tesisat": "Su baskınında önce ana vanayı kapat, su prizlere ulaştıysa sigortayı da kapat. Sokaktaki ana boru arızası için belediyenin su idaresini ara.",
+      "ambulans": "Hayati tehlikede özel ambulansı değil 112'yi ara; 112 ücretsizdir. Özel ambulans planlı nakil ve hastane transferi içindir.",
+      "taksi": "Binmeden önce plakayı ve taksimetreyi kontrol et. Gece yolculuğunda plakayı bir yakınına gönder.",
+      "sigorta": "Kazadan sonra önce yaralıyı ve güvenliği düşün (112). Hasar için tutanak, fotoğraf ve poliçe numarası hazır olsun; ödeme yapmadan önce acentenin yetkisini sor.",
+      "tamirat": "İşe başlamadan önce fiyatı, süreyi ve malzemeyi yazılı al; tamamı peşin ödeme isteyene dikkat et."
+    }
   },
   "business": {
     "myTitle": "İşletmem",
@@ -230,7 +248,7 @@
       "esnaf": "Esnaf / dükkân",
       "evden-uretim": "Evden üretim / satış",
       "yeme-icme": "Yeme-içme",
-      "konaklama": "Konaklama",
+      "konaklama": "Otel ve konaklama",
       "yol-ustu": "Yol üstü tesis",
       "emlak": "Emlak işletmesi"
     },
@@ -272,7 +290,8 @@
       "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Kurum hesabı için CityJoy ile iletişime geçin.",
       "hours": "Saatleri 09:00 biçiminde yaz; açılış ve kapanış aynı olamaz.",
       "roadside": "Yol üstü tesisin en az bir olanağını seç (tuvalet, akaryakıt…).",
-      "geo": "Tesisin konumunu al: tesisteyken \"Konumu al\" düğmesine bas."
+      "geo": "Tesisin konumunu al: tesisteyken \"Konumu al\" düğmesine bas.",
+      "lodging": "Konaklama bilgilerini kontrol et."
     },
     "hide": "Yayından kaldır (gizle)",
     "show": "Yeniden yayınla",
@@ -977,7 +996,15 @@
       "ogrenme": "Öğrenme",
       "gonullu": "Gönüllülük",
       "diger": "Diğer"
-    }
+    },
+    "subtitle": "{{place}} · insanlarla buluş",
+    "thisWeek": "Bu hafta",
+    "exactOnJoin": "Tam yer katılınca görünür",
+    "join": "Katılıyorum",
+    "upcoming": "Yaklaşan aktiviteler",
+    "countIn": "{{place}} · {{count}} aktivite",
+    "firstMeetTitle": "İlk buluşma için",
+    "firstMeetTips": "Kalabalık, açık bir yerde buluş. Yakınına nereye gittiğini söyle. Rahatsız olursan aktiviteyi tek dokunuşla şikâyet et."
   },
   "explore": {
     "title": "Keşfet",
@@ -1204,8 +1231,8 @@
     "needLocation": "Bölge haberlerini görmek için konumunu seç.",
     "empty": "Bölgende henüz kurum haberi yok.",
     "loadError": "Haberler yüklenemedi.",
-    "readingTime_one": "{{count}} dakikalık okuma",
-    "readingTime_other": "{{count}} dakikalık okuma",
+    "readingTime_one": "{{count}} dk okuma",
+    "readingTime_other": "{{count}} dk okuma",
     "smaller": "A− Yazıyı küçült",
     "larger": "A+ Yazıyı büyüt",
     "share": "Paylaş",
@@ -1219,7 +1246,12 @@
       "saglik": "Sağlık",
       "cevre": "Çevre",
       "ekonomi": "Ekonomi"
-    }
+    },
+    "subtitle": "{{place}} · kaynağıyla",
+    "official": "Kurum haberi",
+    "sourceNote": "Her haberde kaynağın adı yazar. Yayıncı haberlerinde yalnızca başlık ve kısa özet olur, tamamı kaynağın sitesindedir. \"Son dakika\" etiketini uygulama kendisi koymaz.",
+    "publisherTitle": "Yerel haber siten mi var?",
+    "publisherText": "Yayıncı olarak başvur, haberlerin burada çıksın."
   },
   "search": {
     "title": "Ara",
@@ -2142,5 +2174,244 @@
         "save": "Kaydedilemedi. İşletmen doğrulanmış mı, bağlantın açık mı?"
       }
     }
+  },
+  "taxi": {
+    "stands": "Taksi durakları",
+    "nearest": "Sana en yakın durak",
+    "findNear": "Yakınımdakini bul",
+    "finding": "Konum alınıyor…",
+    "distance": "{{km}} km",
+    "unverified": "Doğrulanmadı",
+    "call": "Ara",
+    "route": "Yol tarifi",
+    "fare": "Tarife: {{fare}}",
+    "noPhone": "Bu durağın telefonu bilinmiyor; kayıt haritadan alındı. Durağa yol tarifiyle gidebilirsin.",
+    "source": "Durak bilgileri OpenStreetMap ve kurum kayıtlarından; değişmiş olabilir.",
+    "empty": "Bu ilde henüz taksi durağı kaydı yok.",
+    "loadError": "Duraklar yüklenemedi."
+  },
+  "needs": {
+    "title": "Diğer ihtiyaçlar",
+    "empty": "Bu durum için henüz hizmet seçilmedi.",
+    "note": "Listeler bu durumda en çok aranan hizmetlerden oluşur. Aradığını bulamazsan Acil İhtiyaçlar'daki aramayı kullan.",
+    "items": {
+      "yeni-tasindim": {
+        "title": "Yeni taşındım",
+        "hint": "Nakliye, usta, temizlik",
+        "intro": "Yeni evine yerleşirken lazım olabilecek hizmetler."
+      },
+      "yogunum": {
+        "title": "Çok yoğunum",
+        "hint": "Temizlik, su, market",
+        "intro": "Zamanın yokken işini kolaylaştıracak hizmetler."
+      },
+      "tatil": {
+        "title": "Tatile gidiyorum",
+        "hint": "Evcil hayvan, bahçe, güvenlik",
+        "intro": "Sen yokken evin ve can dostun için."
+      },
+      "hasta": {
+        "title": "Hastayım",
+        "hint": "Evde bakım, nakil, temizlik",
+        "intro": "İyileşirken destek olacak hizmetler. Hayati tehlikede 112'yi ara."
+      },
+      "yasli-yakin": {
+        "title": "Yaşlı bir yakınım var",
+        "hint": "Bakım, fizik tedavi, nakil",
+        "intro": "Büyüklerimizin bakımı ve günlük işleri için."
+      },
+      "ozel-gun": {
+        "title": "Özel günüm var",
+        "hint": "Organizasyon, pasta, fotoğraf",
+        "intro": "Düğün, doğum günü ya da kutlama için."
+      }
+    }
+  },
+  "polls": {
+    "title": "Anketler",
+    "subtitle": "{{place}} için açık anketler",
+    "needLocation": "Anketleri görmek için ilini seç.",
+    "loadError": "Anketler yüklenemedi.",
+    "empty": "Şu an açık anket yok.",
+    "signIn": "Oy vermek için giriş yap.",
+    "verifyEmail": "Oy vermek için e-posta adresini doğrula.",
+    "finished": "Sonuçlanan anketler",
+    "note": "Anketleri kurumlar ve işletmeler CityJoy ekibi aracılığıyla yayınlar; hazırlayanın adı her ankette yazar.",
+    "lastDay": "Bugün son gün",
+    "closed": "Sonuçlandı",
+    "by": "Hazırlayan: {{name}}",
+    "send": "Oyumu gönder",
+    "secret": "Oyun gizlidir, sonuçlar oy verince görünür.",
+    "youVoted": "Oyunu verdin. Oyunu yalnızca sen görürsün.",
+    "voteError": "Oy gönderilemedi. Tekrar dene.",
+    "daysLeft_one": "{{count}} gün kaldı",
+    "daysLeft_other": "{{count}} gün kaldı",
+    "voters_one": "{{count}} katılımcı",
+    "voters_other": "{{count}} katılımcı"
+  },
+  "contests": {
+    "title": "Yarışmalar",
+    "one": "Yarışma",
+    "subtitle": "{{place}} ve Türkiye geneli",
+    "needLocation": "Yarışmaları görmek için ilini seç.",
+    "loadError": "Yarışmalar yüklenemedi.",
+    "empty": "Şu an yarışma yok. Yeni yarışmalar burada duyurulur.",
+    "gone": "Bu yarışma bulunamadı.",
+    "prized": "Ödüllü",
+    "prize": "Ödül: {{prize}}",
+    "joinOpen": "Katılım açık",
+    "voteOpen": "Oylama açık",
+    "results": "Sonuçlandı",
+    "joinUntil": "Son katılım {{date}}",
+    "voteUntil": "Oylama {{date}} bitiyor",
+    "finished": "Sonuçlanan yarışmalar",
+    "note": "Katılım ücretsizdir. Her aşamanın birincisi bir sonraki aşamaya geçer.",
+    "stages": {
+      "il": "İl",
+      "bolge": "Bölge",
+      "turkiye": "Türkiye"
+    },
+    "entry": {
+      "bekliyor": "Katılımın alındı, ekibimiz inceliyor.",
+      "onayli": "Katılımın onaylandı, oylamada görünüyorsun.",
+      "diskalifiye": "Katılımın şartnameye uymadığı için kabul edilmedi."
+    },
+    "signIn": "Katılmak ve oy vermek için giriş yap.",
+    "verifyEmail": "Katılmak ve oy vermek için e-posta adresini doğrula.",
+    "join": "Katıl",
+    "terms": "Şartname",
+    "hideTerms": "Şartnameyi gizle",
+    "leaders": "Öne çıkanlar",
+    "ranking": "Sonuç sıralaması",
+    "noEntries": "Henüz onaylı katılım yok.",
+    "vote": "Oy ver",
+    "voted": "Oy verdin",
+    "voteError": "Oy verilemedi. Tekrar dene.",
+    "rulesTitle": "Oy kuralları",
+    "rules": "Giriş ve doğrulanmış e-posta gerekir. Her yarışmacıya bir oy verebilirsin, kendine oy veremezsin. Günlük oy sınırı vardır; şüpheli oylar sayılmaz.",
+    "fields": {
+      "name": "Görünen ad",
+      "url": "Video bağlantısı",
+      "urlHint": "Videonu bir video sitesine yükle, bağlantısını yapıştır (https://).",
+      "note": "Kısa not (isteğe bağlı)",
+      "accept": "Şartnameyi okudum ve kabul ediyorum."
+    },
+    "errors": {
+      "name": "Ad 2-40 karakter olmalı.",
+      "url": "https:// ile başlayan bir video bağlantısı gir.",
+      "note": "Not en çok 200 karakter.",
+      "terms": "Katılmak için şartnameyi kabul et."
+    },
+    "joinError": "Katılım gönderilemedi. Tekrar dene.",
+    "send": "Katılımı gönder",
+    "cancel": "Vazgeç",
+    "entrants_one": "{{count}} katılımcı",
+    "entrants_other": "{{count}} katılımcı",
+    "votes_one": "{{count}} oy",
+    "votes_other": "{{count}} oy"
+  },
+  "clubs": {
+    "title": "Şehir Kulüpleri",
+    "subtitle": "{{place}} kulüpleri ve maçları",
+    "needLocation": "Kulüpleri görmek için ilini seç.",
+    "loadError": "Kulüpler yüklenemedi.",
+    "empty": "İlinde henüz kulüp eklenmedi.",
+    "all": "Kulüpler",
+    "cityClub": "Şehrin kulübü",
+    "verified": "Doğrulanmış",
+    "nextMatch": "Sıradaki maç",
+    "noFixture": "Fikstür henüz girilmedi.",
+    "home": "İç saha",
+    "away": "Deplasman",
+    "follow": "Takip et",
+    "following": "Takip ediliyor",
+    "ticket": "Bilet",
+    "signIn": "Kulübü takip etmek için giriş yap.",
+    "followError": "İşlem yapılamadı. Tekrar dene.",
+    "applyTitle": "Kulübün mü var? Başvur",
+    "applyText": "Kulüpler belgeyle başvurur, doğrulanınca fikstürünü kendisi girer.",
+    "sports": {
+      "futbol": "Futbol",
+      "basketbol": "Basketbol",
+      "voleybol": "Voleybol",
+      "amator": "Amatör lig",
+      "diger": "Diğer"
+    }
+  },
+  "lodging": {
+    "kinds": {
+      "konak-otel": "Otel",
+      "konak-butik": "Butik otel",
+      "konak-termal": "Termal otel",
+      "konak-pansiyon": "Pansiyon",
+      "konak-apart": "Apart otel",
+      "konak-gunluk-ev": "Günlük kiralık ev",
+      "konak-bungalov": "Bungalov",
+      "konak-kamp": "Kamp ve glamping"
+    },
+    "kindsHint": "Tesisin türü (en çok 2).",
+    "title": "Konaklama bilgileri",
+    "hint": "Tesisin Seyahat > Planla bölümünde görünmesi için bu bilgiler gerekir. Yalnızca doğrulanan tesisler listelenir.",
+    "themes": "Hangi tatil fikirlerine uyar? (en çok 4)",
+    "license": "Turizm belge numarası",
+    "licenseHint": "Turizm işletme belgesi ya da belediye ruhsatı numarası. Ekibimiz doğrular.",
+    "nightMin": "En düşük gece fiyatı (TL)",
+    "nightMax": "En yüksek gece fiyatı (TL)",
+    "website": "Rezervasyon sitesi (isteğe bağlı)",
+    "websiteHint": "https:// ile başlayan kendi siteniz.",
+    "errors": {
+      "themes": "En az bir, en çok 4 tatil fikri seç.",
+      "license": "Belge numarası 3-40 karakter olmalı.",
+      "price": "Gece fiyatlarını kontrol et (en düşük, en yüksekten büyük olamaz).",
+      "website": "Site adresi https:// ile başlamalı."
+    },
+    "priceTable": "Oda ve fiyatlar",
+    "priceTableNote": "Örneğin \"Çift kişilik oda, kahvaltı dahil: 2.400 TL\".",
+    "nightPrice": "Gece fiyatı",
+    "perNight": "{{price}} TL / gece",
+    "bookDirect": "Rezervasyonu tesisle doğrudan yaparsın (telefon ya da kendi sitesi). CityJoy aracılık etmez, ödeme almaz."
+  },
+  "holiday": {
+    "themes": {
+      "deniz": "Deniz",
+      "kayak": "Kayak",
+      "termal": "Termal",
+      "kultur": "Kültür",
+      "doga": "Doğa",
+      "lezzet": "Lezzet",
+      "aile": "Aile",
+      "balayi": "Balayı",
+      "gorulmesi-gereken": "Görülmesi gereken"
+    },
+    "hints": {
+      "deniz": "Koylar, plajlar, mavi bayrak",
+      "kayak": "Kar, pist ve dağ evi",
+      "termal": "Kaplıca, şifalı su, dinlenme",
+      "kultur": "Antik kent, müze, tarihi çarşı",
+      "doga": "Yayla, orman, şelale",
+      "lezzet": "Yöresel mutfak, bağ, pazar",
+      "aile": "Çocuk dostu tesis ve etkinlik",
+      "balayi": "Romantik ve sakin kaçamaklar",
+      "gorulmesi-gereken": "Türkiye'nin en bilinen yerleri"
+    },
+    "title": "Tatil planla",
+    "subtitle": "TravelJoy",
+    "turkiye": "Türkiye",
+    "abroad": "Yurt dışı",
+    "pickTheme": "Nasıl bir tatil istiyorsun?",
+    "note": "Yerler, doğrulanmış tesislerden ve ekibimizin seçiminden gelir.",
+    "abroadSoon": "Yurt dışı tatil önerileri yakında. Ülkeler içerikleri hazırlandıkça açılacak.",
+    "abroadHint": "Tatil önerileri hazırlanıyor",
+    "km": "{{km}} km",
+    "from": "gecesi {{price}} TL",
+    "noPlaces": "Bu tatil fikri için henüz doğrulanmış tesis yok.",
+    "placesNote": "Uzaklık yaklaşık yol mesafesidir.",
+    "knowCity": "Şehri tanı: {{name}}",
+    "knowCityHint": "Gezilecek yerler, rotalar, yerel lezzetler",
+    "staysTitle": "Konaklama",
+    "noStays": "Burada henüz doğrulanmış tesis yok.",
+    "ad": "Reklam",
+    "stays_one": "{{count}} tesis",
+    "stays_other": "{{count}} tesis"
   }
 }

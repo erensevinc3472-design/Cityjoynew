@@ -10,6 +10,7 @@ import {
   dealLive,
   findCategory,
   isFoodKind,
+  isLodgingKind,
   isRoadsideKind,
   isPostListed,
   localized,
@@ -36,6 +37,7 @@ import { countDeal } from '@/lib/deals';
 import { businessRepository, dealRepository, postRepository, reviewRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
+import { priceRange } from '@/lib/holiday';
 import { toggleFollowBusiness, useSocial } from '@/lib/social';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
@@ -109,6 +111,7 @@ export default function BusinessScreen() {
   const services = [
     ...b.categoryIds.filter(isFoodKind).map((k) => t(`food.kinds.${k}`)),
     ...b.categoryIds.filter(isRoadsideKind).map((k) => t(`roadside.kinds.${k}`)),
+    ...b.categoryIds.filter(isLodgingKind).map((k) => t(`lodging.kinds.${k}`)),
     ...b.categoryIds.map((cid) => findCategory(all, cid)).filter(Boolean).map((cat) => localized(cat!.names, lang)),
   ];
   const state = openState(b, new Date());
@@ -362,6 +365,15 @@ export default function BusinessScreen() {
             )}
             {services.length ? infoRow('handyman', t('business.servicesLabel'), services.join(', ')) : null}
             {b.paymentMethods?.length ? infoRow('payments', t('business.page.payment'), chips(b.paymentMethods.map((m) => t(`business.payment.${m}`)))) : null}
+            {b.lodging ? (
+              <>
+                {b.lodging.nightMin || b.lodging.nightMax ? infoRow('payments', t('lodging.nightPrice'), t('lodging.perNight', { price: priceRange(b.lodging.nightMin, b.lodging.nightMax, i18n.language) })) : null}
+                {b.lodging.themes.length ? infoRow('beach-access', t('lodging.themes'), chips(b.lodging.themes.map((x) => t(`holiday.themes.${x}`)))) : null}
+                {infoRow('verified', t('lodging.license'), b.lodging.licenseNo)}
+                {b.lodging.website ? infoRow('language', t('lodging.website'), <AppText style={{ color: c.accent }} onPress={() => Linking.openURL(b.lodging!.website!).catch(() => {})}>{b.lodging.website.replace('https://', '')}</AppText>) : null}
+                <AppText variant="caption" muted>{t('lodging.bookDirect')}</AppText>
+              </>
+            ) : null}
             {b.roadside?.length ? infoRow('add-road', t('roadside.title'), chips(b.roadside.map((m) => t(`roadside.features.${m}`)))) : null}
             {b.amenities?.length ? infoRow('check-circle-outline', t('business.page.amenities'), chips(b.amenities.map((m) => t(`business.amenity.${m}`)))) : null}
             {!verified ? <AppText variant="caption" muted>{t('business.unverifiedWarning')}</AppText> : null}

@@ -288,3 +288,6 @@ export function createBusinessAdmin(db: Firestore, actorUid: string) {
       change(b, { featuredUntil: until ? Timestamp.fromDate(until) : deleteField() }, 'duzenle', until ? `Öne çıkarıldı (${until.toISOString().slice(0, 10)} tarihine kadar)` : 'Öne çıkarma kaldırıldı'),
   };
 }
+
+/** Başka depolar (Seyahat > konaklama) aynı dönüşümü kullanır. */
+export const businessFromDoc = fromDoc;

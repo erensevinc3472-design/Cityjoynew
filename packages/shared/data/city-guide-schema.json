@@ -13,7 +13,7 @@
     "ar": "المؤسسات المهمة",
     "ru": "Важные учреждения"
    },
-   "description": "Valilik, kaymakamlık, il müdürlükleri, hastane, aile sağlığı merkezi, emniyet, itfaiye, nüfus, noter, PTT, vergi dairesi, SGK, kütüphane, okul.",
+   "description": "Valilik, kaymakamlık, il müdürlükleri, hastane, aile sağlığı merkezi, emniyet, itfaiye, nüfus, noter, PTT, vergi dairesi, SGK, kütüphane, okul, taksi durağı.",
    "columns": [
     {
      "key": "kategori",
@@ -43,6 +43,7 @@
       "ibadethane",
       "banka",
       "atm",
+      "taksi-duragi",
       "diger"
      ]
     },
@@ -107,6 +108,12 @@
      "hint": "Kısa açıklama (en çok 300 karakter)."
     },
     {
+     "key": "tarife",
+     "required": false,
+     "type": "text",
+     "hint": "Yalnızca taksi durağı için, resmî tarife (örnek: Açılış 40 TL, km 30 TL). Bilinmiyorsa boş bırakın."
+    },
+    {
      "key": "enlem",
      "required": false,
      "type": "lat",
@@ -149,6 +156,7 @@
     "7/24",
     "7/24",
     "Acil servis 7/24 açık.",
+    "",
     "",
     "",
     "https://bursasehir.saglik.gov.tr",
@@ -1778,6 +1786,13 @@
    "de": "Weiterer Link",
    "ar": "رابط ذو صلة",
    "ru": "Ссылка"
+  },
+  "tarife": {
+   "tr": "Tarife",
+   "en": "Fares",
+   "de": "Tarif",
+   "ar": "التعرفة",
+   "ru": "Тариф"
   }
  },
  "choices": {
@@ -2340,6 +2355,13 @@
    "de": "Geldautomat",
    "ar": "صراف آلي",
    "ru": "Банкомат"
+  },
+  "taksi-duragi": {
+   "tr": "Taksi durağı",
+   "en": "Taxi stand",
+   "de": "Taxistand",
+   "ar": "موقف سيارات الأجرة",
+   "ru": "Стоянка такси"
   }
  }
 }

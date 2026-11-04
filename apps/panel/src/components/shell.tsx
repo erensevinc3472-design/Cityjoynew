@@ -40,7 +40,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
     items: [
       { key: 'seyahat', module: 'seyahat', path: '/seyahat', icon: 'globe' },
       { key: 'yol-ustu', show: admin, path: '/yol-ustu-verisi', icon: 'road' },
-      { key: 'yolculuk-fiyatlari', show: admin, path: '/yolculuk-fiyatlari', icon: 'ticket' },
+      { key: 'tatil-fikirleri', show: admin, path: '/tatil-fikirleri', icon: 'sun' },
     ],
   },
   {
@@ -48,6 +48,9 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
     items: [
       { key: 'moderasyon', module: 'moderasyon', path: '/moderasyon', icon: 'shield' },
       { key: 'bildirimler', module: 'bildirimler', path: '/bildirimler', icon: 'bell' },
+      { key: 'anketler', show: admin, path: '/anketler', icon: 'check' },
+      { key: 'yarismalar', show: admin, path: '/yarismalar', icon: 'badge' },
+      { key: 'kulupler', module: 'kurumlar', path: '/kulupler', icon: 'users' },
     ],
   },
   {
@@ -65,6 +68,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
       { key: 'firsatlar', module: 'moderasyon', path: '/firsatlar', icon: 'ticket' },
       { key: 'profiller', show: admin, path: '/profiller', icon: 'users' },
       { key: 'hizmet-kategorileri', module: 'hizmet-kategorileri', path: '/hizmet-kategorileri', icon: 'grid' },
+      { key: 'diger-ihtiyaclar', show: admin, path: '/diger-ihtiyaclar', icon: 'grid' },
       { key: 'meslekler', module: 'meslekler', path: '/meslekler', icon: 'briefcase' },
     ],
   },
@@ -207,6 +211,7 @@ const ICONS = {
   globe: 'M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z',
   road: 'M8 3 5 21M16 3l3 18M12 5v2M12 11v2M12 17v2',
   ticket: 'M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4ZM14 7v12',
+  sun: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4',
   shield: 'M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6Z',
   bell: 'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4ZM10 21h4',
   phone: 'M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2 4.6 1.4V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.4l1.4 4.6Z',

@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 3 Kasım 2026 (PR #55 kuralları ve dizinleri yüklendi; "{Şehir} kareleri", Seyahat ve belediye kapakları, aktivite kapağı, Çarşı ilan fotoğrafları; Keşfet beğeni ve kaydet işaretleri düzeltmesi). Önceki: kişi profil fotoğrafı (PR #52 birleşti).
+Son güncelleme: 4 Kasım 2026 (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -44,7 +44,7 @@ Son güncelleme: 3 Kasım 2026 (PR #55 kuralları ve dizinleri yüklendi; "{Şeh
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (152)
+npm test                      # ortak paket testleri (166)
 npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (146; Java 21 gerekir)
 npm run test:functions        # sunucu işlevleri, emülatörde (30; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
@@ -747,6 +747,30 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   öne çıkma hakkı (en çok 2 Reklam, doğrulanmış Pro işletmeler sırayla). Önizleme tuvalde (H-Cekici, H-Isletme, H-Kademe).
   **Açık iş:** kodda MembershipTier hâlâ dört değerli ve panel Sınırlar vitrin önerisi 3/10/20/30; iç ekranlar uygulanırken
   ikiye (ucretsiz, pro) ve 1/10 sınırına indirilecek.
+- **İç ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla (4 Kasım, dal `claude/ic-ekranlar`;
+  PROJE.md 13. madde 35 ve 5.2).** **Acil:** Veteriner ve diğer hizmet sayfaları ortak liste kalıbında
+  (`services/[id].tsx`); Taksi durakları (`components/taxi-stands.tsx`: en yakın durak büyük kartta, veri Önemli Kurumlar
+  havuzundan, şehir rehberi şemasında yeni `taksi-duragi`, OSM betiği durakları da çeker); Diğer İhtiyaçlar ("Yeni
+  taşındım" gibi durum kartları > ilgili hizmetler, `services/need.tsx`; Panel > İhtiyaç kartları, `needs-page.tsx`).
+  **Sosyal Harmoni:** Anketler (`/polls`: tek oy, gizli, sonuç çubukları; oy için giriş + doğrulanmış e-posta), Yarışmalar
+  (`/contests`, `/contests/[id]`: aşamalar, şartname, katıl formu, video https bağlantısı olarak ve ekip onayıyla, oy ver,
+  kendine oy yok), Kulüpler (`/clubs`: şehrin kulübü, takip, sıradaki maç ve bilet bağlantısı, spor süzgeci, "Kulübün mü var?"
+  yakında). Günlük oy sınırı (Panel > Sınırlar, `oy` / `oyYeni`). Panel > Sosyal: **Anketler** ve **Yarışmalar** (admin;
+  siyasi anket işaretiyle engellenir), **Kulüpler** (il yöneticisi, "kurumlar" yetkisi; fikstür satır satır). Veri:
+  `polls`, `pollVotes`, `contests` (+ `entries`), `contestVotes`, `clubs`, `clubFollows`.
+  **Seyahat > Planla = tatil keşfi:** eski yol ücreti hesabı kaldırıldı (Yoldayım aynen). Türkiye / Yurt dışı; 9 tatil
+  fikri (Deniz, Kayak, Termal, Kültür, Doğa, Lezzet, Aile, Balayı, Görülmesi gereken) > yerler (il, yol mesafesi, sezon,
+  tesis sayısı, gece fiyat aralığı, not; `/travel/holiday/[theme]`) > konaklama (`/travel/stay`: "Şehri tanı" kartı,
+  doğrulanmış tesisler, en çok 2 "Reklam" başta) > işletme sayfası. **İşletme ekle > "Otel ve konaklama"**: tesis türü
+  (en çok 2), tatil fikirleri (en çok 4), belge numarası zorunlu, gece fiyatı, web sitesi; işletme sayfasında gece fiyatı,
+  temalar, belge no, "rezervasyon tesisle doğrudan". Yalnızca doğrulanan tesis listelenir. **Panel > Seyahat:** "Keşfet ve
+  Öğren" ve yeni **Tatil fikirleri** (yer sırası, sezon, not, gizle; uymayan tesis etiketini kaldır; yurt dışı ülkeleri aç).
+  Panel > Yolculuk fiyatları kaldırıldı. Keşfet ve Öğren'deki ülke şeridi de panelde açılan ülkelere uyar.
+  Kurallar değişti (anket, yarışma, kulüp, ihtiyaç kartları, konaklama, `holidayThemes`, `config/travelCountries`).
+  Testler: ortak 166 (yeni: anket, tatil yerleri); kural testleri bu bilgisayarda çalıştırılmadı (Java 21 klasörü yok).
+  Tip denetimi üç pakette temiz. **Telefonda denenmedi.** **Eren yapacak:** PR'ı birleştir, kuralları yükle; Expo'da dene.
+  Açık: kulüp yöneticisinin fikstür ekranı yok (panelden il yöneticisi girer); yarışma videosu yükleme ve kulüp/yayıncı
+  başvurusu Blaze ve sonraki iş; Panel > Uygulama görselleri yükleme Blaze ile.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
@@ -806,7 +830,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Otoparkta kapasite / canlı takip yok, Satılık ve Kiralık için Çarşı tasarımı, **il Vitrini reklam panosu ve gelir kaynağı**
   (önceki "para karşılığı girilmez" notunun yerine).
   Eklendi (3 Kasım akşam): Acil alt sayfaları (H-Veteriner, H-Taksi, H-Diger) ve Sosyal Harmoni iç sayfaları (SH-*),
-  Eren onayladı (3 Kasım). Hepsi koda geçiyor (dal claude/ic-ekranlar). Seyahat şimdiki hâliyle kalır (Eren).
+  Eren onayladı (3 Kasım). Koda geçti (4 Kasım, dal claude/ic-ekranlar; Yapılanlar sonu).
   Fırsatlar (Eren): kaydırmalı kategori kartları, kategori sayfası, fırsattan işletme sayfasına (geri: listeye), İşletmem >
   Fırsatlarım; fırsat sınırı Ücretsiz 1, Pro 5 (PROJE.md 13 madde 35 ve 15 madde 2).
   Profil, Mesajlar, İşletme ekle, Gönderi paylaş: Expo'daki hâli iyi, aynen kalır (Eren); U-* panoları o hâli gösterir.
@@ -844,7 +868,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **Güvenlik kuralları ve dizinler 27 Ekim 2026'da Firebase'e yüklendi** (Eren, kendi bilgisayarından:
   `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`). Kurallar ya da
   dizinler her değiştiğinde aynı komutla yeniden yüklenmeli; Eren'e hatırlat.
-- Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, asistan, taksi durağı (SOS ve hizmetler yapıldı).
+- Acil İhtiyaçlar'ın kalanı: nöbetçi eczane, asistan (SOS, hizmetler ve taksi durakları yapıldı).
 - Hizmet önerileri: admin hepsini, il yöneticisi kendi ilininkileri görür ve inceler. Günlük sınır ve hesap silinince
   önerilerin silinmesi yapıldı (31 Ekim; uygulama siler, sunucudaki günlük temizlik Blaze ile güvenlik ağı).
 - **SOS bildirimi ve arka plan konumu telefonda denenmedi:** kod hazır, ama Expo push adresi için `app.json` içinde EAS proje

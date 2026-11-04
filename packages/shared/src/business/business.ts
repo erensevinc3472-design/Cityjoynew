@@ -1,6 +1,7 @@
 import { cleanPhoto, type Photo } from '../media/photo';
 import type { MembershipTier } from '../models/membership';
 import { isReservedName } from '../organizations/municipalities';
+import { cleanLodging, validateLodging, type LodgingInfo } from '../travel/holiday';
 
 /** İşletme türü (PROJE.md 5.7 adım 1). Belediye, kurum, kulüp ve muhtar hesapları bu akışta değildir. */
 export const BUSINESS_TYPES = ['hizmet', 'esnaf', 'evden-uretim', 'yeme-icme', 'konaklama', 'yol-ustu', 'emlak'] as const;
@@ -208,6 +209,8 @@ export interface BusinessInput {
   roadside?: RoadsideFeature[];
   /** Tesisin tam yeri (şimdilik yalnızca yol üstü tesislerde). */
   geo?: GeoPoint;
+  /** "Otel ve konaklama" türünde zorunlu: tatil fikirleri, belge numarası, gece fiyat aralığı (travel/holiday). */
+  lodging?: LodgingInfo;
   /** Kare logo (kartta ve sayfada yuvarlak). */
   logo?: Photo;
   /** Vitrin fotoğrafları; kademeye göre en çok sayı panelden (Sınırlar > vitrin...). */
@@ -255,7 +258,8 @@ export type BusinessError =
   | 'priceList'
   | 'hours'
   | 'roadside'
-  | 'geo';
+  | 'geo'
+  | 'lodging';
 
 const TIME = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
@@ -281,6 +285,7 @@ export function validateBusiness(b: BusinessInput): BusinessError[] {
   if (roadside && !b.roadside?.length) errors.push('roadside');
   if (b.geo && !validGeo(b.geo)) errors.push('geo');
   else if (roadside && !b.geo) errors.push('geo');
+  if (b.type === 'konaklama' && validateLodging(b.lodging).length) errors.push('lodging');
   if (b.weeklyHours && (b.weeklyHours.length !== 7 || b.weeklyHours.some((d) => d && (!TIME.test(d.open) || !TIME.test(d.close) || d.open === d.close)))) errors.push('hours');
   return errors;
 }
@@ -309,6 +314,7 @@ export function cleanBusinessInput(b: BusinessInput): BusinessInput {
     amenities: AMENITIES.filter((m) => b.amenities?.includes(m)),
     ...(b.roadside?.length ? { roadside: ROADSIDE_FEATURE_IDS.filter((m) => b.roadside!.includes(m)) } : {}),
     ...(b.roadside?.length && b.geo ? { geo: geoPoint(b.geo.lat, b.geo.lng) } : {}),
+    ...(b.type === 'konaklama' && b.lodging ? { lodging: cleanLodging(b.lodging) } : {}),
     ...(b.logo ? { logo: cleanPhoto(b.logo) } : {}),
     gallery: (b.gallery ?? []).map(cleanPhoto),
   };
