@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { TR_REGIONS, TRAVEL_COUNTRIES } from '@cityjoy/shared';
+import { TR_REGIONS, withOpenCountries } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { CoverArt, SceneArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { locationRepository as repo } from '@/lib/locations';
+import { useOpenCountries } from '@/lib/holiday';
 import { REGION_SCENES, useTravelRegions } from '@/lib/travel';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -26,7 +27,8 @@ export default function TravelExploreScreen() {
   const { value: regions, failed, retry } = useTravelRegions();
   const [country, setCountry] = useState('TR');
   const total = TR_REGIONS.reduce((n, r) => n + r.provinceCodes.length, 0);
-  const selected = TRAVEL_COUNTRIES.find((x) => x.code === country)!;
+  const countries = withOpenCountries(useOpenCountries() ?? null);
+  const selected = countries.find((x) => x.code === country)!;
   const countryName = t(`travel.country.${country}`);
 
   return (
@@ -37,7 +39,7 @@ export default function TravelExploreScreen() {
         {/* Ülke şeridi */}
         <ScrollView style={[styles.rail, { backgroundColor: c.hero, borderRightColor: c.border }]} contentContainerStyle={styles.railContent} accessibilityRole="tablist">
           <AppText style={[styles.railLabel, { color: c.heroMuted }]}>{t('travel.countries').toLocaleUpperCase(i18n.language)}</AppText>
-          {TRAVEL_COUNTRIES.map((x) => {
+          {countries.map((x) => {
             const active = x.code === country;
             const name = t(`travel.country.${x.code}`);
             return (

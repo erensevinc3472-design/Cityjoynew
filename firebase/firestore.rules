@@ -287,6 +287,7 @@ service cloud.firestore {
               'engelli-erisimi', 'otopark', 'wifi', 'cocuk-dostu', 'evcil-hayvan', 'rezervasyon'])))
         && validSearchKeys(d, 60)
         && validRoadside(d)
+        && validLodging(d)
         && mediaKeptOrOwn(d, 'logo', 'isletme-logo')
         && vitrinOk(d);
     }
@@ -300,6 +301,19 @@ service cloud.firestore {
                 'oyun-alani', 'bebek-bakim', 'hediyelik'])))
         && (!on || ('roadside' in d && 'geo' in d))
         && (!('geo' in d) || (on && validGeo(d.geo)));
+    }
+    // "Otel ve konaklama" (Seyahat > Planla): tatil fikirleri listeden, belge numarası zorunlu, gece fiyat aralığı.
+    function validLodging(d) {
+      return (d.type != 'konaklama' && !('lodging' in d))
+        || (d.type == 'konaklama' && 'lodging' in d && d.lodging is map
+            && d.lodging.keys().hasOnly(['themes', 'licenseNo', 'nightMin', 'nightMax', 'website'])
+            && d.lodging.themes is list && d.lodging.themes.size() <= 4
+            && d.lodging.themes.hasOnly(['deniz', 'kayak', 'termal', 'kultur', 'doga', 'lezzet', 'aile', 'balayi', 'gorulmesi-gereken'])
+            && d.lodging.licenseNo is string && d.lodging.licenseNo.size() >= 3 && d.lodging.licenseNo.size() <= 40
+            && (!('nightMin' in d.lodging) || (d.lodging.nightMin is int && d.lodging.nightMin > 0))
+            && (!('nightMax' in d.lodging) || (d.lodging.nightMax is int && d.lodging.nightMax > 0))
+            && (!('website' in d.lodging) || (d.lodging.website is string && d.lodging.website.size() <= 300
+                  && d.lodging.website.matches('^https://[^ ]+$'))));
     }
     function validGeo(g) {
       return g is map && g.keys().hasOnly(['lat', 'lng', 'geohash']) && g.keys().hasAll(['lat', 'lng', 'geohash'])
@@ -341,7 +355,7 @@ service cloud.firestore {
     function businessContentKeys() {
       return ['type', 'name', 'categoryIds', 'location', 'address', 'phone', 'whatsapp', 'is24h', 'hoursNote',
               'description', 'priceList', 'searchKeys', 'weeklyHours', 'paymentMethods', 'amenities', 'roadside', 'geo',
-              'logo', 'gallery'];
+              'logo', 'gallery', 'lodging'];
     }
 
     function businessPath(id) {
@@ -431,6 +445,11 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating'])
         && ratingChangeValid(id);
       // Yönetim (admin): doğrulama, kaldırma, kademe, öne çıkma, yetkili çıkarma. İşletmenin bilgilerini değiştiremez.
+      // Ekip, tesisin uymayan tatil fikri etiketini kaldırır (yalnızca çıkarma).
+      allow update: if isAdmin() && resource.data.type == 'konaklama'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lodging'])
+        && request.resource.data.lodging.diff(resource.data.lodging).affectedKeys().hasOnly(['themes'])
+        && resource.data.lodging.themes.hasAll(request.resource.data.lodging.themes);
       allow update: if isAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'verification', 'membership', 'featuredUntil', 'rating', 'managers', 'managerUids'])
         && validManagers(request.resource.data)
@@ -489,6 +508,261 @@ service cloud.firestore {
     }
 
     // İşletme değerlendirmeleri (belge kimliği = yazanın kimliği: kişi başına bir değerlendirme).
+    // ---- Fırsatlar (PROJE.md 13. madde 35): yalnızca doğrulanmış ve yayındaki işletmenin sahibi açar. Bitiş en çok
+    // 90 gün sonra. Aynı anda açık fırsat sınırı (Ücretsiz 1, Pro 5) şimdilik uygulamada denetlenir; sunucu işlevleri
+    // (Blaze) gelince sayaçla kurala bağlanır. ----
+    function dealContentKeys() {
+      return ['businessId', 'category', 'kind', 'value', 'title', 'when', 'terms', 'usage', 'code', 'endsOn'];
+    }
+    function dealEndAt(s) {
+      return timestamp.date(int(s.split('-')[0]), int(s.split('-')[1]), int(s.split('-')[2]));
+    }
+    function dealEndOk(s) {
+      return s is string && s.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && dealEndAt(s) > request.time - duration.value(1, 'd')
+        && dealEndAt(s) <= request.time + duration.value(90, 'd');
+    }
+    function validDeal(d) {
+      return d.category in ['food', 'market', 'sport', 'fun', 'craft', 'health', 'education']
+        && d.kind in ['yuzde', 'tutar', 'hediye', 'ozel-fiyat']
+        && d.value is string && d.value.size() >= 1 && d.value.size() <= 24
+        && d.title is string && d.title.size() >= 3 && d.title.size() <= 80
+        && (!('when' in d) || (d.when is string && d.when.size() <= 80))
+        && (!('terms' in d) || (d.terms is string && d.terms.size() <= 400))
+        && d.usage in ['kod', 'ekran']
+        && (d.usage != 'kod' || (d.get('code', '') is string && d.get('code', '').matches('^[A-Z0-9-]{3,16}$')))
+        && dealEndOk(d.endsOn);
+    }
+    function dealBiz(d) {
+      return get(businessPath(d.businessId)).data;
+    }
+    function dealBizOk(d) {
+      return dealBiz(d).ownerUid == request.auth.uid
+        && dealBiz(d).status == 'yayinda'
+        && dealBiz(d).verification.status == 'dogrulandi'
+        && d.businessName == dealBiz(d).name;
+    }
+    match /deals/{id} {
+      allow read: if resource == null || resource.data.status == 'aktif' || isSelf(resource.data.ownerUid)
+        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(dealContentKeys().concat(['businessName', 'provinceCode', 'districtId', 'ownerUid', 'status', 'stats', 'reportCount', 'createdAt', 'updatedAt']))
+        && validDeal(request.resource.data)
+        && request.resource.data.ownerUid == request.auth.uid
+        && dealBizOk(request.resource.data)
+        && request.resource.data.provinceCode == dealBiz(request.resource.data).location.provinceCode
+        && request.resource.data.districtId == dealBiz(request.resource.data).location.districtId
+        && request.resource.data.status == 'aktif'
+        && request.resource.data.stats == {'views': 0, 'codeViews': 0, 'calls': 0}
+        && request.resource.data.reportCount == 0
+        && request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time;
+      // Sahibi: düzenler, durdurur, yeniden açar, bitirir. Yönetimin gizlediği fırsatı açamaz; yeniden açarken işletme
+      // hâlâ doğrulanmış olmalı. İşletme ve il değişmez.
+      allow update: if isSelf(resource.data.ownerUid)
+        && resource.data.status != 'gizlendi'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(dealContentKeys().concat(['businessName', 'status', 'changedAt', 'updatedAt']))
+        && request.resource.data.businessId == resource.data.businessId
+        && request.resource.data.status in ['aktif', 'durduruldu', 'bitti']
+        && (request.resource.data.status != 'aktif' || dealBizOk(request.resource.data))
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(dealContentKeys()) || validDeal(request.resource.data))
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['changedAt']) || request.resource.data.changedAt == request.time)
+        && request.resource.data.updatedAt == request.time;
+      // Sayaçlar: oturum açmış herkes açık fırsatta tek sayacı bir artırır.
+      allow update: if signedIn() && resource.data.status == 'aktif'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stats'])
+        && request.resource.data.stats.keys().hasOnly(['views', 'codeViews', 'calls'])
+        && request.resource.data.stats.diff(resource.data.stats).affectedKeys().size() == 1
+        && (request.resource.data.stats.views == resource.data.stats.views + 1
+            || request.resource.data.stats.codeViews == resource.data.stats.codeViews + 1
+            || request.resource.data.stats.calls == resource.data.stats.calls + 1);
+      // Şikâyet sayacı şikâyet belgesiyle aynı yazımda bir artar.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])
+        && request.resource.data.reportCount == resource.data.reportCount + 1
+        && !exists(/databases/$(database)/documents/dealReports/$(id + '_' + request.auth.uid))
+        && existsAfter(/databases/$(database)/documents/dealReports/$(id + '_' + request.auth.uid));
+      // İl yöneticisi / moderatör gizler ya da geri açar (geri açılan fırsatı işletme yeniden başlatır).
+      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'moderatedBy', 'updatedAt'])
+        && request.resource.data.status in ['gizlendi', 'durduruldu']
+        && request.resource.data.moderatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      // Sponsorlu öne çıkma yalnızca admin (ödeme sistemi gelene kadar elle).
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['sponsored', 'updatedAt'])
+        && request.resource.data.sponsored is bool;
+      allow delete: if isSelf(resource.data.ownerUid) || isAdmin();
+    }
+    match /dealReports/{rid} {
+      allow read: if isSelf(resource.data.uid) || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
+      allow create: if signedIn()
+        && rid == request.resource.data.dealId + '_' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['dealId', 'uid', 'reason', 'provinceCode', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.reason in ['yaniltici', 'gecersiz', 'uygunsuz', 'diger']
+        && exists(/databases/$(database)/documents/deals/$(request.resource.data.dealId))
+        && request.resource.data.provinceCode == get(/databases/$(database)/documents/deals/$(request.resource.data.dealId)).data.provinceCode
+        && request.resource.data.createdAt == request.time;
+      allow delete: if isSelf(resource.data.uid) || isAdmin();
+    }
+
+    // ---- Sosyal Harmoni: Anketler, Yarışmalar, Şehir Kulüpleri (13. madde 35). Oy: giriş + doğrulanmış e-posta
+    // (telefon doğrulaması Blaze ile), seçenek / yarışmacı başına tek oy, günlük oy sınırı (yeni hesaba düşük). ----
+    function pollPath(id) {
+      return /databases/$(database)/documents/polls/$(id);
+    }
+    function pollVotePath(id) {
+      return /databases/$(database)/documents/pollVotes/$(id);
+    }
+    function contestPath(id) {
+      return /databases/$(database)/documents/contests/$(id);
+    }
+    function entryPath(cid, eid) {
+      return /databases/$(database)/documents/contests/$(cid)/entries/$(eid);
+    }
+    function contestVotePath(id) {
+      return /databases/$(database)/documents/contestVotes/$(id);
+    }
+    function oyOk() {
+      return usageOk('u-' + request.auth.uid, 'oy', userLimit('oy', 30, 5));
+    }
+    function validPoll(d) {
+      return d.question is string && d.question.size() >= 5 && d.question.size() <= 140
+        && d.options is list && d.options.size() >= 2 && d.options.size() <= 6
+        && d.sponsorName is string && d.sponsorName.size() >= 2 && d.sponsorName.size() <= 80
+        && d.provinceCode is string && d.endsOn is string && d.endsAt is timestamp
+        && d.counts is map && d.counts.size() == d.options.size() && d.voteCount is int
+        && d.status in ['yayinda', 'kapali', 'gizlendi'];
+    }
+
+    match /polls/{id} {
+      allow read: if resource.data.status != 'gizlendi' || isAdmin();
+      allow create, update: if isAdmin() && validPoll(request.resource.data);
+      // Oy veren: yalnızca kendi seçeneğinin sayısı ve toplam bir artar; oy belgesi aynı işlemde ilk kez yazılır.
+      allow update: if verified() && resource.data.status == 'yayinda' && request.time < resource.data.endsAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['counts', 'voteCount'])
+        && request.resource.data.voteCount == resource.data.voteCount + 1
+        && !exists(pollVotePath(id + '_' + request.auth.uid))
+        && existsAfter(pollVotePath(id + '_' + request.auth.uid))
+        && request.resource.data.counts.diff(resource.data.counts).affectedKeys()
+             == [getAfter(pollVotePath(id + '_' + request.auth.uid)).data.optionId].toSet()
+        && request.resource.data.counts[getAfter(pollVotePath(id + '_' + request.auth.uid)).data.optionId]
+             == resource.data.counts[getAfter(pollVotePath(id + '_' + request.auth.uid)).data.optionId] + 1;
+      allow delete: if isAdmin();
+    }
+
+    // Oy gizli: yalnızca oy veren okur; değiştirilemez, silinemez.
+    match /pollVotes/{vid} {
+      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow create: if verified()
+        && vid == request.resource.data.pollId + '_' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['pollId', 'uid', 'optionId', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && get(pollPath(request.resource.data.pollId)).data.status == 'yayinda'
+        && request.time < get(pollPath(request.resource.data.pollId)).data.endsAt
+        && request.resource.data.optionId in get(pollPath(request.resource.data.pollId)).data.counts.keys()
+        && getAfter(pollPath(request.resource.data.pollId)).data.voteCount
+             == get(pollPath(request.resource.data.pollId)).data.voteCount + 1
+        && oyOk();
+      allow update, delete: if false;
+    }
+
+    match /contests/{cid} {
+      allow read: if resource.data.status != 'gizlendi' || isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.title is string && request.resource.data.title.size() >= 3 && request.resource.data.title.size() <= 80
+        && request.resource.data.stage in ['il', 'bolge', 'turkiye']
+        && request.resource.data.status in ['katilim', 'oylama', 'sonuc', 'gizlendi']
+        && request.resource.data.joinEndsAt is timestamp && request.resource.data.voteEndsAt is timestamp
+        && request.resource.data.terms is string && request.resource.data.terms.size() <= 6000;
+      allow delete: if isAdmin();
+
+      // Katılım: kişi başına tek (belge kimliği = kullanıcı); ekip onaylar.
+      match /entries/{eid} {
+        allow read: if resource == null || resource.data.status == 'onayli' || isSelf(eid) || isAdmin();
+        allow create: if isSelf(eid) && verified()
+          && get(contestPath(cid)).data.status == 'katilim' && request.time < get(contestPath(cid)).data.joinEndsAt
+          && request.resource.data.keys().hasOnly(['ownerUid', 'displayName', 'mediaUrl', 'note', 'termsAccepted', 'status', 'voteCount', 'createdAt'])
+          && request.resource.data.ownerUid == eid
+          && request.resource.data.displayName is string && request.resource.data.displayName.size() >= 2 && request.resource.data.displayName.size() <= 40
+          && request.resource.data.mediaUrl is string && request.resource.data.mediaUrl.matches('^https://[^ ]+$') && request.resource.data.mediaUrl.size() <= 300
+          && (!('note' in request.resource.data) || (request.resource.data.note is string && request.resource.data.note.size() <= 200))
+          && request.resource.data.termsAccepted == true
+          && request.resource.data.status == 'bekliyor' && request.resource.data.voteCount == 0
+          && request.resource.data.createdAt == request.time;
+        // Onaydan önce katılımcı geri çekebilir.
+        allow delete: if (isSelf(eid) && resource.data.status == 'bekliyor') || isAdmin();
+        allow update: if isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedBy', 'updatedAt'])
+          && request.resource.data.status in ['bekliyor', 'onayli', 'diskalifiye'];
+        // Oy veren: sayı bir artar; oy belgesi aynı işlemde ilk kez yazılır. Kendine oy yok.
+        allow update: if verified() && request.auth.uid != eid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['voteCount'])
+          && request.resource.data.voteCount == resource.data.voteCount + 1
+          && !exists(contestVotePath(cid + '_' + eid + '_' + request.auth.uid))
+          && existsAfter(contestVotePath(cid + '_' + eid + '_' + request.auth.uid));
+      }
+    }
+
+    match /contestVotes/{vid} {
+      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow create: if verified()
+        && request.resource.data.keys().hasOnly(['contestId', 'entryId', 'uid', 'createdAt'])
+        && vid == request.resource.data.contestId + '_' + request.resource.data.entryId + '_' + request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.entryId != request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && get(contestPath(request.resource.data.contestId)).data.status == 'oylama'
+        && request.time < get(contestPath(request.resource.data.contestId)).data.voteEndsAt
+        && get(entryPath(request.resource.data.contestId, request.resource.data.entryId)).data.status == 'onayli'
+        && getAfter(entryPath(request.resource.data.contestId, request.resource.data.entryId)).data.voteCount
+             == get(entryPath(request.resource.data.contestId, request.resource.data.entryId)).data.voteCount + 1
+        && oyOk();
+      allow update, delete: if false;
+    }
+
+    // Kulüpler: il yöneticisi (kurumlar modülü) ekler, doğrular, şehrin kulübünü seçer; kulüp yetkilisi fikstürü girer.
+    function validClub(d) {
+      return d.name is string && d.name.size() >= 2 && d.name.size() <= 60
+        && d.short is string && d.short.size() >= 1 && d.short.size() <= 4
+        && d.sport in ['futbol', 'basketbol', 'voleybol', 'amator', 'diger']
+        && d.provinceCode is string
+        && d.fixtures is list && d.fixtures.size() <= 12
+        && d.managerUids is list && d.managerUids.size() <= 5
+        && d.verified is bool && d.featured is bool && d.hidden is bool;
+    }
+    match /clubs/{id} {
+      allow read: if resource.data.hidden == false || regionAllows('kurumlar', 'duzenle', resource.data.provinceCode, null);
+      allow create: if regionAllows('kurumlar', 'duzenle', request.resource.data.provinceCode, null) && validClub(request.resource.data);
+      allow update: if regionAllows('kurumlar', 'duzenle', resource.data.provinceCode, null)
+        && request.resource.data.provinceCode == resource.data.provinceCode && validClub(request.resource.data);
+      allow update: if signedIn() && request.auth.uid in resource.data.managerUids
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fixtures', 'updatedBy', 'updatedAt'])
+        && request.resource.data.fixtures is list && request.resource.data.fixtures.size() <= 12
+        && request.resource.data.updatedBy == request.auth.uid;
+      allow delete: if regionAllows('kurumlar', 'duzenle', resource.data.provinceCode, null);
+    }
+    match /clubFollows/{fid} {
+      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow create: if signedIn()
+        && fid == request.resource.data.clubId + '_' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['clubId', 'uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // Seyahat > Planla: ekibin temadaki il düzenlemesi (sıra, gizle, dönem, not). Herkes okur, admin yazar.
+    match /holidayThemes/{theme} {
+      allow read: if true;
+      allow write: if isAdmin() && theme in ['deniz', 'kayak', 'termal', 'kultur', 'doga', 'lezzet', 'aile', 'balayi', 'gorulmesi-gereken']
+        && request.resource.data.keys().hasOnly(['places', 'updatedBy', 'updatedAt'])
+        && request.resource.data.places is map && request.resource.data.places.size() <= 81
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+    }
+
     match /businesses/{bid}/reviews/{uid} {
       function biz() {
         return get(businessPath(bid)).data;
@@ -700,6 +974,10 @@ service cloud.firestore {
       return !(k in t) || (t[k] is list && t[k].size() <= 12);
     }
 
+    function needList(m, k) {
+      return !(k in m) || (m[k] is list && m[k].size() <= 12);
+    }
+
     function fuelPrice(f, k) {
       return !(k in f) || (f[k] is number && f[k] >= 1 && f[k] <= 500);
     }
@@ -755,7 +1033,7 @@ service cloud.firestore {
       allow read: if signedIn() && (resource == null || ownsUsage(resource.data.type, resource.data.sid));
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['type', 'sid', 'kind', 'windowStart', 'count'])
-        && request.resource.data.kind in ['gonderi', 'yorum', 'takip', 'aktivite', 'oneri', 'sikayet', 'isletme-gonderi', 'duyuru', 'duyuru-hafta', 'acil', 'etkinlik']
+        && request.resource.data.kind in ['gonderi', 'yorum', 'takip', 'aktivite', 'oneri', 'sikayet', 'isletme-gonderi', 'duyuru', 'duyuru-hafta', 'acil', 'etkinlik', 'oy']
         && request.resource.data.sid is string
         && id == request.resource.data.type + '-' + request.resource.data.sid + '~' + request.resource.data.kind
         && ownsUsage(request.resource.data.type, request.resource.data.sid)
@@ -771,7 +1049,7 @@ service cloud.firestore {
     match /config/{id} {
       // Günlük sınır sayıları (Panel > Sınırlar, yalnızca admin).
       allow write: if isAdmin() && id == 'limits'
-        && request.resource.data.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'sikayet', 'isletmeGonderi', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'oy', 'oyYeni', 'sikayet', 'isletmeGonderi', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
         && limitValue(request.resource.data, 'gonderi')
         && limitValue(request.resource.data, 'gonderiYeni')
         && limitValue(request.resource.data, 'yorum')
@@ -786,6 +1064,8 @@ service cloud.firestore {
         && limitValue(request.resource.data, 'aktiviteYeni')
         && limitValue(request.resource.data, 'oneri')
         && limitValue(request.resource.data, 'oneriYeni')
+        && limitValue(request.resource.data, 'oy')
+        && limitValue(request.resource.data, 'oyYeni')
         && limitValue(request.resource.data, 'sikayet')
         && limitValue(request.resource.data, 'isletmeGonderi')
         && limitValue(request.resource.data, 'muhtarDuyuru')
@@ -830,6 +1110,22 @@ service cloud.firestore {
         && termList(request.resource.data.terms, 'tr') && termList(request.resource.data.terms, 'en')
         && termList(request.resource.data.terms, 'de') && termList(request.resource.data.terms, 'ar')
         && termList(request.resource.data.terms, 'ru')
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      // Diğer İhtiyaçlar eşleşmesi (13. madde 35): durum başına en çok 12 hizmet kimliği; admin yönetir, uygulama okur.
+      allow write: if isAdmin() && id == 'needs'
+        && request.resource.data.keys().hasOnly(['map', 'updatedBy', 'updatedAt'])
+        && request.resource.data.map is map
+        && request.resource.data.map.keys().hasOnly(['yeni-tasindim', 'yogunum', 'tatil', 'hasta', 'yasli-yakin', 'ozel-gun'])
+        && needList(request.resource.data.map, 'yeni-tasindim') && needList(request.resource.data.map, 'yogunum')
+        && needList(request.resource.data.map, 'tatil') && needList(request.resource.data.map, 'hasta')
+        && needList(request.resource.data.map, 'yasli-yakin') && needList(request.resource.data.map, 'ozel-gun')
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      // Seyahat ülkeleri (Panel > Seyahat > Ülkeler): açık ülke kodları; Türkiye her zaman açık.
+      allow write: if isAdmin() && id == 'travelCountries'
+        && request.resource.data.keys().hasOnly(['open', 'updatedBy', 'updatedAt'])
+        && request.resource.data.open is list && request.resource.data.open.size() <= 40
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
       // Ana sayfadaki tanıtım videosu bağlantısı (13. madde 29): admin yönetir; boş ya da https bağlantısı.

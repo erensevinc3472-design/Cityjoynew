@@ -15,12 +15,14 @@ import { AnnouncementCard } from '@/components/announcement-card';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { EventCard } from '@/components/event-card';
+import { GlossyIcon } from '@/components/glossy-icon';
 import { HeroHeader, LocationChip } from '@/components/hero-header';
 import { OfficialProfileCard } from '@/components/official-profile-card';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useAnnouncements } from '@/lib/announcements';
 import { useCityGuideItems } from '@/lib/city-guide';
+import { INSTITUTION_GROUPS } from '@/lib/city-look';
 import { useEvents } from '@/lib/events';
 import { locationRepository as repo } from '@/lib/locations';
 import { useOfficialProfiles } from '@/lib/official-profiles';
@@ -125,6 +127,25 @@ export default function NeighbourhoodScreen() {
         )}
 
         {section(
+          t('neighbourhood.places'),
+          <View style={styles.grid}>
+            {PLACE_GROUPS.map((id) => {
+              const g = INSTITUTION_GROUPS.find((x) => x.id === id)!;
+              return (
+                <Pressable
+                  key={id}
+                  accessibilityRole="button"
+                  onPress={() => router.push({ pathname: '/city/[section]', params: { section: 'onemli-kurumlar', group: id } })}
+                  style={({ pressed }) => [styles.tile, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
+                  <GlossyIcon icon={g.look.icon} colors={g.look.colors} size={36} />
+                  <AppText style={[styles.tileText, { color: c.textStrong }]} numberOfLines={2}>{t(`city.groups.${id}.title`)}</AppText>
+                </Pressable>
+              );
+            })}
+          </View>,
+        )}
+
+        {section(
           t('neighbourhood.announcements'),
           <>
             {mine.length ? mine.slice(0, 5).map((a) => <AnnouncementCard key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />) : announcements ? <AppText variant="caption" muted>{t('neighbourhood.noAnnouncements')}</AppText> : <StateMessage kind="loading" />}
@@ -180,7 +201,13 @@ export default function NeighbourhoodScreen() {
   );
 }
 
+/** Mahalle Meydanı'ndaki yerler (13. madde 35): okullar, aile sağlığı merkezleri, ibadethaneler, ATM'ler, noterler. */
+const PLACE_GROUPS = ['egitim', 'asm', 'ibadethane', 'banka', 'noter'] as const;
+
 const styles = StyleSheet.create({
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  tile: { flexBasis: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: radius.lg, borderWidth: 1 },
+  tileText: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 13.5 },
   content: { gap: spacing.lg, paddingBottom: spacing.xl },
   section: { gap: spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderWidth: 1, borderRadius: radius.md, padding: spacing.md, minHeight: 56 },

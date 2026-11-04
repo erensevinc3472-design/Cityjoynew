@@ -68,8 +68,8 @@
     "exploreHint": "What your neighbourhood and city are sharing"
   },
   "auth": {
-    "welcomeTitle": "Welcome to CityJoy",
-    "welcomeSubtitle": "Information, announcements and services for your province, district and neighbourhood in one place.",
+    "welcomeTitle": "Everything in your neighbourhood, in one place",
+    "welcomeSubtitle": "Announcements, on-duty pharmacies, events and nearby services.",
     "signIn": "Sign in",
     "signUp": "Sign up",
     "email": "Email",
@@ -87,8 +87,16 @@
     "acceptTerms": "I have read and accept the terms of use.",
     "readPrivacy": "I have read the privacy notice on the processing of personal data.",
     "read": "Read",
-    "slideToStart": "Slide to start",
-    "slideToStartHint": "Opens sign-up; you can also tap to start."
+    "slideToStart": "Slide to start exploring",
+    "slideToStartHint": "Opens language selection; you can also tap to start.",
+    "welcomeKicker": "WELCOME",
+    "signInTitle": "Welcome back",
+    "signInSubtitle": "Sign in to your account.",
+    "signUpTitle": "Create an account",
+    "signUpSubtitle": "Get started with just a few details.",
+    "forgotPasswordShort": "Forgot password",
+    "noAccountLead": "No account?",
+    "haveAccountLead": "Already have an account?"
   },
   "errors": {
     "required": "This field is required.",
@@ -206,7 +214,25 @@
     "suggestSignIn": "Sign in to send a suggestion.",
     "suggestError": "Could not send. Check your connection and try again.",
     "cachedNote": "Could not get the latest list; showing the list saved on this phone.",
-    "subcategories": "{{count}} services"
+    "subcategories": "{{count}} services",
+    "searchIn": "Search in {{name}}",
+    "openNow": "Open now",
+    "verifiedOnly": "Verified",
+    "noFilterMatch": "No business matches these filters. Clear them and look again.",
+    "callNumber": "Call {{number}}",
+    "taxiCompanies": "No registered taxi business yet",
+    "profiles": {
+      "veteriner": "If the animal is not breathing, bleeding heavily or poisoned, call the clinic before you set off. At night, use the \"Open now\" filter.",
+      "yol": "Move the car somewhere safe, turn on the hazard lights, set up the warning triangle and wait off the road. If anyone is hurt, call 112 first.",
+      "cilingir": "The locksmith may ask for ID and proof of address before opening the door. If a child, a sick person or a lit stove is inside, call 112.",
+      "dogalgaz": "If you smell gas, do not touch switches or the doorbell, turn off the stove and the valve, open the windows, leave the building and call 187 from outside.",
+      "elektrik": "If you see sparks or smoke or smell burning, switch off the fuse and do not touch the socket. In a fire, call 112.",
+      "tesisat": "In a flood, close the main valve first; if water reaches sockets, switch off the fuse too. For a burst main in the street, call the municipal water authority.",
+      "ambulans": "In a life-threatening emergency call 112, not a private ambulance; 112 is free. Private ambulances are for planned transfers.",
+      "taksi": "Check the plate and the meter before you get in. At night, send the plate number to someone close to you.",
+      "sigorta": "After an accident, think of the injured and safety first (112). Have the report, photos and policy number ready, and check the agent's licence before paying.",
+      "tamirat": "Get the price, duration and materials in writing before work starts; be careful with anyone asking for full payment upfront."
+    }
   },
   "business": {
     "myTitle": "My Business",
@@ -222,7 +248,7 @@
       "esnaf": "Shop / retailer",
       "evden-uretim": "Home-made products / home sales",
       "yeme-icme": "Food & drink",
-      "konaklama": "Accommodation",
+      "konaklama": "Hotels and stays",
       "yol-ustu": "Roadside facility",
       "emlak": "Real estate agency"
     },
@@ -264,7 +290,8 @@
       "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Contact CityJoy for an institution account.",
       "hours": "Write hours like 09:00; opening and closing can't be the same.",
       "roadside": "Choose at least one roadside facility (toilet, fuel…).",
-      "geo": "Set the facility's location: tap \"Use my location\" while you are there."
+      "geo": "Set the facility's location: tap \"Use my location\" while you are there.",
+      "lodging": "Check the accommodation details."
     },
     "hide": "Unpublish (hide)",
     "show": "Publish again",
@@ -403,7 +430,10 @@
     "logo": "Logo (optional)",
     "logoHint": "A square logo looks best; it is shown as a circle.",
     "gallery": "Showcase photos",
-    "galleryHint": "Photos of your shop, products or menu. Add photos you took or have permission to use; they are resized and location data is removed."
+    "galleryHint": "Photos of your shop, products or menu. Add photos you took or have permission to use; they are resized and location data is removed.",
+    "new": "New",
+    "directions": "Directions",
+    "directionsLabel": "Directions to {{name}}"
   },
   "reviews": {
     "title": "Reviews",
@@ -657,8 +687,12 @@
         "hint": "Public libraries"
       },
       "banka": {
-        "title": "Banks",
-        "hint": "Public and private bank branches"
+        "title": "Banks and ATMs",
+        "hint": "Bank branches and ATMs"
+      },
+      "ibadethane": {
+        "title": "Places of worship",
+        "hint": "Mosques, churches, synagogues and cemevis"
       }
     },
     "townhallIntro": "All municipal services in one place",
@@ -670,7 +704,19 @@
     "serviceGuide": "Service guide",
     "otherMunicipalities": "Other district municipalities",
     "districtCount_one": "{{count}} district",
-    "districtCount_other": "{{count}} districts"
+    "districtCount_other": "{{count}} districts",
+    "frequent": "Frequently used",
+    "frequentItem": {
+      "water": "Water fault",
+      "waste": "Waste and cleaning",
+      "police": "Municipal police",
+      "funeral": "Funeral services"
+    },
+    "district": "District",
+    "featured": "Featured",
+    "nearFirst": "Nearest first",
+    "noPrice": "No price info",
+    "listAll": "All ({{count}})"
   },
   "announcements": {
     "title": "Announcements",
@@ -779,42 +825,42 @@
     },
     "toDeals": "Explore deals",
     "backToSocial": "Back to Social Harmony",
-    "dealsNote": "Discounts from verified businesses are coming here soon.",
+    "dealsNote": "Discounts from verified businesses",
     "deals": {
       "food": {
         "name": "Food",
         "tag": "Restaurants and cafés",
-        "desc": "Discounts at restaurants and cafés."
+        "desc": "What shall we eat today? The city's table is on sale."
       },
       "market": {
         "name": "Market",
         "tag": "Daily needs",
-        "desc": "Discounts on groceries and daily shopping."
+        "desc": "A lighter basket, a happier wallet."
       },
       "sport": {
         "name": "Sports",
         "tag": "Gyms and classes",
-        "desc": "Discounts at gyms, pools and classes."
+        "desc": "The sweetest excuse to stay fit."
       },
       "fun": {
         "name": "Fun",
         "tag": "Cinema and games",
-        "desc": "Discounts at cinemas, theatres and play areas."
+        "desc": "Your evening plan is ready."
       },
       "craft": {
         "name": "Local shops",
         "tag": "Your neighbourhood",
-        "desc": "Discounts from shops in your neighbourhood."
+        "desc": "Your neighbourhood's craftspeople, at a price just for you."
       },
       "health": {
         "name": "Health",
         "tag": "Care and health",
-        "desc": "Discounts on health and care services."
+        "desc": "Take care of yourself, for less this time."
       },
       "education": {
         "name": "Education",
         "tag": "Courses and books",
-        "desc": "Discounts on courses, books and stationery."
+        "desc": "The perfect time to learn something new."
       }
     }
   },
@@ -849,7 +895,8 @@
     "gatheringDistrict": "No assembly area is listed for your neighbourhood; showing those in {{place}}. Check e-Devlet or AFAD for official information.",
     "noGathering": "Assembly area details have not been added yet. You can look them up on e-Devlet (\"Emergency Assembly Area\" search).",
     "municipalities": "My municipality",
-    "feedSoon": "The neighbourhood feed (posts from neighbours) will come with Discover."
+    "feedSoon": "The neighbourhood feed (posts from neighbours) will come with Discover.",
+    "places": "In your neighbourhood"
   },
   "activities": {
     "title": "Activities",
@@ -949,7 +996,15 @@
       "ogrenme": "Learning",
       "gonullu": "Volunteering",
       "diger": "Other"
-    }
+    },
+    "subtitle": "{{place}} · meet people",
+    "thisWeek": "This week",
+    "exactOnJoin": "Exact spot shown once you join",
+    "join": "I'm in",
+    "upcoming": "Upcoming activities",
+    "countIn": "{{place}} · {{count}} activities",
+    "firstMeetTitle": "For a first meet-up",
+    "firstMeetTips": "Meet somewhere public and busy. Tell someone close where you're going. If anything feels wrong, report the activity with one tap."
   },
   "explore": {
     "title": "Explore",
@@ -1159,7 +1214,10 @@
       "tooLong": "Videos can be up to {{max}} seconds. Trim it and choose again.",
       "tooLarge": "The video is too large (max 40 MB). Choose a shorter or lower-resolution video."
     },
-    "verifiedBusiness": "Verified business"
+    "verifiedBusiness": "Verified business",
+    "seeComments": "View all {{count}} comments",
+    "seen": "I saw it",
+    "seenHint": "Write where you saw it in a comment"
   },
   "news": {
     "title": "News",
@@ -1173,8 +1231,8 @@
     "needLocation": "Choose your location to see local news.",
     "empty": "There is no official news in your area yet.",
     "loadError": "News could not be loaded.",
-    "readingTime_one": "{{count}} minute read",
-    "readingTime_other": "{{count}} minute read",
+    "readingTime_one": "{{count}} min read",
+    "readingTime_other": "{{count}} min read",
     "smaller": "A− Smaller text",
     "larger": "A+ Larger text",
     "share": "Share",
@@ -1188,7 +1246,12 @@
       "saglik": "Health",
       "cevre": "Environment",
       "ekonomi": "Economy"
-    }
+    },
+    "subtitle": "{{place}} · with sources",
+    "official": "Official news",
+    "sourceNote": "Every story shows its source. Publisher stories show only a headline and short summary; the full text is on the source's site. The app never adds a \"breaking\" label itself.",
+    "publisherTitle": "Run a local news site?",
+    "publisherText": "Apply as a publisher and your stories will appear here."
   },
   "search": {
     "title": "Search",
@@ -1630,7 +1693,9 @@
     "empty": "No cafés or restaurants are listed in {{province}} yet. Owners can join for free from My business.",
     "inviteTitle": "Get your venue listed here",
     "inviteBody": "Own a café or restaurant? Join for free from My business so your menu, hours and reviews show here.",
-    "inviteCta": "Add my business"
+    "inviteCta": "Add my business",
+    "sortNear": "Nearest",
+    "sortLiked": "Most liked"
   },
   "showcase": {
     "title": "{{city}} Showcase",
@@ -2005,5 +2070,348 @@
       "change": "If you change your neighbourhood, the badge is removed automatically.",
       "limit": "The badge is a sign of trust; it can be bypassed with fake-location apps, so it is not proof on its own."
     }
+  },
+  "onboarding": {
+    "step": "Step {{n}} of {{total}}",
+    "locationTitle": "Let us show what's near you",
+    "locationDesc": "We use your location to find your neighbourhood and tailor content for you.",
+    "locationWhy1": "Announcements for your neighbourhood and district",
+    "locationWhy2": "On-duty pharmacies and nearby services",
+    "locationWhy3": "Sending your location to loved ones in an emergency (SOS)",
+    "locationNote": "Your location isn't shared with anyone. If you don't allow it, you can pick your neighbourhood from a list.",
+    "locationFound": "Based on your location: {{place}}.",
+    "change": "Change",
+    "notifyTitle": "Don't miss important announcements",
+    "notifyDesc": "We only send notifications that are useful to you.",
+    "notifySample1": "Urgent · Planned water outage in your neighbourhood",
+    "notifySample2": "Mukhtar's office · Opening hours changed",
+    "notifySample3": "New message · Is the bike still for sale?",
+    "targetingConsent": "Send me notifications suited to my age and, optionally, my gender and occupation.",
+    "notifyNote": "Both are optional; you can turn them off in Settings at any time."
+  },
+  "deals": {
+    "title": "Deals",
+    "empty": "There are no open deals in this category right now.",
+    "ownerHint": "Own a business? Verified businesses add deals for free in Profile > My business > My deals.",
+    "loadError": "Couldn't load deals.",
+    "sponsored": "Sponsored",
+    "updated": "Updated",
+    "daysLeft": "{{count}} days left",
+    "lastDay": "Last day",
+    "until": "Until {{date}}",
+    "showCode": "Show code",
+    "codeLabel": "Say this code at the till",
+    "showScreen": "Show this screen at the till",
+    "terms": "Terms",
+    "noTerms": "No extra terms.",
+    "always": "Every day, during opening hours",
+    "report": "Report",
+    "reportTitle": "What's wrong with this deal?",
+    "reportDone": "Thanks, your report was sent to the city moderators.",
+    "reportReasons": {
+      "yaniltici": "Misleading",
+      "gecersiz": "The business didn't honour it",
+      "uygunsuz": "Inappropriate content",
+      "diger": "Other"
+    },
+    "kinds": {
+      "yuzde": "Percentage off",
+      "tutar": "Amount off",
+      "hediye": "Freebie",
+      "ozel-fiyat": "Special price"
+    },
+    "mine": {
+      "title": "My deals",
+      "add": "New deal",
+      "empty": "You haven't added a deal yet. Deals appear in Social Harmony > Deals and on your business page.",
+      "needVerified": "Your business must be verified to add deals.",
+      "limit": "You can have at most {{count}} open deals at once. Pause or end one first.",
+      "stats": "{{views}} views · {{codes}} codes · {{calls}} calls",
+      "edit": "Edit",
+      "pause": "Pause",
+      "resume": "Resume",
+      "end": "End",
+      "endConfirm": "End this deal? An ended deal can't be reopened.",
+      "status": {
+        "aktif": "Live",
+        "durduruldu": "Paused",
+        "bitti": "Ended",
+        "gizlendi": "Removed by moderators"
+      },
+      "expired": "Expired"
+    },
+    "form": {
+      "titleNew": "New deal",
+      "titleEdit": "Edit deal",
+      "category": "Category",
+      "kind": "Deal type",
+      "value": "Rate or value",
+      "valueHint": "E.g. 20%, 50 TL, buy one get one free",
+      "dealTitle": "What is it valid on?",
+      "dealTitleHint": "E.g. The whole breakfast menu",
+      "when": "Days and hours (optional)",
+      "whenHint": "E.g. Weekdays 12:00-15:00. Leave empty for every day.",
+      "endsOn": "End date (up to 90 days)",
+      "endsOnHint": "YYYY-MM-DD, e.g. {{date}}. It is removed automatically at the end of that day.",
+      "terms": "Terms (optional)",
+      "termsHint": "E.g. Once per table, not valid for takeaway.",
+      "usage": "How is it used?",
+      "usageKod": "A code is said at the till",
+      "usageEkran": "The screen is shown",
+      "code": "Code",
+      "codeHint": "3-16 letters or digits, e.g. COFFEE20",
+      "changedNote": "If you change the value or terms of a live deal, users will see \"Updated\".",
+      "legal": "The business is responsible for the deal being accurate. Misleading deals are removed after reports.",
+      "save": "Publish",
+      "saveEdit": "Save",
+      "errors": {
+        "value": "Enter the rate or value (up to 24 characters).",
+        "title": "Say what it is valid on (3-80 characters).",
+        "when": "Days and hours can be up to 80 characters.",
+        "terms": "Terms can be up to 400 characters.",
+        "code": "The code must be 3-16 letters or digits.",
+        "endsOn": "The end date must be within the next 90 days.",
+        "save": "Couldn't save. Is your business verified and are you online?"
+      }
+    }
+  },
+  "taxi": {
+    "stands": "Taxi stands",
+    "nearest": "Nearest stand",
+    "findNear": "Find nearest",
+    "finding": "Getting location…",
+    "distance": "{{km}} km",
+    "unverified": "Not verified",
+    "call": "Call",
+    "route": "Directions",
+    "fare": "Fares: {{fare}}",
+    "noPhone": "This stand's phone number is unknown; the record comes from the map. You can go there with directions.",
+    "source": "Stand details come from OpenStreetMap and official records and may have changed.",
+    "empty": "No taxi stands recorded in this province yet.",
+    "loadError": "Couldn't load taxi stands."
+  },
+  "needs": {
+    "title": "Other needs",
+    "empty": "No services chosen for this situation yet.",
+    "note": "These lists show the services most searched for in this situation. If you can't find yours, use the search in Urgent Needs.",
+    "items": {
+      "yeni-tasindim": {
+        "title": "Just moved",
+        "hint": "Movers, repairs, cleaning",
+        "intro": "Services you may need while settling into your new home."
+      },
+      "yogunum": {
+        "title": "I'm too busy",
+        "hint": "Cleaning, water, groceries",
+        "intro": "Services that make life easier when you're short on time."
+      },
+      "tatil": {
+        "title": "Going on holiday",
+        "hint": "Pets, garden, security",
+        "intro": "For your home and your pet while you're away."
+      },
+      "hasta": {
+        "title": "I'm ill",
+        "hint": "Home care, transfer, cleaning",
+        "intro": "Services to support you while you recover. In a life-threatening emergency, call 112."
+      },
+      "yasli-yakin": {
+        "title": "Caring for an older relative",
+        "hint": "Care, physiotherapy, transfer",
+        "intro": "For the care and daily needs of older relatives."
+      },
+      "ozel-gun": {
+        "title": "Special occasion",
+        "hint": "Events, cake, photography",
+        "intro": "For a wedding, birthday or celebration."
+      }
+    }
+  },
+  "polls": {
+    "title": "Polls",
+    "subtitle": "Open polls for {{place}}",
+    "needLocation": "Choose your province to see polls.",
+    "loadError": "Polls could not be loaded.",
+    "empty": "No open polls right now.",
+    "signIn": "Sign in to vote.",
+    "verifyEmail": "Verify your email to vote.",
+    "finished": "Finished polls",
+    "note": "Institutions and businesses publish polls through the CityJoy team; each poll shows who prepared it.",
+    "lastDay": "Last day today",
+    "closed": "Finished",
+    "by": "By {{name}}",
+    "send": "Send my vote",
+    "secret": "Your vote is secret; results appear after you vote.",
+    "youVoted": "You voted. Only you can see your choice.",
+    "voteError": "Vote could not be sent. Try again.",
+    "daysLeft_one": "{{count}} day left",
+    "daysLeft_other": "{{count}} days left",
+    "voters_one": "{{count}} participant",
+    "voters_other": "{{count}} participants"
+  },
+  "contests": {
+    "title": "Contests",
+    "one": "Contest",
+    "subtitle": "{{place}} and nationwide",
+    "needLocation": "Choose your province to see contests.",
+    "loadError": "Contests could not be loaded.",
+    "empty": "No contests right now. New ones are announced here.",
+    "gone": "This contest was not found.",
+    "prized": "With prize",
+    "prize": "Prize: {{prize}}",
+    "joinOpen": "Entries open",
+    "voteOpen": "Voting open",
+    "results": "Results out",
+    "joinUntil": "Enter by {{date}}",
+    "voteUntil": "Voting ends {{date}}",
+    "finished": "Finished contests",
+    "note": "Entry is free. The winner of each stage moves on to the next.",
+    "stages": {
+      "il": "Province",
+      "bolge": "Region",
+      "turkiye": "Türkiye"
+    },
+    "entry": {
+      "bekliyor": "Your entry was received and is being reviewed.",
+      "onayli": "Your entry was approved and appears in voting.",
+      "diskalifiye": "Your entry was not accepted because it did not meet the terms."
+    },
+    "signIn": "Sign in to enter and vote.",
+    "verifyEmail": "Verify your email to enter and vote.",
+    "join": "Enter",
+    "terms": "Terms",
+    "hideTerms": "Hide terms",
+    "leaders": "Leaders",
+    "ranking": "Final ranking",
+    "noEntries": "No approved entries yet.",
+    "vote": "Vote",
+    "voted": "Voted",
+    "voteError": "Vote failed. Try again.",
+    "rulesTitle": "Voting rules",
+    "rules": "Sign-in and a verified email are required. One vote per contestant, no voting for yourself. There is a daily vote limit; suspicious votes are not counted.",
+    "fields": {
+      "name": "Display name",
+      "url": "Video link",
+      "urlHint": "Upload your video to a video site and paste the link (https://).",
+      "note": "Short note (optional)",
+      "accept": "I have read and accept the terms."
+    },
+    "errors": {
+      "name": "Name must be 2-40 characters.",
+      "url": "Enter a video link starting with https://.",
+      "note": "Note is at most 200 characters.",
+      "terms": "Accept the terms to enter."
+    },
+    "joinError": "Entry could not be sent. Try again.",
+    "send": "Send entry",
+    "cancel": "Cancel",
+    "entrants_one": "{{count}} entrant",
+    "entrants_other": "{{count}} entrants",
+    "votes_one": "{{count}} vote",
+    "votes_other": "{{count}} votes"
+  },
+  "clubs": {
+    "title": "City Clubs",
+    "subtitle": "Clubs and matches in {{place}}",
+    "needLocation": "Choose your province to see clubs.",
+    "loadError": "Clubs could not be loaded.",
+    "empty": "No clubs added in your province yet.",
+    "all": "Clubs",
+    "cityClub": "City club",
+    "verified": "Verified",
+    "nextMatch": "Next match",
+    "noFixture": "No fixtures yet.",
+    "home": "Home",
+    "away": "Away",
+    "follow": "Follow",
+    "following": "Following",
+    "ticket": "Tickets",
+    "signIn": "Sign in to follow the club.",
+    "followError": "Could not update. Try again.",
+    "applyTitle": "Run a club? Apply",
+    "applyText": "Clubs apply with documents; once verified they enter their own fixtures.",
+    "sports": {
+      "futbol": "Football",
+      "basketbol": "Basketball",
+      "voleybol": "Volleyball",
+      "amator": "Amateur league",
+      "diger": "Other"
+    }
+  },
+  "lodging": {
+    "kinds": {
+      "konak-otel": "Hotel",
+      "konak-butik": "Boutique hotel",
+      "konak-termal": "Thermal hotel",
+      "konak-pansiyon": "Guesthouse",
+      "konak-apart": "Apart hotel",
+      "konak-gunluk-ev": "Holiday home",
+      "konak-bungalov": "Bungalow",
+      "konak-kamp": "Camping and glamping"
+    },
+    "kindsHint": "Type of property (up to 2).",
+    "title": "Accommodation details",
+    "hint": "These details are needed for your property to appear in Travel > Plan. Only verified properties are listed.",
+    "themes": "Which holiday ideas does it suit? (up to 4)",
+    "license": "Tourism licence number",
+    "licenseHint": "Tourism operation certificate or municipal licence number. Our team verifies it.",
+    "nightMin": "Lowest nightly price (TL)",
+    "nightMax": "Highest nightly price (TL)",
+    "website": "Booking website (optional)",
+    "websiteHint": "Your own site, starting with https://.",
+    "errors": {
+      "themes": "Pick 1 to 4 holiday ideas.",
+      "license": "The licence number must be 3-40 characters.",
+      "price": "Check the nightly prices (lowest cannot exceed highest).",
+      "website": "The website must start with https://."
+    },
+    "priceTable": "Rooms and prices",
+    "priceTableNote": "For example \"Double room, breakfast included: 2,400 TL\".",
+    "nightPrice": "Nightly price",
+    "perNight": "{{price}} TL / night",
+    "bookDirect": "You book directly with the property (phone or its own site). CityJoy does not act as an intermediary or take payment."
+  },
+  "holiday": {
+    "themes": {
+      "deniz": "Sea",
+      "kayak": "Ski",
+      "termal": "Thermal",
+      "kultur": "Culture",
+      "doga": "Nature",
+      "lezzet": "Food",
+      "aile": "Family",
+      "balayi": "Honeymoon",
+      "gorulmesi-gereken": "Must see"
+    },
+    "hints": {
+      "deniz": "Bays, beaches, blue flags",
+      "kayak": "Snow, slopes and chalets",
+      "termal": "Hot springs, healing water, rest",
+      "kultur": "Ancient cities, museums, old bazaars",
+      "doga": "Plateaus, forests, waterfalls",
+      "lezzet": "Local cuisine, vineyards, markets",
+      "aile": "Child-friendly stays and activities",
+      "balayi": "Romantic, quiet getaways",
+      "gorulmesi-gereken": "Turkey's best-known places"
+    },
+    "title": "Plan a holiday",
+    "subtitle": "TravelJoy",
+    "turkiye": "Turkey",
+    "abroad": "Abroad",
+    "pickTheme": "What kind of holiday do you want?",
+    "note": "Places come from verified properties and our team's picks.",
+    "abroadSoon": "Holiday ideas abroad are coming soon. Countries open as their content is ready.",
+    "abroadHint": "Holiday ideas in preparation",
+    "km": "{{km}} km",
+    "from": "{{price}} TL / night",
+    "noPlaces": "No verified properties for this idea yet.",
+    "placesNote": "Distance is an approximate road distance.",
+    "knowCity": "Get to know {{name}}",
+    "knowCityHint": "Places to see, routes, local food",
+    "staysTitle": "Where to stay",
+    "noStays": "No verified properties here yet.",
+    "ad": "Ad",
+    "stays_one": "{{count}} property",
+    "stays_other": "{{count}} properties"
   }
 }

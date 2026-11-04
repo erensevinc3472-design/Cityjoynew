@@ -80,6 +80,7 @@ export default function HomeScreen() {
 
   const header = (
     <HeroHeader
+      compact
       title="CityJoy"
       left={{ icon: 'menu', label: t('menu.open'), onPress: () => setMenuOpen(true) }}
       right={

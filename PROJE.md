@@ -170,6 +170,11 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
     Önizleme **(Eren onayladı, 3 Kasım 2026)**: PL-Giris, PL-Tema, PL-Konaklama, PL-Tesis, PL-Isletme, PL-Yurtdisi ve Panel > Seyahat >
     Tatil fikirleri (P-Tatil). Eski T-* önerisi ve "Planla ve Yola Çık" sorusu kaldırıldı. Koda geçerken eski Planla
     ekranındaki yol ücreti tahmini ve Panel > Yolculuk fiyatları kaldırılır ya da gizlenir.
+    **Koda geçti (4 Kasım 2026):** eski yol ücreti tahmini ve Panel > Yolculuk fiyatları kaldırıldı. Teknik kararlar (Claude):
+    tesis türleri işletmenin kategorilerinde ("konak-" önekli, en çok 2), tatil fikri etiketleri en çok 4; belge numarası
+    zorunlu (3-40 karakter); yalnızca doğrulanmış tesis listelenir; yer mesafesi il merkezleri arası yol tahmini; ekibin
+    düzenlemesi tema başına tek belge (holidayThemes/{tema}); açık ülkeler config/travelCountries (Türkiye hep açık).
+    Rezervasyon ve ödeme uygulamada yok ("tesisle doğrudan").
   - **Panel > Seyahat menüsü (3 Kasım 2026, Eren istedi):** iki alt başlık: **Keşfet ve Öğren** ve **Tatil fikirleri**.
     Keşfet ve Öğren kodda zaten var (`apps/panel/src/pages/travel-page.tsx`, 28-29 Ekim): Bölgeler, Şehirler, Gezilecek
     yerler, Hazır rotalar, Yöresel, Başkanlarla Keşif, Kareler sekmeleri; tasarım tuvaline P-Sy* panoları olarak eklendi.
@@ -749,9 +754,9 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
       yol yardım aynı hizmet listesi kalıbını kullanır (kategoriye göre değişen yalnızca üst uyarı, arama ipucu ve filtreler;
       tuvalde Veteriner örneği). Taksi durakları: en yakın durak büyük kartta, telefonu olmayan duraklar harita kaydı
       (OSM, doğrulanmadı), tarife yalnızca panelden girilirse. Diğer İhtiyaçlar: durum kartları (yeni taşındım, yoğunum,
-      tatil, hasta, yaşlı yakın, özel gün) ilgili hizmet listelerine götürür; eşleşmeyi admin panelden belirler. Önizleme,
-      onay bekliyor.
-    - **Sosyal Harmoni iç sayfaları (önizleme, onay bekliyor):** Aktiviteler (tam yer katılınca, ilk buluşma ipuçları),
+      tatil, hasta, yaşlı yakın, özel gün) ilgili hizmet listelerine götürür; eşleşmeyi admin panelden belirler. **Eren onayladı**
+      (3 Kasım 2026).
+    - **Sosyal Harmoni iç sayfaları (Eren onayladı, 3 Kasım 2026):** Aktiviteler (tam yer katılınca, ilk buluşma ipuçları),
       Haberler (Bölgesel/Genel, kaynak adı ve "kaynağa git"), Yarışmalar (il > bölge > Türkiye, oy kuralları, şartname),
       Anketler (hazırlayan adı, gizli oy, sonuç oy verince), Şehir Kulüpleri (üstte il yöneticisinin seçtiği kulüp, fikstür
       kulüpten), Fırsatlar (Eren: Sosyal Harmoni'nin altında, aşağı kaydırınca; her kategori ayrı kart, yana kaydırılır; karta dokununca o kategorinin kendi sayfası açılır. Kartın üstündeki yazı kart değiştikçe değişir (Eren): Yemek "Bugün ne yesek? Şehrin sofrası indirimde.", Market "Sepet hafifler, cüzdan sevinir.", Spor "Formda kalmanın en tatlı bahanesi.", Eğlence "Akşam planın hazır.", Esnaf "Mahallenin ustası, sana özel fiyatla.", Sağlık "Kendine iyi bak, bu kez daha uygun.", Eğitim "Yeni bir şey öğrenmenin tam zamanı." (5 dilde dil dosyasından).

@@ -10,8 +10,9 @@ import { AuditLogPage } from './pages/audit-log-page';
 import { BusinessesPage } from './pages/businesses-page';
 import { CityGuidePage } from './pages/city-guide-page';
 import { RoadsidePage } from './pages/roadside-page';
-import { TravelPricesPage } from './pages/travel-prices-page';
+import { HolidayPage } from './pages/holiday-page';
 import { ShowcasePage } from './pages/showcase-page';
+import { DealsPage } from './pages/deals-page';
 import { TravelPage } from './pages/travel-page';
 import { EmergencyNumbersPage } from './pages/emergency-numbers-page';
 import { EventsPage } from './pages/events-page';
@@ -23,6 +24,8 @@ import { OccupationsPage } from './pages/occupations-page';
 import { OrganizationsPage } from './pages/organizations-page';
 import { ProfilePage } from './pages/profile-page';
 import { ServiceCategoriesPage } from './pages/service-categories-page';
+import { NeedsPage } from './pages/needs-page';
+import { ClubsPage, ContestsPage, PollsPage } from './pages/community-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { LimitsPage } from './pages/limits-page';
 import { NotificationsPage } from './pages/notifications-page';
@@ -58,6 +61,10 @@ const router = createHashRouter([
       { path: 'meslekler', element: <OccupationsPage /> },
       { path: 'acil-numaralar', element: <EmergencyNumbersPage /> },
       { path: 'hizmet-kategorileri', element: <ServiceCategoriesPage /> },
+      { path: 'diger-ihtiyaclar', element: <NeedsPage /> },
+      { path: 'anketler', element: <PollsPage /> },
+      { path: 'yarismalar', element: <ContestsPage /> },
+      { path: 'kulupler', element: <ClubsPage /> },
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
@@ -68,9 +75,10 @@ const router = createHashRouter([
       { path: 'etkinlikler', element: <EventsPage /> },
       { path: 'sehir-rehberi', element: <CityGuidePage /> },
       { path: 'sehir-vitrini', element: <ShowcasePage /> },
+      { path: 'firsatlar', element: <DealsPage /> },
       { path: 'yol-ustu-verisi', element: <RoadsidePage /> },
       { path: 'seyahat', element: <TravelPage /> },
-      { path: 'yolculuk-fiyatlari', element: <TravelPricesPage /> },
+      { path: 'tatil-fikirleri', element: <HolidayPage /> },
       { path: 'kurumlar', element: <OrganizationsPage /> },
       { path: 'profil', element: <ProfilePage /> },
       { path: 'yetkiler', element: <GrantsPage /> },

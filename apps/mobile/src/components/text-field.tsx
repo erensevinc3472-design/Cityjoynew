@@ -3,7 +3,7 @@ import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
 import { useSettings } from '@/lib/settings';
 import { fonts, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
-import { useThemeColors } from '@/theme/use-theme';
+import { useGlass, useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
 
 interface Props extends Omit<TextInputProps, 'style'> {
@@ -16,6 +16,7 @@ interface Props extends Omit<TextInputProps, 'style'> {
 export function TextField({ label, error, hint, ...input }: Props) {
   const c = useThemeColors();
   const { rtl } = useSettings();
+  const glass = useGlass();
   const [focused, setFocused] = useState(false);
   return (
     <View style={styles.wrap}>
@@ -29,8 +30,8 @@ export function TextField({ label, error, hint, ...input }: Props) {
           input.multiline && styles.multiline,
           {
             color: c.textStrong,
-            backgroundColor: c.surfaceStrong,
-            borderColor: error ? c.danger : focused ? c.primary : c.border,
+            backgroundColor: glass ? (focused ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.14)') : c.surfaceStrong,
+            borderColor: error ? c.danger : focused ? c.primary : glass ? 'rgba(255, 255, 255, 0.14)' : c.border,
             textAlign: rtl ? 'right' : 'left',
           },
         ]}

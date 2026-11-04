@@ -1,16 +1,19 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useState, type ComponentProps } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState, type ComponentProps } from 'react';
+import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { findCategory, localized, rankBusinesses, type RankedBusinesses } from '@cityjoy/shared';
+import { findCategory, localized, openState, rankBusinesses, type Business, type RankedBusinesses } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BusinessCard } from '@/components/business-card';
 import { HeroHeader } from '@/components/hero-header';
+import { FilterChip, FilterRow } from '@/components/inner';
 import { Screen } from '@/components/screen';
+import { SearchField } from '@/components/search-field';
 import { StateMessage } from '@/components/state-message';
+import { TaxiStands } from '@/components/taxi-stands';
 import { locationRepository } from '@/lib/locations';
 import { useServiceCategories } from '@/lib/service-categories';
 import { businessRepository } from '@/lib/services';
@@ -22,9 +25,29 @@ import { useThemeColors } from '@/theme/use-theme';
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
 /**
+ * Kategoriye göre değişen üst uyarı (13. madde 35: "çekici sayfası gibi"; kategoriye göre yalnızca uyarı, arama ipucu ve
+ * filtreler değişir). Anahtar kategori ya da üst kategori kimliği; `call` uyarıdaki numara (ör. gaz kokusunda 187).
+ */
+const PROFILES: Record<string, { key: string; call?: string }> = {
+  'acil-veteriner': { key: 'veteriner' },
+  cekici: { key: 'yol' },
+  'yol-yardim': { key: 'yol' },
+  'oto-kurtarma': { key: 'yol' },
+  cilingir: { key: 'cilingir' },
+  'dogalgaz-servisi': { key: 'dogalgaz', call: '187' },
+  elektrikci: { key: 'elektrik' },
+  tesisatci: { key: 'tesisat' },
+  'ozel-ambulans': { key: 'ambulans', call: '112' },
+  taksi: { key: 'taksi' },
+  sigorta: { key: 'sigorta' },
+  'tamirat-tadilat': { key: 'tamirat' },
+};
+
+/**
  * Bir hizmetin işletme listesi, kullanıcının ilinde. Sıralama herkes için aynı kural (Karar, Eren;
  * PROJE.md 5.6): en çok 2 "Reklam" kartı, sonra doğrulanmış, puan, ilçe, güncellik. Acil kategoride
- * 112 hatırlatması üstte durur.
+ * 112 hatırlatması üstte durur. Liste içinde arama, ilçe, "Şu an açık" ve "Doğrulanmış" filtreleri; Taksi'de
+ * üstte taksi durakları.
  */
 export default function ServiceCategoryScreen() {
   const { t } = useTranslation();
@@ -39,10 +62,16 @@ export default function ServiceCategoryScreen() {
   const parent = category?.parentId ? findCategory(all, category.parentId) : undefined;
   const province = location ? locationRepository.getProvince(location.provinceCode)?.name : undefined;
   const subtitle = [parent && localized(parent.names, lang), province].filter(Boolean).join(' · ');
+  const name = category ? localized(category.names, lang) : t('services.title');
+  const profile = PROFILES[id] ?? (category?.parentId ? PROFILES[category.parentId] : undefined);
 
   const [ranked, setRanked] = useState<RankedBusinesses | null>(null);
   const [error, setError] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [query, setQuery] = useState('');
+  const [district, setDistrict] = useState<string | null>(null);
+  const [openNow, setOpenNow] = useState(false);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
 
   const provinceCode = location?.provinceCode;
   const districtId = location?.districtId;
@@ -58,26 +87,61 @@ export default function ServiceCategoryScreen() {
 
   useEffect(load, [load]);
 
+  const everyone = useMemo(() => (ranked ? [...ranked.featured, ...ranked.others] : []), [ranked]);
+  const districts = useMemo(() => {
+    const ids = [...new Set(everyone.map((b) => b.location.districtId).filter((x): x is string => !!x))];
+    return ids.map((d) => ({ id: d, name: locationRepository.getDistrict(d)?.name ?? d })).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+  }, [everyone]);
+  const q = query.trim().toLocaleLowerCase('tr');
+  const now = new Date();
+  const keep = (b: Business) =>
+    (!district || b.location.districtId === district) &&
+    (!verifiedOnly || b.verification.status === 'dogrulandi') &&
+    (!openNow || !!openState(b, now)?.open) &&
+    (!q || `${b.name} ${b.description ?? ''} ${locationRepository.getDistrict(b.location.districtId ?? '')?.name ?? ''}`.toLocaleLowerCase('tr').includes(q));
+  const featured = ranked ? ranked.featured.filter(keep) : [];
+  const others = ranked ? ranked.others.filter(keep) : [];
+  const total = everyone.length;
+  const filtered = !!q || !!district || openNow || verifiedOnly;
+  const anyUnverified = [...featured, ...others].some((b) => b.verification.status !== 'dogrulandi');
+
   const header = (
-    <HeroHeader
-      title={category ? localized(category.names, lang) : t('services.title')}
-      subtitle={subtitle || undefined}
-      onBack={() => (router.canGoBack() ? router.back() : router.replace('/services'))}
-    />
+    <HeroHeader title={name} subtitle={subtitle || undefined} onBack={() => (router.canGoBack() ? router.back() : router.replace('/services'))} />
   );
-  const total = ranked ? ranked.featured.length + ranked.others.length : 0;
-  const anyUnverified = !!ranked && [...ranked.featured, ...ranked.others].some((b) => b.verification.status !== 'dogrulandi');
 
   return (
     <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {category?.urgent ? (
-          <>
-            <View style={[styles.warning, { backgroundColor: c.dangerSoft, borderColor: c.danger }]}>
-              <MaterialIcons name={'warning-amber' as IconName} size={22} color={c.danger} />
-              <AppText variant="caption" style={styles.flex}>{t('services.urgentNote')}</AppText>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        {category?.urgent || profile ? (
+          <View style={[styles.warning, category?.urgent ? { backgroundColor: c.dangerSoft, borderColor: c.danger } : { backgroundColor: c.accentSoft, borderColor: c.accentBorder }]}>
+            <MaterialIcons name={(category?.urgent ? 'warning-amber' : 'info-outline') as IconName} size={22} color={category?.urgent ? c.danger : c.primary} />
+            <View style={styles.flex}>
+              <AppText variant="caption">{profile ? t(`services.profiles.${profile.key}`) : t('services.urgentNote')}</AppText>
+              {profile?.call ? (
+                <AppText accessibilityRole="link" onPress={() => Linking.openURL(`tel:${profile.call}`).catch(() => {})} style={[styles.callLink, { color: c.danger }]}>
+                  {t('services.callNumber', { number: profile.call })}
+                </AppText>
+              ) : null}
             </View>
-            <AppButton variant="secondary" title={t('services.emergencyNumbers')} onPress={() => router.push('/urgent')} />
+          </View>
+        ) : null}
+        {category?.urgent ? <AppButton variant="secondary" title={t('services.emergencyNumbers')} onPress={() => router.push('/urgent')} /> : null}
+        {id === 'taksi' && location ? <TaxiStands provinceCode={location.provinceCode} districtId={location.districtId} /> : null}
+
+        {total > 0 ? (
+          <>
+            {total > 3 ? <SearchField value={query} onChangeText={setQuery} placeholder={t('services.searchIn', { name })} /> : null}
+            <FilterRow
+              districts={districts}
+              district={district}
+              onDistrict={setDistrict}
+              extra={
+                <>
+                  <FilterChip label={t('services.openNow')} icon="schedule" active={openNow} onPress={() => setOpenNow((v) => !v)} />
+                  <FilterChip label={t('services.verifiedOnly')} icon="verified" active={verifiedOnly} onPress={() => setVerifiedOnly((v) => !v)} />
+                </>
+              }
+            />
           </>
         ) : null}
 
@@ -92,13 +156,14 @@ export default function ServiceCategoryScreen() {
           <StateMessage kind="loading" />
         ) : total === 0 ? (
           <>
-            <AppText variant="subtitle">{t('services.emptyTitle')}</AppText>
+            <AppText variant="subtitle">{id === 'taksi' ? t('services.taxiCompanies') : t('services.emptyTitle')}</AppText>
             <StateMessage kind="empty" message={t('services.emptyBody')} />
           </>
         ) : (
           <>
-            {ranked.featured.map((b) => <BusinessCard key={b.id} business={b} featured />)}
-            {ranked.others.map((b) => <BusinessCard key={b.id} business={b} />)}
+            {filtered && !featured.length && !others.length ? <StateMessage kind="empty" message={t('services.noFilterMatch')} /> : null}
+            {featured.map((b) => <BusinessCard key={b.id} business={b} featured />)}
+            {others.map((b) => <BusinessCard key={b.id} business={b} />)}
             {category?.urgent && anyUnverified ? <AppText variant="caption" muted>{t('business.unverifiedWarning')}</AppText> : null}
             <Pressable
               accessibilityRole="button"
@@ -126,6 +191,7 @@ const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
   flex: { flex: 1 },
   warning: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
+  callLink: { fontWeight: '700', marginTop: 4, textDecorationLine: 'underline' },
   rules: { borderWidth: 1, borderRadius: radius.md, padding: spacing.sm, gap: spacing.xs },
   rulesHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 });

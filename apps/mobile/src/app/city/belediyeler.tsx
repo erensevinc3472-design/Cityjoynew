@@ -3,14 +3,13 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { listMunicipalities, municipalityIdsFor, normalizeName, profileIdOfAuthor, type Municipality } from '@cityjoy/shared';
+import { listMunicipalities, municipalityIdsFor, normalizeName, type Municipality } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { GlossyIcon } from '@/components/glossy-icon';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
-import { useAnnouncements } from '@/lib/announcements';
 import { useCityGuideMeta } from '@/lib/city-guide';
 import { LOOK } from '@/lib/city-look';
 import { locationRepository as repo } from '@/lib/locations';
@@ -21,10 +20,17 @@ import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 /**
- * Belediye Hizmetleri (tasarım: belediye-hizmetleri.html): üstte kullanıcının ilçe belediyesi ve büyükşehir / il
- * belediyesi (künyesinin başı ve son duyurusu), altında açılır "Diğer ilçe belediyeleri". Her belediye resmî profiline
- * gider. Şehir rehberinde belediye hizmetleri bilgisi varsa "Hizmet rehberi" satırı da çıkar.
+ * Belediye Hizmetleri (13. madde 35): üstte kullanıcının ilçe belediyesi ve büyükşehir / il belediyesi aynı büyüklükte
+ * kartta, altında sık kullanılanlar ve açılır "Diğer ilçe belediyeleri". Her belediye resmî profiline gider. Duyurular
+ * yalnızca Mahalle Meydanı > Duyurular'da (Eren, 3 Kasım 2026); burada "son duyuru" satırı yok. Başkan adı / parti yok.
  */
+const FREQUENT = [
+  { key: 'water', icon: 'water-drop', tint: '#5FD3DA' },
+  { key: 'waste', icon: 'delete-outline', tint: '#34D399' },
+  { key: 'police', icon: 'local-police', tint: '#E2B277' },
+  { key: 'funeral', icon: 'local-florist', tint: '#C4B5FD' },
+] as const;
+
 export default function MunicipalitiesScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -33,7 +39,6 @@ export default function MunicipalitiesScreen() {
   const { location } = useUserLocation();
   const provinceCode = location?.provinceCode;
   const { meta } = useCityGuideMeta(provinceCode);
-  const { list: news } = useAnnouncements(location, 'hepsi');
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
 
@@ -87,7 +92,6 @@ export default function MunicipalitiesScreen() {
           <>
             {own.map((m) => {
               const p = profiles[m.id];
-              const last = (news ?? []).find((a) => profileIdOfAuthor(a.author) === m.id);
               const look = m.kind === 'ilce-belediyesi' ? LOOK.belediye : LOOK.kurumlar;
               return (
                 <Pressable
@@ -109,19 +113,25 @@ export default function MunicipalitiesScreen() {
                   <AppText style={[styles.about, { color: c.textMuted }]} numberOfLines={2}>
                     {p?.about || t('city.profileSoon')}
                   </AppText>
-                  {last ? (
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={`${t('city.lastNews')}: ${last.title}`}
-                      onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: last.id } })}
-                      style={[styles.news, { backgroundColor: c.accentSoft }]}>
-                      <MaterialIcons name="campaign" size={18} color={c.accent} />
-                      <AppText style={[styles.newsText, { color: c.textStrong }]} numberOfLines={2}>{last.title}</AppText>
-                    </Pressable>
-                  ) : null}
                 </Pressable>
               );
             })}
+
+            <AppText style={[styles.section, { color: c.textStrong }]}>{t('city.frequent')}</AppText>
+            <View style={styles.grid}>
+              {FREQUENT.map((x) => (
+                <Pressable
+                  key={x.key}
+                  accessibilityRole="button"
+                  onPress={() => (hasGuide ? router.push({ pathname: '/city/[section]', params: { section: 'belediye-hizmetleri' } }) : own[0] && go(own[0]))}
+                  style={({ pressed }) => [styles.tile, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.8 : 1 }]}>
+                  <View style={[styles.tileIcon, { backgroundColor: x.tint + '22' }]}>
+                    <MaterialIcons name={x.icon} size={20} color={x.tint} />
+                  </View>
+                  <AppText style={[styles.tileText, { color: c.textStrong }]} numberOfLines={2}>{t(`city.frequentItem.${x.key}`)}</AppText>
+                </Pressable>
+              ))}
+            </View>
 
             {hasGuide ? (
               <Pressable
@@ -166,8 +176,11 @@ const styles = StyleSheet.create({
   kicker: { fontFamily: fonts.bodySemi, fontSize: 10, letterSpacing: 1 },
   cardName: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23 },
   about: { fontSize: 13, lineHeight: 19 },
-  news: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.sm + 2, borderRadius: radius.lg },
-  newsText: { flex: 1, fontSize: 13, lineHeight: 18, fontFamily: fonts.bodySemi },
+  section: { fontFamily: fonts.heading, fontSize: 17, paddingTop: spacing.xs },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  tile: { flexBasis: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: radius.lg, borderWidth: 1 },
+  tileIcon: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  tileText: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 14 },
   guide: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.xl, borderWidth: 1 },
   box: { borderRadius: radius.xl, borderWidth: 1, paddingHorizontal: spacing.md, overflow: 'hidden' },
   boxHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 56 },

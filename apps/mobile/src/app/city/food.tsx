@@ -1,14 +1,15 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { FOOD_KINDS, openState, rankBusinesses, type Business } from '@cityjoy/shared';
+import { averageRating, FOOD_KINDS, openState, rankBusinesses, type Business } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BusinessCard } from '@/components/business-card';
 import { HeroHeader } from '@/components/hero-header';
+import { FilterChip, FilterRow } from '@/components/inner';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { locationRepository } from '@/lib/locations';
@@ -18,9 +19,11 @@ import { MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 /**
- * Benim Şehrim > Cafe ve Restoran (tasarım: cafe-restaurant.html): İşletmem'de "yeme-içme" türüyle kayıtlı, kullanıcının
- * ilindeki işletmeler. Türe göre filtre (kafe, restoran, kebap…) ve "Şu an açık"; sıralama hizmet listeleriyle aynı
- * kural (Reklam en çok 2, sonra doğrulanmış, puan, ilçe, güncellik; PROJE.md 5.6). Uydurma örnek mekân yok.
+ * Benim Şehrim > Cafe ve Restoran (tasarım: cafe-restaurant.html, 13. madde 35): İşletmem'de "yeme-içme" türüyle kayıtlı,
+ * kullanıcının ilinin tamamındaki işletmeler (Eren: uzak ilçedeki işletme de merkezden müşteri çekebilmeli). Tek filtre
+ * satırı: "Tüm ilçeler" açılır düğmesi, "Şu an açık", türler; sıralama En yakın (hizmet listeleriyle aynı kural: Reklam en
+ * çok 2, sonra doğrulanmış, puan, ilçe, güncellik; PROJE.md 5.6) ya da En beğenilen (gerçek oy ortalaması). Fiyat seviyesi
+ * ve "EFSANE" yok; oyu olmayan işletmede "Yeni" yazar. Uydurma örnek mekân yok.
  */
 export default function CityFoodScreen() {
   const { t } = useTranslation();
@@ -34,6 +37,8 @@ export default function CityFoodScreen() {
   const [error, setError] = useState(false);
   const [kind, setKind] = useState<string | null>(null);
   const [openNow, setOpenNow] = useState(false);
+  const [district, setDistrict] = useState<string | null>(null);
+  const [sort, setSort] = useState<'near' | 'liked'>('near');
 
   const load = useCallback(() => {
     if (!provinceCode) return;
@@ -49,22 +54,21 @@ export default function CityFoodScreen() {
   const used = FOOD_KINDS.filter((k) => (all ?? []).some((b) => b.categoryIds.includes(k.id)));
   const ranked = useMemo(() => {
     const now = new Date();
-    const list = (all ?? []).filter((b) => (!kind || b.categoryIds.includes(kind)) && (!openNow || openState(b, now)?.open));
-    return rankBusinesses(list, { districtId });
-  }, [all, kind, openNow, districtId]);
+    const list = (all ?? []).filter(
+      (b) => (!kind || b.categoryIds.includes(kind)) && (!openNow || openState(b, now)?.open) && (!district || b.location.districtId === district),
+    );
+    const r = rankBusinesses(list, { districtId });
+    if (sort === 'liked') {
+      const score = (b: Business) => (b.rating.count ? averageRating(b.rating) : -1);
+      return { featured: r.featured, others: [...r.others].sort((a, b) => score(b) - score(a) || b.rating.count - a.rating.count) };
+    }
+    return r;
+  }, [all, kind, openNow, district, districtId, sort]);
+  const districts = useMemo(() => {
+    const ids = [...new Set((all ?? []).map((b) => b.location.districtId))];
+    return ids.map((id) => ({ id, name: locationRepository.getDistrict(id)?.name ?? id })).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+  }, [all]);
   const total = ranked.featured.length + ranked.others.length;
-
-  const chip = (key: string, label: string, selected: boolean, onPress: () => void, icon?: string) => (
-    <Pressable
-      key={key}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={[styles.chip, selected ? { backgroundColor: c.primary, borderColor: c.primary } : { backgroundColor: c.surface, borderColor: c.border }]}>
-      {icon ? <MaterialIcons name={(icon in MaterialIcons.glyphMap ? icon : 'restaurant') as never} size={16} color={selected ? c.onPrimary : c.icon} /> : null}
-      <AppText variant="caption" style={{ color: selected ? c.onPrimary : c.text }}>{label}</AppText>
-    </Pressable>
-  );
 
   const header = <HeroHeader title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
@@ -83,11 +87,21 @@ export default function CityFoodScreen() {
         ) : (
           <>
             {all.length ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-                {chip('open', t('food.openNow'), openNow, () => setOpenNow((v) => !v), 'schedule')}
-                {chip('all', t('food.all'), !kind, () => setKind(null))}
-                {used.map((k) => chip(k.id, t(`food.kinds.${k.id}`), kind === k.id, () => setKind(kind === k.id ? null : k.id), k.icon))}
-              </ScrollView>
+              <>
+                <FilterRow
+                  districts={districts}
+                  district={district}
+                  onDistrict={setDistrict}
+                  kinds={used.map((k) => ({ id: k.id, name: t(`food.kinds.${k.id}`) }))}
+                  kind={kind}
+                  onKind={setKind}
+                />
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+                  <FilterChip icon="schedule" label={t('food.openNow')} active={openNow} onPress={() => setOpenNow((v) => !v)} />
+                  <FilterChip icon="near-me" label={t('food.sortNear')} active={sort === 'near'} onPress={() => setSort('near')} />
+                  <FilterChip icon="favorite-border" label={t('food.sortLiked')} active={sort === 'liked'} onPress={() => setSort('liked')} />
+                </ScrollView>
+              </>
             ) : null}
             {all.length ? <AppText variant="caption" muted>{t('food.count', { count: total })}</AppText> : null}
             {total === 0 ? (
@@ -117,6 +131,5 @@ const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
   flex: { flex: 1, gap: 2 },
   chips: { gap: spacing.xs },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 36, paddingHorizontal: spacing.md, borderRadius: radius.pill, borderWidth: 1 },
   invite: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1, minHeight: MIN_TOUCH },
 });

@@ -21,6 +21,9 @@ export const DEFAULT_LIMITS = {
   aktiviteYeni: 1,
   oneri: 5,
   oneriYeni: 2,
+  /** Yarışma ve anket oyu (yarışmacı başına tek oy ayrıca). */
+  oy: 30,
+  oyYeni: 5,
   sikayet: 20,
   isletmeGonderi: 5,
   /** İşletme vitrini: kademeye göre en çok fotoğraf (öneri; kademeler gelir konusunda kesinleşecek). */
@@ -43,7 +46,7 @@ export const LIMIT_RANGE = [1, 10000] as const;
 
 /** Panelde gruplar halinde gösterilir. */
 export const LIMIT_GROUPS: { id: 'kullanici' | 'isletme' | 'muhtar' | 'kurum'; keys: LimitKey[] }[] = [
-  { id: 'kullanici', keys: ['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'sikayet'] },
+  { id: 'kullanici', keys: ['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'oy', 'oyYeni', 'sikayet'] },
   { id: 'isletme', keys: ['isletmeGonderi', 'vitrinUcretsiz', 'vitrinStandart', 'vitrinPro', 'vitrinPremium'] },
   { id: 'muhtar', keys: ['muhtarDuyuru', 'muhtarDuyuruHafta', 'acil'] },
   { id: 'kurum', keys: ['kurumDuyuru', 'kurumDuyuruHafta', 'etkinlik'] },
@@ -63,7 +66,7 @@ export function normalizeLimits(raw: unknown): Limits {
 export type UsageSubject = { type: 'u' | 'b' | 'k' | 'g'; id: string };
 
 /** Sayılan işler; "duyuru-hafta" 7 günlük, diğerleri 24 saatlik pencere. */
-export const USAGE_KINDS = ['gonderi', 'yorum', 'takip', 'aktivite', 'oneri', 'sikayet', 'isletme-gonderi', 'duyuru', 'duyuru-hafta', 'acil', 'etkinlik'] as const;
+export const USAGE_KINDS = ['gonderi', 'yorum', 'takip', 'aktivite', 'oneri', 'sikayet', 'isletme-gonderi', 'duyuru', 'duyuru-hafta', 'acil', 'etkinlik', 'oy'] as const;
 export type UsageKind = (typeof USAGE_KINDS)[number];
 
 export function usageWindowMs(kind: UsageKind): number {
@@ -76,13 +79,14 @@ export function usageId(subject: UsageSubject, kind: UsageKind): string {
 
 /** İşin sınırı: kişide hesap yeniyse "Yeni" sınırı; duyuruda kurum ve muhtar ayrı. */
 export function limitFor(kind: UsageKind, subject: UsageSubject, limits: Limits, newAccount: boolean): number {
-  const user = (key: 'gonderi' | 'yorum' | 'takip' | 'aktivite' | 'oneri') => (newAccount ? limits[`${key}Yeni`] : limits[key]);
+  const user = (key: 'gonderi' | 'yorum' | 'takip' | 'aktivite' | 'oneri' | 'oy') => (newAccount ? limits[`${key}Yeni`] : limits[key]);
   switch (kind) {
     case 'gonderi':
     case 'yorum':
     case 'takip':
     case 'aktivite':
     case 'oneri':
+    case 'oy':
       return user(kind);
     case 'sikayet':
       return limits.sikayet;

@@ -33,6 +33,7 @@ import type { MembershipTier } from '../models/membership';
 import type { Action, Module } from '../permissions/types';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { deleteVerificationRequest } from './approvals';
+import { deleteDealsOf } from './deals';
 
 const COLLECTION = 'businesses';
 
@@ -229,6 +230,7 @@ async function deleteBusiness(db: Firestore, id: string) {
     if (claim.exists() && claim.get('businessId') === id) batch.delete(claim.ref);
   }
   await deleteVerificationRequest(db, batch, id);
+  await deleteDealsOf(db, batch, id, snap.get('ownerUid'));
   batch.delete(ref);
   await batch.commit();
 }
@@ -286,3 +288,6 @@ export function createBusinessAdmin(db: Firestore, actorUid: string) {
       change(b, { featuredUntil: until ? Timestamp.fromDate(until) : deleteField() }, 'duzenle', until ? `Öne çıkarıldı (${until.toISOString().slice(0, 10)} tarihine kadar)` : 'Öne çıkarma kaldırıldı'),
   };
 }
+
+/** Başka depolar (Seyahat > konaklama) aynı dönüşümü kullanır. */
+export const businessFromDoc = fromDoc;

@@ -24,6 +24,8 @@ export interface ShowcaseStory {
   body?: string;
   theme: ShowcaseTheme;
   items: ShowcaseItem[];
+  /** Ücretli pano: uygulamada "Reklam" yazar (reklam mevzuatı ve mağaza kuralları; Eren, 3 Kasım 2026). */
+  sponsored?: boolean;
 }
 
 export type ShowcaseStatus = 'taslak' | 'yayinda';

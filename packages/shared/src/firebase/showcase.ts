@@ -34,6 +34,7 @@ const clean = (s: CityShowcaseInput) => ({
     theme: x.theme,
     ...(x.subtitle?.trim() ? { subtitle: x.subtitle.trim() } : {}),
     ...(x.body?.trim() ? { body: x.body.trim() } : {}),
+    ...(x.sponsored ? { sponsored: true } : {}),
     items: x.items.map((i) => ({ kind: i.kind, id: i.id, name: i.name.trim(), ...(i.note?.trim() ? { note: i.note.trim() } : {}) })),
   })),
 });

@@ -183,6 +183,11 @@ export function validateTravelText(c: { tagline: string; description: string; vi
   return e;
 }
 
+/** Panelden açılan ülkeler (config/travelCountries); Türkiye her zaman açık. */
+export function withOpenCountries(open: readonly string[] | null): { code: string; flag: string; open: boolean }[] {
+  return TRAVEL_COUNTRIES.map((c) => ({ ...c, open: c.code === 'TR' || (open ? open.includes(c.code) : c.open) }));
+}
+
 /**
  * Ülke şeridi (tasarım: kesfet-ogren.html). Türkiye açık; diğerleri içerik girildikçe açılır, o zamana kadar "yakında".
  * Adlar dil dosyalarından gelir (travel.country.<kod>).

@@ -1,7 +1,6 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState, type ReactElement } from 'react';
-import { FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { cityChoiceLabel, normalizeName, type CityGuideItem, type CityGuideSectionId } from '@cityjoy/shared';
 
@@ -10,10 +9,12 @@ import type { Look } from '@/lib/city-look';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
 import { GlossyIcon } from './glossy-icon';
+import { FeaturedCard, FilterChip, FilterRow, ListRow, SectionTitle, Tag } from './inner';
+import type { SceneKind } from './scene-art';
 import { SearchField } from './search-field';
 import { StateMessage } from './state-message';
 
@@ -23,10 +24,14 @@ const SUMMARY_KEYS = ['kisa_metin', 'aciklama', 'adres'];
 const META_KEYS = ['acilis_saatleri', 'calisma_hafta_ici', 'calisma_saatleri', 'gunler', 'saatler', 'ilk_saat_tl', 'hat_kodu'];
 const DAYS = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
 
+/** Öne çıkan büyük kartı olan bölümler ve kartın çizimi (Müzeler önizlemesi, 13. madde 35). */
+const FEATURED: Partial<Record<CityGuideSectionId, SceneKind>> = { muzeler: 'townhall', parklar: 'neighbourhood' };
+
 /**
- * Benim Şehrim liste sayfası (tasarım: muzeler.html, otopark.html, park-pazar.html): arama, türe göre altın düğmeler,
- * pazarlarda gün, sayı kutuları (kayıt / ilçe), ilçe seçimi; kartta simge, ilçe, ad, kısa bilgi, saat ve ücret.
- * Kullanıcının ilçesi önce gelir. categories verilirse bölümün yalnızca o kategorileri (Önemli Kurumlar alt başlığı).
+ * Benim Şehrim liste sayfası (13. madde 35, Müzeler önizlemesi): arama, tek filtre satırı (ilçe açılır düğmesi + türler,
+ * normal harf), pazarlarda gün; filtre yokken öne çıkan büyük kart, altında tek yüzeyde liste. Sayı kutuları, "DİĞER"
+ * ve yıldız yok. Otoparkta kapasite / doluluk gösterilmez, ücret yoksa "Ücret bilgisi yok". Kullanıcının ilçesi önce
+ * gelir. categories verilirse bölümün yalnızca o kategorileri (Önemli Kurumlar alt başlığı).
  */
 export function CityGuideList({ section, look, categories, header }: { section: CityGuideSectionId; look: Look; categories?: string[]; header?: ReactElement }) {
   const { t } = useTranslation();
@@ -72,27 +77,16 @@ export function CityGuideList({ section, look, categories, header }: { section: 
     return Array.isArray(v) ? v.join(', ') : String(v);
   };
 
-  const chip = (id: string | null, label: string, active: boolean, onPress: () => void) => (
-    <Pressable
-      key={id ?? 'all'}
-      accessibilityRole="button"
-      accessibilityState={{ selected: active }}
-      onPress={onPress}
-      style={[styles.chip, active ? { backgroundColor: c.accent, borderColor: c.accent } : { backgroundColor: c.surface, borderColor: c.border }]}>
-      <AppText style={[styles.chipText, { color: active ? c.onPrimary : c.textStrong }]}>{label.toLocaleUpperCase(lang)}</AppText>
-    </Pressable>
-  );
-
-  const stat = (n: number, label: string) => (
-    <View style={[styles.stat, { backgroundColor: c.surface, borderColor: c.border }]}>
-      <AppText style={[styles.statN, { color: c.accent }]}>{n}</AppText>
-      <AppText style={[styles.statLabel, { color: c.textMuted }]}>{label.toLocaleUpperCase(lang)}</AppText>
-    </View>
-  );
+  const featuredKind = FEATURED[section];
+  const filtered = !!(query || kind || district || day);
+  const featured = featuredKind && !filtered ? shown[0] : undefined;
+  const rows = featured ? shown.slice(1) : shown;
+  const go = (i: CityGuideItem) => router.push({ pathname: '/city/item', params: { section, id: i.id } });
+  const sectionName = (n: number) => t('city.listAll', { count: n });
 
   return (
     <FlatList
-      data={shown}
+      data={rows}
       keyExtractor={(i) => i.id}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
@@ -101,36 +95,37 @@ export function CityGuideList({ section, look, categories, header }: { section: 
         <View style={styles.top}>
           {header}
           <SearchField value={query} onChangeText={setQuery} placeholder={t('city.search')} />
-          {kinds.length > 1 ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-              {chip(null, t('city.all'), !kind, () => setKind(null))}
-              {kinds.map((k) => chip(k, cityChoiceLabel(k, lang), kind === k, () => setKind(kind === k ? null : k)))}
-            </ScrollView>
-          ) : null}
+          <FilterRow
+            districts={districts}
+            district={district}
+            onDistrict={setDistrict}
+            kinds={kinds.filter((k) => k !== 'diger').map((k) => ({ id: k, name: cityChoiceLabel(k, lang) }))}
+            kind={kind}
+            onKind={setKind}
+          />
           {isMarket ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-              {chip('all-days', t('city.allDays'), !day, () => setDay(null))}
-              {DAYS.map((d) => chip(d, d, day === d, () => setDay(day === d ? null : d)))}
-            </ScrollView>
-          ) : null}
-          {own.length ? (
-            <View style={styles.stats}>
-              {stat(own.length, t('city.records'))}
-              {stat(districts.length, t('city.districts'))}
-            </View>
-          ) : null}
-          {districts.length > 1 ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-              {chip('all-districts', t('city.allDistricts'), !district, () => setDistrict(null))}
-              {districts.map((d) => chip(d.id, d.name, district === d.id, () => setDistrict(district === d.id ? null : d.id)))}
+              <FilterChip label={t('city.allDays')} active={!day} onPress={() => setDay(null)} />
+              {DAYS.map((d) => <FilterChip key={d} label={d} active={day === d} onPress={() => setDay(day === d ? null : d)} />)}
             </ScrollView>
           ) : null}
           {stale ? <AppText variant="caption" muted>{t('city.staleNote')}</AppText> : null}
           {lang !== 'tr' ? <AppText variant="caption" muted>{t('city.contentLanguage')}</AppText> : null}
+          {featured ? (
+            <FeaturedCard
+              kind={featuredKind!}
+              badge={t('city.featured')}
+              title={featured.name}
+              meta={[featured.districtId ? repo.getDistrict(featured.districtId)?.name : '', text(featured, META_KEYS)].filter(Boolean).join(' · ')}
+              tag={featured.values.ucret_durumu === 'Ücretsiz' ? <Tag label={cityChoiceLabel('Ücretsiz', lang)} /> : undefined}
+              onPress={() => go(featured)}
+            />
+          ) : null}
+          {rows.length ? <SectionTitle title={sectionName(shown.length)} aside={location?.districtId && !district ? t('city.nearFirst') : undefined} /> : null}
         </View>
       }
       ListEmptyComponent={
-        error ? (
+        featured ? undefined : error ? (
           <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} />
         ) : items === null ? (
           <StateMessage kind="loading" />
@@ -138,44 +133,33 @@ export function CityGuideList({ section, look, categories, header }: { section: 
           <StateMessage kind="empty" message={own.length ? t('common.noResults') : t('city.empty')} />
         )
       }
-      renderItem={({ item: i }) => {
+      renderItem={({ item: i, index }) => {
         const districtName = i.districtId ? repo.getDistrict(i.districtId)?.name : undefined;
-        const summary = text(i, SUMMARY_KEYS);
         const meta = text(i, META_KEYS);
+        const summary = meta || text(i, SUMMARY_KEYS);
         const free = i.values.ucret_durumu === 'Ücretsiz';
+        const parking = section === 'otoparklar';
+        const last = index === rows.length - 1;
         return (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={[i.name, districtName, i.verified ? '' : t('city.unverified')].filter(Boolean).join(', ')}
-            onPress={() => router.push({ pathname: '/city/item', params: { section, id: i.id } })}
-            style={({ pressed }) => [styles.card, { backgroundColor: c.surface, borderColor: c.border, transform: [{ scale: pressed ? 0.985 : 1 }] }]}>
-            <View style={[styles.thumb, { backgroundColor: `${look.colors[1]}22` }]}>
-              <GlossyIcon icon={look.icon} colors={look.colors} size={44} />
-            </View>
-            <View style={styles.body}>
-              <AppText style={[styles.kicker, { color: c.accent }]} numberOfLines={1}>
-                {[districtName, i.category ? cityChoiceLabel(i.category, lang) : ''].filter(Boolean).join(' · ').toLocaleUpperCase(lang)}
-              </AppText>
-              <AppText style={[styles.name, { color: c.textStrong }]} numberOfLines={2}>{i.name}</AppText>
-              {summary ? <AppText style={[styles.summary, { color: c.textMuted }]} numberOfLines={2}>{summary}</AppText> : null}
-              {meta || free || !i.verified ? (
-                <View style={styles.metaRow}>
-                  {meta ? (
-                    <View style={styles.metaItem}>
-                      <MaterialIcons name="schedule" size={13} color={c.textSoft} />
-                      <AppText style={[styles.metaText, { color: c.textMuted }]} numberOfLines={1}>{meta}</AppText>
-                    </View>
-                  ) : null}
-                  {free ? (
-                    <View style={[styles.badge, { backgroundColor: c.successSoft }]}>
-                      <AppText style={[styles.badgeText, { color: c.success }]}>{cityChoiceLabel('Ücretsiz', lang)}</AppText>
-                    </View>
-                  ) : null}
-                  {!i.verified ? <AppText style={[styles.unverified, { color: c.textSoft }]}>{t('city.unverified')}</AppText> : null}
-                </View>
-              ) : null}
-            </View>
-          </Pressable>
+          <View style={[styles.surfaceRow, { backgroundColor: c.surface, borderColor: c.border }, index === 0 && styles.surfaceFirst, last && styles.surfaceLast]}>
+            <ListRow
+              first={index === 0}
+              leading={<GlossyIcon icon={look.icon} colors={look.colors} size={40} />}
+              title={i.name}
+              subtitle={[districtName, i.category && i.category !== 'diger' ? cityChoiceLabel(i.category, lang) : '', summary].filter(Boolean).join(' · ')}
+              accessibilityLabel={[i.name, districtName, i.verified ? '' : t('city.unverified')].filter(Boolean).join(', ')}
+              trailing={
+                free ? (
+                  <Tag label={cityChoiceLabel('Ücretsiz', lang)} tone="green" />
+                ) : parking && i.values.ilk_saat_tl === undefined ? (
+                  <Tag label={t('city.noPrice')} tone="muted" />
+                ) : !i.verified ? (
+                  <Tag label={t('city.unverified')} tone="muted" />
+                ) : undefined
+              }
+              onPress={() => go(i)}
+            />
+          </View>
         );
       }}
     />
@@ -183,25 +167,11 @@ export function CityGuideList({ section, look, categories, header }: { section: 
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.sm + 2, paddingBottom: spacing.xl },
-  top: { gap: spacing.sm + 2, marginBottom: spacing.xs },
+  content: { paddingBottom: spacing.xl },
+  top: { gap: spacing.sm + 2, marginBottom: spacing.sm + 2 },
   chips: { gap: spacing.xs + 2, paddingVertical: 2 },
-  chip: { minHeight: 36, justifyContent: 'center', paddingHorizontal: spacing.md + 2, borderRadius: radius.pill, borderWidth: 1 },
-  chipText: { fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 0.8 },
-  stats: { flexDirection: 'row', gap: spacing.sm },
-  stat: { flex: 1, alignItems: 'center', paddingVertical: spacing.sm + 2, borderRadius: radius.lg, borderWidth: 1 },
-  statN: { fontFamily: fonts.display, fontSize: 22, lineHeight: 28 },
-  statLabel: { fontFamily: fonts.bodySemi, fontSize: 10, letterSpacing: 1 },
-  card: { flexDirection: 'row', gap: spacing.md, padding: spacing.sm + 4, borderRadius: radius.xl, borderWidth: 1 },
-  thumb: { width: 80, height: 80, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
-  body: { flex: 1, gap: 3, justifyContent: 'center' },
-  kicker: { fontFamily: fonts.bodySemi, fontSize: 10, letterSpacing: 1 },
-  name: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21 },
-  summary: { fontSize: 12, lineHeight: 17 },
-  metaRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm, marginTop: 2 },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 3, flexShrink: 1 },
-  metaText: { fontSize: 11 },
-  badge: { borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 1 },
-  badgeText: { fontFamily: fonts.bodySemi, fontSize: 10 },
-  unverified: { fontSize: 10 },
+  // Satırlar tek yüzeyde: ilk ve son satır köşeleri yuvarlar, kenarlar birleşir.
+  surfaceRow: { borderLeftWidth: 1, borderRightWidth: 1, paddingHorizontal: spacing.md },
+  surfaceFirst: { borderTopWidth: 1, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl },
+  surfaceLast: { borderBottomWidth: 1, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl },
 });

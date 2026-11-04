@@ -13,6 +13,7 @@ import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BottomNav } from '@/components/bottom-nav';
 import { FormMessage } from '@/components/form-message';
+import { FilterChip } from '@/components/inner';
 import { RoundButton } from '@/components/hero-header';
 import { PostCard } from '@/components/post-card';
 import { SideMenu } from '@/components/side-menu';
@@ -51,7 +52,8 @@ export default function ExploreScreen() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pager = useRef<FlatList<PostTarget>>(null);
   const strip = useRef<ScrollViewInstance>(null);
-  const tabW = width / VISIBLE_TABS;
+  // Sekmeler kenar boşluklu cam kutunun içinde (13. madde 35, Keşfet önizlemesi).
+  const tabW = (width - GUTTER * 2 - 8) / VISIBLE_TABS;
   const line = useRef(new Animated.Value(0)).current;
   const feed = useNotificationFeed(false);
   const [read] = useReadState();
@@ -85,8 +87,10 @@ export default function ExploreScreen() {
             {user ? <RoundButton icon="notifications-none" label={hasUnread ? t('notifications.titleUnread') : t('notifications.title')} onPress={() => router.push('/notifications')} badge={hasUnread} /> : null}
           </View>
         </View>
+        <View style={[styles.glass, { marginHorizontal: GUTTER }]}>
         <ScrollView ref={strip} horizontal scrollEnabled={false} showsHorizontalScrollIndicator={false} accessibilityRole="tablist">
           <View>
+            <Animated.View style={[styles.pill, { width: tabW - 8, backgroundColor: c.heroAccent, transform: [{ translateX: Animated.add(line, 4) }] }]} />
             <View style={styles.tabs}>
               {POST_TARGETS.map((x, i) => (
                 <Pressable
@@ -96,15 +100,15 @@ export default function ExploreScreen() {
                   accessibilityLabel={t(`explore.targets.${x}`)}
                   onPress={() => goTab(i)}
                   style={[styles.tab, { width: tabW }]}>
-                  <AppText style={[styles.tabText, { color: i === index ? c.heroAccent : c.heroMuted, fontFamily: i === index ? fonts.bodySemi : fonts.bodyMedium }]}>
-                    {t(`explore.targets.${x}`).toLocaleUpperCase()}
+                  <AppText numberOfLines={1} style={[styles.tabText, { color: i === index ? '#14262A' : c.heroMuted, fontFamily: i === index ? fonts.bodySemi : fonts.bodyMedium }]}>
+                    {t(`explore.targets.${x}`)}
                   </AppText>
                 </Pressable>
               ))}
             </View>
-            <Animated.View style={[styles.line, { width: tabW - 32, backgroundColor: c.heroAccent, transform: [{ translateX: Animated.add(line, 16) }] }]} />
           </View>
         </ScrollView>
+        </View>
       </View>
 
       <FlatList
@@ -198,19 +202,9 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
     <View style={styles.top}>
       {/* Etiketler: kategoriye göre süzme. */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagsScroll} contentContainerStyle={styles.tags} accessibilityRole="tablist" accessibilityLabel={t('explore.tagsLabel')}>
-        {TAGS.map((x) => {
-          const on = x === tag;
-          return (
-            <Pressable
-              key={x}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: on }}
-              onPress={() => onTag(x)}
-              style={({ pressed }) => [styles.chip, { borderColor: on ? c.accent : c.border, backgroundColor: on ? c.accentSoft : 'transparent', opacity: pressed ? 0.7 : 1 }]}>
-              <AppText style={[styles.chipText, { color: on ? c.accent : c.textMuted }]}>#{t(`explore.tags.${x}`)}</AppText>
-            </Pressable>
-          );
-        })}
+        {TAGS.map((x) => (
+          <FilterChip key={x} label={t(`explore.tags.${x}`)} active={x === tag} onPress={() => onTag(x)} />
+        ))}
       </ScrollView>
       {tab === 'bolgesel' && district ? (
         <View style={styles.row}>
@@ -299,14 +293,14 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 12, lineHeight: 16, marginTop: 1 },
   row: { flexDirection: 'row', gap: spacing.xs },
   tabs: { flexDirection: 'row' },
-  tab: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  tabText: { fontSize: 13, letterSpacing: 1.2 },
-  line: { height: 2.5, borderRadius: 2 },
+  glass: { padding: 4, marginBottom: spacing.sm, borderRadius: radius.pill, backgroundColor: 'rgba(255, 255, 255, 0.07)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.12)', overflow: 'hidden' },
+  tab: { minHeight: 38, alignItems: 'center', justifyContent: 'center' },
+  tabText: { fontSize: 13.5 },
+  pill: { position: 'absolute', top: 0, bottom: 0, start: 0, borderRadius: radius.pill },
   page: { paddingHorizontal: GUTTER, paddingBottom: spacing.xl },
   top: { gap: spacing.sm, paddingTop: spacing.sm },
   tagsScroll: { marginHorizontal: -GUTTER, flexGrow: 0 },
   tags: { paddingHorizontal: GUTTER, gap: spacing.sm },
-  chip: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, justifyContent: 'center' },
   chipText: { fontFamily: fonts.bodyMedium, fontSize: 13 },
   place: { minHeight: 32, paddingHorizontal: 12, borderRadius: radius.pill, borderWidth: 1, justifyContent: 'center' },
   ann: { paddingVertical: spacing.sm },

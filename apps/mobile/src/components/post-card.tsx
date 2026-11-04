@@ -108,6 +108,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
     lastTap.current = now;
     if (onPress) single.current = setTimeout(onPress, DOUBLE_TAP_MS);
   };
+  const lost = item.category === 'kayip-buluntu';
   const share = () => Share.share({ message: `${name}: ${item.text}\n\nCityJoy` }).catch(() => {});
 
   const action = (icon: IconName, label: string, onAct: (() => void) | undefined, color: string, count?: number) => (
@@ -182,6 +183,10 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
         {photos.length ? (
           <View style={styles.photos}>
             <PostPhotos photos={photos} maxWidth={640} />
+            {/* Kategori etiketi fotoğrafın üstünde (13. madde 35, Keşfet önizlemesi). */}
+            <View pointerEvents="none" style={styles.photoTag}>
+              <AppText style={styles.photoTagText}>{t(`explore.categories.${item.category}`)}</AppText>
+            </View>
           </View>
         ) : item.video ? (
           <View style={styles.photos}>
@@ -205,6 +210,22 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
         <View style={styles.flex} />
         {onSave ? action(saved ? 'bookmark' : 'bookmark-border', saved ? t('explore.unsave') : t('explore.save'), onSave, saved ? c.accent : c.textStrong) : null}
       </View>
+      {lost && onPress ? (
+        // Kayıp - buluntu: "Gördüm" yorumlara götürür (nerede görüldüğü yazılır), "Paylaş" haberi yayar.
+        <View style={styles.lost}>
+          <Pressable accessibilityRole="button" accessibilityHint={t('explore.seenHint')} onPress={onPress} style={({ pressed }) => [styles.lostBtn, { backgroundColor: c.primary, opacity: pressed ? 0.8 : 1 }]}>
+            <MaterialIcons name="visibility" size={17} color={c.onPrimary} />
+            <AppText style={[styles.lostText, { color: c.onPrimary }]}>{t('explore.seen')}</AppText>
+          </Pressable>
+          <Pressable accessibilityRole="button" onPress={share} style={({ pressed }) => [styles.lostBtn, { borderColor: c.accentBorder, borderWidth: 1, opacity: pressed ? 0.8 : 1 }]}>
+            <MaterialIcons name="share" size={17} color={c.accent} />
+            <AppText style={[styles.lostText, { color: c.accent }]}>{t('explore.share')}</AppText>
+          </Pressable>
+        </View>
+      ) : null}
+      {!full && item.commentCount > 0 && onPress ? (
+        <AppText accessibilityRole="link" onPress={onPress} style={[styles.seeComments, { color: c.textMuted }]}>{t('explore.seeComments', { count: item.commentCount })}</AppText>
+      ) : null}
       <View style={styles.foot}>
         <AppText style={[styles.tag, { color: c.accent }]}>#{t(`explore.categories.${item.category}`)}</AppText>
         <AppText style={[styles.targets, { color: c.textSoft }]} numberOfLines={1}>
@@ -240,6 +261,12 @@ const styles = StyleSheet.create({
   action: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, minWidth: 44, paddingEnd: 10 },
   count: { fontFamily: fonts.bodySemi, fontSize: 14 },
   flex: { flex: 1 },
+  photoTag: { position: 'absolute', top: 10, start: GUTTER, backgroundColor: 'rgba(8, 26, 30, 0.72)', borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
+  photoTagText: { fontFamily: fonts.bodySemi, fontSize: 11.5, color: '#FFFFFF' },
+  lost: { flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.xs },
+  lostBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 40, borderRadius: radius.pill },
+  lostText: { fontFamily: fonts.bodySemi, fontSize: 14 },
+  seeComments: { fontSize: 13, paddingBottom: 4 },
   foot: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   tag: { fontFamily: fonts.bodySemi, fontSize: 12 },
   targets: { flex: 1, fontSize: 11 },

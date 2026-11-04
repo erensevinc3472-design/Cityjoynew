@@ -248,3 +248,4 @@ td.handle-cell { width: 40px; padding-inline: 4px; }
 .frame-card .row-actions { display: flex; flex-wrap: wrap; gap: 4px 12px; }
 .frame-card .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
 .mod-video { display: block; width: 240px; max-height: 320px; margin: 6px 0; border-radius: 8px; background: #000; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }

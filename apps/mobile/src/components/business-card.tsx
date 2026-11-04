@@ -56,10 +56,17 @@ export function BusinessCard({ business: b, featured }: { business: Business; fe
           <MaterialIcons name={verified ? 'verified' : 'help-outline'} size={16} color={verified ? c.success : c.textMuted} />
           <AppText variant="caption" style={{ color: verified ? c.success : c.textMuted }}>{verificationText(b, t, i18n.language)}</AppText>
         </View>
-        <View style={styles.line}>
-          <MaterialIcons name="star" size={16} color={b.rating.count ? c.highlight : c.textSoft} />
-          <AppText variant="caption" muted>{ratingText(b, t, i18n.language)}</AppText>
-        </View>
+        {b.rating.count ? (
+          <View style={styles.line}>
+            <MaterialIcons name="star" size={16} color={c.highlight} />
+            <AppText variant="caption" muted>{ratingText(b, t, i18n.language)}</AppText>
+          </View>
+        ) : (
+          // Puan yalnızca gerçek oyla; oyu olmayan işletme "Yeni" (13. madde 35).
+          <View style={[styles.newTag, { backgroundColor: c.accentSoft }]}>
+            <AppText variant="caption" style={{ color: c.primary }}>{t('business.new')}</AppText>
+          </View>
+        )}
         <View style={styles.line}>
           <MaterialIcons name="place" size={16} color={c.textMuted} />
           <AppText variant="caption" muted>{[district, b.is24h ? t('business.open24') : b.hoursNote].filter(Boolean).join(' · ')}</AppText>
@@ -85,6 +92,18 @@ export function ContactButtons({ business: b }: { business: Business }) {
     ...(b.whatsapp
       ? [{ key: 'wa', icon: 'chat' as const, label: t('business.whatsappBtn'), a11y: t('business.whatsappLabel', { name: b.name }), url: whatsappUrl(b.phone) }]
       : []),
+    // Yol tarifi: adres ya da konum varsa (harita uygulaması açılır).
+    ...(b.geo || b.address
+      ? [{
+          key: 'map',
+          icon: 'directions' as const,
+          label: t('business.directions'),
+          a11y: t('business.directionsLabel', { name: b.name }),
+          url: b.geo
+            ? `https://www.google.com/maps/dir/?api=1&destination=${b.geo.lat},${b.geo.lng}`
+            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${b.name}, ${b.address}`)}`,
+        }]
+      : []),
   ];
   return (
     <View style={[styles.actions, { borderTopColor: c.border }]}>
@@ -109,6 +128,7 @@ const styles = StyleSheet.create({
   withLogo: { paddingEnd: spacing.md + 52 },
   logo: { position: 'absolute', top: spacing.md, end: spacing.md, width: 44, height: 44, borderRadius: 22 },
   line: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  newTag: { alignSelf: 'flex-start', borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: 1 },
   adTag: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.sm, marginBottom: 2 },
   actions: { flexDirection: 'row', borderTopWidth: StyleSheet.hairlineWidth },
   action: { flex: 1, minHeight: MIN_TOUCH, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs },
