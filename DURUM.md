@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 4 Kasım 2026 (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -12,6 +12,12 @@ Son güncelleme: 4 Kasım 2026 (dal claude/ic-ekranlar: Acil alt sayfaları, Sos
 > Temurin JDK 21 zip olarak `%TEMP%\cj-jdk21` klasörüne açıldı (kurulmadı): `JAVA_HOME` ve `PATH` o klasörü gösterecek
 > şekilde ayarlanıp `npm run test:rules`. Klasör silinmişse yeniden indirilir. Kurallar Eren'in bilgisayarından yüklenir:
 > `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew` (giriş kayıtlı).
+
+> **Kural yükleme hatası (4 Kasım, giderildi):** Firebase'in kural derleyicisi işlevlere doğrudan `null` verilmesini
+> ("Geçersiz tür. [null] alındı") artık kabul etmiyor. Düzeltme: ilçesiz yetki denetimi için yeni `provinceAllows`
+> işlevi (eski `regionAllows(..., null)` yerine), `countStep` / `statsStep` içinde "yok" `''` ve boş harita `{}` ile
+> gösteriliyor, `orgAuthorActions` / `personAuthorActions` içinde `null` yerine `{}`. Davranış aynı; 156 kural testi geçti.
+> Yeni kural yazarken işlev çağrısına `null` (ya da `koşul ? x : null`) verme.
 
 ## Depo ve ortam
 
@@ -45,7 +51,7 @@ Son güncelleme: 4 Kasım 2026 (dal claude/ic-ekranlar: Acil alt sayfaları, Sos
 ```sh
 npm install
 npm test                      # ortak paket testleri (166)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (146; Java 21 gerekir)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (156; Java 21 gerekir)
 npm run test:functions        # sunucu işlevleri, emülatörde (30; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)

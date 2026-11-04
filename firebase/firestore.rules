@@ -46,6 +46,12 @@ service cloud.firestore {
             || (provinceCode is string && grantAllows('il-' + provinceCode, module, action))
             || (districtId is string && grantAllows('ilce-' + districtId, module, action))));
     }
+    // İlçesi olmayan kayıtlar için (yalnızca ülke / il kapsamı). Kural derleyicisi işleve null verilmesini kabul etmiyor.
+    function provinceAllows(module, action, provinceCode) {
+      return isAdmin()
+        || (verified() && (grantAllows('ulke', module, action)
+            || (provinceCode is string && grantAllows('il-' + provinceCode, module, action))));
+    }
 
     function ageOf(birthYear) {
       return request.time.year() - birthYear;
@@ -249,11 +255,11 @@ service cloud.firestore {
       allow read: if isAdmin()
         || (signedIn() && resource.data.uid == request.auth.uid)
         || (resource.data.get('provinceCode', null) != null
-            && regionAllows('hizmet-kategorileri', 'goruntule', resource.data.provinceCode, null));
+            && provinceAllows('hizmet-kategorileri', 'goruntule', resource.data.provinceCode));
       allow delete: if signedIn() && resource.data.uid == request.auth.uid;
       allow update: if (isAdmin()
             || (resource.data.get('provinceCode', null) != null
-                && regionAllows('hizmet-kategorileri', 'onayla', resource.data.provinceCode, null)))
+                && provinceAllows('hizmet-kategorileri', 'onayla', resource.data.provinceCode)))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reviewedBy', 'reviewedAt'])
         && request.resource.data.status == 'incelendi'
         && request.resource.data.reviewedBy == request.auth.uid
@@ -396,7 +402,7 @@ service cloud.firestore {
       // İşletme doğrulama yetkisi olan yönetici kendi ilindeki gizli / kaldırılmış işletmeleri de görür.
       allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(resource.data.ownerUid)
         || isManagerOf(resource.data)
-        || regionAllows('isletme-dogrulama', 'goruntule', resource.data.location.provinceCode, null);
+        || provinceAllows('isletme-dogrulama', 'goruntule', resource.data.location.provinceCode);
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(businessContentKeys().concat(
              ['ownerUid', 'status', 'verification', 'membership', 'rating', 'createdAt', 'updatedAt']))
@@ -544,7 +550,7 @@ service cloud.firestore {
     }
     match /deals/{id} {
       allow read: if resource == null || resource.data.status == 'aktif' || isSelf(resource.data.ownerUid)
-        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
+        || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(dealContentKeys().concat(['businessName', 'provinceCode', 'districtId', 'ownerUid', 'status', 'stats', 'reportCount', 'createdAt', 'updatedAt']))
         && validDeal(request.resource.data)
@@ -582,7 +588,7 @@ service cloud.firestore {
         && !exists(/databases/$(database)/documents/dealReports/$(id + '_' + request.auth.uid))
         && existsAfter(/databases/$(database)/documents/dealReports/$(id + '_' + request.auth.uid));
       // İl yöneticisi / moderatör gizler ya da geri açar (geri açılan fırsatı işletme yeniden başlatır).
-      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+      allow update: if provinceAllows('moderasyon', 'duzenle', resource.data.provinceCode)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'moderatedBy', 'updatedAt'])
         && request.resource.data.status in ['gizlendi', 'durduruldu']
         && request.resource.data.moderatedBy == request.auth.uid
@@ -594,7 +600,7 @@ service cloud.firestore {
       allow delete: if isSelf(resource.data.ownerUid) || isAdmin();
     }
     match /dealReports/{rid} {
-      allow read: if isSelf(resource.data.uid) || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
+      allow read: if isSelf(resource.data.uid) || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
       allow create: if signedIn()
         && rid == request.resource.data.dealId + '_' + request.auth.uid
         && request.resource.data.keys().hasOnly(['dealId', 'uid', 'reason', 'provinceCode', 'createdAt'])
@@ -1351,7 +1357,7 @@ service cloud.firestore {
     // ---- Benim Şehrim sabit bilgileri (müzeler, otoparklar...): il başına bölüm paketleri. Herkes okur (girişsiz de);
     // admin ve o ilde şehir rehberi yetkisi olan (il yöneticisi) yazar. Ülke geneli içerik ("tr") yalnızca admin'de.
     function canEditGuide(p) {
-      return isAdmin() || (p is string && p != 'tr' && regionAllows('sehir-rehberi', 'duzenle', p, null));
+      return isAdmin() || (p is string && p != 'tr' && provinceAllows('sehir-rehberi', 'duzenle', p));
     }
     function guideSection(s) {
       return s in ['onemli-kurumlar', 'muzeler', 'otoparklar', 'parklar', 'pazarlar', 'ulasim', 'toplanma-alanlari',
@@ -1452,7 +1458,7 @@ service cloud.firestore {
       // İsteyen ve işletme sahibi kendi isteğini; onay yetkisi olan il yöneticisi kendi ilindekileri; admin hepsini görür.
       allow read: if resource == null || isAdmin()
         || (signedIn() && resource.data.requestedBy == request.auth.uid)
-        || regionAllows('onaylar', 'goruntule', resource.data.region.provinceCode, null)
+        || provinceAllows('onaylar', 'goruntule', resource.data.region.provinceCode)
         || (resource.data.kind == 'isletme-dogrulama' && isBusinessOwner(resource.data.targetId));
       // İşletme sahibi doğrulama ister; reddedilen ya da sonradan doğrulaması kaldırılan istek yeniden gönderilir.
       // (Ucuz denetimler önce: kuralların hesap sınırı aşılmasın.)
@@ -1544,14 +1550,14 @@ service cloud.firestore {
     // ya da hedef bölge hesabın bölgesinin dışındaysa boş liste. (Bir kez hesaplanır: kuralların hesap sınırı aşılmasın.)
     function orgAuthorActions(d, module) {
       let ok = d.author.keys().hasOnly(['type', 'orgId', 'name']) && d.author.orgId is string && isMemberOf(d.author.orgId);
-      let org = ok ? get(orgPath(d.author.orgId)).data : null;
+      let org = ok ? get(orgPath(d.author.orgId)).data : {};
       let acts = ok ? get(memberPath(d.author.orgId)).data.assignments.get(module, []) : [];
       return ok && module in org.modules && d.author.name == org.name && regionWithin(d.region, org.scope) && acts is list ? acts : [];
     }
     function personAuthorActions(d, module) {
       let ok = d.author.keys().hasOnly(['type', 'role', 'grantKey']) && d.author.grantKey is string
         && d.author.role in ['muhtar', 'il-yoneticisi'] && verified() && exists(grantPath(d.author.grantKey));
-      let g = ok ? get(grantPath(d.author.grantKey)).data : null;
+      let g = ok ? get(grantPath(d.author.grantKey)).data : {};
       return ok && g.get('revokedAt', null) == null && (g.get('expiresAt', null) == null || g.expiresAt > request.time)
         && g.role == d.author.role && regionWithin(d.region, g.scope) ? g.modules.get(module, []) : [];
     }
@@ -1907,8 +1913,8 @@ service cloud.firestore {
            == get(activityPath(request.resource.data.activityId)).data.reportCount + 1;
       // Kişi kendi şikâyetini görür ("şikâyet ettiniz" bilgisi için).
       allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
-        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
-      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+        || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
+      allow update: if provinceAllows('moderasyon', 'duzenle', resource.data.provinceCode)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status == 'incelendi';
       allow delete: if false;
@@ -2149,7 +2155,7 @@ service cloud.firestore {
         allow read: if signedIn()
           && ((get(postPath(id)).data.status == 'aktif' && canSeePost(get(postPath(id)).data))
               || get(postPath(id)).data.authorUid == request.auth.uid
-              || regionAllows('moderasyon', 'goruntule', get(postPath(id)).data.region.provinceCode, null));
+              || provinceAllows('moderasyon', 'goruntule', get(postPath(id)).data.region.provinceCode));
         allow create: if signedIn()
           && request.resource.data.keys().hasOnly(['authorUid', 'authorName', 'text', 'reportCount', 'createdAt'])
           && request.resource.data.authorUid == request.auth.uid
@@ -2166,7 +2172,7 @@ service cloud.firestore {
         allow delete: if signedIn()
           && (resource.data.authorUid == request.auth.uid
               || get(postPath(id)).data.authorUid == request.auth.uid
-              || isAdmin() || regionAllows('moderasyon', 'sil', get(postPath(id)).data.region.provinceCode, null))
+              || isAdmin() || provinceAllows('moderasyon', 'sil', get(postPath(id)).data.region.provinceCode))
           && getAfter(postPath(id)).data.commentCount == get(postPath(id)).data.get('commentCount', 0) - 1;
         allow update: if signedIn()
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportCount'])
@@ -2176,7 +2182,7 @@ service cloud.firestore {
         allow update: if request.resource.data.moderatedBy == request.auth.uid
           && request.resource.data.cleared == true
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['cleared', 'moderatedBy'])
-          && (isAdmin() || regionAllows('moderasyon', 'duzenle', get(postPath(id)).data.region.provinceCode, null));
+          && (isAdmin() || provinceAllows('moderasyon', 'duzenle', get(postPath(id)).data.region.provinceCode));
       }
     }
     // Kişinin bütün yorumları (hesap silme için).
@@ -2198,8 +2204,8 @@ service cloud.firestore {
         && request.resource.data.provinceCode == get(postPath(request.resource.data.postId)).data.region.provinceCode
         && get(/databases/$(database)/documents/posts/$(request.resource.data.postId)/comments/$(request.resource.data.commentId)).data.authorUid != request.auth.uid;
       allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
-        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
-      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+        || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
+      allow update: if provinceAllows('moderasyon', 'duzenle', resource.data.provinceCode)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status == 'incelendi';
       allow delete: if false;
@@ -2574,8 +2580,8 @@ service cloud.firestore {
         && getAfter(listingPath(request.resource.data.listingId)).data.reportCount
            == get(listingPath(request.resource.data.listingId)).data.reportCount + 1;
       allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
-        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
-      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+        || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
+      allow update: if provinceAllows('moderasyon', 'duzenle', resource.data.provinceCode)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status == 'incelendi';
     }
@@ -2705,8 +2711,8 @@ service cloud.firestore {
         && getAfter(postPath(request.resource.data.postId)).data.reportCount
            == get(postPath(request.resource.data.postId)).data.reportCount + 1;
       allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
-        || regionAllows('moderasyon', 'goruntule', resource.data.provinceCode, null);
-      allow update: if regionAllows('moderasyon', 'duzenle', resource.data.provinceCode, null)
+        || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
+      allow update: if provinceAllows('moderasyon', 'duzenle', resource.data.provinceCode)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status == 'incelendi';
       allow delete: if false;
@@ -2819,31 +2825,34 @@ service cloud.firestore {
     }
 
     // Haritada tek bir sayaç tam bir azalır (o) ve / veya tam bir artar (n); başka hiçbir anahtar değişmez.
+    // "Yok" null ya da '' ile gösterilir (derleyici işleve doğrudan null verilmesini kabul etmiyor).
     function countStep(b, a, o, n) {
       return o == n ? a == b
-        : a.diff(b).affectedKeys().hasOnly([o, n].removeAll([null]))
-          && (o == null || a.get(o, 0) == b.get(o, 0) - 1)
-          && (n == null || a.get(n, 0) == b.get(n, 0) + 1);
+        : a.diff(b).affectedKeys().hasOnly([o, n].removeAll([null, '']))
+          && (o == null || o == '' || a.get(o, 0) == b.get(o, 0) - 1)
+          && (n == null || n == '' || a.get(n, 0) == b.get(n, 0) + 1);
     }
     function utcDay() {
       let t = request.time;
       return string(t.year()) + (t.month() < 10 ? '0' : '') + string(t.month()) + (t.day() < 10 ? '0' : '') + string(t.day());
     }
-    // b / a: sayaç belgesi önce / sonra; o / n: kişinin takip kaydı önce / sonra (yoksa null).
+    // b / a: sayaç belgesi önce / sonra; o / n: kişinin takip kaydı önce / sonra (yoksa boş harita).
     function statsStep(b, a, o, n) {
-      let none = {'provinceCode': null, 'districtId': null, 'neighbourhoodId': null, 'ageBand': null};
-      let x = o == null ? none : o;
-      let y = n == null ? none : n;
+      let none = {'provinceCode': '', 'districtId': '', 'neighbourhoodId': '', 'ageBand': ''};
+      let had = o.size() > 0;
+      let has = n.size() > 0;
+      let x = had ? o : none;
+      let y = has ? n : none;
       return a.keys().hasOnly(['total', 'unfollows', 'p', 'd', 'n', 'a', 'f', 'u', 'updatedAt'])
         && a.updatedAt == request.time
-        && a.get('total', 0) == b.get('total', 0) + (n == null ? 0 : 1) - (o == null ? 0 : 1)
-        && a.get('unfollows', 0) == b.get('unfollows', 0) + (o != null && n == null ? 1 : 0)
+        && a.get('total', 0) == b.get('total', 0) + (has ? 1 : 0) - (had ? 1 : 0)
+        && a.get('unfollows', 0) == b.get('unfollows', 0) + (had && !has ? 1 : 0)
         && countStep(b.get('p', {}), a.get('p', {}), x.provinceCode, y.provinceCode)
         && countStep(b.get('d', {}), a.get('d', {}), x.districtId, y.districtId)
         && countStep(b.get('n', {}), a.get('n', {}), x.neighbourhoodId, y.neighbourhoodId)
         && countStep(b.get('a', {}), a.get('a', {}), x.ageBand, y.ageBand)
-        && countStep(b.get('f', {}), a.get('f', {}), null, o == null && n != null ? utcDay() : null)
-        && countStep(b.get('u', {}), a.get('u', {}), null, o != null && n == null ? utcDay() : null);
+        && countStep(b.get('f', {}), a.get('f', {}), '', !had && has ? utcDay() : '')
+        && countStep(b.get('u', {}), a.get('u', {}), '', had && !has ? utcDay() : '');
     }
     // Kurumun istatistiğini kurum yöneticisi ve görevlendirilen personel, muhtarlığınkini muhtar, ikisini de admin görür.
     // Başkanın istatistiğini yalnızca belediyenin "Belediye başkanı" bölümünde görevlendirilen kişiler görür (admin dahil değil).
@@ -2860,8 +2869,8 @@ service cloud.firestore {
       allow read: if signedIn() && officialStatsReader(pid);
       allow create, update: if signedIn()
         && statsStep(resource == null ? {} : resource.data, request.resource.data,
-             exists(officialFollowPath(pid)) ? get(officialFollowPath(pid)).data : null,
-             existsAfter(officialFollowPath(pid)) ? getAfter(officialFollowPath(pid)).data : null);
+             exists(officialFollowPath(pid)) ? get(officialFollowPath(pid)).data : {},
+             existsAfter(officialFollowPath(pid)) ? getAfter(officialFollowPath(pid)).data : {});
       allow delete: if false;
     }
 
