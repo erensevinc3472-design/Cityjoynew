@@ -2310,34 +2310,6 @@
     "votes_one": "{{count}} oy",
     "votes_other": "{{count}} oy"
   },
-  "clubs": {
-    "title": "Şehir Kulüpleri",
-    "subtitle": "{{place}} kulüpleri ve maçları",
-    "needLocation": "Kulüpleri görmek için ilini seç.",
-    "loadError": "Kulüpler yüklenemedi.",
-    "empty": "İlinde henüz kulüp eklenmedi.",
-    "all": "Kulüpler",
-    "cityClub": "Şehrin kulübü",
-    "verified": "Doğrulanmış",
-    "nextMatch": "Sıradaki maç",
-    "noFixture": "Fikstür henüz girilmedi.",
-    "home": "İç saha",
-    "away": "Deplasman",
-    "follow": "Takip et",
-    "following": "Takip ediliyor",
-    "ticket": "Bilet",
-    "signIn": "Kulübü takip etmek için giriş yap.",
-    "followError": "İşlem yapılamadı. Tekrar dene.",
-    "applyTitle": "Kulübün mü var? Başvur",
-    "applyText": "Kulüpler belgeyle başvurur, doğrulanınca fikstürünü kendisi girer.",
-    "sports": {
-      "futbol": "Futbol",
-      "basketbol": "Basketbol",
-      "voleybol": "Voleybol",
-      "amator": "Amatör lig",
-      "diger": "Diğer"
-    }
-  },
   "lodging": {
     "kinds": {
       "konak-otel": "Otel",

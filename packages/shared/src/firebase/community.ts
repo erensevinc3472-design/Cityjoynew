@@ -16,14 +16,13 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 
-import { sortClubs, type Club, type ClubInput } from '../polls/clubs';
 import { rankEntries, sortContests, type Contest, type ContestEntry, type ContestInput, type ContestStatus, type EntryStatus } from '../polls/contests';
 import { type Poll, type PollInput, type PollStatus } from '../polls/polls';
 import { addAudit } from './grants';
 import { countUsage } from './limits';
 
 /**
- * Sosyal Harmoni: Anketler, Yarışmalar, Şehir Kulüpleri (13. madde 35). Okuma il başına tek sorgu (en çok 50), oy iki
+ * Sosyal Harmoni: Anketler ve Yarışmalar (13. madde 35; Kulüpler 4 Kasım'da kaldırıldı, Eren). Okuma il başına tek sorgu (en çok 50), oy iki
  * yazım (oy belgesi + sayaç) ve günlük oy sayacı; kuralları `firestore.rules` denetler (tek oy, kendine oy yok, süre).
  */
 
@@ -49,16 +48,6 @@ const pollFrom = (id: string, d: DocumentData): Poll => ({
 });
 const contestFrom = (id: string, d: DocumentData): Contest => ({ ...(d as Contest), id, entryCount: d.entryCount ?? 0, createdAt: iso(d.createdAt) });
 const entryFrom = (contestId: string, id: string, d: DocumentData): ContestEntry => ({ ...(d as ContestEntry), id, contestId, voteCount: d.voteCount ?? 0, createdAt: iso(d.createdAt) });
-const clubFrom = (id: string, d: DocumentData): Club => ({
-  ...(d as Club),
-  id,
-  fixtures: d.fixtures ?? [],
-  managerUids: d.managerUids ?? [],
-  verified: !!d.verified,
-  featured: !!d.featured,
-  hidden: !!d.hidden,
-  updatedAt: iso(d.updatedAt),
-});
 
 /** Uygulama tarafı. */
 export function createFirestoreCommunityRepository(db: Firestore) {
@@ -120,22 +109,10 @@ export function createFirestoreCommunityRepository(db: Firestore) {
       await batch.commit();
     },
 
-    async listClubs(provinceCode: string): Promise<Club[]> {
-      const s = await getDocs(query(collection(db, 'clubs'), where('provinceCode', '==', provinceCode), where('hidden', '==', false), limit(50)));
-      return sortClubs(s.docs.map((d) => clubFrom(d.id, d.data())));
-    },
-    async isFollowing(clubId: string, uid: string): Promise<boolean> {
-      return (await getDoc(doc(db, 'clubFollows', `${clubId}_${uid}`))).exists();
-    },
-    async setFollow(clubId: string, uid: string, on: boolean): Promise<void> {
-      const ref = doc(db, 'clubFollows', `${clubId}_${uid}`);
-      if (on) await setDoc(ref, { clubId, uid, createdAt: serverTimestamp() });
-      else await deleteDoc(ref);
-    },
   };
 }
 
-/** Panel: anket ve yarışma admin'in, kulüpler il yöneticisinin (kurumlar modülü). Her işlem işlem kaydına yazılır. */
+/** Panel: anket ve yarışma admin'in. Her işlem işlem kaydına yazılır. */
 export function createCommunityAdmin(db: Firestore, actorUid: string) {
   const audit = (batch: ReturnType<typeof writeBatch>, module: 'bildirimler' | 'etkinlikler' | 'kurumlar', targetId: string, summary: string, provinceCode?: string) =>
     addAudit(db, batch, { actorUid, module, action: 'duzenle', targetId, summary, ...(provinceCode ? { scope: { level: 'il' as const, provinceCode } } : {}) });
@@ -217,50 +194,5 @@ export function createCommunityAdmin(db: Firestore, actorUid: string) {
       await batch.commit();
     },
 
-    async listClubs(provinceCode: string): Promise<Club[]> {
-      const s = await getDocs(query(collection(db, 'clubs'), where('provinceCode', '==', provinceCode), limit(100)));
-      return s.docs.map((d) => clubFrom(d.id, d.data())).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
-    },
-    async saveClub(id: string | null, c: ClubInput, extra: { verified: boolean; hidden: boolean; managerUids: string[] }): Promise<void> {
-      const ref = id ? doc(db, 'clubs', id) : doc(collection(db, 'clubs'));
-      const body = strip({
-        name: c.name.trim(),
-        short: c.short.trim().toUpperCase(),
-        sport: c.sport,
-        provinceCode: c.provinceCode,
-        districtId: c.districtId || undefined,
-        website: opt(c.website),
-        fixtures: c.fixtures.map((f) => strip({ at: f.at, opponent: f.opponent.trim(), home: f.home, venue: opt(f.venue), ticketUrl: opt(f.ticketUrl) })),
-        verified: extra.verified,
-        hidden: extra.hidden,
-        managerUids: extra.managerUids.slice(0, 5),
-        updatedBy: actorUid,
-        updatedAt: serverTimestamp(),
-      });
-      const batch = writeBatch(db);
-      batch.set(ref, id ? body : { ...body, featured: false }, { merge: !!id });
-      audit(batch, 'kurumlar', ref.id, `Kulüp ${id ? 'düzenlendi' : 'eklendi'}: ${body.name}`, c.provinceCode);
-      await batch.commit();
-    },
-    /** Şehrin kulübü: ilde tek; seçilince diğerlerinin işareti kalkar. */
-    async setFeaturedClub(provinceCode: string, clubId: string | null, all: readonly Club[]): Promise<void> {
-      const batch = writeBatch(db);
-      for (const c of all) {
-        const want = c.id === clubId;
-        if (c.featured !== want) batch.update(doc(db, 'clubs', c.id), { featured: want, updatedBy: actorUid, updatedAt: serverTimestamp() });
-      }
-      audit(batch, 'kurumlar', clubId ?? 'yok', clubId ? `Şehrin kulübü: ${all.find((c) => c.id === clubId)?.name}` : 'Şehrin kulübü kaldırıldı', provinceCode);
-      await batch.commit();
-    },
-    /** Kulüp yetkilisi yalnızca fikstürü günceller. */
-    async saveFixtures(club: Club, fixtures: ClubInput['fixtures']): Promise<void> {
-      const batch = writeBatch(db);
-      batch.update(doc(db, 'clubs', club.id), {
-        fixtures: fixtures.map((f) => strip({ at: f.at, opponent: f.opponent.trim(), home: f.home, venue: opt(f.venue), ticketUrl: opt(f.ticketUrl) })),
-        updatedBy: actorUid,
-        updatedAt: serverTimestamp(),
-      });
-      await batch.commit();
-    },
   };
 }

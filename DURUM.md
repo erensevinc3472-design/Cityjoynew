@@ -754,10 +754,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   taşındım" gibi durum kartları > ilgili hizmetler, `services/need.tsx`; Panel > İhtiyaç kartları, `needs-page.tsx`).
   **Sosyal Harmoni:** Anketler (`/polls`: tek oy, gizli, sonuç çubukları; oy için giriş + doğrulanmış e-posta), Yarışmalar
   (`/contests`, `/contests/[id]`: aşamalar, şartname, katıl formu, video https bağlantısı olarak ve ekip onayıyla, oy ver,
-  kendine oy yok), Kulüpler (`/clubs`: şehrin kulübü, takip, sıradaki maç ve bilet bağlantısı, spor süzgeci, "Kulübün mü var?"
-  yakında). Günlük oy sınırı (Panel > Sınırlar, `oy` / `oyYeni`). Panel > Sosyal: **Anketler** ve **Yarışmalar** (admin;
-  siyasi anket işaretiyle engellenir), **Kulüpler** (il yöneticisi, "kurumlar" yetkisi; fikstür satır satır). Veri:
-  `polls`, `pollVotes`, `contests` (+ `entries`), `contestVotes`, `clubs`, `clubFollows`.
+  kendine oy yok). Kulüpler bölümü 4 Kasım'da kaldırıldı (Eren; PROJE.md 5.3 spor notu). Günlük oy sınırı (Panel > Sınırlar, `oy` / `oyYeni`). Panel > Sosyal: **Anketler** ve **Yarışmalar** (admin;
+  siyasi anket işaretiyle engellenir). Veri:
+  `polls`, `pollVotes`, `contests` (+ `entries`), `contestVotes`.
   **Seyahat > Planla = tatil keşfi:** eski yol ücreti hesabı kaldırıldı (Yoldayım aynen). Türkiye / Yurt dışı; 9 tatil
   fikri (Deniz, Kayak, Termal, Kültür, Doğa, Lezzet, Aile, Balayı, Görülmesi gereken) > yerler (il, yol mesafesi, sezon,
   tesis sayısı, gece fiyat aralığı, not; `/travel/holiday/[theme]`) > konaklama (`/travel/stay`: "Şehri tanı" kartı,
@@ -766,10 +765,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   temalar, belge no, "rezervasyon tesisle doğrudan". Yalnızca doğrulanan tesis listelenir. **Panel > Seyahat:** "Keşfet ve
   Öğren" ve yeni **Tatil fikirleri** (yer sırası, sezon, not, gizle; uymayan tesis etiketini kaldır; yurt dışı ülkeleri aç).
   Panel > Yolculuk fiyatları kaldırıldı. Keşfet ve Öğren'deki ülke şeridi de panelde açılan ülkelere uyar.
-  Kurallar değişti (anket, yarışma, kulüp, ihtiyaç kartları, konaklama, `holidayThemes`, `config/travelCountries`).
+  Kurallar değişti (anket, yarışma, ihtiyaç kartları, konaklama, `holidayThemes`, `config/travelCountries`).
   Testler: ortak 166 (yeni: anket, tatil yerleri); kural testleri bu bilgisayarda çalıştırılmadı (Java 21 klasörü yok).
   Tip denetimi üç pakette temiz. **Telefonda denenmedi.** **Eren yapacak:** PR'ı birleştir, kuralları yükle; Expo'da dene.
-  Açık: kulüp yöneticisinin fikstür ekranı yok (panelden il yöneticisi girer); yarışma videosu yükleme ve kulüp/yayıncı
+  Açık: yarışma videosu yükleme ve yayıncı
   başvurusu Blaze ve sonraki iş; Panel > Uygulama görselleri yükleme Blaze ile.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)

@@ -722,37 +722,6 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Kulüpler: il yöneticisi (kurumlar modülü) ekler, doğrular, şehrin kulübünü seçer; kulüp yetkilisi fikstürü girer.
-    function validClub(d) {
-      return d.name is string && d.name.size() >= 2 && d.name.size() <= 60
-        && d.short is string && d.short.size() >= 1 && d.short.size() <= 4
-        && d.sport in ['futbol', 'basketbol', 'voleybol', 'amator', 'diger']
-        && d.provinceCode is string
-        && d.fixtures is list && d.fixtures.size() <= 12
-        && d.managerUids is list && d.managerUids.size() <= 5
-        && d.verified is bool && d.featured is bool && d.hidden is bool;
-    }
-    match /clubs/{id} {
-      allow read: if resource.data.hidden == false || regionAllows('kurumlar', 'duzenle', resource.data.provinceCode, null);
-      allow create: if regionAllows('kurumlar', 'duzenle', request.resource.data.provinceCode, null) && validClub(request.resource.data);
-      allow update: if regionAllows('kurumlar', 'duzenle', resource.data.provinceCode, null)
-        && request.resource.data.provinceCode == resource.data.provinceCode && validClub(request.resource.data);
-      allow update: if signedIn() && request.auth.uid in resource.data.managerUids
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fixtures', 'updatedBy', 'updatedAt'])
-        && request.resource.data.fixtures is list && request.resource.data.fixtures.size() <= 12
-        && request.resource.data.updatedBy == request.auth.uid;
-      allow delete: if regionAllows('kurumlar', 'duzenle', resource.data.provinceCode, null);
-    }
-    match /clubFollows/{fid} {
-      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
-      allow create: if signedIn()
-        && fid == request.resource.data.clubId + '_' + request.auth.uid
-        && request.resource.data.keys().hasOnly(['clubId', 'uid', 'createdAt'])
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.createdAt == request.time;
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
-    }
-
     // Seyahat > Planla: ekibin temadaki il düzenlemesi (sıra, gizle, dönem, not). Herkes okur, admin yazar.
     match /holidayThemes/{theme} {
       allow read: if true;

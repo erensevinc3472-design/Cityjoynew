@@ -2310,34 +2310,6 @@
     "votes_one": "{{count}} vote",
     "votes_other": "{{count}} votes"
   },
-  "clubs": {
-    "title": "City Clubs",
-    "subtitle": "Clubs and matches in {{place}}",
-    "needLocation": "Choose your province to see clubs.",
-    "loadError": "Clubs could not be loaded.",
-    "empty": "No clubs added in your province yet.",
-    "all": "Clubs",
-    "cityClub": "City club",
-    "verified": "Verified",
-    "nextMatch": "Next match",
-    "noFixture": "No fixtures yet.",
-    "home": "Home",
-    "away": "Away",
-    "follow": "Follow",
-    "following": "Following",
-    "ticket": "Tickets",
-    "signIn": "Sign in to follow the club.",
-    "followError": "Could not update. Try again.",
-    "applyTitle": "Run a club? Apply",
-    "applyText": "Clubs apply with documents; once verified they enter their own fixtures.",
-    "sports": {
-      "futbol": "Football",
-      "basketbol": "Basketball",
-      "voleybol": "Volleyball",
-      "amator": "Amateur league",
-      "diger": "Other"
-    }
-  },
   "lodging": {
     "kinds": {
       "konak-otel": "Hotel",

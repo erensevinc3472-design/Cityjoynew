@@ -33,7 +33,6 @@ const SOCIAL: Card[] = [
   { key: 'news', icon: 'newspaper', scene: 'news', href: '/news' },
   { key: 'contests', icon: 'emoji-events', scene: 'contests', href: '/contests' },
   { key: 'polls', icon: 'poll', scene: 'polls', href: '/polls' },
-  { key: 'clubs', icon: 'sports-soccer', scene: 'clubs', href: '/clubs' },
 ];
 
 /**

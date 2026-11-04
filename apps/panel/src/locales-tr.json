@@ -1694,7 +1694,6 @@
       "diger-ihtiyaclar": "Diğer İhtiyaçlar",
       "anketler": "Anketler",
       "yarismalar": "Yarışmalar",
-      "kulupler": "Şehir Kulüpleri",
       "tatil-fikirleri": "Tatil fikirleri"
     },
     "audience": "Takipçiler"
@@ -1981,47 +1980,6 @@
         "region": "İl ya da bölge seçin.",
         "dates": "Tarihleri girin; oylama bitişi katılım bitişinden önce olamaz.",
         "terms": "Şartname en az 20 karakter olmalı."
-      }
-    },
-    "clubs": {
-      "title": "Şehir Kulüpleri",
-      "intro": "İlinin kulüplerini ekle, doğrula ve uygulamanın üstündeki \"Şehrin kulübü\"nü seç (ilde tek). Fikstürü sen ya da kulübün yetkili hesabı girer. Kulüp başvurusu belge yüklemeyle (Blaze) gelecek.",
-      "noAccess": "Bu sayfa için bir ilde \"Kurumlar: düzenle\" yetkisi gerekir.",
-      "new": "Yeni kulüp",
-      "edit": "Düzenle: {{name}}",
-      "name": "Kulüp",
-      "short": "Rozet kısaltması (1-4 harf)",
-      "sport": "Spor dalı",
-      "district": "İlçe",
-      "website": "İnternet sitesi",
-      "fixtures": "Fikstür (her satıra bir maç)",
-      "fixturesHint": "Biçim: 2026-11-20 19:00 | Rakip | iç ya da dep | Stadyum | https://bilet-bağlantısı (son ikisi isteğe bağlı). En çok 12 maç.",
-      "managers": "Kulüp yetkilileri (kullanıcı kimliği, en çok 5)",
-      "managersHint": "Bu hesaplar uygulamadaki fikstürü güncelleyebilir.",
-      "verified": "Doğrulanmış",
-      "unverified": "Doğrulanmadı",
-      "hidden": "Uygulamada gizle",
-      "hiddenPill": "Gizli",
-      "save": "Kaydet",
-      "empty": "Bu ilde kulüp yok.",
-      "matches": "Maç",
-      "cityClub": "Şehrin kulübü",
-      "makeCityClub": "Şehrin kulübü yap",
-      "removeCityClub": "Şehrin kulübünü kaldır",
-      "noCityClub": "Bu ilde şehrin kulübü seçilmedi; uygulamada üst kart görünmez.",
-      "sports": {
-        "futbol": "Futbol",
-        "basketbol": "Basketbol",
-        "voleybol": "Voleybol",
-        "amator": "Amatör lig",
-        "diger": "Diğer"
-      },
-      "errors": {
-        "name": "Ad 2-60 karakter olmalı.",
-        "short": "Kısaltma 1-4 karakter olmalı.",
-        "website": "Site https:// ile başlamalı.",
-        "fixtures": "Fikstür satırlarını kontrol edin (tarih, rakip, en çok 12 maç, bilet https://).",
-        "managers": "En çok 5 yetkili."
       }
     }
   },
