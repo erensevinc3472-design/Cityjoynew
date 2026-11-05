@@ -46,8 +46,6 @@ export interface AdminPush {
   link: AdminPushLink;
   /** Reklamda işletme (bildirimde "Reklam · {ad}"). */
   business?: { id: string; name: string };
-  /** Seçilen paylaşımın resmi (bildirim kutusunda küçük resim; telefon bildiriminde açılınca). */
-  image?: string;
   status: AdminPushStatus;
   /** Gönderim anı (ISO); geçmiş ya da şimdiyse hemen gider. */
   sendAt: string;

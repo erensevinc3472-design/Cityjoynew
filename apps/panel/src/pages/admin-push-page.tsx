@@ -58,7 +58,7 @@ interface Draft {
   linkType: AdminPushLink['type'];
   linkId: string;
   business?: { id: string; name: string };
-  /** Paylaşım seçildiyse resmi. */
+  /** Seçilen paylaşımın resmi (yalnızca panelde, doğru paylaşım seçilsin diye). */
   image?: string;
   now: boolean;
   sendAt: string;
@@ -101,7 +101,7 @@ function AdminPushes({ user }: { user: PanelUser }) {
       const link: AdminPushLink = d.linkType === 'yok' ? { type: 'yok' } : ({ type: d.linkType, id: d.linkId } as AdminPushLink);
       const amount = d.billing.amount.trim() ? Number(d.billing.amount.replace(',', '.')) : undefined;
       await svc.create(
-        { kind: d.kind, title: d.title, body: d.body, region: d.region, target: cleanPushTarget(d.target) ?? undefined, link, business: d.business, image: d.linkType === 'gonderi' ? d.image : undefined, sendAt: d.now ? new Date().toISOString() : new Date(d.sendAt).toISOString() },
+        { kind: d.kind, title: d.title, body: d.body, region: d.region, target: cleanPushTarget(d.target) ?? undefined, link, business: d.business, sendAt: d.now ? new Date().toISOString() : new Date(d.sendAt).toISOString() },
         d.kind === 'reklam' ? { ...(amount !== undefined && Number.isFinite(amount) ? { amount } : {}), invoiceNo: d.billing.invoiceNo.trim(), note: d.billing.note.trim() } : undefined,
       );
       setDraft(null);

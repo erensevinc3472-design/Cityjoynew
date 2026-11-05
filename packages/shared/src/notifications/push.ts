@@ -48,8 +48,6 @@ export interface PushNotice {
   tag?: 'reklam' | 'kampanya';
   /** Admin bildirimi: açılma sayımı için kimlik. */
   adminPushId?: string;
-  /** Bildirimde gösterilecek resim (gönderen yalnızca bu özellik açıksa verir; telefonda doğrulanana kadar kapalı). */
-  image?: string;
 }
 
 /** Bir alıcı: telefonları, dili ve kendi bildirim tercihleri. */
@@ -73,8 +71,6 @@ export interface NoticePushMessage {
   /** Acil duyuruda: hemen teslim edilir, iOS odak modunda da görünür. */
   priority?: 'high';
   interruptionLevel?: 'time-sensitive';
-  /** Expo: bildirimde resim (Android büyük resim; iPhone'da ek ayar gerekir). */
-  richContent?: { image: string };
 }
 
 /** Bildirimin önceliği: acil ve SOS her zaman; admin işaretlediyse her zaman; değilse panelde türün seçimi. */
@@ -125,7 +121,6 @@ export function noticePushMessages(
       channelId: quiet ? QUIET_CHANNEL_ID : GENERAL_CHANNEL_ID,
       ttl: 86400,
       ...(critical ? { priority: 'high' as const, interruptionLevel: 'time-sensitive' as const } : {}),
-      ...(notice.image ? { richContent: { image: notice.image } } : {}),
     }));
   });
 }

@@ -43,7 +43,6 @@ export function adminPushFromDoc(id: string, d: DocumentData): AdminPush {
     ...(d.target ? { target: d.target } : {}),
     link: d.link ?? { type: 'yok' },
     ...(d.business ? { business: d.business } : {}),
-    ...(typeof d.image === 'string' ? { image: d.image } : {}),
     status: d.status,
     sendAt: iso(d.sendAt) ?? '',
     createdBy: d.createdBy,
@@ -54,7 +53,7 @@ export function adminPushFromDoc(id: string, d: DocumentData): AdminPush {
   };
 }
 
-export type AdminPushInput = Pick<AdminPush, 'kind' | 'title' | 'body' | 'region' | 'target' | 'link' | 'business' | 'sendAt' | 'image'>;
+export type AdminPushInput = Pick<AdminPush, 'kind' | 'title' | 'body' | 'region' | 'target' | 'link' | 'business' | 'sendAt'>;
 
 /** Panel (yalnızca admin): bildirim hazırla / planla, iptal et, listele; açılma sayısı. Her işlem kayda girer. */
 export function createAdminPushPanel(db: Firestore, actorUid: string) {
@@ -77,7 +76,6 @@ export function createAdminPushPanel(db: Firestore, actorUid: string) {
         ...(target ? { target } : {}),
         link: input.link,
         ...(input.kind === 'reklam' && input.business ? { business: input.business } : {}),
-        ...(input.link.type === 'gonderi' && input.image ? { image: input.image } : {}),
         status: 'planli',
         sendAt: Timestamp.fromDate(new Date(input.sendAt)),
         createdBy: actorUid,

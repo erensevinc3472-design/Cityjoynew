@@ -3440,8 +3440,7 @@ service cloud.firestore {
     match /adminPushes/{id} {
       function apOk(nw) {
         return isAdmin() && nw.keys().hasOnly(['kind', 'title', 'body', 'region', 'scope', 'target', 'link', 'business', 'status',
-            'sendAt', 'createdBy', 'createdAt', 'updatedAt', 'image'])
-          && (!('image' in nw) || (nw.image is string && nw.image.matches('^https://.{10,600}$')))
+            'sendAt', 'createdBy', 'createdAt', 'updatedAt'])
           && nw.kind in ['duyuru', 'etkinlik', 'kampanya', 'reklam'] && nw.status == 'planli'
           && nw.title is string && nw.title.size() <= 65 && nw.body is string && nw.body.size() <= 240
           && nw.region is map && nw.scope is string && nw.link is map && nw.sendAt is timestamp

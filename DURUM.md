@@ -856,11 +856,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   emülatörde denendi (reklam planlandı, listede ücret ve durum). **Blaze ile gönderilir.** Telefonda denenmedi.
   **Reklamda işletmenin paylaşımı (Karar Eren, 5 Kasım):** işletme resmi / videoyu kendi sayfasından (işletme adına
   Keşfet paylaşımı, Genel) paylaşır; admin "Dokununca ne açılsın? > İşletmenin paylaşımı" ile o paylaşımı seçer
-  (resimli kartlar), ayrıca dosya yüklenmez, bildirimde link yazmaz. Dokununca paylaşım açılır (`/explore/[id]`);
-  bildirim kutusunda paylaşımın resmi küçük resim olarak görünür; panel önizlemesinde de resim. Telefon bildiriminin
-  içindeki resim (Expo `richContent.image`) yazıldı ama **kapalı**: Expo belgesine bu ortamdan ulaşılamadı, alan
-  doğrulanmadı; gerçek telefon sürümünde (EAS) ve Blaze'de denenince sunucu işlevleri `PUSH_IMAGES=1` ile açılacak
-  (iPhone'da ek ayar gerekebilir). Video bildirimin içinde oynamaz; dokununca paylaşımda oynar.
+  (resimli kartlar, yalnızca panelde), ayrıca dosya yüklenmez, bildirimde link yazmaz. **Bildirim yalnızca yazıdır**
+  (Eren: "bu kadar basit"); dokununca paylaşım (resim / video) açılır (`/explore/[id]`). Bildirimin içinde ya da
+  bildirim kutusunda resim gösterme denemesi Eren'in isteğiyle kaldırıldı.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.
