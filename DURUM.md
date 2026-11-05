@@ -889,6 +889,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   yalnızca `hidden` değişir; durum ve çekim kaydı yalnızca admin. Testler: ortak 189, kurallar 171, sunucu 39.
   Emülatörde uygulamanın web sürümü ve panel örnek veriyle görüldü. **Çalışması için:** Eren NosyAPI hesabı ve anahtarı
   (ortam ayarı), fiyatı siteden doğrulama (5.000 kredi ≈ 6 dolar bilgisi doğrulanmadı), Blaze (zamanlanmış iş).
+- **Eczane ve Gönüllülük ekranları önizleme tasarımına göre (5 Kasım, aynı dal; Eren: "senin tasarladığın sayfalar
+  olsun").** Ölçü Claude'un önizleme panosu (S-Eczane, S-Gonullu), `tasarim/*.html` değil. **Eczane:** üstte liste durumu
+  kartı (Bugünün listesi / güncel olmayabilir + son güncelleme), "Yakınımda" (konum izniyle uzaklığa göre sıralar;
+  koordinat yoksa söyler) ve ilçe düğmeleri, en yakın / ilçendeki eczane büyük kartta (Ara, Yol tarifi), "Diğer
+  nöbetçiler" listesi (satırda Ara), sağ üstte "Hepsini haritada gör". **Gönüllülük:** tür düğmeleri (Tümü, Hayvan,
+  Çevre, Sosyal, Afet, Eğitim; etkinliğe yeni `volunteerType` alanı, panelde Gönüllülük türü seçilince sorulur),
+  "Yuva arayan dostlar" yan yana kartlar + "Tümünü gör" (`/volunteer/animals`, tür / acil süzgeci), "Gönüllü aranıyor"
+  kartları (tür etiketi, doluluk çubuğu "x/y kişi", Katılıyorum / Kontenjan doldu → etkinlik sayfası). Panodaki
+  "+ İlan ver" konmadı (kullanıcı ilan vermez); ilanlarda fotoğraf henüz yok, kartta türe göre renkli alan ve simge.
+  5 dilde. Testler: ortak 189, kurallar 171, sunucu geçti; emülatörde web sürümüyle görüldü.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

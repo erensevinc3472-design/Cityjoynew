@@ -2393,7 +2393,7 @@
   "volunteer": {
     "title": "Gönüllülük",
     "intro": "Şehrin için bir şey yap: belediye ve kurumların gönüllülük çalışmalarına katıl, yuva arayan bir dostu sahiplen.",
-    "jobs": "Gönüllülük ilanları",
+    "jobs": "Gönüllü aranıyor",
     "noJobs": "Şu an açık gönüllülük ilanı yok. Belediyeler ve kurumlar ilan açtıkça burada görünür.",
     "seats": "{{count}}/{{capacity}} kişi",
     "cancelled": "İptal edildi",
@@ -2430,7 +2430,23 @@
     "mailSubject": "{{name}} için sahiplendirme",
     "free": "Sahiplendirme ücretsizdir. Senden para isteyen olursa ilanı verene ve bize bildir.",
     "adopted": "Bu dost yuvasına kavuştu.",
-    "gone": "Bu ilan artık yayında değil."
+    "gone": "Bu ilan artık yayında değil.",
+    "type": {
+      "hepsi": "Tümü",
+      "hayvan": "Hayvan",
+      "cevre": "Çevre",
+      "sosyal": "Sosyal",
+      "afet": "Afet",
+      "egitim": "Eğitim"
+    },
+    "seeAll": "Tümünü gör",
+    "jobCount_one": "{{count}} ilan",
+    "jobCount_other": "{{count}} ilan",
+    "hours_one": "{{count}} saat",
+    "hours_other": "{{count}} saat",
+    "join": "Katılıyorum",
+    "full": "Kontenjan doldu",
+    "byOrgs": "Gönüllülük ilanlarını belediyeler ve kurumlar, sahiplendirme ilanlarını belediye barınakları ve doğrulanmış dernekler verir. Sahiplendirme ücretsizdir."
   },
   "pharmacy": {
     "title": "Nöbetçi eczane",
@@ -2444,6 +2460,19 @@
     "onDuty": "Nöbette",
     "call": "Ara",
     "map": "Haritada aç",
-    "note": "Liste her sabah güncellenir. Acil bir durumda 112'yi ara."
+    "note": "Liste her sabah güncellenir. Acil bir durumda 112'yi ara.",
+    "subtitle": "{{province}} · bugün nöbette olanlar",
+    "mapAll": "Hepsini haritada gör",
+    "mapQuery": "nöbetçi eczane",
+    "listToday": "Bugünün listesi",
+    "near": "Yakınımda",
+    "nearest": "En yakın · {{km}}",
+    "directions": "Yol tarifi",
+    "others": "Diğer nöbetçiler",
+    "count_one": "{{count}} eczane",
+    "count_other": "{{count}} eczane",
+    "noCoords": "Bu listede konum bilgisi yok; uzaklığa göre sıralanamadı.",
+    "locDenied": "Konum izni verilmedi. İlçe seçerek bakabilirsin.",
+    "locUnavailable": "Konumun alınamadı. İlçe seçerek bakabilirsin."
   }
 }

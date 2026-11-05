@@ -2393,7 +2393,7 @@
   "volunteer": {
     "title": "Ehrenamt",
     "intro": "Tu etwas für deine Stadt: Mach bei Ehrenamtsprojekten von Gemeinden und Institutionen mit oder adoptiere ein Tier, das ein Zuhause sucht.",
-    "jobs": "Ehrenamtliche Einsätze",
+    "jobs": "Freiwillige gesucht",
     "noJobs": "Derzeit keine offenen Einsätze. Sie erscheinen hier, sobald Gemeinden und Institutionen sie veröffentlichen.",
     "seats": "{{count}}/{{capacity}} Personen",
     "cancelled": "Abgesagt",
@@ -2430,7 +2430,23 @@
     "mailSubject": "Vermittlung von {{name}}",
     "free": "Die Vermittlung ist kostenlos. Wenn jemand Geld verlangt, melde es dem Anbieter und uns.",
     "adopted": "Dieses Tier hat ein Zuhause gefunden.",
-    "gone": "Diese Anzeige ist nicht mehr verfügbar."
+    "gone": "Diese Anzeige ist nicht mehr verfügbar.",
+    "type": {
+      "hepsi": "Alle",
+      "hayvan": "Tiere",
+      "cevre": "Umwelt",
+      "sosyal": "Soziales",
+      "afet": "Katastrophe",
+      "egitim": "Bildung"
+    },
+    "seeAll": "Alle ansehen",
+    "jobCount_one": "{{count}} Anzeige",
+    "jobCount_other": "{{count}} Anzeigen",
+    "hours_one": "{{count}} Stunde",
+    "hours_other": "{{count}} Stunden",
+    "join": "Ich mache mit",
+    "full": "Ausgebucht",
+    "byOrgs": "Ehrenamtsanzeigen stammen von Gemeinden und Institutionen, Adoptionsanzeigen von städtischen Tierheimen und geprüften Vereinen. Die Adoption ist kostenlos."
   },
   "pharmacy": {
     "title": "Notdienst-Apotheken",
@@ -2444,6 +2460,19 @@
     "onDuty": "Im Dienst",
     "call": "Anrufen",
     "map": "In Karten öffnen",
-    "note": "Die Liste wird jeden Morgen aktualisiert. Im Notfall 112 anrufen."
+    "note": "Die Liste wird jeden Morgen aktualisiert. Im Notfall 112 anrufen.",
+    "subtitle": "{{province}} · heute im Notdienst",
+    "mapAll": "Alle auf der Karte",
+    "mapQuery": "Notdienst Apotheke",
+    "listToday": "Heutige Liste",
+    "near": "In meiner Nähe",
+    "nearest": "Am nächsten · {{km}}",
+    "directions": "Route",
+    "others": "Weitere Notdienst-Apotheken",
+    "count_one": "{{count}} Apotheke",
+    "count_other": "{{count}} Apotheken",
+    "noCoords": "Diese Liste enthält keine Standortdaten, daher keine Sortierung nach Entfernung.",
+    "locDenied": "Standortzugriff nicht erlaubt. Du kannst einen Bezirk wählen.",
+    "locUnavailable": "Dein Standort konnte nicht ermittelt werden. Du kannst einen Bezirk wählen."
   }
 }

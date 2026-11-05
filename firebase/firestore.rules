@@ -1966,7 +1966,8 @@ service cloud.firestore {
     function validEvent(d) {
       return d.keys().hasOnly(['title', 'description', 'category', 'startsAt', 'endsAt', 'venueName', 'address', 'region', 'free',
              'priceNote', 'ticketUrl', 'capacity', 'author', 'status', 'preparedBy', 'preparedByName', 'createdAt', 'updatedAt',
-             'publishedAt', 'reviewedBy', 'reviewNote', 'attendeeCount', 'cover'])
+             'publishedAt', 'reviewedBy', 'reviewNote', 'attendeeCount', 'cover', 'volunteerType'])
+        && (!('volunteerType' in d) || (d.category == 'gonulluluk' && d.volunteerType in ['cevre', 'sosyal', 'afet', 'hayvan', 'egitim']))
         && d.title is string && d.title.size() >= 3 && d.title.size() <= 100
         && d.description is string && d.description.size() >= 10 && d.description.size() <= 3000
         && d.category in ['kultur-sanat', 'muzik', 'tiyatro-sinema', 'spor', 'cocuk-aile', 'egitim-seminer', 'festival-senlik',

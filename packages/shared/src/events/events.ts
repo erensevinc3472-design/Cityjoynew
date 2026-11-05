@@ -23,6 +23,10 @@ export const EVENT_CATEGORIES = [
 ] as const;
 export type EventCategory = (typeof EVENT_CATEGORIES)[number];
 
+/** Gönüllülük alanı (Benim Şehrim > Gönüllülük filtreleri; yalnızca "gonulluluk" türünde). */
+export const VOLUNTEER_TYPES = ['cevre', 'sosyal', 'afet', 'hayvan', 'egitim'] as const;
+export type VolunteerType = (typeof VOLUNTEER_TYPES)[number];
+
 /** Duyuru durumlarına ek olarak "iptal": iptal edilen etkinlik bitişine kadar "İptal edildi" etiketiyle görünür. */
 export type EventStatus = AnnouncementStatus | 'iptal';
 
@@ -46,6 +50,8 @@ export interface EventInput {
   capacity?: number;
   /** Kapak görseli (panelden yüklenir; Storage, Blaze). */
   cover?: Photo;
+  /** Gönüllülük alanı (yalnızca gönüllülük etkinliğinde). */
+  volunteerType?: VolunteerType;
 }
 
 export interface CityEvent extends EventInput {
@@ -91,6 +97,7 @@ export function validateEvent(e: EventInput, scope: RegionScope, now = new Date(
   if (!e.free && !len(e.priceNote)) errors.push('price');
   // Gönüllülük ilanı ücretsizdir (Benim Şehrim > Gönüllülük; Karar Eren 5 Kasım 2026).
   if (e.category === 'gonulluluk' && !e.free) errors.push('price');
+  if (e.volunteerType && (e.category !== 'gonulluluk' || !VOLUNTEER_TYPES.includes(e.volunteerType))) errors.push('category');
   if (len(e.priceNote) > EVENT_LIMITS.priceNote) errors.push('price');
   if (e.ticketUrl && (!/^https:\/\/[^\s]+\.[^\s]+$/.test(e.ticketUrl.trim()) || e.ticketUrl.length > EVENT_LIMITS.ticketUrl)) errors.push('ticketUrl');
   if (e.capacity !== undefined && (!Number.isInteger(e.capacity) || !within(e.capacity, EVENT_LIMITS.capacity))) errors.push('capacity');

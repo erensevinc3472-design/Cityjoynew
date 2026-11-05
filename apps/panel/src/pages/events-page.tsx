@@ -3,6 +3,7 @@ import {
   canPublishDirectly,
   EVENT_CATEGORIES,
   EVENT_LIMITS,
+  VOLUNTEER_TYPES,
   isFromPublisher,
   isGrantActive,
   publishersFor,
@@ -339,6 +340,7 @@ const toInput = (e: CityEvent): EventInput => ({
   ...(e.address ? { address: e.address } : {}),
   region: e.region,
   free: e.free,
+  ...(e.volunteerType ? { volunteerType: e.volunteerType } : {}),
   ...(e.priceNote ? { priceNote: e.priceNote } : {}),
   ...(e.ticketUrl ? { ticketUrl: e.ticketUrl } : {}),
   ...(e.capacity ? { capacity: e.capacity } : {}),
@@ -399,6 +401,15 @@ function EventForm({
           ))}
         </select>
       </div>
+      {input.category === 'gonulluluk' ? (
+        <div className="field">
+          <label htmlFor="ev-vtype">{t('events.volunteerType')}</label>
+          <select id="ev-vtype" value={input.volunteerType ?? ''} onChange={(e) => set({ volunteerType: (e.target.value || undefined) as EventInput['volunteerType'] })}>
+            <option value="">{t('events.volunteerTypeNone')}</option>
+            {VOLUNTEER_TYPES.map((v) => <option key={v} value={v}>{t(`events.volunteerTypes.${v}`)}</option>)}
+          </select>
+        </div>
+      ) : null}
       {dateInput('ev-start', 'startsAt')}
       {dateInput('ev-end', 'endsAt')}
       <p className="form-section">{err('dates')}</p>

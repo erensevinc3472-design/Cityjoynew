@@ -1285,7 +1285,16 @@
     "approvalNoteProvince": "Etkinliğiniz, il yöneticisinin onayından sonra yayınlanır.",
     "cover": "Kapak görseli (isteğe bağlı)",
     "coverHint": "Yatay bir görsel en iyi görünür. Kullanma izni olan bir görsel seç; küçültülerek yüklenir, konum bilgisi silinir.",
-    "volunteerHint": "Gönüllülük ilanı ücretsizdir; uygulamada Benim Şehrim > Gönüllülük sayfasında görünür, katılanlar \"Katıl\" ile kontenjana yazılır."
+    "volunteerHint": "Gönüllülük ilanı ücretsizdir; uygulamada Benim Şehrim > Gönüllülük sayfasında görünür, katılanlar \"Katıl\" ile kontenjana yazılır.",
+    "volunteerType": "Gönüllülük alanı",
+    "volunteerTypeNone": "Seçilmedi",
+    "volunteerTypes": {
+      "cevre": "Çevre",
+      "sosyal": "Sosyal",
+      "afet": "Afet",
+      "hayvan": "Hayvan",
+      "egitim": "Eğitim"
+    }
   },
   "profile": {
     "title": "Resmî profil",

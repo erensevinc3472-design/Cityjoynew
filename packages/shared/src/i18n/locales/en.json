@@ -2393,7 +2393,7 @@
   "volunteer": {
     "title": "Volunteering",
     "intro": "Do something for your city: join volunteering projects of municipalities and institutions, or adopt a friend looking for a home.",
-    "jobs": "Volunteering opportunities",
+    "jobs": "Volunteers wanted",
     "noJobs": "No open volunteering opportunities right now. They appear here as municipalities and institutions post them.",
     "seats": "{{count}}/{{capacity}} people",
     "cancelled": "Cancelled",
@@ -2430,7 +2430,23 @@
     "mailSubject": "Adoption of {{name}}",
     "free": "Adoption is free. If anyone asks you for money, report it to the lister and to us.",
     "adopted": "This friend has found a home.",
-    "gone": "This listing is no longer available."
+    "gone": "This listing is no longer available.",
+    "type": {
+      "hepsi": "All",
+      "hayvan": "Animals",
+      "cevre": "Environment",
+      "sosyal": "Social",
+      "afet": "Disaster",
+      "egitim": "Education"
+    },
+    "seeAll": "See all",
+    "jobCount_one": "{{count}} listing",
+    "jobCount_other": "{{count}} listings",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "join": "I'll join",
+    "full": "Full",
+    "byOrgs": "Volunteering listings come from municipalities and institutions; adoption listings from municipal shelters and verified associations. Adoption is free."
   },
   "pharmacy": {
     "title": "Pharmacies on duty",
@@ -2444,6 +2460,19 @@
     "onDuty": "On duty",
     "call": "Call",
     "map": "Open in maps",
-    "note": "The list is updated every morning. In an emergency, call 112."
+    "note": "The list is updated every morning. In an emergency, call 112.",
+    "subtitle": "{{province}} · on duty today",
+    "mapAll": "See all on the map",
+    "mapQuery": "pharmacy on duty",
+    "listToday": "Today's list",
+    "near": "Near me",
+    "nearest": "Nearest · {{km}}",
+    "directions": "Directions",
+    "others": "Other pharmacies on duty",
+    "count_one": "{{count}} pharmacy",
+    "count_other": "{{count}} pharmacies",
+    "noCoords": "This list has no location data, so it can't be sorted by distance.",
+    "locDenied": "Location permission was not given. You can pick a district instead.",
+    "locUnavailable": "Your location could not be found. You can pick a district instead."
   }
 }
