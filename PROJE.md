@@ -467,8 +467,12 @@ Eren'in kuralı: **herkes yalnızca kendi panelinden, kendine yetkilendirilen ka
     yalnızca "Belediye başkanı > görüntüle" görevi verilen kişiler görür; kurum yöneticisi ve CityJoy admin göremez
     (kurallarda). Kurum istatistiği için "Kitle istatistikleri" bölümü: kurum yöneticisi ve görevli personel; muhtar
     kendi mahallesini görür.
-  - **Sonraya kalan:** gönderi istatistikleri (tekil görüntülenme, kaydetme, paylaşım, videonun sonuna kadar izlenme,
-    yorum oranı) "kurum / başkan adına gönderi" özelliği gelince yapılır; resmî hesaplar şimdilik gönderi paylaşmıyor.
+  - **Yapıldı (5 Kasım 2026): İçerik performansı.** Resmî hesabın duyuru, haber, acil duyuru ve etkinlikleri için
+    tekil okuyan (ayrıntıyı açan kişi başına bir), paylaşan (Paylaş düğmesi, kişi başına bir) ve etkinlik katılımı;
+    öneriler (en çok okunan, takipçilere ulaşma, paylaşılma oranı, en iyi tür / gün / saat, az okunanlar). Kayıt kişinin
+    kimliğini taşımaz (kimlik + içerik karması). Takipçiler'i görebilen görür.
+  - **Sonraya kalan:** Keşfet gönderisi istatistikleri (görüntülenme, kaydetme, videonun sonuna kadar izlenme, yorum
+    oranı) "kurum / başkan adına gönderi" özelliği gelince yapılır; resmî hesaplar şimdilik gönderi paylaşmıyor.
     10 kişi eşiği şimdilik panelde uygulanır; yetkili personel ham sayıları okuyabilir, sunucuda eşik Blaze ve sunucu
     işlevleriyle gelir. Takip / bırakma tekrarına sınır sonra eklenebilir. Seçim dönemi başkan gizleme (Başkanlarla
     Keşif'teki gibi) resmî başkan profiline henüz uygulanmadı.

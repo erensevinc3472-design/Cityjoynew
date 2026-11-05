@@ -1696,7 +1696,8 @@
       "yarismalar": "Yarışmalar",
       "tatil-fikirleri": "Tatil fikirleri"
     },
-    "audience": "Takipçiler"
+    "audience": "Takipçiler",
+    "content": "İçerik performansı"
   },
   "today": {
     "morning": "Günaydın",
@@ -2042,5 +2043,66 @@
       "ES": "İspanya"
     },
     "saveCountries": "Ülkeleri kaydet"
+  },
+  "content": {
+    "title": "İçerik performansı",
+    "intro": "Duyuru, haber, acil duyuru ve etkinliklerinizin kaç kişiye ulaştığı ve ne kadar paylaşıldığı. Her kişi bir içeriği bir kez okumuş sayılır; kimin okuduğu kaydedilmez.",
+    "error": "İstatistik okunamadı. Bu hesabın istatistiğini görmek için \"Kitle istatistikleri\" görevi gerekir.",
+    "privacy": "Okunma, uygulamada içeriğin ayrıntısını açan kişi başına bir kez; paylaşım, uygulamadaki Paylaş düğmesiyle bir kez sayılır. Kişinin kimliği kaydedilmez. Sayım bu özellik açıldıktan sonra başlar, geriye dönük değildir.",
+    "today": "Bugün",
+    "reads": "Okunma (son {{count}} gün)",
+    "published": "Yayınlanan içerik ({{count}} gün)",
+    "publishedHint": "{{events}} etkinlik dahil",
+    "average": "İçerik başına okuyan",
+    "followersHint": "{{count}} takipçiniz var",
+    "shares": "Paylaşan",
+    "attendeesHint": "Etkinliklere {{count}} katılım",
+    "chartDaily": "Günlük okunma",
+    "chartWeekly": "Haftalık okunma",
+    "top": "En çok okunanlar",
+    "byKind": "Türe göre içerik başına okuyan",
+    "filter": "Tür",
+    "all": "Tümü",
+    "sort": "Sırala",
+    "sortNew": "En yeni",
+    "sortReads": "En çok okunan",
+    "sortShares": "En çok paylaşılan",
+    "tableTitle": "İçerikler ve sayıları",
+    "colTitle": "Başlık",
+    "colKind": "Tür",
+    "colDate": "Yayın",
+    "colReads": "Okuyan",
+    "colShares": "Paylaşan",
+    "colAttendees": "Katılım",
+    "empty": "Son {{count}} günde yayınlanmış içerik yok.",
+    "kinds": {
+      "duyuru": "Duyuru",
+      "haber": "Haber",
+      "etkinlik": "Etkinlik",
+      "acil": "Acil duyuru"
+    },
+    "bands": {
+      "sabah": "sabah (06-11)",
+      "ogle": "öğlen (11-17)",
+      "aksam": "akşam (17-23)",
+      "gece": "gece (23-06)"
+    },
+    "ins": {
+      "title": "Öneriler",
+      "bestTitle": "En çok okunan",
+      "best": "\"{{title}}\" {{count}} kişiye ulaştı.",
+      "reachTitle": "Takipçilere ulaşma",
+      "reach": "Bir içerik ortalama olarak takipçi sayınızın %{{pct}}'i kadar kişiye ulaşıyor.",
+      "shareTitle": "Paylaşılma",
+      "share": "Okuyanların %{{pct}}'i içeriği paylaşıyor.",
+      "kindTitle": "En ilgi gören tür",
+      "kind": "{{kind}} içerikleri ortalamanın {{x}} katı okunuyor.",
+      "dayTitle": "En iyi gün",
+      "day": "{{day}} günü yayınlananlar ortalamanın {{x}} katı okunuyor.",
+      "hourTitle": "En iyi saat",
+      "hour": "{{band}} yayınlananlar ortalamanın {{x}} katı okunuyor.",
+      "lowTitle": "Az okunanlar",
+      "low": "{{count}} içerik diğerlerinin yarısından az okundu. Başlığı kısa ve açık yazmak, hedef mahalleyi doğru seçmek ulaşmayı artırabilir."
+    }
   }
 }

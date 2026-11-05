@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { Linking, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { isEventVisible, remainingSeats, type CityEvent } from '@cityjoy/shared';
 
@@ -16,7 +16,7 @@ import { StateMessage } from '@/components/state-message';
 import { useAuthorLabel, useNeighbourhoodName } from '@/lib/announcements';
 import { cachedEvent, patchCachedEvent } from '@/lib/events';
 import { locationRepository as repo } from '@/lib/locations';
-import { eventRepository } from '@/lib/services';
+import { contentStats, eventRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { fonts, radius, spacing } from '@/theme/tokens';
@@ -53,6 +53,12 @@ export default function EventScreen() {
     eventRepository.myAttendance(id, user.uid).then(setAttending, () => setAttending(null));
   }, [id, user]);
 
+  // Görünen etkinlik açılınca kişi başına bir okunma sayılır (belediye paneli, içerik istatistiği).
+  const visible = !!item && isEventVisible(item);
+  useEffect(() => {
+    if (visible && item && user) void contentStats.view('e', item, user.uid);
+  }, [visible, item, user]);
+
   const when = (iso: string, opts: Intl.DateTimeFormatOptions) => new Date(iso).toLocaleString(lang, opts);
   const header = <HeroHeader title={t('events.one')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/events'))} />;
 
@@ -76,6 +82,15 @@ export default function EventScreen() {
   const dateText = sameDay
     ? `${when(item.startsAt, { dateStyle: 'full' })}, ${when(item.startsAt, { timeStyle: 'short' })} - ${when(item.endsAt, { timeStyle: 'short' })}`
     : `${when(item.startsAt, { dateStyle: 'medium', timeStyle: 'short' })} - ${when(item.endsAt, { dateStyle: 'medium', timeStyle: 'short' })}`;
+
+  const share = async () => {
+    try {
+      const r = await Share.share({ message: `${item.title}\n${dateText}\n${[item.venueName, place].filter(Boolean).join(', ')}\n\n${author} · CityJoy` });
+      if (r.action === Share.sharedAction && user) void contentStats.share(item.id, user.uid);
+    } catch {
+      // Paylaşım penceresi açılamadıysa bir şey yapılmaz.
+    }
+  };
 
   const toggle = async () => {
     if (!user) return;
@@ -131,6 +146,7 @@ export default function EventScreen() {
         {item.ticketUrl ? <AppText variant="caption" muted>{t('events.ticketNote')}</AppText> : null}
 
         <AppText selectable>{item.description}</AppText>
+        <AppButton variant="ghost" title={t('news.share')} onPress={share} />
 
         <View style={styles.meta}>
           <AppText variant="label">{t('events.attendance')}</AppText>

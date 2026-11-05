@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -59,8 +59,8 @@ Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yüklem
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (166)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (156; Java 21 gerekir)
+npm test                      # ortak paket testleri (169)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (159; Java 21 gerekir)
 npm run test:functions        # sunucu işlevleri, emülatörde (30; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
@@ -753,6 +753,27 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sayfasında başkan profili. Örnek hesaplarda tutarlı örnek sayılar ("Örnek veri" etiketi). Testler: kurallar 8 yeni,
   ortak 6 yeni; panel derlendi, mobil tür denetimi geçti; tarayıcıda belediye, muhtar, admin örnek hesaplarıyla ve
   375 px genişlikte denendi. **Telefonda denenmedi.** PR #60 birleşti; kurallar Firebase'e, panel cityjoynew.web.app'e yüklendi (3 Kasım, Claude). Gönderi istatistikleri sonraki adım.
+- **Panel 3. aşama: İçerik performansı (5 Kasım, `claude/magical-maxwell-0tnmeh`; PROJE.md 6.1, 6.2 madde 22).**
+  Uygulamada duyuru / haber / acil duyuru ve etkinlik ayrıntısı açılınca kişi başına bir "okunma", Paylaş ile bir
+  "paylaşım" sayılır (`contentStats` kaydedici, okuma yok, oturumda içerik başına bir deneme). Paylaş düğmesi artık her
+  duyuruda ve etkinlikte var (önce yalnızca haberde). Veri: `contentViews/{içerik}_{SHA-256(uid+içerik)}` {item, k, owner,
+  at, sh}: kişinin kimliği yazılmaz, aynı kişi iki kez sayılamaz, iki içeriğin okuru eşleştirilemez; hesap silinince
+  kayıt isimsiz kalır (silmeye gerek yok). Kurallar: belge adı karmayla, hesap içeriğin yayınlayanıyla tutmalı, içerik
+  yayında, paylaşım yalnızca false > true; sayımları `officialStatsReader` ile Takipçiler'i görebilen görür (kurum
+  yöneticisi, "Kitle istatistikleri" görevlisi, muhtar, admin). Panel: **İçerik performansı** (`/icerik-performansi`,
+  menüde Takipçiler'in altında; Bugün kısayollarında önde): 7/30/90 gün; okunma (önceki döneme göre), yayınlanan içerik,
+  içerik başına okuyan (takipçi sayısıyla), paylaşan ve etkinlik katılımı; **Öneriler** (en çok okunan, takipçilere
+  ulaşma oranı, paylaşılma oranı, en iyi tür / gün / saat dilimi, az okunanlar; yeterli veri yoksa çıkmaz,
+  `contentInsights`); günlük / haftalık okunma grafiği, en çok okunanlar, türe göre ortalama, süzülüp sıralanan içerik
+  tablosu. Maliyet: içerik başına 2 sayım + grafik dilimi başına 1 sayım (en çok 30). Örnek hesaplarda örnek veri.
+  **5 yeni dizin** (duyuru ve etkinlik: author.orgId / author.grantKey + status + publishedAt; contentViews: owner + at).
+  Kural dosyası yer açmak için yeniden sıkıştırıldı (okuma / silme kuralları da; işlev argümanlarının tembel
+  değerlendirildiği emülatörde denendi). Testler: ortak 169 (3 yeni), kurallar 159 (3 yeni), sunucu 30; tür denetimi ve
+  panel derlemesi geçti; panel örnek Nilüfer Belediyesi hesabıyla masaüstü ve 390 px'te tarayıcıda görüldü. **Telefonda
+  denenmedi.** **Yüklenmeli:** kurallar + dizinler (Eren'in bilgisayarı ya da ortam ayarına eklenen hizmet hesabı
+  anahtarı) ve panel. Kural dosyası sınıra yakın: yüklemede "Bilinmeyen hata" çıkarsa boyut aşılmıştır, Claude kısaltır.
+  **Aydınlatma metnine eklenecek satır:** "Resmî hesapların içeriklerini açtığınızda ve paylaştığınızda isimsiz sayılır;
+  kimliğiniz kaydedilmez." (avukat kontrolü).
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

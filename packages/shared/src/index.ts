@@ -20,6 +20,7 @@ export * from './organizations/staff';
 export * from './organizations/municipalities';
 export * from './organizations/profiles';
 export * from './organizations/audience';
+export * from './organizations/content-stats';
 export * from './services/types';
 export * from './services/occupations';
 export * from './services/needs';

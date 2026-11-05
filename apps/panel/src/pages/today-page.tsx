@@ -5,7 +5,9 @@ import { createFirebaseStats } from '@cityjoy/shared/firebase';
 
 import { BarList, Change, ColumnChart, daysAgo, lastWeeks, show, StatTile, type Datum } from '../components/charts';
 import { canSeeStats, MENU_GROUPS, visibleItems } from '../components/shell';
+import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
+import { canSeeContentStats } from './content-stats-page';
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import { isAdminUser, useSession } from '../lib/session';
@@ -130,12 +132,21 @@ export function TodayPage() {
 /** İstatistik yetkisi olmayanlar (örn. kurum personeli) için bölümlerine kısayollar. */
 function QuickLinks() {
   const { user } = useSession();
-  const items = MENU_GROUPS.flatMap((g) => visibleItems(user!, g.items)).filter((m) => m.path);
+  const admin = isAdminUser(user!);
+  // Belediye ve muhtar için en çok işe yarayanlar önde: içerik performansı ve takipçiler.
+  const reports = [
+    ...(canSeeContentStats(user!, admin) ? [{ key: 'icerik', path: '/icerik-performansi', label: t('menu.content') }] : []),
+    ...(canSeeAudience(user!, admin) ? [{ key: 'kitle', path: '/takipciler', label: t('menu.audience') }] : []),
+  ];
+  const items = [
+    ...reports,
+    ...MENU_GROUPS.flatMap((g) => visibleItems(user!, g.items)).filter((m) => m.path).map((m) => ({ key: m.key, path: m.path!, label: t(`menu.items.${m.key}`) })),
+  ];
   return (
     <div className="card-grid three">
       {items.map((m) => (
-        <Link key={m.key} to={m.path!} className="card quick">
-          {t(`menu.items.${m.key}`)}
+        <Link key={m.key} to={m.path} className="card quick">
+          {m.label}
           <span aria-hidden="true">›</span>
         </Link>
       ))}

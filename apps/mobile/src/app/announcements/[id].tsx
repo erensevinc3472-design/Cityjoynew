@@ -13,7 +13,8 @@ import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { cachedAnnouncement, useAuthorLabel, useNeighbourhoodName } from '@/lib/announcements';
 import { locationRepository as repo } from '@/lib/locations';
-import { announcementRepository } from '@/lib/services';
+import { announcementRepository, contentStats } from '@/lib/services';
+import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { fonts, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -30,6 +31,7 @@ export default function AnnouncementScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const { language } = useSettings();
+  const { user } = useSession();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [item, setItem] = useState<Announcement | null | undefined>(() => cachedAnnouncement(id));
   const [failed, setFailed] = useState(false);
@@ -41,6 +43,22 @@ export default function AnnouncementScreen() {
     if (item !== undefined) return;
     announcementRepository.get(id).then(setItem, () => setFailed(true));
   }, [id, item]);
+
+  // Yayındaki içerik açılınca kişi başına bir okunma sayılır (belediye paneli, içerik istatistiği).
+  const live = !!item && isAnnouncementLive(item);
+  useEffect(() => {
+    if (live && item && user) void contentStats.view('a', item, user.uid);
+  }, [live, item, user]);
+
+  const share = async () => {
+    if (!item) return;
+    try {
+      const r = await Share.share({ message: `${item.title}\n\n${item.body.slice(0, 300)}\n\n${author} · CityJoy` });
+      if (r.action === Share.sharedAction && user) void contentStats.share(item.id, user.uid);
+    } catch {
+      // Paylaşım penceresi açılamadıysa bir şey yapılmaz.
+    }
+  };
 
   const when = (iso?: string) => (iso ? new Date(iso).toLocaleString(language ?? 'tr', { dateStyle: 'medium', timeStyle: 'short' }) : '');
   const region = item
@@ -78,14 +96,16 @@ export default function AnnouncementScreen() {
               {item.endsAt ? <AppText variant="caption" muted>{t('announcements.until', { date: when(item.endsAt) })}</AppText> : null}
               {news ? <AppText variant="caption" muted>{t('news.readingTime', { count: readingMinutes(item.body) })}</AppText> : null}
             </View>
-            {news ? (
-              // Haber okuyucusu: yazı boyu ve paylaş (PROJE.md 5.3).
-              <View style={styles.tools}>
-                <AppButton variant="ghost" title={t('news.smaller')} disabled={size <= 0} onPress={() => setSize((s) => Math.max(0, s - 1))} />
-                <AppButton variant="ghost" title={t('news.larger')} disabled={size >= SIZES.length - 1} onPress={() => setSize((s) => Math.min(SIZES.length - 1, s + 1))} />
-                <AppButton variant="ghost" title={t('news.share')} onPress={() => Share.share({ message: `${item.title}\n\n${item.body.slice(0, 300)}\n\n${author} · CityJoy` }).catch(() => {})} />
-              </View>
-            ) : null}
+            {/* Haber okuyucusunda yazı boyu (PROJE.md 5.3); paylaş her duyuruda. */}
+            <View style={styles.tools}>
+              {news ? (
+                <>
+                  <AppButton variant="ghost" title={t('news.smaller')} disabled={size <= 0} onPress={() => setSize((s) => Math.max(0, s - 1))} />
+                  <AppButton variant="ghost" title={t('news.larger')} disabled={size >= SIZES.length - 1} onPress={() => setSize((s) => Math.min(SIZES.length - 1, s + 1))} />
+                </>
+              ) : null}
+              <AppButton variant="ghost" title={t('news.share')} onPress={share} />
+            </View>
             <AppText selectable style={news ? { fontSize: SIZES[size], lineHeight: Math.round(SIZES[size] * 1.5) } : undefined}>{item.body}</AppText>
           </>
         )}
