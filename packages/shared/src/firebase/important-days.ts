@@ -1,7 +1,8 @@
 import { doc, getDoc, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
 
 import { cleanImportantDay, IMPORTANT_DAY_LIMITS, type ImportantDay } from '../press/important-days';
-import type { Action, Module } from '../permissions/types';
+import type { Action, Module, RegionScope } from '../permissions/types';
+import { cleanTemplate, TEMPLATE_LIMITS, type PressTemplate } from '../press/templates';
 import { addAudit } from './grants';
 
 /**
@@ -35,6 +36,34 @@ export function createImportantDaysService(db: Firestore, actorUid: string) {
       const batch = writeBatch(db);
       batch.set(local(orgId), { days: days.slice(0, IMPORTANT_DAY_LIMITS.local).map(cleanImportantDay), updatedBy: actorUid, updatedAt: serverTimestamp() });
       addAudit(db, batch, { actorUid, module: as.module, action: as.action, targetId: `orgDays/${orgId}`, orgId, summary: `Yerel önemli günler (${days.length} gün)` });
+      await batch.commit();
+    },
+  };
+}
+
+/**
+ * Basın Masası > Hazır şablonlar: `pressTemplates/{hesap}` (kurum kimliği ya da kişi yetkisinin anahtarı). Hesabın
+ * yöneticisi ve duyuru hazırlayabilenler yazar ve okur; kayıt işlem kaydına girer.
+ */
+export function createPressTemplatesService(db: Firestore, actorUid: string) {
+  const ref = (key: string) => doc(db, 'pressTemplates', key);
+  return {
+    async load(key: string): Promise<PressTemplate[]> {
+      const snap = await getDoc(ref(key));
+      return snap.exists() && Array.isArray(snap.data().items) ? (snap.data().items as PressTemplate[]) : [];
+    },
+    /** as: işlem kaydının bölümü (kurum yöneticisi "kurumlar / duzenle", diğerleri "gonderiler / ekle"). */
+    async save(
+      key: string,
+      items: PressTemplate[],
+      as: { module: Extract<Module, 'kurumlar' | 'gonderiler'>; action: Action; orgId?: string; scope?: RegionScope },
+    ): Promise<void> {
+      const batch = writeBatch(db);
+      batch.set(ref(key), { items: items.slice(0, TEMPLATE_LIMITS.max).map(cleanTemplate), updatedBy: actorUid, updatedAt: serverTimestamp() });
+      addAudit(db, batch, {
+        actorUid, module: as.module, action: as.action, targetId: `pressTemplates/${key}`,
+        ...(as.orgId ? { orgId: as.orgId } : {}), ...(as.scope ? { scope: as.scope } : {}), summary: `Hazır şablonlar (${items.length})`,
+      });
       await batch.commit();
     },
   };

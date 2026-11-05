@@ -3,8 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { DEFAULT_IMPORTANT_DAYS, type ImportantDay } from '@cityjoy/shared';
-import { createImportantDaysService } from '@cityjoy/shared/firebase';
+import { DEFAULT_IMPORTANT_DAYS, STARTER_TEMPLATES, type ImportantDay } from '@cityjoy/shared';
+import { createImportantDaysService, createPressTemplatesService } from '@cityjoy/shared/firebase';
 import { doc, getDoc, serverTimestamp, setDoc, Timestamp, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
@@ -60,5 +60,16 @@ describe('Basın Masası: önemli günler', () => {
     await assertFails(createImportantDaysService(fs('ayse'), 'ayse').saveLocal(orgId, local, { module: 'gonderiler', action: 'ekle' }));
     // 60'tan fazla gün yazılamaz.
     await assertFails(setDoc(doc(fs('kalem'), 'orgDays', orgId), { days: Array(61).fill(local[0]), updatedBy: 'kalem', updatedAt: serverTimestamp() }));
+  });
+
+  it('şablonları kurum yöneticisi ve duyuru hazırlayan okur ve yazar; istatistik görevlisi ve dışarıdaki göremez', async () => {
+    const asStaff = { module: 'gonderiler', action: 'ekle', orgId } as const;
+    await assertSucceeds(createPressTemplatesService(fs('basin'), 'basin').save(orgId, STARTER_TEMPLATES, asStaff));
+    expect((await createPressTemplatesService(fs('kalem'), 'kalem').load(orgId)).map((x) => x.id)).toEqual(STARTER_TEMPLATES.map((x) => x.id));
+    await assertSucceeds(createPressTemplatesService(fs('kalem'), 'kalem').save(orgId, [], { module: 'kurumlar', action: 'duzenle', orgId }));
+    await assertFails(getDoc(doc(fs('analiz'), 'pressTemplates', orgId)));
+    await assertFails(createPressTemplatesService(fs('analiz'), 'analiz').save(orgId, STARTER_TEMPLATES, asStaff));
+    await assertFails(getDoc(doc(fs('ayse'), 'pressTemplates', orgId)));
+    await assertFails(setDoc(doc(fs('basin'), 'pressTemplates', orgId), { items: Array(31).fill(STARTER_TEMPLATES[0]), updatedBy: 'basin', updatedAt: serverTimestamp() }));
   });
 });

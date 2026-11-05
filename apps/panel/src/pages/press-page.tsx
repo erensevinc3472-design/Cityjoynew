@@ -5,6 +5,7 @@ import {
   IMPORTANT_DAY_KINDS,
   isMemberActive,
   isOrganizationActive,
+  isScheduled,
   occurrencesBetween,
   publishersFor,
   upcomingDays,
@@ -14,8 +15,11 @@ import {
   type ImportantDay,
   type ImportantDayKind,
   type Publisher,
+  type PressTemplate,
+  STARTER_TEMPLATES,
 } from '@cityjoy/shared';
-import { createAnnouncementPanel, createEventPanel, createImportantDaysService } from '@cityjoy/shared/firebase';
+import { createAnnouncementPanel, createEventPanel, createImportantDaysService, createPressTemplatesService } from '@cityjoy/shared/firebase';
+import { canEditTemplates, pressAuditAs } from '../lib/press';
 
 import { sampleContent } from '../lib/content-stats';
 import { firestore } from '../lib/firebase';
@@ -58,8 +62,10 @@ interface CalItem {
   /** Takvim günü "YYYY-AA-GG". */
   date: string;
   time?: string;
-  /** Yayında değil (taslak, onay bekliyor). */
+  /** Yayında değil (taslak, onay bekliyor) ya da planlı. */
   pending?: boolean;
+  /** Planlı yayın: zamanı gelince yayına girecek. */
+  scheduled?: boolean;
   idea?: string;
   /** Önemli gün: kaçıncı bayram günü. */
   nthDay?: number;
@@ -169,7 +175,8 @@ function Press({ user }: { user: PanelUser }) {
     if (!data) return map;
     for (const a of data.announcements) {
       if (a.status !== 'yayinda' || !a.publishedAt) continue;
-      add({ key: a.id, kind: a.kind === 'acil' ? 'acil' : a.kind === 'haber' ? 'haber' : 'duyuru', title: a.title, date: keyOf(new Date(a.publishedAt)), time: timeOf(a.publishedAt), to: '/duyurular' });
+      // Planlı (zamanı gelmemiş) duyuru kesik çizgili, "Planlı" etiketiyle.
+      add({ key: a.id, kind: a.kind === 'acil' ? 'acil' : a.kind === 'haber' ? 'haber' : 'duyuru', title: a.title, date: keyOf(new Date(a.publishedAt)), time: timeOf(a.publishedAt), pending: isScheduled(a), scheduled: isScheduled(a), to: '/duyurular' });
     }
     for (const e of data.events) {
       if (e.status === 'reddedildi' || e.status === 'kaldirildi') continue;
@@ -183,7 +190,7 @@ function Press({ user }: { user: PanelUser }) {
     return map;
   }, [data, allDays, grid]);
 
-  const pending = (data?.announcements ?? []).filter((a) => a.status === 'taslak' || a.status === 'onay-bekliyor' || a.status === 'reddedildi');
+  const pending = (data?.announcements ?? []).filter((a) => a.status === 'taslak' || a.status === 'onay-bekliyor' || a.status === 'reddedildi' || isScheduled(a));
   const upcoming = upcomingDays(allDays, today, 30);
   const monthLabel = month.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
   const draftFor = (title: string) => navigate(`/duyurular?yeni=1&baslik=${encodeURIComponent(title)}`);
@@ -246,10 +253,10 @@ function Press({ user }: { user: PanelUser }) {
                 <ul className="upcoming">
                   {pending.slice(0, 6).map((a) => (
                     <li key={a.id}>
-                      <span className="dot k-taslak" aria-hidden="true" />
+                      <span className={`dot k-${isScheduled(a) ? 'duyuru' : 'taslak'}`} aria-hidden="true" />
                       <span className="grow">
                         <strong>{a.title}</strong>
-                        <small>{t(`press.status.${a.status}`)}</small>
+                        <small>{isScheduled(a) ? t('press.scheduledAt', { date: new Date(a.publishedAt!).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }) }) : t(`press.status.${a.status}`)}</small>
                       </span>
                     </li>
                   ))}
@@ -303,9 +310,9 @@ function Press({ user }: { user: PanelUser }) {
             {selectedItems.length ? (
               <ul className="day-list">
                 {selectedItems.map((i) => (
-                  <li key={i.key} className={`k-${i.pending ? 'taslak' : i.kind}`}>
+                  <li key={i.key} className={`k-${i.pending && !i.scheduled ? 'taslak' : i.kind}`}>
                     <div className="grow">
-                      <span className="meta">{t(`press.kinds.${i.kind}`)}{i.time ? ` · ${i.time}` : ''}{i.pending ? ` · ${t('press.kinds.taslak')}` : ''}{i.nthDay ? ` · ${t('press.nthDay', { n: i.nthDay })}` : ''}</span>
+                      <span className="meta">{t(`press.kinds.${i.kind}`)}{i.time ? ` · ${i.time}` : ''}{i.scheduled ? ` · ${t('press.kinds.planli')}` : i.pending ? ` · ${t('press.kinds.taslak')}` : ''}{i.nthDay ? ` · ${t('press.nthDay', { n: i.nthDay })}` : ''}</span>
                       <strong>{i.title}</strong>
                       {i.idea ? <span className="meta">{t('press.idea')}: {i.idea}</span> : null}
                     </div>
@@ -332,6 +339,7 @@ function Press({ user }: { user: PanelUser }) {
               }}
             />
           ) : null}
+          {publisher && ann.some((p) => p.key === publisher.key) ? <TemplatesCard user={user} publisher={publisher} /> : null}
           {admin ? (
             <DaysEditor
               title={t('press.nationalTitle')}
@@ -504,6 +512,60 @@ function DaysEditor({ title, hint, days, kinds, readOnly, max, onSave }: {
           {dirty ? <button type="button" className="btn ghost" onClick={() => setList(days)}>{t('press.discard')}</button> : null}
         </div>
       )}
+      {msg ? <p className={msg.ok ? 'note' : 'error'} role={msg.ok ? 'status' : 'alert'}>{msg.text}</p> : null}
+    </div>
+  );
+}
+
+/** Hazır şablonlar: liste, kaldırma ve örnek şablonları ekleme. Yeni şablon duyuru formunda "Şablon olarak kaydet" ile. */
+function TemplatesCard({ user, publisher }: { user: PanelUser; publisher: Publisher }) {
+  const svc = useMemo(() => createPressTemplatesService(firestore, user.uid), [user.uid]);
+  const [list, setList] = useState<PressTemplate[] | null>(null);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string }>();
+  const [busy, setBusy] = useState(false);
+  const editable = canEditTemplates(user, publisher);
+  useEffect(() => {
+    if (user.isDemo) return setList(STARTER_TEMPLATES.slice(0, 4));
+    svc.load(publisher.key).then(setList, () => setList([]));
+  }, [svc, publisher.key, user.isDemo]);
+
+  const store = async (next: PressTemplate[]) => {
+    setBusy(true);
+    setMsg(undefined);
+    try {
+      await svc.save(publisher.key, next, pressAuditAs(user, publisher));
+      setList(next);
+      setMsg({ ok: true, text: t('press.saved') });
+    } catch {
+      setMsg({ ok: false, text: t('press.saveError') });
+    } finally {
+      setBusy(false);
+    }
+  };
+  const missing = STARTER_TEMPLATES.filter((x) => !(list ?? []).some((y) => y.id === x.id));
+
+  return (
+    <div className="card">
+      <h2 className="card-title">{t('press.templatesTitle')}</h2>
+      <p className="meta">{t('press.templatesHint')}</p>
+      {list === null ? <p className="meta">{t('profile.loading')}</p> : list.length ? (
+        <ul className="day-list">
+          {list.map((x) => (
+            <li key={x.id} className={`k-${x.kind}`}>
+              <div className="grow">
+                <span className="meta">{t(`press.kinds.${x.kind}`)}</span>
+                <strong>{x.name}</strong>
+                <span className="meta">{x.title}</span>
+              </div>
+              {editable ? <button type="button" className="link" disabled={busy} onClick={() => window.confirm(t('press.templateRemoveConfirm', { name: x.name })) && store(list.filter((y) => y.id !== x.id))}>{t('press.remove')}</button> : null}
+            </li>
+          ))}
+        </ul>
+      ) : <p className="meta">{t('press.noTemplates')}</p>}
+      <div className="actions">
+        {editable && missing.length ? <button type="button" className="btn secondary" disabled={busy} onClick={() => store([...(list ?? []), ...missing])}>{t('press.addStarters', { count: missing.length })}</button> : null}
+        <Link className="btn ghost" to="/duyurular?yeni=1">{t('press.useTemplate')}</Link>
+      </div>
       {msg ? <p className={msg.ok ? 'note' : 'error'} role={msg.ok ? 'status' : 'alert'}>{msg.text}</p> : null}
     </div>
   );

@@ -58,3 +58,4 @@ export * from './travel/plan';
 export * from './travel/seed';
 export * from './travel/holiday';
 export * from './press/important-days';
+export * from './press/templates';

@@ -3,7 +3,7 @@ import { getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestor
 import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import { handleAnnouncementWrite } from '../src/announcements';
+import { handleAnnouncementWrite, sendScheduledAnnouncements } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
@@ -125,6 +125,20 @@ describe('duyuru bildirimi', () => {
     await handleAnnouncementWrite(db, 'd5', ann(), ann({ status: 'kaldirildi' }), deps);
     await handleAnnouncementWrite(db, 'd6', undefined, ann({ kind: 'acil', endsAt: Timestamp.fromDate(new Date('2026-10-01T00:00:00Z')) }), deps);
     expect(sent).toEqual([]);
+  });
+
+  it('planlı duyuru yayın anı gelmeden gitmez; zamanı gelince bir kez gider', async () => {
+    const { sent, deps } = fakeSender();
+    const at = Timestamp.fromDate(new Date(NOW.getTime() + 2 * 3600000));
+    const planned = ann({ publishedAt: at, scheduledAt: at });
+    await db.doc('announcements/p1').set(planned);
+    expect(await handleAnnouncementWrite(db, 'p1', undefined, planned, deps)).toBe(0);
+    expect(await sendScheduledAnnouncements(db, deps)).toBe(0);
+    // İki saat sonra.
+    const later2 = { ...deps, now: new Date(NOW.getTime() + 2 * 3600000 + 5 * 60000) };
+    expect(await sendScheduledAnnouncements(db, later2)).toBe(2);
+    expect(await sendScheduledAnnouncements(db, later2)).toBe(0);
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-n1', 'T-n2']);
   });
 });
 

@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { publishersFor, type Action, type AnnouncementInput, type Organization, type Publisher } from '@cityjoy/shared';
+import { isAnnouncementLive, publishersFor, type Action, type AnnouncementInput, type Organization, type Publisher } from '@cityjoy/shared';
 import { createAnnouncementPanel, createFirestoreAnnouncementRepository, listAuditLog } from '@cityjoy/shared/firebase';
 import { doc, getDoc, Timestamp, setDoc, updateDoc, serverTimestamp, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -107,6 +107,26 @@ describe('resmî duyurular', () => {
     // Duyuruya kategori yazılmaz (depo atar).
     const id = await panel('fen').save(p, input({ category: 'spor' }), 'yayinla');
     expect((await live()).find((a) => a.id === id)?.category).toBeUndefined();
+  });
+
+  it('planlı yayın: ileri zamanla yayınlanır, zamanı gelene kadar uygulamada görünmez; onayda seçilen zaman kullanılır', async () => {
+    const at = new Date(Date.now() + 3 * 86400000).toISOString();
+    const p = await publisher('fen');
+    const id = await panel('fen').save(p, input({ scheduledAt: at }), 'yayinla');
+    const [a] = await live();
+    expect(a).toMatchObject({ id, status: 'yayinda', publishedAt: at, scheduledAt: at });
+    expect(isAnnouncementLive(a!)).toBe(false);
+    expect(isAnnouncementLive(a!, new Date(Date.now() + 4 * 86400000))).toBe(true);
+    // Acil duyuru planlanamaz; 60 günden ileri olmaz; yayın anı planlanan zamandan farklı olamaz.
+    await expect(panel('fen').save(p, input({ kind: 'acil', endsAt: new Date(Date.now() + 86400000).toISOString(), scheduledAt: at }), 'yayinla')).resolves.toBeTruthy();
+    expect((await live()).filter((x) => x.kind === 'acil').every((x) => !x.scheduledAt)).toBe(true);
+    await expect(panel('fen').save(p, input({ scheduledAt: new Date(Date.now() + 70 * 86400000).toISOString() }), 'yayinla')).rejects.toThrow();
+    // Onaya giden planlı duyuru onaylanınca planlanan anda yayına girer.
+    const b = await publisher('basin');
+    const id2 = await panel('basin').save(b, input({ scheduledAt: at }), 'onaya');
+    const [pending] = await panel('kalem').listPending({ orgId: org.id });
+    await panel('kalem').approve(pending!);
+    expect((await live()).find((x) => x.id === id2)).toMatchObject({ status: 'yayinda', publishedAt: at });
   });
 
   it('ret gerekçesiyle geri döner; hazırlayan düzeltip yeniden gönderir', async () => {

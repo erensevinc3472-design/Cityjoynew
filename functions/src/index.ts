@@ -10,7 +10,7 @@ import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
-import { handleAnnouncementWrite } from './announcements';
+import { handleAnnouncementWrite, sendScheduledAnnouncements } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
@@ -85,6 +85,10 @@ export const travelCoverChanged = Object.fromEntries(
 // Kaldırılan aktivitenin kapak dosyası silinir.
 export const activityCoverChanged = onDocumentWritten('activities/{id}', async (e) => {
   await handleActivityCover(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+
+export const scheduledAnnouncements = onSchedule({ schedule: 'every 10 minutes', timeZone: 'Europe/Istanbul' }, async () => {
+  await sendScheduledAnnouncements(db, deps());
 });
 
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {

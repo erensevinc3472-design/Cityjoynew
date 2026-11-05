@@ -1041,7 +1041,8 @@
       "region": "Bölge seçin; yalnızca yetkili olduğunuz bölge seçilebilir.",
       "endsAt": "Bitiş tarihi ileri bir tarih olmalı; acil duyuruda zorunlu ve en çok 7 gün.",
       "pinned": "Yalnızca mahalleye yönelik, acil olmayan duyuru sabitlenebilir.",
-      "category": "Kurum haberi için kategori seçin."
+      "category": "Kurum haberi için kategori seçin.",
+      "scheduledAt": "İleri bir zaman seçin (en çok 60 gün, bitiş tarihinden önce). Acil duyuru planlanamaz."
     },
     "publish": "Yayınla",
     "send": "Onaya gönder",
@@ -1105,7 +1106,27 @@
       "ekonomi": "Ekonomi"
     },
     "approveRing": "Onayla, bildirim her zaman çalsın",
-    "approveRingHint": "Telefon bildirimi, kişinin günlük sesli bildirim tavanına bakmadan sesli gelir (ör. önemli bir açılış ya da belediye duyurusu). Yalnızca admin."
+    "approveRingHint": "Telefon bildirimi, kişinin günlük sesli bildirim tavanına bakmadan sesli gelir (ör. önemli bir açılış ya da belediye duyurusu). Yalnızca admin.",
+    "when": "Yayın zamanı",
+    "whenNow": "Hemen",
+    "whenLater": "İleri bir zamanda (planlı yayın)",
+    "scheduledLabel": "Yayına gireceği an",
+    "scheduledHint": "Bu anda kendiliğinden yayına girer ve bölgedekilere bildirim gider. En çok {{days}} gün ileri. Onaya gönderilirse onaylanınca bu an kullanılır.",
+    "schedule": "Planla",
+    "scheduledPill": "Planlandı",
+    "scheduledFor": "Planlanan: {{date}}",
+    "cancelSchedule": "Planı iptal et",
+    "fromTemplate": "Şablondan başla",
+    "chooseTemplate": "Şablon seçin…",
+    "templateHint": "Köşeli parantezli yerleri ([tarih], [saat]) kendi bilginizle değiştirin.",
+    "blanks": "Doldurulmamış yer var: {{list}}. Değiştirip tekrar deneyin (taslak olarak kaydedebilirsiniz).",
+    "saveAsTemplate": "Şablon olarak kaydet",
+    "templateName": "Şablonun adı",
+    "templateNameHint": "Değişen bilgileri köşeli parantezle yazın, örneğin [tarih] ya da [mahalle].",
+    "templateStore": "Şablonu kaydet",
+    "templateSaved": "Şablon kaydedildi.",
+    "templateError": "Şablon kaydedilemedi.",
+    "scheduledOk": "Duyuru planlandı: {{date}} anında kendiliğinden yayına girecek."
   },
   "events": {
     "title": "Etkinlikler",
@@ -2134,7 +2155,8 @@
       "etkinlik": "Etkinlik",
       "gun": "Önemli gün",
       "yerel": "Yerel gün",
-      "taslak": "Hazırlıkta"
+      "taslak": "Hazırlıkta",
+      "planli": "Planlı"
     },
     "empty": "boş",
     "emptyDay": "Bu gün için kayıt yok.",
@@ -2183,6 +2205,13 @@
     "saved": "Kaydedildi.",
     "saveError": "Kaydedilemedi. Yetkinizi kontrol edip tekrar deneyin.",
     "todayCard": "Yaklaşan önemli günler",
-    "todayMore": "Basın Masası'nı aç"
+    "todayMore": "Basın Masası'nı aç",
+    "scheduledAt": "Planlandı: {{date}}",
+    "templatesTitle": "Hazır şablonlar",
+    "templatesHint": "Sık yazdığınız duyurular için şablonlar. Duyuru formunda \"Şablondan başla\" ile seçin; yeni şablonu formdaki \"Şablon olarak kaydet\" ile ekleyin.",
+    "noTemplates": "Henüz şablon yok.",
+    "addStarters": "Örnek şablonları ekle ({{count}})",
+    "useTemplate": "Şablonla duyuru hazırla",
+    "templateRemoveConfirm": "\"{{name}}\" şablonu kaldırılsın mı?"
   }
 }

@@ -35,6 +35,8 @@ export async function handleAnnouncementWrite(
   const category = CATEGORY[after.kind];
   if (!category || !after.region?.provinceCode) return 0;
   if (after.endsAt && after.endsAt.toMillis() < deps.now.getTime()) return 0;
+  // Planlı yayın: zamanı gelmeden bildirim gitmez; zamanı gelince sendScheduledAnnouncements gönderir.
+  if (after.publishedAt?.toMillis && after.publishedAt.toMillis() > deps.now.getTime() + 60000) return 0;
   try {
     await db.doc(`pushLog/duyuru_${id}`).create({ at: deps.now });
   } catch {
@@ -55,4 +57,20 @@ export async function handleAnnouncementWrite(
     },
     deps,
   );
+}
+
+/**
+ * Planlı duyurular (PROJE.md 6.2 madde 4): yayın anı son 30 dakikada gelmiş olanların bildirimini gönderir (10 dakikada
+ * bir çalışır; bir duyuru için bir kez, `pushLog`). Belgeyi değiştirmez: uygulama zamanı gelince kendiliğinden gösterir.
+ */
+export async function sendScheduledAnnouncements(db: Firestore, deps: NotifyDeps): Promise<number> {
+  const from = new Date(deps.now.getTime() - 30 * 60000);
+  const snap = await db.collection('announcements').where('status', '==', 'yayinda')
+    .where('publishedAt', '>', from).where('publishedAt', '<=', deps.now).limit(200).get();
+  let sent = 0;
+  for (const d of snap.docs) {
+    if (!d.data().scheduledAt) continue;
+    sent += await handleAnnouncementWrite(db, d.id, undefined, d.data(), deps);
+  }
+  return sent;
 }

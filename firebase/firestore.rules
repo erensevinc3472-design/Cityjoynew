@@ -1845,7 +1845,12 @@ service cloud.firestore {
       let acts = authorActions(d, module);
       return acts.hasAny(['ekle'])
         && ((d.status in ['taslak', 'onay-bekliyor'] && !('publishedAt' in d))
-            || (d.status == 'yayinda' && d.publishedAt == request.time && acts.hasAny(['yayinla', 'onayla'])));
+            || (d.status == 'yayinda' && pubAtOk(d) && acts.hasAny(['yayinla', 'onayla'])));
+    }
+    // Yayın anı: şimdi ya da planlı yayında (yalnızca duyuru) seçilen ileri zaman.
+    function pubAtOk(d) {
+      return d.publishedAt == request.time
+        || (d.get('scheduledAt', 0) is timestamp && d.publishedAt == d.scheduledAt && d.scheduledAt > request.time);
     }
     // Başkasının hazırladığını onaylayan / yayından kaldıran: kurumda "Onayla" işaretli personel; kişi içeriğinde
     // o ilde onay yetkisi olan il yöneticisi; admin.
@@ -1856,7 +1861,9 @@ service cloud.firestore {
     }
     function validAnnouncement(d) {
       return d.keys().hasOnly(['kind', 'title', 'body', 'region', 'endsAt', 'pinned', 'category', 'author', 'status', 'preparedBy',
-             'preparedByName', 'createdAt', 'updatedAt', 'publishedAt', 'reviewedBy', 'reviewNote', 'ringAlways'])
+             'preparedByName', 'createdAt', 'updatedAt', 'publishedAt', 'reviewedBy', 'reviewNote', 'ringAlways', 'scheduledAt'])
+        // Planlı yayın (Basın Masası): acil duyuruda yok, en çok 60 gün ileri.
+        && (!('scheduledAt' in d) || (d.scheduledAt is timestamp && d.kind != 'acil' && d.scheduledAt <= request.time + duration.value(61, 'd')))
         // "Bildirim her zaman çalsın" (PROJE.md 5.12): yalnızca admin işaretler; düzenlemede korunur.
         && (!('ringAlways' in d) || (d.ringAlways == true && (isAdmin() || (resource != null && resource.data.get('ringAlways', false) == true))))
         // Sabitleme yalnızca mahalleye yönelik, acil olmayan duyuruda (Mahalle Meydanı).
@@ -1915,7 +1922,7 @@ service cloud.firestore {
         return od.status == 'onay-bekliyor'
         && nw.reviewedBy == request.auth.uid
         && nw.updatedAt == request.time
-        && ((nw.status == 'yayinda' && nw.publishedAt == request.time
+        && ((nw.status == 'yayinda' && pubAtOk(nw)
               && nw.diff(od).affectedKeys().hasOnly(['status', 'publishedAt', 'reviewedBy', 'updatedAt', 'ringAlways'])
               // Onaylarken "her zaman çalsın" yalnızca admin.
               && (!nw.diff(od).affectedKeys().hasAny(['ringAlways']) || (isAdmin() && nw.ringAlways == true)))
@@ -3405,6 +3412,20 @@ service cloud.firestore {
       }
       allow read: if isAdmin() || isMemberOf(orgId);
       allow create, update: if signedIn() && odOk(request.resource.data);
+    }
+
+    // Basın Masası > hazır şablonlar: hesap (kurum ya da kişi yetkisi) başına tek belge. Kurum yöneticisi, duyuru
+    // hazırlayan personel ya da o yetkide duyuru ekleyebilen muhtar / il yöneticisi okur ve yazar.
+    match /pressTemplates/{key} {
+      function ptWho() {
+        return isAdmin() || isOrgAdminOf(key) || staffCan(key, 'gonderiler', 'ekle') || grantAllows(key, 'gonderiler', 'ekle');
+      }
+      function ptOk(nw) {
+        return nw.keys().hasOnly(['items', 'updatedBy', 'updatedAt']) && nw.items is list && nw.items.size() <= 30
+          && nw.updatedBy == request.auth.uid && nw.updatedAt == request.time;
+      }
+      allow read: if signedIn() && ptWho();
+      allow create, update: if signedIn() && ptOk(request.resource.data) && ptWho();
     }
 
     // İçerik istatistiği (PROJE.md 6.1, 6.2 madde 22): duyuru / etkinlik başına kişi başına bir okunma ve bir paylaşım.
