@@ -824,15 +824,20 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **Hedefli bildirim (5 Kasım, aynı dal; PROJE.md 7, 6.2 madde 12; Karar Eren 5 Kasım: filtre yalnızca telefon
   bildirimini daraltır, duyuru bölgedeki herkese açık kalır).** Duyuru formunda "Telefon bildirimi kime gitsin?":
   bölgedeki herkese ya da bölgede seçili gruba (yaş aralığı 13-120, cinsiyet, en çok 10 meslek). Duyuruda
-  `pushTarget` saklanır (acilde yok; kural). Sunucu (`handleAnnouncementWrite`): grup seçildiyse yalnızca
-  `consents.targeting` rızası veren ve filtreye uyanlara gönderir; 50 kişiden küçük grupta hiç göndermez
+  `pushTarget` saklanır (acilde yok; kural). Sunucu (`handleAnnouncementWrite`): grup seçildiyse filtreye uyanlara
+  gönderir (**Karar Eren, 5 Kasım: ayrı hedefleme izni sorulmaz**, bildirime izin veren herkes sayılır; kayıttaki
+  "hedefli bildirim" kutucuğu kaldırıldı, meslek ve cinsiyet artık her zaman soruluyor; kampanya izni ayrı kalıyor);
+  50 kişiden küçük grupta hiç göndermez
   (`pushLog.skipped = kucuk-grup`). "Kaç kişiye ulaşır?": yeni çağrılabilir işlev `estimateAudience` (kurum
   personelinde Duyurular > Ekle ve bölge kurumun bölgesinde; muhtar / il yöneticisinde yetkisi; admin her yerde),
   yaklaşık sayı 10'a yuvarlı, 50'den azsa "az"; kişi verisi panele gelmez. Panelde tabloda "Bildirim: 65+ yaş, 1 meslek".
   Testler: ortak 179, kurallar 165, sunucu 33 (hedef, rıza, küçük grup, acil, yetkisiz sayım). Panelde gerçek girişle
   form denendi; sayım işlevi bu bulut ortamında emülatörde çalışmadı (ağ engeli), sunucu testleriyle denendi.
   **Blaze ile çalışır** (bildirim ve sayım sunucuda). Kampanya / tanıtım bildirimi (il yöneticisi > admin onayı, 18 yaş
-  altı hariç) ayrı iş olarak sırada. Aydınlatma metninde hedefleme rızası açıklaması avukat kontrolünde.
+  altı hariç) ayrı iş olarak sırada. **Avukata sorulacak:** yaş / cinsiyet / meslekle bildirim seçiminin açık rıza
+  olmadan (aydınlatma ile) yapılması. **Aydınlatma metnine eklenecek satır:** "Bildirim izni verdiğinizde resmî
+  kurumların duyuru bildirimleri bölgenize, yaşınıza, cinsiyetinize ve mesleğinize göre size uygunsa gönderilir;
+  kurumlar kimliğinizi görmez." Uygulamadaki kayıt ekranı değişikliği telefonda denenmedi.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

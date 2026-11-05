@@ -51,7 +51,6 @@ export default function CompleteProfileScreen() {
   const [readPrivacy, setReadPrivacy] = useState(false);
   const [gender, setGender] = useState<Gender | undefined>(profile?.gender);
   const [occupationId, setOccupationId] = useState<string | undefined>(profile?.occupationId);
-  const [targeting, setTargeting] = useState(profile?.consents.targeting?.granted ?? false);
   const [commercial, setCommercial] = useState(profile?.consents.commercialMessages?.granted ?? false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -95,7 +94,6 @@ export default function CompleteProfileScreen() {
         {
           gender,
           occupationId: occupationId ?? profile?.occupationId ?? NO_OCCUPATION,
-          targeting: consent(targeting),
           // 18 yaş altına kampanya bildirimi gönderilmez.
           commercialMessages: consent(isAdult && commercial),
         },
@@ -151,18 +149,15 @@ export default function CompleteProfileScreen() {
       ) : null}
 
       <View style={styles.options}>
-        <CheckboxRow checked={targeting} onToggle={() => setTargeting((v) => !v)} label={t('onboarding.targetingConsent')} />
-        {targeting ? (
-          <>
-            <OptionRow title={occupationLabel ?? t('profile.occupation')} subtitle={occupationLabel ? t('profile.occupation') : undefined} showChevron onPress={() => setPickerOpen(true)} />
-            <Chips
-              label={t('profile.gender')}
-              value={gender ?? 'belirtmek-istemiyorum'}
-              onChange={(v) => setGender(v)}
-              options={GENDERS.map((g) => ({ value: g.value, label: t(g.key) }))}
-            />
-          </>
-        ) : null}
+        {/* Karar (Eren, 5 Kasım 2026): yaş, cinsiyet ve meslekle hedefli bildirim için ayrı izin sorulmaz; bildirime izin
+            veren kişiye bu bilgilere göre uygun duyuru bildirimi gider (aydınlatma metninde yazılı, avukat teyidi). */}
+        <OptionRow title={occupationLabel ?? t('profile.occupation')} subtitle={occupationLabel ? t('profile.occupation') : undefined} showChevron onPress={() => setPickerOpen(true)} />
+        <Chips
+          label={t('profile.gender')}
+          value={gender ?? 'belirtmek-istemiyorum'}
+          onChange={(v) => setGender(v)}
+          options={GENDERS.map((g) => ({ value: g.value, label: t(g.key) }))}
+        />
         {isAdult ? <CheckboxRow checked={commercial} onToggle={() => setCommercial((v) => !v)} label={t('profile.commercialConsent')} /> : null}
         <AppText style={onboardingStyles.note}>{t('onboarding.notifyNote')}</AppText>
       </View>

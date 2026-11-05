@@ -14,14 +14,14 @@ function sourceName(author: DocumentData | undefined): string {
 
 /**
  * Duyurunun bölgesinde (il > ilçe > mahalle) oturan kişiler, profillerindeki konuma göre. Hedef verilirse (yaş, cinsiyet,
- * meslek) yalnızca hedeflemeye rıza veren ve hedefe uyanlar (PROJE.md 7).
+ * meslek) yalnızca hedefe uyanlar (PROJE.md 7; ayrı izin aranmaz, Karar Eren 5 Kasım 2026).
  */
 export async function residents(db: Firestore, region: DocumentData, target?: AudienceFilter | null, now = new Date()): Promise<string[]> {
   let q = db.collection('users').where('location.provinceCode', '==', region.provinceCode);
   if (region.districtId) q = q.where('location.districtId', '==', region.districtId);
   if (region.neighbourhoodId) q = q.where('location.neighbourhoodId', '==', region.neighbourhoodId);
   if (isEmptyTarget(target)) return (await q.select().get()).docs.map((d) => d.id);
-  const docs = (await q.select('birthYear', 'gender', 'occupationId', 'consents.targeting').get()).docs;
+  const docs = (await q.select('birthYear', 'gender', 'occupationId').get()).docs;
   return docs.filter((d) => matchesPushTarget(d.data() as Parameters<typeof matchesPushTarget>[0], target, now)).map((d) => d.id);
 }
 

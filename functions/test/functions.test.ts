@@ -128,28 +128,29 @@ describe('duyuru bildirimi', () => {
   });
 
   describe('hedefli bildirim', () => {
-    // 60 kişi: 30'u 65+ yaş kadın emekli (rızalı), 20'si 30 yaş erkek (rızalı), 10'u 70 yaş ama rızasız.
+    // 60 kişi: 30'u 65+ yaş kadın emekli, 20'si 30 yaş erkek mühendis, 10'u 70 yaş kadın emekli (hedefleme izni sorulmadı).
     async function crowd() {
       const batch = db.batch();
-      const add = (i: number, birthYear: number, gender: string, occupationId: string, consent: boolean) => {
-        batch.set(db.doc(`users/h${i}`), { uid: `h${i}`, location: { provinceCode: '16', districtId: '16-nilufer' }, birthYear, gender, occupationId, consents: consent ? { targeting: { granted: true } } : {} });
+      const add = (i: number, birthYear: number, gender: string, occupationId: string) => {
+        batch.set(db.doc(`users/h${i}`), { uid: `h${i}`, location: { provinceCode: '16', districtId: '16-nilufer' }, birthYear, gender, occupationId, consents: {} });
         batch.set(db.doc(`pushTokens/h${i}`), { tokens: [`T-h${i}`], language: 'tr', updatedAt: Timestamp.now() });
       };
-      for (let i = 0; i < 30; i++) add(i, 1955, 'kadin', 'emekli', true);
-      for (let i = 30; i < 50; i++) add(i, 1996, 'erkek', 'muhendis', true);
-      for (let i = 50; i < 60; i++) add(i, 1956, 'kadin', 'emekli', false);
+      for (let i = 0; i < 30; i++) add(i, 1955, 'kadin', 'emekli');
+      for (let i = 30; i < 50; i++) add(i, 1996, 'erkek', 'muhendis');
+      for (let i = 50; i < 60; i++) add(i, 1956, 'kadin', 'emekli');
       await batch.commit();
     }
 
-    it('bildirim yalnızca hedefe uyan ve rıza verenlere gider; 50 kişiden küçük gruba gitmez; acilde hedef yok sayılır', async () => {
+    it('bildirim yalnızca hedefe uyanlara gider (ayrı izin aranmaz); 50 kişiden küçük gruba gitmez; acilde hedef yok sayılır', async () => {
       await crowd();
       const { sent, deps } = fakeSender();
-      // 65+ yaş: 30 rızalı kişi (rızasız 10 sayılmaz) -> 50'den az, gönderilmez.
-      expect(await handleAnnouncementWrite(db, 't1', undefined, ann({ pushTarget: { ageMin: 65 } }), deps)).toBe(0);
+      // Erkek: 20 kişi -> 50'den az, gönderilmez.
+      expect(await handleAnnouncementWrite(db, 't1', undefined, ann({ pushTarget: { genders: ['erkek'] } }), deps)).toBe(0);
       expect((await db.doc('pushLog/duyuru_t1').get()).get('skipped')).toBe('kucuk-grup');
-      // 13+ yaş, rızalı herkes: 50 kişi -> gider; rızasızlar ve bölge dışındakiler yok.
-      expect(await handleAnnouncementWrite(db, 't2', undefined, ann({ pushTarget: { ageMin: 13 } }), deps)).toBe(50);
-      expect(sent.some((m) => m.to === 'T-h55' || m.to === 'T-o1')).toBe(false);
+      // 65+ yaş emekli kadın: 40 kişi -> gönderilmez; 13+ yaş: 60 kişi -> gider. Bölge dışındakiler yok, yaşı olmayanlar yok.
+      expect(await handleAnnouncementWrite(db, 't2', undefined, ann({ pushTarget: { ageMin: 65, occupations: ['emekli'] } }), deps)).toBe(0);
+      expect(await handleAnnouncementWrite(db, 't4', undefined, ann({ pushTarget: { ageMin: 13 } }), deps)).toBe(60);
+      expect(sent.some((m) => m.to === 'T-o1' || m.to === 'T-n1')).toBe(false);
       // Acil duyuruda hedef yok sayılır: bölgedeki herkese (60 + önceki 2).
       sent.length = 0;
       await handleAnnouncementWrite(db, 't3', undefined, ann({ kind: 'acil', endsAt: later, pushTarget: { ageMin: 65 } }), deps);

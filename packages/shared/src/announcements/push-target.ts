@@ -1,7 +1,8 @@
 /**
  * Hedefli bildirim (PROJE.md 7, 6.2 madde 12; Karar Eren 5 Kasım 2026: filtre yalnızca telefon bildirimini daraltır,
  * duyuru bölgedeki herkese uygulamada açık kalır). Bölge duyurunun bölgesidir; ek olarak yaş aralığı, cinsiyet ve meslek
- * seçilebilir. Yalnızca hedeflemeye ayrı açık rıza veren kişiler bu filtreyle sayılır (KVKK). Belediye kişileri görmez,
+ * seçilebilir. Karar (Eren, 5 Kasım 2026): ayrı izin aranmaz, bildirime izin veren herkes sayılır (aydınlatma metninde
+ * yazılı; avukat teyidi). Belediye kişileri görmez,
  * yalnızca yaklaşık sayıyı görür; 50 kişiden küçük gruba gönderilmez. Acil duyuruda hedefleme yoktur (herkese gider).
  */
 
@@ -42,15 +43,14 @@ export function cleanPushTarget(t?: AudienceFilter | null): AudienceFilter | nul
   };
 }
 
-type Person = Pick<UserProfile, 'birthYear' | 'gender' | 'occupationId'> & { consents?: { targeting?: { granted?: boolean } } };
+type Person = Pick<UserProfile, 'birthYear' | 'gender' | 'occupationId'>;
 
 /**
- * Kişi hedefe uyuyor mu? Hedef boşsa herkes uyar. Hedef varsa yalnızca hedefleme rızası veren ve seçilen her filtreye
- * uyan kişi (cinsiyet / meslek belirtmeyen, o filtre seçildiyse dışarıda kalır).
+ * Kişi hedefe uyuyor mu? Hedef boşsa herkes uyar. Hedef varsa seçilen her filtreye uyan kişi (cinsiyet / meslek
+ * belirtmeyen, o filtre seçildiyse dışarıda kalır).
  */
 export function matchesPushTarget(p: Person, t: AudienceFilter | null | undefined, now = new Date()): boolean {
   if (isEmptyTarget(t)) return true;
-  if (p.consents?.targeting?.granted !== true) return false;
   const age = now.getFullYear() - p.birthYear;
   if (t!.ageMin !== undefined && !(age >= t!.ageMin)) return false;
   if (t!.ageMax !== undefined && !(age <= t!.ageMax)) return false;

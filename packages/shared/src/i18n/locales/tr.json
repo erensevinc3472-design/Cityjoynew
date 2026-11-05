@@ -2087,7 +2087,7 @@
     "notifySample2": "Muhtarlık · Çalışma saatleri değişti",
     "notifySample3": "Yeni mesaj · Bisiklet hâlâ satılık mı?",
     "targetingConsent": "Yaşıma ve isteğe bağlı olarak cinsiyetime ve mesleğime göre bana uygun bildirimler gönderilsin.",
-    "notifyNote": "İkisi de isteğe bağlı, Ayarlar'dan istediğin zaman kapatabilirsin."
+    "notifyNote": "Kampanya bildirimleri isteğe bağlıdır. Bildirim türlerini Ayarlar'dan istediğin zaman kapatabilirsin."
   },
   "deals": {
     "title": "Fırsatlar",

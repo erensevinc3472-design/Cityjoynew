@@ -1189,7 +1189,7 @@
       "approx": "Yaklaşık {{count}} kişiye bildirim gider.",
       "small": "Bu grup 50 kişiden az: kişiler tanınmasın diye bu gruba bildirim gönderilmez. Grubu genişletin.",
       "noServer": "Kişi sayısı sunucuda hesaplanır; Firebase ücretli plana (Blaze) geçince çalışır.",
-      "note": "Duyuru bölgedeki herkese uygulamada görünür; bu seçim yalnızca telefon bildiriminin kime gideceğini belirler. Grup seçilirse yalnızca hedeflemeye izin veren kişiler sayılır, 50 kişiden küçük gruba gönderilmez. Kişilerin kimliği hiçbir zaman görünmez.",
+      "note": "Duyuru bölgedeki herkese uygulamada görünür; bu seçim yalnızca telefon bildiriminin kime gideceğini belirler. 50 kişiden küçük gruba gönderilmez. Kişilerin kimliği hiçbir zaman görünmez.",
       "tableLabel": "Bildirim: {{what}}",
       "ageFrom": "{{min}}+ yaş",
       "ageTo": "{{max}} yaşa kadar",
