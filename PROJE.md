@@ -625,6 +625,10 @@ Not: 9 ve 10 numaralı güvenlik ve KVKK maddeleri mağaza onayı ve yasal uyum 
 ## 7. Filtreli bildirim
 
 Paneller şu filtrelerle bildirim gönderebilecek: **il, ilçe, mahalle, yaş, cinsiyet, ilgi alanı**.
+- **Karar (Eren, 5 Kasım 2026):** yaş / cinsiyet / meslek filtresi yalnızca telefon bildiriminin kime gideceğini
+  belirler; duyurunun kendisi bölgedeki herkese uygulamada açık kalır. **Yapıldı (5 Kasım):** duyurularda hedefli
+  bildirim (yaş, cinsiyet, meslek; rıza, 50 kişi alt sınırı, yaklaşık sayı). İlgi alanı filtresi ve kampanya /
+  tanıtım bildirimi (onay zinciri) sonra.
 - Bunun için kayıtta ilgili bilgiler alınır. Yaş, cinsiyet ve ilgi alanıyla hedefleme **KVKK kapsamında ayrı açık rıza** ister.
 - Öneri: Bildirim türleri (acil duyuru, hizmet, etkinlik, kampanya) ayrılır. Kullanıcı türlere göre kapatabilir. Acil kamu duyuruları ayrı sınıfta olur. Bir panelin bir günde gönderebileceği bildirim sayısına sınır konur (kötüye kullanımı önlemek için).
 - Belirli bir kişiye değil, **gruba** gönderilir. Panel kullanıcıların kişisel verisini görmez, yalnızca "kaç kişiye ulaşır" bilgisini görür (öneri).

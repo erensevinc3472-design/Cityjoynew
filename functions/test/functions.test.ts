@@ -3,7 +3,7 @@ import { getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestor
 import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import { handleAnnouncementWrite, sendScheduledAnnouncements } from '../src/announcements';
+import { estimateAudienceFor, handleAnnouncementWrite, sendScheduledAnnouncements } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
@@ -125,6 +125,51 @@ describe('duyuru bildirimi', () => {
     await handleAnnouncementWrite(db, 'd5', ann(), ann({ status: 'kaldirildi' }), deps);
     await handleAnnouncementWrite(db, 'd6', undefined, ann({ kind: 'acil', endsAt: Timestamp.fromDate(new Date('2026-10-01T00:00:00Z')) }), deps);
     expect(sent).toEqual([]);
+  });
+
+  describe('hedefli bildirim', () => {
+    // 60 kişi: 30'u 65+ yaş kadın emekli (rızalı), 20'si 30 yaş erkek (rızalı), 10'u 70 yaş ama rızasız.
+    async function crowd() {
+      const batch = db.batch();
+      const add = (i: number, birthYear: number, gender: string, occupationId: string, consent: boolean) => {
+        batch.set(db.doc(`users/h${i}`), { uid: `h${i}`, location: { provinceCode: '16', districtId: '16-nilufer' }, birthYear, gender, occupationId, consents: consent ? { targeting: { granted: true } } : {} });
+        batch.set(db.doc(`pushTokens/h${i}`), { tokens: [`T-h${i}`], language: 'tr', updatedAt: Timestamp.now() });
+      };
+      for (let i = 0; i < 30; i++) add(i, 1955, 'kadin', 'emekli', true);
+      for (let i = 30; i < 50; i++) add(i, 1996, 'erkek', 'muhendis', true);
+      for (let i = 50; i < 60; i++) add(i, 1956, 'kadin', 'emekli', false);
+      await batch.commit();
+    }
+
+    it('bildirim yalnızca hedefe uyan ve rıza verenlere gider; 50 kişiden küçük gruba gitmez; acilde hedef yok sayılır', async () => {
+      await crowd();
+      const { sent, deps } = fakeSender();
+      // 65+ yaş: 30 rızalı kişi (rızasız 10 sayılmaz) -> 50'den az, gönderilmez.
+      expect(await handleAnnouncementWrite(db, 't1', undefined, ann({ pushTarget: { ageMin: 65 } }), deps)).toBe(0);
+      expect((await db.doc('pushLog/duyuru_t1').get()).get('skipped')).toBe('kucuk-grup');
+      // 13+ yaş, rızalı herkes: 50 kişi -> gider; rızasızlar ve bölge dışındakiler yok.
+      expect(await handleAnnouncementWrite(db, 't2', undefined, ann({ pushTarget: { ageMin: 13 } }), deps)).toBe(50);
+      expect(sent.some((m) => m.to === 'T-h55' || m.to === 'T-o1')).toBe(false);
+      // Acil duyuruda hedef yok sayılır: bölgedeki herkese (60 + önceki 2).
+      sent.length = 0;
+      await handleAnnouncementWrite(db, 't3', undefined, ann({ kind: 'acil', endsAt: later, pushTarget: { ageMin: 65 } }), deps);
+      expect(sent.length).toBe(62);
+    });
+
+    it('panel yaklaşık sayıyı yalnızca yetkili kişiye ve kendi bölgesinde söyler', async () => {
+      await crowd();
+      const org = 'bld-16-nilufer';
+      await db.doc(`organizations/${org}`).set({ status: 'aktif', modules: ['gonderiler'], scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' } });
+      await db.doc(`orgMembers/${org}__basin@ornek.com`).set({ assignments: { gonderiler: ['goruntule', 'ekle'] } });
+      await db.doc(`orgMembers/${org}__izleyen@ornek.com`).set({ assignments: { gonderiler: ['goruntule'] } });
+      const region = { provinceCode: '16', districtId: '16-nilufer' };
+      const basin = { uid: 'b', email: 'basin@ornek.com', emailVerified: true };
+      expect(await estimateAudienceFor(db, basin, { publisherKey: org, region, target: { genders: ['erkek'] } }, NOW)).toEqual({ tooSmall: true, approx: 0 });
+      expect(await estimateAudienceFor(db, basin, { publisherKey: org, region, target: null }, NOW)).toEqual({ tooSmall: false, approx: 60 });
+      expect(await estimateAudienceFor(db, basin, { publisherKey: org, region: { provinceCode: '16', districtId: '16-osmangazi' }, target: null }, NOW)).toEqual({ denied: true });
+      expect(await estimateAudienceFor(db, { uid: 'i', email: 'izleyen@ornek.com', emailVerified: true }, { publisherKey: org, region, target: null }, NOW)).toEqual({ denied: true });
+      expect(await estimateAudienceFor(db, { ...basin, emailVerified: false }, { publisherKey: org, region, target: null }, NOW)).toEqual({ denied: true });
+    });
   });
 
   it('planlı duyuru yayın anı gelmeden gitmez; zamanı gelince bir kez gider', async () => {

@@ -1864,7 +1864,10 @@ service cloud.firestore {
     }
     function validAnnouncement(d) {
       return d.keys().hasOnly(['kind', 'title', 'body', 'region', 'endsAt', 'pinned', 'category', 'author', 'status', 'preparedBy',
-             'preparedByName', 'createdAt', 'updatedAt', 'publishedAt', 'reviewedBy', 'reviewNote', 'ringAlways', 'scheduledAt'])
+             'preparedByName', 'createdAt', 'updatedAt', 'publishedAt', 'reviewedBy', 'reviewNote', 'ringAlways', 'scheduledAt', 'pushTarget'])
+        // Hedefli bildirim: yaş / cinsiyet / meslek; acil duyuruda yok (bildirim herkese gider).
+        && (!('pushTarget' in d) || (d.kind != 'acil' && d.pushTarget is map && d.pushTarget.keys().hasOnly(['ageMin', 'ageMax', 'genders', 'occupations'])
+              && d.pushTarget.get('genders', []) is list && d.pushTarget.get('occupations', []).size() <= 10))
         // Planlı yayın (Basın Masası): acil duyuruda yok, en çok 60 gün ileri.
         && (!('scheduledAt' in d) || (d.scheduledAt is timestamp && d.kind != 'acil' && d.scheduledAt <= request.time + duration.value(61, 'd')))
         // "Bildirim her zaman çalsın" (PROJE.md 5.12): yalnızca admin işaretler; düzenlemede korunur.

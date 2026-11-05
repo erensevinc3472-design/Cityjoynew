@@ -9,8 +9,9 @@ import * as functionsV1 from 'firebase-functions/v1';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
-import { handleAnnouncementWrite, sendScheduledAnnouncements } from './announcements';
+import { estimateAudienceFor, handleAnnouncementWrite, sendScheduledAnnouncements, type AudienceRequest } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
@@ -85,6 +86,14 @@ export const travelCoverChanged = Object.fromEntries(
 // Kaldırılan aktivitenin kapak dosyası silinir.
 export const activityCoverChanged = onDocumentWritten('activities/{id}', async (e) => {
   await handleActivityCover(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+
+/** Panel: hedefli bildirimin yaklaşık ulaşacağı kişi sayısı (kişi verisi dönmez). */
+export const estimateAudience = onCall(async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'Giriş gerekli');
+  const r = await estimateAudienceFor(db, { uid: req.auth.uid, email: req.auth.token.email, emailVerified: req.auth.token.email_verified }, req.data as AudienceRequest);
+  if ('denied' in r) throw new HttpsError('permission-denied', 'Bu bölge için yetkiniz yok');
+  return r;
 });
 
 export const scheduledAnnouncements = onSchedule({ schedule: 'every 10 minutes', timeZone: 'Europe/Istanbul' }, async () => {

@@ -39,6 +39,7 @@ export * from './city-guide/showcase';
 export * from './models/sign-up';
 export * from './approvals/approvals';
 export * from './announcements/announcements';
+export * from './announcements/push-target';
 export * from './events/events';
 export * from './activities/activities';
 export * from './posts/posts';

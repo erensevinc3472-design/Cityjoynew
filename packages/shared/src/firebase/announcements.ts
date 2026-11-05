@@ -24,6 +24,7 @@ import {
   type AnnouncementRegion,
   type Publisher,
 } from '../announcements/announcements';
+import { cleanPushTarget } from '../announcements/push-target';
 import type { Action, RegionScope } from '../permissions/types';
 import { addAudit, iso } from './grants';
 import { publishUsage } from '../limits/limits';
@@ -51,6 +52,7 @@ function fromDoc(id: string, d: DocumentData): Announcement {
     ...(d.reviewedBy ? { reviewedBy: d.reviewedBy } : {}),
     ...(d.reviewNote ? { reviewNote: d.reviewNote } : {}),
     ...(d.scheduledAt ? { scheduledAt: iso(d.scheduledAt) } : {}),
+    ...(d.pushTarget ? { pushTarget: d.pushTarget } : {}),
   };
 }
 
@@ -130,6 +132,8 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
       const status = mode === 'taslak' ? 'taslak' : mode === 'onaya' ? 'onay-bekliyor' : 'yayinda';
       // Planlı yayın: doğrudan yayında yayın anı seçilen zaman; onaya gidende onaylanınca kullanılır.
       const scheduled = input.scheduledAt && input.kind !== 'acil' ? Timestamp.fromDate(new Date(input.scheduledAt)) : null;
+      // Hedefli bildirim: yalnızca telefon bildirimi daralır; acil duyuru herkese gider.
+      const target = input.kind === 'acil' ? null : cleanPushTarget(input.pushTarget);
       const data = {
         kind: input.kind,
         title: input.title.trim().slice(0, ANNOUNCEMENT_LIMITS.title[1]),
@@ -139,6 +143,7 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
         ...(input.pinned ? { pinned: true } : {}),
         ...(input.kind === 'haber' && input.category ? { category: input.category } : {}),
         ...(scheduled ? { scheduledAt: scheduled } : {}),
+        ...(target ? { pushTarget: target } : {}),
         author: p.author,
         status,
         preparedBy: actor.uid,
@@ -158,6 +163,7 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
           ...(input.pinned ? {} : { pinned: deleteField() }),
           ...(input.kind === 'haber' ? {} : { category: deleteField() }),
           ...(scheduled ? {} : { scheduledAt: deleteField() }),
+          ...(target ? {} : { pushTarget: deleteField() }),
           reviewNote: deleteField(),
           reviewedBy: deleteField(),
         });

@@ -129,6 +129,18 @@ describe('resmî duyurular', () => {
     expect((await live()).find((x) => x.id === id2)).toMatchObject({ status: 'yayinda', publishedAt: at });
   });
 
+  it('hedefli bildirim: grup duyuruyla saklanır; duyuru herkese görünür; acil duyuruya grup yazılamaz', async () => {
+    const p = await publisher('fen');
+    const id = await panel('fen').save(p, input({ pushTarget: { ageMin: 65, genders: ['kadin'], occupations: ['emekli'] } }), 'yayinla');
+    expect((await live()).find((x) => x.id === id)?.pushTarget).toEqual({ ageMin: 65, genders: ['kadin'], occupations: ['emekli'] });
+    const ref = doc(fs('fen'), 'announcements', 'acil-hedefli');
+    await assertFails(setDoc(ref, {
+      kind: 'acil', title: 'Yol kapandı', body: 'Kar nedeniyle yol kapandı, dikkatli olun.', region: { provinceCode: '16', districtId: '16-nilufer' },
+      endsAt: Timestamp.fromDate(new Date(Date.now() + 86400000)), author: p.author, status: 'yayinda', preparedBy: 'fen', preparedByName: 'fen',
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp(), publishedAt: serverTimestamp(), pushTarget: { ageMin: 65 },
+    }));
+  });
+
   it('ret gerekçesiyle geri döner; hazırlayan düzeltip yeniden gönderir', async () => {
     const p = await publisher('basin');
     const id = await panel('basin').save(p, input(), 'onaya');

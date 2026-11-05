@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı ve Basın Masası tamamı; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası, hedefli bildirim; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -59,9 +59,9 @@ Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye pane
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (177)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (164; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (31; Java 21 gerekir)
+npm test                      # ortak paket testleri (179)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (165; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (33; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -821,6 +821,18 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   (yayınlamak / onaylamak için); kurum yöneticiliğini ve süresini değiştiremez (kural + test). Personel formunda
   görevlerin hangi sayfaları açtığını anlatan not. Emülatörde dört hesapla denendi (yönetici, basın müdürü, yalnızca
   istatistik, görevsiz): menüler beklendiği gibi; yönetici kendine görev verince "Yeni duyuru" açıldı.
+- **Hedefli bildirim (5 Kasım, aynı dal; PROJE.md 7, 6.2 madde 12; Karar Eren 5 Kasım: filtre yalnızca telefon
+  bildirimini daraltır, duyuru bölgedeki herkese açık kalır).** Duyuru formunda "Telefon bildirimi kime gitsin?":
+  bölgedeki herkese ya da bölgede seçili gruba (yaş aralığı 13-120, cinsiyet, en çok 10 meslek). Duyuruda
+  `pushTarget` saklanır (acilde yok; kural). Sunucu (`handleAnnouncementWrite`): grup seçildiyse yalnızca
+  `consents.targeting` rızası veren ve filtreye uyanlara gönderir; 50 kişiden küçük grupta hiç göndermez
+  (`pushLog.skipped = kucuk-grup`). "Kaç kişiye ulaşır?": yeni çağrılabilir işlev `estimateAudience` (kurum
+  personelinde Duyurular > Ekle ve bölge kurumun bölgesinde; muhtar / il yöneticisinde yetkisi; admin her yerde),
+  yaklaşık sayı 10'a yuvarlı, 50'den azsa "az"; kişi verisi panele gelmez. Panelde tabloda "Bildirim: 65+ yaş, 1 meslek".
+  Testler: ortak 179, kurallar 165, sunucu 33 (hedef, rıza, küçük grup, acil, yetkisiz sayım). Panelde gerçek girişle
+  form denendi; sayım işlevi bu bulut ortamında emülatörde çalışmadı (ağ engeli), sunucu testleriyle denendi.
+  **Blaze ile çalışır** (bildirim ve sayım sunucuda). Kampanya / tanıtım bildirimi (il yöneticisi > admin onayı, 18 yaş
+  altı hariç) ayrı iş olarak sırada. Aydınlatma metninde hedefleme rızası açıklaması avukat kontrolünde.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

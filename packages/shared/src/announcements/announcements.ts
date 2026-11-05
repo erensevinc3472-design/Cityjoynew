@@ -1,3 +1,4 @@
+import { validatePushTarget, type AudienceFilter } from './push-target';
 import { isMemberActive, isOrganizationActive } from '../organizations/staff';
 import type { Organization, OrganizationMember } from '../organizations/types';
 import { scopeKey } from '../permissions/grants';
@@ -59,6 +60,8 @@ export interface AnnouncementInput {
    * SCHEDULE_MAX_DAYS gün ileri. Onaya giden duyuruda onaylanınca bu zaman kullanılır (geçmişse hemen yayınlanır).
    */
   scheduledAt?: string;
+  /** Hedefli bildirim: telefon bildirimi yalnızca bu gruba (duyuru herkese açık kalır). Acil duyuruda yok. */
+  pushTarget?: AudienceFilter;
   /** Yalnızca haberde, zorunlu. */
   category?: NewsCategory;
 }
@@ -82,7 +85,7 @@ export const ANNOUNCEMENT_LIMITS = { title: [3, 100], body: [10, 2000], reviewNo
 /** Acil duyuru en çok bu kadar gün açık kalır (unutulup sürekli en üstte kalmasın). */
 export const URGENT_MAX_DAYS = 7;
 
-export type AnnouncementError = 'title' | 'body' | 'region' | 'endsAt' | 'pinned' | 'category' | 'scheduledAt';
+export type AnnouncementError = 'title' | 'body' | 'region' | 'endsAt' | 'pinned' | 'category' | 'scheduledAt' | 'pushTarget';
 /** Planlı yayın en çok bu kadar gün ileri. */
 export const SCHEDULE_MAX_DAYS = 60;
 
@@ -121,6 +124,7 @@ export function validateAnnouncement(a: AnnouncementInput, scope: RegionScope, n
       errors.push('scheduledAt');
     }
   }
+  if (a.pushTarget && (a.kind === 'acil' || validatePushTarget(a.pushTarget).length)) errors.push('pushTarget');
   return errors;
 }
 

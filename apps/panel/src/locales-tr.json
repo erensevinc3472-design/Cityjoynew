@@ -1043,7 +1043,8 @@
       "endsAt": "Bitiş tarihi ileri bir tarih olmalı; acil duyuruda zorunlu ve en çok 7 gün.",
       "pinned": "Yalnızca mahalleye yönelik, acil olmayan duyuru sabitlenebilir.",
       "category": "Kurum haberi için kategori seçin.",
-      "scheduledAt": "İleri bir zaman seçin (en çok 60 gün, bitiş tarihinden önce). Acil duyuru planlanamaz."
+      "scheduledAt": "İleri bir zaman seçin (en çok 60 gün, bitiş tarihinden önce). Acil duyuru planlanamaz.",
+      "pushTarget": "Bildirim grubu geçersiz. Acil duyuruda grup seçilemez."
     },
     "publish": "Yayınla",
     "send": "Onaya gönder",
@@ -1168,6 +1169,32 @@
         "ok": "Kimler görecek: {{region}}.",
         "warn": ""
       }
+    },
+    "target2": {
+      "title": "Telefon bildirimi kime gitsin?",
+      "everyone": "Bölgedeki herkese",
+      "group": "Bölgede seçili bir gruba (yaş, cinsiyet, meslek)",
+      "urgent": "Acil duyurunun bildirimi bölgedeki herkese gider (grup seçilemez).",
+      "ageMin": "En küçük yaş",
+      "ageMax": "En büyük yaş",
+      "gender": "Cinsiyet",
+      "occupations": "Meslek",
+      "occHint": "(en çok 10; boş bırakılırsa hepsi)",
+      "g": {
+        "kadin": "Kadın",
+        "erkek": "Erkek"
+      },
+      "invalid": "Yaş 13 ile 120 arasında olmalı, en küçük yaş en büyükten fazla olamaz.",
+      "ask": "Kaç kişiye ulaşır?",
+      "approx": "Yaklaşık {{count}} kişiye bildirim gider.",
+      "small": "Bu grup 50 kişiden az: kişiler tanınmasın diye bu gruba bildirim gönderilmez. Grubu genişletin.",
+      "noServer": "Kişi sayısı sunucuda hesaplanır; Firebase ücretli plana (Blaze) geçince çalışır.",
+      "note": "Duyuru bölgedeki herkese uygulamada görünür; bu seçim yalnızca telefon bildiriminin kime gideceğini belirler. Grup seçilirse yalnızca hedeflemeye izin veren kişiler sayılır, 50 kişiden küçük gruba gönderilmez. Kişilerin kimliği hiçbir zaman görünmez.",
+      "tableLabel": "Bildirim: {{what}}",
+      "ageFrom": "{{min}}+ yaş",
+      "ageTo": "{{max}} yaşa kadar",
+      "ageRange": "{{min}}-{{max}} yaş",
+      "occCount": "{{count}} meslek"
     }
   },
   "events": {
