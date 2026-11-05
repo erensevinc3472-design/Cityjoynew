@@ -2389,5 +2389,47 @@
     "ad": "Ad",
     "stays_one": "{{count}} property",
     "stays_other": "{{count}} properties"
+  },
+  "volunteer": {
+    "title": "Volunteering",
+    "intro": "Do something for your city: join volunteering projects of municipalities and institutions, or adopt a friend looking for a home.",
+    "jobs": "Volunteering opportunities",
+    "noJobs": "No open volunteering opportunities right now. They appear here as municipalities and institutions post them.",
+    "seats": "{{count}}/{{capacity}} people",
+    "cancelled": "Cancelled",
+    "animals": "Friends looking for a home",
+    "noAnimals": "No adoption listings in this province right now.",
+    "filter": {
+      "hepsi": "All",
+      "kedi": "Cat",
+      "kopek": "Dog",
+      "diger": "Other",
+      "acil": "Urgent"
+    },
+    "species": {
+      "kedi": "Cat",
+      "kopek": "Dog",
+      "diger": "Other"
+    },
+    "sex": {
+      "disi": "Female",
+      "erkek": "Male",
+      "bilinmiyor": "Sex unknown"
+    },
+    "urgent": "Urgent",
+    "note": "Adoption listings come from municipal shelters and verified associations. Adoption is free.",
+    "loadError": "Could not load. Check your connection and try again.",
+    "animal": "Adoption",
+    "vaccinated": "Fully vaccinated",
+    "notVaccinated": "Vaccinations incomplete",
+    "neutered": "Neutered",
+    "where": "Where",
+    "by": "Listed by",
+    "call": "Call",
+    "email": "Send e-mail",
+    "mailSubject": "Adoption of {{name}}",
+    "free": "Adoption is free. If anyone asks you for money, report it to the lister and to us.",
+    "adopted": "This friend has found a home.",
+    "gone": "This listing is no longer available."
   }
 }

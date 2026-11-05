@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası, hedefli bildirim, admin bildirimleri ve ücretli reklam; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası, hedefli bildirim, admin bildirimleri ve ücretli reklam, Gönüllülük ve hayvan sahiplendirme; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -59,8 +59,8 @@ Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye pane
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (182)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (167; Java 21 gerekir)
+npm test                      # ortak paket testleri (186)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (170; Java 21 gerekir)
 npm run test:functions        # sunucu işlevleri, emülatörde (37; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
@@ -859,6 +859,20 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   (resimli kartlar, yalnızca panelde), ayrıca dosya yüklenmez, bildirimde link yazmaz. **Bildirim yalnızca yazıdır**
   (Eren: "bu kadar basit"); dokununca paylaşım (resim / video) açılır (`/explore/[id]`). Bildirimin içinde ya da
   bildirim kutusunda resim gösterme denemesi Eren'in isteğiyle kaldırıldı.
+- **Gönüllülük ve hayvan sahiplendirme (5 Kasım, aynı dal; Karar Eren 5 Kasım: gönüllülük ilanını yalnızca belediye ve
+  kurumlar açar; sahiplendirme ilanını belediye barınakları ve doğrulanmış dernekler verir).** Uygulama: Benim Şehrim >
+  **Gönüllülük** (`/volunteer`, "Yakında" kalktı): gönüllülük ilanları (Etkinlikler'deki "Gönüllülük" türü; tarih, yer,
+  "12/20 kişi", dokununca etkinlik sayfası ve Katıl) ve "Yuva arayan dostlar" (Tümü / Kedi / Köpek / Diğer / Acil;
+  acil önce) > hayvan sayfası (`/volunteer/animal/[id]`: tür, yaş, cinsiyet, ırk, aşı / kısır etiketleri, yer, ilanı
+  veren, Ara ve E-posta, "sahiplendirme ücretsizdir, para isteyeni bildir"). 5 dilde. Uydurma sayı yok. Panel: yeni
+  hesap türü **Dernek / vakıf** (yalnızca admin açar, yalnızca "Hayvan sahiplendirme" bölümü alır; kural + test),
+  yeni bölüm **Hayvan sahiplendirme** (`/sahiplendirme`; belediyelere ve derneklere): ilan ekle / düzenle,
+  Sahiplendirildi, Kaldır, Yeniden yayınla (silinmez), işlem kaydı. Etkinlik formunda "Gönüllülük" türü seçilince
+  ücret kapanır (kural: gönüllülük ücretsiz). Veri: `adoptions` (yayındaki / sahiplendirileni herkes okur; kurum
+  yöneticisi ya da görevli yazar; ad kurumun adı, bölge kurumun bölgesi). 1 yeni dizin. Fotoğraf Blaze ile (şimdilik
+  simge). Denemede bulunan hata düzeltildi: kurum yöneticisi işlem kaydına "sahiplendirme" yazamıyordu. Testler: ortak
+  186, kurallar 170, sunucu 37. Emülatörde panel (dernek hesabıyla ilan ekleme) ve uygulamanın web sürümü (Gönüllülük
+  ve hayvan sayfası) gerçek veriyle görüldü. Telefonda denenmedi.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

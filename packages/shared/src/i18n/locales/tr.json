@@ -2389,5 +2389,47 @@
     "ad": "Reklam",
     "stays_one": "{{count}} tesis",
     "stays_other": "{{count}} tesis"
+  },
+  "volunteer": {
+    "title": "Gönüllülük",
+    "intro": "Şehrin için bir şey yap: belediye ve kurumların gönüllülük çalışmalarına katıl, yuva arayan bir dostu sahiplen.",
+    "jobs": "Gönüllülük ilanları",
+    "noJobs": "Şu an açık gönüllülük ilanı yok. Belediyeler ve kurumlar ilan açtıkça burada görünür.",
+    "seats": "{{count}}/{{capacity}} kişi",
+    "cancelled": "İptal edildi",
+    "animals": "Yuva arayan dostlar",
+    "noAnimals": "Şu an bu ilde sahiplendirme ilanı yok.",
+    "filter": {
+      "hepsi": "Tümü",
+      "kedi": "Kedi",
+      "kopek": "Köpek",
+      "diger": "Diğer",
+      "acil": "Acil"
+    },
+    "species": {
+      "kedi": "Kedi",
+      "kopek": "Köpek",
+      "diger": "Diğer"
+    },
+    "sex": {
+      "disi": "Dişi",
+      "erkek": "Erkek",
+      "bilinmiyor": "Cinsiyeti bilinmiyor"
+    },
+    "urgent": "Acil",
+    "note": "Sahiplendirme ilanları belediye barınaklarından ve doğrulanmış derneklerden gelir. Sahiplendirme ücretsizdir.",
+    "loadError": "Yüklenemedi. Bağlantını kontrol edip tekrar dene.",
+    "animal": "Sahiplendirme",
+    "vaccinated": "Aşıları tam",
+    "notVaccinated": "Aşıları eksik",
+    "neutered": "Kısırlaştırılmış",
+    "where": "Nerede",
+    "by": "İlanı veren",
+    "call": "Ara",
+    "email": "E-posta gönder",
+    "mailSubject": "{{name}} için sahiplendirme",
+    "free": "Sahiplendirme ücretsizdir. Senden para isteyen olursa ilanı verene ve bize bildir.",
+    "adopted": "Bu dost yuvasına kavuştu.",
+    "gone": "Bu ilan artık yayında değil."
   }
 }

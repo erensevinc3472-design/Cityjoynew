@@ -34,6 +34,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
       { key: 'sehir-rehberi', module: 'sehir-rehberi', path: '/sehir-rehberi', icon: 'book' },
       { key: 'gonderiler', module: 'gonderiler', path: '/duyurular', icon: 'megaphone' },
       { key: 'etkinlikler', module: 'etkinlikler', path: '/etkinlikler', icon: 'calendar' },
+      { key: 'sahiplendirme', module: 'sahiplendirme', path: '/sahiplendirme', icon: 'paw' },
       { key: 'hizmetler', module: 'hizmetler', icon: 'tool' },
     ],
   },
@@ -189,7 +190,9 @@ export function Shell() {
           <div>
             <strong>{user.displayName}</strong>
             {user.grants.map((g) => (
-              <span key={g.id}>{t(`roles.${g.role}`)} · <ScopeLabel scope={g.scope} /></span>
+              <span key={g.id}>
+                {user.memberships.find((m) => m.org.id === g.orgId)?.org.kind === 'dernek' ? t('orgs.kinds.dernek') : t(`roles.${g.role}`)} · <ScopeLabel scope={g.scope} />
+              </span>
             ))}
             <button className="btn ghost" onClick={() => signOut()}>{t('login.logout')}</button>
           </div>
@@ -230,6 +233,7 @@ const ICONS = {
   key: 'M14 10a4 4 0 1 0-1 2.7L20 20M17 17l2-2',
   file: 'M7 3h7l5 5v13H7ZM14 3v5h5M10 13h6M10 17h4',
   gauge: 'M4 16a8 8 0 1 1 16 0M12 16l4-5',
+  paw: 'M12 14c-3 0-5 2.5-5 4.5S8.5 21 12 21s5-.5 5-2.5-2-4.5-5-4.5ZM6 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM10 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM14 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
 } as const;
 
 function Icon({ name }: { name: keyof typeof ICONS }) {

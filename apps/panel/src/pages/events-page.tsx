@@ -393,7 +393,7 @@ function EventForm({
       </div>
       <div className="field">
         <label htmlFor="ev-category">{t('events.category')}</label>
-        <select id="ev-category" value={input.category} onChange={(e) => set({ category: e.target.value as EventInput['category'] })}>
+        <select id="ev-category" value={input.category} onChange={(e) => set({ category: e.target.value as EventInput['category'], ...(e.target.value === 'gonulluluk' ? { free: true } : {}) })}>
           {EVENT_CATEGORIES.map((c) => (
             <option key={c} value={c}>{t(`events.categories.${c}`)}</option>
           ))}
@@ -431,11 +431,14 @@ function EventForm({
           <input type="radio" name="ev-free" checked={input.free} onChange={() => set({ free: true })} />
           {t('events.free')}
         </label>
-        <label>
-          <input type="radio" name="ev-free" checked={!input.free} onChange={() => set({ free: false })} />
-          {t('events.paid')}
-        </label>
+        {input.category !== 'gonulluluk' ? (
+          <label>
+            <input type="radio" name="ev-free" checked={!input.free} onChange={() => set({ free: false })} />
+            {t('events.paid')}
+          </label>
+        ) : null}
       </fieldset>
+      {input.category === 'gonulluluk' ? <p className="form-section meta">{t('events.volunteerHint')}</p> : null}
       {!input.free ? (
         <div className="field">
           <label htmlFor="ev-price">{t('events.priceNote')}</label>

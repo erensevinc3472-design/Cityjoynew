@@ -152,13 +152,16 @@ export interface GrantRecord extends PermissionGrant {
 // ---- Kurumlar ----
 
 /** Kuruma verilebilecek bölümler (kurumun içerik bölümleri). */
-export const ORG_MODULES: Module[] = ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat', 'istatistik', 'baskan'];
+export const ORG_MODULES: Module[] = ['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat', 'istatistik', 'baskan', 'sahiplendirme'];
 
 /** Yalnızca belediyelere verilen bölümler. */
-export const MUNICIPAL_MODULES: Module[] = ['seyahat', 'baskan'];
+export const MUNICIPAL_MODULES: Module[] = ['seyahat', 'baskan', 'sahiplendirme'];
+/** Dernekler yalnızca hayvan sahiplendirme ilanı verir (gönüllülük ilanını belediye ve kurumlar açar; Karar Eren). */
+export const ASSOCIATION_MODULES: Module[] = ['sahiplendirme'];
 
 /** Seyahat (Başkanlarla Keşif tanıtımı ve rotaları) ve Belediye başkanı yalnızca belediyelere verilir. */
 export function orgModulesFor(kind: Organization['kind']): Module[] {
+  if (kind === 'dernek') return [...ASSOCIATION_MODULES];
   return ORG_MODULES.filter((m) => !MUNICIPAL_MODULES.includes(m) || orgRole(kind) === 'belediye');
 }
 
@@ -177,6 +180,7 @@ export function staffActionsFor(module: Module): Action[] {
 
 export function orgRole(kind: Organization['kind']): Role {
   if (kind === 'kulup' || kind === 'yayinci' || kind === 'kurum') return kind;
+  if (kind === 'dernek') return 'kurum';
   return 'belediye';
 }
 

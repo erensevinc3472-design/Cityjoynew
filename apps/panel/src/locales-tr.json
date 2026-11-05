@@ -22,7 +22,8 @@
     "seyahat": "Seyahat",
     "istatistik": "Kitle istatistikleri",
     "baskan": "Belediye başkanı",
-    "sinirlar": "Günlük sınırlar"
+    "sinirlar": "Günlük sınırlar",
+    "sahiplendirme": "Hayvan sahiplendirme"
   },
   "roles": {
     "admin": "Admin",
@@ -748,7 +749,8 @@
       "ilce-belediyesi": "İlçe belediyesi",
       "kurum": "Kamu kurumu",
       "kulup": "Kulüp",
-      "yayinci": "Haber yayıncısı"
+      "yayinci": "Haber yayıncısı",
+      "dernek": "Dernek / vakıf"
     },
     "name": "Kurum adı",
     "level": "Bölge düzeyi",
@@ -1282,7 +1284,8 @@
     "approvalNoteOrg": "Etkinliğiniz, kurumunuzda \"Onayla\" yetkisi olan kişinin onayından sonra yayınlanır.",
     "approvalNoteProvince": "Etkinliğiniz, il yöneticisinin onayından sonra yayınlanır.",
     "cover": "Kapak görseli (isteğe bağlı)",
-    "coverHint": "Yatay bir görsel en iyi görünür. Kullanma izni olan bir görsel seç; küçültülerek yüklenir, konum bilgisi silinir."
+    "coverHint": "Yatay bir görsel en iyi görünür. Kullanma izni olan bir görsel seç; küçültülerek yüklenir, konum bilgisi silinir.",
+    "volunteerHint": "Gönüllülük ilanı ücretsizdir; uygulamada Benim Şehrim > Gönüllülük sayfasında görünür, katılanlar \"Katıl\" ile kontenjana yazılır."
   },
   "profile": {
     "title": "Resmî profil",
@@ -1788,7 +1791,8 @@
       "anketler": "Anketler",
       "yarismalar": "Yarışmalar",
       "tatil-fikirleri": "Tatil fikirleri",
-      "bildirim-gonder": "Bildirim gönder"
+      "bildirim-gonder": "Bildirim gönder",
+      "sahiplendirme": "Hayvan sahiplendirme"
     },
     "audience": "Takipçiler",
     "content": "İçerik performansı",
@@ -2378,5 +2382,63 @@
     "shareHint": "İşletmenin kendi sayfasında herkese açık paylaştığı gönderiler. Dokununca paylaşım (resim ya da video) açılır; bildirim kutusunda resmi görünür.",
     "video": "Video",
     "noText": "(yazısız)"
+  },
+  "adoption": {
+    "title": "Hayvan sahiplendirme",
+    "intro": "Barınağınızdaki ya da derneğinizdeki sahiplendirilecek hayvanlar. Uygulamada Benim Şehrim > Gönüllülük sayfasında görünür; sahiplenmek isteyen telefonla ya da e-postayla size ulaşır. Sahiplendirme ücretsizdir.",
+    "which": "Kurum",
+    "new": "Yeni ilan",
+    "edit": "Düzenle",
+    "empty": "Henüz ilan yok.",
+    "loadError": "İlanlar okunamadı.",
+    "saveError": "Kaydedilemedi. Görevinizi kontrol edip tekrar deneyin.",
+    "saved": "Kaydedildi.",
+    "fName": "Adı",
+    "fSpecies": "Tür",
+    "fAge": "Yaşı",
+    "fAgePh": "2 yaşında, 6 aylık…",
+    "fSex": "Cinsiyeti",
+    "fBreed": "Irkı (isteğe bağlı)",
+    "fVaccinated": "Aşıları tam",
+    "fNeutered": "Kısırlaştırılmış",
+    "fUrgent": "Acil yuva arıyor",
+    "fAbout": "Hakkında",
+    "fDistrict": "İlçe",
+    "fPhone": "Telefon",
+    "fEmail": "E-posta",
+    "contactHint": "En az biri gerekli; uygulamada \"Ara\" ve \"E-posta\" düğmesi olarak görünür.",
+    "photoNote": "Fotoğraf ekleme Firebase ücretli plana (Blaze) geçince açılacak.",
+    "species": {
+      "kedi": "Kedi",
+      "kopek": "Köpek",
+      "diger": "Diğer"
+    },
+    "sex": {
+      "disi": "Dişi",
+      "erkek": "Erkek",
+      "bilinmiyor": "Bilinmiyor"
+    },
+    "status": {
+      "yayinda": "Yayında",
+      "sahiplendirildi": "Sahiplendirildi",
+      "kaldirildi": "Kaldırıldı"
+    },
+    "markAdopted": "Sahiplendirildi",
+    "remove": "Kaldır",
+    "republish": "Yeniden yayınla",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "urgentTag": "Acil",
+    "errors": {
+      "name": "Adı yazın (en çok 40 karakter).",
+      "age": "Yaşını yazın.",
+      "about": "Hakkında 10 ile 600 karakter arasında olmalı.",
+      "contact": "Geçerli bir telefon ya da e-posta yazın.",
+      "breed": "Irk en çok 40 karakter."
+    },
+    "colAnimal": "Hayvan",
+    "colPlace": "Yer",
+    "colStatus": "Durum",
+    "colActions": "İşlemler"
   }
 }

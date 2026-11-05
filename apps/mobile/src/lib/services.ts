@@ -5,6 +5,7 @@ import {
   createFirestoreEventRepository,
   createFirestoreOfficialProfileRepository,
   createAdminPushFeed,
+  createAdoptionRepository,
   createAdminPushOpens,
   createContentStatsRecorder,
   createFirestoreOfficialFollowRepository,
@@ -59,6 +60,8 @@ export const contentStats = createContentStatsRecorder(firestore);
 /** Admin bildirimleri: bildirim kutusu (il başına tek sorgu) ve açılma sayımı. */
 export const adminPushFeed = createAdminPushFeed(firestore);
 export const adminPushOpens = createAdminPushOpens(firestore);
+/** Hayvan sahiplendirme (Benim Şehrim > Gönüllülük). */
+export const adoptionRepository = createAdoptionRepository(firestore);
 /** Kullanıcı aktiviteleri (tam buluşma yeri yalnızca düzenleyene ve katılanlara). */
 export const activityRepository = createFirestoreActivityRepository(firestore);
 /** Keşfet gönderileri (Mahallem yalnızca o mahalleye, Bölgesel yalnızca o ile görünür). */

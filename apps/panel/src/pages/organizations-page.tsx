@@ -26,7 +26,7 @@ import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
-const KINDS: ('belediye' | Exclude<OrganizationKind, 'buyuksehir-belediyesi' | 'il-belediyesi' | 'ilce-belediyesi'>)[] = ['belediye', 'kurum', 'kulup', 'yayinci'];
+const KINDS: ('belediye' | Exclude<OrganizationKind, 'buyuksehir-belediyesi' | 'il-belediyesi' | 'ilce-belediyesi'>)[] = ['belediye', 'kurum', 'dernek', 'kulup', 'yayinci'];
 
 const dateOnly = (iso?: string) => (iso ? iso.slice(0, 10) : '');
 const endOfDay = (d: string) => (d ? new Date(`${d}T23:59:59`) : undefined);
@@ -239,7 +239,9 @@ function CreateOrgForm({ user, existingIds, onCancel, onDone }: { user: PanelUse
 
     setBusy(true);
     try {
-      await service.create({ id, name: orgName, kind: orgKind, scope, modules, officialEmail: address, contractEndsAt: ends }, { email: address, displayName: adminName });
+      // Yalnızca bu tür kuruma verilebilen bölümler (dernek: yalnızca hayvan sahiplendirme).
+      const allowed = orgModulesFor(orgKind);
+      await service.create({ id, name: orgName, kind: orgKind, scope, modules: modules.filter((m) => allowed.includes(m)), officialEmail: address, contractEndsAt: ends }, { email: address, displayName: adminName });
     } catch {
       setBusy(false);
       return setError(t('orgs.createError'));
@@ -334,7 +336,7 @@ function CreateOrgForm({ user, existingIds, onCancel, onDone }: { user: PanelUse
       <h3 className="form-section">{t('orgs.modulesAndContract')}</h3>
       <fieldset className="form-section checkbox-group">
         <legend className="sr-only">{t('orgs.modules')}</legend>
-        {(kind === 'belediye' ? ORG_MODULES : ORG_MODULES.filter((m) => !MUNICIPAL_MODULES.includes(m))).map((m) => (
+        {(kind === 'belediye' ? ORG_MODULES : orgModulesFor(kind)).map((m) => (
           <label key={m}>
             <input type="checkbox" checked={modules.includes(m)} onChange={(e) => setModules(e.target.checked ? [...modules, m] : modules.filter((x) => x !== m))} />
             {t(`nav.${m}`)}

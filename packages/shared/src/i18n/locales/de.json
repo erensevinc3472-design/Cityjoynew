@@ -2389,5 +2389,47 @@
     "ad": "Anzeige",
     "stays_one": "{{count}} Unterkunft",
     "stays_other": "{{count}} Unterkünfte"
+  },
+  "volunteer": {
+    "title": "Ehrenamt",
+    "intro": "Tu etwas für deine Stadt: Mach bei Ehrenamtsprojekten von Gemeinden und Institutionen mit oder adoptiere ein Tier, das ein Zuhause sucht.",
+    "jobs": "Ehrenamtliche Einsätze",
+    "noJobs": "Derzeit keine offenen Einsätze. Sie erscheinen hier, sobald Gemeinden und Institutionen sie veröffentlichen.",
+    "seats": "{{count}}/{{capacity}} Personen",
+    "cancelled": "Abgesagt",
+    "animals": "Tiere suchen ein Zuhause",
+    "noAnimals": "Derzeit keine Vermittlungsanzeigen in dieser Provinz.",
+    "filter": {
+      "hepsi": "Alle",
+      "kedi": "Katze",
+      "kopek": "Hund",
+      "diger": "Andere",
+      "acil": "Dringend"
+    },
+    "species": {
+      "kedi": "Katze",
+      "kopek": "Hund",
+      "diger": "Andere"
+    },
+    "sex": {
+      "disi": "Weiblich",
+      "erkek": "Männlich",
+      "bilinmiyor": "Geschlecht unbekannt"
+    },
+    "urgent": "Dringend",
+    "note": "Vermittlungsanzeigen stammen von städtischen Tierheimen und geprüften Vereinen. Die Vermittlung ist kostenlos.",
+    "loadError": "Konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "animal": "Vermittlung",
+    "vaccinated": "Vollständig geimpft",
+    "notVaccinated": "Impfungen unvollständig",
+    "neutered": "Kastriert",
+    "where": "Wo",
+    "by": "Angeboten von",
+    "call": "Anrufen",
+    "email": "E-Mail senden",
+    "mailSubject": "Vermittlung von {{name}}",
+    "free": "Die Vermittlung ist kostenlos. Wenn jemand Geld verlangt, melde es dem Anbieter und uns.",
+    "adopted": "Dieses Tier hat ein Zuhause gefunden.",
+    "gone": "Diese Anzeige ist nicht mehr verfügbar."
   }
 }

@@ -33,7 +33,9 @@ export type Module =
   /** Kurumun resmî hesabını takip edenlerin isimsiz toplu istatistiği (kurum personeli görür). */
   | 'istatistik'
   /** Belediye başkanının profili ve istatistikleri (yalnızca belediyeler; başkanın yetki verdiği personel). */
-  | 'baskan';
+  | 'baskan'
+  /** Hayvan sahiplendirme (belediye barınakları ve dernekler; Karar Eren 5 Kasım 2026). */
+  | 'sahiplendirme';
 
 /** yayinla: hazırladığını onay beklemeden yayınlar ("onaysız yayınla", PROJE.md 6.6). */
 export type Action = 'goruntule' | 'ekle' | 'duzenle' | 'sil' | 'onayla' | 'yayinla' | 'bildirim-gonder';

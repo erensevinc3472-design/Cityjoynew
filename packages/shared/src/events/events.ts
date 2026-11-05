@@ -89,6 +89,8 @@ export function validateEvent(e: EventInput, scope: RegionScope, now = new Date(
   if (!within(len(e.venueName), EVENT_LIMITS.venueName)) errors.push('venue');
   if (len(e.address) > EVENT_LIMITS.address) errors.push('address');
   if (!e.free && !len(e.priceNote)) errors.push('price');
+  // Gönüllülük ilanı ücretsizdir (Benim Şehrim > Gönüllülük; Karar Eren 5 Kasım 2026).
+  if (e.category === 'gonulluluk' && !e.free) errors.push('price');
   if (len(e.priceNote) > EVENT_LIMITS.priceNote) errors.push('price');
   if (e.ticketUrl && (!/^https:\/\/[^\s]+\.[^\s]+$/.test(e.ticketUrl.trim()) || e.ticketUrl.length > EVENT_LIMITS.ticketUrl)) errors.push('ticketUrl');
   if (e.capacity !== undefined && (!Number.isInteger(e.capacity) || !within(e.capacity, EVENT_LIMITS.capacity))) errors.push('capacity');

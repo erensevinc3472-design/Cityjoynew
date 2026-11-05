@@ -53,7 +53,7 @@ const TILES: Tile[] = [
   { key: 'parkPazar', href: '/city/park-pazar', icon: 'park', hue: 'green' },
   { key: 'listings', href: '/carsi', icon: 'sell', hue: 'violet' },
   { key: 'otoparklar', section: 'otoparklar', icon: 'local-parking', hue: 'teal' },
-  { key: 'volunteer', icon: 'volunteer-activism', hue: 'rose' },
+  { key: 'volunteer', href: '/volunteer', icon: 'volunteer-activism', hue: 'rose' },
   { key: 'nasil-yapilir', section: 'nasil-yapilir', icon: 'lightbulb', hue: 'gold' },
 ];
 

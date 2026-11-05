@@ -1500,14 +1500,17 @@ service cloud.firestore {
       return d.keys().hasOnly(['name', 'kind', 'scope', 'modules', 'officialEmail', 'status', 'contractEndsAt',
              'createdBy', 'createdAt', 'updatedAt'])
         && d.name is string && d.name.size() >= 2 && d.name.size() <= 120
-        && d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi', 'kurum', 'kulup', 'yayinci']
+        && d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi', 'kurum', 'kulup', 'yayinci', 'dernek']
         // Belediyeler kilitli ad listesindeki kimlikle açılır (aynı belediye iki kez açılamaz).
         && (d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi']) == id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
         && (id.matches('^bld-.+') || id.matches('^krm-[a-z0-9-]{2,80}$'))
         && validScope(d.scope)
-        && d.modules is list && d.modules.hasOnly(['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat', 'istatistik', 'baskan'])
-        // Seyahat (Başkanlarla Keşif) ve Belediye başkanı yalnızca belediyelere.
+        && d.modules is list && d.modules.hasOnly(['gonderiler', 'etkinlikler', 'bildirimler', 'hizmetler', 'seyahat', 'istatistik', 'baskan', 'sahiplendirme'])
+        // Seyahat (Başkanlarla Keşif) ve Belediye başkanı yalnızca belediyelere; sahiplendirme belediye (barınak) ve
+        // derneklere; dernek yalnızca sahiplendirme.
         && (!d.modules.hasAny(['seyahat', 'baskan']) || d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi'])
+        && (!d.modules.hasAny(['sahiplendirme']) || d.kind in ['buyuksehir-belediyesi', 'il-belediyesi', 'ilce-belediyesi', 'dernek'])
+        && (d.kind != 'dernek' || d.modules.hasOnly(['sahiplendirme']))
         && validEmail(d.officialEmail)
         && d.status in ['aktif', 'pasif']
         && (!('contractEndsAt' in d) || d.contractEndsAt is timestamp)
@@ -1968,6 +1971,8 @@ service cloud.firestore {
         && d.description is string && d.description.size() >= 10 && d.description.size() <= 3000
         && d.category in ['kultur-sanat', 'muzik', 'tiyatro-sinema', 'spor', 'cocuk-aile', 'egitim-seminer', 'festival-senlik',
                           'saglik', 'gonulluluk', 'diger']
+        // Gönüllülük ilanı ücretsizdir (Karar Eren 5 Kasım 2026).
+        && (d.category != 'gonulluluk' || d.free == true)
         && d.startsAt is timestamp && d.endsAt is timestamp && d.startsAt <= d.endsAt && d.endsAt > request.time
         && d.endsAt <= d.startsAt + duration.value(60, 'd')
         && d.venueName is string && d.venueName.size() >= 2 && d.venueName.size() <= 120
@@ -3463,6 +3468,31 @@ service cloud.firestore {
       allow list: if isAdmin();
     }
 
+    // Hayvan sahiplendirme (Karar Eren 5 Kasım 2026): belediye barınağı ve dernek, "Hayvan sahiplendirme" görevi olan
+    // personel ya da kurum yöneticisi yazar; yayındakini ve sahiplendirileni herkes okur; silinmez (kaldırıldı olur).
+    match /adoptions/{id} {
+      function adWho(orgId, action) {
+        return isAdmin() || isOrgAdminOf(orgId) || staffCan(orgId, 'sahiplendirme', action);
+      }
+      function adOk(nw) {
+        return nw.keys().hasOnly(['name', 'species', 'age', 'sex', 'breed', 'vaccinated', 'neutered', 'about', 'urgent', 'region',
+            'phone', 'email', 'org', 'status', 'updatedBy', 'createdAt', 'updatedAt'])
+          && nw.species in ['kedi', 'kopek', 'diger'] && nw.sex in ['disi', 'erkek', 'bilinmiyor']
+          && nw.status in ['yayinda', 'sahiplendirildi', 'kaldirildi']
+          && nw.name is string && nw.name.size() <= 40 && nw.about is string && nw.about.size() <= 600
+          && validLocation(nw.region) && (nw.get('phone', '') != '' || nw.get('email', '') != '')
+          && nw.org.keys().hasOnly(['id', 'name']) && nw.org.name == get(orgPath(nw.org.id)).data.name
+          && regionWithin(nw.region, get(orgPath(nw.org.id)).data.scope)
+          && get(orgPath(nw.org.id)).data.modules.hasAny(['sahiplendirme'])
+          && nw.updatedBy == request.auth.uid && nw.updatedAt == request.time;
+      }
+      allow read: if resource.data.status in ['yayinda', 'sahiplendirildi'] || (signedIn() && adWho(resource.data.org.id, 'goruntule'));
+      allow create: if signedIn() && adOk(request.resource.data) && request.resource.data.createdAt == request.time
+        && adWho(request.resource.data.org.id, 'ekle');
+      allow update: if signedIn() && adOk(request.resource.data) && request.resource.data.org.id == resource.data.org.id
+        && request.resource.data.createdAt == resource.data.createdAt && adWho(resource.data.org.id, 'duzenle');
+    }
+
     // İçerik istatistiği (PROJE.md 6.1, 6.2 madde 22): duyuru / etkinlik başına kişi başına bir okunma ve bir paylaşım.
     // Belge adı içerik + (kişi kimliği + içerik) karması: kişi kaydedilmez, ikinci kez sayılamaz.
     match /contentViews/{vid} {
@@ -3655,14 +3685,14 @@ service cloud.firestore {
                 && grantAllows('mahalle-' + nw.region.neighbourhoodId, nw.module,
                      nw.action))
             // Kurum yöneticisi kendi kurumunda (personel işlemleri).
-            || (nw.get('orgId', null) is string && nw.module in ['kurumlar', 'baskan']
+            || (nw.get('orgId', null) is string && nw.module in ['kurumlar', 'baskan', 'sahiplendirme']
                 && isOrgAdminOf(nw.orgId))
             // Muhtar kendi mahallesinin resmî profilini düzenler.
             || (nw.module == 'kurumlar' && nw.action == 'duzenle'
                 && nw.targetId is string && nw.targetId.matches('^mahalle-.+')
                 && isMuhtarOf(nw.targetId))
             // Kurum personeli kurumun bölümlerinde (duyuru hazırlama, onay).
-            || (nw.get('orgId', null) is string && nw.module in ['gonderiler', 'etkinlikler', 'seyahat', 'baskan']
+            || (nw.get('orgId', null) is string && nw.module in ['gonderiler', 'etkinlikler', 'seyahat', 'baskan', 'sahiplendirme']
                 && staffCan(nw.orgId, nw.module, nw.action)));
       }
       allow create: if _k180(request.resource.data);
