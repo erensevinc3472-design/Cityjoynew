@@ -34,6 +34,7 @@ import { StatsPage } from './pages/stats-page';
 import { ProfilesPage } from './pages/profiles-page';
 import { AudiencePage } from './pages/audience-page';
 import { ContentStatsPage } from './pages/content-stats-page';
+import { PressPage } from './pages/press-page';
 import { CityProvider } from './lib/city';
 import './styles.css';
 
@@ -59,6 +60,7 @@ const router = createHashRouter([
       { path: 'profiller', element: <ProfilesPage /> },
       { path: 'takipciler', element: <AudiencePage /> },
       { path: 'icerik-performansi', element: <ContentStatsPage /> },
+      { path: 'basin-masasi', element: <PressPage /> },
       { path: 'konumlar', element: <LocationsPage /> },
       { path: 'meslekler', element: <OccupationsPage /> },
       { path: 'acil-numaralar', element: <EmergencyNumbersPage /> },

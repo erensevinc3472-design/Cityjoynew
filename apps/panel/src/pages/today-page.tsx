@@ -8,6 +8,9 @@ import { canSeeStats, MENU_GROUPS, visibleItems } from '../components/shell';
 import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
 import { canSeeContentStats } from './content-stats-page';
+import { canSeePress } from './press-page';
+import { DEFAULT_IMPORTANT_DAYS, upcomingDays, type ImportantDay } from '@cityjoy/shared';
+import { createImportantDaysService } from '@cityjoy/shared/firebase';
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import { isAdminUser, useSession } from '../lib/session';
@@ -86,6 +89,8 @@ export function TodayPage() {
         </div>
       </header>
 
+      {canSeePress(user) ? <UpcomingDaysCard /> : null}
+
       {stats ? (
         <>
           <div className="stat-grid">
@@ -135,6 +140,7 @@ function QuickLinks() {
   const admin = isAdminUser(user!);
   // Belediye ve muhtar için en çok işe yarayanlar önde: içerik performansı ve takipçiler.
   const reports = [
+    ...(canSeePress(user!) ? [{ key: 'basin', path: '/basin-masasi', label: t('menu.press') }] : []),
     ...(canSeeContentStats(user!, admin) ? [{ key: 'icerik', path: '/icerik-performansi', label: t('menu.content') }] : []),
     ...(canSeeAudience(user!, admin) ? [{ key: 'kitle', path: '/takipciler', label: t('menu.audience') }] : []),
   ];
@@ -150,6 +156,41 @@ function QuickLinks() {
           <span aria-hidden="true">›</span>
         </Link>
       ))}
+    </div>
+  );
+}
+
+/** Basın birimi için yaklaşan önemli günler (14 gün): ülke geneli liste ve kurumun yerel günleri. */
+function UpcomingDaysCard() {
+  const { user } = useSession();
+  const [days, setDays] = useState<ImportantDay[] | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    if (user.isDemo) return setDays(DEFAULT_IMPORTANT_DAYS);
+    const svc = createImportantDaysService(firestore, user.uid);
+    const orgId = user.memberships[0]?.org.id;
+    Promise.all([svc.loadNational().catch(() => null), orgId ? svc.loadLocal(orgId).catch(() => []) : Promise.resolve([])]).then(
+      ([national, local]) => setDays([...(national ?? DEFAULT_IMPORTANT_DAYS), ...local]),
+    );
+  }, [user]);
+  const list = days ? upcomingDays(days, new Date(), 14).slice(0, 4) : [];
+  if (!days || !list.length) return null;
+  return (
+    <div className="card">
+      <h2 className="card-title">{t('press.todayCard')}</h2>
+      <ul className="upcoming">
+        {list.map((o) => (
+          <li key={`${o.day.id}-${o.date}`}>
+            <span className={`dot k-${o.day.kind === 'yerel' ? 'yerel' : 'gun'}`} aria-hidden="true" />
+            <span className="grow">
+              <strong>{o.day.title}</strong>
+              {o.day.idea ? <small>{o.day.idea}</small> : null}
+            </span>
+            <span className="when">{o.inDays === 0 ? t('press.todayShort') : t('press.inDays', { count: o.inDays })}</span>
+          </li>
+        ))}
+      </ul>
+      <Link className="btn secondary" to="/basin-masasi">{t('press.todayMore')}</Link>
     </div>
   );
 }

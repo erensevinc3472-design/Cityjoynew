@@ -531,6 +531,12 @@ Aşağıdaki 24 madde belediye panelinin kapsamıdır. Her biri 6.1'deki ilkeye 
 **İlk sürüm önerisi (Eren onayladı):** 1, 2, 3, 4, 6, 8, 12, 14, 15, 17, 18, 19. (18. madde, Eren'in kurum içi onay kararıyla ilk sürüme eklendi, bölüm 6.6.) Talep kutusu (11) ikinci aşamaya: cevap beklentisi doğurur, belediyenin hazır olması gerekir. Geri kalanı sonraki aşamalarda.
 - Onay kuyruğu (14): **Karar (Eren): önce il yöneticisi, sonra admin** (iki aşamalı onay, bölüm 6.5).
 
+**Karar (Eren, 5 Kasım 2026): Basın Masası.** Basın biriminin işine yarayacak yardımcı araçlar, panelde ayrı bölüm:
+(1) yayın takvimi, (2) önemli günler (resmî, dinî, anma, uluslararası; kurumun yerel günleri; yaklaşan gün
+hatırlatması ve paylaşım fikri), (3) planlı yayın (6.2 madde 4), (4) hazır şablonlar (madde 13), (5) yayın öncesi
+kontrol listesi. Sıra: 1-2, sonra 3-4, en son 5. **Yapıldı (5 Kasım): 1 ve 2.** Ülke geneli gün listesini admin yönetir
+(dinî bayram tarihleri her yıl Diyanet takviminden); tarafsızlık için siyasi anlam taşıyan gün konmaz.
+
 ### 6.3 İl yöneticisi paneli (kapsam: kendi ili)
 
 Eren'in onayıyla ilk sürüm seçimi Claude'a bırakıldı. Tam liste ve ilk sürüm işareti:

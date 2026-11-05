@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router';
 import {
   ANNOUNCEMENT_KINDS,
   ANNOUNCEMENT_LIMITS,
@@ -115,6 +116,15 @@ function Announcements({ user }: { user: PanelUser }) {
   const newDraft = (): AnnouncementInput => {
     return { kind: 'duyuru', title: '', body: '', region: scopeRegion(publisher!) };
   };
+
+  // Basın Masası'ndan "Bu gün için duyuru hazırla": yeni taslak, başlık önceden dolu.
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (params.get('yeni') !== '1' || !publisher || !live) return;
+    setDraft({ input: { ...newDraft(), title: (params.get('baslik') ?? '').slice(0, 100) } });
+    setParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, publisher, live]);
 
   const rejectSubmit = (e: FormEvent, a: Announcement) => {
     e.preventDefault();

@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı ve Basın Masası 1. aşama). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -59,8 +59,8 @@ Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye pane
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (169)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (159; Java 21 gerekir)
+npm test                      # ortak paket testleri (172)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (161; Java 21 gerekir)
 npm run test:functions        # sunucu işlevleri, emülatörde (30; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
@@ -774,6 +774,23 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   anahtarı) ve panel. Kural dosyası sınıra yakın: yüklemede "Bilinmeyen hata" çıkarsa boyut aşılmıştır, Claude kısaltır.
   **Aydınlatma metnine eklenecek satır:** "Resmî hesapların içeriklerini açtığınızda ve paylaştığınızda isimsiz sayılır;
   kimliğiniz kaydedilmez." (avukat kontrolü).
+- **Basın Masası, 1. aşama: yayın takvimi ve önemli günler (5 Kasım, aynı dal; Karar Eren 5 Kasım; PROJE.md 6.2).**
+  Panel > **Basın Masası** (`/basin-masasi`, menüde Bugün'ün altında): aylık takvim (pazartesi başlar; yayınlanan
+  duyuru / haber / acil, etkinlikler başlangıç gününde, hazırlıktaki etkinlik kesik çizgili, önemli ve yerel günler;
+  renk açıklaması), güne dokununca ayrıntı ve önemli günde **"Bu gün için duyuru hazırla"** (Duyurular sayfası
+  `?yeni=1&baslik=` ile başlığı dolu yeni taslak açar), yaklaşan önemli günler (30 gün), hazırlıktakiler (taslak / onay
+  bekliyor / düzeltme istendi). Telefonda takvim noktalı küçük görünüm. Bugün sayfasında "Yaklaşan önemli günler"
+  kartı (14 gün) ve kısayollarda Basın Masası önde. Kimler görür: duyuru ya da etkinlik bölümü açık kurumda kurum
+  yöneticisi ve o bölümlerde görevi olan personel (yalnızca görüntüleyen dahil), duyuru yazabilen muhtar / il
+  yöneticisi, admin. **Önemli günler** (`packages/shared/src/press`): başlangıç listesi 33 gün (resmî / millî, dinî
+  bayram 2026-2027, anma ve belirli günler, uluslararası günler; Anneler / Babalar Günü "ayın n. pazarı" olarak
+  hesaplanır), her birinde kısa paylaşım fikri. Ülke geneli liste `config/importantDays` (admin panelden düzenler;
+  kaydedilene kadar başlangıç listesi), kurumun **yerel günleri** `orgDays/{kurum}` (kurum yöneticisi ya da duyuru
+  hazırlayan personel; kurum üyeleri okur). Kaydetme işlem kaydına girer. **Dinî bayram tarihleri Diyanet
+  takviminden doğrulanmalı; 2028 ve sonrası admin tarafından eklenmeli.** Tarafsızlık: siyasi anlam taşıyan gün
+  başlangıç listesinde yok. Testler: ortak 172 (3 yeni), kurallar 161 (2 yeni); tür denetimi ve panel derlemesi geçti;
+  tarayıcıda örnek belediye ve admin hesabıyla, masaüstü ve 390 px'te görüldü. **Yüklenmeli:** kurallar ve panel
+  (dizin değişikliği yok). Sıradaki aşamalar (Eren onayladı): planlı yayın, hazır şablonlar, yayın öncesi kontrol listesi.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

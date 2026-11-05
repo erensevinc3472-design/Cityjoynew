@@ -5,6 +5,7 @@ import { canSeeModule, type Module } from '@cityjoy/shared';
 import { ScopeLabel } from './scope-label';
 import { hasProfileAccess } from '../pages/profile-page';
 import { canSeeContentStats } from '../pages/content-stats-page';
+import { canSeePress } from '../pages/press-page';
 import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
@@ -160,6 +161,7 @@ export function Shell() {
 
         <nav aria-label={t('menu.label')}>
           {link({ key: 'today', path: '/', icon: 'home' }, t('menu.today'))}
+          {canSeePress(user) ? link({ key: 'basin', path: '/basin-masasi', icon: 'calendar' }, t('menu.press')) : null}
           {canSeeStats(user) ? link({ key: 'stats', path: '/istatistikler', icon: 'chart' }, t('menu.stats')) : null}
           {canSeeAudience(user, isAdminUser(user)) ? link({ key: 'kitle', path: '/takipciler', icon: 'users' }, t('menu.audience')) : null}
           {canSeeContentStats(user, isAdminUser(user)) ? link({ key: 'icerik', path: '/icerik-performansi', icon: 'megaphone' }, t('menu.content')) : null}

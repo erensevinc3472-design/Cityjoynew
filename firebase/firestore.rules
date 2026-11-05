@@ -1258,6 +1258,12 @@ service cloud.firestore {
         && nw.updatedAt == request.time;
       }
       allow write: if _k62(request.resource.data);
+      // Basın Masası > ülke geneli önemli günler (admin).
+      function cfgDays(nw) {
+        return isAdmin() && id == 'importantDays' && nw.keys().hasOnly(['days', 'updatedBy', 'updatedAt'])
+          && nw.days is list && nw.days.size() <= 300 && nw.updatedBy == request.auth.uid && nw.updatedAt == request.time;
+      }
+      allow write: if cfgDays(request.resource.data);
       // Keşfet yasaklı kelime listesi (madde 8): admin yönetir, uygulama okur.
       function _k63(nw) {
         return isAdmin() && id == 'bannedWords'
@@ -3388,6 +3394,17 @@ service cloud.firestore {
              exists(officialFollowPath(pid)) ? get(officialFollowPath(pid)).data : {},
              existsAfter(officialFollowPath(pid)) ? getAfter(officialFollowPath(pid)).data : {});
       allow delete: if false;
+    }
+
+    // Basın Masası > kurumun yerel önemli günleri: kurum yöneticisi ya da duyuru hazırlayan personel yazar, üyeler okur.
+    match /orgDays/{orgId} {
+      function odOk(nw) {
+        return (isAdmin() || isOrgAdminOf(orgId) || staffCan(orgId, 'gonderiler', 'ekle'))
+          && nw.keys().hasOnly(['days', 'updatedBy', 'updatedAt']) && nw.days is list && nw.days.size() <= 60
+          && nw.updatedBy == request.auth.uid && nw.updatedAt == request.time;
+      }
+      allow read: if isAdmin() || isMemberOf(orgId);
+      allow create, update: if signedIn() && odOk(request.resource.data);
     }
 
     // İçerik istatistiği (PROJE.md 6.1, 6.2 madde 22): duyuru / etkinlik başına kişi başına bir okunma ve bir paylaşım.
