@@ -2431,5 +2431,19 @@
     "free": "Adoption is free. If anyone asks you for money, report it to the lister and to us.",
     "adopted": "This friend has found a home.",
     "gone": "This listing is no longer available."
+  },
+  "pharmacy": {
+    "title": "Pharmacies on duty",
+    "noLocation": "Choose your province first to see pharmacies on duty.",
+    "loadError": "Could not load the list. Check your connection and try again.",
+    "none": "Today's list for this province is not available yet.",
+    "edevlet": "Check pharmacies on duty on e-Devlet",
+    "updated": "Last updated: {{date}}",
+    "stale": "The list may be out of date. Call the pharmacy to confirm before you go.",
+    "yourDistrict": "Your district",
+    "onDuty": "On duty",
+    "call": "Call",
+    "map": "Open in maps",
+    "note": "The list is updated every morning. In an emergency, call 112."
   }
 }

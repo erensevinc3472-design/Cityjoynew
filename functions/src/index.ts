@@ -12,6 +12,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { sendAdminPush, sendDueAdminPushes } from './admin-push';
+import { providerFromEnv, syncPharmacies } from './pharmacy';
 import { estimateAudienceFor, handleAnnouncementWrite, sendScheduledAnnouncements, type AudienceRequest } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
@@ -106,6 +107,27 @@ export const scheduledAnnouncements = onSchedule({ schedule: 'every 10 minutes',
 export const adminPushCreated = onDocumentCreated('adminPushes/{id}', async (e) => {
   const d = e.data?.data();
   if (d) await sendAdminPush(db, e.params.id, d, deps());
+});
+
+/**
+ * Nöbetçi eczane: her sabah 08.15'te bütün iller, 10.00'da yalnızca bugünün listesi gelmeyen iller (Eren onayladı,
+ * docs/oneri-nobetci-eczane.md). Servis ve anahtar ortam ayarından (PHARMACY_PROVIDER, PHARMACY_API_KEY); yoksa çalışmaz.
+ */
+export const pharmacyMorning = onSchedule({ schedule: '15 8 * * *', timeZone: 'Europe/Istanbul', timeoutSeconds: 540 }, async () => {
+  const provider = providerFromEnv();
+  if (provider) await syncPharmacies(db, provider, { now: new Date() });
+});
+export const pharmacyRetry = onSchedule({ schedule: '0 10 * * *', timeZone: 'Europe/Istanbul', timeoutSeconds: 540 }, async () => {
+  const provider = providerFromEnv();
+  if (provider) await syncPharmacies(db, provider, { now: new Date(), onlyStale: true });
+});
+/** Panel (admin): "Şimdi yeniden çek" (bir il ya da hepsi). */
+export const pharmacyResync = onCall({ timeoutSeconds: 540 }, async (req) => {
+  if (!req.auth || !(await db.doc(`admins/${req.auth.uid}`).get()).exists) throw new HttpsError('permission-denied', 'Yalnızca admin');
+  const provider = providerFromEnv();
+  if (!provider) throw new HttpsError('failed-precondition', 'Eczane servisi ayarlı değil');
+  const code = typeof req.data?.provinceCode === 'string' ? req.data.provinceCode : undefined;
+  return syncPharmacies(db, provider, { now: new Date(), provinces: code ? [code] : undefined, by: req.auth.uid });
 });
 
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {

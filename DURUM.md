@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası, hedefli bildirim, admin bildirimleri ve ücretli reklam, Gönüllülük ve hayvan sahiplendirme; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası, hedefli bildirim, admin bildirimleri ve ücretli reklam, Gönüllülük ve hayvan sahiplendirme, nöbetçi eczane; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -59,9 +59,9 @@ Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye pane
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (186)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (170; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (37; Java 21 gerekir)
+npm test                      # ortak paket testleri (189)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (171; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (39; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -873,6 +873,22 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   simge). Denemede bulunan hata düzeltildi: kurum yöneticisi işlem kaydına "sahiplendirme" yazamıyordu. Testler: ortak
   186, kurallar 170, sunucu 37. Emülatörde panel (dernek hesabıyla ilan ekleme) ve uygulamanın web sürümü (Gönüllülük
   ve hayvan sayfası) gerçek veriyle görüldü. Telefonda denenmedi.
+- **Nöbetçi eczane (5 Kasım, aynı dal; Eren onayladı: NosyAPI, docs/oneri-nobetci-eczane.md).** Uygulama: Acil
+  İhtiyaçlar ve Benim Şehrim'de "Nöbetçi eczane" açıldı (`/pharmacy`): ilin bugünkü listesi, kendi ilçen önce ("Senin
+  ilçen"), ilçe başlıkları, Ara, Haritada aç (koordinat yoksa ad + adresle arama), "Son güncelleme", liste bugüne ait
+  değilse uyarı (sabah 09.00'a kadar dünkü liste geçerli), liste yoksa e-Devlet sorgusu ve 112 notu. 5 dilde. Okuma:
+  `dutyPharmacies/{il}` tek belge, 30 dakika telefonda. Sunucu: `pharmacyMorning` (08.15, bütün iller),
+  `pharmacyRetry` (10.00, bugünün listesi gelmeyen iller), `pharmacyResync` (admin, "şimdi çek"); aynı gün yeniden
+  çekilince gizlemeler korunur; il durumu `dataSourceStatus/pharmacy`, çalışma özeti `dataSourceRuns`. Servis
+  bağdaştırıcısı `nosyProvider` (adres `PHARMACY_API_URL` ile değiştirilebilir; **NosyAPI'nin adresi ve yanıt
+  biçimi doğrulanmadı**: siteye bu ortamdan erişilemedi, anahtar gelince ilk çekimde kontrol edilecek; alan adları
+  `normalizePharmacy` ile birkaç olası adla okunur) ve sahte servis (`PHARMACY_PROVIDER=sahte`). Ortam ayarları:
+  `PHARMACY_PROVIDER=nosy`, `PHARMACY_API_KEY`. Panel > Acil > **Nöbetçi eczane** (`/nobetci-eczane`): seçili ilin bugünkü
+  listesi, "Bugün gizle / Göster" (admin ve "Acil numaralar > düzenle" yetkili il yöneticisi; işlem kaydı), admin için
+  81 ilin durumu (bugün / eski / hata / hiç), son çekimler, "Bütün illeri / bu ili şimdi çek". Kurallar: herkes okur,
+  yalnızca `hidden` değişir; durum ve çekim kaydı yalnızca admin. Testler: ortak 189, kurallar 171, sunucu 39.
+  Emülatörde uygulamanın web sürümü ve panel örnek veriyle görüldü. **Çalışması için:** Eren NosyAPI hesabı ve anahtarı
+  (ortam ayarı), fiyatı siteden doğrulama (5.000 kredi ≈ 6 dolar bilgisi doğrulanmadı), Blaze (zamanlanmış iş).
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

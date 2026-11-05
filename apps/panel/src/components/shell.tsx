@@ -60,6 +60,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
     key: 'acil',
     items: [
       { key: 'acil-numaralar', module: 'acil-numaralar', path: '/acil-numaralar', icon: 'phone' },
+      { key: 'nobetci-eczane', module: 'acil-numaralar', path: '/nobetci-eczane', icon: 'pill' },
       { key: 'sos', module: 'sos', path: '/sos-ayarlari', icon: 'alert' },
     ],
   },
@@ -233,6 +234,7 @@ const ICONS = {
   key: 'M14 10a4 4 0 1 0-1 2.7L20 20M17 17l2-2',
   file: 'M7 3h7l5 5v13H7ZM14 3v5h5M10 13h6M10 17h4',
   gauge: 'M4 16a8 8 0 1 1 16 0M12 16l4-5',
+  pill: 'M10.5 20.5a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7ZM7 10l7 7',
   paw: 'M12 14c-3 0-5 2.5-5 4.5S8.5 21 12 21s5-.5 5-2.5-2-4.5-5-4.5ZM6 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM10 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM14 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
 } as const;
 

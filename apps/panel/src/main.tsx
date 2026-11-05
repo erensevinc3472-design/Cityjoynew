@@ -37,6 +37,7 @@ import { ContentStatsPage } from './pages/content-stats-page';
 import { PressPage } from './pages/press-page';
 import { AdminPushPage } from './pages/admin-push-page';
 import { AdoptionPage } from './pages/adoption-page';
+import { PharmacyPage } from './pages/pharmacy-page';
 import { CityProvider } from './lib/city';
 import './styles.css';
 
@@ -65,6 +66,7 @@ const router = createHashRouter([
       { path: 'basin-masasi', element: <PressPage /> },
       { path: 'bildirim-gonder', element: <AdminPushPage /> },
       { path: 'sahiplendirme', element: <AdoptionPage /> },
+      { path: 'nobetci-eczane', element: <PharmacyPage /> },
       { path: 'konumlar', element: <LocationsPage /> },
       { path: 'meslekler', element: <OccupationsPage /> },
       { path: 'acil-numaralar', element: <EmergencyNumbersPage /> },

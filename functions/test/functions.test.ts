@@ -4,6 +4,7 @@ import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { sendAdminPush, sendDueAdminPushes } from '../src/admin-push';
+import { citySlug, nosyProvider, syncPharmacies } from '../src/pharmacy';
 import { estimateAudienceFor, handleAnnouncementWrite, sendScheduledAnnouncements } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
@@ -557,6 +558,37 @@ describe('admin bildirimi', () => {
     expect(await sendDueAdminPushes(db, deps)).toBe(0);
     expect(await sendDueAdminPushes(db, { ...deps, now: new Date(NOW.getTime() + 2 * 3600000) })).toBe(70);
     expect(sent.length).toBe(70);
+  });
+});
+
+describe('nöbetçi eczane çekimi', () => {
+  const ok = { id: 'deneme', fetchProvince: async ({ code }: { code: string }) => [{ name: `Eczane ${code}`, district: 'Merkez', address: 'Cad. 1' }] };
+  it('illeri yazar, hata alanı panele düşer; ikinci deneme yalnızca eksik illeri çeker; aynı gün gizlemeler korunur', async () => {
+    const flaky = { id: 'deneme', fetchProvince: async ({ code }: { code: string }) => { if (code === '34') throw new Error('zaman aşımı'); return ok.fetchProvince({ code }); } };
+    const r = await syncPharmacies(db, flaky, { now: NOW, provinces: ['16', '34'] });
+    expect(r).toEqual({ ok: ['16'], failed: [{ code: '34', error: 'zaman aşımı' }] });
+    expect((await db.doc('dutyPharmacies/16').get()).data()).toMatchObject({ date: '2026-11-01', source: 'deneme', items: [{ name: 'Eczane 16' }], hidden: [] });
+    expect((await db.doc('dataSourceStatus/pharmacy').get()).get('provinces.34.error')).toBe('zaman aşımı');
+    await db.doc('dutyPharmacies/16').update({ hidden: ['merkez|eczane 16'] });
+    const calls: string[] = [];
+    const spy = { id: 'deneme', fetchProvince: async (p: { code: string }) => { calls.push(p.code); return ok.fetchProvince(p); } };
+    await syncPharmacies(db, spy, { now: NOW, provinces: ['16', '34'], onlyStale: true });
+    expect(calls).toEqual(['34']);
+    await syncPharmacies(db, spy, { now: NOW, provinces: ['16'] });
+    expect((await db.doc('dutyPharmacies/16').get()).get('hidden')).toEqual(['merkez|eczane 16']);
+    expect((await db.collection('dataSourceRuns').get()).size).toBe(3);
+  });
+
+  it('NosyAPI bağdaştırıcısı: il adresi Türkçe harfsiz, anahtar başlıkta, yanıt çevrilir', async () => {
+    expect(citySlug('Şanlıurfa')).toBe('sanliurfa');
+    let seen: { url: string; auth: string } | null = null;
+    const fake = (async (url: string, init: { headers: Record<string, string> }) => {
+      seen = { url, auth: init.headers.Authorization };
+      return { ok: true, json: async () => ({ data: [{ pharmacyName: 'Şifa', address: 'Cad. 1', district: 'Osmangazi', phone: '0224' }, { pharmacyName: 'Eksik' }] }) };
+    }) as unknown as typeof fetch;
+    const items = await nosyProvider('ANAHTAR', fake).fetchProvince({ code: '16', name: 'Bursa' });
+    expect(items).toEqual([{ name: 'Şifa', district: 'Osmangazi', address: 'Cad. 1', phone: '0224' }]);
+    expect(seen).toEqual({ url: 'https://www.nosyapi.com/apiv2/service/pharmacies-on-duty?city=bursa', auth: 'Bearer ANAHTAR' });
   });
 });
 

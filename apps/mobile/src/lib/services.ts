@@ -6,6 +6,7 @@ import {
   createFirestoreOfficialProfileRepository,
   createAdminPushFeed,
   createAdoptionRepository,
+  createPharmacyRepository,
   createAdminPushOpens,
   createContentStatsRecorder,
   createFirestoreOfficialFollowRepository,
@@ -62,6 +63,8 @@ export const adminPushFeed = createAdminPushFeed(firestore);
 export const adminPushOpens = createAdminPushOpens(firestore);
 /** Hayvan sahiplendirme (Benim Şehrim > Gönüllülük). */
 export const adoptionRepository = createAdoptionRepository(firestore);
+/** Nöbetçi eczane (il başına günlük belge). */
+export const pharmacyRepository = createPharmacyRepository(firestore);
 /** Kullanıcı aktiviteleri (tam buluşma yeri yalnızca düzenleyene ve katılanlara). */
 export const activityRepository = createFirestoreActivityRepository(firestore);
 /** Keşfet gönderileri (Mahallem yalnızca o mahalleye, Bölgesel yalnızca o ile görünür). */

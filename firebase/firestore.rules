@@ -3493,6 +3493,21 @@ service cloud.firestore {
         && request.resource.data.createdAt == resource.data.createdAt && adWho(resource.data.org.id, 'duzenle');
     }
 
+    // Nöbetçi eczane (docs/oneri-nobetci-eczane.md): sunucu her sabah yazar, herkes okur. Admin ve il yöneticisi
+    // ("Acil numaralar > düzenle") servisin yanlış verdiği eczaneyi o gün için gizler (yalnızca `hidden` değişir).
+    match /dutyPharmacies/{code} {
+      allow read: if true;
+      allow update: if signedIn() && (isAdmin() || grantAllows('il-' + code, 'acil-numaralar', 'duzenle'))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hidden'])
+        && request.resource.data.hidden is list && request.resource.data.hidden.size() <= 200;
+    }
+    match /dataSourceStatus/{id} {
+      allow read: if isAdmin();
+    }
+    match /dataSourceRuns/{id} {
+      allow read: if isAdmin();
+    }
+
     // İçerik istatistiği (PROJE.md 6.1, 6.2 madde 22): duyuru / etkinlik başına kişi başına bir okunma ve bir paylaşım.
     // Belge adı içerik + (kişi kimliği + içerik) karması: kişi kaydedilmez, ikinci kez sayılamaz.
     match /contentViews/{vid} {

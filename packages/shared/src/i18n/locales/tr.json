@@ -2431,5 +2431,19 @@
     "free": "Sahiplendirme ücretsizdir. Senden para isteyen olursa ilanı verene ve bize bildir.",
     "adopted": "Bu dost yuvasına kavuştu.",
     "gone": "Bu ilan artık yayında değil."
+  },
+  "pharmacy": {
+    "title": "Nöbetçi eczane",
+    "noLocation": "Nöbetçi eczaneleri görmek için önce ilini seç.",
+    "loadError": "Liste yüklenemedi. Bağlantını kontrol edip tekrar dene.",
+    "none": "Bu il için bugünün listesi henüz yok.",
+    "edevlet": "e-Devlet'te nöbetçi eczane sorgula",
+    "updated": "Son güncelleme: {{date}}",
+    "stale": "Liste güncel olmayabilir. Gitmeden önce eczaneyi arayarak teyit et.",
+    "yourDistrict": "Senin ilçen",
+    "onDuty": "Nöbette",
+    "call": "Ara",
+    "map": "Haritada aç",
+    "note": "Liste her sabah güncellenir. Acil bir durumda 112'yi ara."
   }
 }

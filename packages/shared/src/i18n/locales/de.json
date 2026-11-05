@@ -2431,5 +2431,19 @@
     "free": "Die Vermittlung ist kostenlos. Wenn jemand Geld verlangt, melde es dem Anbieter und uns.",
     "adopted": "Dieses Tier hat ein Zuhause gefunden.",
     "gone": "Diese Anzeige ist nicht mehr verfügbar."
+  },
+  "pharmacy": {
+    "title": "Notdienst-Apotheken",
+    "noLocation": "Wähle zuerst deine Provinz, um Notdienst-Apotheken zu sehen.",
+    "loadError": "Die Liste konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "none": "Die heutige Liste für diese Provinz liegt noch nicht vor.",
+    "edevlet": "Notdienst-Apotheken auf e-Devlet abfragen",
+    "updated": "Zuletzt aktualisiert: {{date}}",
+    "stale": "Die Liste ist möglicherweise nicht aktuell. Ruf die Apotheke vorher an.",
+    "yourDistrict": "Dein Bezirk",
+    "onDuty": "Im Dienst",
+    "call": "Anrufen",
+    "map": "In Karten öffnen",
+    "note": "Die Liste wird jeden Morgen aktualisiert. Im Notfall 112 anrufen."
   }
 }
