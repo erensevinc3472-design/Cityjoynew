@@ -1036,7 +1036,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sahiplik doğrulaması (SMS, Blaze), belge yükleme ve ücretli doğrulama, aynı işletmenin ikinci kaydını engelleme, kategoriye
   özel alanlar (konaklama, yeme-içme...), mobil ustalar için hizmet verdiği ilçeler, "bilgileriniz hâlâ doğru mu?" hatırlatması,
   işletme başına günlük ekleme sınırı. (İl yöneticisi kendi ilinin işletmelerini panelde görür, doğrulama admin'de.)
-- SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
+- ~~Nöbetçi eczane veri kaynağı~~: Eren onayladı (5 Kasım, NosyAPI); kod yazıldı. Bekleyen: NosyAPI anahtarı, fiyat doğrulaması, Blaze.
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
 - **Panel 2. aşama (Eren istedi, 3 Kasım):** belediye panelinde gönderi istatistikleri (görüntülenme, beğeni, yorum,
@@ -1066,7 +1066,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini, kişi profil fotoğrafı~~ (31 Ekim - 1 Kasım, Blaze
    bekliyor), ~~Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat ve belediye kapakları, "{Şehir} kareleri"~~ (3 Kasım).
    Fotoğraf işleri tamam (Blaze ile çalışır). Video sonra.
-6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
+6. ~~Nöbetçi eczane günlük çekimi~~ (5 Kasım; NosyAPI anahtarı ve Blaze bekliyor). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 
 **Eren'in fikri, bekliyor (31 Ekim; Eren plan yapacak, şimdilik bir şey yapılmayacak):** afet / deprem modu. Bölgedekilere
@@ -1089,7 +1089,7 @@ toplamak olmaz, dron ve Wi-Fi Direct ayrı bir Ar-Ge projesi. Temeli bu duyuru b
    aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
-2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"
+2. ~~Nöbetçi eczane~~: ekran, panel ve çekim kodu yazıldı (5 Kasım); NosyAPI anahtarı ve Blaze gelince bağlanır.
    sayfası ve çekim kodu sahte sağlayıcıyla emülatörde yapılır; anahtarlar gelince bağlanır.
 3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu (Firebase Storage; Blaze plan gerekir). ~~Fotoğraf vitrini~~ (31 Ekim).
 4. ~~Paneli internete koyma~~ (31 Ekim, https://cityjoynew.web.app).
