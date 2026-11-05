@@ -1418,7 +1418,9 @@
       "muhtar": "Muhtarlık",
       "cityjoy": "CityJoy",
       "channel": "Genel bildirimler",
-      "quietChannel": "Sessiz bildirimler"
+      "quietChannel": "Sessiz bildirimler",
+      "adTag": "Reklam",
+      "campaignTag": "Kampanya"
     },
     "categories": {
       "acil": "Acil duyurular",
@@ -1427,7 +1429,8 @@
       "takip": "Takip",
       "duyuru": "Duyurular",
       "haber": "Kurum haberleri",
-      "etkinlik": "Etkinlikler"
+      "etkinlik": "Etkinlikler",
+      "kampanya": "Kampanya ve reklamlar"
     },
     "hints": {
       "acil": "Su kesintisi, afet gibi bölgendeki acil kamu duyuruları.",
@@ -1436,7 +1439,8 @@
       "takip": "Seni takip etmeye başlayanlar.",
       "duyuru": "Belediye, muhtarlık ve kurum duyuruları.",
       "haber": "Kurumların bölgen için yayınladığı haberler.",
-      "etkinlik": "İlindeki yeni etkinlikler."
+      "etkinlik": "İlindeki yeni etkinlikler.",
+      "kampanya": "İşletme kampanyaları ve tanıtımlar (kampanya izni verdiysen)."
     },
     "offByCityJoy": "Bu tür şu an CityJoy tarafından kapalı.",
     "criticalWarning": {

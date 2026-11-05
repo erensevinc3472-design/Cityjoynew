@@ -629,6 +629,11 @@ Paneller şu filtrelerle bildirim gönderebilecek: **il, ilçe, mahalle, yaş, c
   belirler; duyurunun kendisi bölgedeki herkese uygulamada açık kalır. **Yapıldı (5 Kasım):** duyurularda hedefli
   bildirim (yaş, cinsiyet, meslek; 50 kişi alt sınırı, yaklaşık sayı). İlgi alanı filtresi ve kampanya / tanıtım
   bildirimi (onay zinciri) sonra.
+- **Karar (Eren, 5 Kasım 2026): admin her türlü bildirimi gönderir; işletme reklamı ücret karşılığı.** Admin panelden
+  duyuru, etkinlik, kampanya / tanıtım ve işletme reklamı gönderir (il yöneticisi onayı yok); ücret ve fatura elle
+  girilir (ödeme uygulama dışında). Haftalık reklam ve gece sınırı konmadı (Eren: elle girilir). Kampanya ve reklam
+  yalnızca kampanya izni veren 18+ kişiye, "Reklam" / "Kampanya" etiketiyle gider (ticari ileti ve reklam kuralı;
+  avukat teyidi, İYS kaydı). **Yapıldı (5 Kasım).**
 - **Karar (Eren, 5 Kasım 2026): hedefli duyuru bildirimi için ayrı izin sorulmaz.** Bildirime izin veren kişi, resmî
   kurumların duyurularında yaş, cinsiyet ve mesleğine göre seçilebilir; kayıttaki ayrı "hedefli bildirim" kutucuğu
   kaldırıldı. Kampanya / ticari ileti izni ayrı kalır (ticari ileti kuralı, İYS). **Avukata sorulacak:** bunun açık

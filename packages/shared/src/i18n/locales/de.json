@@ -1418,7 +1418,9 @@
       "muhtar": "Ortsvorsteher",
       "cityjoy": "CityJoy",
       "channel": "Allgemeine Benachrichtigungen",
-      "quietChannel": "Stille Benachrichtigungen"
+      "quietChannel": "Stille Benachrichtigungen",
+      "adTag": "Werbung",
+      "campaignTag": "Kampagne"
     },
     "categories": {
       "acil": "Dringende Meldungen",
@@ -1427,7 +1429,8 @@
       "takip": "Folgen",
       "duyuru": "Bekanntmachungen",
       "haber": "Behördennachrichten",
-      "etkinlik": "Veranstaltungen"
+      "etkinlik": "Veranstaltungen",
+      "kampanya": "Kampagnen und Werbung"
     },
     "hints": {
       "acil": "Dringende öffentliche Meldungen für deine Gegend, z. B. Wasserausfall oder Katastrophen.",
@@ -1436,7 +1439,8 @@
       "takip": "Personen, die dir neu folgen.",
       "duyuru": "Bekanntmachungen von Gemeinden, Ortsvorstehern und Behörden.",
       "haber": "Nachrichten, die Behörden für deine Gegend veröffentlichen.",
-      "etkinlik": "Neue Veranstaltungen in deiner Provinz."
+      "etkinlik": "Neue Veranstaltungen in deiner Provinz.",
+      "kampanya": "Kampagnen und Werbung von Unternehmen (wenn du Kampagnen erlaubt hast)."
     },
     "offByCityJoy": "Diese Art ist derzeit von CityJoy ausgeschaltet.",
     "criticalWarning": {

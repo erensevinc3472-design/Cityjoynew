@@ -1,4 +1,4 @@
-import { isEmptyTarget, matchesPushTarget, PUSH_TARGET_MIN_GROUP, regionWithin, roundAudience, type AudienceFilter, type AnnouncementRegion, type NotificationCategory, type RegionScope, translations } from '@cityjoy/shared';
+import { adminPushReaches, isEmptyTarget, matchesPushTarget, PUSH_TARGET_MIN_GROUP, regionWithin, roundAudience, type AudienceFilter, type AnnouncementRegion, type NotificationCategory, type RegionScope, translations } from '@cityjoy/shared';
 import type { DocumentData, Firestore } from 'firebase-admin/firestore';
 
 import { notifyUsers, type NotifyDeps } from './push';
@@ -87,10 +87,13 @@ export async function sendScheduledAnnouncements(db: Firestore, deps: NotifyDeps
 }
 
 export interface AudienceRequest {
-  /** Yayınlayan hesap: kurum kimliği ya da kişi yetkisinin anahtarı (il-.., mahalle-..). */
+  /** Yayınlayan hesap: kurum kimliği ya da kişi yetkisinin anahtarı (il-.., mahalle-..); admin için önemsiz. */
   publisherKey: string;
-  region: AnnouncementRegion;
+  /** Admin ülke geneli için il boş olabilir. */
+  region: Partial<AnnouncementRegion>;
   target: AudienceFilter | null;
+  /** Kampanya / reklam (yalnızca admin): kampanya izni veren 18+ sayılır. */
+  commercial?: boolean;
 }
 
 /**
@@ -103,9 +106,10 @@ export async function estimateAudienceFor(
   req: AudienceRequest,
   now = new Date(),
 ): Promise<{ tooSmall: boolean; approx: number } | { denied: true }> {
-  const region = req?.region;
-  if (!region?.provinceCode || typeof req.publisherKey !== 'string') return { denied: true };
+  const region = req?.region ?? {};
+  if (typeof req?.publisherKey !== 'string') return { denied: true };
   const admin = (await db.doc(`admins/${caller.uid}`).get()).exists;
+  if (!admin && (!region.provinceCode || req.commercial)) return { denied: true };
   if (!admin) {
     if (!caller.email || caller.emailVerified !== true) return { denied: true };
     const alive = (d: DocumentData) => !d.removedAt && !d.revokedAt && (!d.expiresAt || d.expiresAt.toMillis() > now.getTime());
@@ -122,8 +126,14 @@ export async function estimateAudienceFor(
       const g = (await db.doc(`grants/${caller.email}__${req.publisherKey}`).get()).data();
       if (g && alive(g) && ['muhtar', 'il-yoneticisi'].includes(g.role) && (g.modules?.gonderiler ?? []).includes('ekle')) scope = g.scope;
     }
-    if (!scope || !regionWithin(region, scope)) return { denied: true };
+    if (!scope || !regionWithin(region as AnnouncementRegion, scope)) return { denied: true };
   }
-  const uids = await residents(db, region, req.target, now);
-  return roundAudience(uids.length);
+  // Admin bildirimiyle aynı kural (bölge, hedef, ticari iletide izin + 18 yaş).
+  let q: FirebaseFirestore.Query = db.collection('users');
+  if (region.provinceCode) q = q.where('location.provinceCode', '==', region.provinceCode);
+  if (region.districtId) q = q.where('location.districtId', '==', region.districtId);
+  if (region.neighbourhoodId) q = q.where('location.neighbourhoodId', '==', region.neighbourhoodId);
+  const docs = (await q.select('birthYear', 'gender', 'occupationId', 'location', 'consents.commercialMessages').get()).docs;
+  const push = { kind: req.commercial ? 'kampanya' : 'duyuru', region, target: req.target ?? undefined } as const;
+  return roundAudience(docs.filter((d) => adminPushReaches(d.data() as Parameters<typeof adminPushReaches>[0], push, now)).length);
 }

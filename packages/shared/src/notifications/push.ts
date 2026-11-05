@@ -28,7 +28,8 @@ export type PushNoticeKind =
   | 'messageRequest'
   | 'follower'
   | 'followRequest'
-  | 'followAccepted';
+  | 'followAccepted'
+  | 'adminPush';
 
 export interface PushNotice {
   kind: PushNoticeKind;
@@ -43,6 +44,10 @@ export interface PushNotice {
   source?: 'kurum' | 'kisi';
   /** Admin onayda "her zaman çalsın" dediyse. */
   ringAlways?: boolean;
+  /** Admin bildiriminde başlığın önüne gelen etiket (ticari ileti açıkça belli olsun). */
+  tag?: 'reklam' | 'kampanya';
+  /** Admin bildirimi: açılma sayımı için kimlik. */
+  adminPushId?: string;
 }
 
 /** Bir alıcı: telefonları, dili ve kendi bildirim tercihleri. */
@@ -57,7 +62,7 @@ export interface NoticePushMessage {
   to: string;
   title: string;
   body: string;
-  data: { href: PushNotice['href'] };
+  data: { href: PushNotice['href']; adminPushId?: string };
   /** Yoksa sessiz gelir (günlük sesli tavan doldu). */
   sound?: 'default';
   channelId: string;
@@ -101,14 +106,17 @@ export function noticePushMessages(
   return noticeRecipients(targets, notice, triggers, hour).flatMap((target) => {
     const push = (translations[target.language] ?? translations.tr).notifications.push as Record<string, string>;
     const key = notice.kind === 'announcement' ? notice.category : notice.kind;
-    const title = push[`${key}Title`].replace('{{title}}', notice.title);
+    // Admin bildirimi: başlık ve metin adminin yazdığı (yazıldığı dilde); ticari iletide başta "Reklam" / "Kampanya".
+    const title = notice.kind === 'adminPush'
+      ? (notice.tag ? `${push[notice.tag === 'reklam' ? 'adTag' : 'campaignTag']} · ${notice.title}` : notice.title)
+      : push[`${key}Title`].replace('{{title}}', notice.title);
     const body = notice.body ?? push[`${key}Body`].replace('{{title}}', notice.title);
     const quiet = !critical && silent.has(target.uid);
     return [...new Set(target.tokens)].map((to) => ({
       to,
       title,
       body,
-      data: { href: notice.href },
+      data: { href: notice.href, ...(notice.adminPushId ? { adminPushId: notice.adminPushId } : {}) },
       ...(quiet ? {} : { sound: 'default' as const }),
       channelId: quiet ? QUIET_CHANNEL_ID : GENERAL_CHANNEL_ID,
       ttl: 86400,

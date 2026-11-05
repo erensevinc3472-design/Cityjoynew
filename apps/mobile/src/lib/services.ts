@@ -4,6 +4,8 @@ import {
   createFirestoreAnnouncementRepository,
   createFirestoreEventRepository,
   createFirestoreOfficialProfileRepository,
+  createAdminPushFeed,
+  createAdminPushOpens,
   createContentStatsRecorder,
   createFirestoreOfficialFollowRepository,
   createFirestoreActivityRepository,
@@ -54,6 +56,9 @@ export const officialProfileRepository = createFirestoreOfficialProfileRepositor
 export const officialFollowRepository = createFirestoreOfficialFollowRepository(firestore);
 /** İçerik istatistiği: ayrıntı açılınca bir okunma, paylaşınca bir paylaşım (kişi kaydedilmez). */
 export const contentStats = createContentStatsRecorder(firestore);
+/** Admin bildirimleri: bildirim kutusu (il başına tek sorgu) ve açılma sayımı. */
+export const adminPushFeed = createAdminPushFeed(firestore);
+export const adminPushOpens = createAdminPushOpens(firestore);
 /** Kullanıcı aktiviteleri (tam buluşma yeri yalnızca düzenleyene ve katılanlara). */
 export const activityRepository = createFirestoreActivityRepository(firestore);
 /** Keşfet gönderileri (Mahallem yalnızca o mahalleye, Bölgesel yalnızca o ile görünür). */

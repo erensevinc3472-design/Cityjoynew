@@ -3,6 +3,7 @@ import { getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestor
 import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
+import { sendAdminPush, sendDueAdminPushes } from '../src/admin-push';
 import { estimateAudienceFor, handleAnnouncementWrite, sendScheduledAnnouncements } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
@@ -489,3 +490,64 @@ describe('Seyahat kapakları', () => {
     expect(await handleMediaChange(MEDIA_FIELDS.travel, { cover: b }, undefined, del)).toEqual([b.path]);
   });
 });
+
+describe('admin bildirimi', () => {
+  async function people() {
+    const batch = db.batch();
+    for (let i = 0; i < 70; i++) {
+      // 0-59: Bursa / Osmangazi yetişkin; 0-29 kampanya izinli; 60-69: 16 yaşında izinli; hepsinin telefonu var.
+      const teen = i >= 60;
+      batch.set(db.doc(`users/a${i}`), {
+        uid: `a${i}`, location: { provinceCode: '16', districtId: '16-osmangazi' }, birthYear: teen ? 2010 : 1985, gender: i % 2 ? 'kadin' : 'erkek',
+        occupationId: 'esnaf', consents: i < 30 || teen ? { commercialMessages: { granted: true } } : {},
+      });
+      batch.set(db.doc(`pushTokens/a${i}`), { tokens: [`T-a${i}`], language: 'tr', updatedAt: Timestamp.now() });
+    }
+    batch.set(db.doc('users/ist'), { uid: 'ist', location: { provinceCode: '34' }, birthYear: 1980, consents: { commercialMessages: { granted: true } } });
+    batch.set(db.doc('pushTokens/ist'), { tokens: ['T-ist'], language: 'en', updatedAt: Timestamp.now() });
+    await batch.commit();
+  }
+  const push = (over: Record<string, unknown> = {}) => ({
+    kind: 'duyuru', title: 'Kar uyarısı', body: 'Yarın yoğun kar bekleniyor.', region: { provinceCode: '16' }, scope: '16', link: { type: 'yok' },
+    status: 'planli', sendAt: Timestamp.fromDate(NOW), createdBy: 'eren', ...over,
+  });
+
+  it('duyuru bölgedeki herkese bir kez gider; sonuç belgeye yazılır', async () => {
+    await people();
+    const { sent, deps } = fakeSender();
+    await db.doc('adminPushes/p1').set(push());
+    expect(await sendAdminPush(db, 'p1', push(), deps)).toBe(70);
+    expect(await sendAdminPush(db, 'p1', push(), deps)).toBe(0);
+    expect((await db.doc('adminPushes/p1').get()).data()).toMatchObject({ status: 'gonderildi', recipients: 70 });
+    expect(sent.some((m) => m.to === 'T-ist')).toBe(false);
+    expect(sent[0]).toMatchObject({ title: 'Kar uyarısı', body: 'Yarın yoğun kar bekleniyor.', data: { adminPushId: 'p1' } });
+  });
+
+  it('reklam yalnızca kampanya izni veren yetişkinlere, "Reklam" etiketiyle; ülke geneli il dışını da kapsar', async () => {
+    await people();
+    const { sent, deps } = fakeSender();
+    const ad = push({ kind: 'reklam', region: {}, scope: 'TR', business: { id: 'b1', name: 'Kahve Durağı' }, link: { type: 'isletme', id: 'b1' } });
+    await db.doc('adminPushes/p2').set(ad);
+    expect(await sendAdminPush(db, 'p2', ad, deps)).toBe(31);
+    const tr = sent.find((m) => m.to === 'T-a0')!;
+    expect(tr).toMatchObject({ title: 'Reklam · Kahve Durağı: Kar uyarısı', data: { href: { pathname: '/business/[id]', params: { id: 'b1' } } } });
+    expect(sent.find((m) => m.to === 'T-ist')?.title).toBe('Ad · Kahve Durağı: Kar uyarısı');
+    expect(sent.some((m) => m.to === 'T-a60' || m.to === 'T-a40')).toBe(false);
+  });
+
+  it('hedefli gönderimde 50 kişiden küçük gruba gitmez; planlı bildirim zamanı gelince gider', async () => {
+    await people();
+    const { sent, deps } = fakeSender();
+    const small = push({ target: { genders: ['kadin'] }, region: { provinceCode: '16', districtId: '16-osmangazi' } });
+    await db.doc('adminPushes/p3').set(small);
+    expect(await sendAdminPush(db, 'p3', small, deps)).toBe(0);
+    expect((await db.doc('adminPushes/p3').get()).data()).toMatchObject({ status: 'gonderildi', recipients: 0, skipped: 'kucuk-grup' });
+    const later2 = push({ sendAt: Timestamp.fromDate(new Date(NOW.getTime() + 3600000)) });
+    await db.doc('adminPushes/p4').set(later2);
+    expect(await sendAdminPush(db, 'p4', later2, deps)).toBe(0);
+    expect(await sendDueAdminPushes(db, deps)).toBe(0);
+    expect(await sendDueAdminPushes(db, { ...deps, now: new Date(NOW.getTime() + 2 * 3600000) })).toBe(70);
+    expect(sent.length).toBe(70);
+  });
+});
+

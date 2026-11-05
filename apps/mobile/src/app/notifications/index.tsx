@@ -11,6 +11,8 @@ import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useNotificationFeed, useReadState } from '@/lib/notifications';
+import { adminPushOpens } from '@/lib/services';
+import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -24,6 +26,7 @@ const ICONS: Record<NotificationCategory, IconName> = {
   duyuru: 'notifications-none',
   haber: 'newspaper',
   etkinlik: 'event',
+  kampanya: 'local-offer',
 };
 
 /**
@@ -36,12 +39,15 @@ export default function NotificationsScreen() {
   const c = useThemeColors();
   const { language } = useSettings();
   const lang = language ?? 'tr';
+  const { user } = useSession();
   const list = useNotificationFeed(true);
   const [read, setRead] = useReadState();
   const unread = (list ?? []).filter((n) => isUnread(n, read));
 
   const open = (n: AppNotification) => {
     setRead(markRead(read, n.id));
+    // Admin bildirimi: açılma sayılır (kişi kaydedilmez).
+    if (n.id.startsWith('admin:') && user) void adminPushOpens.record(n.id.slice(6), user.uid);
     router.push(n.href as Href);
   };
   const when = (iso: string) => {

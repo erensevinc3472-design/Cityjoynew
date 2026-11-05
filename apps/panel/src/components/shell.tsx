@@ -50,6 +50,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
     items: [
       { key: 'moderasyon', module: 'moderasyon', path: '/moderasyon', icon: 'shield' },
       { key: 'bildirimler', module: 'bildirimler', path: '/bildirimler', icon: 'bell' },
+      { key: 'bildirim-gonder', show: admin, path: '/bildirim-gonder', icon: 'megaphone' },
       { key: 'anketler', show: admin, path: '/anketler', icon: 'check' },
       { key: 'yarismalar', show: admin, path: '/yarismalar', icon: 'badge' },
     ],

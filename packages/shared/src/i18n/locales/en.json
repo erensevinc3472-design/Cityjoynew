@@ -1418,7 +1418,9 @@
       "muhtar": "Neighbourhood office",
       "cityjoy": "CityJoy",
       "channel": "General notifications",
-      "quietChannel": "Silent notifications"
+      "quietChannel": "Silent notifications",
+      "adTag": "Ad",
+      "campaignTag": "Campaign"
     },
     "categories": {
       "acil": "Urgent announcements",
@@ -1427,7 +1429,8 @@
       "takip": "Follows",
       "duyuru": "Announcements",
       "haber": "Official news",
-      "etkinlik": "Events"
+      "etkinlik": "Events",
+      "kampanya": "Campaigns and ads"
     },
     "hints": {
       "acil": "Urgent public notices for your area, such as water cuts or disasters.",
@@ -1436,7 +1439,8 @@
       "takip": "People who start following you.",
       "duyuru": "Announcements from municipalities, mukhtars and institutions.",
       "haber": "News published by institutions for your area.",
-      "etkinlik": "New events in your province."
+      "etkinlik": "New events in your province.",
+      "kampanya": "Business campaigns and promotions (if you allowed campaign notifications)."
     },
     "offByCityJoy": "This type is currently turned off by CityJoy.",
     "criticalWarning": {

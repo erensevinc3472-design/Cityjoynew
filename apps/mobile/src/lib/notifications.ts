@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  adminPushHref,
+  adminPushReaches,
   collectNotifications,
+  type AdminPush,
   DEFAULT_NOTIFICATION_PREFS,
   DEFAULT_NOTIFICATION_TRIGGERS,
   isRecent,
@@ -21,7 +24,7 @@ import { firestore } from './firebase';
 import { isFirebaseConfigured } from './firebase-config';
 import { useIncomingSos } from './incoming-sos';
 import { chatHref, useChats } from './messages';
-import { socialRepository } from './services';
+import { adminPushFeed, socialRepository } from './services';
 import { useSession } from './session';
 import { deviceStorage } from './storage';
 import { useUserLocation } from './user-location';
@@ -118,6 +121,28 @@ export function useReadState(): [ReadState, (next: ReadState) => void] {
   return [read ?? { until: null, ids: [] }, setRead];
 }
 
+// ---- Admin bildirimleri (kampanya, reklam, duyuru): il başına tek sorgu, 10 dakika telefonda ----
+
+const adminCache = new Map<string, { at: number; list: AdminPush[] }>();
+
+function useAdminPushes(provinceCode: string | undefined): AdminPush[] {
+  const key = provinceCode ?? 'TR';
+  const [list, setList] = useState<AdminPush[]>(() => adminCache.get(key)?.list ?? []);
+  useEffect(() => {
+    if (!isFirebaseConfigured) return;
+    const hit = adminCache.get(key);
+    if (hit && Date.now() - hit.at < 10 * 60 * 1000) return setList(hit.list);
+    adminPushFeed.listSent(provinceCode).then(
+      (l) => {
+        adminCache.set(key, { at: Date.now(), list: l });
+        setList(l);
+      },
+      () => setList([]),
+    );
+  }, [key, provinceCode]);
+  return list;
+}
+
 // ---- Bildirim akışı ----
 
 /**
@@ -127,9 +152,10 @@ export function useReadState(): [ReadState, (next: ReadState) => void] {
  */
 export function useNotificationFeed(full: boolean): AppNotification[] | null {
   const { t } = useTranslation();
-  const { user } = useSession();
+  const { user, profile } = useSession();
   const { location } = useUserLocation();
   const { prefs, triggers } = useNotificationPrefs();
+  const adminPushes = useAdminPushes(location?.provinceCode);
   const { list: announcements } = useAnnouncements(location, 'hepsi');
   const sos = useIncomingSos();
   const { chats } = useChats(user?.uid);
@@ -153,6 +179,19 @@ export function useNotificationFeed(full: boolean): AppNotification[] | null {
       body: a.author.type === 'kurum' ? a.author.name : undefined,
       at: a.publishedAt ?? a.createdAt,
       href: { pathname: '/announcements/[id]', params: { id: a.id } },
+    });
+  }
+  // Admin bildirimleri: sunucunun gönderdiği kişilerle aynı kural (bölge, hedef, ticari iletide izin ve 18 yaş).
+  for (const p of adminPushes) {
+    if (!profile || !adminPushReaches({ ...profile, location: location ?? undefined }, p)) continue;
+    const commercial = p.kind === 'kampanya' || p.kind === 'reklam';
+    items.push({
+      id: `admin:${p.id}`,
+      category: commercial ? 'kampanya' : p.kind === 'etkinlik' ? 'etkinlik' : 'duyuru',
+      title: commercial ? `${t(p.kind === 'reklam' ? 'notifications.push.adTag' : 'notifications.push.campaignTag')} · ${p.business ? `${p.business.name}: ` : ''}${p.title}` : p.title,
+      body: p.body,
+      at: p.sentAt ?? p.sendAt,
+      href: adminPushHref(p.link),
     });
   }
   for (const s of sos) {

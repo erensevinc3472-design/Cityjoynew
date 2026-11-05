@@ -1096,7 +1096,7 @@ service cloud.firestore {
     }
 
     function validPriorities(m) {
-      return m is map && m.keys().hasOnly(['kurum-duyuru', 'muhtar-duyuru', 'haber', 'etkinlik', 'mesaj', 'takip'])
+      return m is map && m.keys().hasOnly(['kurum-duyuru', 'muhtar-duyuru', 'haber', 'etkinlik', 'mesaj', 'takip', 'kampanya'])
         && m.values().hasOnly(['always', 'normal', 'inapp']);
     }
 
@@ -1107,9 +1107,10 @@ service cloud.firestore {
 
     // Bildirim kategorileri haritası (tercihler ve panel tetikleyicileri): bilinen kategoriler, hepsi evet/hayır.
     function validNotificationMap(m) {
-      return m is map && m.keys().hasOnly(['acil', 'sos', 'mesaj', 'takip', 'duyuru', 'haber', 'etkinlik'])
+      return m is map && m.keys().hasOnly(['acil', 'sos', 'mesaj', 'takip', 'duyuru', 'haber', 'etkinlik', 'kampanya'])
         && m.keys().hasAll(['acil', 'sos', 'mesaj', 'takip', 'duyuru', 'haber', 'etkinlik'])
-        && m.acil is bool && m.sos is bool && m.mesaj is bool && m.takip is bool && m.duyuru is bool && m.haber is bool && m.etkinlik is bool;
+        && m.acil is bool && m.sos is bool && m.mesaj is bool && m.takip is bool && m.duyuru is bool && m.haber is bool && m.etkinlik is bool
+        && m.get('kampanya', true) is bool;
     }
 
     // Önerilen aramalar listesi (dil başına en çok 12, her biri en çok 40 harf; uzunluğu panel denetler).
@@ -3432,6 +3433,34 @@ service cloud.firestore {
       }
       allow read: if signedIn() && ptWho();
       allow create, update: if signedIn() && ptOk(request.resource.data) && ptWho();
+    }
+
+    // Admin bildirimleri (PROJE.md 7, Karar Eren 5 Kasım 2026): yalnızca admin hazırlar / iptal eder; gönderimi sunucu
+    // yapar (gonderildi). Gönderilmişi giriş yapan herkes okur (bildirim kutusu; süzme telefonda). Ücret ayrı belgede.
+    match /adminPushes/{id} {
+      function apOk(nw) {
+        return isAdmin() && nw.keys().hasOnly(['kind', 'title', 'body', 'region', 'scope', 'target', 'link', 'business', 'status',
+            'sendAt', 'createdBy', 'createdAt', 'updatedAt'])
+          && nw.kind in ['duyuru', 'etkinlik', 'kampanya', 'reklam'] && nw.status == 'planli'
+          && nw.title is string && nw.title.size() <= 65 && nw.body is string && nw.body.size() <= 240
+          && nw.region is map && nw.scope is string && nw.link is map && nw.sendAt is timestamp
+          && nw.createdBy == request.auth.uid && nw.createdAt == request.time;
+      }
+      allow read: if isAdmin() || (signedIn() && resource.data.status == 'gonderildi');
+      allow create: if apOk(request.resource.data);
+      allow update: if isAdmin() && resource.data.status == 'planli' && request.resource.data.status == 'iptal'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
+    }
+    match /adminPushBilling/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /adminPushOpens/{vid} {
+      function aoOk(nw) {
+        return nw.keys().hasOnly(['push', 'at']) && nw.push is string && nw.at == request.time
+          && vid == nw.push + '_' + hashing.sha256(request.auth.uid + nw.push).toHexString();
+      }
+      allow create: if signedIn() && aoOk(request.resource.data);
+      allow list: if isAdmin();
     }
 
     // İçerik istatistiği (PROJE.md 6.1, 6.2 madde 22): duyuru / etkinlik başına kişi başına bir okunma ve bir paylaşım.

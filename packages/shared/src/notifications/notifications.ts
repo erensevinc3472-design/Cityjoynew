@@ -4,7 +4,7 @@
  * işlevi ve ek yazma maliyeti yok). Telefona anlık bildirim (push) telefon sürümüyle gelir; buradaki tercihler ve sessiz
  * saatler o zaman da kullanılır.
  */
-export const NOTIFICATION_CATEGORIES = ['acil', 'sos', 'mesaj', 'takip', 'duyuru', 'haber', 'etkinlik'] as const;
+export const NOTIFICATION_CATEGORIES = ['acil', 'sos', 'mesaj', 'takip', 'duyuru', 'haber', 'etkinlik', 'kampanya'] as const;
 export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
 
 /** Acil kamu duyurusu ve SOS varsayılan açıktır; kapatılırsa kişi uyarılır (PROJE.md 5.12). Panel bunları kapatamaz. */
@@ -32,7 +32,8 @@ export interface NotificationPrefs {
 }
 
 export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
-  categories: { acil: true, sos: true, mesaj: true, takip: true, duyuru: true, haber: true, etkinlik: true },
+  // Kampanya ve reklam (admin, 5 Kasım 2026): ayrıca kampanya izni ister; kişi bu türü de kapatabilir.
+  categories: { acil: true, sos: true, mesaj: true, takip: true, duyuru: true, haber: true, etkinlik: true, kampanya: true },
   quietHours: { enabled: false, start: 22, end: 8 },
 };
 
@@ -67,7 +68,7 @@ export function normalizeTriggers(raw: unknown): NotificationTriggers {
  * listesinde ve uygulamadaki zilde yine görünür); "inapp" telefona gitmez, yalnızca uygulamadaki bildirim merkezinde.
  * Acil duyuru ve SOS her zaman çalar, değiştirilemez. Admin tek bir duyuru için "her zaman çalsın" diyebilir.
  */
-export const PRIORITY_KEYS = ['kurum-duyuru', 'muhtar-duyuru', 'haber', 'etkinlik', 'mesaj', 'takip'] as const;
+export const PRIORITY_KEYS = ['kurum-duyuru', 'muhtar-duyuru', 'haber', 'etkinlik', 'mesaj', 'takip', 'kampanya'] as const;
 export type PriorityKey = (typeof PRIORITY_KEYS)[number];
 export const NOTIFICATION_PRIORITIES = ['always', 'normal', 'inapp'] as const;
 export type NotificationPriority = (typeof NOTIFICATION_PRIORITIES)[number];
@@ -80,6 +81,7 @@ export const DEFAULT_NOTIFICATION_PRIORITIES: NotificationPriorities = {
   etkinlik: 'normal',
   mesaj: 'normal',
   takip: 'normal',
+  kampanya: 'normal',
 };
 
 /** Kişi başına günde en çok kaç "normal" bildirim sesli çalar (sonrası sessiz gelir). */

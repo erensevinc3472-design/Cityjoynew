@@ -11,6 +11,7 @@ import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebas
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
+import { sendAdminPush, sendDueAdminPushes } from './admin-push';
 import { estimateAudienceFor, handleAnnouncementWrite, sendScheduledAnnouncements, type AudienceRequest } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
@@ -98,6 +99,13 @@ export const estimateAudience = onCall(async (req) => {
 
 export const scheduledAnnouncements = onSchedule({ schedule: 'every 10 minutes', timeZone: 'Europe/Istanbul' }, async () => {
   await sendScheduledAnnouncements(db, deps());
+  await sendDueAdminPushes(db, deps());
+});
+
+/** Admin bildirimi: "hemen" seçildiyse hazırlanınca gider; planlıysa zamanı gelince (yukarıdaki iş). */
+export const adminPushCreated = onDocumentCreated('adminPushes/{id}', async (e) => {
+  const d = e.data?.data();
+  if (d) await sendAdminPush(db, e.params.id, d, deps());
 });
 
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {

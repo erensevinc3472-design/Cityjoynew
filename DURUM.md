@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası, hedefli bildirim; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası, hedefli bildirim, admin bildirimleri ve ücretli reklam; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -59,9 +59,9 @@ Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye pane
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (179)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (165; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (33; Java 21 gerekir)
+npm test                      # ortak paket testleri (182)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (167; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (36; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -838,6 +838,22 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   olmadan (aydınlatma ile) yapılması. **Aydınlatma metnine eklenecek satır:** "Bildirim izni verdiğinizde resmî
   kurumların duyuru bildirimleri bölgenize, yaşınıza, cinsiyetinize ve mesleğinize göre size uygunsa gönderilir;
   kurumlar kimliğinizi görmez." Uygulamadaki kayıt ekranı değişikliği telefonda denenmedi.
+- **Admin bildirimleri ve ücretli işletme reklamı (5 Kasım, aynı dal; Karar Eren 5 Kasım: admin her türlü bildirimi
+  gönderir; işletme reklamı ücret karşılığı, admin elle girer; haftalık ve gece sınırı yok).** Panel > Sosyal >
+  **Bildirim gönder** (`/bildirim-gonder`, yalnızca admin): tür (duyuru / hizmet, etkinlik, kampanya / tanıtım,
+  işletme reklamı), bölge (ülke, il, ilçe, mahalle), yaş / cinsiyet / meslek + "Kaç kişiye ulaşır?", reklamda işletme
+  seçimi, başlık / metin ve "telefonda böyle görünür" önizlemesi, dokununca açılacak yer (işletme, etkinlik, duyuru,
+  bildirimler), hemen ya da planlı, reklamda ücret / fatura / not (`adminPushBilling`, yalnızca admin). Liste: durum
+  (planlandı / gönderildi: N kişi / grup küçük / iptal), açan sayısı, ücret; planlıyı iptal. Veri: `adminPushes`
+  (gönderileni giriş yapan herkes okur, bildirim kutusu için; hazırlama / iptal yalnızca admin, "gönderildi"yi sunucu
+  yazar), `adminPushOpens/{bildirim}_{karma}` (açılma, kişi kaydedilmez). Kampanya ve reklam yalnızca kampanya izni
+  veren 18 yaş ve üstüne gider, başında "Reklam · {işletme}" / "Kampanya" yazar (5 dilde); hedefli gönderimde 50 kişi
+  alt sınırı. **Yeni bildirim türü "Kampanya ve reklamlar"**: kişi Bildirim ayarlarından kapatabilir; panel
+  tetikleyici ve öncelik listesine eklendi. Uygulamada bildirim kutusunda gönderilen admin bildirimleri (aynı kurala
+  göre süzülür, il başına tek sorgu, 10 dakika), bildirime ya da kutudaki öğeye dokununca açılma sayılır. Sunucu:
+  `adminPushCreated` (hemen), 10 dakikalık iş planlıları gönderir; `estimateAudience` admin için ülke geneli ve
+  kampanya iznini de sayar. 2 yeni dizin. Testler: ortak 182, kurallar 167, sunucu 36. Panelde admin hesabıyla
+  emülatörde denendi (reklam planlandı, listede ücret ve durum). **Blaze ile gönderilir.** Telefonda denenmedi.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.
