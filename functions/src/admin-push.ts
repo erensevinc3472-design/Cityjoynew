@@ -40,6 +40,8 @@ export async function sendAdminPush(db: Firestore, id: string, d: DocumentData, 
       source: 'kurum',
       ...(commercial ? { tag: d.kind as 'reklam' | 'kampanya' } : {}),
       adminPushId: id,
+      // Bildirimde resim: Expo'nun resim alanı gerçek telefonda doğrulanana kadar kapalı (PUSH_IMAGES=1 ile açılır).
+      ...(process.env.PUSH_IMAGES === '1' && typeof d.image === 'string' ? { image: d.image } : {}),
     },
     deps,
   );

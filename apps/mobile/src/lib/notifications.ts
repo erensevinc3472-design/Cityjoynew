@@ -192,6 +192,7 @@ export function useNotificationFeed(full: boolean): AppNotification[] | null {
       body: p.body,
       at: p.sentAt ?? p.sendAt,
       href: adminPushHref(p.link),
+      ...(p.image ? { image: p.image } : {}),
     });
   }
   for (const s of sos) {

@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
 import type { ComponentProps } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -100,6 +101,7 @@ export default function NotificationsScreen() {
                   <AppText variant={fresh ? 'label' : undefined} numberOfLines={2}>{n.title}</AppText>
                   {n.body ? <AppText variant="caption" muted numberOfLines={1}>{n.body}</AppText> : null}
                 </View>
+                {n.image ? <Image source={{ uri: n.image }} style={styles.thumb} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
                 {fresh ? <View style={[styles.dot, { backgroundColor: c.primary }]} /> : null}
               </Pressable>
             );
@@ -112,6 +114,7 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
+  thumb: { width: 52, height: 52, borderRadius: radius.sm },
   content: { gap: spacing.sm, paddingBottom: spacing.xl },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: MIN_TOUCH, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   icon: { width: 38, height: 38, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },

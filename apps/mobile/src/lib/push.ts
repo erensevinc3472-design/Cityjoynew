@@ -121,7 +121,7 @@ export async function sendSosPush(alert: Pick<SosAlert, 'id' | 'fromName' | 'tes
 }
 
 /** Sunucu bildirimlerinin açabileceği ekranlar (bildirimdeki adres yalnızca bunlardan biri olabilir). */
-const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]', '/announcements/[id]', '/messages/[uid]', '/u/[uid]', '/me', '/business/[id]', '/notifications']);
+const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]', '/announcements/[id]', '/messages/[uid]', '/u/[uid]', '/me', '/business/[id]', '/notifications', '/explore/[id]']);
 
 /** Bildirime dokununca ilgili ekran açılır: SOS ya da sunucu bildiriminin gösterdiği ekran. */
 export function onNotificationTap(open: (href: Href) => void): () => void {

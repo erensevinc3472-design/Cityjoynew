@@ -61,7 +61,7 @@ Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye pane
 npm install
 npm test                      # ortak paket testleri (182)
 npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (167; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (36; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (37; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -852,8 +852,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   tetikleyici ve öncelik listesine eklendi. Uygulamada bildirim kutusunda gönderilen admin bildirimleri (aynı kurala
   göre süzülür, il başına tek sorgu, 10 dakika), bildirime ya da kutudaki öğeye dokununca açılma sayılır. Sunucu:
   `adminPushCreated` (hemen), 10 dakikalık iş planlıları gönderir; `estimateAudience` admin için ülke geneli ve
-  kampanya iznini de sayar. 2 yeni dizin. Testler: ortak 182, kurallar 167, sunucu 36. Panelde admin hesabıyla
+  kampanya iznini de sayar. 2 yeni dizin. Testler: ortak 182, kurallar 167, sunucu 37. Panelde admin hesabıyla
   emülatörde denendi (reklam planlandı, listede ücret ve durum). **Blaze ile gönderilir.** Telefonda denenmedi.
+  **Reklamda işletmenin paylaşımı (Karar Eren, 5 Kasım):** işletme resmi / videoyu kendi sayfasından (işletme adına
+  Keşfet paylaşımı, Genel) paylaşır; admin "Dokununca ne açılsın? > İşletmenin paylaşımı" ile o paylaşımı seçer
+  (resimli kartlar), ayrıca dosya yüklenmez, bildirimde link yazmaz. Dokununca paylaşım açılır (`/explore/[id]`);
+  bildirim kutusunda paylaşımın resmi küçük resim olarak görünür; panel önizlemesinde de resim. Telefon bildiriminin
+  içindeki resim (Expo `richContent.image`) yazıldı ama **kapalı**: Expo belgesine bu ortamdan ulaşılamadı, alan
+  doğrulanmadı; gerçek telefon sürümünde (EAS) ve Blaze'de denenince sunucu işlevleri `PUSH_IMAGES=1` ile açılacak
+  (iPhone'da ek ayar gerekebilir). Video bildirimin içinde oynamaz; dokununca paylaşımda oynar.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

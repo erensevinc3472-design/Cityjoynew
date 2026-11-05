@@ -137,6 +137,8 @@ export interface AppNotification {
   at: string;
   /** Dokununca açılacak ekran. */
   href: { pathname: string; params?: Record<string, string> };
+  /** Küçük resim (admin bildiriminde seçilen paylaşımın resmi). */
+  image?: string;
 }
 
 /** Kaynaklardan gelenleri birleştirir: kapalı kategoriler ve 14 günden eskiler çıkar, en yeni üstte, en çok 60. */

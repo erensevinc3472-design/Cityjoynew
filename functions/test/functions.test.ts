@@ -535,6 +535,25 @@ describe('admin bildirimi', () => {
     expect(sent.some((m) => m.to === 'T-a60' || m.to === 'T-a40')).toBe(false);
   });
 
+  it('işletmenin paylaşımını açar; bildirim resmi yalnızca PUSH_IMAGES açıkken eklenir', async () => {
+    await people();
+    const { sent, deps } = fakeSender();
+    const ad = push({ kind: 'reklam', business: { id: 'b1', name: 'Dürümcü' }, link: { type: 'gonderi', id: 'post1' }, image: 'https://ornek.com/durum.jpg' });
+    await db.doc('adminPushes/p5').set(ad);
+    await sendAdminPush(db, 'p5', ad, deps);
+    expect(sent[0]).toMatchObject({ data: { href: { pathname: '/explore/[id]', params: { id: 'post1' } }, adminPushId: 'p5' } });
+    expect(sent[0]).not.toHaveProperty('richContent');
+    sent.length = 0;
+    process.env.PUSH_IMAGES = '1';
+    try {
+      await db.doc('adminPushes/p6').set(ad);
+      await sendAdminPush(db, 'p6', ad, deps);
+      expect(sent[0]).toMatchObject({ richContent: { image: 'https://ornek.com/durum.jpg' } });
+    } finally {
+      delete process.env.PUSH_IMAGES;
+    }
+  });
+
   it('hedefli gönderimde 50 kişiden küçük gruba gitmez; planlı bildirim zamanı gelince gider', async () => {
     await people();
     const { sent, deps } = fakeSender();

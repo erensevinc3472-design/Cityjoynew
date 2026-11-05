@@ -14,12 +14,14 @@ import {
   type AudienceFilter,
   type Business,
   type Neighbourhood,
+  type Post,
 } from '@cityjoy/shared';
 import {
   createAdminPushPanel,
   createBusinessAdmin,
   createFirestoreAnnouncementRepository,
   createFirestoreEventRepository,
+  createFirestorePostRepository,
   type AdminPushBilling,
 } from '@cityjoy/shared/firebase';
 
@@ -56,6 +58,8 @@ interface Draft {
   linkType: AdminPushLink['type'];
   linkId: string;
   business?: { id: string; name: string };
+  /** Paylaşım seçildiyse resmi. */
+  image?: string;
   now: boolean;
   sendAt: string;
   billing: { amount: string; invoiceNo: string; note: string };
@@ -97,7 +101,7 @@ function AdminPushes({ user }: { user: PanelUser }) {
       const link: AdminPushLink = d.linkType === 'yok' ? { type: 'yok' } : ({ type: d.linkType, id: d.linkId } as AdminPushLink);
       const amount = d.billing.amount.trim() ? Number(d.billing.amount.replace(',', '.')) : undefined;
       await svc.create(
-        { kind: d.kind, title: d.title, body: d.body, region: d.region, target: cleanPushTarget(d.target) ?? undefined, link, business: d.business, sendAt: d.now ? new Date().toISOString() : new Date(d.sendAt).toISOString() },
+        { kind: d.kind, title: d.title, body: d.body, region: d.region, target: cleanPushTarget(d.target) ?? undefined, link, business: d.business, image: d.linkType === 'gonderi' ? d.image : undefined, sendAt: d.now ? new Date().toISOString() : new Date(d.sendAt).toISOString() },
         d.kind === 'reklam' ? { ...(amount !== undefined && Number.isFinite(amount) ? { amount } : {}), invoiceNo: d.billing.invoiceNo.trim(), note: d.billing.note.trim() } : undefined,
       );
       setDraft(null);
@@ -196,7 +200,15 @@ function PushForm({ draft: d, setDraft, busy, onSubmit }: { draft: Draft; setDra
     if (d.region.districtId) repo.getNeighbourhoods(d.region.districtId).then(setHoods, () => setHoods([]));
   }, [d.region.districtId]);
   // İşletme seçimi (reklam ya da "işletme sayfası açılsın"): seçili ildeki işletmeler.
-  const needBiz = d.kind === 'reklam' || d.linkType === 'isletme';
+  const needBiz = d.kind === 'reklam' || d.linkType === 'isletme' || d.linkType === 'gonderi';
+  // İşletmenin herkese açık (Genel) paylaşımları: reklam bildirimi bunlardan birini açar (Karar Eren 5 Kasım 2026).
+  const [posts, setPosts] = useState<Post[] | null>(null);
+  const bizId = d.business?.id;
+  useEffect(() => {
+    setPosts(null);
+    if (d.linkType !== 'gonderi' || !bizId) return;
+    createFirestorePostRepository(firestore).byBusiness(bizId, { following: false }).then(setPosts, () => setPosts([]));
+  }, [d.linkType, bizId]);
   useEffect(() => {
     setBusinesses(null);
     if (!needBiz || !pc || !user) return;
@@ -212,7 +224,8 @@ function PushForm({ draft: d, setDraft, busy, onSubmit }: { draft: Draft; setDra
     load.then(setLinkOptions, () => setLinkOptions([]));
   }, [pc, d.linkType]);
 
-  const chooseBusiness = (b: Business) => set({ business: { id: b.id, name: b.name }, ...(d.linkType === 'isletme' || d.kind === 'reklam' ? { linkType: 'isletme', linkId: b.id } : {}) });
+  const chooseBusiness = (b: Business) =>
+    set({ business: { id: b.id, name: b.name }, image: undefined, ...(d.linkType === 'gonderi' ? { linkId: '' } : d.linkType === 'isletme' || d.kind === 'reklam' ? { linkType: 'isletme', linkId: b.id } : {}) });
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const link: AdminPushLink = d.linkType === 'yok' ? { type: 'yok' } : ({ type: d.linkType, id: d.linkId } as AdminPushLink);
@@ -300,16 +313,34 @@ function PushForm({ draft: d, setDraft, busy, onSubmit }: { draft: Draft; setDra
       </div>
       <div className="form-section push-preview" aria-label={t('adminPush.preview')}>
         <span className="meta">{t('adminPush.preview')}</span>
+        {d.linkType === 'gonderi' && d.image ? <img src={d.image} alt="" className="push-preview-img" /> : null}
         <strong>{preview}</strong>
         <span>{d.body || t('adminPush.fBody')}</span>
       </div>
 
       <div className="field">
         <label htmlFor="ap-link">{t('adminPush.link')}</label>
-        <select id="ap-link" value={d.linkType} onChange={(e) => set({ linkType: e.target.value as AdminPushLink['type'], linkId: e.target.value === 'isletme' && d.business ? d.business.id : '' })}>
-          {(['yok', 'isletme', 'etkinlik', 'duyuru'] as const).map((k) => <option key={k} value={k}>{t(`adminPush.links.${k}`)}</option>)}
+        <select id="ap-link" value={d.linkType} onChange={(e) => set({ linkType: e.target.value as AdminPushLink['type'], linkId: e.target.value === 'isletme' && d.business ? d.business.id : '', image: undefined })}>
+          {(['yok', 'gonderi', 'isletme', 'etkinlik', 'duyuru'] as const).map((k) => <option key={k} value={k}>{t(`adminPush.links.${k}`)}</option>)}
         </select>
       </div>
+      {d.linkType === 'gonderi' ? (
+        <fieldset className="form-section">
+          <legend>{t('adminPush.chooseShare')}</legend>
+          {!d.business ? <span className="meta">{t('adminPush.shareNeedsBusiness')}</span> : posts === null ? <span className="meta">{t('profile.loading')}</span> : posts.length ? (
+            <div className="share-grid" role="listbox" aria-label={t('adminPush.chooseShare')}>
+              {posts.map((p) => (
+                <button key={p.id} type="button" role="option" aria-selected={d.linkId === p.id} className={d.linkId === p.id ? 'share on' : 'share'}
+                  onClick={() => set({ linkId: p.id, image: p.photos?.[0]?.url })}>
+                  {p.photos?.[0] ? <img src={p.photos[0].url} alt="" /> : <span className="share-ph" aria-hidden="true">{p.video ? '▶' : '¶'}</span>}
+                  <span className="share-text">{p.video ? `${t('adminPush.video')} · ` : ''}{p.text || t('adminPush.noText')}</span>
+                </button>
+              ))}
+            </div>
+          ) : <span className="meta">{t('adminPush.noShares')}</span>}
+          <p className="meta">{t('adminPush.shareHint')}</p>
+        </fieldset>
+      ) : null}
       {d.linkType === 'etkinlik' || d.linkType === 'duyuru' ? (
         <div className="field">
           <label htmlFor="ap-link-id">{t(`adminPush.links.${d.linkType}`)}</label>

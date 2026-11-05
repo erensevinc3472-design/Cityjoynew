@@ -21,7 +21,9 @@ export type AdminPushLink =
   | { type: 'yok' }
   | { type: 'isletme'; id: string }
   | { type: 'etkinlik'; id: string }
-  | { type: 'duyuru'; id: string };
+  | { type: 'duyuru'; id: string }
+  /** İşletmenin kendi sayfasında paylaştığı resimli / videolu gönderi (Karar Eren 5 Kasım 2026). */
+  | { type: 'gonderi'; id: string };
 
 export interface AdminPushRegion {
   /** Boşsa ülke geneli. */
@@ -44,6 +46,8 @@ export interface AdminPush {
   link: AdminPushLink;
   /** Reklamda işletme (bildirimde "Reklam · {ad}"). */
   business?: { id: string; name: string };
+  /** Seçilen paylaşımın resmi (bildirim kutusunda küçük resim; telefon bildiriminde açılınca). */
+  image?: string;
   status: AdminPushStatus;
   /** Gönderim anı (ISO); geçmiş ya da şimdiyse hemen gider. */
   sendAt: string;
@@ -104,6 +108,8 @@ export function adminPushHref(link: AdminPushLink): { pathname: string; params?:
       return { pathname: '/events/[id]', params: { id: link.id } };
     case 'duyuru':
       return { pathname: '/announcements/[id]', params: { id: link.id } };
+    case 'gonderi':
+      return { pathname: '/explore/[id]', params: { id: link.id } };
     default:
       return { pathname: '/notifications' };
   }

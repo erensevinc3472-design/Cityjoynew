@@ -2335,6 +2335,7 @@
     "link": "Dokununca ne açılsın?",
     "links": {
       "yok": "Bildirimler sayfası",
+      "gonderi": "İşletmenin paylaşımı (resim / video)",
       "isletme": "İşletme sayfası",
       "etkinlik": "Etkinlik",
       "duyuru": "Duyuru"
@@ -2370,6 +2371,12 @@
       "link": "Açılacak sayfayı seçin.",
       "sendAt": "Geçerli bir zaman seçin (en çok 60 gün ileri)."
     },
-    "kind": "Bildirim türü"
+    "kind": "Bildirim türü",
+    "chooseShare": "Hangi paylaşım açılsın?",
+    "shareNeedsBusiness": "Önce yukarıdan işletmeyi seçin.",
+    "noShares": "Bu işletmenin herkese açık paylaşımı yok. İşletme kendi sayfasından resimli ya da videolu paylaşım yapmalı.",
+    "shareHint": "İşletmenin kendi sayfasında herkese açık paylaştığı gönderiler. Dokununca paylaşım (resim ya da video) açılır; bildirim kutusunda resmi görünür.",
+    "video": "Video",
+    "noText": "(yazısız)"
   }
 }

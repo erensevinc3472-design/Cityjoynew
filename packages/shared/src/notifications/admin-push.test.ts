@@ -30,5 +30,6 @@ describe('admin bildirimi', () => {
     expect(validateAdminPush({ ...base, link: { type: 'isletme', id: '' } }, now)).toEqual(['link']);
     expect(validateAdminPush({ ...base, sendAt: new Date(now.getTime() + 90 * 86400000).toISOString() }, now)).toEqual(['sendAt']);
     expect(adminPushHref({ type: 'isletme', id: 'b1' })).toEqual({ pathname: '/business/[id]', params: { id: 'b1' } });
+    expect(adminPushHref({ type: 'gonderi', id: 'p1' })).toEqual({ pathname: '/explore/[id]', params: { id: 'p1' } });
   });
 });

@@ -29,6 +29,9 @@ const input = {
 describe('admin bildirimleri', () => {
   it('yalnızca admin hazırlar ve iptal eder; ücret yalnızca admin görür', async () => {
     const id = await createAdminPushPanel(fs('eren'), 'eren').create(input, { amount: 1500, invoiceNo: 'A-1' });
+    // İşletmenin paylaşımını açan reklam: resim https olmalı.
+    await assertSucceeds(createAdminPushPanel(fs('eren'), 'eren').create({ ...input, link: { type: 'gonderi', id: 'post1' }, image: 'https://ornek.com/durum.jpg' }));
+    await expect(createAdminPushPanel(fs('eren'), 'eren').create({ ...input, link: { type: 'gonderi', id: 'post1' }, image: 'javascript:alert(1)' })).rejects.toThrow();
     await expect(createAdminPushPanel(fs('ayse'), 'ayse').create(input)).rejects.toThrow();
     expect((await createAdminPushPanel(fs('eren'), 'eren').billing(id))?.amount).toBe(1500);
     await assertFails(getDoc(doc(fs('ayse'), 'adminPushBilling', id)));
