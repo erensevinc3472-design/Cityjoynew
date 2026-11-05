@@ -534,7 +534,7 @@ Aşağıdaki 24 madde belediye panelinin kapsamıdır. Her biri 6.1'deki ilkeye 
 **Karar (Eren, 5 Kasım 2026): Basın Masası.** Basın biriminin işine yarayacak yardımcı araçlar, panelde ayrı bölüm:
 (1) yayın takvimi, (2) önemli günler (resmî, dinî, anma, uluslararası; kurumun yerel günleri; yaklaşan gün
 hatırlatması ve paylaşım fikri), (3) planlı yayın (6.2 madde 4), (4) hazır şablonlar (madde 13), (5) yayın öncesi
-kontrol listesi. Sıra: 1-2, sonra 3-4, en son 5. **Yapıldı (5 Kasım): 1, 2, 3 ve 4** (planlı yayın yalnızca duyuru ve haberde; acil duyuru planlanmaz). Ülke geneli gün listesini admin yönetir
+kontrol listesi. Sıra: 1-2, sonra 3-4, en son 5. **Yapıldı (5 Kasım): hepsi (1-5)** (planlı yayın yalnızca duyuru ve haberde; acil duyuru planlanmaz). **Karar (Eren, 5 Kasım):** bu sayfalar kurum hesabında (kurum yöneticisi) ve kurum yöneticisinin görev verdiği personelde görünür; kim neyi görecekse kurum yöneticisi belirler, kendine de görev verebilir. Ülke geneli gün listesini admin yönetir
 (dinî bayram tarihleri her yıl Diyanet takviminden); tarafsızlık için siyasi anlam taşıyan gün konmaz.
 
 ### 6.3 İl yöneticisi paneli (kapsam: kendi ili)

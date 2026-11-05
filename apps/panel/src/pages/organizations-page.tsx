@@ -424,12 +424,15 @@ function OrgDetail({
     const email = d.email.trim().toLowerCase();
     if (!isValidEmail(email)) return setMessage({ kind: 'error', text: t('orgs.emailRequired') });
     if (d.displayName.trim().length < 2) return setMessage({ kind: 'error', text: t('orgs.memberNameRequired') });
-    if (!isAdmin && email === myEmail) return setMessage({ kind: 'error', text: t('orgs.notSelf') });
-    const expiresAt = endOfDay(d.expiresOn);
-    if (expiresAt && expiresAt <= new Date()) return setMessage({ kind: 'error', text: t('orgs.expiryPast') });
+    const self = !isAdmin && email === myEmail;
+    const mine = self ? members?.find((m) => m.email === email) : undefined;
+    if (self && !mine?.isOrgAdmin) return setMessage({ kind: 'error', text: t('orgs.notSelf') });
+    // Kendi kaydında süre ve kurum yöneticiliği değişmez, yalnızca görevler.
+    const expiresAt = mine ? (mine.expiresAt ? new Date(mine.expiresAt) : undefined) : endOfDay(d.expiresOn);
+    if (!mine && expiresAt && expiresAt <= new Date()) return setMessage({ kind: 'error', text: t('orgs.expiryPast') });
     const exists = members?.some((m) => m.email === email);
     const ok = await act(
-      () => service.saveMember(org, { email, displayName: d.displayName, isOrgAdmin: isAdmin && d.isOrgAdmin, assignments: d.assignments, expiresAt }, !exists),
+      () => service.saveMember(org, { email, displayName: mine ? mine.displayName : d.displayName, isOrgAdmin: isAdmin ? d.isOrgAdmin : !!mine, assignments: d.assignments, expiresAt }, !exists),
       exists ? t('orgs.memberUpdated') : t('orgs.memberAdded', { email }),
     );
     if (ok) setDraft(null);
@@ -456,7 +459,8 @@ function OrgDetail({
       await onChanged();
     }, t('orgs.settingsSaved'));
 
-  const canEditMember = (m: OrganizationMember) => !user.isDemo && (isAdmin || (!m.isOrgAdmin && m.email !== myEmail));
+  // Kurum yöneticisi personeli ve kendi görevlerini düzenler (başka kurum yöneticisini değil).
+  const canEditMember = (m: OrganizationMember) => !user.isDemo && (isAdmin || (!m.isOrgAdmin && m.email !== myEmail) || (m.isOrgAdmin && m.email === myEmail));
   const now = new Date();
 
   return (
@@ -681,6 +685,7 @@ function MemberForm({
         </table>
       </div>
       <p className="form-section meta">{t('orgs.dutyHint')}</p>
+      <p className="form-section note">{t('orgs.pagesHint')}</p>
 
       <div className="actions">
         <button className="btn" type="submit" disabled={busy}>{draft.isNew ? t('orgs.addMember') : t('orgs.save')}</button>

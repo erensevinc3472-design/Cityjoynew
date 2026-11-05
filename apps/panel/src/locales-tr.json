@@ -828,12 +828,13 @@
     "duties": "Görevler",
     "actions": "İşlemler",
     "orgAdmin": "Kurum yöneticisi",
-    "allModulesView": "Tüm bölümleri görür, personel yönetir",
+    "allModulesView": "Tüm bölümleri görür, personel yönetir (yayın için kendine görev verebilir)",
     "removed": "Çıkarıldı",
     "expired": "Süresi doldu",
     "edit": "Düzenle",
     "readd": "Yeniden ekle",
-    "remove": "Çıkar"
+    "remove": "Çıkar",
+    "pagesHint": "Görevler panelde şu sayfaları açar: Duyurular ya da Etkinlikler görevi → Basın Masası (yayın takvimi, önemli günler, şablonlar); Duyurular > Ekle → duyuru hazırlama ve şablonlar; Kitle istatistikleri → Takipçiler ve İçerik performansı. Kurum yöneticisi hepsini görür; duyuru hazırlamak ya da onaylamak için kendine de görev verebilir."
   },
   "guide": {
     "title": "Şehir rehberi",
@@ -1126,7 +1127,48 @@
     "templateStore": "Şablonu kaydet",
     "templateSaved": "Şablon kaydedildi.",
     "templateError": "Şablon kaydedilemedi.",
-    "scheduledOk": "Duyuru planlandı: {{date}} anında kendiliğinden yayına girecek."
+    "scheduledOk": "Duyuru planlandı: {{date}} anında kendiliğinden yayına girecek.",
+    "check": {
+      "title": "Yayın öncesi kontrol",
+      "oneHood": "seçili mahalle",
+      "level": {
+        "tamam": "Tamam",
+        "uyari": "Öneri",
+        "hata": "Düzeltilmeli"
+      },
+      "bosluk": {
+        "ok": "Doldurulmamış yer yok.",
+        "warn": "Doldurulmamış yer var: {{list}}. Bunlar düzeltilmeden yayınlanmaz."
+      },
+      "baslikUzun": {
+        "ok": "Başlık telefonda rahat okunur ({{count}} karakter).",
+        "warn": "Başlık uzun ({{count}} karakter); telefonda kesilebilir, {{max}} karakterin altı önerilir."
+      },
+      "buyukHarf": {
+        "ok": "",
+        "warn": "Başlığın tamamı büyük harf; okunması zor, bağırıyor gibi görünür."
+      },
+      "unlem": {
+        "ok": "",
+        "warn": "Ünlem işareti çok; resmî dilde tek ünlem yeterlidir."
+      },
+      "tarihYok": {
+        "ok": "Tarih ya da saat yazılmış.",
+        "warn": "Tarih ya da saat yazılmamış görünüyor; vatandaş \"ne zaman?\" diye soracaktır."
+      },
+      "bitisYok": {
+        "ok": "",
+        "warn": "Tarihli bir duyuru: bitiş tarihi eklerseniz süresi geçince listeden kendiliğinden kalkar."
+      },
+      "onemliGun": {
+        "ok": "",
+        "warn": "Yayın günü {{day}}; içeriğin tonunu bu güne göre gözden geçirin."
+      },
+      "bolge": {
+        "ok": "Kimler görecek: {{region}}.",
+        "warn": ""
+      }
+    }
   },
   "events": {
     "title": "Etkinlikler",

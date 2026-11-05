@@ -303,3 +303,14 @@ td.actions .link + .link { margin-inline-start: 1rem; }
   .cal-chip b { display: none; }
   .cal-more { font-size: 0.65rem; }
 }
+
+/* Duyuru formu: yayın öncesi kontrol listesi */
+.prepublish { border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; background: var(--surface-2); }
+.prepublish h3 { font-size: 0.95rem; margin: 0 0 0.4rem; }
+.prepublish ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; }
+.prepublish li { display: flex; gap: 0.6rem; align-items: baseline; font-size: 0.9rem; }
+.prepublish .ic { flex: none; width: 1.3rem; height: 1.3rem; border-radius: 50%; display: inline-grid; place-items: center; font-size: 0.75rem; font-weight: 700; }
+.prepublish .lvl-tamam .ic { background: var(--ok-bg); color: var(--ok-fg); }
+.prepublish .lvl-uyari .ic { background: var(--accent-soft); color: var(--accent); }
+.prepublish .lvl-hata .ic { background: rgb(252 165 165 / 0.16); color: var(--danger); }
+.prepublish .lvl-tamam { color: var(--muted); }

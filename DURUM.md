@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası 1. ve 2. aşama). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı ve Basın Masası tamamı; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -59,8 +59,8 @@ Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye pane
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (174)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (163; Java 21 gerekir)
+npm test                      # ortak paket testleri (177)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (164; Java 21 gerekir)
 npm run test:functions        # sunucu işlevleri, emülatörde (31; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
@@ -808,7 +808,19 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sunucu 31. **Emülatörde baştan sona denendi** (gerçek giriş, Basın Masası > örnek şablonlar > şablondan duyuru >
   boşluk uyarısı > planlı yayın > veritabanında `publishedAt = scheduledAt`, uygulamada görünmez; hemen yayın
   görünür; takvimde Planlı; işlem kaydı). **Yüklenmeli:** kurallar, dizinler, sunucu işlevleri (Blaze), panel.
-  Sıradaki (Eren onayladı): yayın öncesi kontrol listesi.
+  Sıradaki (Eren onayladı): yayın öncesi kontrol listesi (yapıldı, aşağıda).
+- **Basın Masası, 3. aşama: yayın öncesi kontrol listesi (5 Kasım, aynı dal).** Duyuru formunda yazarken güncellenen
+  "Yayın öncesi kontrol" kutusu (`prePublishChecks`, `packages/shared/src/press/checklist.ts`): doldurulmamış [boşluk]
+  (yayını durdurur), uzun başlık (60 karakter üstü), tamamı büyük harf başlık, fazla ünlem, duyuruda tarih / saat yok,
+  tarihli duyuruda bitiş tarihi yok, yayın günü resmî / dinî / anma gününe denk geliyor (ton hatırlatması), "Kimler
+  görecek" bölge özeti. Yalnızca boşluk engeller, diğerleri öneridir. Emülatörde gerçek girişle denendi.
+- **Görev kuralı netleşti (Karar Eren, 5 Kasım 2026): "kurum yöneticisi kime ne görev verirse o görünür".** Kurum
+  yöneticisi (örn. Osmangazi Belediyesi hesabı / özel kalem) bütün sayfaları görür; personel yalnızca görevine göre:
+  Duyurular ya da Etkinlikler görevi > Basın Masası; Duyurular > Ekle > duyuru hazırlama ve şablonlar; Kitle
+  istatistikleri > Takipçiler ve İçerik performansı. **Yeni:** kurum yöneticisi kendi kaydında kendine görev verebilir
+  (yayınlamak / onaylamak için); kurum yöneticiliğini ve süresini değiştiremez (kural + test). Personel formunda
+  görevlerin hangi sayfaları açtığını anlatan not. Emülatörde dört hesapla denendi (yönetici, basın müdürü, yalnızca
+  istatistik, görevsiz): menüler beklendiği gibi; yönetici kendine görev verince "Yeni duyuru" açıldı.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

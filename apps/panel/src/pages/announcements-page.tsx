@@ -12,6 +12,8 @@ import {
   URGENT_MAX_DAYS,
   validateAnnouncement,
   placeholdersIn,
+  prePublishChecks,
+  DEFAULT_IMPORTANT_DAYS,
   type PressTemplate,
   isScheduled,
   SCHEDULE_MAX_DAYS,
@@ -548,6 +550,7 @@ function AnnouncementForm({
       {errors.includes('region') ? <p className="form-section error" role="alert">{t('announcements.errors.region')}</p> : null}
       <p className="form-section meta">{t('announcements.languageNote')}</p>
       {blanks.length ? <p className="form-section error" role="alert">{t('announcements.blanks', { list: blanks.join(', ') })}</p> : null}
+      <PrePublish input={input} />
 
       <div className="actions">
         {direct ? (
@@ -576,5 +579,29 @@ function AnnouncementForm({
       ) : null}
       {tplMsg ? <p className={`form-section ${tplMsg.ok ? 'note' : 'error'}`} role={tplMsg.ok ? 'status' : 'alert'}>{tplMsg.text}</p> : null}
     </form>
+  );
+}
+
+/** Yayın öncesi kontrol listesi (Basın Masası): yazarken güncellenir; yalnızca doldurulmamış boşluk yayını durdurur. */
+function PrePublish({ input }: { input: AnnouncementInput }) {
+  const region = cleanRegion(input.region);
+  const label = region.provinceCode ? `${regionLabel(region)}${region.neighbourhoodId ? ` · ${t('announcements.check.oneHood')}` : ''}` : '—';
+  const checks = prePublishChecks(input, { regionLabel: label, days: DEFAULT_IMPORTANT_DAYS });
+  const icon = { tamam: '✓', uyari: '!', hata: '✕' } as const;
+  return (
+    <div className="form-section prepublish" aria-live="polite">
+      <h3>{t('announcements.check.title')}</h3>
+      <ul>
+        {checks.map((c) => (
+          <li key={c.key} className={`lvl-${c.level}`}>
+            <span className="ic" aria-hidden="true">{icon[c.level]}</span>
+            <span>
+              <span className="sr-only">{t(`announcements.check.level.${c.level}`)}: </span>
+              {t(`announcements.check.${c.key}.${c.level === 'tamam' ? 'ok' : 'warn'}`, c.vars ?? {})}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

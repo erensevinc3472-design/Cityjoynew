@@ -72,4 +72,15 @@ describe('Basın Masası: önemli günler', () => {
     await assertFails(getDoc(doc(fs('ayse'), 'pressTemplates', orgId)));
     await assertFails(setDoc(doc(fs('basin'), 'pressTemplates', orgId), { items: Array(31).fill(STARTER_TEMPLATES[0]), updatedBy: 'basin', updatedAt: serverTimestamp() }));
   });
+
+  it('kurum yöneticisi kendine görev verebilir; kurum yöneticiliğini ve süresini değiştiremez', async () => {
+    const ref = doc(fs('kalem'), 'orgMembers', `${orgId}__kalem@ornek.com`);
+    const base = { orgId, email: 'kalem@ornek.com', displayName: 'kalem', isOrgAdmin: true, addedBy: 'kalem', updatedAt: serverTimestamp() };
+    await assertSucceeds(setDoc(ref, { ...base, assignments: { gonderiler: ['goruntule', 'ekle', 'onayla', 'yayinla'] } }));
+    await assertFails(setDoc(ref, { ...base, isOrgAdmin: false, assignments: {} }));
+    await assertFails(setDoc(ref, { ...base, assignments: {}, expiresAt: Timestamp.fromDate(new Date(Date.now() + 86400000)) }));
+    // Personel kendine görev veremez.
+    await assertFails(setDoc(doc(fs('basin'), 'orgMembers', `${orgId}__basin@ornek.com`), { ...base, email: 'basin@ornek.com', isOrgAdmin: false, assignments: { gonderiler: ['goruntule', 'ekle', 'yayinla'] } }));
+  });
 });
+

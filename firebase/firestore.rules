@@ -1564,15 +1564,18 @@ service cloud.firestore {
         || isOrgAdminOf(od.orgId);
       }
       allow read: if _k74(resource.data);
-      // Ekleme / görev değiştirme / yeniden ekleme. Kurum yöneticisi kendi kaydını ve başka bir kurum yöneticisini
-      // değiştiremez, kurum yöneticisi atayamaz.
+      // Ekleme / görev değiştirme / yeniden ekleme. Kurum yöneticisi başka bir kurum yöneticisini değiştiremez, kurum
+      // yöneticisi atayamaz; kendi kaydında yalnızca görevlerini değiştirir.
       function _k75(nw) {
         return validMember(id, nw)
         && (isAdmin()
             || (isOrgAdminOf(nw.orgId)
                 && nw.isOrgAdmin == false
                 && nw.email != myEmail()
-                && (resource == null || resource.data.isOrgAdmin == false)));
+                && (resource == null || resource.data.isOrgAdmin == false))
+            // Kurum yöneticisi kendine görev verir (Eren, 5 Kasım 2026): yalnızca görevler ve ad değişir.
+            || (isOrgAdminOf(nw.orgId) && nw.email == myEmail() && resource != null && resource.data.isOrgAdmin == true
+                && nw.isOrgAdmin == true && nw.diff(resource.data).affectedKeys().hasOnly(['assignments', 'displayName', 'addedBy', 'updatedAt'])));
       }
       allow create, update: if _k75(request.resource.data);
       // Çıkarma: yalnızca çıkarma bilgisi eklenir.
