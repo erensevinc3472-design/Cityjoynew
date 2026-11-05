@@ -22,6 +22,39 @@ export interface DutyPharmacyDay {
   items: DutyPharmacy[];
   /** Admin / il yöneticisinin o gün için gizlediği eczaneler (`pharmacyKey`). */
   hidden?: string[];
+  /** İlin nöbet saatleri (panelden; yoksa `DEFAULT_DUTY_HOURS`). Günlük çekimde korunur. */
+  hours?: DutyHours;
+}
+
+/** Nöbet başlangıcı ve ertesi sabah bitişi, Türkiye saatiyle "SS:DD". */
+export interface DutyHours {
+  start: string;
+  end: string;
+}
+
+/** Çoğu ilde nöbet akşam eczaneler kapanınca başlar, ertesi sabah açılınca biter; il yöneticisi panelden düzeltir. */
+export const DEFAULT_DUTY_HOURS: DutyHours = { start: '19:00', end: '08:30' };
+
+export const isDutyTime = (s: unknown): s is string => typeof s === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
+
+/**
+ * Listenin nöbet aralığı: liste gününün başlangıç saatinden ertesi günün bitiş saatine. `phase`: başlamadı / sürüyor /
+ * bitti. `startDay` ve `endDay` bugüne göre (-1 dün, 0 bugün, 1 yarın); `hoursLeft` bitişe kalan tam saat (yukarı).
+ */
+export function dutyWindow(day: Pick<DutyPharmacyDay, 'date' | 'hours'>, now = new Date()) {
+  const h = day.hours && isDutyTime(day.hours.start) && isDutyTime(day.hours.end) ? day.hours : DEFAULT_DUTY_HOURS;
+  const at = (date: string, hm: string, plusDays = 0) => new Date(Date.parse(`${date}T${hm}:00+03:00`) + plusDays * 86400000);
+  const start = at(day.date, h.start);
+  const end = at(day.date, h.end, 1);
+  const rel = (d: Date) => Math.round((Date.parse(turkeyDate(d)) - Date.parse(turkeyDate(now))) / 86400000);
+  const t = now.getTime();
+  return {
+    hours: h,
+    phase: t < start.getTime() ? ('soon' as const) : t < end.getTime() ? ('on' as const) : ('over' as const),
+    startDay: rel(start),
+    endDay: rel(end),
+    hoursLeft: Math.max(0, Math.ceil((end.getTime() - t) / 3600000)),
+  };
 }
 
 /** Türkiye tarihi (UTC+3) "YYYY-AA-GG". */

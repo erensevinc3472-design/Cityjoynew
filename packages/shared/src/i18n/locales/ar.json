@@ -2488,11 +2488,10 @@
     "onDuty": "مناوبة",
     "call": "اتصال",
     "map": "فتح في الخريطة",
-    "note": "تُحدَّث القائمة كل صباح. في حالة الطوارئ اتصل بـ 112.",
+    "note": "تُحدَّث القائمة كل صباح. ننصحك بالاتصال قبل الذهاب. في حالة الطوارئ اتصل بـ 112.",
     "subtitle": "{{province}} · المناوبة اليوم",
     "mapAll": "عرض الكل على الخريطة",
     "mapQuery": "صيدلية مناوبة",
-    "listToday": "قائمة اليوم",
     "near": "بالقرب مني",
     "nearest": "الأقرب · {{km}}",
     "directions": "الاتجاهات",
@@ -2505,6 +2504,18 @@
     "count_other": "{{count}} صيدلية",
     "noCoords": "لا تتضمن هذه القائمة بيانات موقع، لذا لا يمكن ترتيبها حسب المسافة.",
     "locDenied": "لم يُمنح إذن الموقع. يمكنك اختيار منطقة.",
-    "locUnavailable": "تعذّر تحديد موقعك. يمكنك اختيار منطقة."
+    "locUnavailable": "تعذّر تحديد موقعك. يمكنك اختيار منطقة.",
+    "screenTitle": "الصيدليات المناوبة",
+    "today": "اليوم",
+    "dutyOn": "بدأت المناوبة",
+    "dutySoon": "لم تبدأ المناوبة بعد",
+    "rangeToday": "اليوم {{start}} - غدًا {{end}}",
+    "rangeYesterday": "أمس {{start}} - اليوم {{end}}",
+    "hoursLeft_zero": "{{count}} س",
+    "hoursLeft_one": "{{count}} س",
+    "hoursLeft_two": "{{count}} س",
+    "hoursLeft_few": "{{count}} س",
+    "hoursLeft_many": "{{count}} س",
+    "hoursLeft_other": "{{count}} س"
   }
 }

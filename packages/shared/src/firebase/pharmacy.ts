@@ -1,6 +1,6 @@
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, writeBatch, type DocumentData, type Firestore } from 'firebase/firestore';
 
-import type { DutyPharmacy, DutyPharmacyDay } from '../pharmacy/pharmacy';
+import { isDutyTime, type DutyHours, type DutyPharmacy, type DutyPharmacyDay } from '../pharmacy/pharmacy';
 import { addAudit, iso } from './grants';
 
 function dayFrom(d: DocumentData): DutyPharmacyDay {
@@ -10,6 +10,7 @@ function dayFrom(d: DocumentData): DutyPharmacyDay {
     source: d.source ?? '',
     items: Array.isArray(d.items) ? (d.items as DutyPharmacy[]) : [],
     hidden: Array.isArray(d.hidden) ? d.hidden : [],
+    ...(d.hours && isDutyTime(d.hours.start) && isDutyTime(d.hours.end) ? { hours: { start: d.hours.start, end: d.hours.end } } : {}),
   };
 }
 
@@ -62,6 +63,13 @@ export function createPharmacyAdmin(db: Firestore, actorUid: string) {
       const batch = writeBatch(db);
       batch.update(doc(db, 'dutyPharmacies', provinceCode), { hidden: hidden.slice(0, 200) });
       addAudit(db, batch, { actorUid, module: 'acil-numaralar', action: 'duzenle', targetId: `dutyPharmacies/${provinceCode}`, scope: { level: 'il', provinceCode }, summary: `Nöbetçi eczane: ${summary}`.slice(0, 120) });
+      await batch.commit();
+    },
+    /** İlin nöbet saatleri (uygulamada "Nöbet başladı · 13 sa"); günlük çekimde korunur. */
+    async setHours(provinceCode: string, hours: DutyHours): Promise<void> {
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'dutyPharmacies', provinceCode), { hours: { start: hours.start, end: hours.end } });
+      addAudit(db, batch, { actorUid, module: 'acil-numaralar', action: 'duzenle', targetId: `dutyPharmacies/${provinceCode}`, scope: { level: 'il', provinceCode }, summary: `Nöbet saatleri: ${hours.start}-${hours.end}` });
       await batch.commit();
     },
   };

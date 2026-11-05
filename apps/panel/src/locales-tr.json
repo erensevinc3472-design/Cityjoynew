@@ -2483,6 +2483,12 @@
     "runs": "Son çekimler",
     "runLine": "{{ok}} il çekildi, {{failed}} hata · {{by}}",
     "byScheduler": "zamanlayıcı",
-    "byAdmin": "admin"
+    "byAdmin": "admin",
+    "hoursStart": "Nöbet başlar",
+    "hoursEnd": "Ertesi sabah biter",
+    "hoursSave": "Saatleri kaydet",
+    "hoursSaved": "Nöbet saatleri kaydedildi.",
+    "hoursInvalid": "Saatleri SS:DD biçiminde gir.",
+    "hoursHint": "Uygulamada \"Nöbet başladı · kalan süre\" bu saatlerle gösterilir; girilmezse 19:00 – 08:30 kabul edilir. Saat il için geçerlidir, her gün korunur."
   }
 }

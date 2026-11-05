@@ -569,14 +569,16 @@ describe('nöbetçi eczane çekimi', () => {
     expect(r).toEqual({ ok: ['16'], failed: [{ code: '34', error: 'zaman aşımı' }] });
     expect((await db.doc('dutyPharmacies/16').get()).data()).toMatchObject({ date: '2026-11-01', source: 'deneme', items: [{ name: 'Eczane 16' }], hidden: [] });
     expect((await db.doc('dataSourceStatus/pharmacy').get()).get('provinces.34.error')).toBe('zaman aşımı');
-    await db.doc('dutyPharmacies/16').update({ hidden: ['merkez|eczane 16'] });
+    await db.doc('dutyPharmacies/16').update({ hidden: ['merkez|eczane 16'], hours: { start: '18:30', end: '09:00' } });
     const calls: string[] = [];
     const spy = { id: 'deneme', fetchProvince: async (p: { code: string }) => { calls.push(p.code); return ok.fetchProvince(p); } };
     await syncPharmacies(db, spy, { now: NOW, provinces: ['16', '34'], onlyStale: true });
     expect(calls).toEqual(['34']);
     await syncPharmacies(db, spy, { now: NOW, provinces: ['16'] });
     expect((await db.doc('dutyPharmacies/16').get()).get('hidden')).toEqual(['merkez|eczane 16']);
-    expect((await db.collection('dataSourceRuns').get()).size).toBe(3);
+    await syncPharmacies(db, spy, { now: new Date('2026-11-02T06:00:00Z'), provinces: ['16'] });
+    expect((await db.doc('dutyPharmacies/16').get()).data()).toMatchObject({ hidden: [], hours: { start: '18:30', end: '09:00' } });
+    expect((await db.collection('dataSourceRuns').get()).size).toBe(4);
   });
 
   it('NosyAPI bağdaştırıcısı: il adresi Türkçe harfsiz, anahtar başlıkta, yanıt çevrilir', async () => {

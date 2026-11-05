@@ -52,7 +52,7 @@ export default function VolunteerScreen() {
   };
 
   return (
-    <Screen header={<HeroHeader title={t('volunteer.title')} subtitle={pc ? repo.getProvince(pc)?.name : undefined} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />}>
+    <Screen header={<HeroHeader inline title={t('volunteer.title')} subtitle={pc ? repo.getProvince(pc)?.name : undefined} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />}>
       <ScrollView contentContainerStyle={styles.content}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
           {FILTERS.map((f) => <FilterChip key={f} label={t(`volunteer.type.${f}`)} active={filter === f} onPress={() => setFilter(f)} />)}

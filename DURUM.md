@@ -899,6 +899,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   kartları (tür etiketi, doluluk çubuğu "x/y kişi", Katılıyorum / Kontenjan doldu → etkinlik sayfası). Panodaki
   "+ İlan ver" konmadı (kullanıcı ilan vermez); ilanlarda fotoğraf henüz yok, kartta türe göre renkli alan ve simge.
   5 dilde. Testler: ortak 189, kurallar 171, sunucu geçti; emülatörde web sürümüyle görüldü.
+- **Eczane ekranı panodaki görünüme birebir (5 Kasım, aynı dal; Eren panonun görüntüsünü gönderdi: "bunu yap").**
+  Başlık geri düğmesinin yanında ("Nöbetçi Eczaneler", "Bursa · Bugün"; `HeroHeader inline`, Gönüllülük'te de),
+  nöbet durumu kartı ("Nöbet başladı" / "henüz başlamadı", "Bugün 19:00 - yarın 08:30", sağda kalan saat "13 sa"),
+  "Yakınımda" açık gelir (konum izni önceden verildiyse hemen uzaklığa göre sıralar, izin burada sorulmaz), "En yakın ·
+  0,5 km" etiketi, simgeli Ara / Yol tarifi, satırlarda "ilçe · km". **Nöbet saatleri:** servis vermediği için il başına
+  panelden girilir (Panel > Nöbetçi eczane > "Nöbet başlar / Ertesi sabah biter"; admin ve il yöneticisi, işlem
+  kaydı; `dutyPharmacies/{il}.hours`, günlük çekimde korunur); girilmezse 19:00–08:30 (`DEFAULT_DUTY_HOURS`; il
+  odalarına göre değişebilir, il yöneticisi düzeltir). Pazar / bayram tam gün nöbeti henüz ayrı değil. Testler: ortak
+  192, kurallar 171, sunucu 39.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.

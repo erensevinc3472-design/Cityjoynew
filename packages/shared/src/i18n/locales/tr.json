@@ -2460,11 +2460,10 @@
     "onDuty": "Nöbette",
     "call": "Ara",
     "map": "Haritada aç",
-    "note": "Liste her sabah güncellenir. Acil bir durumda 112'yi ara.",
+    "note": "Liste her sabah güncellenir. Gitmeden önce aramanı öneririz. Acil bir durumda 112'yi ara.",
     "subtitle": "{{province}} · bugün nöbette olanlar",
     "mapAll": "Hepsini haritada gör",
     "mapQuery": "nöbetçi eczane",
-    "listToday": "Bugünün listesi",
     "near": "Yakınımda",
     "nearest": "En yakın · {{km}}",
     "directions": "Yol tarifi",
@@ -2473,6 +2472,14 @@
     "count_other": "{{count}} eczane",
     "noCoords": "Bu listede konum bilgisi yok; uzaklığa göre sıralanamadı.",
     "locDenied": "Konum izni verilmedi. İlçe seçerek bakabilirsin.",
-    "locUnavailable": "Konumun alınamadı. İlçe seçerek bakabilirsin."
+    "locUnavailable": "Konumun alınamadı. İlçe seçerek bakabilirsin.",
+    "screenTitle": "Nöbetçi Eczaneler",
+    "today": "Bugün",
+    "dutyOn": "Nöbet başladı",
+    "dutySoon": "Nöbet henüz başlamadı",
+    "rangeToday": "Bugün {{start}} - yarın {{end}}",
+    "rangeYesterday": "Dün {{start}} - bugün {{end}}",
+    "hoursLeft_one": "{{count}} sa",
+    "hoursLeft_other": "{{count}} sa"
   }
 }

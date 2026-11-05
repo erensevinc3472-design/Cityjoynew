@@ -34,6 +34,10 @@ describe('nöbetçi eczane kuralları', () => {
     await assertSucceeds(createPharmacyAdmin(fs('eren'), 'eren').setHidden('16', [], 'gösterildi Şifa'));
     await assertFails(createPharmacyAdmin(fs('ayse'), 'ayse').setHidden('16', ['x'], 'x'));
     await assertFails(updateDoc(doc(fs('eren'), 'dutyPharmacies', '16'), { items: [] }));
+    await assertSucceeds(createPharmacyAdmin(fs('ahmet'), 'ahmet').setHours('16', { start: '18:30', end: '09:00' }));
+    await assertFails(createPharmacyAdmin(fs('ahmet'), 'ahmet').setHours('16', { start: '25:00', end: '09:00' }));
+    await assertFails(createPharmacyAdmin(fs('ayse'), 'ayse').setHours('16', { start: '18:30', end: '09:00' }));
+    expect((await createPharmacyAdmin(fs('eren'), 'eren').get('16'))?.hours).toEqual({ start: '18:30', end: '09:00' });
     await assertFails(getDoc(doc(fs('ahmet'), 'dataSourceStatus', 'pharmacy')));
     expect(await createPharmacyAdmin(fs('eren'), 'eren').status()).toMatchObject({ source: 'nosyapi' });
   });

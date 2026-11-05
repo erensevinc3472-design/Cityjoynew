@@ -3499,8 +3499,10 @@ service cloud.firestore {
     match /dutyPharmacies/{code} {
       allow read: if true;
       allow update: if signedIn() && (isAdmin() || grantAllows('il-' + code, 'acil-numaralar', 'duzenle'))
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hidden'])
-        && request.resource.data.hidden is list && request.resource.data.hidden.size() <= 200;
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hidden', 'hours'])
+        && request.resource.data.hidden is list && request.resource.data.hidden.size() <= 200
+        && (!('hours' in request.resource.data) || (request.resource.data.hours.keys().hasOnly(['start', 'end'])
+          && request.resource.data.hours.start.matches('([01][0-9]|2[0-3]):[0-5][0-9]') && request.resource.data.hours.end.matches('([01][0-9]|2[0-3]):[0-5][0-9]')));
     }
     match /dataSourceStatus/{id} {
       allow read: if isAdmin();

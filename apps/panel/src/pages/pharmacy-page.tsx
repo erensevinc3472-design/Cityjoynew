@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { httpsCallable } from 'firebase/functions';
-import { isPharmacyListCurrent, pharmacyKey, turkeyDate, type DutyPharmacyDay } from '@cityjoy/shared';
+import { DEFAULT_DUTY_HOURS, isDutyTime, isPharmacyListCurrent, pharmacyKey, turkeyDate, type DutyPharmacyDay } from '@cityjoy/shared';
 import { createPharmacyAdmin, type DataSourceRun, type PharmacySourceStatus } from '@cityjoy/shared/firebase';
 
 import { useCity } from '../lib/city';
@@ -80,6 +80,25 @@ function Pharmacy({ user }: { user: PanelUser }) {
     }
   };
 
+  const saveHours = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!day) return;
+    const f = new FormData(e.currentTarget);
+    const hours = { start: String(f.get('start')), end: String(f.get('end')) };
+    if (!isDutyTime(hours.start) || !isDutyTime(hours.end)) return setMsg({ ok: false, text: t('pharmacy.hoursInvalid') });
+    setBusy(true);
+    setMsg(undefined);
+    try {
+      await svc.setHours(code, hours);
+      setDay({ ...day, hours });
+      setMsg({ ok: true, text: t('pharmacy.hoursSaved') });
+    } catch {
+      setMsg({ ok: false, text: t('pharmacy.hideError') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const provinces = repo.getProvinces();
   const stateOf = (c: string) => {
     const s = status?.provinces[c];
@@ -137,6 +156,16 @@ function Pharmacy({ user }: { user: PanelUser }) {
               </table>
             </div>
             <p className="meta">{t('pharmacy.hideHint')}</p>
+            {!user.isDemo ? (
+              <form className="toolbar" key={`${code}-${day.hours?.start}-${day.hours?.end}`} onSubmit={saveHours}>
+                <label htmlFor="ph-start">{t('pharmacy.hoursStart')}</label>
+                <input id="ph-start" name="start" type="time" defaultValue={day.hours?.start ?? DEFAULT_DUTY_HOURS.start} required />
+                <label htmlFor="ph-end">{t('pharmacy.hoursEnd')}</label>
+                <input id="ph-end" name="end" type="time" defaultValue={day.hours?.end ?? DEFAULT_DUTY_HOURS.end} required />
+                <button className="btn secondary" type="submit" disabled={busy}>{t('pharmacy.hoursSave')}</button>
+              </form>
+            ) : null}
+            <p className="meta">{t('pharmacy.hoursHint')}</p>
           </>
         )}
       </div>

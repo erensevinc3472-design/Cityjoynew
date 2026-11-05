@@ -58,7 +58,7 @@ export async function syncPharmacies(
     if (opts.onlyStale && prev?.date === today) continue;
     try {
       const items = await provider.fetchProvince({ code: p.code, name: p.name });
-      await ref.set({ date: today, fetchedAt: opts.now, source: provider.id, items, hidden: prev?.date === today ? (prev.hidden ?? []) : [] });
+      await ref.set({ date: today, fetchedAt: opts.now, source: provider.id, items, hidden: prev?.date === today ? (prev.hidden ?? []) : [], ...(prev?.hours ? { hours: prev.hours } : {}) });
       result.ok.push(p.code);
       status[p.code] = { date: today, count: items.length, at: opts.now };
     } catch (e) {
