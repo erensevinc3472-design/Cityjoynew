@@ -17,9 +17,9 @@ export interface TranslationResult {
 }
 
 const STOP: Record<'tr' | 'en' | 'de', ReadonlySet<string>> = {
-  tr: new Set(['ve', 'bir', 'bu', 'için', 'ile', 'çok', 'da', 'de', 'mi', 'ne', 'var', 'yok', 'gibi', 'daha', 'ama', 'olan', 'en', 'şu', 'her', 'biz', 'ben', 'sen', 'bugün', 'yarın', 'merhaba']),
-  en: new Set(['the', 'and', 'is', 'are', 'to', 'of', 'for', 'with', 'you', 'this', 'that', 'in', 'on', 'it', 'we', 'was', 'have', 'be', 'not', 'at', 'my', 'today', 'hello']),
-  de: new Set(['und', 'der', 'die', 'das', 'ist', 'nicht', 'mit', 'für', 'ein', 'eine', 'ich', 'zu', 'auf', 'sind', 'wir', 'sie', 'es', 'den', 'dem', 'auch', 'heute', 'hallo']),
+  tr: new Set(['ve', 'bir', 'bu', 'için', 'ile', 'çok', 'da', 'de', 'mi', 'ne', 'var', 'yok', 'gibi', 'daha', 'ama', 'olan', 'en', 'şu', 'her', 'biz', 'ben', 'sen', 'bugün', 'yarın', 'merhaba', 'selam', 'selamlar', 'tamam', 'evet', 'hayır', 'teşekkürler', 'sağol', 'güzel', 'harika', 'iyi', 'günaydın', 'akşamlar', 'geceler', 'kolay', 'gelsin', 'abi', 'abla', 'hocam', 'hepinize', 'nasılsın', 'nasılsınız']),
+  en: new Set(['the', 'and', 'is', 'are', 'to', 'of', 'for', 'with', 'you', 'this', 'that', 'in', 'on', 'it', 'we', 'was', 'have', 'be', 'not', 'at', 'my', 'today', 'hello', 'hi', 'thanks', 'thank', 'yes', 'good', 'morning', 'night', 'great', 'nice']),
+  de: new Set(['und', 'der', 'die', 'das', 'ist', 'nicht', 'mit', 'für', 'ein', 'eine', 'ich', 'zu', 'auf', 'sind', 'wir', 'sie', 'es', 'den', 'dem', 'auch', 'heute', 'hallo', 'danke', 'ja', 'nein', 'gut', 'guten', 'morgen', 'abend', 'nacht', 'schön']),
 };
 
 /**

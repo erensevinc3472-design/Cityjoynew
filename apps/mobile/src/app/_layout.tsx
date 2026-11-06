@@ -5,6 +5,7 @@ import { LocaleProvider, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Platform, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { CrashScreen } from '@/components/crash-screen';
@@ -60,12 +61,15 @@ export const ErrorBoundary = CrashScreen;
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider>
-      <SettingsProvider>
-        <SessionProvider>
-          <RootNavigator />
-        </SessionProvider>
-      </SettingsProvider>
-    </SafeAreaProvider>
+    // İç içe kaydırmalar (Keşfet sekmeleri içinde fotoğraflar) için hareket kütüphanesinin kökü.
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <SettingsProvider>
+          <SessionProvider>
+            <RootNavigator />
+          </SessionProvider>
+        </SettingsProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

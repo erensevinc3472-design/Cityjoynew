@@ -821,6 +821,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   içerik (anket, yarışma) için ayrı 5 dil alanı gerekmedi, aynı düğme çevirir. PR #72 birleşti; kurallar ve dizinler
   Firebase'e, panel cityjoynew.web.app'e yüklendi (6 Kasım, Claude; kurallarda Google'da 8 deneme geçici 503/409, 9.'da tamam).
 
+- **Keşfet ve profil düzeltmeleri (7 Kasım, dal `claude/blaze-kurulum`; Eren telefonda denedi).** Çok fotoğraflı
+  gönderide sağa-sola kaydırma artık sekme değil fotoğraf değiştirir (react-native-gesture-handler ScrollView/FlatList,
+  kök `GestureHandlerRootView`). Gönderiye dokununca ayrı sayfa açılmaz: uzun metin "devamı" ile yerinde açılır, çift
+  dokunuş beğenir; yorumlar ve gönderi işlemleri (şikâyet, sahibine kapatma/kaldırma) alttan açılan panelde
+  (`components/post-sheet.tsx`, `post-actions.tsx`). Ayrıntı sayfası yalnızca bildirim/bağlantı için kaldı. Keşfet üst
+  bölümü (Mahallem/bölge) aşağı kayarken gizlenir, biraz fazla yukarı kaydırınca geri gelir. Profil: fotoğrafa dokununca
+  ekranda yuvarlak büyür; düzenlemede fotoğraf ekleme/kaldırma yalnızca "Kaydet" ile geçerli (vazgeçince kaydedilmemiş
+  yeni dosya silinir). Çeviri: "Selam" gibi kısa selamlaşmalarda "Çevir" çıkmasın diye ek sözcükler. Tür denetimi temiz,
+  ortak testler 169 geçti. Telefonda Eren'in onayı bekleniyor.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Seyahat > Planla (Eren onayladı 29 Ekim 2026: tek ekran, fiyatlar panelden elle): `/travel/planla`, Seyahat girişinde "Yolculuğunu planla". Nereden-nereye (il), tarih (7 gün), yolcu sayısı; Kendi aracım / Otobüs / Uçak / Tren kartları (süre, tahmini ücret); yolculuk kartı (İST ━ BUR, süre, km, maliyet, notlar); araba için güzergâh çevresindeki mola yerleri (OSM + yol üstü işletmeler, yaklaşık); varınca (şehri keşfet, yöresel, başkanlarla); hazırlık listesi; "Yola çık" Yoldayım'ı varış iliyle açar (kalan km, varınca "Vardın!" kartı). Planlar yalnızca telefonda (en çok 5). Hesap: il merkezleri arası kuş uçuşu x 1,3; araba 90 km/s + 2,5 saatte 15 dk mola; otobüs 70 km/s + 20 dk; uçak 650 km/s + 30 dk, iki ilde havalimanı ve 150 km üstü. Panel > Seyahat > Yolculuk fiyatları (yalnızca admin): akaryakıt (benzin, dizel, LPG, elektrik kWh), otobüs km aralığı, ay; boşsa ücret gösterilmez. **Kurallar değişti (config/travelPrices): yüklenmeli. Eren fiyatları girmeli.** Olmayanlar: bilet, sefer, firma adları, canlı yol durumu, yapay zekâ, hava durumu.

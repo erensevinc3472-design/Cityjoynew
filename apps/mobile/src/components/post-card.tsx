@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useEffect, useRef, type ComponentProps } from 'react';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import { Animated, Pressable, Share, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { Post } from '@cityjoy/shared';
@@ -8,6 +8,7 @@ import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
 import { TranslatableText } from '@/components/translatable-text';
 import { PostPhotos } from '@/components/post-photos';
+import { PostSheet } from '@/components/post-sheet';
 import { PostVideoView } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { locationRepository as repo } from '@/lib/locations';
@@ -19,9 +20,8 @@ import { useThemeColors } from '@/theme/use-theme';
 interface Props {
   item: Post;
   liked: boolean;
-  /** Akışta yazının başı; ayrıntıda tamamı. */
+  /** Akışta yazının başı (dokununca açılır) ve yorumlar alttan açılan panelde; ayrıntıda yazının tamamı. */
   full?: boolean;
-  onPress?(): void;
   onLike?(): void;
   /** Paylaşanın Keşfet profili. */
   onAuthor?(): void;
@@ -55,9 +55,16 @@ export function useRelativeTime() {
 /**
  * Keşfet gönderisi (Instagram hissi; Eren'in örnek ekranı, 13. madde 30): çerçevesiz, ekran genişliğinde. Üstte halkalı
  * harf, ad, yer ve zaman, sağda Takip et; ortada yazı (kısa yazı büyük harfle); altta beğeni, yorum, paylaş ve kaydet;
- * en altta kategori etiketi. Fotoğraf varsa ekran genişliğinde üstte durur, yazı altında. Yazıya ya da fotoğrafa iki kez dokunmak beğenir (kalp belirir), bir kez dokunmak gönderiyi açar.
+ * en altta kategori etiketi. Fotoğraf varsa ekran genişliğinde üstte durur, yazı altında. Yazıya ya da fotoğrafa iki kez dokunmak beğenir (kalp belirir); bir kez dokunmak uzun yazıyı açar. Yorumlar ayrı sayfada
+ * değil, alttan açılan panelde (Eren, 7 Kasım).
  */
-export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow, onFollow, saved, onSave }: Props) {
+export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, onFollow, saved, onSave }: Props) {
+  // Yorum panelinde yapılan değişiklikler (yorum sayısı, yorumları kapatma) kartta hemen görünür.
+  const [changed, setChanged] = useState<Post | null>(null);
+  const item = changed && changed.id === given.id ? changed : given;
+  const [sheet, setSheet] = useState(false);
+  const [removed, setRemoved] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   // Ad ve rozet güncel profilden (oturumda kişi başına bir okuma): ad değişikliği eski gönderilerde de görünür.
   const author = useAuthor(item.business ? undefined : item.authorUid);
   const biz = useBusinessInfo(item.business?.id);
@@ -76,6 +83,10 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
   const photos = item.photos ?? [];
   // Kısa yazı büyük harfle; fotoğraflı gönderide yazı fotoğrafın altında açıklama olur.
   const short = !full && !photos.length && item.text.length <= 140;
+  const lines = full || expanded ? undefined : photos.length || item.video ? 3 : 8;
+  // Kesilmiş olabilecek uzun yazıda "devamı" (dokununca yazının tamamı açılır).
+  const long = !full && !expanded && item.text.length > (photos.length || item.video ? 120 : 400);
+  const openComments = full ? undefined : () => setSheet(true);
 
   useEffect(() => () => clearTimeout(single.current), []);
 
@@ -107,7 +118,8 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
       return;
     }
     lastTap.current = now;
-    if (onPress) single.current = setTimeout(onPress, DOUBLE_TAP_MS);
+    // Tek dokunma gönderiyi ayrı sayfada açmaz (Eren, 7 Kasım); uzun yazıyı açar.
+    if (long) single.current = setTimeout(() => setExpanded(true), DOUBLE_TAP_MS);
   };
   const lost = item.category === 'kayip-buluntu';
   const share = () => Share.share({ message: `${name}: ${item.text}\n\nCityJoy` }).catch(() => {});
@@ -120,6 +132,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
   );
   const followLabel = follow === 'aktif' ? t('explore.profile.following') : follow === 'istek' ? t('explore.profile.requestedShort') : t('explore.profile.follow');
 
+  if (removed) return null;
   return (
     <View style={[styles.post, { borderBottomColor: c.border }]}>
       <View style={styles.top}>
@@ -171,19 +184,10 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
         ) : null}
       </View>
 
-      <Pressable
-        accessibilityRole={onPress ? 'button' : undefined}
-        accessibilityLabel={
-          onPress
-            ? [name, t(`explore.categories.${item.category}`), photos.length ? t('explore.photos.count', { count: photos.length }) : item.video ? t('explore.video.label') : '', item.text.slice(0, 120)].filter(Boolean).join('. ')
-            : undefined
-        }
-        accessibilityHint={onLike ? t('explore.doubleTapHint') : undefined}
-        onPress={tapBody}
-        style={styles.body}>
+      <View style={styles.body}>
         {photos.length ? (
           <View style={styles.photos}>
-            <PostPhotos photos={photos} maxWidth={640} />
+            <PostPhotos photos={photos} maxWidth={640} onTap={tapBody} />
             {/* Kategori etiketi fotoğrafın üstünde (13. madde 35, Keşfet önizlemesi). */}
             <View pointerEvents="none" style={styles.photoTag}>
               <AppText style={styles.photoTagText}>{t(`explore.categories.${item.category}`)}</AppText>
@@ -195,26 +199,32 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
           </View>
         ) : null}
         {item.text ? (
-          <TranslatableText text={item.text} selectable={full} numberOfLines={full ? undefined : photos.length || item.video ? 3 : 8} style={[short ? styles.textBig : styles.text, { color: c.text }]} />
+          <Pressable
+            accessibilityLabel={[name, t(`explore.categories.${item.category}`), photos.length ? t('explore.photos.count', { count: photos.length }) : item.video ? t('explore.video.label') : '', item.text.slice(0, 120)].filter(Boolean).join('. ')}
+            accessibilityHint={onLike ? t('explore.doubleTapHint') : undefined}
+            onPress={tapBody}>
+            <TranslatableText text={item.text} selectable={full} numberOfLines={lines} style={[short ? styles.textBig : styles.text, { color: c.text }]} />
+            {long ? <AppText style={[styles.more, { color: c.textMuted }]}>{t('explore.more')}</AppText> : null}
+          </Pressable>
         ) : null}
         <Animated.View pointerEvents="none" style={[styles.heart, { opacity: heart, transform: [{ scale: heart.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }] }]}>
           <MaterialIcons name="favorite" size={76} color={c.danger} />
         </Animated.View>
-      </Pressable>
+      </View>
 
       <View style={styles.actions}>
         <Animated.View style={{ transform: [{ scale: bump }] }}>
           {action(liked ? 'favorite' : 'favorite-border', liked ? t('explore.unlike') : t('explore.like'), onLike ? pressLike : undefined, liked ? c.danger : c.textStrong, item.likeCount)}
         </Animated.View>
-        {action('chat-bubble-outline', t('explore.comments.title', { count: item.commentCount }), onPress, c.textStrong, item.commentCount)}
+        {action('chat-bubble-outline', t('explore.comments.title', { count: item.commentCount }), openComments, c.textStrong, item.commentCount)}
         {action('share', t('explore.share'), share, c.textStrong)}
         <View style={styles.flex} />
         {onSave ? action(saved ? 'bookmark' : 'bookmark-border', saved ? t('explore.unsave') : t('explore.save'), onSave, saved ? c.accent : c.textStrong) : null}
       </View>
-      {lost && onPress ? (
+      {lost && openComments ? (
         // Kayıp - buluntu: "Gördüm" yorumlara götürür (nerede görüldüğü yazılır), "Paylaş" haberi yayar.
         <View style={styles.lost}>
-          <Pressable accessibilityRole="button" accessibilityHint={t('explore.seenHint')} onPress={onPress} style={({ pressed }) => [styles.lostBtn, { backgroundColor: c.primary, opacity: pressed ? 0.8 : 1 }]}>
+          <Pressable accessibilityRole="button" accessibilityHint={t('explore.seenHint')} onPress={openComments} style={({ pressed }) => [styles.lostBtn, { backgroundColor: c.primary, opacity: pressed ? 0.8 : 1 }]}>
             <MaterialIcons name="visibility" size={17} color={c.onPrimary} />
             <AppText style={[styles.lostText, { color: c.onPrimary }]}>{t('explore.seen')}</AppText>
           </Pressable>
@@ -224,8 +234,8 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
           </Pressable>
         </View>
       ) : null}
-      {!full && item.commentCount > 0 && onPress ? (
-        <AppText accessibilityRole="link" onPress={onPress} style={[styles.seeComments, { color: c.textMuted }]}>{t('explore.seeComments', { count: item.commentCount })}</AppText>
+      {item.commentCount > 0 && openComments ? (
+        <AppText accessibilityRole="link" onPress={openComments} style={[styles.seeComments, { color: c.textMuted }]}>{t('explore.seeComments', { count: item.commentCount })}</AppText>
       ) : null}
       <View style={styles.foot}>
         <AppText style={[styles.tag, { color: c.accent }]}>#{t(`explore.categories.${item.category}`)}</AppText>
@@ -233,6 +243,18 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
           {item.targets.map((x) => t(`explore.targets.${x}`)).join(' · ')}
         </AppText>
       </View>
+      {openComments ? (
+        <PostSheet
+          item={item}
+          open={sheet}
+          onClose={() => setSheet(false)}
+          onChange={setChanged}
+          onRemoved={() => {
+            setSheet(false);
+            setRemoved(true);
+          }}
+        />
+      ) : null}
     </View>
   );
 }
@@ -256,6 +278,7 @@ const styles = StyleSheet.create({
   body: { paddingVertical: 10, gap: 10 },
   photos: { marginHorizontal: -GUTTER },
   text: { fontSize: 15, lineHeight: 22 },
+  more: { fontSize: 14, lineHeight: 20, marginTop: 2 },
   textBig: { fontFamily: fonts.bodyMedium, fontSize: 18, lineHeight: 26 },
   heart: { position: 'absolute', top: 0, bottom: 0, start: 0, end: 0, alignItems: 'center', justifyContent: 'center' },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 4 },

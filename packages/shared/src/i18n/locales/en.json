@@ -1167,7 +1167,8 @@
       "cancelled": "Cancelled",
       "photo": "Profile photo",
       "photoHint": "Visible to everyone. It is cropped square and resized; location data is removed.",
-      "photoRemoved": "Your profile photo was removed after a report; you cannot add a new one."
+      "photoRemoved": "Your profile photo was removed after a report; you cannot add a new one.",
+      "photoZoom": "Enlarge profile photo"
     },
     "takipFeedHint": "posts shared only with followers by people you follow",
     "share": "Share",
@@ -1217,7 +1218,8 @@
     "verifiedBusiness": "Verified business",
     "seeComments": "View all {{count}} comments",
     "seen": "I saw it",
-    "seenHint": "Write where you saw it in a comment"
+    "seenHint": "Write where you saw it in a comment",
+    "more": "more"
   },
   "news": {
     "title": "News",

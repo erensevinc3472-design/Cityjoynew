@@ -19,6 +19,10 @@ describe('çeviri düğmesi', () => {
     expect(canOfferTranslation('Bugün parkta konser var', 'de')).toBe(true);
     expect(canOfferTranslation('Сегодня концерт в парке', 'ru')).toBe(false);
     expect(canOfferTranslation('Konser 20:00', 'tr')).toBe(true);
+    expect(canOfferTranslation('Selam', 'tr')).toBe(false);
+    expect(canOfferTranslation('Tamam, teşekkürler', 'tr')).toBe(false);
+    expect(canOfferTranslation('Thanks', 'en')).toBe(false);
+    expect(canOfferTranslation('Selam', 'en')).toBe(true);
     expect(canOfferTranslation('  ', 'tr')).toBe(false);
     expect(canOfferTranslation('123 😀', 'en')).toBe(false);
     expect(canOfferTranslation(undefined, 'en')).toBe(false);

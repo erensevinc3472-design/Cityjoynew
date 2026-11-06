@@ -1,6 +1,9 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { Pressable, StyleSheet, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+// Hareket kütüphanesinin kaydırma alanı: Keşfet'in yana kayan sekmelerinin içinde parmak fotoğraftayken fotoğraf kayar,
+// sekme değil (iç içe yatay kaydırmada içteki önceliklidir).
+import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import type { PostPhoto } from '@cityjoy/shared';
 
@@ -14,18 +17,20 @@ const ratioOf = (p: PostPhoto) => Math.min(1.91, Math.max(0.8, p.width / p.heigh
  * Gönderi fotoğrafları, ekran genişliğinde. Birden çoksa yana kaydırılır; sağ üstte "2/3" ve altta noktalar. Yükseklik
  * ilk fotoğrafın oranından gelir, diğerleri bu çerçeveye sığdırılır.
  */
-export function PostPhotos({ photos, maxWidth }: { photos: readonly PostPhoto[]; maxWidth: number }) {
+export function PostPhotos({ photos, maxWidth, onTap }: { photos: readonly PostPhoto[]; maxWidth: number; /** Dokunma (iki kez: beğeni). */ onTap?(): void }) {
   const { t } = useTranslation();
   const c = useThemeColors();
   const { width: screen } = useWindowDimensions();
   const width = Math.min(screen, maxWidth);
   const height = Math.round(width / ratioOf(photos[0]));
   const [page, setPage] = useState(0);
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => setPage(Math.round(e.nativeEvent.contentOffset.x / width));
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setPage(Math.round(e.nativeEvent.contentOffset.x / width));
+  };
 
   const image = (p: PostPhoto, i: number) => (
+    <Pressable key={p.path} onPress={onTap} disabled={!onTap} accessible={false}>
     <Image
-      key={p.path}
       source={{ uri: p.url }}
       style={{ width, height, backgroundColor: c.surfaceStrong }}
       contentFit="cover"
@@ -35,12 +40,19 @@ export function PostPhotos({ photos, maxWidth }: { photos: readonly PostPhoto[];
       accessibilityRole="image"
       accessibilityLabel={t('explore.photos.label', { n: i + 1, total: photos.length })}
     />
+    </Pressable>
   );
 
   if (photos.length === 1) return image(photos[0], 0);
   return (
     <View>
-      <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} onMomentumScrollEnd={onScroll} scrollEventThrottle={16}>
+      <ScrollView
+        horizontal
+        pagingEnabled
+        nestedScrollEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={onScroll}
+        scrollEventThrottle={16}>
         {photos.map(image)}
       </ScrollView>
       <View style={[styles.badge, { backgroundColor: 'rgba(0,0,0,0.55)' }]} pointerEvents="none">

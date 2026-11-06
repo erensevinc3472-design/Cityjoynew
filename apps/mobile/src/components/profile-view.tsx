@@ -1,7 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState, type ComponentProps, type ReactNode } from 'react';
-import { Modal, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
+import { Modal, Pressable, ScrollView, Share, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,7 +17,7 @@ import {
   type PublicProfile,
   unreadKey,
 } from '@cityjoy/shared';
-import type { JoinedItem } from '@cityjoy/shared/firebase';
+import { deletePhotos, type JoinedItem } from '@cityjoy/shared/firebase';
 
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppButton } from '@/components/app-button';
@@ -32,6 +33,7 @@ import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { TopBar } from '@/components/top-bar';
 import { useBannedWordCheck } from '@/lib/banned-words';
+import { storage } from '@/lib/firebase';
 import { useChats } from '@/lib/messages';
 import { eventRepository, postRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
@@ -74,6 +76,11 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const [tab, setTab] = useState<Tab>('gonderiler');
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({ displayName: '', bio: '', isPrivate: false });
+  // Düzenlemede seçilen / kaldırılan fotoğraf yalnızca "Kaydet" ile geçerli olur (undefined: dokunulmadı, null: kaldırıldı).
+  const [photoDraft, setPhotoDraft] = useState<Photo | null | undefined>(undefined);
+  // Profil fotoğrafına dokununca ekranda yuvarlak olarak büyür.
+  const [zoom, setZoom] = useState(false);
+  const { width: screenW } = useWindowDimensions();
   const [menu, setMenu] = useState(false);
   const [reporting, setReporting] = useState<ProfileReportReason | null>(null);
   const [reported, setReported] = useState(false);
@@ -166,23 +173,30 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
       load();
     });
 
-  // Fotoğraf seçilince hemen kaydedilir (eski dosyayı sunucu siler).
-  const changePhoto = (photo: Photo | undefined) =>
-    run(async () => {
-      await socialRepository.setPhoto(uid, photo ?? null);
-      const { photo: _old, ...rest } = profile;
-      const next = photo ? { ...rest, photo } : rest;
-      setProfile(next);
-      setMyProfile(next);
-      rememberProfilePhoto(uid, photo);
-    });
+  /** Yüklenip kaydedilmeyen fotoğraf dosyası silinir (depoda boşuna yer tutmasın). */
+  const dropUnsavedPhoto = () => {
+    if (photoDraft && photoDraft.path !== profile.photo?.path) deletePhotos(storage, [photoDraft]).catch(() => {});
+  };
+  const cancelEdit = () => {
+    dropUnsavedPhoto();
+    setPhotoDraft(undefined);
+    setEditing(false);
+  };
 
   const saveProfile = () => {
     if (!draft.displayName.trim() || !validateBio(draft.bio)) return setError(t('explore.profile.invalid'));
     if (hasBanned(draft.displayName, draft.bio)) return setError(t('explore.errors.banned'));
     run(async () => {
       await socialRepository.updateProfile(uid, draft);
-      const next = { ...profile, displayName: draft.displayName.trim().slice(0, 40), bio: draft.bio.trim(), isPrivate: draft.isPrivate };
+      let next: typeof profile = { ...profile, displayName: draft.displayName.trim().slice(0, 40), bio: draft.bio.trim(), isPrivate: draft.isPrivate };
+      // Fotoğraf değiştiyse ya da kaldırıldıysa şimdi kaydedilir (eski dosyayı sunucu siler).
+      if (photoDraft !== undefined && photoDraft?.path !== profile.photo?.path) {
+        await socialRepository.setPhoto(uid, photoDraft);
+        const { photo: _old, ...rest } = next;
+        next = photoDraft ? { ...rest, photo: photoDraft } : rest;
+        rememberProfilePhoto(uid, photoDraft ?? undefined);
+      }
+      setPhotoDraft(undefined);
       rememberProfile(uid, { displayName: next.displayName });
       setProfile(next);
       setMyProfile(next);
@@ -209,6 +223,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const shareProfile = () => Share.share({ message: t('explore.profile.shareText', { name: profile.displayName }) }).catch(() => {});
   const startEdit = () => {
     setDraft({ displayName: profile.displayName, bio: profile.bio, isPrivate: profile.isPrivate });
+    setPhotoDraft(undefined);
     setEditing(true);
   };
 
@@ -289,12 +304,30 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
         <View style={styles.pad}>
           {/* Profil başı: halkalı harf, yanında gönderi / takipçi / takip sayıları. */}
           <View style={styles.head}>
-            <View style={[styles.ring, { borderColor: c.accent }]}>
+            <Pressable
+              disabled={!profile.photo}
+              onPress={() => setZoom(true)}
+              accessibilityRole={profile.photo ? 'imagebutton' : undefined}
+              accessibilityLabel={profile.photo ? t('explore.profile.photoZoom') : undefined}
+              style={[styles.ring, { borderColor: c.accent }]}>
               <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
                 <AppText style={[styles.initial, { color: c.accent }]}>{(profile.displayName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
                 <AvatarPhoto photo={profile.photo} size={76} />
               </View>
-            </View>
+            </Pressable>
+            {profile.photo ? (
+              <Modal visible={zoom} transparent animationType="fade" onRequestClose={() => setZoom(false)}>
+                <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} onPress={() => setZoom(false)} style={styles.zoomBack}>
+                  <Image
+                    source={{ uri: profile.photo.url }}
+                    recyclingKey={profile.photo.path}
+                    contentFit="cover"
+                    accessibilityIgnoresInvertColors
+                    style={{ width: Math.min(screenW * 0.8, 360), height: Math.min(screenW * 0.8, 360), borderRadius: Math.min(screenW * 0.8, 360) / 2 }}
+                  />
+                </Pressable>
+              </Modal>
+            ) : null}
             <View style={styles.stats}>
               {[
                 { n: hidden || posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts') },
@@ -337,12 +370,15 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                     hint={t('explore.profile.photoHint')}
                     kind="profil"
                     uid={uid}
-                    photos={profile.photo ? [profile.photo] : []}
+                    photos={(photoDraft === undefined ? profile.photo : photoDraft) ? [(photoDraft === undefined ? profile.photo : photoDraft)!] : []}
                     max={1}
                     round
                     pick={{ square: true, maxEdge: 800 }}
                     disabled={busy}
-                    onChange={(p) => changePhoto(p[0])}
+                    onChange={(p) => {
+                      dropUnsavedPhoto();
+                      setPhotoDraft(p[0] ?? null);
+                    }}
                   />
                 )}
                 <TextField label={t('explore.profile.name')} value={draft.displayName} onChangeText={(v) => setDraft((d) => ({ ...d, displayName: v }))} maxLength={40} hint={t('explore.profile.nameHint')} />
@@ -353,7 +389,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                 )}
                 <CheckboxRow checked={draft.isPrivate} onToggle={() => setDraft((d) => ({ ...d, isPrivate: !d.isPrivate }))} label={t('explore.profile.privateToggle')} />
                 <AppButton title={t('explore.profile.save')} loading={busy} disabled={busy} onPress={saveProfile} />
-                <AppButton variant="ghost" title={t('account.cancel')} onPress={() => setEditing(false)} />
+                <AppButton variant="ghost" title={t('account.cancel')} onPress={cancelEdit} />
               </View>
             ) : (
               <View style={styles.buttons}>
@@ -478,6 +514,7 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
   ring: { width: 88, height: 88, borderRadius: 44, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 76, height: 76, borderRadius: 38, alignItems: 'center', justifyContent: 'center' },
+  zoomBack: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.85)', alignItems: 'center', justifyContent: 'center' },
   initial: { fontFamily: fonts.heading, fontSize: 32 },
   stats: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
   stat: { alignItems: 'center' },

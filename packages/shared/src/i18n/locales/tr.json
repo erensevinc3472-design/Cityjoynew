@@ -1167,7 +1167,8 @@
       "cancelled": "İptal edildi",
       "photo": "Profil fotoğrafı",
       "photoHint": "Herkese açık görünür. Kare kırpılır, küçültülür; konum bilgisi silinir.",
-      "photoRemoved": "Profil fotoğrafın şikâyet üzerine kaldırıldı; yeni fotoğraf koyamazsın."
+      "photoRemoved": "Profil fotoğrafın şikâyet üzerine kaldırıldı; yeni fotoğraf koyamazsın.",
+      "photoZoom": "Profil fotoğrafını büyüt"
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
     "share": "Paylaş",
@@ -1217,7 +1218,8 @@
     "verifiedBusiness": "Doğrulanmış işletme",
     "seeComments": "{{count}} yorumun tümünü gör",
     "seen": "Gördüm",
-    "seenHint": "Nerede gördüğünü yorumla yaz"
+    "seenHint": "Nerede gördüğünü yorumla yaz",
+    "more": "devamı"
   },
   "news": {
     "title": "Haberler",

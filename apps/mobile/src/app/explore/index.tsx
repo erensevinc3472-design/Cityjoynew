@@ -2,7 +2,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions, type FlatListProps, type ScrollViewInstance } from 'react-native';
+import { ActivityIndicator, Alert, Animated, FlatList, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions, type FlatListProps, type ScrollViewInstance } from 'react-native';
+// Sekme sayfaları hareket kütüphanesinin listesiyle: içindeki fotoğraf kaydırması önceliklidir (post-photos.tsx).
+import { FlatList as PagerList } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { isUnread, POST_CATEGORIES, POST_TARGETS, type Announcement, type Post, type PostCategory, type PostTarget } from '@cityjoy/shared';
@@ -33,6 +35,9 @@ type Tag = PostCategory | 'all';
 const TAGS: Tag[] = ['all', ...POST_CATEGORIES];
 /** Sekme şeridinde aynı anda görünen sekme (Eren'in örneği: Takip'e geçince Mahallem gizlenir). */
 const VISIBLE_TABS = 3;
+/** Aşağı inerken üst çubuk bu kadar kayınca gizlenir; yukarı çekince bu kadar kayınca geri gelir (Eren, 7 Kasım). */
+const HIDE_AFTER = 12;
+const SHOW_AFTER = 60;
 
 /**
  * Keşfet (PROJE.md 5.5; Eren'in örnek ekranı, 13. madde 30). Üstte menü, "KEŞFET" ve açık sekme, yeni gönderi ve bildirim.
@@ -51,6 +56,29 @@ export default function ExploreScreen() {
   const [tag, setTag] = useState<Tag>('all');
   const [menuOpen, setMenuOpen] = useState(false);
   const pager = useRef<FlatList<PostTarget>>(null);
+  // Üst çubuk (başlık ve sekmeler) akış aşağı kayarken gizlenir, belirgin biçimde yukarı çekince görünür.
+  const [headerH, setHeaderH] = useState(insets.top + 120);
+  const hidden = useRef(new Animated.Value(0)).current;
+  const shown = useRef(true);
+  const lastY = useRef(0);
+  const drift = useRef(0);
+  const showHeader = (v: boolean) => {
+    if (shown.current === v) return;
+    shown.current = v;
+    Animated.timing(hidden, { toValue: v ? 0 : 1, duration: 200, useNativeDriver: true }).start();
+  };
+  const onFeedScroll = (y: number) => {
+    const d = y - lastY.current;
+    lastY.current = y;
+    if (y <= headerH) {
+      drift.current = 0;
+      return showHeader(true);
+    }
+    if (d > 0 !== drift.current > 0) drift.current = 0;
+    drift.current += d;
+    if (drift.current > HIDE_AFTER) showHeader(false);
+    else if (drift.current < -SHOW_AFTER) showHeader(true);
+  };
   const strip = useRef<ScrollViewInstance>(null);
   // Sekmeler kenar boşluklu cam kutunun içinde (13. madde 35, Keşfet önizlemesi).
   const tabW = (width - GUTTER * 2 - 8) / VISIBLE_TABS;
@@ -65,7 +93,14 @@ export default function ExploreScreen() {
     strip.current?.scrollTo({ x: Math.max(0, index - (VISIBLE_TABS - 1)) * tabW, animated: true });
     Animated.spring(line, { toValue: index * tabW, useNativeDriver: true, friction: 9 }).start();
     setVisited((v) => (v.has(index) ? v : new Set(v).add(index)));
-  }, [index, tabW, line]);
+    // Sekme değişince üst çubuk görünür.
+    lastY.current = 0;
+    drift.current = 0;
+    if (!shown.current) {
+      shown.current = true;
+      Animated.timing(hidden, { toValue: 0, duration: 200, useNativeDriver: true }).start();
+    }
+  }, [index, tabW, line, hidden]);
 
   const goTab = (i: number) => {
     setIndex(i);
@@ -75,7 +110,13 @@ export default function ExploreScreen() {
   return (
     <View style={[styles.root, { backgroundColor: c.background }]}>
       <StatusBar style="light" />
-      <View style={[styles.header, { paddingTop: insets.top + spacing.xs, backgroundColor: c.hero, borderBottomColor: c.border }]}>
+      <Animated.View
+        onLayout={(e) => setHeaderH(Math.round(e.nativeEvent.layout.height))}
+        style={[
+          styles.header,
+          { paddingTop: insets.top + spacing.xs, backgroundColor: c.hero, borderBottomColor: c.border },
+          { transform: [{ translateY: hidden.interpolate({ inputRange: [0, 1], outputRange: [0, -headerH] }) }] },
+        ]}>
         <View style={styles.bar}>
           <RoundButton icon="menu" label={t('menu.open')} onPress={() => setMenuOpen(true)} />
           <View style={styles.titleBox}>
@@ -109,9 +150,11 @@ export default function ExploreScreen() {
           </View>
         </ScrollView>
         </View>
-      </View>
+      </Animated.View>
+      {/* Saat ve pil çubuğunun altı, üst çubuk gizliyken de aynı renkte kalır. */}
+      <View pointerEvents="none" style={[styles.statusCover, { height: insets.top, backgroundColor: c.hero }]} />
 
-      <FlatList
+      <PagerList
         ref={pager}
         data={POST_TARGETS as unknown as PostTarget[]}
         keyExtractor={(x) => x}
@@ -122,7 +165,7 @@ export default function ExploreScreen() {
         onMomentumScrollEnd={(e) => setIndex(Math.max(0, Math.min(POST_TARGETS.length - 1, Math.round(e.nativeEvent.contentOffset.x / width))))}
         style={styles.flex}
         renderItem={({ item: x, index: i }) => (
-          <View style={{ width }}>{visited.has(i) ? <FeedPage tab={x} tag={tag} onTag={setTag} active={i === index} /> : null}</View>
+          <View style={{ width }}>{visited.has(i) ? <FeedPage tab={x} tag={tag} onTag={setTag} active={i === index} topInset={headerH} onScrollY={i === index ? onFeedScroll : undefined} /> : null}</View>
         )}
       />
       <BottomNav active="explore" />
@@ -132,7 +175,7 @@ export default function ExploreScreen() {
 }
 
 /** Bir sekmenin akışı (yalnızca açılınca okunur; sekme değiştirince önbellekten gelir). */
-function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTag(t: Tag): void; active: boolean }) {
+function FeedPage({ tab, tag, onTag, active, topInset, onScrollY }: { tab: PostTarget; tag: Tag; onTag(t: Tag): void; active: boolean; topInset: number; onScrollY?(y: number): void }) {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
@@ -229,7 +272,7 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
 
   if (!user || !location || (tab === 'mahallem' && !location.neighbourhoodId)) {
     return (
-      <View style={styles.page}>
+      <View style={[styles.page, { paddingTop: topInset }]}>
         {!user ? (
           <FormMessage kind="info" text={t('explore.signIn')} />
         ) : (
@@ -248,7 +291,13 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
       {...listProps}
       data={items ?? []}
       keyExtractor={(i) => (i.kind === 'post' ? i.post.id : `a-${i.ann.id}`)}
-      contentContainerStyle={styles.page}
+      // Liste üst çubuğun altından başlar; iPhone'da yenileme göstergesi de çubuğun altında görünsün diye boşluk iç boşluk olarak verilir.
+      contentContainerStyle={[styles.page, Platform.OS === 'ios' ? null : { paddingTop: topInset }]}
+      contentInset={Platform.OS === 'ios' ? { top: topInset } : undefined}
+      contentOffset={Platform.OS === 'ios' ? { x: 0, y: -topInset } : undefined}
+      scrollIndicatorInsets={Platform.OS === 'ios' ? { top: topInset } : undefined}
+      onScroll={onScrollY ? (e) => onScrollY(e.nativeEvent.contentOffset.y + (Platform.OS === 'ios' ? topInset : 0)) : undefined}
+      scrollEventThrottle={16}
       ListHeaderComponent={top}
       renderItem={({ item: i }) =>
         i.kind === 'ann' ? (
@@ -264,7 +313,6 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
             // İşletme adına paylaşımda takip ve ad işletmeye gider.
             follow={i.post.authorUid === user.uid ? undefined : i.post.business ? (followingBusinesses?.includes(i.post.business.id) ? 'aktif' : null) : followOf(i.post.authorUid)}
             onFollow={() => (i.post.business ? followBusiness(i.post.business.id) : follow(i.post.authorUid))}
-            onPress={() => router.push({ pathname: '/explore/[id]', params: { id: i.post.id } })}
             onLike={() => like(i.post.id)}
             onAuthor={() => router.push(authorHref(i.post))}
           />
@@ -278,7 +326,7 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
       ListFooterComponent={loadingMore ? <ActivityIndicator /> : !hasMore && all?.length ? <AppText variant="caption" muted style={styles.center}>{t('explore.end')}</AppText> : undefined}
       onEndReached={hasMore ? loadMore : undefined}
       onEndReachedThreshold={0.5}
-      refreshControl={<RefreshControl refreshing={false} onRefresh={reload} />}
+      refreshControl={<RefreshControl refreshing={false} onRefresh={reload} progressViewOffset={topInset} />}
     />
   );
 }
@@ -286,7 +334,8 @@ function FeedPage({ tab, tag, onTag, active }: { tab: PostTarget; tag: Tag; onTa
 const styles = StyleSheet.create({
   root: { flex: 1 },
   flex: { flex: 1 },
-  header: { borderBottomWidth: StyleSheet.hairlineWidth },
+  header: { position: 'absolute', top: 0, start: 0, end: 0, zIndex: 2, borderBottomWidth: StyleSheet.hairlineWidth },
+  statusCover: { position: 'absolute', top: 0, start: 0, end: 0, zIndex: 3 },
   bar: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: GUTTER, minHeight: 52 },
   titleBox: { flex: 1, alignItems: 'center' },
   title: { fontFamily: fonts.headingSemi, fontSize: 17, lineHeight: 22, letterSpacing: 5 },

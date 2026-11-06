@@ -2,24 +2,26 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { isPostListed, POST_REPORT_REASONS, type Post, type PostReportReason } from '@cityjoy/shared';
+import { isPostListed, type Post } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
-import { AppText } from '@/components/app-text';
-import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
+import { PostActions } from '@/components/post-actions';
 import { PostCard } from '@/components/post-card';
 import { PostComments } from '@/components/post-comments';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
-import { authorHref, cachedPost, patchCachedPost, toggleLike, useLiked } from '@/lib/posts';
+import { authorHref, cachedPost, toggleLike, useLiked } from '@/lib/posts';
 import { postRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { spacing } from '@/theme/tokens';
 import { errorText } from '@/lib/limits';
 
-/** Gönderi ayrıntısı: yazının tamamı, beğeni, kaydet, yorumlar, şikâyet; sahibi için yorumları kapatma ve kaldırma. */
+/**
+ * Gönderi ayrıntısı: bildirimden ya da paylaşılan bağlantıdan açılır (akışta gönderi yerinde, yorumlar alttan açılan
+ * panelde). Yazının tamamı, beğeni, kaydet, yorumlar, şikâyet; sahibi için yorumları kapatma ve kaldırma.
+ */
 export default function PostScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -28,22 +30,19 @@ export default function PostScreen() {
   const [item, setItem] = useState<Post | null | undefined>(() => cachedPost(id));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
-  const [reporting, setReporting] = useState<PostReportReason | null>(null);
-  const [reported, setReported] = useState(false);
-  const [confirmRemove, setConfirmRemove] = useState(false);
   const [saved, setSaved] = useState<boolean>();
   const isLiked = useLiked(user?.uid);
   const mine = !!item && !!user && item.authorUid === user.uid;
+  const back = () => (router.canGoBack() ? router.back() : router.replace('/explore'));
 
   useEffect(() => {
     if (!user) return;
     // Göremediği gönderide (başka mahalle, kaldırılmış) kurallar okutmaz: "artık yok" gösterilir.
     postRepository.get(id).then(setItem, () => setItem(null));
-    postRepository.hasReported(id, user.uid).then(setReported);
     postRepository.isSaved(user.uid, id).then(setSaved);
   }, [id, user]);
 
-  const header = <HeroHeader compact title={t('explore.post')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/explore'))} />;
+  const header = <HeroHeader compact title={t('explore.post')} onBack={back} />;
 
   if (!user || item === undefined || !item || !(isPostListed(item) || (mine && item.status === 'aktif'))) {
     return (
@@ -73,20 +72,6 @@ export default function PostScreen() {
       setItem({ ...item, likeCount: count });
     }, 'explore.likeError');
 
-  const remove = () =>
-    run(async () => {
-      await postRepository.remove(item.id);
-      patchCachedPost(item.id, { status: 'kaldirildi' });
-      router.canGoBack() ? router.back() : router.replace('/explore');
-    }, 'explore.saveError');
-
-  const report = () =>
-    run(async () => {
-      await postRepository.report(item, user.uid, reporting!);
-      setReported(true);
-      setReporting(null);
-    }, 'explore.reportError');
-
   const toggleSave = () =>
     run(async () => {
       if (saved) await postRepository.unsave(user.uid, item.id);
@@ -94,47 +79,16 @@ export default function PostScreen() {
       setSaved(!saved);
     }, 'explore.saveError');
 
-  const toggleComments = () =>
-    run(async () => {
-      await postRepository.setCommentsOff(item.id, !item.commentsOff);
-      patchCachedPost(item.id, { commentsOff: !item.commentsOff });
-      setItem({ ...item, commentsOff: !item.commentsOff });
-    }, 'explore.saveError');
-
   return (
     <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <PostCard item={item} liked={isLiked(item.id)} full onLike={busy ? undefined : like} onAuthor={() => router.push(authorHref(item))} />
-        {mine && item.reportCount >= 3 && !item.cleared ? <FormMessage kind="info" text={t('explore.hiddenForReview')} /> : null}
         {error ? <FormMessage kind="error" text={error} /> : null}
         <View style={styles.row}>
           <AppButton variant="secondary" title={saved ? t('explore.unsave') : t('explore.save')} disabled={busy || saved === undefined} onPress={toggleSave} />
-          {mine ? <AppButton variant="secondary" title={item.commentsOff ? t('explore.comments.turnOn') : t('explore.comments.turnOff')} disabled={busy} onPress={toggleComments} /> : null}
         </View>
         <PostComments post={item} uid={user.uid} displayName={profile?.displayName} onCount={(n) => setItem((p) => (p ? { ...p, commentCount: n } : p))} />
-
-        {mine ? (
-          confirmRemove ? (
-            <View style={styles.block}>
-              <AppText>{t('explore.removeConfirm')}</AppText>
-              <AppButton title={t('explore.remove')} loading={busy} disabled={busy} onPress={remove} />
-              <AppButton variant="ghost" title={t('account.cancel')} onPress={() => setConfirmRemove(false)} />
-            </View>
-          ) : (
-            <AppButton variant="ghost" title={t('explore.remove')} onPress={() => setConfirmRemove(true)} />
-          )
-        ) : reported ? (
-          <AppText variant="caption" muted>{t('explore.reported')}</AppText>
-        ) : reporting ? (
-          <View style={styles.block}>
-            <AppText variant="label">{t('explore.reportTitle')}</AppText>
-            <Chips<PostReportReason> label={t('explore.reportTitle')} value={reporting} onChange={setReporting} options={POST_REPORT_REASONS.map((r) => ({ value: r, label: t(`explore.reasons.${r}`) }))} />
-            <AppButton title={t('explore.reportSend')} loading={busy} disabled={busy} onPress={report} />
-            <AppButton variant="ghost" title={t('account.cancel')} onPress={() => setReporting(null)} />
-          </View>
-        ) : (
-          <AppButton variant="ghost" title={t('explore.report')} onPress={() => setReporting('spam')} />
-        )}
+        <PostActions item={item} uid={user.uid} onChange={setItem} onRemoved={back} />
       </ScrollView>
     </Screen>
   );
@@ -142,6 +96,5 @@ export default function PostScreen() {
 
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
-  block: { gap: spacing.xs },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
 });

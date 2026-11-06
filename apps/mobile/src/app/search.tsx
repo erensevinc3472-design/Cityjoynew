@@ -218,7 +218,6 @@ export default function SearchScreen() {
         key={p.id}
         item={p}
         liked={isLiked(p.id)}
-        onPress={() => router.push({ pathname: '/explore/[id]', params: { id: p.id } })}
         onLike={() => like(p)}
         onAuthor={() => router.push(authorHref(p))}
       />

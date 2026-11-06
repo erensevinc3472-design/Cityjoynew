@@ -54,7 +54,7 @@ export default function SavedPostsScreen() {
         keyExtractor={(p) => p.id}
         contentContainerStyle={styles.content}
         renderItem={({ item }) => (
-          <PostCard item={item} liked={isLiked(item.id)} onPress={() => router.push({ pathname: '/explore/[id]', params: { id: item.id } })} onLike={() => like(item)} />
+          <PostCard item={item} liked={isLiked(item.id)} onLike={() => like(item)} />
         )}
         ListEmptyComponent={
           failed ? <StateMessage kind="error" message={t('explore.loadError')} onRetry={load} />
