@@ -790,8 +790,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Panel > İşletmeler kademe seçimi ve Sınırlar sayfası iki kademeyi gösterir. Fırsat sınırı zaten Ücretsiz 1, Pro 5.
   **Hata düzeltmesi:** Panel > Sınırlar "Kaydet" vitrin sayılarını da yazıyordu ama kurallar bu alanlara izin vermiyordu,
   kayıt hep reddedilirdi; kurallar düzeltildi, yeni testle denetleniyor. Kural dosyası biraz küçüldü (sınıra yakınlık
-  sorunu yok). Testler: ortak 166, kurallar 156 geçti; tür denetimi dört pakette temiz. **Eren yapacak:** PR'ı birleştir;
-  sonra kurallar ve panel yüklenmeli (Claude yükleyebilir ya da Eren: kural komutu yukarıda, panel `npm run panel:deploy`).
+  sorunu yok). Testler: ortak 166, kurallar 156 geçti; tür denetimi dört pakette temiz. PR #70 birleşti; kurallar
+  ve dizinler Firebase'e, panel cityjoynew.web.app'e yüklendi (6 Kasım, Claude; kurallarda ilk iki denemede Google'da geçici 503).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
