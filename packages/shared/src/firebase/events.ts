@@ -45,6 +45,7 @@ function fromDoc(id: string, d: DocumentData): CityEvent {
     title: d.title,
     description: d.description,
     category: d.category,
+    ...(d.volunteerType ? { volunteerType: d.volunteerType } : {}),
     startsAt: iso(d.startsAt) ?? '',
     endsAt: iso(d.endsAt) ?? '',
     venueName: d.venueName,
@@ -202,6 +203,7 @@ export function createEventPanel(db: Firestore, actor: { uid: string; name: stri
         ticketUrl: input.ticketUrl?.trim() || undefined,
         capacity: input.capacity,
         cover: input.cover ? cleanPhoto(input.cover) : undefined,
+        volunteerType: input.category === 'gonulluluk' ? input.volunteerType : undefined,
       };
       const data = {
         title: input.title.trim(),

@@ -9,8 +9,11 @@ import * as functionsV1 from 'firebase-functions/v1';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
-import { handleAnnouncementWrite } from './announcements';
+import { sendAdminPush, sendDueAdminPushes } from './admin-push';
+import { providerFromEnv, syncPharmacies } from './pharmacy';
+import { estimateAudienceFor, handleAnnouncementWrite, sendScheduledAnnouncements, type AudienceRequest } from './announcements';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
@@ -85,6 +88,46 @@ export const travelCoverChanged = Object.fromEntries(
 // Kaldırılan aktivitenin kapak dosyası silinir.
 export const activityCoverChanged = onDocumentWritten('activities/{id}', async (e) => {
   await handleActivityCover(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+
+/** Panel: hedefli bildirimin yaklaşık ulaşacağı kişi sayısı (kişi verisi dönmez). */
+export const estimateAudience = onCall(async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'Giriş gerekli');
+  const r = await estimateAudienceFor(db, { uid: req.auth.uid, email: req.auth.token.email, emailVerified: req.auth.token.email_verified }, req.data as AudienceRequest);
+  if ('denied' in r) throw new HttpsError('permission-denied', 'Bu bölge için yetkiniz yok');
+  return r;
+});
+
+export const scheduledAnnouncements = onSchedule({ schedule: 'every 10 minutes', timeZone: 'Europe/Istanbul' }, async () => {
+  await sendScheduledAnnouncements(db, deps());
+  await sendDueAdminPushes(db, deps());
+});
+
+/** Admin bildirimi: "hemen" seçildiyse hazırlanınca gider; planlıysa zamanı gelince (yukarıdaki iş). */
+export const adminPushCreated = onDocumentCreated('adminPushes/{id}', async (e) => {
+  const d = e.data?.data();
+  if (d) await sendAdminPush(db, e.params.id, d, deps());
+});
+
+/**
+ * Nöbetçi eczane: her sabah 08.15'te bütün iller, 10.00'da yalnızca bugünün listesi gelmeyen iller (Eren onayladı,
+ * docs/oneri-nobetci-eczane.md). Servis ve anahtar ortam ayarından (PHARMACY_PROVIDER, PHARMACY_API_KEY); yoksa çalışmaz.
+ */
+export const pharmacyMorning = onSchedule({ schedule: '15 8 * * *', timeZone: 'Europe/Istanbul', timeoutSeconds: 540 }, async () => {
+  const provider = providerFromEnv();
+  if (provider) await syncPharmacies(db, provider, { now: new Date() });
+});
+export const pharmacyRetry = onSchedule({ schedule: '0 10 * * *', timeZone: 'Europe/Istanbul', timeoutSeconds: 540 }, async () => {
+  const provider = providerFromEnv();
+  if (provider) await syncPharmacies(db, provider, { now: new Date(), onlyStale: true });
+});
+/** Panel (admin): "Şimdi yeniden çek" (bir il ya da hepsi). */
+export const pharmacyResync = onCall({ timeoutSeconds: 540 }, async (req) => {
+  if (!req.auth || !(await db.doc(`admins/${req.auth.uid}`).get()).exists) throw new HttpsError('permission-denied', 'Yalnızca admin');
+  const provider = providerFromEnv();
+  if (!provider) throw new HttpsError('failed-precondition', 'Eczane servisi ayarlı değil');
+  const code = typeof req.data?.provinceCode === 'string' ? req.data.provinceCode : undefined;
+  return syncPharmacies(db, provider, { now: new Date(), provinces: code ? [code] : undefined, by: req.auth.uid });
 });
 
 export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 'Europe/Istanbul' }, async () => {

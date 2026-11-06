@@ -109,9 +109,14 @@ Eren her modülü sırayla ayrıntılı anlatacak. Aşağıdakiler tasarım dosy
 - **Yapıldı (27 Ekim 2026): sabit bilgiler şablonla.** Önemli kurumlar, müzeler, otoparklar, parklar, pazarlar, ulaşım, toplanma alanları, muhtarlıklar, belediye hizmetleri ve "Nasıl yapılır?" tek bir şablonla tutulur; veri Excel'den panelden yüklenir (Eren'in önerisi: başka bir yapay zekâyla ya da ekiple doldurulur, kaynak ve tarih zorunlu, bilinmeyen boş bırakılır). Yüklenen bilgi "doğrulanmadı" etiketiyle ve kaynağıyla görünür, doğrulanınca etiket kalkar. Uygulamada bölümler, liste ve ayrıntı hazır. Kafe-restoran (İşletmem), nöbetçi eczane, etkinlik, ilan ve Mahalle Meydanı ayrı gelecek. Seyahat'in sabit bilgileri aynı yöntemle yapılacak.
 - **OpenStreetMap iskeleti (Claude karar verdi, Eren bıraktı; 28 Ekim 2026):** ekip veya belediyelerden veri toplamak uzun süreceği için şablon önce OSM'den doldurulur (`scripts/osm-city-guide.ts`). Bursa denemesinde ad ve konum iyi, ayrıntılar (telefon, saat, ücret, pazar günü) çoğunlukla boş; ayrıntıları ekip/yapay zekâ kaynakla tamamlar. Toplanma alanları için AFAD / e-Devlet gerekir. Lisans ODbL: uygulamada "© OpenStreetMap katkıda bulunanlar" yazılır; birleşik veritabanının paylaşım koşulu avukata sorulacak. Uygulama Overpass'e hiç gitmez (maliyet ilkesi).
 - **Benim Şehrim, her düğme çalışsın (Eren bıraktı, 29 Ekim 2026):** (1) Bursa'nın müze, otopark, park, pazar, önemli kurum ve toplanma alanı bilgileri OpenStreetMap'ten Excel olarak hazırlandı (650 kayıt), panelden yüklenir; müze ücret durumu, otopark tipi ve pazar günleri bilinmiyorsa boş kalabilir (uydurulmaz). (2) "Nasıl yapılır?" ülke geneli 12 rehber (`scripts/nasil-yapilir.ts`, resmî kaynaklı). (3) **Cafe ve Restoran:** İşletmem'de "yeme-içme" türündeki işletmeler; bu tür hizmet kategorisi yerine yemek türü seçer (kafe, restoran, kahvaltı, kebap, pide, ev yemekleri, balık, tatlı, fast food); filtre ve "Şu an açık"; sıralama hizmet listeleriyle aynı kural. (4) **Şehir Vitrini** (3 Kasım: Eren reklam vitrini ve gelir kaynağı olarak değiştirdi, 13. madde 35; aşağıdaki "para karşılığı girilmez" geçersiz): il başına haftalık sayılar (konular + seçilen işletme / gezilecek yerler), panelden hazırlanır (admin ve il yöneticisi), editör seçkisi, para karşılığı girilmez, "Premium" yazmaz. Kalanlar: nöbetçi eczane (servis onayı), Satılık ve Kiralık ile Gönüllülük (ilan sistemi, ayrıca konuşulacak), hava durumu (ticari kullanıma uygun servis), Ulaşım / Muhtarlıklar / Belediye hizmetleri verisi.
+- **Karar (Eren, 5 Kasım 2026): Gönüllülük.** Gönüllülük ilanlarını (park temizliği, fidan dikimi, huzurevi ziyareti)
+  yalnızca belediyeler ve kurumlar panelden açar (Etkinlikler > tür "Gönüllülük", ücretsiz, kontenjan ve Katıl). Hayvan
+  sahiplendirme ilanlarını belediye barınakları ve doğrulanmış dernekler verir (panelde "Dernek / vakıf" hesap türü,
+  yalnızca admin açar; "Hayvan sahiplendirme" bölümü). Bireyler ilan vermez (gizli satış ve istismar riski). Sahiplendirme
+  ücretsizdir, iletişim barınak / dernekle doğrudan (telefon, e-posta). **Yapıldı (5 Kasım).**
 - **Karar (Eren):** Belediye hizmetlerinde uygulama hizmeti, gerekli evrakı ve başvuru bağlantısını gösterir, başvuru belediyenin kendi sistemine yönlendirilir. Uygulama içi başvuru ilk sürümde yok (istekli belediyelerle sonra düşünülebilir).
 - SORULACAK: Veri kaynakları neler (özellikle nöbetçi eczane, ulaşım)?
-  - **Nöbetçi eczane önerisi (Claude, 27 Ekim 2026, ONAY BEKLİYOR):** resmi kurumların açık servisi yok; hazır ücretli servis (ilk tercih NosyAPI, yedek CollectAPI, tahmini ayda 6-13 dolar), her sabah 81 il bir kez çekilir, ikinci deneme yalnızca başarısız illeri tamamlar. Zamanlayıcı şimdilik GitHub Actions (ücretsiz), Blaze'e geçilirse Firebase'e taşınır. Ayrıntı: `docs/oneri-nobetci-eczane.md`.
+  - **Nöbetçi eczane önerisi (Claude, 27 Ekim 2026; Eren onayladı 5 Kasım 2026, kod yazıldı, zamanlayıcı Blaze'de Firebase içinde):** resmi kurumların açık servisi yok; hazır ücretli servis (ilk tercih NosyAPI, yedek CollectAPI, tahmini ayda 6-13 dolar), her sabah 81 il bir kez çekilir, ikinci deneme yalnızca başarısız illeri tamamlar. Zamanlayıcı şimdilik GitHub Actions (ücretsiz), Blaze'e geçilirse Firebase'e taşınır. Ayrıntı: `docs/oneri-nobetci-eczane.md`.
 - **Ziyaretçi Modu (Eren onayladı; eşik değerleri sonra belirlenecek):** Benim Şehrim kullanıcının o an bulunduğu şehre göre değişebilir. Örnek: Bursa'dan Antalya'ya giden kullanıcıya "Konumunuz Antalya görünüyor, Antalya olarak devam etmek ister misiniz?" sorulur.
   - Kayıtlı il/ilçe/mahalle her zaman "Evim" olarak durur. Farklı bir ilde olunduğu algılandığında (konum izni verilmişse) sorulur, sessizce değişmez. Seçenekler: "Antalya'yı göster", "Bursa'da kal", "Bir daha sorma".
   - Seçilirse ekranın üstünde "Antalya (ziyaretçi) · Evim: Bursa" şeridi ve tek dokunuşla eve dönüş bulunur. Ziyaretçi modunda yerleşik kullanıcıya özel bölümler (belediye başvuruları, mahalle duyuruları) geri çekilir, gezilecek yerler, eczane, acil numaralar, ulaşım ve etkinlikler öne çıkar.
@@ -467,8 +472,12 @@ Eren'in kuralı: **herkes yalnızca kendi panelinden, kendine yetkilendirilen ka
     yalnızca "Belediye başkanı > görüntüle" görevi verilen kişiler görür; kurum yöneticisi ve CityJoy admin göremez
     (kurallarda). Kurum istatistiği için "Kitle istatistikleri" bölümü: kurum yöneticisi ve görevli personel; muhtar
     kendi mahallesini görür.
-  - **Sonraya kalan:** gönderi istatistikleri (tekil görüntülenme, kaydetme, paylaşım, videonun sonuna kadar izlenme,
-    yorum oranı) "kurum / başkan adına gönderi" özelliği gelince yapılır; resmî hesaplar şimdilik gönderi paylaşmıyor.
+  - **Yapıldı (5 Kasım 2026): İçerik performansı.** Resmî hesabın duyuru, haber, acil duyuru ve etkinlikleri için
+    tekil okuyan (ayrıntıyı açan kişi başına bir), paylaşan (Paylaş düğmesi, kişi başına bir) ve etkinlik katılımı;
+    öneriler (en çok okunan, takipçilere ulaşma, paylaşılma oranı, en iyi tür / gün / saat, az okunanlar). Kayıt kişinin
+    kimliğini taşımaz (kimlik + içerik karması). Takipçiler'i görebilen görür.
+  - **Sonraya kalan:** Keşfet gönderisi istatistikleri (görüntülenme, kaydetme, videonun sonuna kadar izlenme, yorum
+    oranı) "kurum / başkan adına gönderi" özelliği gelince yapılır; resmî hesaplar şimdilik gönderi paylaşmıyor.
     10 kişi eşiği şimdilik panelde uygulanır; yetkili personel ham sayıları okuyabilir, sunucuda eşik Blaze ve sunucu
     işlevleriyle gelir. Takip / bırakma tekrarına sınır sonra eklenebilir. Seçim dönemi başkan gizleme (Başkanlarla
     Keşif'teki gibi) resmî başkan profiline henüz uygulanmadı.
@@ -526,6 +535,12 @@ Aşağıdaki 24 madde belediye panelinin kapsamıdır. Her biri 6.1'deki ilkeye 
 
 **İlk sürüm önerisi (Eren onayladı):** 1, 2, 3, 4, 6, 8, 12, 14, 15, 17, 18, 19. (18. madde, Eren'in kurum içi onay kararıyla ilk sürüme eklendi, bölüm 6.6.) Talep kutusu (11) ikinci aşamaya: cevap beklentisi doğurur, belediyenin hazır olması gerekir. Geri kalanı sonraki aşamalarda.
 - Onay kuyruğu (14): **Karar (Eren): önce il yöneticisi, sonra admin** (iki aşamalı onay, bölüm 6.5).
+
+**Karar (Eren, 5 Kasım 2026): Basın Masası.** Basın biriminin işine yarayacak yardımcı araçlar, panelde ayrı bölüm:
+(1) yayın takvimi, (2) önemli günler (resmî, dinî, anma, uluslararası; kurumun yerel günleri; yaklaşan gün
+hatırlatması ve paylaşım fikri), (3) planlı yayın (6.2 madde 4), (4) hazır şablonlar (madde 13), (5) yayın öncesi
+kontrol listesi. Sıra: 1-2, sonra 3-4, en son 5. **Yapıldı (5 Kasım): hepsi (1-5)** (planlı yayın yalnızca duyuru ve haberde; acil duyuru planlanmaz). **Karar (Eren, 5 Kasım):** bu sayfalar kurum hesabında (kurum yöneticisi) ve kurum yöneticisinin görev verdiği personelde görünür; kim neyi görecekse kurum yöneticisi belirler, kendine de görev verebilir. Ülke geneli gün listesini admin yönetir
+(dinî bayram tarihleri her yıl Diyanet takviminden); tarafsızlık için siyasi anlam taşıyan gün konmaz.
 
 ### 6.3 İl yöneticisi paneli (kapsam: kendi ili)
 
@@ -615,6 +630,20 @@ Not: 9 ve 10 numaralı güvenlik ve KVKK maddeleri mağaza onayı ve yasal uyum 
 ## 7. Filtreli bildirim
 
 Paneller şu filtrelerle bildirim gönderebilecek: **il, ilçe, mahalle, yaş, cinsiyet, ilgi alanı**.
+- **Karar (Eren, 5 Kasım 2026):** yaş / cinsiyet / meslek filtresi yalnızca telefon bildiriminin kime gideceğini
+  belirler; duyurunun kendisi bölgedeki herkese uygulamada açık kalır. **Yapıldı (5 Kasım):** duyurularda hedefli
+  bildirim (yaş, cinsiyet, meslek; 50 kişi alt sınırı, yaklaşık sayı). İlgi alanı filtresi ve kampanya / tanıtım
+  bildirimi (onay zinciri) sonra.
+- **Karar (Eren, 5 Kasım 2026): admin her türlü bildirimi gönderir; işletme reklamı ücret karşılığı.** Admin panelden
+  duyuru, etkinlik, kampanya / tanıtım ve işletme reklamı gönderir (il yöneticisi onayı yok); ücret ve fatura elle
+  girilir (ödeme uygulama dışında). Haftalık reklam ve gece sınırı konmadı (Eren: elle girilir). Kampanya ve reklam
+  yalnızca kampanya izni veren 18+ kişiye, "Reklam" / "Kampanya" etiketiyle gider (ticari ileti ve reklam kuralı;
+  avukat teyidi, İYS kaydı). **Yapıldı (5 Kasım).** **Karar (Eren, 5 Kasım):** reklamın resmi / videosu işletmenin
+  kendi sayfasındaki paylaşımdır; admin bildirimde o paylaşımı seçer, dokununca paylaşım açılır (link yazılmaz).
+- **Karar (Eren, 5 Kasım 2026): hedefli duyuru bildirimi için ayrı izin sorulmaz.** Bildirime izin veren kişi, resmî
+  kurumların duyurularında yaş, cinsiyet ve mesleğine göre seçilebilir; kayıttaki ayrı "hedefli bildirim" kutucuğu
+  kaldırıldı. Kampanya / ticari ileti izni ayrı kalır (ticari ileti kuralı, İYS). **Avukata sorulacak:** bunun açık
+  rıza olmadan, aydınlatma metniyle yapılabilmesi; aydınlatma metnine açık bir satır eklenmeli.
 - Bunun için kayıtta ilgili bilgiler alınır. Yaş, cinsiyet ve ilgi alanıyla hedefleme **KVKK kapsamında ayrı açık rıza** ister.
 - Öneri: Bildirim türleri (acil duyuru, hizmet, etkinlik, kampanya) ayrılır. Kullanıcı türlere göre kapatabilir. Acil kamu duyuruları ayrı sınıfta olur. Bir panelin bir günde gönderebileceği bildirim sayısına sınır konur (kötüye kullanımı önlemek için).
 - Belirli bir kişiye değil, **gruba** gönderilir. Panel kullanıcıların kişisel verisini görmez, yalnızca "kaç kişiye ulaşır" bilgisini görür (öneri).

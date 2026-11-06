@@ -266,7 +266,7 @@ export default function UrgentScreen() {
             {/* Hemen lazım olabilir */}
             <AppText variant="subtitle" accessibilityRole="header">{t('urgent.quickTitle')}</AppText>
             <View style={styles.tiles}>
-              {tile('pharmacy', 'local-pharmacy', t('urgent.pharmacy'), undefined, true)}
+              {tile('pharmacy', 'local-pharmacy', t('urgent.pharmacy'), () => router.push('/pharmacy'))}
               {quick.map((x) => tile(x.id, iconOf(x), localized(x.names, lang) ?? x.names.tr, () => openService(x)))}
             </View>
 

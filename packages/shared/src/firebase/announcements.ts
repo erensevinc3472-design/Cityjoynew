@@ -24,6 +24,7 @@ import {
   type AnnouncementRegion,
   type Publisher,
 } from '../announcements/announcements';
+import { cleanPushTarget } from '../announcements/push-target';
 import type { Action, RegionScope } from '../permissions/types';
 import { addAudit, iso } from './grants';
 import { publishUsage } from '../limits/limits';
@@ -50,6 +51,8 @@ function fromDoc(id: string, d: DocumentData): Announcement {
     ...(d.publishedAt ? { publishedAt: iso(d.publishedAt) } : {}),
     ...(d.reviewedBy ? { reviewedBy: d.reviewedBy } : {}),
     ...(d.reviewNote ? { reviewNote: d.reviewNote } : {}),
+    ...(d.scheduledAt ? { scheduledAt: iso(d.scheduledAt) } : {}),
+    ...(d.pushTarget ? { pushTarget: d.pushTarget } : {}),
   };
 }
 
@@ -127,6 +130,10 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
     async save(p: Publisher, input: AnnouncementInput, mode: SaveMode, existing?: Announcement): Promise<string> {
       const ref = existing ? doc(db, COLLECTION, existing.id) : doc(collection(db, COLLECTION));
       const status = mode === 'taslak' ? 'taslak' : mode === 'onaya' ? 'onay-bekliyor' : 'yayinda';
+      // Planlı yayın: doğrudan yayında yayın anı seçilen zaman; onaya gidende onaylanınca kullanılır.
+      const scheduled = input.scheduledAt && input.kind !== 'acil' ? Timestamp.fromDate(new Date(input.scheduledAt)) : null;
+      // Hedefli bildirim: yalnızca telefon bildirimi daralır; acil duyuru herkese gider.
+      const target = input.kind === 'acil' ? null : cleanPushTarget(input.pushTarget);
       const data = {
         kind: input.kind,
         title: input.title.trim().slice(0, ANNOUNCEMENT_LIMITS.title[1]),
@@ -135,12 +142,14 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
         ...(input.endsAt ? { endsAt: Timestamp.fromDate(new Date(input.endsAt)) } : {}),
         ...(input.pinned ? { pinned: true } : {}),
         ...(input.kind === 'haber' && input.category ? { category: input.category } : {}),
+        ...(scheduled ? { scheduledAt: scheduled } : {}),
+        ...(target ? { pushTarget: target } : {}),
         author: p.author,
         status,
         preparedBy: actor.uid,
         preparedByName: actor.name.slice(0, 80),
         updatedAt: serverTimestamp(),
-        ...(status === 'yayinda' ? { publishedAt: serverTimestamp() } : {}),
+        ...(status === 'yayinda' ? { publishedAt: scheduled ?? serverTimestamp() } : {}),
       };
       const batch = writeBatch(db);
       // Doğrudan yayın günlük sınıra sayılır; dolduysa LimitReachedError (panel "Onaya gönder" önerir).
@@ -153,12 +162,15 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
           ...(input.endsAt ? {} : { endsAt: deleteField() }),
           ...(input.pinned ? {} : { pinned: deleteField() }),
           ...(input.kind === 'haber' ? {} : { category: deleteField() }),
+          ...(scheduled ? {} : { scheduledAt: deleteField() }),
+          ...(target ? {} : { pushTarget: deleteField() }),
           reviewNote: deleteField(),
           reviewedBy: deleteField(),
         });
       } else batch.set(ref, { ...data, createdAt: serverTimestamp() });
       if (mode !== 'taslak') {
-        audit(batch, { id: ref.id, author: p.author, region: data.region, title: data.title }, 'ekle', mode === 'yayinla' ? 'Duyuru yayınlandı (onaysız)' : 'Duyuru onaya gönderildi');
+        const when = scheduled ? ` (planlı: ${scheduled.toDate().toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Istanbul' })})` : '';
+        audit(batch, { id: ref.id, author: p.author, region: data.region, title: data.title }, 'ekle', (mode === 'yayinla' ? (scheduled ? 'Duyuru planlandı (onaysız)' : 'Duyuru yayınlandı (onaysız)') : 'Duyuru onaya gönderildi') + when);
       }
       await batch.commit();
       return ref.id;
@@ -167,9 +179,11 @@ export function createAnnouncementPanel(db: Firestore, actor: { uid: string; nam
     /** `ringAlways`: yalnızca admin; telefon bildirimi önceliğe bakmadan her zaman çalar (PROJE.md 5.12). */
     async approve(a: Announcement, opts: { ringAlways?: boolean } = {}): Promise<void> {
       const batch = writeBatch(db);
+      // Planlı duyuru: zamanı gelmediyse o anda yayına girer, geçtiyse hemen.
+      const later = a.scheduledAt && new Date(a.scheduledAt).getTime() > Date.now() + 60000 ? Timestamp.fromDate(new Date(a.scheduledAt)) : null;
       batch.update(doc(db, COLLECTION, a.id), {
         status: 'yayinda',
-        publishedAt: serverTimestamp(),
+        publishedAt: later ?? serverTimestamp(),
         reviewedBy: actor.uid,
         updatedAt: serverTimestamp(),
         ...(opts.ringAlways ? { ringAlways: true } : {}),

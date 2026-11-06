@@ -4,6 +4,8 @@ import { canSeeModule, type Module } from '@cityjoy/shared';
 
 import { ScopeLabel } from './scope-label';
 import { hasProfileAccess } from '../pages/profile-page';
+import { canSeeContentStats } from '../pages/content-stats-page';
+import { canSeePress } from '../pages/press-page';
 import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
@@ -32,6 +34,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
       { key: 'sehir-rehberi', module: 'sehir-rehberi', path: '/sehir-rehberi', icon: 'book' },
       { key: 'gonderiler', module: 'gonderiler', path: '/duyurular', icon: 'megaphone' },
       { key: 'etkinlikler', module: 'etkinlikler', path: '/etkinlikler', icon: 'calendar' },
+      { key: 'sahiplendirme', module: 'sahiplendirme', path: '/sahiplendirme', icon: 'paw' },
       { key: 'hizmetler', module: 'hizmetler', icon: 'tool' },
     ],
   },
@@ -48,6 +51,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
     items: [
       { key: 'moderasyon', module: 'moderasyon', path: '/moderasyon', icon: 'shield' },
       { key: 'bildirimler', module: 'bildirimler', path: '/bildirimler', icon: 'bell' },
+      { key: 'bildirim-gonder', show: admin, path: '/bildirim-gonder', icon: 'megaphone' },
       { key: 'anketler', show: admin, path: '/anketler', icon: 'check' },
       { key: 'yarismalar', show: admin, path: '/yarismalar', icon: 'badge' },
     ],
@@ -56,6 +60,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
     key: 'acil',
     items: [
       { key: 'acil-numaralar', module: 'acil-numaralar', path: '/acil-numaralar', icon: 'phone' },
+      { key: 'nobetci-eczane', module: 'acil-numaralar', path: '/nobetci-eczane', icon: 'pill' },
       { key: 'sos', module: 'sos', path: '/sos-ayarlari', icon: 'alert' },
     ],
   },
@@ -159,8 +164,10 @@ export function Shell() {
 
         <nav aria-label={t('menu.label')}>
           {link({ key: 'today', path: '/', icon: 'home' }, t('menu.today'))}
+          {canSeePress(user) ? link({ key: 'basin', path: '/basin-masasi', icon: 'calendar' }, t('menu.press')) : null}
           {canSeeStats(user) ? link({ key: 'stats', path: '/istatistikler', icon: 'chart' }, t('menu.stats')) : null}
           {canSeeAudience(user, isAdminUser(user)) ? link({ key: 'kitle', path: '/takipciler', icon: 'users' }, t('menu.audience')) : null}
+          {canSeeContentStats(user, isAdminUser(user)) ? link({ key: 'icerik', path: '/icerik-performansi', icon: 'megaphone' }, t('menu.content')) : null}
           {showcase ? link({ key: 'vitrin', path: '/sehir-vitrini', icon: 'screen' }, t('menu.showcase')) : null}
 
           {MENU_GROUPS.map((g) => {
@@ -184,7 +191,9 @@ export function Shell() {
           <div>
             <strong>{user.displayName}</strong>
             {user.grants.map((g) => (
-              <span key={g.id}>{t(`roles.${g.role}`)} · <ScopeLabel scope={g.scope} /></span>
+              <span key={g.id}>
+                {user.memberships.find((m) => m.org.id === g.orgId)?.org.kind === 'dernek' ? t('orgs.kinds.dernek') : t(`roles.${g.role}`)} · <ScopeLabel scope={g.scope} />
+              </span>
             ))}
             <button className="btn ghost" onClick={() => signOut()}>{t('login.logout')}</button>
           </div>
@@ -225,6 +234,8 @@ const ICONS = {
   key: 'M14 10a4 4 0 1 0-1 2.7L20 20M17 17l2-2',
   file: 'M7 3h7l5 5v13H7ZM14 3v5h5M10 13h6M10 17h4',
   gauge: 'M4 16a8 8 0 1 1 16 0M12 16l4-5',
+  pill: 'M10.5 20.5a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7ZM7 10l7 7',
+  paw: 'M12 14c-3 0-5 2.5-5 4.5S8.5 21 12 21s5-.5 5-2.5-2-4.5-5-4.5ZM6 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM10 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM14 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
 } as const;
 
 function Icon({ name }: { name: keyof typeof ICONS }) {

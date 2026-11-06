@@ -6,7 +6,9 @@ export type OrganizationKind =
   | 'ilce-belediyesi'
   | 'kurum'
   | 'kulup'
-  | 'yayinci';
+  | 'yayinci'
+  /** Dernek / vakıf / STK (Karar Eren 5 Kasım 2026): yalnızca hayvan sahiplendirme bölümü; admin açar ve doğrular. */
+  | 'dernek';
 
 /**
  * Panel kullanan kurum: belediye, kamu kurumu, kulüp, yayıncı. Yalnızca admin açar (PROJE.md 6.7). Belediyelerin

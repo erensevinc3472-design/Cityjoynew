@@ -4,6 +4,11 @@ import {
   createFirestoreAnnouncementRepository,
   createFirestoreEventRepository,
   createFirestoreOfficialProfileRepository,
+  createAdminPushFeed,
+  createAdoptionRepository,
+  createPharmacyRepository,
+  createAdminPushOpens,
+  createContentStatsRecorder,
   createFirestoreOfficialFollowRepository,
   createFirestoreActivityRepository,
   createFirestoreShowcaseRepository,
@@ -51,6 +56,15 @@ export const eventRepository = createFirestoreEventRepository(firestore);
 export const officialProfileRepository = createFirestoreOfficialProfileRepository(firestore);
 /** Resmî profil takibi (kitle istatistiği isimsiz, toplu sayılır). */
 export const officialFollowRepository = createFirestoreOfficialFollowRepository(firestore);
+/** İçerik istatistiği: ayrıntı açılınca bir okunma, paylaşınca bir paylaşım (kişi kaydedilmez). */
+export const contentStats = createContentStatsRecorder(firestore);
+/** Admin bildirimleri: bildirim kutusu (il başına tek sorgu) ve açılma sayımı. */
+export const adminPushFeed = createAdminPushFeed(firestore);
+export const adminPushOpens = createAdminPushOpens(firestore);
+/** Hayvan sahiplendirme (Benim Şehrim > Gönüllülük). */
+export const adoptionRepository = createAdoptionRepository(firestore);
+/** Nöbetçi eczane (il başına günlük belge). */
+export const pharmacyRepository = createPharmacyRepository(firestore);
 /** Kullanıcı aktiviteleri (tam buluşma yeri yalnızca düzenleyene ve katılanlara). */
 export const activityRepository = createFirestoreActivityRepository(firestore);
 /** Keşfet gönderileri (Mahallem yalnızca o mahalleye, Bölgesel yalnızca o ile görünür). */

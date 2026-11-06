@@ -49,6 +49,11 @@ export { createAnnouncementPanel, createFirestoreAnnouncementRepository, type Sa
 export { createEventPanel, createFirestoreEventRepository, type JoinedItem } from './events';
 export { createFirestoreOfficialProfileRepository, createOfficialProfileAdmin } from './official-profiles';
 export { createFirestoreOfficialFollowRepository, getOfficialStats, type OfficialFollowRepository } from './official-follows';
+export { createContentStatsReader, createContentStatsRecorder, type ContentOwner } from './content-stats';
+export { createImportantDaysService, createPressTemplatesService } from './important-days';
+export { createAdoptionPanel, createAdoptionRepository } from './adoption';
+export { createPharmacyAdmin, createPharmacyRepository, type DataSourceRun, type PharmacySourceStatus } from './pharmacy';
+export { adminPushFromDoc, createAdminPushFeed, createAdminPushOpens, createAdminPushPanel, type AdminPushBilling, type AdminPushInput } from './admin-push';
 export { createActivityModeration, createFirestoreActivityRepository, type ActivityReport } from './activities';
 export { deletePhotos, PhotoTooLargeError, uploadMedia, uploadPostPhotos, uploadPostVideo, VideoTooLargeError, type PreparedPhoto, type PreparedVideo } from './photos';
 export { createFirestorePostRepository, createFramesAdmin, createPostModeration, type CommentReport, type FeedFilter, type FeedPage, type PostReport } from './posts';

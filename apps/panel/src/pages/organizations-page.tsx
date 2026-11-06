@@ -26,7 +26,7 @@ import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
-const KINDS: ('belediye' | Exclude<OrganizationKind, 'buyuksehir-belediyesi' | 'il-belediyesi' | 'ilce-belediyesi'>)[] = ['belediye', 'kurum', 'kulup', 'yayinci'];
+const KINDS: ('belediye' | Exclude<OrganizationKind, 'buyuksehir-belediyesi' | 'il-belediyesi' | 'ilce-belediyesi'>)[] = ['belediye', 'kurum', 'dernek', 'kulup', 'yayinci'];
 
 const dateOnly = (iso?: string) => (iso ? iso.slice(0, 10) : '');
 const endOfDay = (d: string) => (d ? new Date(`${d}T23:59:59`) : undefined);
@@ -239,7 +239,9 @@ function CreateOrgForm({ user, existingIds, onCancel, onDone }: { user: PanelUse
 
     setBusy(true);
     try {
-      await service.create({ id, name: orgName, kind: orgKind, scope, modules, officialEmail: address, contractEndsAt: ends }, { email: address, displayName: adminName });
+      // Yalnızca bu tür kuruma verilebilen bölümler (dernek: yalnızca hayvan sahiplendirme).
+      const allowed = orgModulesFor(orgKind);
+      await service.create({ id, name: orgName, kind: orgKind, scope, modules: modules.filter((m) => allowed.includes(m)), officialEmail: address, contractEndsAt: ends }, { email: address, displayName: adminName });
     } catch {
       setBusy(false);
       return setError(t('orgs.createError'));
@@ -334,7 +336,7 @@ function CreateOrgForm({ user, existingIds, onCancel, onDone }: { user: PanelUse
       <h3 className="form-section">{t('orgs.modulesAndContract')}</h3>
       <fieldset className="form-section checkbox-group">
         <legend className="sr-only">{t('orgs.modules')}</legend>
-        {(kind === 'belediye' ? ORG_MODULES : ORG_MODULES.filter((m) => !MUNICIPAL_MODULES.includes(m))).map((m) => (
+        {(kind === 'belediye' ? ORG_MODULES : orgModulesFor(kind)).map((m) => (
           <label key={m}>
             <input type="checkbox" checked={modules.includes(m)} onChange={(e) => setModules(e.target.checked ? [...modules, m] : modules.filter((x) => x !== m))} />
             {t(`nav.${m}`)}
@@ -424,12 +426,15 @@ function OrgDetail({
     const email = d.email.trim().toLowerCase();
     if (!isValidEmail(email)) return setMessage({ kind: 'error', text: t('orgs.emailRequired') });
     if (d.displayName.trim().length < 2) return setMessage({ kind: 'error', text: t('orgs.memberNameRequired') });
-    if (!isAdmin && email === myEmail) return setMessage({ kind: 'error', text: t('orgs.notSelf') });
-    const expiresAt = endOfDay(d.expiresOn);
-    if (expiresAt && expiresAt <= new Date()) return setMessage({ kind: 'error', text: t('orgs.expiryPast') });
+    const self = !isAdmin && email === myEmail;
+    const mine = self ? members?.find((m) => m.email === email) : undefined;
+    if (self && !mine?.isOrgAdmin) return setMessage({ kind: 'error', text: t('orgs.notSelf') });
+    // Kendi kaydında süre ve kurum yöneticiliği değişmez, yalnızca görevler.
+    const expiresAt = mine ? (mine.expiresAt ? new Date(mine.expiresAt) : undefined) : endOfDay(d.expiresOn);
+    if (!mine && expiresAt && expiresAt <= new Date()) return setMessage({ kind: 'error', text: t('orgs.expiryPast') });
     const exists = members?.some((m) => m.email === email);
     const ok = await act(
-      () => service.saveMember(org, { email, displayName: d.displayName, isOrgAdmin: isAdmin && d.isOrgAdmin, assignments: d.assignments, expiresAt }, !exists),
+      () => service.saveMember(org, { email, displayName: mine ? mine.displayName : d.displayName, isOrgAdmin: isAdmin ? d.isOrgAdmin : !!mine, assignments: d.assignments, expiresAt }, !exists),
       exists ? t('orgs.memberUpdated') : t('orgs.memberAdded', { email }),
     );
     if (ok) setDraft(null);
@@ -456,7 +461,8 @@ function OrgDetail({
       await onChanged();
     }, t('orgs.settingsSaved'));
 
-  const canEditMember = (m: OrganizationMember) => !user.isDemo && (isAdmin || (!m.isOrgAdmin && m.email !== myEmail));
+  // Kurum yöneticisi personeli ve kendi görevlerini düzenler (başka kurum yöneticisini değil).
+  const canEditMember = (m: OrganizationMember) => !user.isDemo && (isAdmin || (!m.isOrgAdmin && m.email !== myEmail) || (m.isOrgAdmin && m.email === myEmail));
   const now = new Date();
 
   return (
@@ -681,6 +687,7 @@ function MemberForm({
         </table>
       </div>
       <p className="form-section meta">{t('orgs.dutyHint')}</p>
+      <p className="form-section note">{t('orgs.pagesHint')}</p>
 
       <div className="actions">
         <button className="btn" type="submit" disabled={busy}>{draft.isNew ? t('orgs.addMember') : t('orgs.save')}</button>

@@ -29,17 +29,19 @@ interface Props {
   right?: HeaderAction | HeaderAction[];
   /** Eski ortalı küçük başlık (yalnızca ana sekmelerde). İç ekranlar büyük altın başlığı kullanır (13. madde 35). */
   compact?: boolean;
+  /** Başlık geri düğmesinin yanında, altında açıklama (önizleme panolarındaki ekranlar: Eczane, Gönüllülük). */
+  inline?: boolean;
 }
 
 /**
  * Üst bant: geri düğmesi ve sağda işlemler; altında sola yaslı büyük altın başlık ve konum / açıklama (iç ekranların
  * ortak dili, 13. madde 35); en altta isteğe bağlı içerik (konum çipi, filtre satırı vb.).
  */
-export function HeroHeader({ title, subtitle, onBack, left, right, compact, children }: PropsWithChildren<Props>) {
+export function HeroHeader({ title, subtitle, onBack, left, right, compact, inline, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
   const { rtl } = useSettings();
   const { t } = useTranslation();
-  const large = !!title && !compact;
+  const large = !!title && !compact && !inline;
   return (
     <View style={styles.wrap}>
       <View style={styles.top}>
@@ -50,7 +52,12 @@ export function HeroHeader({ title, subtitle, onBack, left, right, compact, chil
         ) : (
           <View style={styles.spacer} />
         )}
-        {title && !large ? (
+        {title && inline ? (
+          <View style={styles.inline}>
+            <AppText accessibilityRole="header" numberOfLines={1} style={[styles.inlineTitle, { color: c.heroAccent }]}>{title}</AppText>
+            {subtitle ? <AppText numberOfLines={1} style={[styles.bigSub, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
+          </View>
+        ) : title && !large ? (
           <AppText accessibilityRole="header" numberOfLines={1} style={[styles.title, { color: c.heroText }]}>{title}</AppText>
         ) : (
           <View style={styles.flex} />
@@ -72,7 +79,7 @@ export function HeroHeader({ title, subtitle, onBack, left, right, compact, chil
           <AppText accessibilityRole="header" style={[styles.bigTitle, { color: c.heroAccent }]}>{title}</AppText>
           {subtitle ? <AppText style={[styles.bigSub, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
         </View>
-      ) : subtitle ? (
+      ) : subtitle && !inline ? (
         <AppText style={[styles.subtitle, { color: c.heroMuted }]}>{subtitle}</AppText>
       ) : null}
       {children}
@@ -110,6 +117,8 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 14, lineHeight: 20, marginTop: -spacing.xs },
   big: { gap: 2, marginTop: -spacing.xs },
   bigTitle: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 35, letterSpacing: -0.3 },
+  inline: { flex: 1, minWidth: 0, gap: 1 },
+  inlineTitle: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 30, letterSpacing: -0.2 },
   bigSub: { fontSize: 14, lineHeight: 20 },
   spacer: { width: 40 },
   badge: { position: 'absolute', top: 7, right: 7, width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },

@@ -31,6 +31,20 @@ export async function currentLocation(): Promise<LocationState> {
   }
 }
 
+/** İzin önceden verildiyse konum (izin sormaz); yoksa null. Ekran açılırken "Yakınımda" sıralaması için. */
+export async function knownLocation(): Promise<Omit<SosLocation, 'at'> | null> {
+  try {
+    if ((await Location.getForegroundPermissionsAsync()).status !== 'granted') return null;
+    const last = (await Location.getLastKnownPositionAsync()) ?? (await Promise.race([
+      Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+      new Promise<null>((r) => setTimeout(() => r(null), 10_000)),
+    ]));
+    return last ? toLoc(last) : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Canlı konum (SOS sürerken, ekran açıkken). Dönen işlev izlemeyi durdurur. */
 export async function watchLocation(onChange: (l: Omit<SosLocation, 'at'>) => void): Promise<() => void> {
   try {

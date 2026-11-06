@@ -1,6 +1,7 @@
 # Nöbetçi eczane: veri kaynağı ve günlük güncelleme önerisi
 
-> Durum: **öneri, Eren'in onayını bekliyor** (PROJE.md 5.1, 9.1, 12. madde 5).
+> Durum: **Eren onayladı (5 Kasım 2026); kod yazıldı** (ekran, panel, çekim; sahte servisle denendi). Bekleyen: NosyAPI
+> anahtarı, fiyat ve yanıt biçiminin doğrulanması, Blaze. Zamanlayıcı Blaze'de Firebase içinde (GitHub Actions kullanılmadı).
 > Hazırlayan: Claude, 27 Ekim 2026. Fiyatlar internet aramasından alındı; ödeme yapmadan önce sağlayıcının
 > sitesinden doğrulanacak.
 

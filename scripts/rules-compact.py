@@ -1,6 +1,7 @@
 # Firestore kurallarını küçültür (Firebase sınırı: derlenmiş boyut 256.000 bayt).
 # "allow create/update: if ..." içinde request.resource.data 2+ kez geçiyorsa ifade bir işleve taşınır ve
-# request.resource.data -> nw, (yalnızca update'te, null denetimi yoksa) resource.data -> od olur. Davranış aynı kalır.
+# request.resource.data -> nw, resource.data -> od olur. İşlev argümanları tembel değerlendirilir (emülatörde denendi:
+# kayıt yokken resource.data argümanı, kullanılmadıkça hata vermez), bu yüzden davranış aynı kalır.
 # Kullanım: python3 scripts/rules-compact.py girdi.rules cikti.rules   (sonra npm run test:rules)
 import re,sys
 src=open(sys.argv[1]).read()
@@ -28,11 +29,10 @@ while True:
     expr=src[m.end():j]
     assert not re.search(r'\b(nw|od)\b',expr)
     cn=expr.count(NEW)
-    body=expr.replace(NEW,'nw') if (ops<={'create','update'} and cn>=2) else expr
+    body=expr.replace(NEW,'nw') if cn>=2 else expr
     useN = body is not expr
     co=len(OLD.findall(body))
-    nullsafe=not re.search(r'resource\s*[!=]=\s*null',expr)
-    useO = co>=2 and nullsafe and ops<={'update'}
+    useO = co>=2
     if useO: body=OLD.sub('od',body)
     if useN or useO:
         n+=1;ind=m.group(1);fname='_k%d'%n

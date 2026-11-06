@@ -5,7 +5,8 @@ import { Platform } from 'react-native';
 import { GENERAL_CHANNEL_ID, QUIET_CHANNEL_ID, SOS_CHANNEL_ID, sosPushMessages, type LanguageCode, type PushMessage, type PushNotice, type SosAlert } from '@cityjoy/shared';
 
 import i18n from './i18n';
-import { pushTokenRepository } from './services';
+import { firebaseAuth } from './firebase';
+import { adminPushOpens, pushTokenRepository } from './services';
 
 /**
  * SOS bildirimleri (Expo push). Bildirimi, SOS'u gönderen kişinin telefonu aile üyelerinin telefonlarına
@@ -120,13 +121,16 @@ export async function sendSosPush(alert: Pick<SosAlert, 'id' | 'fromName' | 'tes
 }
 
 /** Sunucu bildirimlerinin açabileceği ekranlar (bildirimdeki adres yalnızca bunlardan biri olabilir). */
-const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]', '/announcements/[id]', '/messages/[uid]', '/u/[uid]', '/me']);
+const TAP_PATHS = new Set(['/events/[id]', '/activities/[id]', '/announcements/[id]', '/messages/[uid]', '/u/[uid]', '/me', '/business/[id]', '/notifications', '/explore/[id]']);
 
 /** Bildirime dokununca ilgili ekran açılır: SOS ya da sunucu bildiriminin gösterdiği ekran. */
 export function onNotificationTap(open: (href: Href) => void): () => void {
   if (!pushSupported) return () => {};
   const handle = (r: Notifications.NotificationResponse | null) => {
-    const data = r?.notification.request.content.data as { sosId?: string; href?: Href } | undefined;
+    const data = r?.notification.request.content.data as { sosId?: string; href?: Href; adminPushId?: string } | undefined;
+    // Admin bildirimi: açılma sayılır (kişi kaydedilmez).
+    const uid = firebaseAuth.currentUser?.uid;
+    if (typeof data?.adminPushId === 'string' && uid) void adminPushOpens.record(data.adminPushId, uid);
     if (typeof data?.sosId === 'string') open({ pathname: '/sos/[id]', params: { id: data.sosId } });
     else if (data?.href && TAP_PATHS.has(data.href.pathname)) open(data.href);
   };

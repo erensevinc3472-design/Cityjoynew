@@ -3,6 +3,7 @@ import {
   canPublishDirectly,
   EVENT_CATEGORIES,
   EVENT_LIMITS,
+  VOLUNTEER_TYPES,
   isFromPublisher,
   isGrantActive,
   publishersFor,
@@ -339,6 +340,7 @@ const toInput = (e: CityEvent): EventInput => ({
   ...(e.address ? { address: e.address } : {}),
   region: e.region,
   free: e.free,
+  ...(e.volunteerType ? { volunteerType: e.volunteerType } : {}),
   ...(e.priceNote ? { priceNote: e.priceNote } : {}),
   ...(e.ticketUrl ? { ticketUrl: e.ticketUrl } : {}),
   ...(e.capacity ? { capacity: e.capacity } : {}),
@@ -393,12 +395,21 @@ function EventForm({
       </div>
       <div className="field">
         <label htmlFor="ev-category">{t('events.category')}</label>
-        <select id="ev-category" value={input.category} onChange={(e) => set({ category: e.target.value as EventInput['category'] })}>
+        <select id="ev-category" value={input.category} onChange={(e) => set({ category: e.target.value as EventInput['category'], ...(e.target.value === 'gonulluluk' ? { free: true } : {}) })}>
           {EVENT_CATEGORIES.map((c) => (
             <option key={c} value={c}>{t(`events.categories.${c}`)}</option>
           ))}
         </select>
       </div>
+      {input.category === 'gonulluluk' ? (
+        <div className="field">
+          <label htmlFor="ev-vtype">{t('events.volunteerType')}</label>
+          <select id="ev-vtype" value={input.volunteerType ?? ''} onChange={(e) => set({ volunteerType: (e.target.value || undefined) as EventInput['volunteerType'] })}>
+            <option value="">{t('events.volunteerTypeNone')}</option>
+            {VOLUNTEER_TYPES.map((v) => <option key={v} value={v}>{t(`events.volunteerTypes.${v}`)}</option>)}
+          </select>
+        </div>
+      ) : null}
       {dateInput('ev-start', 'startsAt')}
       {dateInput('ev-end', 'endsAt')}
       <p className="form-section">{err('dates')}</p>
@@ -431,11 +442,14 @@ function EventForm({
           <input type="radio" name="ev-free" checked={input.free} onChange={() => set({ free: true })} />
           {t('events.free')}
         </label>
-        <label>
-          <input type="radio" name="ev-free" checked={!input.free} onChange={() => set({ free: false })} />
-          {t('events.paid')}
-        </label>
+        {input.category !== 'gonulluluk' ? (
+          <label>
+            <input type="radio" name="ev-free" checked={!input.free} onChange={() => set({ free: false })} />
+            {t('events.paid')}
+          </label>
+        ) : null}
       </fieldset>
+      {input.category === 'gonulluluk' ? <p className="form-section meta">{t('events.volunteerHint')}</p> : null}
       {!input.free ? (
         <div className="field">
           <label htmlFor="ev-price">{t('events.priceNote')}</label>

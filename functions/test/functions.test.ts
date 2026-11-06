@@ -3,7 +3,9 @@ import { getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestor
 import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import { handleAnnouncementWrite } from '../src/announcements';
+import { sendAdminPush, sendDueAdminPushes } from '../src/admin-push';
+import { citySlug, nosyProvider, syncPharmacies } from '../src/pharmacy';
+import { estimateAudienceFor, handleAnnouncementWrite, sendScheduledAnnouncements } from '../src/announcements';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
@@ -125,6 +127,66 @@ describe('duyuru bildirimi', () => {
     await handleAnnouncementWrite(db, 'd5', ann(), ann({ status: 'kaldirildi' }), deps);
     await handleAnnouncementWrite(db, 'd6', undefined, ann({ kind: 'acil', endsAt: Timestamp.fromDate(new Date('2026-10-01T00:00:00Z')) }), deps);
     expect(sent).toEqual([]);
+  });
+
+  describe('hedefli bildirim', () => {
+    // 60 kişi: 30'u 65+ yaş kadın emekli, 20'si 30 yaş erkek mühendis, 10'u 70 yaş kadın emekli (hedefleme izni sorulmadı).
+    async function crowd() {
+      const batch = db.batch();
+      const add = (i: number, birthYear: number, gender: string, occupationId: string) => {
+        batch.set(db.doc(`users/h${i}`), { uid: `h${i}`, location: { provinceCode: '16', districtId: '16-nilufer' }, birthYear, gender, occupationId, consents: {} });
+        batch.set(db.doc(`pushTokens/h${i}`), { tokens: [`T-h${i}`], language: 'tr', updatedAt: Timestamp.now() });
+      };
+      for (let i = 0; i < 30; i++) add(i, 1955, 'kadin', 'emekli');
+      for (let i = 30; i < 50; i++) add(i, 1996, 'erkek', 'muhendis');
+      for (let i = 50; i < 60; i++) add(i, 1956, 'kadin', 'emekli');
+      await batch.commit();
+    }
+
+    it('bildirim yalnızca hedefe uyanlara gider (ayrı izin aranmaz); 50 kişiden küçük gruba gitmez; acilde hedef yok sayılır', async () => {
+      await crowd();
+      const { sent, deps } = fakeSender();
+      // Erkek: 20 kişi -> 50'den az, gönderilmez.
+      expect(await handleAnnouncementWrite(db, 't1', undefined, ann({ pushTarget: { genders: ['erkek'] } }), deps)).toBe(0);
+      expect((await db.doc('pushLog/duyuru_t1').get()).get('skipped')).toBe('kucuk-grup');
+      // 65+ yaş emekli kadın: 40 kişi -> gönderilmez; 13+ yaş: 60 kişi -> gider. Bölge dışındakiler yok, yaşı olmayanlar yok.
+      expect(await handleAnnouncementWrite(db, 't2', undefined, ann({ pushTarget: { ageMin: 65, occupations: ['emekli'] } }), deps)).toBe(0);
+      expect(await handleAnnouncementWrite(db, 't4', undefined, ann({ pushTarget: { ageMin: 13 } }), deps)).toBe(60);
+      expect(sent.some((m) => m.to === 'T-o1' || m.to === 'T-n1')).toBe(false);
+      // Acil duyuruda hedef yok sayılır: bölgedeki herkese (60 + önceki 2).
+      sent.length = 0;
+      await handleAnnouncementWrite(db, 't3', undefined, ann({ kind: 'acil', endsAt: later, pushTarget: { ageMin: 65 } }), deps);
+      expect(sent.length).toBe(62);
+    });
+
+    it('panel yaklaşık sayıyı yalnızca yetkili kişiye ve kendi bölgesinde söyler', async () => {
+      await crowd();
+      const org = 'bld-16-nilufer';
+      await db.doc(`organizations/${org}`).set({ status: 'aktif', modules: ['gonderiler'], scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' } });
+      await db.doc(`orgMembers/${org}__basin@ornek.com`).set({ assignments: { gonderiler: ['goruntule', 'ekle'] } });
+      await db.doc(`orgMembers/${org}__izleyen@ornek.com`).set({ assignments: { gonderiler: ['goruntule'] } });
+      const region = { provinceCode: '16', districtId: '16-nilufer' };
+      const basin = { uid: 'b', email: 'basin@ornek.com', emailVerified: true };
+      expect(await estimateAudienceFor(db, basin, { publisherKey: org, region, target: { genders: ['erkek'] } }, NOW)).toEqual({ tooSmall: true, approx: 0 });
+      expect(await estimateAudienceFor(db, basin, { publisherKey: org, region, target: null }, NOW)).toEqual({ tooSmall: false, approx: 60 });
+      expect(await estimateAudienceFor(db, basin, { publisherKey: org, region: { provinceCode: '16', districtId: '16-osmangazi' }, target: null }, NOW)).toEqual({ denied: true });
+      expect(await estimateAudienceFor(db, { uid: 'i', email: 'izleyen@ornek.com', emailVerified: true }, { publisherKey: org, region, target: null }, NOW)).toEqual({ denied: true });
+      expect(await estimateAudienceFor(db, { ...basin, emailVerified: false }, { publisherKey: org, region, target: null }, NOW)).toEqual({ denied: true });
+    });
+  });
+
+  it('planlı duyuru yayın anı gelmeden gitmez; zamanı gelince bir kez gider', async () => {
+    const { sent, deps } = fakeSender();
+    const at = Timestamp.fromDate(new Date(NOW.getTime() + 2 * 3600000));
+    const planned = ann({ publishedAt: at, scheduledAt: at });
+    await db.doc('announcements/p1').set(planned);
+    expect(await handleAnnouncementWrite(db, 'p1', undefined, planned, deps)).toBe(0);
+    expect(await sendScheduledAnnouncements(db, deps)).toBe(0);
+    // İki saat sonra.
+    const later2 = { ...deps, now: new Date(NOW.getTime() + 2 * 3600000 + 5 * 60000) };
+    expect(await sendScheduledAnnouncements(db, later2)).toBe(2);
+    expect(await sendScheduledAnnouncements(db, later2)).toBe(0);
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-n1', 'T-n2']);
   });
 });
 
@@ -429,3 +491,106 @@ describe('Seyahat kapakları', () => {
     expect(await handleMediaChange(MEDIA_FIELDS.travel, { cover: b }, undefined, del)).toEqual([b.path]);
   });
 });
+
+describe('admin bildirimi', () => {
+  async function people() {
+    const batch = db.batch();
+    for (let i = 0; i < 70; i++) {
+      // 0-59: Bursa / Osmangazi yetişkin; 0-29 kampanya izinli; 60-69: 16 yaşında izinli; hepsinin telefonu var.
+      const teen = i >= 60;
+      batch.set(db.doc(`users/a${i}`), {
+        uid: `a${i}`, location: { provinceCode: '16', districtId: '16-osmangazi' }, birthYear: teen ? 2010 : 1985, gender: i % 2 ? 'kadin' : 'erkek',
+        occupationId: 'esnaf', consents: i < 30 || teen ? { commercialMessages: { granted: true } } : {},
+      });
+      batch.set(db.doc(`pushTokens/a${i}`), { tokens: [`T-a${i}`], language: 'tr', updatedAt: Timestamp.now() });
+    }
+    batch.set(db.doc('users/ist'), { uid: 'ist', location: { provinceCode: '34' }, birthYear: 1980, consents: { commercialMessages: { granted: true } } });
+    batch.set(db.doc('pushTokens/ist'), { tokens: ['T-ist'], language: 'en', updatedAt: Timestamp.now() });
+    await batch.commit();
+  }
+  const push = (over: Record<string, unknown> = {}) => ({
+    kind: 'duyuru', title: 'Kar uyarısı', body: 'Yarın yoğun kar bekleniyor.', region: { provinceCode: '16' }, scope: '16', link: { type: 'yok' },
+    status: 'planli', sendAt: Timestamp.fromDate(NOW), createdBy: 'eren', ...over,
+  });
+
+  it('duyuru bölgedeki herkese bir kez gider; sonuç belgeye yazılır', async () => {
+    await people();
+    const { sent, deps } = fakeSender();
+    await db.doc('adminPushes/p1').set(push());
+    expect(await sendAdminPush(db, 'p1', push(), deps)).toBe(70);
+    expect(await sendAdminPush(db, 'p1', push(), deps)).toBe(0);
+    expect((await db.doc('adminPushes/p1').get()).data()).toMatchObject({ status: 'gonderildi', recipients: 70 });
+    expect(sent.some((m) => m.to === 'T-ist')).toBe(false);
+    expect(sent[0]).toMatchObject({ title: 'Kar uyarısı', body: 'Yarın yoğun kar bekleniyor.', data: { adminPushId: 'p1' } });
+  });
+
+  it('reklam yalnızca kampanya izni veren yetişkinlere, "Reklam" etiketiyle; ülke geneli il dışını da kapsar', async () => {
+    await people();
+    const { sent, deps } = fakeSender();
+    const ad = push({ kind: 'reklam', region: {}, scope: 'TR', business: { id: 'b1', name: 'Kahve Durağı' }, link: { type: 'isletme', id: 'b1' } });
+    await db.doc('adminPushes/p2').set(ad);
+    expect(await sendAdminPush(db, 'p2', ad, deps)).toBe(31);
+    const tr = sent.find((m) => m.to === 'T-a0')!;
+    expect(tr).toMatchObject({ title: 'Reklam · Kahve Durağı: Kar uyarısı', data: { href: { pathname: '/business/[id]', params: { id: 'b1' } } } });
+    expect(sent.find((m) => m.to === 'T-ist')?.title).toBe('Ad · Kahve Durağı: Kar uyarısı');
+    expect(sent.some((m) => m.to === 'T-a60' || m.to === 'T-a40')).toBe(false);
+  });
+
+  it('reklam bildirimi yazı olarak gider, dokununca işletmenin paylaşımını açar', async () => {
+    await people();
+    const { sent, deps } = fakeSender();
+    const ad = push({ kind: 'reklam', business: { id: 'b1', name: 'Dürümcü' }, link: { type: 'gonderi', id: 'post1' } });
+    await db.doc('adminPushes/p5').set(ad);
+    await sendAdminPush(db, 'p5', ad, deps);
+    expect(sent[0]).toMatchObject({ data: { href: { pathname: '/explore/[id]', params: { id: 'post1' } }, adminPushId: 'p5' } });
+  });
+
+  it('hedefli gönderimde 50 kişiden küçük gruba gitmez; planlı bildirim zamanı gelince gider', async () => {
+    await people();
+    const { sent, deps } = fakeSender();
+    const small = push({ target: { genders: ['kadin'] }, region: { provinceCode: '16', districtId: '16-osmangazi' } });
+    await db.doc('adminPushes/p3').set(small);
+    expect(await sendAdminPush(db, 'p3', small, deps)).toBe(0);
+    expect((await db.doc('adminPushes/p3').get()).data()).toMatchObject({ status: 'gonderildi', recipients: 0, skipped: 'kucuk-grup' });
+    const later2 = push({ sendAt: Timestamp.fromDate(new Date(NOW.getTime() + 3600000)) });
+    await db.doc('adminPushes/p4').set(later2);
+    expect(await sendAdminPush(db, 'p4', later2, deps)).toBe(0);
+    expect(await sendDueAdminPushes(db, deps)).toBe(0);
+    expect(await sendDueAdminPushes(db, { ...deps, now: new Date(NOW.getTime() + 2 * 3600000) })).toBe(70);
+    expect(sent.length).toBe(70);
+  });
+});
+
+describe('nöbetçi eczane çekimi', () => {
+  const ok = { id: 'deneme', fetchProvince: async ({ code }: { code: string }) => [{ name: `Eczane ${code}`, district: 'Merkez', address: 'Cad. 1' }] };
+  it('illeri yazar, hata alanı panele düşer; ikinci deneme yalnızca eksik illeri çeker; aynı gün gizlemeler korunur', async () => {
+    const flaky = { id: 'deneme', fetchProvince: async ({ code }: { code: string }) => { if (code === '34') throw new Error('zaman aşımı'); return ok.fetchProvince({ code }); } };
+    const r = await syncPharmacies(db, flaky, { now: NOW, provinces: ['16', '34'] });
+    expect(r).toEqual({ ok: ['16'], failed: [{ code: '34', error: 'zaman aşımı' }] });
+    expect((await db.doc('dutyPharmacies/16').get()).data()).toMatchObject({ date: '2026-11-01', source: 'deneme', items: [{ name: 'Eczane 16' }], hidden: [] });
+    expect((await db.doc('dataSourceStatus/pharmacy').get()).get('provinces.34.error')).toBe('zaman aşımı');
+    await db.doc('dutyPharmacies/16').update({ hidden: ['merkez|eczane 16'], hours: { start: '18:30', end: '09:00' } });
+    const calls: string[] = [];
+    const spy = { id: 'deneme', fetchProvince: async (p: { code: string }) => { calls.push(p.code); return ok.fetchProvince(p); } };
+    await syncPharmacies(db, spy, { now: NOW, provinces: ['16', '34'], onlyStale: true });
+    expect(calls).toEqual(['34']);
+    await syncPharmacies(db, spy, { now: NOW, provinces: ['16'] });
+    expect((await db.doc('dutyPharmacies/16').get()).get('hidden')).toEqual(['merkez|eczane 16']);
+    await syncPharmacies(db, spy, { now: new Date('2026-11-02T06:00:00Z'), provinces: ['16'] });
+    expect((await db.doc('dutyPharmacies/16').get()).data()).toMatchObject({ hidden: [], hours: { start: '18:30', end: '09:00' } });
+    expect((await db.collection('dataSourceRuns').get()).size).toBe(4);
+  });
+
+  it('NosyAPI bağdaştırıcısı: il adresi Türkçe harfsiz, anahtar başlıkta, yanıt çevrilir', async () => {
+    expect(citySlug('Şanlıurfa')).toBe('sanliurfa');
+    let seen: { url: string; auth: string } | null = null;
+    const fake = (async (url: string, init: { headers: Record<string, string> }) => {
+      seen = { url, auth: init.headers.Authorization };
+      return { ok: true, json: async () => ({ data: [{ pharmacyName: 'Şifa', address: 'Cad. 1', district: 'Osmangazi', phone: '0224' }, { pharmacyName: 'Eksik' }] }) };
+    }) as unknown as typeof fetch;
+    const items = await nosyProvider('ANAHTAR', fake).fetchProvince({ code: '16', name: 'Bursa' });
+    expect(items).toEqual([{ name: 'Şifa', district: 'Osmangazi', address: 'Cad. 1', phone: '0224' }]);
+    expect(seen).toEqual({ url: 'https://www.nosyapi.com/apiv2/service/pharmacies-on-duty?city=bursa', auth: 'Bearer ANAHTAR' });
+  });
+});
+

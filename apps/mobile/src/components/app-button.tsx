@@ -1,3 +1,5 @@
+import { MaterialIcons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 
 import { fonts, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
@@ -10,9 +12,11 @@ interface Props {
   variant?: 'primary' | 'secondary' | 'ghost';
   disabled?: boolean;
   loading?: boolean;
+  /** Yazının önünde simge (ör. Ara, Yol tarifi). */
+  icon?: ComponentProps<typeof MaterialIcons>['name'];
 }
 
-export function AppButton({ title, onPress, variant = 'primary', disabled, loading }: Props) {
+export function AppButton({ title, onPress, variant = 'primary', disabled, loading, icon }: Props) {
   const c = useThemeColors();
   const inactive = disabled || loading;
   // Ana: altın zemin; ikincil: kart zemini + altın kenarlık; metin: yalnızca altın yazı.
@@ -33,7 +37,10 @@ export function AppButton({ title, onPress, variant = 'primary', disabled, loadi
       {loading ? (
         <ActivityIndicator color={fg} />
       ) : (
-        <AppText style={[styles.label, { color: fg }]}>{title}</AppText>
+        <>
+          {icon ? <MaterialIcons name={icon} size={19} color={fg} /> : null}
+          <AppText style={[styles.label, { color: fg }]}>{title}</AppText>
+        </>
       )}
     </Pressable>
   );
@@ -44,6 +51,8 @@ const styles = StyleSheet.create({
     minHeight: MIN_TOUCH,
     borderRadius: radius.pill,
     paddingHorizontal: spacing.lg,
+    flexDirection: 'row',
+    gap: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,

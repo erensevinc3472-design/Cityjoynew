@@ -1418,7 +1418,9 @@
       "muhtar": "Neighbourhood office",
       "cityjoy": "CityJoy",
       "channel": "General notifications",
-      "quietChannel": "Silent notifications"
+      "quietChannel": "Silent notifications",
+      "adTag": "Ad",
+      "campaignTag": "Campaign"
     },
     "categories": {
       "acil": "Urgent announcements",
@@ -1427,7 +1429,8 @@
       "takip": "Follows",
       "duyuru": "Announcements",
       "haber": "Official news",
-      "etkinlik": "Events"
+      "etkinlik": "Events",
+      "kampanya": "Campaigns and ads"
     },
     "hints": {
       "acil": "Urgent public notices for your area, such as water cuts or disasters.",
@@ -1436,7 +1439,8 @@
       "takip": "People who start following you.",
       "duyuru": "Announcements from municipalities, mukhtars and institutions.",
       "haber": "News published by institutions for your area.",
-      "etkinlik": "New events in your province."
+      "etkinlik": "New events in your province.",
+      "kampanya": "Business campaigns and promotions (if you allowed campaign notifications)."
     },
     "offByCityJoy": "This type is currently turned off by CityJoy.",
     "criticalWarning": {
@@ -2087,7 +2091,7 @@
     "notifySample2": "Mukhtar's office · Opening hours changed",
     "notifySample3": "New message · Is the bike still for sale?",
     "targetingConsent": "Send me notifications suited to my age and, optionally, my gender and occupation.",
-    "notifyNote": "Both are optional; you can turn them off in Settings at any time."
+    "notifyNote": "Campaign notifications are optional. You can turn notification types off in Settings at any time."
   },
   "deals": {
     "title": "Deals",
@@ -2385,5 +2389,97 @@
     "ad": "Ad",
     "stays_one": "{{count}} property",
     "stays_other": "{{count}} properties"
+  },
+  "volunteer": {
+    "title": "Volunteering",
+    "intro": "Do something for your city: join volunteering projects of municipalities and institutions, or adopt a friend looking for a home.",
+    "jobs": "Volunteers wanted",
+    "noJobs": "No open volunteering opportunities right now. They appear here as municipalities and institutions post them.",
+    "seats": "{{count}}/{{capacity}} people",
+    "cancelled": "Cancelled",
+    "animals": "Friends looking for a home",
+    "noAnimals": "No adoption listings in this province right now.",
+    "filter": {
+      "hepsi": "All",
+      "kedi": "Cat",
+      "kopek": "Dog",
+      "diger": "Other",
+      "acil": "Urgent"
+    },
+    "species": {
+      "kedi": "Cat",
+      "kopek": "Dog",
+      "diger": "Other"
+    },
+    "sex": {
+      "disi": "Female",
+      "erkek": "Male",
+      "bilinmiyor": "Sex unknown"
+    },
+    "urgent": "Urgent",
+    "note": "Adoption listings come from municipal shelters and verified associations. Adoption is free.",
+    "loadError": "Could not load. Check your connection and try again.",
+    "animal": "Adoption",
+    "vaccinated": "Fully vaccinated",
+    "notVaccinated": "Vaccinations incomplete",
+    "neutered": "Neutered",
+    "where": "Where",
+    "by": "Listed by",
+    "call": "Call",
+    "email": "Send e-mail",
+    "mailSubject": "Adoption of {{name}}",
+    "free": "Adoption is free. If anyone asks you for money, report it to the lister and to us.",
+    "adopted": "This friend has found a home.",
+    "gone": "This listing is no longer available.",
+    "type": {
+      "hepsi": "All",
+      "hayvan": "Animals",
+      "cevre": "Environment",
+      "sosyal": "Social",
+      "afet": "Disaster",
+      "egitim": "Education"
+    },
+    "seeAll": "See all",
+    "jobCount_one": "{{count}} listing",
+    "jobCount_other": "{{count}} listings",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "join": "I'll join",
+    "full": "Full",
+    "byOrgs": "Volunteering listings come from municipalities and institutions; adoption listings from municipal shelters and verified associations. Adoption is free."
+  },
+  "pharmacy": {
+    "title": "Pharmacies on duty",
+    "noLocation": "Choose your province first to see pharmacies on duty.",
+    "loadError": "Could not load the list. Check your connection and try again.",
+    "none": "Today's list for this province is not available yet.",
+    "edevlet": "Check pharmacies on duty on e-Devlet",
+    "updated": "Last updated: {{date}}",
+    "stale": "The list may be out of date. Call the pharmacy to confirm before you go.",
+    "yourDistrict": "Your district",
+    "onDuty": "On duty",
+    "call": "Call",
+    "map": "Open in maps",
+    "note": "The list is updated every morning. We recommend calling before you go. In an emergency, call 112.",
+    "subtitle": "{{province}} · on duty today",
+    "mapAll": "See all on the map",
+    "mapQuery": "pharmacy on duty",
+    "near": "Near me",
+    "nearest": "Nearest · {{km}}",
+    "directions": "Directions",
+    "others": "Other pharmacies on duty",
+    "count_one": "{{count}} pharmacy",
+    "count_other": "{{count}} pharmacies",
+    "noCoords": "This list has no location data, so it can't be sorted by distance.",
+    "locDenied": "Location permission was not given. You can pick a district instead.",
+    "locUnavailable": "Your location could not be found. You can pick a district instead.",
+    "screenTitle": "Pharmacies on Duty",
+    "today": "Today",
+    "dutyOn": "Duty has started",
+    "dutySoon": "Duty hasn't started yet",
+    "rangeToday": "Today {{start}} - tomorrow {{end}}",
+    "rangeYesterday": "Yesterday {{start}} - today {{end}}",
+    "hoursLeft_one": "{{count}} h",
+    "hoursLeft_other": "{{count}} h"
   }
 }

@@ -1,3 +1,4 @@
+import { validatePushTarget, type AudienceFilter } from './push-target';
 import { isMemberActive, isOrganizationActive } from '../organizations/staff';
 import type { Organization, OrganizationMember } from '../organizations/types';
 import { scopeKey } from '../permissions/grants';
@@ -54,6 +55,13 @@ export interface AnnouncementInput {
    * muhtarın "pazar günü", "muhtarlık saatleri" gibi kalıcı bilgisi için.
    */
   pinned?: boolean;
+  /**
+   * Planlı yayın (PROJE.md 6.2 madde 4, Basın Masası): bu anda yayına girer (ISO). Acil duyuruda olmaz; en çok
+   * SCHEDULE_MAX_DAYS gün ileri. Onaya giden duyuruda onaylanınca bu zaman kullanılır (geçmişse hemen yayınlanır).
+   */
+  scheduledAt?: string;
+  /** Hedefli bildirim: telefon bildirimi yalnızca bu gruba (duyuru herkese açık kalır). Acil duyuruda yok. */
+  pushTarget?: AudienceFilter;
   /** Yalnızca haberde, zorunlu. */
   category?: NewsCategory;
 }
@@ -77,7 +85,9 @@ export const ANNOUNCEMENT_LIMITS = { title: [3, 100], body: [10, 2000], reviewNo
 /** Acil duyuru en çok bu kadar gün açık kalır (unutulup sürekli en üstte kalmasın). */
 export const URGENT_MAX_DAYS = 7;
 
-export type AnnouncementError = 'title' | 'body' | 'region' | 'endsAt' | 'pinned' | 'category';
+export type AnnouncementError = 'title' | 'body' | 'region' | 'endsAt' | 'pinned' | 'category' | 'scheduledAt' | 'pushTarget';
+/** Planlı yayın en çok bu kadar gün ileri. */
+export const SCHEDULE_MAX_DAYS = 60;
 
 /** Bölge, yetki bölgesinin içinde mi (il > ilçe > mahalle)? */
 export function regionWithin(r: AnnouncementRegion, scope: RegionScope): boolean {
@@ -107,12 +117,25 @@ export function validateAnnouncement(a: AnnouncementInput, scope: RegionScope, n
   if (a.pinned && (!r.neighbourhoodId || a.kind !== 'duyuru')) errors.push('pinned');
   // Kategori yalnızca haberde ve orada zorunlu.
   if (a.kind === 'haber' ? !a.category || !NEWS_CATEGORIES.includes(a.category) : !!a.category) errors.push('category');
+  // Planlı yayın: ileri bir zaman, en çok 60 gün; acil duyuru beklemez; bitişten önce olmalı.
+  if (a.scheduledAt) {
+    const at = new Date(a.scheduledAt).getTime();
+    if (a.kind === 'acil' || !(at > now.getTime()) || at > now.getTime() + SCHEDULE_MAX_DAYS * 86400000 || (a.endsAt && at >= new Date(a.endsAt).getTime())) {
+      errors.push('scheduledAt');
+    }
+  }
+  if (a.pushTarget && (a.kind === 'acil' || validatePushTarget(a.pushTarget).length)) errors.push('pushTarget');
   return errors;
 }
 
-/** Yayında ve süresi geçmemiş mi? */
-export function isAnnouncementLive(a: Pick<Announcement, 'status' | 'endsAt'>, now = new Date()): boolean {
-  return a.status === 'yayinda' && (!a.endsAt || new Date(a.endsAt) > now);
+/** Yayın zamanı gelmemiş (planlı) mı? */
+export function isScheduled(a: Pick<Announcement, 'status' | 'publishedAt'>, now = new Date()): boolean {
+  return a.status === 'yayinda' && !!a.publishedAt && new Date(a.publishedAt) > now;
+}
+
+/** Yayında, yayın zamanı gelmiş ve süresi geçmemiş mi? */
+export function isAnnouncementLive(a: Pick<Announcement, 'status' | 'endsAt' | 'publishedAt'>, now = new Date()): boolean {
+  return a.status === 'yayinda' && (!a.endsAt || new Date(a.endsAt) > now) && !isScheduled(a, now);
 }
 
 /** Kullanıcının konumuna yönelik mi: il geneli, kendi ilçesi ya da kendi mahallesi. */

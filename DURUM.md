@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 5 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: belediye paneli İçerik performansı, Basın Masası, hedefli bildirim, admin bildirimleri ve ücretli reklam, Gönüllülük ve hayvan sahiplendirme, nöbetçi eczane; kurum yöneticisi kendine görev verir). Önceki: 4 Kasım, kural yükleme hatası giderildi (aşağıdaki not); 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -24,7 +24,9 @@ Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yüklem
 > yayına alındı (4 Kasım 21:09). Dizinler zaten yüklüydü (58/58). **Yeni kural yazarken** yeni kayıt 2+ kez geçiyorsa
 > aynı kalıpla işlev içine yaz; dosya sınıra yakın. Not: hizmet hesabıyla `firebase deploy` yetki hatası veriyor
 > (serviceusage); kurallar firebase-admin `releaseFirestoreRulesetFromSource` ile yüklendi. Eren anahtarı sohbete
-> yapıştırdı; konsoldan silmesi istendi.
+> yapıştırdı; Eren konsoldan sildiğini söyledi (4 Kasım).
+> **Bilgisayar bozuk (4 Kasım):** Expo Go için sunucu çalıştıracak bilgisayar yok; bulut oturumundan Expo/ngrok kapalı.
+> Önerildi, Eren "sonra bakarız" dedi: GitHub Actions ile EAS Update (Eren GitHub'a EXPO_TOKEN ve FIREBASE_WEB_CONFIG ekler).
 
 ## Depo ve ortam
 
@@ -57,9 +59,9 @@ Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yüklem
 
 ```sh
 npm install
-npm test                      # ortak paket testleri (166)
-npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (156; Java 21 gerekir)
-npm run test:functions        # sunucu işlevleri, emülatörde (30; Java 21 gerekir)
+npm test                      # ortak paket testleri (189)
+npm run test:rules            # güvenlik kuralları (Firestore + Storage) + depo testleri, emülatörde (171; Java 21 gerekir)
+npm run test:functions        # sunucu işlevleri, emülatörde (39; Java 21 gerekir)
 npm run panel:deploy          # paneli derleyip internete koyar (Firebase Hosting, ücretsiz plan yeter): cityjoynew.web.app
 npm run functions:build       # functions/lib/index.js (ortak kod gömülü tek dosya)
 # Sunucu işlevlerini yükleme (Blaze plan gerekir): npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew
@@ -751,6 +753,161 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sayfasında başkan profili. Örnek hesaplarda tutarlı örnek sayılar ("Örnek veri" etiketi). Testler: kurallar 8 yeni,
   ortak 6 yeni; panel derlendi, mobil tür denetimi geçti; tarayıcıda belediye, muhtar, admin örnek hesaplarıyla ve
   375 px genişlikte denendi. **Telefonda denenmedi.** PR #60 birleşti; kurallar Firebase'e, panel cityjoynew.web.app'e yüklendi (3 Kasım, Claude). Gönderi istatistikleri sonraki adım.
+- **Panel 3. aşama: İçerik performansı (5 Kasım, `claude/magical-maxwell-0tnmeh`; PROJE.md 6.1, 6.2 madde 22).**
+  Uygulamada duyuru / haber / acil duyuru ve etkinlik ayrıntısı açılınca kişi başına bir "okunma", Paylaş ile bir
+  "paylaşım" sayılır (`contentStats` kaydedici, okuma yok, oturumda içerik başına bir deneme). Paylaş düğmesi artık her
+  duyuruda ve etkinlikte var (önce yalnızca haberde). Veri: `contentViews/{içerik}_{SHA-256(uid+içerik)}` {item, k, owner,
+  at, sh}: kişinin kimliği yazılmaz, aynı kişi iki kez sayılamaz, iki içeriğin okuru eşleştirilemez; hesap silinince
+  kayıt isimsiz kalır (silmeye gerek yok). Kurallar: belge adı karmayla, hesap içeriğin yayınlayanıyla tutmalı, içerik
+  yayında, paylaşım yalnızca false > true; sayımları `officialStatsReader` ile Takipçiler'i görebilen görür (kurum
+  yöneticisi, "Kitle istatistikleri" görevlisi, muhtar, admin). Panel: **İçerik performansı** (`/icerik-performansi`,
+  menüde Takipçiler'in altında; Bugün kısayollarında önde): 7/30/90 gün; okunma (önceki döneme göre), yayınlanan içerik,
+  içerik başına okuyan (takipçi sayısıyla), paylaşan ve etkinlik katılımı; **Öneriler** (en çok okunan, takipçilere
+  ulaşma oranı, paylaşılma oranı, en iyi tür / gün / saat dilimi, az okunanlar; yeterli veri yoksa çıkmaz,
+  `contentInsights`); günlük / haftalık okunma grafiği, en çok okunanlar, türe göre ortalama, süzülüp sıralanan içerik
+  tablosu. Maliyet: içerik başına 2 sayım + grafik dilimi başına 1 sayım (en çok 30). Örnek hesaplarda örnek veri.
+  **5 yeni dizin** (duyuru ve etkinlik: author.orgId / author.grantKey + status + publishedAt; contentViews: owner + at).
+  Kural dosyası yer açmak için yeniden sıkıştırıldı (okuma / silme kuralları da; işlev argümanlarının tembel
+  değerlendirildiği emülatörde denendi). Testler: ortak 169 (3 yeni), kurallar 159 (3 yeni), sunucu 30; tür denetimi ve
+  panel derlemesi geçti; panel örnek Nilüfer Belediyesi hesabıyla masaüstü ve 390 px'te tarayıcıda görüldü. **Telefonda
+  denenmedi.** **Yüklenmeli:** kurallar + dizinler (Eren'in bilgisayarı ya da ortam ayarına eklenen hizmet hesabı
+  anahtarı) ve panel. Kural dosyası sınıra yakın: yüklemede "Bilinmeyen hata" çıkarsa boyut aşılmıştır, Claude kısaltır.
+  **Aydınlatma metnine eklenecek satır:** "Resmî hesapların içeriklerini açtığınızda ve paylaştığınızda isimsiz sayılır;
+  kimliğiniz kaydedilmez." (avukat kontrolü).
+- **Basın Masası, 1. aşama: yayın takvimi ve önemli günler (5 Kasım, aynı dal; Karar Eren 5 Kasım; PROJE.md 6.2).**
+  Panel > **Basın Masası** (`/basin-masasi`, menüde Bugün'ün altında): aylık takvim (pazartesi başlar; yayınlanan
+  duyuru / haber / acil, etkinlikler başlangıç gününde, hazırlıktaki etkinlik kesik çizgili, önemli ve yerel günler;
+  renk açıklaması), güne dokununca ayrıntı ve önemli günde **"Bu gün için duyuru hazırla"** (Duyurular sayfası
+  `?yeni=1&baslik=` ile başlığı dolu yeni taslak açar), yaklaşan önemli günler (30 gün), hazırlıktakiler (taslak / onay
+  bekliyor / düzeltme istendi). Telefonda takvim noktalı küçük görünüm. Bugün sayfasında "Yaklaşan önemli günler"
+  kartı (14 gün) ve kısayollarda Basın Masası önde. Kimler görür: duyuru ya da etkinlik bölümü açık kurumda kurum
+  yöneticisi ve o bölümlerde görevi olan personel (yalnızca görüntüleyen dahil), duyuru yazabilen muhtar / il
+  yöneticisi, admin. **Önemli günler** (`packages/shared/src/press`): başlangıç listesi 33 gün (resmî / millî, dinî
+  bayram 2026-2027, anma ve belirli günler, uluslararası günler; Anneler / Babalar Günü "ayın n. pazarı" olarak
+  hesaplanır), her birinde kısa paylaşım fikri. Ülke geneli liste `config/importantDays` (admin panelden düzenler;
+  kaydedilene kadar başlangıç listesi), kurumun **yerel günleri** `orgDays/{kurum}` (kurum yöneticisi ya da duyuru
+  hazırlayan personel; kurum üyeleri okur). Kaydetme işlem kaydına girer. **Dinî bayram tarihleri Diyanet
+  takviminden doğrulanmalı; 2028 ve sonrası admin tarafından eklenmeli.** Tarafsızlık: siyasi anlam taşıyan gün
+  başlangıç listesinde yok. Testler: ortak 172 (3 yeni), kurallar 161 (2 yeni); tür denetimi ve panel derlemesi geçti;
+  tarayıcıda örnek belediye ve admin hesabıyla, masaüstü ve 390 px'te görüldü. **Yüklenmeli:** kurallar ve panel
+  (dizin değişikliği yok). Sıradaki aşamalar (Eren onayladı): planlı yayın, hazır şablonlar, yayın öncesi kontrol listesi.
+- **Basın Masası, 2. aşama: planlı yayın ve hazır şablonlar (5 Kasım, aynı dal; PROJE.md 6.2 madde 4 ve 13).**
+  **Planlı yayın:** duyuru formunda "Yayın zamanı: Hemen / İleri bir zamanda" (acilde yok, en çok 60 gün, bitişten
+  önce). Doğrudan yayın yetkisi olanda belge `status: yayinda`, `publishedAt = scheduledAt` (ileri zaman) yazılır;
+  uygulama `isAnnouncementLive` ile zamanı gelene kadar göstermez (sunucu işlemi gerekmez, ücretsiz planda çalışır).
+  Onaya gidende `scheduledAt` saklanır, onaylanınca o an kullanılır (geçmişse hemen). Panelde "Planlandı" etiketi,
+  "Planı iptal et" (yayından kaldırma), takvimde kesik çizgili "Planlı", Hazırlıktakiler'de planlananlar. Kurallar:
+  `pubAtOk` (yayın anı şimdi ya da ileri `scheduledAt`). Telefon bildirimi: tetikleyici zamanı gelmemişte göndermez,
+  yeni `scheduledAnnouncements` işlevi 10 dakikada bir zamanı gelenlere gönderir (Blaze ile). Yeni dizin:
+  announcements status + publishedAt. **Bilinen sınır:** planlı duyuru yayın anından önce de veritabanından okunabilir
+  (uygulama göstermez); ambargolu basın bülteni için kullanılmamalı. **Hazır şablonlar:** `pressTemplates/{hesap}`
+  (en çok 30; kurum yöneticisi, duyuru hazırlayan personel, o yetkide duyuru ekleyebilen muhtar / il yöneticisi okur
+  ve yazar; işlem kaydı). Duyuru formunda "Şablondan başla" ve "Şablon olarak kaydet"; Basın Masası'nda şablon listesi,
+  kaldırma ve 6 örnek şablon (su kesintisi, yol çalışması, etkinlik, bayram, anma, hizmet). Köşeli parantezli
+  doldurulmamış yer ([tarih]) kalırsa yayına / onaya gönderilmez (taslak olur). Testler: ortak 174, kurallar 163,
+  sunucu 31. **Emülatörde baştan sona denendi** (gerçek giriş, Basın Masası > örnek şablonlar > şablondan duyuru >
+  boşluk uyarısı > planlı yayın > veritabanında `publishedAt = scheduledAt`, uygulamada görünmez; hemen yayın
+  görünür; takvimde Planlı; işlem kaydı). **Yüklenmeli:** kurallar, dizinler, sunucu işlevleri (Blaze), panel.
+  Sıradaki (Eren onayladı): yayın öncesi kontrol listesi (yapıldı, aşağıda).
+- **Basın Masası, 3. aşama: yayın öncesi kontrol listesi (5 Kasım, aynı dal).** Duyuru formunda yazarken güncellenen
+  "Yayın öncesi kontrol" kutusu (`prePublishChecks`, `packages/shared/src/press/checklist.ts`): doldurulmamış [boşluk]
+  (yayını durdurur), uzun başlık (60 karakter üstü), tamamı büyük harf başlık, fazla ünlem, duyuruda tarih / saat yok,
+  tarihli duyuruda bitiş tarihi yok, yayın günü resmî / dinî / anma gününe denk geliyor (ton hatırlatması), "Kimler
+  görecek" bölge özeti. Yalnızca boşluk engeller, diğerleri öneridir. Emülatörde gerçek girişle denendi.
+- **Görev kuralı netleşti (Karar Eren, 5 Kasım 2026): "kurum yöneticisi kime ne görev verirse o görünür".** Kurum
+  yöneticisi (örn. Osmangazi Belediyesi hesabı / özel kalem) bütün sayfaları görür; personel yalnızca görevine göre:
+  Duyurular ya da Etkinlikler görevi > Basın Masası; Duyurular > Ekle > duyuru hazırlama ve şablonlar; Kitle
+  istatistikleri > Takipçiler ve İçerik performansı. **Yeni:** kurum yöneticisi kendi kaydında kendine görev verebilir
+  (yayınlamak / onaylamak için); kurum yöneticiliğini ve süresini değiştiremez (kural + test). Personel formunda
+  görevlerin hangi sayfaları açtığını anlatan not. Emülatörde dört hesapla denendi (yönetici, basın müdürü, yalnızca
+  istatistik, görevsiz): menüler beklendiği gibi; yönetici kendine görev verince "Yeni duyuru" açıldı.
+- **Hedefli bildirim (5 Kasım, aynı dal; PROJE.md 7, 6.2 madde 12; Karar Eren 5 Kasım: filtre yalnızca telefon
+  bildirimini daraltır, duyuru bölgedeki herkese açık kalır).** Duyuru formunda "Telefon bildirimi kime gitsin?":
+  bölgedeki herkese ya da bölgede seçili gruba (yaş aralığı 13-120, cinsiyet, en çok 10 meslek). Duyuruda
+  `pushTarget` saklanır (acilde yok; kural). Sunucu (`handleAnnouncementWrite`): grup seçildiyse filtreye uyanlara
+  gönderir (**Karar Eren, 5 Kasım: ayrı hedefleme izni sorulmaz**, bildirime izin veren herkes sayılır; kayıttaki
+  "hedefli bildirim" kutucuğu kaldırıldı, meslek ve cinsiyet artık her zaman soruluyor; kampanya izni ayrı kalıyor);
+  50 kişiden küçük grupta hiç göndermez
+  (`pushLog.skipped = kucuk-grup`). "Kaç kişiye ulaşır?": yeni çağrılabilir işlev `estimateAudience` (kurum
+  personelinde Duyurular > Ekle ve bölge kurumun bölgesinde; muhtar / il yöneticisinde yetkisi; admin her yerde),
+  yaklaşık sayı 10'a yuvarlı, 50'den azsa "az"; kişi verisi panele gelmez. Panelde tabloda "Bildirim: 65+ yaş, 1 meslek".
+  Testler: ortak 179, kurallar 165, sunucu 33 (hedef, rıza, küçük grup, acil, yetkisiz sayım). Panelde gerçek girişle
+  form denendi; sayım işlevi bu bulut ortamında emülatörde çalışmadı (ağ engeli), sunucu testleriyle denendi.
+  **Blaze ile çalışır** (bildirim ve sayım sunucuda). Kampanya / tanıtım bildirimi (il yöneticisi > admin onayı, 18 yaş
+  altı hariç) ayrı iş olarak sırada. **Avukata sorulacak:** yaş / cinsiyet / meslekle bildirim seçiminin açık rıza
+  olmadan (aydınlatma ile) yapılması. **Aydınlatma metnine eklenecek satır:** "Bildirim izni verdiğinizde resmî
+  kurumların duyuru bildirimleri bölgenize, yaşınıza, cinsiyetinize ve mesleğinize göre size uygunsa gönderilir;
+  kurumlar kimliğinizi görmez." Uygulamadaki kayıt ekranı değişikliği telefonda denenmedi.
+- **Admin bildirimleri ve ücretli işletme reklamı (5 Kasım, aynı dal; Karar Eren 5 Kasım: admin her türlü bildirimi
+  gönderir; işletme reklamı ücret karşılığı, admin elle girer; haftalık ve gece sınırı yok).** Panel > Sosyal >
+  **Bildirim gönder** (`/bildirim-gonder`, yalnızca admin): tür (duyuru / hizmet, etkinlik, kampanya / tanıtım,
+  işletme reklamı), bölge (ülke, il, ilçe, mahalle), yaş / cinsiyet / meslek + "Kaç kişiye ulaşır?", reklamda işletme
+  seçimi, başlık / metin ve "telefonda böyle görünür" önizlemesi, dokununca açılacak yer (işletme, etkinlik, duyuru,
+  bildirimler), hemen ya da planlı, reklamda ücret / fatura / not (`adminPushBilling`, yalnızca admin). Liste: durum
+  (planlandı / gönderildi: N kişi / grup küçük / iptal), açan sayısı, ücret; planlıyı iptal. Veri: `adminPushes`
+  (gönderileni giriş yapan herkes okur, bildirim kutusu için; hazırlama / iptal yalnızca admin, "gönderildi"yi sunucu
+  yazar), `adminPushOpens/{bildirim}_{karma}` (açılma, kişi kaydedilmez). Kampanya ve reklam yalnızca kampanya izni
+  veren 18 yaş ve üstüne gider, başında "Reklam · {işletme}" / "Kampanya" yazar (5 dilde); hedefli gönderimde 50 kişi
+  alt sınırı. **Yeni bildirim türü "Kampanya ve reklamlar"**: kişi Bildirim ayarlarından kapatabilir; panel
+  tetikleyici ve öncelik listesine eklendi. Uygulamada bildirim kutusunda gönderilen admin bildirimleri (aynı kurala
+  göre süzülür, il başına tek sorgu, 10 dakika), bildirime ya da kutudaki öğeye dokununca açılma sayılır. Sunucu:
+  `adminPushCreated` (hemen), 10 dakikalık iş planlıları gönderir; `estimateAudience` admin için ülke geneli ve
+  kampanya iznini de sayar. 2 yeni dizin. Testler: ortak 182, kurallar 167, sunucu 37. Panelde admin hesabıyla
+  emülatörde denendi (reklam planlandı, listede ücret ve durum). **Blaze ile gönderilir.** Telefonda denenmedi.
+  **Reklamda işletmenin paylaşımı (Karar Eren, 5 Kasım):** işletme resmi / videoyu kendi sayfasından (işletme adına
+  Keşfet paylaşımı, Genel) paylaşır; admin "Dokununca ne açılsın? > İşletmenin paylaşımı" ile o paylaşımı seçer
+  (resimli kartlar, yalnızca panelde), ayrıca dosya yüklenmez, bildirimde link yazmaz. **Bildirim yalnızca yazıdır**
+  (Eren: "bu kadar basit"); dokununca paylaşım (resim / video) açılır (`/explore/[id]`). Bildirimin içinde ya da
+  bildirim kutusunda resim gösterme denemesi Eren'in isteğiyle kaldırıldı.
+- **Gönüllülük ve hayvan sahiplendirme (5 Kasım, aynı dal; Karar Eren 5 Kasım: gönüllülük ilanını yalnızca belediye ve
+  kurumlar açar; sahiplendirme ilanını belediye barınakları ve doğrulanmış dernekler verir).** Uygulama: Benim Şehrim >
+  **Gönüllülük** (`/volunteer`, "Yakında" kalktı): gönüllülük ilanları (Etkinlikler'deki "Gönüllülük" türü; tarih, yer,
+  "12/20 kişi", dokununca etkinlik sayfası ve Katıl) ve "Yuva arayan dostlar" (Tümü / Kedi / Köpek / Diğer / Acil;
+  acil önce) > hayvan sayfası (`/volunteer/animal/[id]`: tür, yaş, cinsiyet, ırk, aşı / kısır etiketleri, yer, ilanı
+  veren, Ara ve E-posta, "sahiplendirme ücretsizdir, para isteyeni bildir"). 5 dilde. Uydurma sayı yok. Panel: yeni
+  hesap türü **Dernek / vakıf** (yalnızca admin açar, yalnızca "Hayvan sahiplendirme" bölümü alır; kural + test),
+  yeni bölüm **Hayvan sahiplendirme** (`/sahiplendirme`; belediyelere ve derneklere): ilan ekle / düzenle,
+  Sahiplendirildi, Kaldır, Yeniden yayınla (silinmez), işlem kaydı. Etkinlik formunda "Gönüllülük" türü seçilince
+  ücret kapanır (kural: gönüllülük ücretsiz). Veri: `adoptions` (yayındaki / sahiplendirileni herkes okur; kurum
+  yöneticisi ya da görevli yazar; ad kurumun adı, bölge kurumun bölgesi). 1 yeni dizin. Fotoğraf Blaze ile (şimdilik
+  simge). Denemede bulunan hata düzeltildi: kurum yöneticisi işlem kaydına "sahiplendirme" yazamıyordu. Testler: ortak
+  186, kurallar 170, sunucu 37. Emülatörde panel (dernek hesabıyla ilan ekleme) ve uygulamanın web sürümü (Gönüllülük
+  ve hayvan sayfası) gerçek veriyle görüldü. Telefonda denenmedi.
+- **Nöbetçi eczane (5 Kasım, aynı dal; Eren onayladı: NosyAPI, docs/oneri-nobetci-eczane.md).** Uygulama: Acil
+  İhtiyaçlar ve Benim Şehrim'de "Nöbetçi eczane" açıldı (`/pharmacy`): ilin bugünkü listesi, kendi ilçen önce ("Senin
+  ilçen"), ilçe başlıkları, Ara, Haritada aç (koordinat yoksa ad + adresle arama), "Son güncelleme", liste bugüne ait
+  değilse uyarı (sabah 09.00'a kadar dünkü liste geçerli), liste yoksa e-Devlet sorgusu ve 112 notu. 5 dilde. Okuma:
+  `dutyPharmacies/{il}` tek belge, 30 dakika telefonda. Sunucu: `pharmacyMorning` (08.15, bütün iller),
+  `pharmacyRetry` (10.00, bugünün listesi gelmeyen iller), `pharmacyResync` (admin, "şimdi çek"); aynı gün yeniden
+  çekilince gizlemeler korunur; il durumu `dataSourceStatus/pharmacy`, çalışma özeti `dataSourceRuns`. Servis
+  bağdaştırıcısı `nosyProvider` (adres `PHARMACY_API_URL` ile değiştirilebilir; **NosyAPI'nin adresi ve yanıt
+  biçimi doğrulanmadı**: siteye bu ortamdan erişilemedi, anahtar gelince ilk çekimde kontrol edilecek; alan adları
+  `normalizePharmacy` ile birkaç olası adla okunur) ve sahte servis (`PHARMACY_PROVIDER=sahte`). Ortam ayarları:
+  `PHARMACY_PROVIDER=nosy`, `PHARMACY_API_KEY`. Panel > Acil > **Nöbetçi eczane** (`/nobetci-eczane`): seçili ilin bugünkü
+  listesi, "Bugün gizle / Göster" (admin ve "Acil numaralar > düzenle" yetkili il yöneticisi; işlem kaydı), admin için
+  81 ilin durumu (bugün / eski / hata / hiç), son çekimler, "Bütün illeri / bu ili şimdi çek". Kurallar: herkes okur,
+  yalnızca `hidden` değişir; durum ve çekim kaydı yalnızca admin. Testler: ortak 189, kurallar 171, sunucu 39.
+  Emülatörde uygulamanın web sürümü ve panel örnek veriyle görüldü. **Çalışması için:** Eren NosyAPI hesabı ve anahtarı
+  (ortam ayarı), fiyatı siteden doğrulama (5.000 kredi ≈ 6 dolar bilgisi doğrulanmadı), Blaze (zamanlanmış iş).
+- **Eczane ve Gönüllülük ekranları önizleme tasarımına göre (5 Kasım, aynı dal; Eren: "senin tasarladığın sayfalar
+  olsun").** Ölçü Claude'un önizleme panosu (S-Eczane, S-Gonullu), `tasarim/*.html` değil. **Eczane:** üstte liste durumu
+  kartı (Bugünün listesi / güncel olmayabilir + son güncelleme), "Yakınımda" (konum izniyle uzaklığa göre sıralar;
+  koordinat yoksa söyler) ve ilçe düğmeleri, en yakın / ilçendeki eczane büyük kartta (Ara, Yol tarifi), "Diğer
+  nöbetçiler" listesi (satırda Ara), sağ üstte "Hepsini haritada gör". **Gönüllülük:** tür düğmeleri (Tümü, Hayvan,
+  Çevre, Sosyal, Afet, Eğitim; etkinliğe yeni `volunteerType` alanı, panelde Gönüllülük türü seçilince sorulur),
+  "Yuva arayan dostlar" yan yana kartlar + "Tümünü gör" (`/volunteer/animals`, tür / acil süzgeci), "Gönüllü aranıyor"
+  kartları (tür etiketi, doluluk çubuğu "x/y kişi", Katılıyorum / Kontenjan doldu → etkinlik sayfası). Panodaki
+  "+ İlan ver" konmadı (kullanıcı ilan vermez); ilanlarda fotoğraf henüz yok, kartta türe göre renkli alan ve simge.
+  5 dilde. Testler: ortak 189, kurallar 171, sunucu geçti; emülatörde web sürümüyle görüldü.
+- **Eczane ekranı panodaki görünüme birebir (5 Kasım, aynı dal; Eren panonun görüntüsünü gönderdi: "bunu yap").**
+  Başlık geri düğmesinin yanında ("Nöbetçi Eczaneler", "Bursa · Bugün"; `HeroHeader inline`, Gönüllülük'te de),
+  nöbet durumu kartı ("Nöbet başladı" / "henüz başlamadı", "Bugün 19:00 - yarın 08:30", sağda kalan saat "13 sa"),
+  "Yakınımda" açık gelir (konum izni önceden verildiyse hemen uzaklığa göre sıralar, izin burada sorulmaz), "En yakın ·
+  0,5 km" etiketi, simgeli Ara / Yol tarifi, satırlarda "ilçe · km". **Nöbet saatleri:** servis vermediği için il başına
+  panelden girilir (Panel > Nöbetçi eczane > "Nöbet başlar / Ertesi sabah biter"; admin ve il yöneticisi, işlem
+  kaydı; `dutyPharmacies/{il}.hours`, günlük çekimde korunur); girilmezse 19:00–08:30 (`DEFAULT_DUTY_HOURS`; il
+  odalarına göre değişebilir, il yöneticisi düzeltir). Pazar / bayram tam gün nöbeti henüz ayrı değil. Testler: ortak
+  192, kurallar 171, sunucu 39.
 - **Acil numaralar güncellendi (3 Kasım, `claude/acil-numaralar`; PROJE.md 5.4).** 155, 156, 110 (ve 122, 177, 158) 112'ye
   bağlandığı için ayrı düğme değil, 112'nin açıklamasında. Yeni: 114 zehir danışma. Sıra: 112, 114, 186, 187, 185, 183.
   Canlı veritabanında kayıt yok (gömülü liste kullanılıyor); panelden "Başlangıç listesini yükle" yeni listeyi yazar.
@@ -898,7 +1055,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sahiplik doğrulaması (SMS, Blaze), belge yükleme ve ücretli doğrulama, aynı işletmenin ikinci kaydını engelleme, kategoriye
   özel alanlar (konaklama, yeme-içme...), mobil ustalar için hizmet verdiği ilçeler, "bilgileriniz hâlâ doğru mu?" hatırlatması,
   işletme başına günlük ekleme sınırı. (İl yöneticisi kendi ilinin işletmelerini panelde görür, doğrulama admin'de.)
-- SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
+- ~~Nöbetçi eczane veri kaynağı~~: Eren onayladı (5 Kasım, NosyAPI); kod yazıldı. Bekleyen: NosyAPI anahtarı, fiyat doğrulaması, Blaze.
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
 - **Panel 2. aşama (Eren istedi, 3 Kasım):** belediye panelinde gönderi istatistikleri (görüntülenme, beğeni, yorum,
@@ -928,7 +1085,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 5. Fotoğraf yükleme: ~~Keşfet gönderisi, etkinlik kapağı, kurum ve işletme logosu, işletme vitrini, kişi profil fotoğrafı~~ (31 Ekim - 1 Kasım, Blaze
    bekliyor), ~~Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat ve belediye kapakları, "{Şehir} kareleri"~~ (3 Kasım).
    Fotoğraf işleri tamam (Blaze ile çalışır). Video sonra.
-6. Nöbetçi eczane günlük çekimi (Eren'in onayı ve anahtar). 7. Yönetici iki aşamalı doğrulama.
+6. ~~Nöbetçi eczane günlük çekimi~~ (5 Kasım; NosyAPI anahtarı ve Blaze bekliyor). 7. Yönetici iki aşamalı doğrulama.
 Hepsi emülatörde yazılıp test edilir; Blaze gelince tek komutla yüklenir.
 
 **Eren'in fikri, bekliyor (31 Ekim; Eren plan yapacak, şimdilik bir şey yapılmayacak):** afet / deprem modu. Bölgedekilere
@@ -951,8 +1108,7 @@ toplamak olmaz, dron ve Wi-Fi Direct ayrı bir Ar-Ge projesi. Temeli bu duyuru b
    aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
-2. Nöbetçi eczane: öneri hazır (`docs/oneri-nobetci-eczane.md`), Eren onaylayınca ekran, panel "Veri kaynakları"
-   sayfası ve çekim kodu sahte sağlayıcıyla emülatörde yapılır; anahtarlar gelince bağlanır.
+2. ~~Nöbetçi eczane~~: ekran, panel ve çekim kodu yazıldı (5 Kasım); NosyAPI anahtarı ve Blaze gelince bağlanır.
 3. İşletme, 3. parça: belge yükleyerek doğrulama başvurusu (Firebase Storage; Blaze plan gerekir). ~~Fotoğraf vitrini~~ (31 Ekim).
 4. ~~Paneli internete koyma~~ (31 Ekim, https://cityjoynew.web.app).
 

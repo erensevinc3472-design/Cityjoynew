@@ -1418,7 +1418,9 @@
       "muhtar": "Ortsvorsteher",
       "cityjoy": "CityJoy",
       "channel": "Allgemeine Benachrichtigungen",
-      "quietChannel": "Stille Benachrichtigungen"
+      "quietChannel": "Stille Benachrichtigungen",
+      "adTag": "Werbung",
+      "campaignTag": "Kampagne"
     },
     "categories": {
       "acil": "Dringende Meldungen",
@@ -1427,7 +1429,8 @@
       "takip": "Folgen",
       "duyuru": "Bekanntmachungen",
       "haber": "Behördennachrichten",
-      "etkinlik": "Veranstaltungen"
+      "etkinlik": "Veranstaltungen",
+      "kampanya": "Kampagnen und Werbung"
     },
     "hints": {
       "acil": "Dringende öffentliche Meldungen für deine Gegend, z. B. Wasserausfall oder Katastrophen.",
@@ -1436,7 +1439,8 @@
       "takip": "Personen, die dir neu folgen.",
       "duyuru": "Bekanntmachungen von Gemeinden, Ortsvorstehern und Behörden.",
       "haber": "Nachrichten, die Behörden für deine Gegend veröffentlichen.",
-      "etkinlik": "Neue Veranstaltungen in deiner Provinz."
+      "etkinlik": "Neue Veranstaltungen in deiner Provinz.",
+      "kampanya": "Kampagnen und Werbung von Unternehmen (wenn du Kampagnen erlaubt hast)."
     },
     "offByCityJoy": "Diese Art ist derzeit von CityJoy ausgeschaltet.",
     "criticalWarning": {
@@ -2087,7 +2091,7 @@
     "notifySample2": "Ortsvorsteher · Öffnungszeiten geändert",
     "notifySample3": "Neue Nachricht · Ist das Fahrrad noch zu haben?",
     "targetingConsent": "Sende mir passende Benachrichtigungen nach meinem Alter und optional Geschlecht und Beruf.",
-    "notifyNote": "Beides ist freiwillig und jederzeit in den Einstellungen abschaltbar."
+    "notifyNote": "Kampagnen-Benachrichtigungen sind freiwillig. Benachrichtigungsarten kannst du jederzeit in den Einstellungen abschalten."
   },
   "deals": {
     "title": "Angebote",
@@ -2385,5 +2389,97 @@
     "ad": "Anzeige",
     "stays_one": "{{count}} Unterkunft",
     "stays_other": "{{count}} Unterkünfte"
+  },
+  "volunteer": {
+    "title": "Ehrenamt",
+    "intro": "Tu etwas für deine Stadt: Mach bei Ehrenamtsprojekten von Gemeinden und Institutionen mit oder adoptiere ein Tier, das ein Zuhause sucht.",
+    "jobs": "Freiwillige gesucht",
+    "noJobs": "Derzeit keine offenen Einsätze. Sie erscheinen hier, sobald Gemeinden und Institutionen sie veröffentlichen.",
+    "seats": "{{count}}/{{capacity}} Personen",
+    "cancelled": "Abgesagt",
+    "animals": "Tiere suchen ein Zuhause",
+    "noAnimals": "Derzeit keine Vermittlungsanzeigen in dieser Provinz.",
+    "filter": {
+      "hepsi": "Alle",
+      "kedi": "Katze",
+      "kopek": "Hund",
+      "diger": "Andere",
+      "acil": "Dringend"
+    },
+    "species": {
+      "kedi": "Katze",
+      "kopek": "Hund",
+      "diger": "Andere"
+    },
+    "sex": {
+      "disi": "Weiblich",
+      "erkek": "Männlich",
+      "bilinmiyor": "Geschlecht unbekannt"
+    },
+    "urgent": "Dringend",
+    "note": "Vermittlungsanzeigen stammen von städtischen Tierheimen und geprüften Vereinen. Die Vermittlung ist kostenlos.",
+    "loadError": "Konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "animal": "Vermittlung",
+    "vaccinated": "Vollständig geimpft",
+    "notVaccinated": "Impfungen unvollständig",
+    "neutered": "Kastriert",
+    "where": "Wo",
+    "by": "Angeboten von",
+    "call": "Anrufen",
+    "email": "E-Mail senden",
+    "mailSubject": "Vermittlung von {{name}}",
+    "free": "Die Vermittlung ist kostenlos. Wenn jemand Geld verlangt, melde es dem Anbieter und uns.",
+    "adopted": "Dieses Tier hat ein Zuhause gefunden.",
+    "gone": "Diese Anzeige ist nicht mehr verfügbar.",
+    "type": {
+      "hepsi": "Alle",
+      "hayvan": "Tiere",
+      "cevre": "Umwelt",
+      "sosyal": "Soziales",
+      "afet": "Katastrophe",
+      "egitim": "Bildung"
+    },
+    "seeAll": "Alle ansehen",
+    "jobCount_one": "{{count}} Anzeige",
+    "jobCount_other": "{{count}} Anzeigen",
+    "hours_one": "{{count}} Stunde",
+    "hours_other": "{{count}} Stunden",
+    "join": "Ich mache mit",
+    "full": "Ausgebucht",
+    "byOrgs": "Ehrenamtsanzeigen stammen von Gemeinden und Institutionen, Adoptionsanzeigen von städtischen Tierheimen und geprüften Vereinen. Die Adoption ist kostenlos."
+  },
+  "pharmacy": {
+    "title": "Notdienst-Apotheken",
+    "noLocation": "Wähle zuerst deine Provinz, um Notdienst-Apotheken zu sehen.",
+    "loadError": "Die Liste konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "none": "Die heutige Liste für diese Provinz liegt noch nicht vor.",
+    "edevlet": "Notdienst-Apotheken auf e-Devlet abfragen",
+    "updated": "Zuletzt aktualisiert: {{date}}",
+    "stale": "Die Liste ist möglicherweise nicht aktuell. Ruf die Apotheke vorher an.",
+    "yourDistrict": "Dein Bezirk",
+    "onDuty": "Im Dienst",
+    "call": "Anrufen",
+    "map": "In Karten öffnen",
+    "note": "Die Liste wird jeden Morgen aktualisiert. Ruf am besten vorher an. Im Notfall 112 anrufen.",
+    "subtitle": "{{province}} · heute im Notdienst",
+    "mapAll": "Alle auf der Karte",
+    "mapQuery": "Notdienst Apotheke",
+    "near": "In meiner Nähe",
+    "nearest": "Am nächsten · {{km}}",
+    "directions": "Route",
+    "others": "Weitere Notdienst-Apotheken",
+    "count_one": "{{count}} Apotheke",
+    "count_other": "{{count}} Apotheken",
+    "noCoords": "Diese Liste enthält keine Standortdaten, daher keine Sortierung nach Entfernung.",
+    "locDenied": "Standortzugriff nicht erlaubt. Du kannst einen Bezirk wählen.",
+    "locUnavailable": "Dein Standort konnte nicht ermittelt werden. Du kannst einen Bezirk wählen.",
+    "screenTitle": "Notdienst-Apotheken",
+    "today": "Heute",
+    "dutyOn": "Notdienst hat begonnen",
+    "dutySoon": "Notdienst hat noch nicht begonnen",
+    "rangeToday": "Heute {{start}} - morgen {{end}}",
+    "rangeYesterday": "Gestern {{start}} - heute {{end}}",
+    "hoursLeft_one": "{{count}} Std.",
+    "hoursLeft_other": "{{count}} Std."
   }
 }
