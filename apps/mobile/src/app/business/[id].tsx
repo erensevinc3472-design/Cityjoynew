@@ -27,6 +27,7 @@ import { AppText } from '@/components/app-text';
 import { TranslatableText } from '@/components/translatable-text';
 import { verificationText } from '@/components/business-card';
 import { DealBox } from '@/components/deal-box';
+import { Tag } from '@/components/inner';
 import { RoundButton } from '@/components/hero-header';
 import { PostGrid } from '@/components/post-grid';
 import { ReviewsSection } from '@/components/reviews-section';
@@ -227,6 +228,8 @@ export default function BusinessScreen() {
             <View style={styles.nameRow}>
               <AppText style={[styles.name, { color: c.textStrong }]}>{b.name}</AppText>
               {verified ? <MaterialIcons name="verified" size={16} color={c.accent} accessibilityLabel={t('business.verified')} /> : null}
+              {/* Doğrulanmamış işletme ilk bakışta belli olsun (PROJE.md 1.1: doğrulanmamış doğrulanmış gibi gösterilmez). */}
+              {!verified ? <Tag label={verificationText(b, t, i18n.language)} tone="muted" /> : null}
             </View>
             <AppText variant="caption" muted numberOfLines={2}>{[services.slice(0, 2).join(', '), district].filter(Boolean).join(' · ')}</AppText>
             {state ? (
