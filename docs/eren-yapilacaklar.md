@@ -49,6 +49,8 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
   bildirimi, duyuru, mesaj ve takip bildirimleri, SOS kayıtlarının 30 gün sonra silinmesi, hesap silinince verilerin temizlenmesi); Blaze'e geçince Claude
   tek komutla yükler. Keşfet fotoğrafı için ayrıca konsolda sol menü > Storage > "Başlayın" (Get started) > konum
   **europe-west1** seç (kurallar sorulursa "üretim modu" seç; asıl kuralları Claude yükler).
+  (Karar senin, 6 Kasım: Avrupa. Veritabanı da Avrupa'da; ücretsiz Storage kotası yalnızca ABD'de olduğu için fotoğraf
+  deposu ilk fotoğraftan küçük ücretlidir, başta ayda en çok ~10-12 dolar, deneme kredisinden düşer. Bölge sonradan değişmez.)
   "Çevir" düğmesi için ayrıca: console.cloud.google.com > üstte proje **cityjoynew** > arama kutusuna "Cloud Translation API"
   yaz > **Etkinleştir** (Enable). Ayda 500 bin karakter ücretsiz, sonrası milyon karakter başına yaklaşık 20 dolar; günlük
   kişi başı sınır Panel > Sınırlar > "Çeviri" (başlangıç 50).
