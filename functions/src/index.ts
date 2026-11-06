@@ -9,9 +9,11 @@ import * as functionsV1 from 'firebase-functions/v1';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 import { handleAnnouncementWrite } from './announcements';
+import { cloudBillingDisabler, handleBudgetNotice, type BudgetNotice } from './budget';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
@@ -107,6 +109,13 @@ export const translate = onCall({ maxInstances: 5 }, async (req) => {
     const code = e.code === 'sinir' ? 'resource-exhausted' : e.code === 'gecersiz' ? 'invalid-argument' : 'unavailable';
     throw new HttpsError(code, e.code, e.resetAt ? { resetAt: e.resetAt } : undefined);
   }
+});
+
+// Harcama sigortası: bütçe bildirimi gelir, harcama bütçenin 2 katını geçerse ödeme bağlantısı koparılır (budget.ts).
+export const budgetGuard = onMessagePublished({ topic: 'budget-alerts', maxInstances: 1 }, async (e) => {
+  const notice = (e.data.message.json ?? {}) as BudgetNotice;
+  const project = process.env.GCLOUD_PROJECT ?? process.env.GCP_PROJECT ?? '';
+  if (await handleBudgetNotice(notice, cloudBillingDisabler(project))) console.warn('Harcama sigortası attı', notice);
 });
 
 // Hesap silme tetikleyicisi yalnızca 1. kuşak işlevlerde var.

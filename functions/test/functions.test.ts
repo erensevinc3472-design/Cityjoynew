@@ -4,6 +4,7 @@ import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { handleAnnouncementWrite } from '../src/announcements';
+import { handleBudgetNotice, overCap } from '../src/budget';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
@@ -481,5 +482,23 @@ describe('Çevir düğmesi', () => {
     await db.doc(`translations/${translationId('yeni', 'en')}`).set({ text: 'new', source: 'tr', target: 'en', createdAt: Timestamp.fromDate(NOW) });
     expect(await deleteOldTranslations(db, NOW)).toBe(1);
     expect((await db.collection('translations').get()).size).toBe(1);
+  });
+});
+
+describe('harcama sigortası', () => {
+  it('bütçenin iki katında ödeme bağlantısını koparır, altında dokunmaz', async () => {
+    let calls = 0;
+    const disable = async () => { calls += 1; };
+    expect(await handleBudgetNotice({ costAmount: 349, budgetAmount: 350, currencyCode: 'TRY' }, disable)).toBe(false);
+    expect(await handleBudgetNotice({ costAmount: 699.99, budgetAmount: 350 }, disable)).toBe(false);
+    expect(calls).toBe(0);
+    expect(await handleBudgetNotice({ costAmount: 700, budgetAmount: 350 }, disable)).toBe(true);
+    expect(calls).toBe(1);
+  });
+
+  it('bozuk bildirimde hiçbir şey yapmaz', () => {
+    expect(overCap({})).toBe(false);
+    expect(overCap({ costAmount: 10, budgetAmount: 0 })).toBe(false);
+    expect(overCap({ costAmount: Number.NaN, budgetAmount: 10 })).toBe(false);
   });
 });
