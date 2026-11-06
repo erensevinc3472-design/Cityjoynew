@@ -7,6 +7,7 @@ import { isEventVisible, remainingSeats, type CityEvent } from '@cityjoy/shared'
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { AuthorLink } from '@/components/author-link';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { FormMessage } from '@/components/form-message';
@@ -130,7 +131,7 @@ export default function EventScreen() {
         {item.ticketUrl ? <AppButton variant="secondary" title={t('events.ticket')} onPress={() => open(item.ticketUrl!)} /> : null}
         {item.ticketUrl ? <AppText variant="caption" muted>{t('events.ticketNote')}</AppText> : null}
 
-        <AppText selectable>{item.description}</AppText>
+        <TranslatableText selectable text={item.description} />
 
         <View style={styles.meta}>
           <AppText variant="label">{t('events.attendance')}</AppText>

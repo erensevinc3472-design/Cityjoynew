@@ -67,3 +67,4 @@ export { createFirestoreTravelRepository, createMunicipalTravel, createTravelAdm
 export { createRoadsidePackAdmin, createRoadsidePackRepository, type RoadsidePackSummary } from './roadside';
 export { createTravelPrices } from './travel-prices';
 export { createFirebaseStats, type FirebaseStats, type StatsRange } from './stats';
+export { createTranslationClient } from './translate';

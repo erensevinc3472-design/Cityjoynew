@@ -9,6 +9,7 @@ import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
+import { deleteOldTranslations, handleTranslate, translationId, type Translator } from '../src/translate';
 
 // Emülatördeki veritabanıyla çalışır (npm test, firebase emulators:exec). Gerçek bildirim gönderilmez.
 let app: App;
@@ -427,5 +428,58 @@ describe('Seyahat kapakları', () => {
     expect(await handleMediaChange(MEDIA_FIELDS.travel, { cover: a, slogan: 'x' }, { cover: a, slogan: 'y' }, del)).toEqual([]);
     expect(await handleMediaChange(MEDIA_FIELDS.travel, { cover: a }, { cover: b }, del)).toEqual([a.path]);
     expect(await handleMediaChange(MEDIA_FIELDS.travel, { cover: b }, undefined, del)).toEqual([b.path]);
+  });
+});
+
+describe('Çevir düğmesi', () => {
+  function fakeTranslator() {
+    const calls: string[] = [];
+    const fn: Translator = async (text, target) => {
+      calls.push(`${target}:${text}`);
+      if (text === 'Hello') return { text: 'Hello', source: 'en' };
+      return { text: `[${target}] ${text}`, source: 'tr' };
+    };
+    return { calls, fn };
+  }
+
+  it('çevirir, aynı metni ikinci kez sağlayıcıya sormaz ve sınırdan düşmez', async () => {
+    const { calls, fn } = fakeTranslator();
+    expect(await handleTranslate(db, fn, 'ali', '  Bugün konser var ', 'de', NOW)).toEqual({ text: '[de] Bugün konser var', source: 'tr', same: false });
+    expect(await handleTranslate(db, fn, 'veli', 'Bugün konser var', 'de', NOW)).toEqual({ text: '[de] Bugün konser var', source: 'tr', same: false });
+    expect(calls).toEqual(['de:Bugün konser var']);
+    expect((await db.doc('usage/u-ali~ceviri').get()).get('count')).toBe(1);
+    expect((await db.doc('usage/u-veli~ceviri').get()).exists).toBe(false);
+    // Metin zaten istenen dildeyse "aynı" döner, metin değişmez.
+    expect(await handleTranslate(db, fn, 'ali', 'Hello', 'en', NOW)).toEqual({ text: 'Hello', source: 'en', same: true });
+  });
+
+  it('günlük sınır panelden; dolunca hata, ertesi gün yeniden', async () => {
+    const { fn } = fakeTranslator();
+    await db.doc('config/limits').set({ ceviri: 2 });
+    await handleTranslate(db, fn, 'ali', 'bir', 'en', NOW);
+    await handleTranslate(db, fn, 'ali', 'iki', 'en', NOW);
+    await expect(handleTranslate(db, fn, 'ali', 'üç', 'en', NOW)).rejects.toMatchObject({ code: 'sinir', resetAt: '2026-11-02T09:00:00.000Z' });
+    // Saklanan çeviri sınır dolsa da gösterilir.
+    expect((await handleTranslate(db, fn, 'ali', 'bir', 'en', NOW)).text).toBe('[en] bir');
+    expect((await handleTranslate(db, fn, 'ali', 'üç', 'en', new Date('2026-11-02T09:00:01Z'))).text).toBe('[en] üç');
+  });
+
+  it('boş metin, bilinmeyen dil ve sağlayıcı hatası', async () => {
+    const { fn } = fakeTranslator();
+    await expect(handleTranslate(db, fn, 'ali', '   ', 'en', NOW)).rejects.toMatchObject({ code: 'gecersiz' });
+    await expect(handleTranslate(db, fn, 'ali', 'merhaba', 'fr', NOW)).rejects.toMatchObject({ code: 'gecersiz' });
+    await expect(handleTranslate(db, fn, 'ali', 42, 'en', NOW)).rejects.toMatchObject({ code: 'gecersiz' });
+    const broken: Translator = async () => {
+      throw new Error('503');
+    };
+    await expect(handleTranslate(db, broken, 'ali', 'merhaba', 'en', NOW)).rejects.toMatchObject({ code: 'hizmet' });
+    expect((await db.doc('usage/u-ali~ceviri').get()).exists).toBe(false);
+  });
+
+  it('90 günden eski çeviriler temizlenir', async () => {
+    await db.doc(`translations/${translationId('eski', 'en')}`).set({ text: 'old', source: 'tr', target: 'en', createdAt: Timestamp.fromDate(new Date('2026-07-01T00:00:00Z')) });
+    await db.doc(`translations/${translationId('yeni', 'en')}`).set({ text: 'new', source: 'tr', target: 'en', createdAt: Timestamp.fromDate(NOW) });
+    expect(await deleteOldTranslations(db, NOW)).toBe(1);
+    expect((await db.collection('translations').get()).size).toBe(1);
   });
 });

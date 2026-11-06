@@ -14,6 +14,7 @@ import {
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { StateMessage } from '@/components/state-message';
@@ -125,7 +126,7 @@ export function PostComments({ post, uid, displayName, onCount }: Props) {
               <AppText variant="caption" muted>
                 <AuthorName uid={cm.authorUid} fallback={cm.authorName} /> · {at.toLocaleDateString(lang, { day: 'numeric', month: 'short' })} {at.toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })}
               </AppText>
-              <AppText selectable>{cm.text}</AppText>
+              <TranslatableText selectable text={cm.text} />
               {reporting?.id === cm.id ? (
                 <View style={styles.block}>
                   <Chips<PostReportReason>

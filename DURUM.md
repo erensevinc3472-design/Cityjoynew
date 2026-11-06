@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 6 Kasım 2026 (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 6 Kasım 2026 (dal claude/cevir-dugmesi: kullanıcı içeriğine "Çevir" düğmesi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -793,6 +793,20 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sorunu yok). Testler: ortak 166, kurallar 156 geçti; tür denetimi dört pakette temiz. PR #70 birleşti; kurallar
   ve dizinler Firebase'e, panel cityjoynew.web.app'e yüklendi (6 Kasım, Claude; kurallarda ilk iki denemede Google'da geçici 503).
 
+- **"Çevir" düğmesi (6 Kasım, dal `claude/cevir-dugmesi`; Karar Eren, PROJE.md bölüm 2).** Kullanıcı içeriği kendiliğinden
+  çevrilmez; metnin altında "Çevir", basınca okuyanın uygulama dilinde çeviri, "Aslını gör" ile geri. Düğme yalnızca metin
+  okuyanın dilinde görünmüyorsa çıkar (`canOfferTranslation`: kaba dil tahmini; emin değilse gösterir). Yerler: Keşfet
+  gönderisi ve yorumları, işletme değerlendirmesi ve cevabı, duyuru, Çarşı ilanı, işletme tanıtımı, etkinlik, aktivite,
+  anket sorusu, yarışma açıklaması, gelen mesaj (`components/translatable-text.tsx`). Sunucu: çağrılabilir işlev
+  `translate` (`functions/src/translate.ts`): Google Cloud Translation (anahtar yok, işlevin hizmet hesabı), aynı metin aynı
+  dile bir kez çevrilip `translations/` içinde saklanır (90 gün, günlük temizlik), kişi başına günlük sınır
+  `usage/u-{uid}~ceviri` (Panel > Sınırlar > "Çeviri", varsayılan 50; saklanan çeviriyi yeniden görmek sayılmaz). Girişsiz
+  basınca "Çeviri için giriş yap". Metinler 5 dilde. Testler: ortak 169, kurallar 156, sunucu 34 geçti; tür denetimi temiz;
+  web önizlemede görünüm ve girişsiz durum denendi. **Gerçek çeviri denenmedi:** Blaze + "Cloud Translation API"yi açmak
+  gerekir (`docs/eren-yapilacaklar.md` Blaze maddesi); işlev yüklenince telefonda denenecek. Panelden girilen tek dilli
+  içerik (anket, yarışma) için ayrı 5 dil alanı gerekmedi, aynı düğme çevirir. **Eren yapacak:** PR'ı birleştir; Claude
+  kuralları (Sınırlar'a "ceviri" eklendi) ve paneli yükler.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Seyahat > Planla (Eren onayladı 29 Ekim 2026: tek ekran, fiyatlar panelden elle): `/travel/planla`, Seyahat girişinde "Yolculuğunu planla". Nereden-nereye (il), tarih (7 gün), yolcu sayısı; Kendi aracım / Otobüs / Uçak / Tren kartları (süre, tahmini ücret); yolculuk kartı (İST ━ BUR, süre, km, maliyet, notlar); araba için güzergâh çevresindeki mola yerleri (OSM + yol üstü işletmeler, yaklaşık); varınca (şehri keşfet, yöresel, başkanlarla); hazırlık listesi; "Yola çık" Yoldayım'ı varış iliyle açar (kalan km, varınca "Vardın!" kartı). Planlar yalnızca telefonda (en çok 5). Hesap: il merkezleri arası kuş uçuşu x 1,3; araba 90 km/s + 2,5 saatte 15 dk mola; otobüs 70 km/s + 20 dk; uçak 650 km/s + 30 dk, iki ilde havalimanı ve 150 km üstü. Panel > Seyahat > Yolculuk fiyatları (yalnızca admin): akaryakıt (benzin, dizel, LPG, elektrik kWh), otobüs km aralığı, ay; boşsa ücret gösterilmez. **Kurallar değişti (config/travelPrices): yüklenmeli. Eren fiyatları girmeli.** Olmayanlar: bilet, sefer, firma adları, canlı yol durumu, yapay zekâ, hava durumu.
@@ -833,7 +847,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **Kitle istatistiği (3 Kasım):** gönderi istatistikleri "kurum / başkan adına gönderi" ile gelecek; 10 kişi eşiği şimdilik
   panelde (sunucuda Blaze ile); takip / bırakma tekrarına sınır yok; seçim dönemi başkan gizleme resmî profile
   uygulanmadı; avukat: verinin siyasi kullanımı; aydınlatma metnine "isimsiz, toplu istatistik" satırı (PROJE.md 6.1).
-- **Blaze'e geçince Claude'un yapacakları:** Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu (uygulama + kurallar; Karar
+- **Blaze'e geçince Claude'un yapacakları:** "Çevir" düğmesinin işlevini yükleyip gerçek çeviriyle denemek; Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu (uygulama + kurallar; Karar
   Eren 3 Kasım); fotoğraflı akışları gerçek projede deneme.
 - **Eren'in yapacakları tek listede:** `docs/eren-yapilacaklar.md` (31 Ekim). Eren bir maddeyi bitirdim deyince işaretle.
 - **Mağaza öncesi kontrol listesi (30 Ekim 2026, 20 maddelik liste üzerinden):** Claude'un üç işi yapıldı (konum izni metni,

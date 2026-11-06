@@ -6,6 +6,7 @@ import type { Post } from '@cityjoy/shared';
 
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { PostPhotos } from '@/components/post-photos';
 import { PostVideoView } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
@@ -194,7 +195,7 @@ export function PostCard({ item, liked, full, onPress, onLike, onAuthor, follow,
           </View>
         ) : null}
         {item.text ? (
-          <AppText selectable={full} numberOfLines={full ? undefined : photos.length || item.video ? 3 : 8} style={[short ? styles.textBig : styles.text, { color: c.text }]}>{item.text}</AppText>
+          <TranslatableText text={item.text} selectable={full} numberOfLines={full ? undefined : photos.length || item.video ? 3 : 8} style={[short ? styles.textBig : styles.text, { color: c.text }]} />
         ) : null}
         <Animated.View pointerEvents="none" style={[styles.heart, { opacity: heart, transform: [{ scale: heart.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }] }]}>
           <MaterialIcons name="favorite" size={76} color={c.danger} />

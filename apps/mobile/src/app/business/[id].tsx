@@ -24,6 +24,7 @@ import {
 } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { verificationText } from '@/components/business-card';
 import { DealBox } from '@/components/deal-box';
 import { RoundButton } from '@/components/hero-header';
@@ -235,7 +236,7 @@ export default function BusinessScreen() {
                   : state.until ? t('business.page.opensAt', { time: state.until }) : t('business.page.closedNow')}
               </AppText>
             ) : null}
-            {b.description ? <AppText style={styles.desc}>{b.description}</AppText> : null}
+            {b.description ? <TranslatableText style={styles.desc} text={b.description} /> : null}
             {b.status !== 'yayinda' ? <AppText variant="caption" style={{ color: c.danger }}>{b.status === 'gizli' ? t('business.statusHidden') : t('business.statusRemoved')}</AppText> : null}
           </View>
 

@@ -8,6 +8,7 @@ import { getStorage } from 'firebase-admin/storage';
 import * as functionsV1 from 'firebase-functions/v1';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 import { handleAnnouncementWrite } from './announcements';
@@ -16,6 +17,7 @@ import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './c
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
 import { expoSender } from './push';
 import { handleFollowWrite, handleMessageCreate } from './social';
+import { deleteOldTranslations, googleTranslator, handleTranslate, TranslateError } from './translate';
 
 initializeApp();
 const db = getFirestore();
@@ -91,6 +93,20 @@ export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 
   const now = new Date();
   await deleteExpiredSos(db, now);
   await deleteExpiredPushLog(db, now);
+  await deleteOldTranslations(db, now);
+});
+
+// "Çevir" düğmesi: yalnızca giriş yapmış kişi; sınır ve önbellek translate.ts'de.
+export const translate = onCall({ maxInstances: 5 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  const data = (req.data ?? {}) as { text?: unknown; target?: unknown };
+  try {
+    return await handleTranslate(db, googleTranslator, req.auth.uid, data.text, data.target, new Date());
+  } catch (e) {
+    if (!(e instanceof TranslateError)) throw e;
+    const code = e.code === 'sinir' ? 'resource-exhausted' : e.code === 'gecersiz' ? 'invalid-argument' : 'unavailable';
+    throw new HttpsError(code, e.code, e.resetAt ? { resetAt: e.resetAt } : undefined);
+  }
 });
 
 // Hesap silme tetikleyicisi yalnızca 1. kuşak işlevlerde var.

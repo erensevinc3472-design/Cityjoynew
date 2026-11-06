@@ -57,7 +57,11 @@ Türkçe, İngilizce, Almanca, Arapça, Rusça.
 
 - Arapça sağdan sola (RTL) yazılır, tasarım ve kod baştan RTL'ye uygun kurulmalı.
 - Metinler kodun içine gömülmez, dil dosyalarından gelir.
-- Kullanıcı içeriğinin (gönderi, duyuru) çevirisi **SORULACAK** (otomatik çeviri olsun mu).
+- **Karar (Eren, 6 Kasım 2026): kullanıcı içeriği kendiliğinden çevrilmez.** Metnin altında "Çevir" düğmesi olur, basılınca
+  okuyanın uygulama dilindeki çeviri gösterilir ("Aslını gör" ile geri döner). Uygulama (Claude): çeviri sunucuda yapılır
+  (Google Cloud Translation, anahtar koda girmez), aynı metin aynı dile bir kez çevrilip saklanır (maliyet ilkesi), kişi
+  başına günlük çeviri sınırı Panel > Sınırlar'dan. Panelden girilen tek dilli içerik (anket, yarışma, tatil notu) de aynı
+  düğmeyle çevrilir. Blaze plan ve Cloud Translation API'nin açılması gerekir (ayda 500 bin karakter ücretsiz).
 
 ## 3. Kullanıcı akışı
 
@@ -694,7 +698,7 @@ Görsel kimlik: koyu petrol yeşili ve turkuaz ağırlıklı, altın/bakır vurg
 
 1. Uygulama adı: **Karar (Eren): CityJoy** (Seyahat modülünün alt adı TravelJoy). Eren alan adını ve temel kayıtları aldı. Marka tescili (TürkPatent) ayrıca kontrol edilecek, domain tek başına marka hakkı sağlamaz.
 2. Gelir modeli: Kullanıcılar ücretsiz. Anketler tamamen ücretli. Diğer kalemler (indirimler, öne çıkan işletme, belediye anlaşmaları, Premium üyelik) en sona bırakıldı, birlikte kararlaştırılacak.
-3. Kullanıcı içeriği çevirisi (otomatik çeviri): birlikte düşünülecek.
+3. ~~Kullanıcı içeriği çevirisi~~: Karar (Eren, 6 Kasım 2026), "Çevir" düğmesi (bölüm 2).
 4. Hesap doğrulama süreci (belediye, muhtar, esnaf)
 5. Veri kaynakları: nöbetçi eczane, ulaşım, hava durumu, harita
 6. Yetkilendirme: kim verir, kim geri alır

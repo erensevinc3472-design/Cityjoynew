@@ -49,6 +49,9 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
   bildirimi, duyuru, mesaj ve takip bildirimleri, SOS kayıtlarının 30 gün sonra silinmesi, hesap silinince verilerin temizlenmesi); Blaze'e geçince Claude
   tek komutla yükler. Keşfet fotoğrafı için ayrıca konsolda sol menü > Storage > "Başlayın" (Get started) > konum
   **europe-west1** seç (kurallar sorulursa "üretim modu" seç; asıl kuralları Claude yükler).
+  "Çevir" düğmesi için ayrıca: console.cloud.google.com > üstte proje **cityjoynew** > arama kutusuna "Cloud Translation API"
+  yaz > **Etkinleştir** (Enable). Ayda 500 bin karakter ücretsiz, sonrası milyon karakter başına yaklaşık 20 dolar; günlük
+  kişi başı sınır Panel > Sınırlar > "Çeviri" (başlangıç 50).
 - [ ] **Apple Developer Program (yılda 99 dolar):** developer.apple.com/programs/enroll
   - İki adımlı doğrulaması açık bir Apple kimliği gerekir.
   - iPhone'a "Apple Developer" uygulamasını kur, oradan kimliğinle (TC kimlik/pasaport) kayıt ol.

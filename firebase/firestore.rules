@@ -1171,7 +1171,7 @@ service cloud.firestore {
     match /config/{id} {
       // Günlük sınır sayıları (Panel > Sınırlar, yalnızca admin).
       function limitsOk(d) {
-        return d.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'oy', 'oyYeni', 'sikayet', 'isletmeGonderi', 'vitrinUcretsiz', 'vitrinPro', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
+        return d.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'oy', 'oyYeni', 'sikayet', 'ceviri', 'isletmeGonderi', 'vitrinUcretsiz', 'vitrinPro', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
         && limitValue(d, 'gonderi')
         && limitValue(d, 'gonderiYeni')
         && limitValue(d, 'yorum')
@@ -1189,6 +1189,7 @@ service cloud.firestore {
         && limitValue(d, 'oy')
         && limitValue(d, 'oyYeni')
         && limitValue(d, 'sikayet')
+        && limitValue(d, 'ceviri')
         && limitValue(d, 'isletmeGonderi')
         && limitValue(d, 'vitrinUcretsiz')
         && limitValue(d, 'vitrinPro')

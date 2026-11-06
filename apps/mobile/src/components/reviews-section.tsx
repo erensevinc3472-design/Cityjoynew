@@ -10,6 +10,7 @@ import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { AppButton } from './app-button';
 import { AppText } from './app-text';
+import { TranslatableText } from './translatable-text';
 import { FormMessage } from './form-message';
 import { Stars } from './stars';
 import { StateMessage } from './state-message';
@@ -102,11 +103,11 @@ export function ReviewsSection({ business: b }: { business: Business }) {
               <Stars value={r.stars} size={16} />
               <AppText variant="caption" muted style={styles.flex}>{`${r.authorName} · ${date(r.createdAt)}`}</AppText>
             </View>
-            <AppText>{r.text}</AppText>
+            <TranslatableText text={r.text} />
             {r.reply ? (
               <View style={[styles.reply, { borderColor: c.accentBorder, backgroundColor: c.accentSoft }]}>
                 <AppText variant="caption" style={{ color: c.textStrong }}>{`${t('reviews.replyFrom')} · ${date(r.reply.at)}`}</AppText>
-                <AppText variant="caption">{r.reply.text}</AppText>
+                <TranslatableText variant="caption" text={r.reply.text} />
               </View>
             ) : null}
 

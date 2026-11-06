@@ -22,6 +22,7 @@ import {
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
@@ -271,9 +272,11 @@ export default function ChatScreen() {
                     setReporting(null);
                   }}
                   style={[styles.bubble, { backgroundColor: mine ? c.primary : c.surface, borderColor: mine ? c.primary : c.border }]}>
-                  <AppText style={[gone && styles.italic, { color: mine ? c.onPrimary : gone ? c.textMuted : c.textStrong }]}>
-                    {gone ? t(m.status === 'silindi' ? 'messages.deleted' : 'messages.removed') : m.text}
-                  </AppText>
+                  <TranslatableText
+                    noTranslate={mine || gone}
+                    style={[gone && styles.italic, { color: mine ? c.onPrimary : gone ? c.textMuted : c.textStrong }]}
+                    text={gone ? t(m.status === 'silindi' ? 'messages.deleted' : 'messages.removed') : m.text}
+                  />
                   <AppText variant="caption" style={{ color: mine ? c.onPrimary : c.textMuted, opacity: 0.8 }}>{team ? `${t('messages.fromTeam')} · ` : ''}{time(m.createdAt)}</AppText>
                 </Pressable>
                 {signal ? (

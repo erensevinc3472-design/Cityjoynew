@@ -2385,5 +2385,15 @@
     "ad": "Reklam",
     "stays_one": "{{count}} tesis",
     "stays_other": "{{count}} tesis"
+  },
+  "translate": {
+    "action": "Çevir",
+    "loading": "Çevriliyor…",
+    "original": "Aslını gör",
+    "from": "Çevrildi · Aslı: {{lang}}",
+    "same": "Bu metin zaten senin dilinde",
+    "signIn": "Çeviri için giriş yap",
+    "error": "Şu an çevrilemedi, biraz sonra tekrar dene",
+    "a11y": "Bu metni çevir ({{lang}})"
   }
 }

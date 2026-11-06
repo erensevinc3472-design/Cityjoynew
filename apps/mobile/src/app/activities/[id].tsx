@@ -14,6 +14,7 @@ import {
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
@@ -161,7 +162,7 @@ export default function ActivityScreen() {
         </View>
         {mapLink ? <AppButton variant="secondary" title={t('events.openMap')} onPress={() => Linking.openURL(mapLink).catch(() => {})} /> : null}
 
-        <AppText selectable>{item.description}</AppText>
+        <TranslatableText selectable text={item.description} />
 
         <View style={styles.meta}>
           <AppText variant="label">{t('activities.attendance')}</AppText>
