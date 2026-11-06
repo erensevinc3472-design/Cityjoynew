@@ -58,6 +58,11 @@ const toUser = (u: User): AuthUser => ({
 export interface FirebaseAuthOptions {
   /** Doğrulama ve şifre sıfırlama e-postalarının dili. */
   languageCode?: () => string;
+  /**
+   * E-postadaki bağlantıyla şifre değişince / e-posta doğrulanınca Firebase sayfasında çıkan "Devam" düğmesinin
+   * götüreceği adres (uygulamaya dönüş sayfası). Yetkili alan adında olmalı; emülatörde verilmez.
+   */
+  continueUrl?: () => string | undefined;
 }
 
 export function createFirebaseAuthService(auth: Auth, options: FirebaseAuthOptions = {}): AuthService & {
@@ -67,6 +72,10 @@ export function createFirebaseAuthService(auth: Auth, options: FirebaseAuthOptio
   const setLanguage = () => {
     const lang = options.languageCode?.();
     if (lang) auth.languageCode = lang;
+  };
+  const linkSettings = () => {
+    const url = options.continueUrl?.();
+    return url ? { url } : undefined;
   };
   const requireUser = () => {
     if (!auth.currentUser) throw new AuthError('wrong-credentials');
@@ -91,7 +100,7 @@ export function createFirebaseAuthService(auth: Auth, options: FirebaseAuthOptio
         setLanguage();
         const { user } = await createUserWithEmailAndPassword(auth, email.trim(), password);
         await updateProfile(user, { displayName: displayName.trim() });
-        await sendEmailVerification(user);
+        await sendEmailVerification(user, linkSettings());
         return toUser(user);
       }),
     signIn: (email: string, password: string) =>
@@ -100,12 +109,12 @@ export function createFirebaseAuthService(auth: Auth, options: FirebaseAuthOptio
     sendPasswordReset: (email: string) =>
       wrap(async () => {
         setLanguage();
-        await sendPasswordResetEmail(auth, email.trim());
+        await sendPasswordResetEmail(auth, email.trim(), linkSettings());
       }),
     sendEmailVerification: () =>
       wrap(async () => {
         setLanguage();
-        await sendEmailVerification(requireUser());
+        await sendEmailVerification(requireUser(), linkSettings());
       }),
     reload: () =>
       wrap(async () => {

@@ -831,6 +831,14 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   yeni dosya silinir). Çeviri: "Selam" gibi kısa selamlaşmalarda "Çevir" çıkmasın diye ek sözcükler. Tür denetimi temiz,
   ortak testler 169 geçti. Telefonda Eren'in onayı bekleniyor.
 
+- **E-posta bağlantısından uygulamaya dönüş (7 Kasım).** Şifre sıfırlama ve e-posta doğrulama e-postalarına dönüş adresi
+  eklendi: Firebase sayfasında işlem bitince "Devam" düğmesi `cityjoynew.web.app/uygulama.html` sayfasına gider (5 dil,
+  Arapça sağdan sola, açık/koyu), oradan "CityJoy'u aç" uygulamayı açar (`cityjoy://`; Expo Go'da çalışmaz, mağaza
+  sürümünde çalışır). Panelde dönüş panelin kendisi. Sayfa panelle birlikte yüklendi. Sonra: tamamen markalı kendi işlem
+  sayfamız (Firebase'de "işlem adresini özelleştir" ayarı gerekir).
+  Not: Eren'in iki hesabı var (`erensevinc3472@` boş, `zcayliyak@` gönderiler, işletme, profil fotoğrafı); şifre
+  sıfırlayıp boş hesaba girince içerik "silindi" sandı, veri yerinde.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Seyahat > Planla (Eren onayladı 29 Ekim 2026: tek ekran, fiyatlar panelden elle): `/travel/planla`, Seyahat girişinde "Yolculuğunu planla". Nereden-nereye (il), tarih (7 gün), yolcu sayısı; Kendi aracım / Otobüs / Uçak / Tren kartları (süre, tahmini ücret); yolculuk kartı (İST ━ BUR, süre, km, maliyet, notlar); araba için güzergâh çevresindeki mola yerleri (OSM + yol üstü işletmeler, yaklaşık); varınca (şehri keşfet, yöresel, başkanlarla); hazırlık listesi; "Yola çık" Yoldayım'ı varış iliyle açar (kalan km, varınca "Vardın!" kartı). Planlar yalnızca telefonda (en çok 5). Hesap: il merkezleri arası kuş uçuşu x 1,3; araba 90 km/s + 2,5 saatte 15 dk mola; otobüs 70 km/s + 20 dk; uçak 650 km/s + 30 dk, iki ilde havalimanı ve 150 km üstü. Panel > Seyahat > Yolculuk fiyatları (yalnızca admin): akaryakıt (benzin, dizel, LPG, elektrik kWh), otobüs km aralığı, ay; boşsa ücret gösterilmez. **Kurallar değişti (config/travelPrices): yüklenmeli. Eren fiyatları girmeli.** Olmayanlar: bilet, sefer, firma adları, canlı yol durumu, yapay zekâ, hava durumu.

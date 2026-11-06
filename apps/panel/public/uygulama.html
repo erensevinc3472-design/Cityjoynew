@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<title>CityJoy</title>
+<style>
+  :root { --bg: #F4F5F1; --card: #FFFFFF; --text: #13262A; --muted: #5B6B6E; --accent: #0E4F57; --on-accent: #FFFFFF; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0B2328; --card: #12333A; --text: #F1EDE4; --muted: #A9B8B9; --accent: #E2B277; --on-accent: #0B2328; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+    background: var(--bg); color: var(--text); font: 16px/1.5 -apple-system, system-ui, "Segoe UI", Roboto, sans-serif; }
+  main { width: 100%; max-width: 400px; background: var(--card); border-radius: 24px; padding: 32px 24px; text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08); }
+  .mark { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+    display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; }
+  .brand { font-weight: 700; letter-spacing: 0.02em; color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: 22px; margin: 0 0 8px; }
+  p { margin: 0 0 24px; color: var(--muted); }
+  a.btn { display: block; padding: 14px 16px; border-radius: 14px; background: var(--accent); color: var(--on-accent);
+    font-weight: 600; text-decoration: none; }
+  a.btn:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+  small { display: block; margin-top: 16px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="mark" aria-hidden="true">✓</div>
+  <p class="brand">CityJoy</p>
+  <h1 id="title">İşlem tamam</h1>
+  <p id="body">Şimdi CityJoy uygulamasına dönüp giriş yapabilirsin.</p>
+  <a class="btn" id="open" href="cityjoy://sign-in">CityJoy'u aç</a>
+  <small id="hint">Uygulama açılmazsa bu sayfayı kapatıp CityJoy'u kendin aç.</small>
+</main>
+<script>
+  // E-postadaki bağlantıdan (şifre sıfırlama / e-posta doğrulama) sonra Firebase sayfasındaki "Devam" buraya getirir.
+  var T = {
+    tr: ['İşlem tamam', 'Şimdi CityJoy uygulamasına dönüp giriş yapabilirsin.', "CityJoy'u aç", 'Uygulama açılmazsa bu sayfayı kapatıp CityJoy’u kendin aç.'],
+    en: ['All done', 'You can now go back to the CityJoy app and sign in.', 'Open CityJoy', 'If the app does not open, close this page and open CityJoy yourself.'],
+    de: ['Erledigt', 'Du kannst jetzt zur CityJoy-App zurückkehren und dich anmelden.', 'CityJoy öffnen', 'Falls sich die App nicht öffnet, schließe diese Seite und öffne CityJoy selbst.'],
+    ar: ['تم بنجاح', 'يمكنك الآن العودة إلى تطبيق CityJoy وتسجيل الدخول.', 'افتح CityJoy', 'إذا لم يُفتح التطبيق، أغلق هذه الصفحة وافتح CityJoy بنفسك.'],
+    ru: ['Готово', 'Теперь можно вернуться в приложение CityJoy и войти.', 'Открыть CityJoy', 'Если приложение не открылось, закройте страницу и откройте CityJoy сами.']
+  };
+  var q = new URLSearchParams(location.search).get('lang') || (navigator.language || 'tr');
+  var lang = String(q).slice(0, 2).toLowerCase();
+  if (!T[lang]) lang = 'tr';
+  var t = T[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('title').textContent = t[0];
+  document.getElementById('body').textContent = t[1];
+  document.getElementById('open').textContent = t[2];
+  document.getElementById('hint').textContent = t[3];
+</script>
+</body>
+</html>

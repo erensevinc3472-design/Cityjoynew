@@ -38,7 +38,15 @@ import { firebaseAuth, firestore } from './firebase';
 import i18n from './i18n';
 import { deviceStorage } from './storage';
 
-export const authService = createFirebaseAuthService(firebaseAuth, { languageCode: () => i18n.language });
+// E-posta bağlantısından sonra "Devam" uygulamaya dönüş sayfasına gider (panel barındırmasında, 5 dil).
+const webHost = firebaseAuth.app.options.projectId;
+export const authService = createFirebaseAuthService(firebaseAuth, {
+  languageCode: () => i18n.language,
+  continueUrl: () =>
+    webHost && !webHost.startsWith('demo-') && process.env.EXPO_PUBLIC_FIREBASE_EMULATOR !== '1'
+      ? `https://${webHost}.web.app/uygulama.html?lang=${encodeURIComponent(i18n.language)}`
+      : undefined,
+});
 export const profileRepository = createFirestoreProfileRepository(firestore);
 export const occupationRepository = createFirestoreOccupationRepository(firestore);
 export const emergencyNumbers = createEmergencyNumberStore(createFirestoreEmergencyNumberRepository(firestore), deviceStorage);
