@@ -511,7 +511,7 @@ service cloud.firestore {
         && nw.get('managerUids', []).size() <= od.get('managerUids', []).size()
         && nw.status in ['yayinda', 'gizli', 'kaldirildi']
         && nw.verification.status in ['dogrulanmadi', 'inceleniyor', 'dogrulandi']
-        && nw.membership.tier in ['ucretsiz', 'standart', 'pro', 'premium'];
+        && (nw.membership == od.membership || nw.membership.tier in ['ucretsiz', 'pro']);
       }
       allow update: if _k17(request.resource.data, resource.data);
       // Sahibi silebilir (hesap silmede de kullanılır, KVKK).
@@ -1170,34 +1170,38 @@ service cloud.firestore {
 
     match /config/{id} {
       // Günlük sınır sayıları (Panel > Sınırlar, yalnızca admin).
-      allow write: if isAdmin() && id == 'limits'
-        && request.resource.data.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'oy', 'oyYeni', 'sikayet', 'isletmeGonderi', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
-        && limitValue(request.resource.data, 'gonderi')
-        && limitValue(request.resource.data, 'gonderiYeni')
-        && limitValue(request.resource.data, 'yorum')
-        && limitValue(request.resource.data, 'yorumYeni')
-        && limitValue(request.resource.data, 'takip')
-        && limitValue(request.resource.data, 'takipYeni')
-        && limitValue(request.resource.data, 'sohbet')
-        && limitValue(request.resource.data, 'sohbetYeni')
-        && limitValue(request.resource.data, 'ilan')
-        && limitValue(request.resource.data, 'ilanYeni')
-        && limitValue(request.resource.data, 'aktivite')
-        && limitValue(request.resource.data, 'aktiviteYeni')
-        && limitValue(request.resource.data, 'oneri')
-        && limitValue(request.resource.data, 'oneriYeni')
-        && limitValue(request.resource.data, 'oy')
-        && limitValue(request.resource.data, 'oyYeni')
-        && limitValue(request.resource.data, 'sikayet')
-        && limitValue(request.resource.data, 'isletmeGonderi')
-        && limitValue(request.resource.data, 'muhtarDuyuru')
-        && limitValue(request.resource.data, 'muhtarDuyuruHafta')
-        && limitValue(request.resource.data, 'kurumDuyuru')
-        && limitValue(request.resource.data, 'kurumDuyuruHafta')
-        && limitValue(request.resource.data, 'acil')
-        && limitValue(request.resource.data, 'etkinlik')
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function limitsOk(d) {
+        return d.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'oy', 'oyYeni', 'sikayet', 'isletmeGonderi', 'vitrinUcretsiz', 'vitrinPro', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
+        && limitValue(d, 'gonderi')
+        && limitValue(d, 'gonderiYeni')
+        && limitValue(d, 'yorum')
+        && limitValue(d, 'yorumYeni')
+        && limitValue(d, 'takip')
+        && limitValue(d, 'takipYeni')
+        && limitValue(d, 'sohbet')
+        && limitValue(d, 'sohbetYeni')
+        && limitValue(d, 'ilan')
+        && limitValue(d, 'ilanYeni')
+        && limitValue(d, 'aktivite')
+        && limitValue(d, 'aktiviteYeni')
+        && limitValue(d, 'oneri')
+        && limitValue(d, 'oneriYeni')
+        && limitValue(d, 'oy')
+        && limitValue(d, 'oyYeni')
+        && limitValue(d, 'sikayet')
+        && limitValue(d, 'isletmeGonderi')
+        && limitValue(d, 'vitrinUcretsiz')
+        && limitValue(d, 'vitrinPro')
+        && limitValue(d, 'muhtarDuyuru')
+        && limitValue(d, 'muhtarDuyuruHafta')
+        && limitValue(d, 'kurumDuyuru')
+        && limitValue(d, 'kurumDuyuruHafta')
+        && limitValue(d, 'acil')
+        && limitValue(d, 'etkinlik')
+        && d.updatedBy == request.auth.uid
+        && d.updatedAt == request.time;
+      }
+      allow write: if isAdmin() && id == 'limits' && limitsOk(request.resource.data);
       allow read: if true;
       allow write: if isAdmin() && id == 'sos'
         && request.resource.data.keys().hasOnly(['liveMinutes', 'countdownSeconds', 'updatedBy', 'updatedAt'])
@@ -2227,11 +2231,11 @@ service cloud.firestore {
     // sunucu da kayıttan çıkan dosyadan yalnızca sahibin ve yetkililerin yüklediğini siler.
     function vitrinOk(d) {
       let l = d.get('gallery', []);
-      let tier = d.get('membership', {'tier': 'ucretsiz'}).get('tier', 'ucretsiz');
+      // Eski kayıtlardaki 'premium' Pro, 'standart' Ücretsiz sayılır.
+      let pro = d.get('membership', {}).get('tier', '') in ['pro', 'premium'];
       return l is list && (l.size() == 0
         || (resource != null && resource.data.get('gallery', []) == l)
-        || (l.size() <= 30 && l.size() <= limitOf({'ucretsiz': 'vitrinUcretsiz', 'standart': 'vitrinStandart', 'pro': 'vitrinPro', 'premium': 'vitrinPremium'}[tier],
-              {'ucretsiz': 3, 'standart': 10, 'pro': 20, 'premium': 30}[tier])));
+        || (l.size() <= 30 && l.size() <= limitOf(pro ? 'vitrinPro' : 'vitrinUcretsiz', pro ? 10 : 1)));
     }
     // Gönderi fotoğrafları (en çok 10, albüm): dosya paylaşanın klasöründe, bu gönderinin kimliğiyle ve sırayla
     // adlandırılır. Kural motorunun işlem sınırı (1000) yüzünden yalnızca yol denetlenir; biçimi ve adresin o dosyayı

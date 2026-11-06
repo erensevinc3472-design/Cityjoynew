@@ -82,8 +82,8 @@ describe('sıralama (Karar, Eren)', () => {
 
   it('üyelik kademesi sırayı değiştirmez; öne çıkanlar en çok 2 ve süresi dolan normal sıraya döner', () => {
     const free = biz({ rating: { sum: 225, count: 50 } });
-    const premium = biz({ membership: { tier: 'premium' }, rating: { sum: 0, count: 0 } });
-    expect(rankBusinesses([premium, free], { now }).others.map((x) => x.id)).toEqual([free.id, premium.id]);
+    const pro = biz({ membership: { tier: 'pro' }, rating: { sum: 0, count: 0 } });
+    expect(rankBusinesses([pro, free], { now }).others.map((x) => x.id)).toEqual([free.id, pro.id]);
 
     const f = (over: Partial<Business>) => biz({ featuredUntil: '2026-11-01T00:00:00Z', verification: { status: 'dogrulandi' }, ...over });
     const f1 = f({ rating: { sum: 250, count: 50 } });

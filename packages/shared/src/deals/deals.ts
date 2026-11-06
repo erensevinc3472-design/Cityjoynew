@@ -118,7 +118,7 @@ export const dealLive = (d: Pick<Deal, 'status' | 'endsOn'>, now = new Date()) =
 export const dealDaysLeft = (d: Pick<Deal, 'endsOn'>, now = new Date()) =>
   Math.max(0, Math.round((new Date(`${d.endsOn}T00:00:00`).getTime() - new Date(`${todayYmd(now)}T00:00:00`).getTime()) / DAY_MS));
 
-export const activeDealLimit = (tier: MembershipTier) => (tier === 'pro' || tier === 'premium' ? DEAL_LIMITS.activePro : DEAL_LIMITS.activeFree);
+export const activeDealLimit = (tier: MembershipTier) => (tier === 'pro' ? DEAL_LIMITS.activePro : DEAL_LIMITS.activeFree);
 
 /** Sponsorlu önce, sonra en yakın bitiş (süresi azalan fırsat önde), sonra en yeni. */
 export const sortDeals = (list: Deal[]) =>

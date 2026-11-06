@@ -33,9 +33,7 @@ export function photoPaths(...items: (Photo | readonly Photo[] | null | undefine
 /** İşletme vitrininde kademeye göre en çok fotoğraf; sayılar panelden (Sınırlar) değişir. */
 export const VITRIN_LIMIT_KEY = {
   ucretsiz: 'vitrinUcretsiz',
-  standart: 'vitrinStandart',
   pro: 'vitrinPro',
-  premium: 'vitrinPremium',
 } as const satisfies Record<MembershipTier, string>;
 
 /** Kayda yazılacak biçim: yalnızca bu dört alan, boyutlar tam sayı. */
