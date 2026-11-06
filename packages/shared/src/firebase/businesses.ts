@@ -29,7 +29,7 @@ import {
   type VerificationStatus,
 } from '../business/business';
 import { photoFrom, type Photo } from '../media/photo';
-import type { MembershipTier } from '../models/membership';
+import { toTier, type MembershipTier } from '../models/membership';
 import type { Action, Module } from '../permissions/types';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { deleteVerificationRequest } from './approvals';
@@ -47,7 +47,7 @@ function fromDoc(id: string, d: DocumentData): Business {
     ...(d as Business),
     id,
     verification: { status: d.verification?.status ?? 'dogrulanmadi', ...(iso(d.verification?.verifiedAt) ? { verifiedAt: iso(d.verification.verifiedAt) } : {}) },
-    membership: { tier: d.membership?.tier ?? 'ucretsiz', ...(iso(d.membership?.endsAt) ? { endsAt: iso(d.membership.endsAt) } : {}) },
+    membership: { tier: toTier(d.membership?.tier), ...(iso(d.membership?.endsAt) ? { endsAt: iso(d.membership.endsAt) } : {}) },
     featuredUntil: iso(d.featuredUntil),
     rating: { sum: d.rating?.sum ?? 0, count: d.rating?.count ?? 0 },
     followerCount: d.followerCount ?? 0,

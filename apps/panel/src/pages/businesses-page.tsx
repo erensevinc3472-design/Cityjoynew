@@ -4,6 +4,7 @@ import {
   DEFAULT_SERVICE_CATEGORIES,
   isGrantActive,
   isFeatured,
+  MEMBERSHIP_TIERS,
   type Approval,
   type Business,
   type MembershipTier,
@@ -17,7 +18,7 @@ import { useCity } from '../lib/city';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
 
-const TIERS: MembershipTier[] = ['ucretsiz', 'standart', 'pro', 'premium'];
+const TIERS = MEMBERSHIP_TIERS;
 const DAY = 86400000;
 
 /**

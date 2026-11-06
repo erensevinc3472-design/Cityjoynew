@@ -4,13 +4,14 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 4 Kasım 2026 (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 6 Kasım 2026 (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
 > girişiyle gönderir, PR'ı Eren bağlantıdan açıp birleştirir (20. madde PR #6). Sistem Java'sı 8; kural testleri için
 > Temurin JDK 21 zip olarak `%TEMP%\cj-jdk21` klasörüne açıldı (kurulmadı): `JAVA_HOME` ve `PATH` o klasörü gösterecek
-> şekilde ayarlanıp `npm run test:rules`. Klasör silinmişse yeniden indirilir. Kurallar Eren'in bilgisayarından yüklenir:
+> şekilde ayarlanıp `npm run test:rules` (JDK yolu: `%TEMP%/cj-jdk21/x/jdk-21.0.12.1+1`). Emülatör "An unexpected error" ile
+> açılmazsa `%TEMP%hub-demo-cityjoy.json` bozuktur (içi boş baytlar): adını değiştir ya da sil. Klasör silinmişse yeniden indirilir. Kurallar Eren'in bilgisayarından yüklenir:
 > `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew` (giriş kayıtlı).
 
 > **Kural yükleme hatası (4 Kasım, giderildi):** Firebase'in kural derleyicisi işlevlere doğrudan `null` verilmesini
@@ -758,8 +759,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **İşletme kademeleri: iki kademe (Karar Eren, 3 Kasım; PROJE.md 15 madde 2).** Ücretsiz: listeye kendiliğinden düşer,
   1 fotoğraf, Ara, WhatsApp. Pro: 10 fotoğraf, adres/yol, detaylı yazı, ücretler, yorumlar ve puan, video, istatistik,
   öne çıkma hakkı (en çok 2 Reklam, doğrulanmış Pro işletmeler sırayla). Önizleme tuvalde (H-Cekici, H-Isletme, H-Kademe).
-  **Açık iş:** kodda MembershipTier hâlâ dört değerli ve panel Sınırlar vitrin önerisi 3/10/20/30; iç ekranlar uygulanırken
-  ikiye (ucretsiz, pro) ve 1/10 sınırına indirilecek.
+  ~~Açık iş: kodda dört kademe~~ (6 Kasım yapıldı, Yapılanlar sonu).
 - **İç ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla (4 Kasım, dal `claude/ic-ekranlar`;
   PROJE.md 13. madde 35 ve 5.2).** **Acil:** Veteriner ve diğer hizmet sayfaları ortak liste kalıbında
   (`services/[id].tsx`); Taksi durakları (`components/taxi-stands.tsx`: en yakın durak büyük kartta, veri Önemli Kurumlar
@@ -783,6 +783,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Tip denetimi üç pakette temiz. **Telefonda denenmedi.** **Eren yapacak:** PR'ı birleştir, kuralları yükle; Expo'da dene.
   Açık: yarışma videosu yükleme ve yayıncı
   başvurusu Blaze ve sonraki iş; Panel > Uygulama görselleri yükleme Blaze ile.
+
+- **İşletme kademeleri koda geçti: Ücretsiz ve Pro (6 Kasım, dal `claude/iki-kademe`; PROJE.md 15 madde 2).**
+  `MembershipTier` artık iki değerli (`ucretsiz`, `pro`); eski kayıtlardaki `premium` Pro, `standart` Ücretsiz sayılır
+  (`toTier`, kurallarda da). Vitrin varsayılanı Ücretsiz 1, Pro 10 fotoğraf (Panel > Sınırlar'dan değişir, en çok 30).
+  Panel > İşletmeler kademe seçimi ve Sınırlar sayfası iki kademeyi gösterir. Fırsat sınırı zaten Ücretsiz 1, Pro 5.
+  **Hata düzeltmesi:** Panel > Sınırlar "Kaydet" vitrin sayılarını da yazıyordu ama kurallar bu alanlara izin vermiyordu,
+  kayıt hep reddedilirdi; kurallar düzeltildi, yeni testle denetleniyor. Kural dosyası biraz küçüldü (sınıra yakınlık
+  sorunu yok). Testler: ortak 166, kurallar 156 geçti; tür denetimi dört pakette temiz. **Eren yapacak:** PR'ı birleştir;
+  sonra kurallar ve panel yüklenmeli (Claude yükleyebilir ya da Eren: kural komutu yukarıda, panel `npm run panel:deploy`).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

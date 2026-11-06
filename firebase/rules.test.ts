@@ -8,6 +8,7 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
+import { DEFAULT_LIMITS } from '@cityjoy/shared';
 import { collection, deleteDoc, doc, getDoc, getDocs, query, serverTimestamp, setDoc, Timestamp, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
@@ -199,7 +200,7 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(setDoc(doc(db(), 'businesses/b1'), fresh('misafir')));
     await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('veli')));
     await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { verification: { status: 'dogrulandi' } })));
-    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { membership: { tier: 'premium' } })));
+    await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { membership: { tier: 'pro' } })));
     await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { rating: { sum: 500, count: 100 } })));
     await assertFails(setDoc(doc(db('ali'), 'businesses/b1'), fresh('ali', { type: 'evden-uretim', address: 'Ev adresim' })));
     // Telefon kaydı olmadan işletme açılamaz; telefon başkasınınsa da açılamaz.
@@ -414,6 +415,8 @@ describe('günlük sınırlar', () => {
     await assertFails(setDoc(doc(db('eren'), 'config/limits'), { oneriYeni: 0, updatedBy: 'eren', updatedAt: serverTimestamp() }));
     await assertFails(setDoc(doc(db('eren'), 'config/limits'), { bilinmeyen: 3, updatedBy: 'eren', updatedAt: serverTimestamp() }));
     await assertSucceeds(setDoc(doc(db('eren'), 'config/limits'), { oneriYeni: 3, updatedBy: 'eren', updatedAt: serverTimestamp() }));
+    // Panel > Sınırlar bütün sayıları (vitrin dahil) birlikte yazar.
+    await assertSucceeds(setDoc(doc(db('eren'), 'config/limits'), { ...DEFAULT_LIMITS, oneriYeni: 3, updatedBy: 'eren', updatedAt: serverTimestamp() }));
     await assertSucceeds(bump(db('ali'), 3, 'serviceSuggestions/a'));
   });
 });
