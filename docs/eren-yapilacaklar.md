@@ -52,6 +52,10 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
   "Çevir" düğmesi için ayrıca: console.cloud.google.com > üstte proje **cityjoynew** > arama kutusuna "Cloud Translation API"
   yaz > **Etkinleştir** (Enable). Ayda 500 bin karakter ücretsiz, sonrası milyon karakter başına yaklaşık 20 dolar; günlük
   kişi başı sınır Panel > Sınırlar > "Çeviri" (başlangıç 50).
+  **Bilmen gereken:** bütçe uyarısı harcamayı durdurmaz, yalnızca e-posta atar; kartta kendiliğinden üst sınır yoktur.
+  Bu yüzden Blaze'e geçince Claude ilk iş **otomatik sigorta** kuracak: aylık harcama belirlenen tutarı (öneri 20 dolar)
+  geçerse faturalandırma projeden koparılır, ücretli servisler durur, karttan sürpriz tutar çekilmez (sen yeniden açana
+  kadar fotoğraf, bildirim, çeviri çalışmaz). Bitince Claude'a "Blaze tamam" yaz.
 - [ ] **Apple Developer Program (yılda 99 dolar):** developer.apple.com/programs/enroll
   - İki adımlı doğrulaması açık bir Apple kimliği gerekir.
   - iPhone'a "Apple Developer" uygulamasını kur, oradan kimliğinle (TC kimlik/pasaport) kayıt ol.

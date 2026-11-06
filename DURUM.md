@@ -847,7 +847,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **Kitle istatistiği (3 Kasım):** gönderi istatistikleri "kurum / başkan adına gönderi" ile gelecek; 10 kişi eşiği şimdilik
   panelde (sunucuda Blaze ile); takip / bırakma tekrarına sınır yok; seçim dönemi başkan gizleme resmî profile
   uygulanmadı; avukat: verinin siyasi kullanımı; aydınlatma metnine "isimsiz, toplu istatistik" satırı (PROJE.md 6.1).
-- **Blaze'e geçince Claude'un yapacakları:** "Çevir" düğmesinin işlevini yükleyip gerçek çeviriyle denemek; Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu (uygulama + kurallar; Karar
+- **Blaze'e geçince Claude'un yapacakları:** **ilk iş otomatik harcama sigortası** (Eren istedi, 6 Kasım: bütçe Pub/Sub bildirimi > işlev > tutar aşılınca projenin faturalandırmasını kapatır; öneri aylık 20 dolar, ayrıca 10 dolar e-posta uyarısı; `docs/eren-yapilacaklar.md`); sonra sunucu işlevleri ve Storage kurallarını yüklemek; listelerde küçük önizleme görseli (maliyet: şu an liste de 1600 piksellik asıl fotoğrafı indiriyor); Storage europe-west1'de ücretsiz kota yok, ilk bayttan ücretlendirilir, maliyeti izlemek; "Çevir" düğmesinin işlevini yükleyip gerçek çeviriyle denemek; Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu (uygulama + kurallar; Karar
   Eren 3 Kasım); fotoğraflı akışları gerçek projede deneme.
 - **Eren'in yapacakları tek listede:** `docs/eren-yapilacaklar.md` (31 Ekim). Eren bir maddeyi bitirdim deyince işaretle.
 - **Mağaza öncesi kontrol listesi (30 Ekim 2026, 20 maddelik liste üzerinden):** Claude'un üç işi yapıldı (konum izni metni,
