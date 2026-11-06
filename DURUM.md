@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 6 Kasım 2026 (dal claude/cevir-dugmesi: kullanıcı içeriğine "Çevir" düğmesi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 6 Kasım 2026 (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -804,8 +804,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   basınca "Çeviri için giriş yap". Metinler 5 dilde. Testler: ortak 169, kurallar 156, sunucu 34 geçti; tür denetimi temiz;
   web önizlemede görünüm ve girişsiz durum denendi. **Gerçek çeviri denenmedi:** Blaze + "Cloud Translation API"yi açmak
   gerekir (`docs/eren-yapilacaklar.md` Blaze maddesi); işlev yüklenince telefonda denenecek. Panelden girilen tek dilli
-  içerik (anket, yarışma) için ayrı 5 dil alanı gerekmedi, aynı düğme çevirir. **Eren yapacak:** PR'ı birleştir; Claude
-  kuralları (Sınırlar'a "ceviri" eklendi) ve paneli yükler.
+  içerik (anket, yarışma) için ayrı 5 dil alanı gerekmedi, aynı düğme çevirir. PR #72 birleşti; kurallar ve dizinler
+  Firebase'e, panel cityjoynew.web.app'e yüklendi (6 Kasım, Claude; kurallarda Google'da 8 deneme geçici 503/409, 9.'da tamam).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
