@@ -1279,6 +1279,15 @@ service cloud.firestore {
       allow read: if isSelf(uid);
       allow write: if false;
     }
+    // Harcama (Panel > Harcama, yalnızca admin): status'u sunucu yazar, settings'te sigorta tutarı (TL, 100-100000).
+    match /billing/{id} {
+      allow read: if isAdmin();
+      allow write: if isAdmin() && id == 'settings'
+        && request.resource.data.keys().hasOnly(['cap', 'updatedBy', 'updatedAt'])
+        && request.resource.data.cap is int && request.resource.data.cap >= 100 && request.resource.data.cap <= 100000
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+    }
 
     // ---- Yetkiler (PROJE.md 6.7): admin il yöneticisi, muhtar ve moderatör verir; il yöneticisi kendi ilinde muhtar
     // ve moderatör verir, kendinde olmayan yetkiyi veremez. Admin rolü panelden verilmez (yalnızca konsol, admins).

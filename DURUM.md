@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 6 Kasım 2026 (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -26,6 +26,20 @@ Son güncelleme: 6 Kasım 2026 (PR #72 "Çevir" düğmesi birleşti; kurallar ve
 > aynı kalıpla işlev içine yaz; dosya sınıra yakın. Not: hizmet hesabıyla `firebase deploy` yetki hatası veriyor
 > (serviceusage); kurallar firebase-admin `releaseFirestoreRulesetFromSource` ile yüklendi. Eren anahtarı sohbete
 > yapıştırdı; konsoldan silmesi istendi.
+
+> **Blaze ve harcama sigortası (6-7 Kasım, dal `claude/blaze-kurulum`):** cityjoynew Blaze'de (ödeme hesabı
+> "Firebase Payment" 01AEE0-D23C40-9ABD42; bütçe "cityjoy" 350 TL/ay), Storage europe-west1, Translation API açık
+> (herkese açık API anahtarı Translation'a kapalı, denendi). Tüm sunucu işlevleri europe-west1'e yüklendi (ilk yüklemede
+> Eventarc izni gecikti, ikinci denemede tamam). **Sigorta:** `functions/src/budget.ts`, `budgetGuard` (Pub/Sub
+> `budget-alerts`): her bildirimde `billing/status` yazılır; bu ayki harcama sigorta tutarına (`billing/settings.cap`,
+> boşsa bütçe × 2) ulaşınca Cloud Billing API ile ödeme bağlantısı koparılır. **Panel > Harcama** (yalnızca admin):
+> durum, sigorta tutarı (100-100000 TL, işlem kaydı), "Şimdi durdur" (`billingStop` callable, sunucu admin denetler,
+> işlem kaydı), yeniden açma Google Cloud bağlantısıyla (bağlantı kopukken sunucu çalışmaz). Kural: `billing/{id}`
+> okuma admin, yazma yalnızca `settings`. **Eksik (Eren, docs/eren-yapilacaklar.md):** hizmet hesabına "Project Billing
+> Manager" rolü (Claude'un IAM değişikliği izin dışı kaldı) ve bütçeyi `budget-alerts` konusuna bağlamak. Not:
+> Google'ın kendi harcama tavanı yalnızca Gemini/Vertex/Cloud Run içindir, bu yüzden özel sigorta.
+> **Fırsat bitiş günü düzeltmesi (7 Kasım):** `latestDealEnd` UTC tarihine göre; Türkiye saatiyle 00.00-03.00 arası
+> "en geç gün" sunucu kuralınca reddediliyordu (kural testi gece yarısından sonra düşüyordu).
 
 ## Depo ve ortam
 

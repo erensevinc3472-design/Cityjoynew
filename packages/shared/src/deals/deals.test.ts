@@ -19,6 +19,8 @@ describe('Fırsatlar', () => {
   it('bitiş zorunlu ve en çok 90 gün; kod kullanımında kod şart', () => {
     expect(validateDeal(input(), now)).toEqual([]);
     expect(latestDealEnd(now)).toBe('2027-02-01');
+    // Türkiye saatiyle gece yarısından sonra (UTC hâlâ önceki gün) sunucunun kabul ettiği gün seçilir.
+    expect(latestDealEnd(new Date('2026-11-06T22:30:00Z'))).toBe('2027-02-04');
     expect(validateDeal(input({ endsOn: '2027-02-01' }), now)).toEqual([]);
     expect(validateDeal(input({ endsOn: '2027-02-02' }), now)).toEqual(['endsOn']);
     expect(validateDeal(input({ endsOn: '2026-11-02' }), now)).toEqual(['endsOn']);

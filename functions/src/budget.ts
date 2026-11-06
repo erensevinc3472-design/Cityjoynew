@@ -1,14 +1,14 @@
 /**
- * Harcama sigortası (Eren istedi, 6 Kasım 2026). Google Cloud bütçe uyarısı yalnızca e-posta atar, harcamayı durdurmaz.
- * Bütçe (Faturalandırma > Bütçeler, "cityjoy", aylık) her güncellemede `budget-alerts` konusuna bildirim yollar;
- * o ayın harcaması bütçenin SIGORTA_KATI katına ulaşırsa projenin ödeme hesabı bağlantısı koparılır: ücretli
- * servisler durur, karttan sürpriz tutar çekilmez. Yeniden açmak için Eren Google Cloud > Faturalandırma > Projelerim'den
- * cityjoynew'i yeniden "Firebase Payment" hesabına bağlar.
+ * Harcama sigortası (Eren istedi, 6-7 Kasım 2026). Google Cloud bütçe uyarısı yalnızca e-posta atar, harcamayı
+ * durdurmaz. Bütçe (Faturalandırma > Bütçeler, "cityjoy", aylık) her güncellemede `budget-alerts` konusuna bildirim
+ * yollar; o ayın harcaması sigorta tutarına (Panel > Harcama; boşsa bütçenin iki katı) ulaşırsa projenin ödeme hesabı
+ * bağlantısı koparılır: ücretli servisler durur, karttan sürpriz tutar çekilmez. Son durum `billing/status`'a yazılır
+ * (yalnızca admin okur). Yeniden açmak için Eren Google Cloud > Faturalandırma > Projelerim'den cityjoynew'i yeniden
+ * "Firebase Payment" hesabına bağlar (bağlantı kopukken sunucu çalışmaz, panelden açılamaz).
  */
 import { applicationDefault } from 'firebase-admin/app';
-
-/** Bütçe 350 TL (yaklaşık 10 $); sigorta iki katında, yaklaşık 20 $. */
-export const SIGORTA_KATI = 2;
+import { FieldValue, Timestamp, type Firestore } from 'firebase-admin/firestore';
+import { capFor } from '@cityjoy/shared';
 
 /** Google'ın bütçe bildirimindeki alanlar (https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications). */
 export interface BudgetNotice {
@@ -20,22 +20,51 @@ export interface BudgetNotice {
 
 export type DisableBilling = () => Promise<void>;
 
-/** Sigortanın atması gerekiyor mu? Bütçe tutarı yoksa ya da bozuksa hiçbir şey yapılmaz. */
-export function overCap(n: BudgetNotice, factor = SIGORTA_KATI): boolean {
+/** Bildirim geçerli mi; geçerliyse harcama ve bütçe. */
+function amounts(n: BudgetNotice): { cost: number; budget: number } | null {
   const cost = Number(n.costAmount);
   const budget = Number(n.budgetAmount);
-  if (!Number.isFinite(cost) || !Number.isFinite(budget) || budget <= 0) return false;
-  return cost >= budget * factor;
+  return Number.isFinite(cost) && Number.isFinite(budget) && budget > 0 ? { cost, budget } : null;
 }
 
-/** Bildirimi işler; sigorta attıysa true döner. */
-export async function handleBudgetNotice(n: BudgetNotice, disable: DisableBilling): Promise<boolean> {
-  if (!overCap(n)) return false;
+/**
+ * Bildirimi işler: durumu yazar, harcama sigorta tutarına ulaştıysa bağlantıyı koparır. Sigorta attıysa true.
+ */
+export async function handleBudgetNotice(db: Firestore, n: BudgetNotice, disable: DisableBilling, now: Date): Promise<boolean> {
+  const a = amounts(n);
+  if (!a) return false;
+  const settings = await db.doc('billing/settings').get();
+  const capAmount = capFor(a.budget, settings.exists ? (settings.get('cap') as number) : null);
+  const status = db.doc('billing/status');
+  const base = { costAmount: a.cost, budgetAmount: a.budget, currency: n.currencyCode ?? '', capAmount, updatedAt: Timestamp.fromDate(now) };
+  if (a.cost < capAmount) {
+    await status.set({ ...base, enabled: true, stoppedBy: FieldValue.delete(), stoppedAt: FieldValue.delete() }, { merge: true });
+    return false;
+  }
   await disable();
+  await status.set({ ...base, enabled: false, stoppedBy: 'sigorta', stoppedAt: Timestamp.fromDate(now) }, { merge: true });
   return true;
 }
 
-/** Projenin ödeme hesabı bağlantısını koparır (Cloud Billing API; işlevin hizmet hesabı "Billing Project Manager" olmalı). */
+/** Panel > Harcama > "Şimdi durdur": yalnızca admin; işlem kaydına yazılır. */
+export async function handleManualStop(db: Firestore, uid: string, disable: DisableBilling, now: Date): Promise<void> {
+  if (!(await db.doc(`admins/${uid}`).get()).exists) throw new Error('yetki');
+  await disable();
+  const at = Timestamp.fromDate(now);
+  const batch = db.batch();
+  batch.set(db.doc('billing/status'), { enabled: false, stoppedBy: 'panel', stoppedAt: at, updatedAt: at }, { merge: true });
+  batch.set(db.collection('auditLog').doc(), {
+    actorUid: uid,
+    module: 'moderasyon',
+    action: 'duzenle',
+    targetId: 'billing',
+    at,
+    summary: 'Ödeme bağlantısı panelden koparıldı (ücretli servisler durdu)',
+  });
+  await batch.commit();
+}
+
+/** Projenin ödeme hesabı bağlantısını koparır (Cloud Billing API; işlevin hizmet hesabı "Project Billing Manager" olmalı). */
 export const cloudBillingDisabler =
   (projectId: string): DisableBilling =>
   async () => {

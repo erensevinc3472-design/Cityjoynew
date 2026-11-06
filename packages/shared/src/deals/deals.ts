@@ -85,8 +85,11 @@ export type DealError = 'category' | 'kind' | 'value' | 'title' | 'when' | 'term
 const DAY_MS = 86_400_000;
 const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-/** Bitiş için seçilebilecek en geç gün (bugün + 90). */
-export const latestDealEnd = (now = new Date()) => ymd(new Date(now.getTime() + DEAL_LIMITS.maxDays * DAY_MS));
+/**
+ * Bitiş için seçilebilecek en geç gün (bugün + 90). Sunucu kuralı günü UTC gece yarısı sayar; Türkiye saatiyle 00.00-03.00
+ * arasında yerel tarih bir gün ileride olduğundan en geç gün UTC tarihinden alınır (yoksa sunucu reddeder).
+ */
+export const latestDealEnd = (now = new Date()) => new Date(now.getTime() + DEAL_LIMITS.maxDays * DAY_MS).toISOString().slice(0, 10);
 export const todayYmd = (now = new Date()) => ymd(now);
 
 const within = (s: string | undefined, [min, max]: readonly [number, number]) => {

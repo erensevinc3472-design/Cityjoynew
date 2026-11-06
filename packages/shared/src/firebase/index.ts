@@ -62,6 +62,7 @@ export { createHolidayAdmin, createHolidayRepository, readOpenCountries } from '
 export { createFirestoreMessageRepository, createMessageModeration, type MessageReport } from './messages';
 export { createFirestoreListingRepository, createListingModeration, type ListingFilter, type ListingPage, type ListingReport } from './listings';
 export { createNotificationSettings, createNotificationTriggers } from './notifications';
+export { createBillingAdmin } from './billing';
 export { countUsage, createLimitsAdmin, deleteUsageOf, vitrinLimit } from './limits';
 export { createFirestoreTravelRepository, createMunicipalTravel, createTravelAdmin, type TravelAdminKind } from './travel';
 export { createRoadsidePackAdmin, createRoadsidePackRepository, type RoadsidePackSummary } from './roadside';

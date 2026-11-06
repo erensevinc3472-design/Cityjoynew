@@ -4,7 +4,7 @@ import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { handleAnnouncementWrite } from '../src/announcements';
-import { handleBudgetNotice, overCap } from '../src/budget';
+import { handleBudgetNotice, handleManualStop } from '../src/budget';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
@@ -486,19 +486,48 @@ describe('Çevir düğmesi', () => {
 });
 
 describe('harcama sigortası', () => {
-  it('bütçenin iki katında ödeme bağlantısını koparır, altında dokunmaz', async () => {
-    let calls = 0;
-    const disable = async () => { calls += 1; };
-    expect(await handleBudgetNotice({ costAmount: 349, budgetAmount: 350, currencyCode: 'TRY' }, disable)).toBe(false);
-    expect(await handleBudgetNotice({ costAmount: 699.99, budgetAmount: 350 }, disable)).toBe(false);
-    expect(calls).toBe(0);
-    expect(await handleBudgetNotice({ costAmount: 700, budgetAmount: 350 }, disable)).toBe(true);
-    expect(calls).toBe(1);
+  const counter = () => {
+    const c = { n: 0, fn: async () => { c.n += 1; } };
+    return c;
+  };
+
+  it('bütçenin iki katında ödeme bağlantısını koparır, altında yalnızca durumu yazar', async () => {
+    const d = counter();
+    expect(await handleBudgetNotice(db, { costAmount: 699.99, budgetAmount: 350, currencyCode: 'TRY' }, d.fn, NOW)).toBe(false);
+    expect(d.n).toBe(0);
+    let s = (await db.doc('billing/status').get()).data()!;
+    expect(s).toMatchObject({ costAmount: 699.99, budgetAmount: 350, capAmount: 700, enabled: true, currency: 'TRY' });
+    expect(await handleBudgetNotice(db, { costAmount: 700, budgetAmount: 350, currencyCode: 'TRY' }, d.fn, NOW)).toBe(true);
+    expect(d.n).toBe(1);
+    s = (await db.doc('billing/status').get()).data()!;
+    expect(s).toMatchObject({ enabled: false, stoppedBy: 'sigorta' });
   });
 
-  it('bozuk bildirimde hiçbir şey yapmaz', () => {
-    expect(overCap({})).toBe(false);
-    expect(overCap({ costAmount: 10, budgetAmount: 0 })).toBe(false);
-    expect(overCap({ costAmount: Number.NaN, budgetAmount: 10 })).toBe(false);
+  it('panelden girilen sigorta tutarını kullanır', async () => {
+    await db.doc('billing/settings').set({ cap: 1000 });
+    const d = counter();
+    expect(await handleBudgetNotice(db, { costAmount: 900, budgetAmount: 350 }, d.fn, NOW)).toBe(false);
+    expect(await handleBudgetNotice(db, { costAmount: 1000, budgetAmount: 350 }, d.fn, NOW)).toBe(true);
+    expect(d.n).toBe(1);
+  });
+
+  it('bozuk bildirimde hiçbir şey yapmaz', async () => {
+    const d = counter();
+    expect(await handleBudgetNotice(db, {}, d.fn, NOW)).toBe(false);
+    expect(await handleBudgetNotice(db, { costAmount: 10, budgetAmount: 0 }, d.fn, NOW)).toBe(false);
+    expect(d.n).toBe(0);
+    expect((await db.doc('billing/status').get()).exists).toBe(false);
+  });
+
+  it('"Şimdi durdur" yalnızca admin içindir ve işlem kaydına yazılır', async () => {
+    const d = counter();
+    await expect(handleManualStop(db, 'biri', d.fn, NOW)).rejects.toThrow('yetki');
+    expect(d.n).toBe(0);
+    await db.doc('admins/eren').set({});
+    await handleManualStop(db, 'eren', d.fn, NOW);
+    expect(d.n).toBe(1);
+    expect((await db.doc('billing/status').get()).data()).toMatchObject({ enabled: false, stoppedBy: 'panel' });
+    const log = await db.collection('auditLog').where('targetId', '==', 'billing').get();
+    expect(log.docs[0].data()).toMatchObject({ actorUid: 'eren', module: 'moderasyon' });
   });
 });

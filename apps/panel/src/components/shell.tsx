@@ -79,6 +79,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
       { key: 'yetkiler', module: 'yetkiler', path: '/yetkiler', icon: 'key' },
       { key: 'islem-kayitlari', module: 'islem-kayitlari', path: '/islem-kayitlari', icon: 'file' },
       { key: 'sinirlar', show: admin, path: '/sinirlar', icon: 'gauge' },
+      { key: 'harcama', show: admin, path: '/harcama', icon: 'gauge' },
     ],
   },
 ];

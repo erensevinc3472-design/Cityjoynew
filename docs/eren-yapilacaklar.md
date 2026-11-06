@@ -43,21 +43,17 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
   - Şahıs: hızlı açılır. Google Play yayından önce **12 kişi x 14 gün kapalı test** ister.
   - Şirket: Apple bir **D-U-N-S numarası** ister (ücretsiz, 1-2 hafta sürebilir), Google'ın 14 gün kuralı yok.
   - Mali müşavirine sor: uygulama ileride gelir getirecekse şirket daha doğru olabilir.
-- [ ] **Firebase Blaze plan:** console.firebase.google.com > cityjoynew > sol altta "Spark" yazan yer > Yükselt (Upgrade)
-  > Blaze > kartını ekle. Ardından **bütçe uyarısı** kur: Google Cloud'da "Faturalandırma > Bütçeler ve uyarılar" >
-  aylık 10 dolar (aşınca e-posta gelir). Sunucu işlevleri yazıldı ve hazır bekliyor (etkinlik iptal
-  bildirimi, duyuru, mesaj ve takip bildirimleri, SOS kayıtlarının 30 gün sonra silinmesi, hesap silinince verilerin temizlenmesi); Blaze'e geçince Claude
-  tek komutla yükler. Keşfet fotoğrafı için ayrıca konsolda sol menü > Storage > "Başlayın" (Get started) > konum
-  **europe-west1** seç (kurallar sorulursa "üretim modu" seç; asıl kuralları Claude yükler).
-  (Karar senin, 6 Kasım: Avrupa. Veritabanı da Avrupa'da; ücretsiz Storage kotası yalnızca ABD'de olduğu için fotoğraf
-  deposu ilk fotoğraftan küçük ücretlidir, başta ayda en çok ~10-12 dolar, deneme kredisinden düşer. Bölge sonradan değişmez.)
-  "Çevir" düğmesi için ayrıca: console.cloud.google.com > üstte proje **cityjoynew** > arama kutusuna "Cloud Translation API"
-  yaz > **Etkinleştir** (Enable). Ayda 500 bin karakter ücretsiz, sonrası milyon karakter başına yaklaşık 20 dolar; günlük
-  kişi başı sınır Panel > Sınırlar > "Çeviri" (başlangıç 50).
-  **Bilmen gereken:** bütçe uyarısı harcamayı durdurmaz, yalnızca e-posta atar; kartta kendiliğinden üst sınır yoktur.
-  Bu yüzden Blaze'e geçince Claude ilk iş **otomatik sigorta** kuracak: aylık harcama belirlenen tutarı (öneri 20 dolar)
-  geçerse faturalandırma projeden koparılır, ücretli servisler durur, karttan sürpriz tutar çekilmez (sen yeniden açana
-  kadar fotoğraf, bildirim, çeviri çalışmaz). Bitince Claude'a "Blaze tamam" yaz.
+- [x] **Firebase Blaze plan (6 Kasım, tamam):** cityjoynew Blaze'de, ödeme hesabı "Firebase Payment", aylık bütçe
+  "cityjoy" 350 TL (uyarılar %50/%90/%100), Storage europe-west1, Cloud Translation API açık. Sunucu işlevleri yüklendi.
+- [ ] **Harcama sigortası için iki ayar (7 Kasım; Claude'un izni yok, senin yapman gerekiyor):**
+  1. console.cloud.google.com/iam-admin/iam?project=cityjoynew > **Erişim izni ver** (Grant access) > "Yeni ana hesaplar"
+     kutusuna `484442991767-compute@developer.gserviceaccount.com` > Rol: **Proje Faturalandırma Yöneticisi** (Project
+     Billing Manager) > Kaydet. (Sunucu bu izinle kart bağlantısını koparabilir; başka bir şey yapamaz.)
+  2. console.cloud.google.com/billing > Bütçeler ve uyarılar > **cityjoy** > Düzenle > en altta "Bu bütçeye bir Pub/Sub
+     konusu bağla" kutusunu işaretle > proje **cityjoynew**, konu **budget-alerts** > Kaydet.
+  Bitince Panel > Harcama sayfasında bu ayki harcama görünmeye başlar (Google günde birkaç kez bildirir). Sigorta
+  tutarını orada değiştirebilir, "Kart bağlantısını şimdi kopar" düğmesiyle hemen durdurabilirsin. Yeniden açmak:
+  console.cloud.google.com/billing/projects > cityjoynew > Faturalandırmayı değiştir > "Firebase Payment".
 - [ ] **Apple Developer Program (yılda 99 dolar):** developer.apple.com/programs/enroll
   - İki adımlı doğrulaması açık bir Apple kimliği gerekir.
   - iPhone'a "Apple Developer" uygulamasını kur, oradan kimliğinle (TC kimlik/pasaport) kayıt ol.

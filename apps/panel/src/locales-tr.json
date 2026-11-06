@@ -1691,7 +1691,8 @@
       "diger-ihtiyaclar": "Diğer İhtiyaçlar",
       "anketler": "Anketler",
       "yarismalar": "Yarışmalar",
-      "tatil-fikirleri": "Tatil fikirleri"
+      "tatil-fikirleri": "Tatil fikirleri",
+      "harcama": "Harcama"
     },
     "audience": "Takipçiler"
   },
@@ -2039,5 +2040,39 @@
       "ES": "İspanya"
     },
     "saveCountries": "Ülkeleri kaydet"
+  },
+  "billing": {
+    "title": "Harcama",
+    "intro": "Google Cloud faturası ve harcama sigortası. Bu ayki harcama sigorta tutarına ulaşınca kartla bağlantı kendiliğinden kopar, ücretli servisler durur.",
+    "adminOnly": "Bu sayfayı yalnızca admin görür.",
+    "loading": "Yükleniyor…",
+    "loadError": "Harcama bilgisi yüklenemedi.",
+    "retry": "Tekrar dene",
+    "noData": "Henüz Google'dan harcama bildirimi gelmedi. Bütçe Pub/Sub konusuna bağlanınca burada görünür (günde birkaç kez güncellenir).",
+    "state": "Durum",
+    "on": "Açık (servisler çalışıyor)",
+    "offCap": "Durdu: sigorta attı",
+    "offPanel": "Durdu: panelden durduruldu",
+    "cost": "Bu ayki harcama",
+    "updated": "Son bilgi: {{at}}",
+    "budget": "Aylık bütçe",
+    "cap": "Sigorta tutarı",
+    "capTitle": "Sigorta tutarı",
+    "capLabel": "Aylık en çok (TL)",
+    "capPlaceholder": "Boş: bütçenin iki katı",
+    "capHint": "Bu ayki harcama bu tutara ulaşınca kart bağlantısı kopar. Boş bırakılırsa bütçenin iki katıdır. Google harcamayı birkaç saat gecikmeyle bildirir.",
+    "capInvalid": "Tutar {{min}} ile {{max}} TL arasında tam sayı olmalı.",
+    "capSaved": "Sigorta tutarı kaydedildi.",
+    "save": "Kaydet",
+    "error": "Kaydedilemedi, tekrar dene.",
+    "stopTitle": "Şimdi durdur",
+    "stopHint": "Kart bağlantısını hemen koparır. Fotoğraf yükleme, çeviri ve bildirimler gibi ücretli servisler durur; uygulama ücretsiz kotayla sınırlı çalışır.",
+    "stop": "Kart bağlantısını şimdi kopar",
+    "stopConfirm": "Kart bağlantısı hemen kopacak ve ücretli servisler duracak. Emin misin?",
+    "stopped": "Kart bağlantısı koparıldı.",
+    "stopError": "Durdurulamadı. Sunucunun faturalandırma izni eksik olabilir.",
+    "reopenTitle": "Yeniden aç",
+    "reopenHint": "Bağlantı kopunca sunucu çalışmaz, bu yüzden panelden açılamaz. Google Cloud'da cityjoynew projesini \"Firebase Payment\" hesabına yeniden bağla.",
+    "reopen": "Google Cloud'da yeniden bağla"
   }
 }

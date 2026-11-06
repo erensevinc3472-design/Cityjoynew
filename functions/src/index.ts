@@ -13,7 +13,7 @@ import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 import { handleAnnouncementWrite } from './announcements';
-import { cloudBillingDisabler, handleBudgetNotice, type BudgetNotice } from './budget';
+import { cloudBillingDisabler, handleBudgetNotice, handleManualStop, type BudgetNotice } from './budget';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
@@ -111,11 +111,23 @@ export const translate = onCall({ maxInstances: 5 }, async (req) => {
   }
 });
 
-// Harcama sigortası: bütçe bildirimi gelir, harcama bütçenin 2 katını geçerse ödeme bağlantısı koparılır (budget.ts).
+// Harcama sigortası: bütçe bildirimi gelir, harcama sigorta tutarına ulaşırsa ödeme bağlantısı koparılır (budget.ts).
+const PROJECT = process.env.GCLOUD_PROJECT ?? process.env.GCP_PROJECT ?? '';
 export const budgetGuard = onMessagePublished({ topic: 'budget-alerts', maxInstances: 1 }, async (e) => {
   const notice = (e.data.message.json ?? {}) as BudgetNotice;
-  const project = process.env.GCLOUD_PROJECT ?? process.env.GCP_PROJECT ?? '';
-  if (await handleBudgetNotice(notice, cloudBillingDisabler(project))) console.warn('Harcama sigortası attı', notice);
+  if (await handleBudgetNotice(db, notice, cloudBillingDisabler(PROJECT), new Date())) console.warn('Harcama sigortası attı', notice);
+});
+
+// Panel > Harcama > "Şimdi durdur" (yalnızca admin).
+export const billingStop = onCall({ maxInstances: 1 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  try {
+    await handleManualStop(db, req.auth.uid, cloudBillingDisabler(PROJECT), new Date());
+    return { stopped: true };
+  } catch (e) {
+    if (e instanceof Error && e.message === 'yetki') throw new HttpsError('permission-denied', 'yetki');
+    throw new HttpsError('internal', 'durdurulamadi');
+  }
 });
 
 // Hesap silme tetikleyicisi yalnızca 1. kuşak işlevlerde var.

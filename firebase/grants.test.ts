@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { defaultModulesFor, grantDocId, ROLE_TEMPLATES, type Organization } from '@cityjoy/shared';
 import {
+  createBillingAdmin,
   createBusinessAdmin,
   createGrantAdmin,
   createOrganizationAdmin,
@@ -253,5 +254,23 @@ describe('kilitli adlar', () => {
     await seed('businesses/y', { ...biz('Ahmet Usta'), createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
     await assertFails(updateDoc(doc(ali, 'businesses/y'), { name: 'Osmangazi Belediyesi', updatedAt: serverTimestamp() }));
     await assertSucceeds(updateDoc(doc(ali, 'businesses/y'), { name: 'Ahmet Usta Tesisat', updatedAt: serverTimestamp() }));
+  });
+});
+
+describe('harcama (Panel > Harcama)', () => {
+  it('yalnızca admin okur ve sigorta tutarını değiştirir; durum belgesini yalnızca sunucu yazar', async () => {
+    await seed('billing/status', { costAmount: 12, budgetAmount: 350, capAmount: 700, enabled: true });
+    await assertFails(getDoc(doc(fs('ali'), 'billing/status')));
+    await assertSucceeds(getDoc(doc(fs('eren'), 'billing/status')));
+    await assertFails(setDoc(doc(fs('eren'), 'billing/status'), { enabled: true }));
+    await assertFails(setDoc(doc(fs('ali'), 'billing/settings'), { cap: 500, updatedBy: 'ali', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(fs('eren'), 'billing/settings'), { cap: 50, updatedBy: 'eren', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(fs('eren'), 'billing/settings'), { cap: 500.5, updatedBy: 'eren', updatedAt: serverTimestamp() }));
+    const billing = createBillingAdmin(fs('eren'), null as never);
+    await billing.saveCap('eren', 1000);
+    expect(await billing.cap()).toBe(1000);
+    expect((await billing.status())?.capAmount).toBe(700);
+    const log = await listAuditLog(fs('eren'), { max: 5 });
+    expect(JSON.stringify(log)).toContain('billing');
   });
 });
