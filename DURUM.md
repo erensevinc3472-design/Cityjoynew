@@ -11,7 +11,7 @@ Son güncelleme: 6 Kasım 2026 (dal claude/iki-kademe: işletme kademeleri ikiye
 > girişiyle gönderir, PR'ı Eren bağlantıdan açıp birleştirir (20. madde PR #6). Sistem Java'sı 8; kural testleri için
 > Temurin JDK 21 zip olarak `%TEMP%\cj-jdk21` klasörüne açıldı (kurulmadı): `JAVA_HOME` ve `PATH` o klasörü gösterecek
 > şekilde ayarlanıp `npm run test:rules` (JDK yolu: `%TEMP%/cj-jdk21/x/jdk-21.0.12.1+1`). Emülatör "An unexpected error" ile
-> açılmazsa `%TEMP%hub-demo-cityjoy.json` bozuktur (içi boş baytlar): adını değiştir ya da sil. Klasör silinmişse yeniden indirilir. Kurallar Eren'in bilgisayarından yüklenir:
+> açılmazsa `%TEMP%/hub-demo-cityjoy.json` bozuktur (içi boş baytlar): adını değiştir ya da sil. Klasör silinmişse yeniden indirilir. Kurallar Eren'in bilgisayarından yüklenir:
 > `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew` (giriş kayıtlı).
 
 > **Kural yükleme hatası (4 Kasım, giderildi):** Firebase'in kural derleyicisi işlevlere doğrudan `null` verilmesini
