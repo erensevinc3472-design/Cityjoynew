@@ -203,8 +203,8 @@ export default function BusinessScreen() {
                   <Image source={{ uri: b.logo.url }} style={styles.logo} contentFit="cover" accessibilityLabel={b.name} />
                 ) : (
                   <>
-                    <MaterialIcons name="storefront" size={22} color={c.accent} style={styles.avatarIcon} />
-                    <AppText style={[styles.initial, { color: c.accent }]}>{b.name.slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                    <MaterialIcons name="storefront" size={20} color={c.accent} style={styles.avatarIcon} />
+                    <AppText maxFontSizeMultiplier={1} style={[styles.initial, { color: c.accent }]}>{b.name.slice(0, 1).toLocaleUpperCase(lang)}</AppText>
                   </>
                 )}
               </View>
@@ -395,11 +395,12 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
   ring: { width: 88, height: 88, borderRadius: 44, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 76, height: 76, borderRadius: 38, alignItems: 'center', justifyContent: 'center' },
-  avatarIcon: { position: 'absolute', top: 8, opacity: 0.35 },
+  // Logo yoksa: küçük dükkân simgesi ve baş harf alt alta (büyük yazı boyutunda üst üste binmesin).
+  avatarIcon: { opacity: 0.45 },
   logo: { width: 76, height: 76, borderRadius: 38 },
   gallery: { gap: spacing.sm },
   galleryItem: { height: 140, borderRadius: radius.md },
-  initial: { fontFamily: fonts.heading, fontSize: 32, marginTop: 8 },
+  initial: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 30 },
   stats: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
   stat: { alignItems: 'center', flexShrink: 1 },
   statN: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23 },
@@ -410,7 +411,8 @@ const styles = StyleSheet.create({
   open: { fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 18 },
   desc: { fontSize: 14, lineHeight: 20, marginTop: 2 },
   buttons: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  pill: { flexGrow: 1, flexBasis: 70, minHeight: 36, borderRadius: radius.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: spacing.sm },
+  // Düğmeler yazıları sığacak genişlikte; sığmayan alt satıra geçer (yazı kesilmez).
+  pill: { flexGrow: 1, minHeight: 40, borderRadius: radius.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: spacing.md },
   pillText: { fontFamily: fonts.bodySemi, fontSize: 13 },
   teamBox: { borderWidth: 1, borderRadius: radius.md, padding: spacing.md, gap: spacing.sm },
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: MIN_TOUCH },
