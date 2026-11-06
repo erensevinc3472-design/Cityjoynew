@@ -6,6 +6,7 @@ import { CONTEST_LIMITS, validateEntry, type Contest, type ContestEntry, type En
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
@@ -86,7 +87,7 @@ export default function ContestScreen() {
           <Tag label={item.status === 'katilim' ? t('contests.joinOpen') : item.status === 'oylama' ? t('contests.voteOpen') : t('contests.results')} tone={item.status === 'sonuc' ? 'muted' : 'green'} />
         </View>
         <AppText variant="title">{item.title}</AppText>
-        <AppText>{item.description}</AppText>
+        <TranslatableText text={item.description} />
         {item.prize ? <AppText variant="label" style={{ color: c.accent }}>{t('contests.prize', { prize: item.prize })}</AppText> : null}
 
         <View style={styles.stages}>

@@ -6,6 +6,7 @@ import { isAnnouncementLive, readingMinutes, type Announcement } from '@cityjoy/
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { AuthorLink } from '@/components/author-link';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
@@ -86,7 +87,7 @@ export default function AnnouncementScreen() {
                 <AppButton variant="ghost" title={t('news.share')} onPress={() => Share.share({ message: `${item.title}\n\n${item.body.slice(0, 300)}\n\n${author} · CityJoy` }).catch(() => {})} />
               </View>
             ) : null}
-            <AppText selectable style={news ? { fontSize: SIZES[size], lineHeight: Math.round(SIZES[size] * 1.5) } : undefined}>{item.body}</AppText>
+            <TranslatableText selectable style={news ? { fontSize: SIZES[size], lineHeight: Math.round(SIZES[size] * 1.5) } : undefined} text={item.body} />
           </>
         )}
       </ScrollView>

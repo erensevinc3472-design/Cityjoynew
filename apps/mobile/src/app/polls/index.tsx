@@ -7,6 +7,7 @@ import { pollDaysLeft, pollOpen, pollPercents, type Poll } from '@cityjoy/shared
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
 import { SectionTitle, Tag } from '@/components/inner';
@@ -126,7 +127,7 @@ function PollCard({ poll, onVoted }: { poll: Poll; onVoted?(next: Poll): void })
         <Tag label={isOpen ? (days ? t('polls.daysLeft', { count: days }) : t('polls.lastDay')) : t('polls.closed')} tone={isOpen ? 'green' : 'muted'} />
         {district ? <Tag label={district} tone="muted" /> : null}
       </View>
-      <AppText variant="subtitle">{poll.question}</AppText>
+      <TranslatableText variant="subtitle" text={poll.question} />
       <AppText variant="caption" muted>
         {t('polls.by', { name: poll.sponsorName })} · {t('polls.voters', { count: poll.voteCount })}
       </AppText>

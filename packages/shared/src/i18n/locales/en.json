@@ -2385,5 +2385,15 @@
     "ad": "Ad",
     "stays_one": "{{count}} property",
     "stays_other": "{{count}} properties"
+  },
+  "translate": {
+    "action": "Translate",
+    "loading": "Translating…",
+    "original": "See original",
+    "from": "Translated · Original: {{lang}}",
+    "same": "This text is already in your language",
+    "signIn": "Sign in to translate",
+    "error": "Couldn’t translate right now, please try again later",
+    "a11y": "Translate this text into {{lang}}"
   }
 }

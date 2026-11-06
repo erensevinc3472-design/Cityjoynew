@@ -56,3 +56,4 @@ export * from './travel/travel';
 export * from './travel/plan';
 export * from './travel/seed';
 export * from './travel/holiday';
+export * from './translate/translate';

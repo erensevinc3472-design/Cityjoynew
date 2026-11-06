@@ -15,6 +15,7 @@ import {
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { TranslatableText } from '@/components/translatable-text';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
@@ -143,7 +144,7 @@ export default function ListingScreen() {
             <AppText>{item.swapFor}</AppText>
           </View>
         ) : null}
-        {item.description.trim() ? <AppText>{item.description}</AppText> : null}
+        {item.description.trim() ? <TranslatableText text={item.description} /> : null}
 
         {error ? <FormMessage kind="error" text={error} /> : null}
 

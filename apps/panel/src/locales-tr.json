@@ -1623,6 +1623,7 @@
       "kurumDuyuruHafta": "Kurum duyuru ve haberi (haftalık)",
       "acil": "Acil duyuru (günlük, muhtar ve kurum)",
       "etkinlik": "Kurum etkinliği (günlük)",
+      "ceviri": "Çeviri (\"Çevir\" düğmesi, günlük)",
       "vitrinUcretsiz": "Vitrin fotoğrafı, Ücretsiz kademe (en çok 30)",
       "vitrinPro": "Vitrin fotoğrafı, Pro kademe (en çok 30)"
     },
