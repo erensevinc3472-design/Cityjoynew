@@ -839,6 +839,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Not: Eren'in iki hesabı var (`erensevinc3472@` boş, `zcayliyak@` gönderiler, işletme, profil fotoğrafı); şifre
   sıfırlayıp boş hesaba girince içerik "silindi" sandı, veri yerinde.
 
+- **Doğrulama iste tek dokunuş (7 Kasım; Eren istedi).** İşletme sayfasında sahibi "Doğrulama iste"ye basınca düzenleme ekranına
+  gitmeden istek gönderilir (`components/verify-request.tsx`, mevcut `verificationRequests`); panelde Bekleyen onaylar'a düşer,
+  admin onaylar. Ekranda "Talebiniz alındı. En kısa sürede ekibimiz sizinle iletişime geçecek." (5 dil); reddedilirse gerekçe ve
+  "Yeniden iste". Panelde admin Bekleyen onaylar'ı açınca artık tüm bekleyenleri görür. **Bekleyen (Eren):** `npm run panel:deploy`.
 - **Küçük fotoğraf ve Çarşı fotoğraf zorunluluğu (7 Kasım).** Sunucu işlevi `photoThumbnail` (`functions/src/thumbs.ts`, sharp)
   her yüklenen JPEG'in 640 piksellik küçüğünü `thumbs/{asıl yol}` yoluna, asıl dosyanın erişim anahtarıyla yazar; uygulama
   adresi asıl adresten hesaplar (`thumbUrl`, kayıt değişmez). Listeler, kartlar, avatarlar, logolar ve kapaklar

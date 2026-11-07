@@ -387,11 +387,9 @@ function VerificationSection({ business, uid }: { business: Business; uid: strin
   const pending = request?.status === 'il-onayi-bekliyor' || request?.status === 'admin-onayi-bekliyor';
   const status = verified
     ? t('business.verifyDone')
-    : request?.status === 'il-onayi-bekliyor'
-      ? t('business.verifyPendingFirst')
-      : request?.status === 'admin-onayi-bekliyor'
-        ? t('business.verifyPendingAdmin')
-        : request?.status === 'reddedildi'
+    : pending
+      ? t('business.tiers.requestSent')
+      : request?.status === 'reddedildi'
           ? t('business.verifyRejected', { reason: request.decision?.reason ?? '' })
           : null;
 

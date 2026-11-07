@@ -30,6 +30,7 @@ import { AppText } from '@/components/app-text';
 import { TranslatableText } from '@/components/translatable-text';
 import { BusinessCard, ProTag, verificationText } from '@/components/business-card';
 import { useToast } from '@/components/toast';
+import { VerifyRequest } from '@/components/verify-request';
 import { DealBox } from '@/components/deal-box';
 import { Tag } from '@/components/inner';
 import { RoundButton } from '@/components/hero-header';
@@ -291,18 +292,21 @@ export default function BusinessScreen() {
           {/* Ekip: işletme adına paylaş ve onay bekleyenler. */}
           {team ? (
             <View style={[styles.teamBox, { backgroundColor: c.surface, borderColor: c.border }]}>
-              {/* Doğrulanmamış işletmenin ekibi: sayfa dışarıya kapalı; doğrulama başvurusu düzenleme ekranında. */}
+              {/* Doğrulanmamış işletmenin ekibi: sayfa dışarıya kapalı; sahibi buradan tek dokunuşla doğrulama ister (panelde Bekleyen onaylar). */}
               {!verified ? (
                 <View style={styles.verifyBox}>
                   <AppText variant="label">{t('business.tiers.unverifiedTitle')}</AppText>
-                  <AppText variant="caption" muted>
-                    {b.verification.status === 'inceleniyor' ? t('business.tiers.reviewingBody') : t('business.tiers.unverifiedBody')}
-                  </AppText>
-                  {isOwner && b.verification.status !== 'inceleniyor' ? (
-                    <View style={styles.buttons}>
-                      {pill(t('business.tiers.requestVerification'), 'verified', () => router.push({ pathname: '/business/edit', params: { id: b.id } }), true)}
-                    </View>
-                  ) : null}
+                  {b.verification.status === 'inceleniyor' ? (
+                    <AppText variant="caption" muted>{t('business.tiers.reviewingBody')}</AppText>
+                  ) : (
+                    <VerifyRequest
+                      business={b}
+                      uid={user!.uid}
+                      isOwner={isOwner}
+                      onSent={() => toast.show(t('business.tiers.requestSent'))}
+                      button={(label, onPress, busy) => <View style={styles.buttons}>{pill(label, 'verified', busy ? () => {} : onPress, true)}</View>}
+                    />
+                  )}
                 </View>
               ) : postMode ? (
                 <Pressable

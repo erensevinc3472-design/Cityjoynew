@@ -449,7 +449,9 @@
       "postLimit": "On the free plan you can share up to {{count}} posts. Switch to Pro for more.",
       "postCount": "{{count}}/{{max}}",
       "dealsPro": "Switch to Pro to publish deals.",
-      "unverifiedSection": "Unverified businesses"
+      "unverifiedSection": "Unverified businesses",
+      "requestSent": "Your request has been received. Our team will contact you as soon as possible.",
+      "requestFailed": "The request could not be sent. Check your connection and try again."
     }
   },
   "reviews": {

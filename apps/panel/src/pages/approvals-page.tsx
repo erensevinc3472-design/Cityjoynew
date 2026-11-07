@@ -56,7 +56,7 @@ export function ApprovalsPage() {
   const [provinceCode, setProvinceCode] = useState(() => (isAdmin || provinceCodes.includes(city.provinceCode) ? city.provinceCode : (provinceCodes[0] ?? '')));
   const [districtId, setDistrictId] = useState('');
   const [module, setModule] = useState<Module | ''>('');
-  const [view, setView] = useState<View>(isAdmin ? 'admin-onayi-bekliyor' : 'il-onayi-bekliyor');
+  const [view, setView] = useState<View>(isAdmin ? 'bekleyen' : 'il-onayi-bekliyor');
   const [list, setList] = useState<Approval[] | null>(null);
   const [trusted, setTrusted] = useState<TrustedApprover[]>([]);
   const [loadError, setLoadError] = useState(false);

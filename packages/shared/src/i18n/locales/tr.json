@@ -449,7 +449,9 @@
       "postLimit": "Ücretsiz üyelikte en çok {{count}} gönderi paylaşabilirsin. Daha fazlası için Pro üyeliğe geç.",
       "postCount": "{{count}}/{{max}}",
       "dealsPro": "Fırsat yayınlamak için Pro üyeliğe geç.",
-      "unverifiedSection": "Doğrulanmamış işletmeler"
+      "unverifiedSection": "Doğrulanmamış işletmeler",
+      "requestSent": "Talebiniz alındı. En kısa sürede ekibimiz sizinle iletişime geçecek.",
+      "requestFailed": "Talep gönderilemedi. Bağlantını kontrol edip tekrar dene."
     }
   },
   "reviews": {
