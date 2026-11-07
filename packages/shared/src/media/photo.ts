@@ -55,3 +55,20 @@ export function photoFrom(v: unknown): Photo | undefined {
     ? cleanPhoto(p as Photo)
     : undefined;
 }
+
+/**
+ * Listelerde gösterilen küçük kopya (en uzun kenar 640 piksel). Sunucu her yüklenen JPEG'in küçüğünü `thumbs/{asıl yol}`
+ * yoluna, asıl dosyanın erişim anahtarıyla yazar; böylece adres kayda yazılmadan asıl adresten hesaplanır. Küçük kopya
+ * henüz yoksa (yeni yüklendi ya da eski fotoğraf) ekran asıl adrese döner.
+ */
+export const THUMB = { prefix: 'thumbs/', maxEdge: 640, quality: 70 } as const;
+
+export const thumbPath = (path: string) => `${THUMB.prefix}${path}`;
+
+/** Küçük kopyanın adresi; adres depomuzu göstermiyorsa asıl adres döner. */
+export function thumbUrl(p: Pick<Photo, 'path' | 'url'>): string {
+  const enc = encodeURIComponent(p.path);
+  const at = p.url.indexOf(`/o/${enc}?`);
+  if (at < 0 || p.path.startsWith(THUMB.prefix)) return p.url;
+  return `${p.url.slice(0, at)}/o/${encodeURIComponent(thumbPath(p.path))}${p.url.slice(at + 3 + enc.length)}`;
+}

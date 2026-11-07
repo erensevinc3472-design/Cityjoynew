@@ -68,4 +68,10 @@ describe('Dosya deposu: gönderi fotoğrafları', () => {
     await assertSucceeds(getBytes(ref(st('ali'), 'media/ayse/etkinlik/abcDEF123456.jpg')));
     await assertFails(deleteObject(ref(st('ali'), 'media/ayse/etkinlik/abcDEF123456.jpg')));
   });
+
+  it('küçük kopyalar: kimse yükleyemez ya da silemez (yalnızca sunucu)', async () => {
+    await assertFails(put(st('ayse'), 'thumbs/posts/ayse/p1/0.jpg'));
+    await assertFails(put(st('ayse'), 'thumbs/media/ayse/profil/abcDEF123456.jpg'));
+    await assertFails(deleteObject(ref(st('ayse'), 'thumbs/posts/ayse/p1/0.jpg')));
+  });
 });

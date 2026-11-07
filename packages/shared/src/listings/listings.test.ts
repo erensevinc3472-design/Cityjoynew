@@ -13,6 +13,7 @@ const input = (patch: Partial<ListingInput> = {}): ListingInput => ({
   rentUnit: null,
   swapFor: '',
   region: { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-ataevler' },
+  photos: [{ path: 'media/u1/ilan/abcdefghij12.jpg', url: 'https://x', width: 800, height: 600 }],
   ...patch,
 });
 const days = (n: number) => new Date(Date.now() - n * 86400000).toISOString();
@@ -26,6 +27,8 @@ describe('Çarşı', () => {
     expect(validateListing(input({ kind: 'kiralik' }))).toEqual(['rentUnit']);
     expect(validateListing(input({ title: 'ab' }))).toEqual(['title']);
     expect(validateListing(input({ title: 'Satılık daire 3+1' }))).toEqual(['realEstate']);
+    expect(validateListing(input({ photos: [] }))).toEqual(['photos']);
+    expect(validateListing(input({ photos: undefined }))).toEqual(['photos']);
   });
 
   it('fiyat yazımı', () => {

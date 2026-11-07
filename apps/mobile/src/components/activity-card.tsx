@@ -1,8 +1,8 @@
-import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { Activity } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { AppText } from '@/components/app-text';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
@@ -42,7 +42,7 @@ export function ActivityCard({ item, neighbourhood, onPress }: { item: Activity;
           {t(`activities.categories.${item.category}`)} · {left ? t('activities.seatsLeft', { count: left }) : t('activities.full')}
         </AppText>
       </View>
-      {item.cover ? <Image source={{ uri: item.cover.url }} style={[styles.cover, { backgroundColor: c.surfaceStrong }]} contentFit="cover" recyclingKey={item.cover.path} accessibilityIgnoresInvertColors /> : null}
+      {item.cover ? <ThumbImage photo={item.cover} style={[styles.cover, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
     </Pressable>
   );
 }

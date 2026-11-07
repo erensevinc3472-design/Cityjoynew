@@ -2004,7 +2004,7 @@
       "description": "Açıklama",
       "descriptionHint": "Kusurları, ölçüleri, teslim biçimini yaz. Telefon numarası yazma.",
       "photos": "Fotoğraflar",
-      "photosHint": "En çok 6 fotoğraf; ilki listede görünür. Ürünün kendi fotoğrafını ekle. Kişi, plaka ya da adres görünmesin."
+      "photosHint": "En çok 6 fotoğraf, en az 1; ilki listede görünür. Ürünün kendi fotoğrafını ekle. Kişi, plaka ya da adres görünmesin."
     },
     "errors": {
       "kind": "İlan türünü seç.",
@@ -2017,7 +2017,8 @@
       "swapFor": "Takas notu en çok 120 karakter olabilir.",
       "region": "Konumunda il, ilçe ve mahalle seçili olmalı.",
       "realEstate": "Emlak ve araç ilanları şimdilik Çarşı'da verilemiyor.",
-      "banned": "İlanda uygun olmayan bir ifade var. Lütfen düzelt."
+      "banned": "İlanda uygun olmayan bir ifade var. Lütfen düzelt.",
+      "photos": "En az bir fotoğraf ekle."
     },
     "prohibited": {
       "title": "Çarşı'da satılamayanlar",

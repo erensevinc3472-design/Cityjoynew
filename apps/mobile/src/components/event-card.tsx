@@ -1,8 +1,8 @@
-import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { CityEvent } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { AppText } from '@/components/app-text';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
@@ -40,7 +40,7 @@ export function EventCard({ item, onPress }: { item: CityEvent; onPress(): void 
           {t(`events.categories.${item.category}`)} · {item.free ? t('events.free') : item.priceNote}
         </AppText>
       </View>
-      {item.cover ? <Image source={{ uri: item.cover.url }} style={[styles.cover, { backgroundColor: c.surfaceStrong }]} contentFit="cover" recyclingKey={item.cover.path} accessibilityIgnoresInvertColors /> : null}
+      {item.cover ? <ThumbImage photo={item.cover} style={[styles.cover, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
     </Pressable>
   );
 }

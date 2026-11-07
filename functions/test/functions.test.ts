@@ -11,6 +11,8 @@ import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
+import { handleThumb, type ThumbStore } from '../src/thumbs';
+import sharp from 'sharp';
 import { deleteOldTranslations, handleTranslate, translationId, type Translator } from '../src/translate';
 
 // Emülatördeki veritabanıyla çalışır (npm test, firebase emulators:exec). Gerçek bildirim gönderilmez.
@@ -550,5 +552,34 @@ describe('harcama sigortası', () => {
     expect((await db.doc('billing/status').get()).data()).toMatchObject({ enabled: false, stoppedBy: 'panel' });
     const log = await db.collection('auditLog').where('targetId', '==', 'billing').get();
     expect(log.docs[0].data()).toMatchObject({ actorUid: 'eren', module: 'moderasyon' });
+  });
+});
+
+describe('küçük kopya', () => {
+  const fakeStore = (files: Record<string, Buffer>) => {
+    const written: { name: string; data: Buffer; token?: string }[] = [];
+    const store: ThumbStore = {
+      read: async (n) => files[n],
+      write: async (name, data, token) => void written.push({ name, data, token }),
+    };
+    return { store, written };
+  };
+
+  it('büyük fotoğrafı 640 piksele indirir, aynı anahtarla thumbs/ yoluna yazar', async () => {
+    const big = await sharp({ create: { width: 1600, height: 1200, channels: 3, background: '#d0602a' } }).jpeg().toBuffer();
+    const { store, written } = fakeStore({ 'posts/u1/p1/0.jpg': big });
+    expect(await handleThumb('posts/u1/p1/0.jpg', 'image/jpeg', 'tok1,tok2', store)).toBe('thumbs/posts/u1/p1/0.jpg');
+    expect(written[0].name).toBe('thumbs/posts/u1/p1/0.jpg');
+    expect(written[0].token).toBe('tok1');
+    const meta = await sharp(written[0].data).metadata();
+    expect([meta.width, meta.height, meta.format]).toEqual([640, 480, 'jpeg']);
+  });
+
+  it('küçük kopyanın kendisini, videoyu ve başka yolları atlar', async () => {
+    const { store, written } = fakeStore({});
+    expect(await handleThumb('thumbs/posts/u1/p1/0.jpg', 'image/jpeg', 't', store)).toBeNull();
+    expect(await handleThumb('posts/u1/p1/video.mp4', 'video/mp4', 't', store)).toBeNull();
+    expect(await handleThumb('baska/x.jpg', 'image/jpeg', 't', store)).toBeNull();
+    expect(written).toHaveLength(0);
   });
 });

@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
@@ -8,6 +7,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { byPopulation, DISTRICT_ZONES, videoEmbedUrl, type DistrictZone, type Municipality, type TravelMunicipal, type TravelRoute } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { AppText } from '@/components/app-text';
 import { SceneArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
@@ -97,7 +97,7 @@ export default function TravelMayorsScreen() {
         </Pressable>
         {expanded && intro ? (
           <View style={styles.body}>
-            {intro.cover ? <Image source={{ uri: intro.cover.url }} style={[styles.cover, { aspectRatio: Math.min(2, Math.max(1, intro.cover.width / intro.cover.height)), backgroundColor: c.surfaceStrong }]} contentFit="cover" recyclingKey={intro.cover.path} accessibilityIgnoresInvertColors /> : null}
+            {intro.cover ? <ThumbImage photo={intro.cover} style={[styles.cover, { aspectRatio: Math.min(2, Math.max(1, intro.cover.width / intro.cover.height)), backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
             <AppText style={[styles.text, { color: c.text }]}>{intro.description}</AppText>
             {m.routes.length ? <AppText style={[styles.h3, { color: c.textStrong }]}>{t('travel.municipalRoutes')}</AppText> : null}
             {m.routes.map((r) => (

@@ -1,5 +1,5 @@
 // Sunucu işlevlerini tek dosyaya paketler. Ortak kod (@cityjoy/shared) npm'de olmadığı için pakete gömülür;
-// firebase-admin ve firebase-functions bulutta package.json'dan kurulur.
+// firebase-admin, firebase-functions ve sharp (görsel küçültme) bulutta package.json'dan kurulur.
 import { build } from 'esbuild';
 
 await build({
@@ -9,6 +9,6 @@ await build({
   platform: 'node',
   target: 'node22',
   format: 'cjs',
-  external: ['firebase-admin', 'firebase-functions'],
+  external: ['firebase-admin', 'firebase-functions', 'sharp'],
   logLevel: 'warning',
 });

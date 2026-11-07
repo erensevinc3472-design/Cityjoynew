@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
@@ -7,6 +6,7 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, View, useWindowDime
 import { useTranslation } from 'react-i18next';
 import { isPostListed, type Post } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { StateMessage } from '@/components/state-message';
@@ -111,7 +111,7 @@ export default function TravelFramesScreen() {
               accessibilityLabel={[t('travel.frameN', { n: index + 1 }), item.featured ? t('travel.framesFeatured') : null, item.authorName].filter(Boolean).join(', ')}
               onPress={() => router.push({ pathname: '/explore/[id]', params: { id: item.id } })}
               style={({ pressed }) => [{ width: size, height: size, marginBottom: GAP, backgroundColor: c.surfaceStrong, opacity: pressed ? 0.85 : 1 }]}>
-              {photo ? <Image source={{ uri: photo.url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={150} recyclingKey={photo.path} accessibilityIgnoresInvertColors /> : null}
+              {photo ? <ThumbImage photo={photo} style={StyleSheet.absoluteFill} contentFit="cover" transition={150} accessibilityIgnoresInvertColors /> : null}
               {item.featured ? (
                 <View style={styles.star}>
                   <MaterialIcons name="star" size={14} color="#E0B07A" />

@@ -36,6 +36,12 @@ service firebase.storage {
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
 
+    // Listelerde gösterilen küçük kopyalar (640 piksel): thumbs/{asıl yol}. Yalnızca sunucu yazar ve siler.
+    match /thumbs/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

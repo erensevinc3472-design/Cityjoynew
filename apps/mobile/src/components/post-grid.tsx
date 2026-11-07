@@ -1,10 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { POST_CATEGORIES, type Post } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { fonts, spacing } from '@/theme/tokens';
 import { AppText } from './app-text';
 import { StateMessage } from './state-message';
@@ -33,7 +33,7 @@ export function PostGrid({ list, empty }: { list: Post[] | null; empty: string }
           style={({ pressed }) => [styles.tile, { width: size, height: size, backgroundColor: tileColor(p), opacity: pressed ? 0.85 : 1 }]}>
           {p.photos?.length ? (
             <>
-              <Image source={{ uri: p.photos[0].url }} style={StyleSheet.absoluteFill} contentFit="cover" recyclingKey={p.photos[0].path} />
+              <ThumbImage photo={p.photos[0]} style={StyleSheet.absoluteFill} contentFit="cover" />
               {p.photos.length > 1 ? <MaterialIcons name="collections" size={16} color="#FFFFFF" style={styles.multi} /> : <View />}
             </>
           ) : p.video ? (

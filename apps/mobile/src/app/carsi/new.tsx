@@ -183,6 +183,7 @@ export default function NewListingScreen() {
         onChange={setPhotos}
         disabled={busy}
       />
+      {errors.includes('photos') ? <FormMessage kind="error" text={t('carsi.errors.photos')} /> : null}
       <View style={styles.block}>
         <AppText variant="label">{t('carsi.fields.category')}</AppText>
         <Chips<ListingCategory> label={t('carsi.fields.category')} value={category} onChange={setCategory} options={LISTING_CATEGORIES.map((x) => ({ value: x, label: t(`carsi.categories.${x}`) }))} />

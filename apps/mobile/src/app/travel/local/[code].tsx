@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -7,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LOCAL_KINDS, type LocalKind } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { AppText } from '@/components/app-text';
 import { SceneArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
@@ -102,7 +102,7 @@ export default function TravelLocalScreen() {
                 </Pressable>
                 {expanded ? (
                   <View style={styles.body}>
-                    {x.cover ? <Image source={{ uri: x.cover.url }} style={[styles.cover, { aspectRatio: Math.min(2, Math.max(1, x.cover.width / x.cover.height)), backgroundColor: c.surfaceStrong }]} contentFit="cover" recyclingKey={x.cover.path} accessibilityIgnoresInvertColors /> : null}
+                    {x.cover ? <ThumbImage photo={x.cover} style={[styles.cover, { aspectRatio: Math.min(2, Math.max(1, x.cover.width / x.cover.height)), backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
                     <AppText style={[styles.text, { color: c.text }]}>{x.body}</AppText>
                     {x.facts.map((f) => (
                       <View key={f.label} style={[styles.fact, { backgroundColor: c.background, borderColor: c.border }]}>

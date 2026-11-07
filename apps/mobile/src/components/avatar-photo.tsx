@@ -1,7 +1,7 @@
-import { Image } from 'expo-image';
 import { StyleSheet } from 'react-native';
 import type { Photo } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { useProfilePhoto } from '@/lib/profile-photos';
 
 /**
@@ -13,9 +13,8 @@ export function AvatarPhoto({ uid, photo, size }: { uid?: string; photo?: Photo;
   const p = photo ?? fetched;
   if (!p) return null;
   return (
-    <Image
-      source={{ uri: p.url }}
-      recyclingKey={p.path}
+    <ThumbImage
+      photo={p}
       style={[StyleSheet.absoluteFill, { width: size, height: size, borderRadius: size / 2 }]}
       contentFit="cover"
       accessibilityIgnoresInvertColors

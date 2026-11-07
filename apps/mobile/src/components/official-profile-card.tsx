@@ -1,9 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { Linking, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ltr, telUrl, type OfficialProfile } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { fonts, radius, spacing } from '@/theme/tokens';
@@ -36,7 +36,7 @@ export function OfficialProfileCard({
     <View style={[styles.card, { backgroundColor: c.surface, borderColor: c.border, shadowColor: c.shadow }]}>
       <View style={styles.head}>
         {p?.logo ? (
-          <Image source={{ uri: p.logo.url }} style={[styles.logo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors />
+          <ThumbImage photo={p.logo} style={[styles.logo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors />
         ) : (
           <View style={[styles.badge, { backgroundColor: c.accentSoft }]}>
             <MaterialIcons name="verified" size={22} color={c.icon} />

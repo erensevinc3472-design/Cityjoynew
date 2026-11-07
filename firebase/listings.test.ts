@@ -55,6 +55,7 @@ const input = (patch: Partial<ListingInput> = {}): ListingInput => ({
   rentUnit: null,
   swapFor: '',
   region: ataevler,
+  photos: photos(1),
   ...patch,
 });
 
@@ -76,8 +77,8 @@ describe('Çarşı ilanları', () => {
     expect(l?.status).toBe('yayinda');
     await assertFails(repo('ali').create('ali', 'Ali Y.', input({ region: fethiye })));
     await assertFails(repo('genc').create('genc', 'Genç', input()));
-    await assertFails(repo('veli', false).create('veli', 'Veli', input()));
-    await assertFails(repo('veli').create('veli', 'Ayşe K.', input()));
+    await assertFails(repo('veli', false).create('veli', 'Veli', input({ photos: photos(1, 'veli') })));
+    await assertFails(repo('veli').create('veli', 'Ayşe K.', input({ photos: photos(1, 'veli') })));
   });
 
   it('fiyat türe uyar: satılık ve kiralıkta zorunlu, ücretsiz ve takasta yok; kiralıkta süre birimi; düz adresle fotoğraf olmaz', async () => {
@@ -95,16 +96,16 @@ describe('Çarşı ilanları', () => {
   });
 
   it('günlük ilan sınırı: yeni hesapta 2, eski hesapta 5', async () => {
-    await repo('yeni').create('yeni', 'Yeni', input());
-    await repo('yeni').create('yeni', 'Yeni', input());
+    await repo('yeni').create('yeni', 'Yeni', input({ photos: photos(1, 'yeni') }));
+    await repo('yeni').create('yeni', 'Yeni', input({ photos: photos(1, 'yeni') }));
     await assertFails(repo('yeni').create('yeni', 'Yeni', input()));
-    for (let i = 0; i < 5; i++) await repo('veli').create('veli', 'Veli', input());
-    await assertFails(repo('veli').create('veli', 'Veli', input()));
+    for (let i = 0; i < 5; i++) await repo('veli').create('veli', 'Veli', input({ photos: photos(1, 'veli') }));
+    await assertFails(repo('veli').create('veli', 'Veli', input({ photos: photos(1, 'veli') })));
   });
 
   it('giriş yapan herkes ilde, ilçede, kategoride listeler; girişsiz okunmaz; kaldırılan ilanı başkası görmez', async () => {
     const id = await repo('ali').create('ali', 'Ali Y.', input());
-    await repo('veli').create('veli', 'Veli', input({ kind: 'ucretsiz', price: null, category: 'kitap-hobi', title: 'Roman kitapları' }));
+    await repo('veli').create('veli', 'Veli', input({ photos: photos(1, 'veli'), kind: 'ucretsiz', price: null, category: 'kitap-hobi', title: 'Roman kitapları' }));
     expect((await repo('ayse').list({ provinceCode: '16' })).listings).toHaveLength(2);
     expect((await repo('ayse').list({ provinceCode: '16', districtId: '16-nilufer', kind: 'ucretsiz' })).listings.map((x) => x.title)).toEqual(['Roman kitapları']);
     expect((await repo('ayse').list({ provinceCode: '16', key: 'masa' })).listings.map((x) => x.id)).toEqual([id]);
@@ -129,7 +130,10 @@ describe('Çarşı ilanları', () => {
     await assertFails(repo('ali').create('ali', 'Ali Y.', input({ photos: [media('ali', 'profilFotosu1', 'profil')] })));
     // Sahibi ekler, çıkarır; başkasının dosyasını ekleyemez.
     await assertSucceeds(repo('ali').update(id, input({ photos: photos(3) })));
-    await assertSucceeds(repo('ali').update(id, input({ photos: [] })));
+    await assertSucceeds(repo('ali').update(id, input({ photos: photos(1) })));
+    // Fotoğrafsız ilan verilemez, fotoğraflar sıfıra indirilemez.
+    await assertFails(repo('ali').update(id, input({ photos: [] })));
+    await assertFails(repo('ali').create('ali', 'Ali Y.', input({ photos: [] })));
     await assertFails(repo('ali').update(id, input({ photos: [media('ayse', 'baskasininFoto')] })));
     // Kaldırırken fotoğraflar boşaltılmalı (dosyaları sunucu siler).
     await assertSucceeds(repo('ali').update(id, input({ photos: photos(1) })));

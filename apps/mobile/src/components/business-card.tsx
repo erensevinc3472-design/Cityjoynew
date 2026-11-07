@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
@@ -7,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { averageRating, hasPublicPage, isProBusiness, telUrl, whatsappUrl, type Business } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { locationRepository } from '@/lib/locations';
 import { reviewRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
@@ -132,7 +132,7 @@ export function BusinessCard({ business: b, featured, initiallyOpen }: { busines
         accessibilityHint={t('business.card.openHint')}
         onPress={() => router.push({ pathname: '/business/[id]', params: { id: b.id } })}
         style={({ pressed }) => [styles.body, styles.withArrow, b.logo ? styles.withLogo : null, { opacity: pressed ? 0.8 : 1 }]}>
-        {b.logo ? <Image source={{ uri: b.logo.url }} style={[styles.logo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
+        {b.logo ? <ThumbImage photo={b.logo} style={[styles.logo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
         <MaterialIcons name="chevron-right" size={24} color={c.textSoft} style={styles.arrow} />
         {featured || pro ? (
           <View style={styles.tags}>

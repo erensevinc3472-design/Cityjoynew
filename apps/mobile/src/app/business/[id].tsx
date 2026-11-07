@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState, type ComponentProps, type ReactNode } from 'react';
 import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
@@ -26,6 +25,7 @@ import {
   type Post,
 } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { AppText } from '@/components/app-text';
 import { TranslatableText } from '@/components/translatable-text';
 import { BusinessCard, ProTag, verificationText } from '@/components/business-card';
@@ -220,7 +220,7 @@ export default function BusinessScreen() {
             <View style={[styles.ring, { borderColor: c.accent }]}>
               <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
                 {b.logo ? (
-                  <Image source={{ uri: b.logo.url }} style={styles.logo} contentFit="cover" accessibilityLabel={b.name} />
+                  <ThumbImage photo={b.logo} style={styles.logo} contentFit="cover" accessibilityLabel={b.name} />
                 ) : (
                   <>
                     <MaterialIcons name="storefront" size={20} color={c.accent} style={styles.avatarIcon} />
@@ -269,9 +269,9 @@ export default function BusinessScreen() {
           {b.gallery?.length ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery} accessibilityLabel={t('business.page.gallery')}>
               {b.gallery.map((p, i) => (
-                <Image
+                <ThumbImage
                   key={p.path}
-                  source={{ uri: p.url }}
+                  photo={p}
                   style={[styles.galleryItem, { aspectRatio: Math.min(1.5, Math.max(0.8, p.width / p.height)), backgroundColor: c.surfaceStrong }]}
                   contentFit="cover"
                   accessibilityLabel={t('explore.photos.label', { n: i + 1, total: b.gallery!.length })}

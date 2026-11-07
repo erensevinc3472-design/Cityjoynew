@@ -11,6 +11,7 @@ import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebas
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { onObjectFinalized } from 'firebase-functions/v2/storage';
 
 import { handleAnnouncementWrite } from './announcements';
 import { handleBusinessPostWrite } from './business-posts';
@@ -20,6 +21,7 @@ import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './c
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
 import { expoSender } from './push';
 import { handleFollowWrite, handleMessageCreate } from './social';
+import { handleThumb } from './thumbs';
 import { deleteOldTranslations, googleTranslator, handleTranslate, TranslateError } from './translate';
 
 initializeApp();
@@ -29,7 +31,11 @@ const REGION = 'europe-west1';
 setGlobalOptions({ region: REGION, maxInstances: 5 });
 
 const deps = () => ({ send: expoSender, now: new Date() });
-const deleteFiles: DeleteFiles = (prefix) => getStorage().bucket().deleteFiles({ prefix });
+// Asıl dosyalar silinirken listelerde gösterilen küçük kopyaları da (`thumbs/`) silinir.
+const deleteFiles: DeleteFiles = async (prefix) => {
+  const bucket = getStorage().bucket();
+  await Promise.all([bucket.deleteFiles({ prefix }), bucket.deleteFiles({ prefix: `thumbs/${prefix}` })]);
+};
 
 export const eventCancelled = onDocumentUpdated('events/{id}', async (e) => {
   await handleEventChange(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deps());
@@ -55,6 +61,21 @@ export const followChanged = onDocumentWritten('follows/{fid}', async (e) => {
 // İşletme adına yayındaki gönderi sayısı (Ücretsiz kademede toplam sınır).
 export const businessPostCounted = onDocumentWritten('posts/{id}', async (e) => {
   await handleBusinessPostWrite(db, e.data?.before.data(), e.data?.after.data());
+});
+
+// Yüklenen her fotoğrafın listelerde gösterilecek küçük kopyası (640 piksel) çıkarılır; maliyeti ve yüklenme süresini düşürür.
+export const photoThumbnail = onObjectFinalized({ memory: '512MiB', maxInstances: 3 }, async (e) => {
+  const { name, contentType, metadata } = e.data;
+  const bucket = getStorage().bucket(e.data.bucket);
+  await handleThumb(name, contentType, metadata?.firebaseStorageDownloadTokens, {
+    read: async (n) => (await bucket.file(n).download())[0],
+    write: (n, data, token) =>
+      bucket.file(n).save(data, {
+        resumable: false,
+        contentType: 'image/jpeg',
+        metadata: { cacheControl: 'public, max-age=31536000', ...(token ? { metadata: { firebaseStorageDownloadTokens: token } } : {}) },
+      }),
+  });
 });
 
 // Gönderi kaldırılınca fotoğraf dosyaları silinir.

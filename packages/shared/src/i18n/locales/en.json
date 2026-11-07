@@ -2004,7 +2004,7 @@
       "description": "Description",
       "descriptionHint": "Mention flaws, size and how it will be handed over. Do not add a phone number.",
       "photos": "Photos",
-      "photosHint": "Up to 6 photos; the first one is shown in the list. Add real photos of the item. Keep people, plates and addresses out of shot."
+      "photosHint": "Up to 6 photos, at least 1; the first one is shown in the list. Add real photos of the item. Keep people, plates and addresses out of shot."
     },
     "errors": {
       "kind": "Choose a listing type.",
@@ -2017,7 +2017,8 @@
       "swapFor": "Swap note can be at most 120 characters.",
       "region": "Your location must include province, district and neighbourhood.",
       "realEstate": "Property and vehicle listings are not available in the Bazaar yet.",
-      "banned": "The listing contains an inappropriate word. Please edit it."
+      "banned": "The listing contains an inappropriate word. Please edit it.",
+      "photos": "Add at least one photo."
     },
     "prohibited": {
       "title": "Not allowed in the Bazaar",

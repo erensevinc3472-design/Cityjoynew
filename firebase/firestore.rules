@@ -2853,6 +2853,8 @@ service cloud.firestore {
       function _k110(nw) {
         return verified() && nw.ownerUid == request.auth.uid
         && validListing(nw)
+        // Yeni ilanda en az bir fotoğraf (Karar Eren, 3 Kasım).
+        && nw.photos.size() >= 1
         && nw.status == 'yayinda'
         && nw.reportCount == 0
         && !('cleared' in nw) && !('moderatedBy' in nw)
@@ -2869,7 +2871,9 @@ service cloud.firestore {
       function _k111(nw, od) {
         return od.ownerUid == request.auth.uid && od.status == 'yayinda'
         && nw.diff(od).affectedKeys().hasOnly(listingContentKeys())
-        && validListing(nw);
+        && validListing(nw)
+        // Fotoğraflar sıfıra indirilemez (kuraldan önce fotoğrafsız verilmiş eski ilan dışında).
+        && (nw.photos.size() >= 1 || od.get('photos', []).size() == 0);
       }
       allow update: if _k111(request.resource.data, resource.data);
       // Satıldı / yeniden yayında.

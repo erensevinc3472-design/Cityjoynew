@@ -839,6 +839,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Not: Eren'in iki hesabı var (`erensevinc3472@` boş, `zcayliyak@` gönderiler, işletme, profil fotoğrafı); şifre
   sıfırlayıp boş hesaba girince içerik "silindi" sandı, veri yerinde.
 
+- **Küçük fotoğraf ve Çarşı fotoğraf zorunluluğu (7 Kasım).** Sunucu işlevi `photoThumbnail` (`functions/src/thumbs.ts`, sharp)
+  her yüklenen JPEG'in 640 piksellik küçüğünü `thumbs/{asıl yol}` yoluna, asıl dosyanın erişim anahtarıyla yazar; uygulama
+  adresi asıl adresten hesaplar (`thumbUrl`, kayıt değişmez). Listeler, kartlar, avatarlar, logolar ve kapaklar
+  `components/thumb-image.tsx` ile küçüğü gösterir; küçük henüz yoksa (yeni ya da eski fotoğraf) asıl dosyaya döner. Tam ekran,
+  albüm ve profil büyütme asıl dosyayı kullanır. Silme işlevleri `thumbs/` kopyalarını da siler; Storage kuralı `thumbs/`'u
+  yalnızca okumaya açar. Eski fotoğrafların küçüğü yok (gerekirse sonra toplu üretilir). Çarşı: yeni ilanda en az bir fotoğraf
+  (uygulama + kural); düzenlemede fotoğraflar sıfıra indirilemez (fotoğrafsız eski ilan hariç). Testler: ortak 171, sunucu 41,
+  kurallar 159 (Storage dahil) geçti; tür denetimi temiz. **Bekleyen (Eren):** kurallar (Firestore + Storage) ve
+  `photoThumbnail` işlevi yüklenecek. Telefonda denenmedi.
 - **İşletme kademeleri (7 Kasım; Karar Eren, PROJE.md 5.6).** Doğrulanmamış işletme: dışarıdan sayfa yok, listede ve aramada
   dokununca yerinde büyüyen kart (`components/business-card.tsx`; yorumlar `reviews-sheet.tsx`), bağlantıyla açılan sayfa
   da kartı gösterir; ekibine "Doğrulama iste" kutusu. Doğrulanmış: sayfa, toplam 9 işletme gönderisi (sunucu işlevi
@@ -889,7 +898,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **Kitle istatistiği (3 Kasım):** gönderi istatistikleri "kurum / başkan adına gönderi" ile gelecek; 10 kişi eşiği şimdilik
   panelde (sunucuda Blaze ile); takip / bırakma tekrarına sınır yok; seçim dönemi başkan gizleme resmî profile
   uygulanmadı; avukat: verinin siyasi kullanımı; aydınlatma metnine "isimsiz, toplu istatistik" satırı (PROJE.md 6.1).
-- **Blaze'e geçince Claude'un yapacakları:** **ilk iş otomatik harcama sigortası** (Eren istedi, 6 Kasım: bütçe Pub/Sub bildirimi > işlev > tutar aşılınca projenin faturalandırmasını kapatır; öneri aylık 20 dolar, ayrıca 10 dolar e-posta uyarısı; `docs/eren-yapilacaklar.md`); sonra sunucu işlevleri ve Storage kurallarını yüklemek; listelerde küçük önizleme görseli (maliyet: şu an liste de 1600 piksellik asıl fotoğrafı indiriyor); Storage bölgesi **europe-west1** (Karar Eren, 6 Kasım: Firestore da Avrupa'da, eur3; Firebase'in ücretsiz Storage kotası yalnızca ABD bölgelerinde, bu yüzden ilk bayttan ücretli, başta ayda en çok ~10-12 $, maliyeti izlemek); **fotoğraf/video gösterimi** (Eren ile konuşuldu, 6 Kasım): asıl gider görüntüleme; fatura ayda ~50 doları geçince yalnızca medya Cloudflare R2'ye (indirme ücretsiz) ya da Bunny CDN'e taşınacak, Firebase giriş/veri/bildirim için kalır; tamamen kendi sunucusu önerilmedi (bakım, güvenlik, KVKK); video dokununca oynar; "Çevir" düğmesinin işlevini yükleyip gerçek çeviriyle denemek; Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu (uygulama + kurallar; Karar
+- **Blaze'e geçince Claude'un yapacakları:** **ilk iş otomatik harcama sigortası** (Eren istedi, 6 Kasım: bütçe Pub/Sub bildirimi > işlev > tutar aşılınca projenin faturalandırmasını kapatır; öneri aylık 20 dolar, ayrıca 10 dolar e-posta uyarısı; `docs/eren-yapilacaklar.md`); sonra sunucu işlevleri ve Storage kurallarını yüklemek; ~~listelerde küçük önizleme görseli~~ (7 Kasım); Storage bölgesi **europe-west1** (Karar Eren, 6 Kasım: Firestore da Avrupa'da, eur3; Firebase'in ücretsiz Storage kotası yalnızca ABD bölgelerinde, bu yüzden ilk bayttan ücretli, başta ayda en çok ~10-12 $, maliyeti izlemek); **fotoğraf/video gösterimi** (Eren ile konuşuldu, 6 Kasım): asıl gider görüntüleme; fatura ayda ~50 doları geçince yalnızca medya Cloudflare R2'ye (indirme ücretsiz) ya da Bunny CDN'e taşınacak, Firebase giriş/veri/bildirim için kalır; tamamen kendi sunucusu önerilmedi (bakım, güvenlik, KVKK); video dokununca oynar; "Çevir" düğmesinin işlevini yükleyip gerçek çeviriyle denemek; ~~Çarşı'da yeni ilana en az bir fotoğraf zorunluluğu~~ (7 Kasım; uygulama + kurallar; Karar
   Eren 3 Kasım); fotoğraflı akışları gerçek projede deneme.
 - **Eren'in yapacakları tek listede:** `docs/eren-yapilacaklar.md` (31 Ekim). Eren bir maddeyi bitirdim deyince işaretle.
 - **Mağaza öncesi kontrol listesi (30 Ekim 2026, 20 maddelik liste üzerinden):** Claude'un üç işi yapıldı (konum izni metni,

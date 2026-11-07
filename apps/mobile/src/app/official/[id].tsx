@@ -1,10 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { isMunicipalityId, mayorProfileId } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { HeroHeader } from '@/components/hero-header';
@@ -76,7 +76,7 @@ export default function OfficialProfileScreen() {
                 style={({ pressed }) => [styles.mayor, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}
               >
                 {mayor.logo ? (
-                  <Image source={{ uri: mayor.logo.url }} style={[styles.photo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors />
+                  <ThumbImage photo={mayor.logo} style={[styles.photo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors />
                 ) : (
                   <View style={[styles.photo, styles.initial, { backgroundColor: c.accentSoft }]}>
                     <AppText style={[styles.initialText, { color: c.icon }]}>{mayor.name.slice(0, 1)}</AppText>

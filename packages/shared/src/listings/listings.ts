@@ -60,7 +60,7 @@ export interface ListingInput {
   swapFor: string;
   /** İlan verenin kayıtlı konumu (kurallar denetler). */
   region: ListingRegion;
-  /** Ürün fotoğrafları (en çok 6, `media/{sahip}/ilan/...`); ilk fotoğraf listede kapak olur. Boş olabilir. */
+  /** Ürün fotoğrafları (en çok 6, `media/{sahip}/ilan/...`); ilk fotoğraf listede kapak olur. En az bir fotoğraf zorunlu (Karar Eren, 3 Kasım). */
   photos?: Photo[];
 }
 
@@ -103,7 +103,7 @@ export type ListingReportReason = (typeof LISTING_REPORT_REASONS)[number];
 /** İlan formunda gösterilen yasaklı ürünler (kullanım şartlarıyla birlikte avukata gösterilecek). */
 export const PROHIBITED_ITEMS = ['silah', 'ilac', 'alkol-tutun', 'hayvan', 'sahte', 'calinti', 'hesap', 'yetiskin'] as const;
 
-export type ListingError = 'kind' | 'category' | 'condition' | 'title' | 'description' | 'price' | 'rentUnit' | 'swapFor' | 'region' | 'realEstate';
+export type ListingError = 'kind' | 'category' | 'condition' | 'title' | 'description' | 'price' | 'rentUnit' | 'swapFor' | 'region' | 'realEstate' | 'photos';
 
 export const listingHasPrice = (kind: ListingKind) => kind === 'satilik' || kind === 'kiralik';
 
@@ -123,6 +123,7 @@ export function validateListing(l: ListingInput): ListingError[] {
   const r = l.region;
   if (!/^[0-8][0-9]$/.test(r.provinceCode) || !r.districtId.startsWith(`${r.provinceCode}-`) || !r.neighbourhoodId.startsWith(`${r.districtId}-`)) errors.push('region');
   if (looksLikeRealEstate(`${l.title} ${l.description}`)) errors.push('realEstate');
+  if (!l.photos?.length) errors.push('photos');
   return errors;
 }
 

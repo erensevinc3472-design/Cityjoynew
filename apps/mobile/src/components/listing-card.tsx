@@ -1,10 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LISTING_CATEGORY_ICONS, type Listing, type ListingCategory } from '@cityjoy/shared';
 
+import { ThumbImage } from '@/components/thumb-image';
 import { priceText } from '@/lib/listings';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
@@ -50,12 +50,11 @@ export function ListingCard({ item, favorite, onFavorite, onPress }: { item: Lis
         onPress={onPress}
         style={({ pressed }) => [styles.body, { opacity: pressed ? 0.85 : 1 }]}>
         {item.photos[0] ? (
-          <Image
-            source={{ uri: item.photos[0].url }}
+          <ThumbImage
+            photo={item.photos[0]}
             style={[styles.photo, { backgroundColor: c.surfaceStrong }]}
             contentFit="cover"
             transition={150}
-            recyclingKey={item.photos[0].path}
             accessibilityIgnoresInvertColors
           />
         ) : (

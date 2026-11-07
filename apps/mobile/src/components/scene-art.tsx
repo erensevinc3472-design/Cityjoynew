@@ -1,7 +1,7 @@
-import { Image } from 'expo-image';
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, StyleSheet } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { ThumbImage } from '@/components/thumb-image';
 
 /**
  * Kartların arkasındaki çizim sahneleri (13. madde 29). Seyahat içeriğine panelden kapak fotoğrafı yüklenmişse onun
@@ -203,7 +203,7 @@ export const sceneRim = (kind: SceneKind) => `${SCENES[kind].sun}59`;
  */
 export function CoverArt({ photo, kind, still }: { photo?: { url: string; path: string }; kind: SceneKind; still?: boolean }) {
   if (photo) {
-    return <Image source={{ uri: photo.url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={150} recyclingKey={photo.path} accessibilityIgnoresInvertColors />;
+    return <ThumbImage photo={photo} style={StyleSheet.absoluteFill} contentFit="cover" transition={150} accessibilityIgnoresInvertColors />;
   }
   return <SceneArt kind={kind} still={still} />;
 }
