@@ -735,7 +735,10 @@
     "featured": "Featured",
     "nearFirst": "Nearest first",
     "noPrice": "No price info",
-    "listAll": "All ({{count}})"
+    "listAll": "All ({{count}})",
+    "callShort": "Call",
+    "directions": "Directions",
+    "inYourDistrict": "In your district"
   },
   "announcements": {
     "title": "Announcements",

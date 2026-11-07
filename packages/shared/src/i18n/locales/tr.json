@@ -735,7 +735,10 @@
     "featured": "Öne çıkan",
     "nearFirst": "Yakına göre",
     "noPrice": "Ücret bilgisi yok",
-    "listAll": "Tümü ({{count}})"
+    "listAll": "Tümü ({{count}})",
+    "callShort": "Ara",
+    "directions": "Yol tarifi",
+    "inYourDistrict": "İlçende"
   },
   "announcements": {
     "title": "Duyurular",

@@ -5,16 +5,17 @@ import { useResolvedScheme } from '@/theme/use-theme';
 
 /**
  * Koyu modda kartların "cam" dolgusu (taslaklar, 13. madde 35): sol üstten sağ alta hafifçe koyulaşan petrol yeşili.
- * Kapsayan kutuyu doldurur, dokunmayı engellemez; açık modda çizilmez (kartın kendi beyaz zemini kalır).
+ * Kapsayan kutuyu doldurur, dokunmayı engellemez; açık modda çizilmez (kartın kendi beyaz zemini kalır). `horizontal`:
+ * yalnızca soldan sağa; alt alta dizilen liste satırlarında birleşme yerleri görünmez.
  */
-export function GlassFill({ strong }: { strong?: boolean }) {
+export function GlassFill({ strong, horizontal }: { strong?: boolean; horizontal?: boolean }) {
   const scheme = useResolvedScheme();
   if (scheme !== 'dark') return null;
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <Svg width="100%" height="100%" preserveAspectRatio="none">
         <Defs>
-          <LinearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <LinearGradient id="g" x1="0" y1="0" x2="1" y2={horizontal ? 0 : 1}>
             <Stop offset="0" stopColor="#14404A" stopOpacity={strong ? 0.95 : 0.85} />
             <Stop offset="1" stopColor="#0D3238" stopOpacity={strong ? 0.75 : 0.6} />
           </LinearGradient>

@@ -735,7 +735,10 @@
     "featured": "مميّز",
     "nearFirst": "الأقرب أولاً",
     "noPrice": "لا معلومات عن السعر",
-    "listAll": "الكل ({{count}})"
+    "listAll": "الكل ({{count}})",
+    "callShort": "اتصال",
+    "directions": "الاتجاهات",
+    "inYourDistrict": "في منطقتك"
   },
   "announcements": {
     "title": "الإعلانات",

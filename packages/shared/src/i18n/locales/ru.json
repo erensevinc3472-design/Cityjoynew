@@ -735,7 +735,10 @@
     "featured": "Рекомендуем",
     "nearFirst": "Сначала ближайшие",
     "noPrice": "Нет данных о цене",
-    "listAll": "Все ({{count}})"
+    "listAll": "Все ({{count}})",
+    "callShort": "Позвонить",
+    "directions": "Маршрут",
+    "inYourDistrict": "В вашем районе"
   },
   "announcements": {
     "title": "Объявления",

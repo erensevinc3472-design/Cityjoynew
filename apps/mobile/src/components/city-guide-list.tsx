@@ -1,19 +1,20 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState, type ReactElement } from 'react';
-import { FlatList, ScrollView, StyleSheet, View } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { FlatList, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { cityChoiceLabel, normalizeName, type CityGuideItem, type CityGuideSectionId } from '@cityjoy/shared';
+import { cityChoiceLabel, mapsUrl, normalizeName, telUrl, type CityGuideItem, type CityGuideSectionId } from '@cityjoy/shared';
 
 import { useCityGuideItems } from '@/lib/city-guide';
 import type { Look } from '@/lib/city-look';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
-import { radius, spacing } from '@/theme/tokens';
+import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
-import { GlossyIcon } from './glossy-icon';
-import { FeaturedCard, FilterChip, FilterRow, ListRow, SectionTitle, Tag } from './inner';
+import { GlassFill } from './glass';
+import { FeaturedCard, FilterChip, FilterRow, ListRow, RowIcon, SectionTitle, Tag } from './inner';
 import type { SceneKind } from './scene-art';
 import { SearchField } from './search-field';
 import { StateMessage } from './state-message';
@@ -80,7 +81,17 @@ export function CityGuideList({ section, look, categories, header }: { section: 
   const featuredKind = FEATURED[section];
   const filtered = !!(query || kind || district || day);
   const featured = featuredKind && !filtered ? shown[0] : undefined;
-  const rows = featured ? shown.slice(1) : shown;
+  // Çizimli kartı olmayan bölümlerde en üstte ilk kayıt (kullanıcının ilçesindeki önce), Ara ve Yol tarifi ile (taslak S-Eczane).
+  const spot = !featuredKind && !filtered && shown.length > 1 ? shown[0] : undefined;
+  const rows = featured || spot ? shown.slice(1) : shown;
+  const open = (url: string) => Linking.openURL(url).catch(() => {});
+  const phoneOf = (i: CityGuideItem) => (typeof i.values.telefon === 'string' && i.values.telefon.trim() ? i.values.telefon : undefined);
+  const mapOf = (i: CityGuideItem) => {
+    if (i.location) return mapsUrl(i.location);
+    const address = typeof i.values.adres === 'string' ? i.values.adres : '';
+    const place = [i.districtId ? repo.getDistrict(i.districtId)?.name : '', repo.getProvince(i.provinceCode)?.name].filter(Boolean).join(', ');
+    return address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${i.name}, ${address}, ${place}`)}` : undefined;
+  };
   const go = (i: CityGuideItem) => router.push({ pathname: '/city/item', params: { section, id: i.id } });
   const sectionName = (n: number) => t('city.listAll', { count: n });
 
@@ -121,11 +132,12 @@ export function CityGuideList({ section, look, categories, header }: { section: 
               onPress={() => go(featured)}
             />
           ) : null}
+          {spot ? <Spotlight item={spot} look={look} mine={!!location?.districtId && spot.districtId === location.districtId} phone={phoneOf(spot)} map={mapOf(spot)} onOpen={open} onPress={() => go(spot)} /> : null}
           {rows.length ? <SectionTitle title={sectionName(shown.length)} aside={location?.districtId && !district ? t('city.nearFirst') : undefined} /> : null}
         </View>
       }
       ListEmptyComponent={
-        featured ? undefined : error ? (
+        featured || spot ? undefined : error ? (
           <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} />
         ) : items === null ? (
           <StateMessage kind="loading" />
@@ -139,12 +151,14 @@ export function CityGuideList({ section, look, categories, header }: { section: 
         const summary = meta || text(i, SUMMARY_KEYS);
         const free = i.values.ucret_durumu === 'Ücretsiz';
         const parking = section === 'otoparklar';
+        const phone = phoneOf(i);
         const last = index === rows.length - 1;
         return (
           <View style={[styles.surfaceRow, { backgroundColor: c.surface, borderColor: c.border }, index === 0 && styles.surfaceFirst, last && styles.surfaceLast]}>
+            <GlassFill horizontal />
             <ListRow
               first={index === 0}
-              leading={<GlossyIcon icon={look.icon} colors={look.colors} size={40} />}
+              leading={<RowIcon icon={look.icon} tint={look.colors[0]} size={38} />}
               title={i.name}
               subtitle={[districtName, i.category && i.category !== 'diger' ? cityChoiceLabel(i.category, lang) : '', summary].filter(Boolean).join(' · ')}
               accessibilityLabel={[i.name, districtName, i.verified ? '' : t('city.unverified')].filter(Boolean).join(', ')}
@@ -153,6 +167,8 @@ export function CityGuideList({ section, look, categories, header }: { section: 
                   <Tag label={cityChoiceLabel('Ücretsiz', lang)} tone="green" />
                 ) : parking && i.values.ilk_saat_tl === undefined ? (
                   <Tag label={t('city.noPrice')} tone="muted" />
+                ) : phone ? (
+                  <CallButton label={t('city.callShort')} onPress={() => open(telUrl(phone))} />
                 ) : !i.verified ? (
                   <Tag label={t('city.unverified')} tone="muted" />
                 ) : undefined
@@ -166,12 +182,73 @@ export function CityGuideList({ section, look, categories, header }: { section: 
   );
 }
 
+/** Satırın sağında tek dokunuşla arama (telefonun arama ekranı açılır). */
+function CallButton({ label, onPress }: { label: string; onPress(): void }) {
+  const c = useThemeColors();
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={label} hitSlop={6} onPress={onPress} style={({ pressed }) => [styles.call, { backgroundColor: c.accentSoft, opacity: pressed ? 0.7 : 1 }]}>
+      <MaterialIcons name="call" size={17} color={c.primary} />
+    </Pressable>
+  );
+}
+
+/** Üstte öne çıkan kayıt: altın çerçeveli cam kart, ad, adres, Ara ve Yol tarifi. */
+function Spotlight({ item, look, mine, phone, map, onOpen, onPress }: { item: CityGuideItem; look: Look; mine: boolean; phone?: string; map?: string; onOpen(url: string): void; onPress(): void }) {
+  const { t } = useTranslation();
+  const c = useThemeColors();
+  const district = item.districtId ? repo.getDistrict(item.districtId)?.name : undefined;
+  const address = typeof item.values.adres === 'string' ? item.values.adres : '';
+  const badge = mine ? t('city.inYourDistrict') : district;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={[item.name, district, address].filter(Boolean).join(', ')}
+      onPress={onPress}
+      style={({ pressed }) => [styles.spot, { backgroundColor: c.surface, borderColor: c.accentBorder, transform: [{ scale: pressed ? 0.985 : 1 }] }]}>
+      <GlassFill strong />
+      <View style={styles.spotHead}>
+        <RowIcon icon={look.icon} tint={look.colors[0]} size={42} />
+        <View style={styles.flex}>
+          {badge ? <Tag label={badge} /> : null}
+          <AppText style={[styles.spotTitle, { color: c.textStrong }]} numberOfLines={2}>{item.name}</AppText>
+        </View>
+      </View>
+      {address ? <AppText style={[styles.spotSub, { color: c.textMuted }]} numberOfLines={2}>{address}</AppText> : null}
+      {phone || map ? (
+        <View style={styles.spotBtns}>
+          {phone ? (
+            <Pressable accessibilityRole="button" onPress={() => onOpen(telUrl(phone))} style={({ pressed }) => [styles.spotBtn, { backgroundColor: c.primary, opacity: pressed ? 0.85 : 1 }]}>
+              <MaterialIcons name="call" size={16} color={c.onPrimary} />
+              <AppText style={[styles.spotBtnText, { color: c.onPrimary }]}>{t('city.callShort')}</AppText>
+            </Pressable>
+          ) : null}
+          {map ? (
+            <Pressable accessibilityRole="button" onPress={() => onOpen(map)} style={({ pressed }) => [styles.spotBtn, { backgroundColor: c.surfaceStrong, opacity: pressed ? 0.85 : 1 }]}>
+              <MaterialIcons name="directions" size={16} color={c.textStrong} />
+              <AppText style={[styles.spotBtnText, { color: c.textStrong }]}>{t('city.directions')}</AppText>
+            </Pressable>
+          ) : null}
+        </View>
+      ) : null}
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
+  flex: { flex: 1, gap: 4, alignItems: 'flex-start' },
+  call: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  spot: { borderWidth: 1, borderRadius: radius.xl, padding: spacing.md, gap: spacing.sm + 2, overflow: 'hidden' },
+  spotHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 2 },
+  spotTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 22 },
+  spotSub: { fontSize: 12.5, lineHeight: 17 },
+  spotBtns: { flexDirection: 'row', gap: spacing.sm },
+  spotBtn: { flex: 1, minHeight: 44, borderRadius: radius.md, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  spotBtnText: { fontFamily: fonts.bodySemi, fontSize: 13.5 },
   content: { paddingBottom: spacing.xl },
   top: { gap: spacing.sm + 2, marginBottom: spacing.sm + 2 },
   chips: { gap: spacing.xs + 2, paddingVertical: 2 },
   // Satırlar tek yüzeyde: ilk ve son satır köşeleri yuvarlar, kenarlar birleşir.
-  surfaceRow: { borderLeftWidth: 1, borderRightWidth: 1, paddingHorizontal: spacing.md },
+  surfaceRow: { borderLeftWidth: 1, borderRightWidth: 1, paddingHorizontal: spacing.md, overflow: 'hidden' },
   surfaceFirst: { borderTopWidth: 1, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl },
   surfaceLast: { borderBottomWidth: 1, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl },
 });

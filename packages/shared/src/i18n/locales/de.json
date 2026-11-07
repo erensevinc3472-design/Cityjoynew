@@ -735,7 +735,10 @@
     "featured": "Empfohlen",
     "nearFirst": "Nächste zuerst",
     "noPrice": "Keine Preisangabe",
-    "listAll": "Alle ({{count}})"
+    "listAll": "Alle ({{count}})",
+    "callShort": "Anrufen",
+    "directions": "Route",
+    "inYourDistrict": "In deinem Bezirk"
   },
   "announcements": {
     "title": "Bekanntmachungen",
