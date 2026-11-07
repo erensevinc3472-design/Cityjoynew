@@ -69,6 +69,9 @@ function useCached<T>(key: string | null, load: () => Promise<T>) {
 export const useTravelRegions = () => useCached<TravelRegionContent[]>('regions', () => travelRepository.listRegions());
 export const useTravelCities = (regionId: string | undefined) =>
   useCached<TravelCityContent[]>(regionId ? `cities:${regionId}` : null, () => travelRepository.listCities(regionId!));
+/** Tek il sayfası (ör. Benim Şehrim kartında panelden yüklenen il kapak fotoğrafı için). */
+export const useTravelCity = (code: string | undefined) =>
+  useCached<TravelCityContent | null>(code ? `city:${code}` : null, () => travelRepository.getCity(code!));
 export const useTravelPlaces = (cityId: string | undefined) =>
   useCached<TravelPlace[]>(cityId ? `places:${cityId}` : null, () => travelRepository.listPlaces(cityId!));
 

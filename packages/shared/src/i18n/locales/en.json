@@ -749,7 +749,9 @@
       "everything": "All · {{count}} places",
       "clear": "Clear selection",
       "details": "Details",
-      "places": "{{count}} places"
+      "places": "{{count}} places",
+      "explore": "Explore your city",
+      "showcaseOf": "{{city}} Showcase"
     }
   },
   "announcements": {

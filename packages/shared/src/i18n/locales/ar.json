@@ -749,7 +749,9 @@
       "everything": "الكل · {{count}}",
       "clear": "إلغاء التحديد",
       "details": "التفاصيل",
-      "places": "{{count}} مكان"
+      "places": "{{count}} مكان",
+      "explore": "اكتشف مدينتك",
+      "showcaseOf": "واجهة {{city}}"
     }
   },
   "announcements": {

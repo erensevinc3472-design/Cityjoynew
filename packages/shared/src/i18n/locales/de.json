@@ -749,7 +749,9 @@
       "everything": "Alle · {{count}} Einträge",
       "clear": "Auswahl aufheben",
       "details": "Details",
-      "places": "{{count}} Orte"
+      "places": "{{count}} Orte",
+      "explore": "Entdecke deine Stadt",
+      "showcaseOf": "Schaufenster {{city}}"
     }
   },
   "announcements": {

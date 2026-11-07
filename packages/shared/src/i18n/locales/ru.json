@@ -749,7 +749,9 @@
       "everything": "Все · {{count}}",
       "clear": "Сбросить выбор",
       "details": "Подробнее",
-      "places": "Мест: {{count}}"
+      "places": "Мест: {{count}}",
+      "explore": "Откройте свой город",
+      "showcaseOf": "Витрина: {{city}}"
     }
   },
   "announcements": {

@@ -1,77 +1,75 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
-import { useEffect, useState, type ComponentProps } from 'react';
-import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useEffect, useId, useState, type ComponentProps, type ReactNode } from 'react';
+import { I18nManager, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 import { CITY_GUIDE_SECTIONS, type CityGuideSectionId } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { frost } from '@/components/city-hub';
+import { FrostFill } from '@/components/glass';
 import { HeroHeader } from '@/components/hero-header';
-import { SceneArt, sceneRim, type SceneKind } from '@/components/scene-art';
+import { LineIcon } from '@/components/line-icon';
+import { CoverArt, SceneArt, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useCityGuideMeta } from '@/lib/city-guide';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
+import { useTravelCity } from '@/lib/travel';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
-import { useThemeColors } from '@/theme/use-theme';
+import { fonts, radius, spacing } from '@/theme/tokens';
+import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
-/** Her kutucuğun kendi rengi (simge ve hafif hale); koyu ve açık zeminde okunur tonlar. */
-const HUES = {
-  gold: '#D9A15C',
-  teal: '#2FB3A3',
-  blue: '#5B9BE6',
-  rose: '#E07A9B',
-  green: '#3DBB8C',
-  violet: '#9B87E8',
-  amber: '#E6A23C',
-} as const;
-type Hue = keyof typeof HUES;
+const GOLD = '#E2B277';
+const TEAL = '#4FC2A8';
 
 interface Tile {
   key: string;
   icon: IconName;
-  hue: Hue;
+  /** Simge rengi: altın ya da yeşil vurgu; yoksa yazı rengi. */
+  tint?: 'gold' | 'teal';
   /** Şehir rehberi bölümü (veri sayısına göre açılır) ya da doğrudan bir ekran; ikisi de yoksa "yakında". */
   section?: CityGuideSectionId;
   href?: Href;
 }
 
-// Sıra Eren'in tasarımındaki gibi; Belediye Hizmetleri ayrıca büyük kartta. Muhtarlıklar Önemli Kurumlar'ın içinde,
-// toplanma alanları Mahalle Meydanı'nda; Park ve Pazar tek bölüm (Eren, 29 Ekim 2026: kategoriler toplu olsun).
+// Sıra Eren'in taslağındaki gibi (7 Kasım 2026): üstte Belediye Hizmetleri ile Önemli Kurumlar, altında iki sütunlu
+// satırlar. Muhtarlıklar Önemli Kurumlar'ın içinde, toplanma alanları Mahalle Meydanı'nda.
+const KURUMLAR: Tile = { key: 'kurumlar', href: '/city/kurumlar', icon: 'corporate-fare' };
 const TILES: Tile[] = [
-  { key: 'kurumlar', href: '/city/kurumlar', icon: 'account-balance', hue: 'blue' },
-  { key: 'muzeler', section: 'muzeler', icon: 'museum', hue: 'gold' },
-  { key: 'cafe', href: '/city/food', icon: 'restaurant', hue: 'amber' },
-  { key: 'events', href: '/events', icon: 'event', hue: 'rose' },
-  { key: 'pharmacy', icon: 'local-pharmacy', hue: 'green' },
-  { key: 'ulasim', section: 'ulasim', icon: 'directions-bus', hue: 'blue' },
-  { key: 'parkPazar', href: '/city/park-pazar', icon: 'park', hue: 'green' },
-  { key: 'listings', href: '/carsi', icon: 'sell', hue: 'violet' },
-  { key: 'otoparklar', section: 'otoparklar', icon: 'local-parking', hue: 'teal' },
-  { key: 'volunteer', icon: 'volunteer-activism', hue: 'rose' },
-  { key: 'nasil-yapilir', section: 'nasil-yapilir', icon: 'lightbulb', hue: 'gold' },
+  { key: 'muzeler', section: 'muzeler', icon: 'museum' },
+  { key: 'cafe', href: '/city/food', icon: 'restaurant' },
+  { key: 'events', href: '/events', icon: 'event' },
+  { key: 'pharmacy', icon: 'local-pharmacy', tint: 'gold' },
+  { key: 'ulasim', section: 'ulasim', icon: 'directions-bus' },
+  { key: 'parkPazar', href: '/city/park-pazar', icon: 'park', tint: 'teal' },
+  { key: 'listings', href: '/carsi', icon: 'sell', tint: 'gold' },
+  { key: 'otoparklar', section: 'otoparklar', icon: 'local-parking' },
+  { key: 'volunteer', icon: 'volunteer-activism', tint: 'gold' },
+  { key: 'nasil-yapilir', section: 'nasil-yapilir', icon: 'lightbulb', tint: 'gold' },
 ];
 
 /**
- * Benim Şehrim (PROJE.md 5.1, 13. madde 29; Eren onayladı): üstte şehrin kapağı, altında tek ızgara (Belediye
- * Hizmetleri büyük, diğer bölümler kendi renginde), en altta Mahalle Meydanı ve Şehir Vitrini. Bölümler veritabanından,
- * il başına gelir; bilgisi olmayan bölüm soluk "Yakında" görünür.
+ * Benim Şehrim (PROJE.md 5.1; Eren'in 7 Kasım 2026 taslağı): üstte ilin fotoğraflı kapağı (Seyahat bölümünde panelden
+ * yüklenen il kapağı; yoksa çizim), "Şehrinde keşfet" altında altın Belediye kartı ve Önemli Kurumlar, sonra iki
+ * sütunlu cam satırlar, en altta Mahalle Meydanı ve il Vitrini. Bilgisi olmayan bölüm soluk "Yakında" görünür.
  */
 export default function MyCityScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const dark = useResolvedScheme() === 'dark';
   const { language } = useSettings();
   const lang = language ?? 'tr';
-  const { width } = useWindowDimensions();
   const { location } = useUserLocation();
   const provinceCode = location?.provinceCode;
   const { meta, stale, failed } = useCityGuideMeta(provinceCode);
+  const { value: travelCity } = useTravelCity(provinceCode);
   const province = provinceCode ? repo.getProvince(provinceCode)?.name : undefined;
   const district = location?.districtId ? repo.getDistrict(location.districtId)?.name : undefined;
   const [neighbourhood, setNeighbourhood] = useState<string>();
@@ -88,6 +86,7 @@ export default function MyCityScreen() {
 
   const header = (
     <HeroHeader
+      serif
       title={t('modules.myCity')}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
       right={{ icon: 'edit-location-alt', label: t('home.changeLocation'), onPress: () => router.push('/location?edit=1') }}
@@ -96,7 +95,7 @@ export default function MyCityScreen() {
 
   if (!provinceCode) {
     return (
-      <Screen header={header}>
+      <Screen warm header={header}>
         <View style={styles.content}>
           <StateMessage kind="empty" message={t('city.needLocation')} />
           <AppButton title={t('home.changeLocation')} onPress={() => router.push('/location?edit=1')} />
@@ -105,10 +104,6 @@ export default function MyCityScreen() {
     );
   }
 
-  // Üç sütunlu ızgara: Belediye Hizmetleri 2x2, yanında iki küçük kutu, gerisi üçerli.
-  const GAP = 10;
-  const inner = Math.min(width, 640) - GUTTER * 2;
-  const cell = Math.floor((inner - GAP * 2) / 3);
   const sectionName = (id: CityGuideSectionId) => {
     const s = CITY_GUIDE_SECTIONS.find((x) => x.id === id);
     return s ? (s.names[lang] ?? s.names.tr) : id;
@@ -121,129 +116,197 @@ export default function MyCityScreen() {
     return { ready: !!meta && (count > 0 || tile.section === 'nasil-yapilir'), label: sectionName(tile.section) };
   };
   const open = (tile: Tile) => (tile.href ? router.push(tile.href) : router.push({ pathname: '/city/[section]', params: { section: tile.section! } }));
+  const tintOf = (tile: Tile) => (tile.tint === 'gold' ? GOLD : tile.tint === 'teal' ? TEAL : c.textStrong);
+  const glass = frost(dark, c.surface, c.border);
 
-  const renderTile = (tile: Tile) => {
+  const soonChip = <AppText style={[styles.soon, { backgroundColor: c.surfaceStrong, color: c.textMuted }]}>{t('city.soon')}</AppText>;
+
+  const renderRow = (tile: Tile) => {
     const { ready, label } = tileState(tile);
-    const hue = HUES[tile.hue];
     return (
       <Pressable
         key={tile.key}
         accessibilityRole="button"
         accessibilityLabel={ready ? label : `${label}. ${t('city.soon')}`}
+        accessibilityState={{ disabled: !ready }}
         disabled={!ready}
         onPress={() => open(tile)}
-        style={({ pressed }) => [
-          styles.tile,
-          { width: cell, height: 92, backgroundColor: c.surface, borderColor: c.border, opacity: !ready ? 0.5 : pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] },
-        ]}>
-        <View style={[styles.halo, { backgroundColor: `${hue}26` }]} />
-        <View style={[styles.chip, { backgroundColor: `${hue}29` }]}>
-          <MaterialIcons name={tile.icon} size={19} color={hue} />
-        </View>
-        {!ready ? <AppText style={[styles.soon, { backgroundColor: c.surfaceStrong, color: c.textMuted }]}>{t('city.soon')}</AppText> : null}
-        <AppText numberOfLines={2} style={[styles.tileTitle, { color: c.textStrong }]}>{label}</AppText>
+        style={({ pressed }) => [styles.row, glass, { opacity: !ready ? 0.5 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+        <FrostFill />
+        <LineIcon name={tile.icon} size={24} color={tintOf(tile)} />
+        <AppText numberOfLines={2} style={[styles.rowTitle, { color: c.textStrong }]}>{label}</AppText>
+        {!ready ? soonChip : null}
+        <Chevron />
       </Pressable>
     );
   };
 
-  const townhall = tileState({ key: 'belediye-hizmetleri', section: 'belediye-hizmetleri', icon: 'apartment', hue: 'gold' });
-  const featured: { key: string; scene: SceneKind; tag: string; title: string; href?: Href }[] = [
-    { key: 'neighbourhood', scene: 'neighbourhood', tag: t('neighbourhood.title'), title: neighbourhood ?? t('neighbourhood.hint'), href: '/neighbourhood' },
-    { key: 'showcase', scene: 'showcase', tag: t('city.showcase'), title: t('showcase.weekly'), href: '/city/showcase' },
-  ];
+  const townhall = tileState({ key: 'belediye-hizmetleri', section: 'belediye-hizmetleri', icon: 'apartment' });
+  const kurumlar = tileState(KURUMLAR);
+  const pairs: Tile[][] = [];
+  for (let i = 0; i < TILES.length; i += 2) pairs.push(TILES.slice(i, i + 2));
 
   return (
-    <Screen header={header}>
+    <Screen warm header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Şehir kapağı: fotoğraflar panelden yüklenebilir olunca (Storage) çizimin yerini alacak. */}
-        <View style={[styles.cover, { borderColor: c.border }]}>
-          <SceneArt kind="cover" />
+        {/* İl kapağı: Seyahat panelinde ile yüklenen fotoğraf; yoksa çizim. */}
+        <View style={styles.cover}>
+          <CoverArt photo={travelCity?.cover} kind="cover" />
+          <Shade from="#061417" opacity={0.92} />
           <View style={styles.coverText}>
-            <AppText style={[styles.kicker, { color: c.heroAccent }]}>{t('modules.myCity').toLocaleUpperCase(lang)}</AppText>
-            <AppText accessibilityRole="header" style={styles.cityName}>{province}</AppText>
-            <AppText style={styles.place}>{[district, neighbourhood].filter(Boolean).join(' · ')}</AppText>
+            <AppText style={styles.kicker}>{t('modules.myCity').toLocaleUpperCase(lang)}</AppText>
+            <AppText accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit style={styles.cityName}>{province}</AppText>
+            {district || neighbourhood ? (
+            <View style={styles.placeRow}>
+              <LineIcon name="location-on" size={16} color={GOLD} />
+              <AppText numberOfLines={1} style={styles.place}>{[district, neighbourhood].filter(Boolean).join(' · ')}</AppText>
+            </View>
+            ) : null}
           </View>
+          <View pointerEvents="none" style={styles.coverRim} />
         </View>
         {stale ? <AppText variant="caption" muted>{t('city.staleNote')}</AppText> : null}
         {failed && !meta ? <StateMessage kind="error" message={t('city.loadError')} /> : !meta ? <StateMessage kind="loading" /> : null}
 
-        <View style={[styles.grid, { gap: GAP }]}>
-          <View style={[styles.row, { gap: GAP }]}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={townhall.label}
-              onPress={() => router.push('/city/belediyeler')}
-              style={({ pressed }) => [styles.big, { width: cell * 2 + GAP, height: 92 * 2 + GAP, borderColor: sceneRim('townhall'), opacity: pressed ? 0.88 : 1 }]}>
-              <SceneArt kind="townhall" />
-              <View style={styles.bigIcon}>
-                <MaterialIcons name="apartment" size={22} color="#FFFFFF" />
-              </View>
-              <View style={styles.foot}>
-                <AppText style={styles.bigTitle}>{townhall.label}</AppText>
-                <AppText style={styles.footHint}>{t('city.townhallHint')}</AppText>
-              </View>
-            </Pressable>
-            <View style={{ gap: GAP }}>{TILES.slice(0, 2).map(renderTile)}</View>
+        <View style={styles.heading}>
+          <View style={styles.headingIcon}>
+            <LineIcon name="explore" size={17} color="#2A1C06" />
           </View>
-          <View style={[styles.wrap, { gap: GAP }]}>{TILES.slice(2).map(renderTile)}</View>
+          <AppText accessibilityRole="header" style={[styles.headingText, { color: c.textStrong }]}>{t('city.hub.explore')}</AppText>
+          <View style={[styles.headingLine, { backgroundColor: c.border }]} />
         </View>
 
-        <View style={[styles.row, { gap: GAP }]}>
-          {featured.map((f) => (
-            <Pressable
-              key={f.key}
-              accessibilityRole="button"
-              accessibilityLabel={f.href ? `${f.tag}. ${f.title}` : `${f.tag}. ${t('city.soon')}`}
-              disabled={!f.href}
-              onPress={f.href ? () => router.push(f.href!) : undefined}
-              style={({ pressed }) => [styles.featured, { borderColor: sceneRim(f.scene), opacity: !f.href ? 0.6 : pressed ? 0.88 : 1 }]}>
-              <SceneArt kind={f.scene} />
-              <View style={styles.foot}>
-                <AppText numberOfLines={1} style={[styles.featuredTag, { color: c.heroAccent }]}>{f.tag.toLocaleUpperCase(lang)}</AppText>
-                <AppText numberOfLines={1} style={styles.featuredTitle}>{f.href ? f.title : t('city.soon')}</AppText>
-              </View>
-            </Pressable>
-          ))}
+        <View style={styles.pair}>
+          <PhotoCard
+            flex={1.45}
+            scene="townhall"
+            gold
+            icon="account-balance"
+            title={townhall.label}
+            onPress={() => router.push('/city/belediyeler')}
+          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={kurumlar.label}
+            onPress={() => open(KURUMLAR)}
+            style={({ pressed }) => [styles.tall, glass, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+            <FrostFill />
+            <LineIcon name={KURUMLAR.icon} size={30} color={c.textStrong} />
+            <View style={styles.tallFoot}>
+              <AppText numberOfLines={2} style={[styles.tallTitle, { color: c.textStrong }]}>{kurumlar.label}</AppText>
+              <Chevron />
+            </View>
+          </Pressable>
+        </View>
+
+        {pairs.map((p) => (
+          <View key={p[0].key} style={styles.pair}>
+            {p.map(renderRow)}
+          </View>
+        ))}
+
+        <View style={[styles.pair, styles.bottom]}>
+          <PhotoCard
+            scene="neighbourhood"
+            icon="holiday-village"
+            title={t('neighbourhood.title')}
+            sub={neighbourhood ?? t('neighbourhood.hint')}
+            onPress={() => router.push('/neighbourhood')}
+          />
+          <PhotoCard
+            scene="showcase"
+            gold
+            icon="auto-awesome"
+            title={province ? t('city.hub.showcaseOf', { city: province }) : t('city.showcase')}
+            sub={t('showcase.weekly')}
+            onPress={() => router.push('/city/showcase')}
+          />
         </View>
       </ScrollView>
     </Screen>
   );
 }
 
+/** Kartın soldan sağa koyulaşan örtüsü (fotoğraf üstündeki yazı okunsun). */
+function Shade({ from, opacity, to = 0.15 }: { from: string; opacity: number; to?: number }) {
+  const rtl = I18nManager.isRTL;
+  const id = 'shade' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <Svg width="100%" height="100%" preserveAspectRatio="none">
+        <Defs>
+          <LinearGradient id={id} x1={rtl ? '1' : '0'} y1="0" x2={rtl ? '0' : '1'} y2="0.3">
+            <Stop offset="0" stopColor={from} stopOpacity={opacity} />
+            <Stop offset="0.55" stopColor={from} stopOpacity={opacity * 0.55} />
+            <Stop offset="1" stopColor={from} stopOpacity={to} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
+      </Svg>
+    </View>
+  );
+}
+
+/** Sağdaki küçük yuvarlak ok. */
+function Chevron({ gold }: { gold?: boolean }) {
+  const rtl = I18nManager.isRTL;
+  return (
+    <View style={[styles.chevron, gold ? styles.chevronGold : null]}>
+      <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={18} color={gold ? '#2A1C06' : '#EAF1EF'} />
+    </View>
+  );
+}
+
+/** Fotoğraflı (şimdilik çizimli) büyük kart: Belediye, Mahalle Meydanı, Vitrin. `gold`: altın tonlu örtü. */
+function PhotoCard({ scene, gold, icon, title, sub, flex = 1, onPress }: { scene: SceneKind; gold?: boolean; icon: IconName; title: string; sub?: string; flex?: number; onPress(): void }): ReactNode {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={sub ? `${title}. ${sub}` : title}
+      onPress={onPress}
+      style={({ pressed }) => [styles.tall, styles.photoCard, { flex, borderColor: gold ? 'rgba(226, 178, 119, 0.55)' : 'rgba(220, 240, 236, 0.18)', transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+      <SceneArt kind={scene} still />
+      <Shade from={gold ? '#9C7434' : '#061417'} opacity={gold ? 0.95 : 0.88} to={gold ? 0.35 : 0.2} />
+      <View>
+        <LineIcon name={icon} size={30} color="#FFFFFF" />
+      </View>
+      <View style={styles.tallFoot}>
+        <View style={styles.flex}>
+          <AppText numberOfLines={2} style={styles.photoTitle}>{title}</AppText>
+          {sub ? <AppText numberOfLines={1} style={styles.photoSub}>{sub}</AppText> : null}
+        </View>
+        <Chevron gold={gold} />
+      </View>
+    </Pressable>
+  );
+}
+
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xl },
-  cover: { height: 172, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  coverText: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: spacing.md, paddingVertical: 10, backgroundColor: 'rgba(8, 26, 30, 0.6)' },
-  kicker: { fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 1 },
-  cityName: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 32, color: white },
-  place: { fontSize: 13, color: '#D5E2E3' },
-  grid: {},
-  row: { flexDirection: 'row' },
-  wrap: { flexDirection: 'row', flexWrap: 'wrap' },
-  tile: { borderRadius: radius.lg, borderWidth: 1, padding: 10, justifyContent: 'space-between', overflow: 'hidden' },
-  halo: { position: 'absolute', top: -18, end: -18, width: 64, height: 64, borderRadius: 32 },
-  chip: { width: 34, height: 34, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  soon: { position: 'absolute', top: 10, end: 8, fontFamily: fonts.bodySemi, fontSize: 10, paddingHorizontal: 6, paddingVertical: 2, borderRadius: radius.pill, overflow: 'hidden' },
-  tileTitle: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 16 },
-  big: { borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  bigIcon: {
-    position: 'absolute',
-    top: 12,
-    start: 12,
-    width: 42,
-    height: 42,
-    borderRadius: radius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(11, 35, 40, 0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.18)',
-  },
-  foot: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: 'rgba(8, 26, 30, 0.72)' },
-  bigTitle: { fontFamily: fonts.heading, fontSize: 16, lineHeight: 21, color: white },
-  footHint: { fontSize: 12, lineHeight: 16, color: '#D5E2E3', marginTop: 2 },
-  featured: { flex: 1, height: 124, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  featuredTag: { fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 0.8 },
-  featuredTitle: { fontFamily: fonts.heading, fontSize: 14, lineHeight: 19, color: white, marginTop: 2 },
+  content: { gap: spacing.sm + 2, paddingBottom: spacing.xl },
+  cover: { height: 184, borderRadius: radius.xl, borderWidth: 1, borderColor: 'rgba(220, 240, 236, 0.16)', overflow: 'hidden', justifyContent: 'center' },
+  coverRim: { position: 'absolute', start: 0, end: 0, bottom: 0, height: 2, backgroundColor: GOLD, opacity: 0.7 },
+  coverText: { paddingHorizontal: spacing.md + 2, gap: 2, maxWidth: '68%' },
+  kicker: { alignSelf: 'flex-start', fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 1.4, color: GOLD, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(226, 178, 119, 0.6)' },
+  cityName: { fontFamily: fonts.serifSemi, fontSize: 40, lineHeight: 48, color: white, marginTop: 4 },
+  placeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  place: { flexShrink: 1, fontSize: 13, color: '#E3ECEA' },
+  heading: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: spacing.sm },
+  headingIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: GOLD, alignItems: 'center', justifyContent: 'center' },
+  headingText: { fontFamily: fonts.serif, fontSize: 20, lineHeight: 26 },
+  headingLine: { flex: 1, height: 1, marginStart: 6 },
+  pair: { flexDirection: 'row', gap: spacing.sm + 2 },
+  bottom: { marginTop: spacing.sm },
+  tall: { flex: 1, height: 128, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden', padding: spacing.md - 2, justifyContent: 'space-between' },
+  tallFoot: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
+  tallTitle: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
+  photoCard: { backgroundColor: '#0B2327' },
+  photoTitle: { fontFamily: fonts.serifSemi, fontSize: 17, lineHeight: 21, color: white },
+  photoSub: { fontSize: 12, lineHeight: 16, color: '#E3ECEA', marginTop: 2 },
+  flex: { flex: 1 },
+  row: { flex: 1, minHeight: 62, borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 10, paddingStart: 14, paddingEnd: 10, paddingVertical: 10 },
+  rowTitle: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 14, lineHeight: 18 },
+  soon: { position: 'absolute', top: 5, end: 8, fontFamily: fonts.bodySemi, fontSize: 9.5, paddingHorizontal: 6, paddingVertical: 1, borderRadius: radius.pill, overflow: 'hidden' },
+  chevron: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(220, 240, 236, 0.14)' },
+  chevronGold: { backgroundColor: GOLD },
 });

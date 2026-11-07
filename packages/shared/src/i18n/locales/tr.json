@@ -749,7 +749,9 @@
       "everything": "Tümü · {{count}} kayıt",
       "clear": "Seçimi kaldır",
       "details": "Ayrıntılar",
-      "places": "{{count}} yer"
+      "places": "{{count}} yer",
+      "explore": "Şehrinde keşfet",
+      "showcaseOf": "{{city}} Vitrini"
     }
   },
   "announcements": {

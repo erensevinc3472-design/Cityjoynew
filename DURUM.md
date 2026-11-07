@@ -854,6 +854,13 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `app/city/*` alt sayfaları). Kurumlar kutularında ince simge. Tür denetimi temiz, telefon paketi derlendi; **telefonda
   denenmedi**. Sonraki parça: her il için şehir fotoğrafı (panelden yükleme, sayfa arkasında bulanık; taslaktaki gibi),
   fotoğrafı olmayan ilde düz zemin.
+- **Benim Şehrim ana sayfası, yeni düzen (7 Kasım; Eren kendi görselini gönderdi: "böyle bir şey").** `app/city/index.tsx`:
+  tırnaklı başlık, büyük il kapağı (Seyahat panelinde ile yüklenen kapak fotoğrafı `useTravelCity(il kodu).cover`; yoksa
+  çizim), "Şehrinde keşfet" başlığı, altın Belediye Hizmetleri kartı + Önemli Kurumlar, iki sütunlu cam satırlar (ince simge,
+  ok, "Yakında"), en altta aynı tarzda Mahalle Meydanı ve "{il} Vitrini". Yeni yazılar `city.hub.explore`,
+  `city.hub.showcaseOf` (5 dil). Webde (8081) Bursa ile denendi; **telefonda denenmedi**. Bursa'nın Seyahat kapak
+  fotoğrafı henüz yüklü değil (çizim görünüyor). Eren'in görselindeki "Sosyal Destek" / "Faydalı Bilgiler" adları
+  uygulanmadı (bugünkü Gönüllülük / Nasıl yapılır? kaldı), SORULACAK.
 - **Küçük fotoğraf ve Çarşı fotoğraf zorunluluğu (7 Kasım).** Sunucu işlevi `photoThumbnail` (`functions/src/thumbs.ts`, sharp)
   her yüklenen JPEG'in 640 piksellik küçüğünü `thumbs/{asıl yol}` yoluna, asıl dosyanın erişim anahtarıyla yazar; uygulama
   adresi asıl adresten hesaplar (`thumbUrl`, kayıt değişmez). Listeler, kartlar, avatarlar, logolar ve kapaklar

@@ -6,7 +6,13 @@ import {
   Building2,
   Bus,
   CalendarDays,
+  Coffee,
+  Compass,
   Cross,
+  HandHeart,
+  Lightbulb,
+  MapPin,
+  ShoppingBag,
   Flag,
   Flame,
   Gavel,
@@ -67,6 +73,13 @@ const LINE: Partial<Record<IconName, LucideIcon>> = {
   apartment: Building2,
   shield: Shield,
   atm: CreditCard,
+  restaurant: Coffee,
+  event: CalendarDays,
+  sell: ShoppingBag,
+  'volunteer-activism': HandHeart,
+  lightbulb: Lightbulb,
+  explore: Compass,
+  'location-on': MapPin,
 };
 
 export function LineIcon({ name, size = 20, color }: { name: IconName; size?: number; color: string }) {
