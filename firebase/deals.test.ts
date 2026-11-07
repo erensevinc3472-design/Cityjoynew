@@ -21,7 +21,7 @@ afterAll(() => env.cleanup());
 
 const fs = (uid: string) => env.authenticatedContext(uid, { email: `${uid}@ornek.com`, email_verified: true }).firestore() as unknown as Firestore;
 
-const biz = (verified: boolean) =>
+const biz = (verified: boolean, tier: 'ucretsiz' | 'pro' = 'pro') =>
   ({
     id: 'b1',
     name: 'Kahve Durağı',
@@ -29,7 +29,7 @@ const biz = (verified: boolean) =>
     status: 'yayinda',
     location: { provinceCode: '16', districtId: '16-osmangazi' },
     verification: { status: verified ? 'dogrulandi' : 'dogrulanmadi' },
-    membership: { tier: 'ucretsiz' },
+    membership: { tier },
   }) as unknown as Business;
 
 const input = (over: Partial<DealInput> = {}): DealInput => ({
@@ -46,10 +46,10 @@ const input = (over: Partial<DealInput> = {}): DealInput => ({
   ...over,
 });
 
-async function seed(verified: boolean) {
+async function seed(verified: boolean, tier: 'ucretsiz' | 'pro' = 'pro') {
   await env.clearFirestore();
   await env.withSecurityRulesDisabled(async (ctx) => {
-    const { id, ...data } = biz(verified);
+    const { id, ...data } = biz(verified, tier);
     await setDoc(doc(ctx.firestore(), 'businesses', id), data);
     const now = Timestamp.now();
     await setDoc(doc(ctx.firestore(), 'grants', 'ahmet@ornek.com__il-16'), {
@@ -63,6 +63,9 @@ describe('Fırsatlar', () => {
   it('yalnızca doğrulanmış işletmenin sahibi açar; bitiş en çok 90 gün', async () => {
     await seed(false);
     await expect(createFirestoreDealRepository(fs('esnaf')).save(null, input(), biz(false))).rejects.toThrow();
+    // Fırsat yalnızca Pro'da (Karar Eren, 7 Kasım): doğrulanmış Ücretsiz işletme açamaz.
+    await seed(true, 'ucretsiz');
+    await expect(createFirestoreDealRepository(fs('esnaf')).save(null, input(), biz(true, 'ucretsiz'))).rejects.toThrow();
     await seed(true);
     const repo = createFirestoreDealRepository(fs('esnaf'));
     await expect(createFirestoreDealRepository(fs('ali')).save(null, input(), { ...biz(true), ownerUid: 'ali' } as Business)).rejects.toThrow();

@@ -606,6 +606,8 @@ service cloud.firestore {
       return dealBiz(d).ownerUid == request.auth.uid
         && dealBiz(d).status == 'yayinda'
         && dealBiz(d).verification.status == 'dogrulandi'
+        // Fırsat yalnızca Pro'da (Karar Eren, 7 Kasım 2026); eski 'premium' Pro sayılır.
+        && dealBiz(d).get('membership', {}).get('tier', '') in ['pro', 'premium']
         && d.businessName == dealBiz(d).name;
     }
     match /deals/{id} {
@@ -1171,7 +1173,7 @@ service cloud.firestore {
     match /config/{id} {
       // Günlük sınır sayıları (Panel > Sınırlar, yalnızca admin).
       function limitsOk(d) {
-        return d.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'oy', 'oyYeni', 'sikayet', 'ceviri', 'isletmeGonderi', 'vitrinUcretsiz', 'vitrinPro', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
+        return d.keys().hasOnly(['gonderi', 'gonderiYeni', 'yorum', 'yorumYeni', 'takip', 'takipYeni', 'sohbet', 'sohbetYeni', 'ilan', 'ilanYeni', 'aktivite', 'aktiviteYeni', 'oneri', 'oneriYeni', 'oy', 'oyYeni', 'sikayet', 'ceviri', 'isletmeGonderi', 'isletmeGonderiToplam', 'vitrinUcretsiz', 'vitrinPro', 'muhtarDuyuru', 'muhtarDuyuruHafta', 'kurumDuyuru', 'kurumDuyuruHafta', 'acil', 'etkinlik', 'updatedBy', 'updatedAt'])
         && limitValue(d, 'gonderi')
         && limitValue(d, 'gonderiYeni')
         && limitValue(d, 'yorum')
@@ -1191,6 +1193,7 @@ service cloud.firestore {
         && limitValue(d, 'sikayet')
         && limitValue(d, 'ceviri')
         && limitValue(d, 'isletmeGonderi')
+        && limitValue(d, 'isletmeGonderiToplam')
         && limitValue(d, 'vitrinUcretsiz')
         && limitValue(d, 'vitrinPro')
         && limitValue(d, 'muhtarDuyuru')
@@ -2293,6 +2296,10 @@ service cloud.firestore {
       let b = get(businessPath(d.business.id)).data;
       return d.business.keys().hasOnly(['id', 'name']) && d.business.name is string && d.business.name.size() <= 80
         && b.status == 'yayinda'
+        // İşletme adına gönderi yalnızca doğrulanmış işletmede; Ücretsiz'de toplam sınır (postCount'u sunucu işlevi sayar).
+        && b.verification.status == 'dogrulandi'
+        && (b.get('membership', {}).get('tier', '') in ['pro', 'premium']
+            || b.get('postCount', 0) < limitOf('isletmeGonderiToplam', 9))
         && ((b.ownerUid == request.auth.uid && d.status == 'aktif')
             || (isManagerOf(b) && b.managers[request.auth.uid].post == 'dogrudan' && d.status == 'aktif')
             || (isManagerOf(b) && b.managers[request.auth.uid].post == 'onayla' && d.status == 'onay-bekliyor'))

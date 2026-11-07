@@ -316,7 +316,7 @@
     "updated": "Information last updated: {{date}}",
     "infoOnly": "CityJoy is only an information platform; any agreement and payment is between you and the business.",
     "rankingTitle": "How is this list ordered?",
-    "rankingBody": "At most 2 cards labelled \"Ad\" appear at the top (only businesses with verified documents). All others follow the same rule for everyone: businesses with verified documents first, then review score (the number of reviews counts too), then those in your district, then the most recently updated. Membership plans do not change the order.",
+    "rankingBody": "At most 2 cards labelled \"Ad\" appear at the top. Then the same rule for everyone: businesses labelled \"Pro\" first, then those with verified documents, and unverified ones last (in a separate section). Within each group: review score (the number of reviews counts too), then those in your district, then the most recently updated. Ads and Pro are only available to businesses with verified documents.",
     "notFound": "This business was not found or is not published.",
     "listError": "Could not load businesses.",
     "unverifiedWarning": "Be careful with unverified businesses; confirm identity and price in advance.",
@@ -433,7 +433,24 @@
     "galleryHint": "Photos of your shop, products or menu. Add photos you took or have permission to use; they are resized and location data is removed.",
     "new": "New",
     "directions": "Directions",
-    "directionsLabel": "Directions to {{name}}"
+    "directionsLabel": "Directions to {{name}}",
+    "pro": "Pro",
+    "card": {
+      "expandHint": "Shows details and contact buttons",
+      "openHint": "Opens the business's page",
+      "seeReviews": "See reviews ({{count}})",
+      "reviewsEmpty": "No reviews yet"
+    },
+    "tiers": {
+      "unverifiedTitle": "Your business is not verified yet",
+      "unverifiedBody": "For now, visitors see a short card instead of your page. Your page and posting as the business open after verification.",
+      "reviewingBody": "Your verification request is being reviewed. Once approved, your page opens to everyone.",
+      "requestVerification": "Request verification",
+      "postLimit": "On the free plan you can share up to {{count}} posts. Switch to Pro for more.",
+      "postCount": "{{count}}/{{max}}",
+      "dealsPro": "Switch to Pro to publish deals.",
+      "unverifiedSection": "Unverified businesses"
+    }
   },
   "reviews": {
     "title": "Reviews",

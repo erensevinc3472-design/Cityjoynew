@@ -13,6 +13,7 @@ import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 
 import { handleAnnouncementWrite } from './announcements';
+import { handleBusinessPostWrite } from './business-posts';
 import { cloudBillingDisabler, handleBudgetNotice, handleManualStop, type BudgetNotice } from './budget';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
@@ -49,6 +50,11 @@ export const messageSent = onDocumentCreated('chats/{chatId}/messages/{mid}', as
 
 export const followChanged = onDocumentWritten('follows/{fid}', async (e) => {
   await handleFollowWrite(db, e.params.fid, e.data?.before.data(), e.data?.after.data(), deps());
+});
+
+// İşletme adına yayındaki gönderi sayısı (Ücretsiz kademede toplam sınır).
+export const businessPostCounted = onDocumentWritten('posts/{id}', async (e) => {
+  await handleBusinessPostWrite(db, e.data?.before.data(), e.data?.after.data());
 });
 
 // Gönderi kaldırılınca fotoğraf dosyaları silinir.

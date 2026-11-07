@@ -6,6 +6,9 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
   authorNameOf,
+  DEFAULT_LIMITS,
+  isProBusiness,
+  isVerifiedBusiness,
   ltr,
   POST_CATEGORIES,
   POST_LIMITS,
@@ -66,7 +69,8 @@ export default function NewPostScreen() {
   useEffect(() => {
     if (!user) return;
     Promise.all([businessRepository.listMine(user.uid).catch(() => []), businessRepository.listManaged(user.uid).catch(() => [])]).then(([mine, managed]) => {
-      const list = [...mine, ...managed].filter((b) => b.status === 'yayinda' && postModeFor(b, user.uid));
+      // İşletme adına paylaşım yalnızca doğrulanmış işletmede (Karar Eren, 7 Kasım).
+      const list = [...mine, ...managed].filter((b) => b.status === 'yayinda' && isVerifiedBusiness(b) && postModeFor(b, user.uid));
       setBusinesses(list);
       // Bağlantıdaki işletme adına paylaşılamıyorsa kişinin kendi adına döner.
       setAuthor((a) => (a === 'me' || list.some((b) => b.id === a) ? a : 'me'));
@@ -102,11 +106,13 @@ export default function NewPostScreen() {
   const mode = biz ? postModeFor(biz, user.uid) : null;
   // İşletme adına paylaşım işletmenin konumuyla yapılır; mahallesi seçilmemişse önce seçilmeli.
   const bizNoHood = !!biz && !biz.location.neighbourhoodId;
+  // Ücretsiz işletme toplam gönderi sınırına ulaştı mı (asıl denetim sunucuda).
+  const bizFull = !!biz && !isProBusiness(biz) && biz.postCount >= DEFAULT_LIMITS.isletmeGonderiToplam;
 
   const toggle = (x: PostTarget) => setTargets((cur) => (cur.includes(x) ? cur.filter((y) => y !== x) : [...cur, x]));
 
   const submit = async () => {
-    if (bizNoHood) return;
+    if (bizNoHood || bizFull) return;
     const region = biz
       ? { provinceCode: biz.location.provinceCode, districtId: biz.location.districtId, neighbourhoodId: biz.location.neighbourhoodId! }
       : { provinceCode: location!.provinceCode, districtId: location!.districtId!, neighbourhoodId: location!.neighbourhoodId! };
@@ -204,6 +210,7 @@ export default function NewPostScreen() {
           <AppButton variant="secondary" title={t('explore.business.setHood')} onPress={() => router.push({ pathname: '/business/edit', params: { id: biz!.id } })} />
         </>
       ) : null}
+      {bizFull ? <FormMessage kind="error" text={t('business.tiers.postLimit', { count: DEFAULT_LIMITS.isletmeGonderiToplam })} /> : null}
       {mode === 'onayla' ? <FormMessage kind="info" text={t('explore.business.pendingNote', { name: biz!.name })} /> : null}
       <TextField label={t('explore.fields.text')} value={text} onChangeText={setText} maxLength={POST_LIMITS.text[1]} multiline error={err('text')} hint={t('explore.fields.textHint')} />
       {video ? (

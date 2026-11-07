@@ -35,8 +35,8 @@ export const DEAL_LIMITS = {
   code: [3, 16],
   /** Bitiş tarihi bugünden en çok bu kadar gün sonra. */
   maxDays: 90,
-  /** Aynı anda açık fırsat sayısı kademeye göre (Karar Eren, 3 Kasım 2026). */
-  activeFree: 1,
+  /** Aynı anda açık fırsat sayısı kademeye göre (Karar Eren, 3 Kasım; 7 Kasım: fırsat yalnızca Pro'da). */
+  activeFree: 0,
   activePro: 5,
 } as const;
 

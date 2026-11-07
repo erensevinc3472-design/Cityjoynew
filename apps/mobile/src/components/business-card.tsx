@@ -1,10 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { averageRating, telUrl, whatsappUrl, type Business } from '@cityjoy/shared';
+import { averageRating, hasPublicPage, isProBusiness, telUrl, whatsappUrl, type Business } from '@cityjoy/shared';
 
 import { locationRepository } from '@/lib/locations';
 import { reviewRepository } from '@/lib/services';
@@ -12,6 +13,7 @@ import { useSession } from '@/lib/session';
 import { MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
+import { ReviewsSheet } from './reviews-sheet';
 
 /** Doğrulama etiketi metni. Rozet "güvenilir" demez, yalnızca belge doğrulamasını ve tarihini söyler (PROJE.md 1.1). */
 export function verificationText(b: Business, t: TFunction, language: string): string {
@@ -30,25 +32,116 @@ export function ratingText(b: Business, t: TFunction, language: string): string 
     : t('business.noReviews');
 }
 
-/** Hizmet listesindeki işletme kartı: güven bilgisi herkeste aynı ve ücretsiz görünür (Karar, Eren). */
-export function BusinessCard({ business: b, featured }: { business: Business; featured?: boolean }) {
+/** Kartta "Pro" etiketi: ücretli kademe öne geçtiği için açıkça yazılır (gizli sıralama yok; Karar Eren, 7 Kasım). */
+export function ProTag() {
+  const { t } = useTranslation();
+  const c = useThemeColors();
+  return (
+    <View style={[styles.proTag, { backgroundColor: c.accentSoft, borderColor: c.accentBorder }]}>
+      <AppText variant="caption" style={[styles.proText, { color: c.primary }]}>{t('business.pro')}</AppText>
+    </View>
+  );
+}
+
+/**
+ * Hizmet listesindeki işletme kartı: güven bilgisi herkeste aynı ve ücretsiz görünür (Karar, Eren).
+ * Kademeler (Karar Eren, 7 Kasım 2026): doğrulanmış işletmenin kartı sayfasına götürür (sağda ok); doğrulanmamış
+ * işletmenin sayfası dışarıya kapalı, kart dokununca yerinde açılır: bilgiler, uyarı, yorumlar, Ara ve WhatsApp.
+ */
+export function BusinessCard({ business: b, featured, initiallyOpen }: { business: Business; featured?: boolean; initiallyOpen?: boolean }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const { user } = useSession();
   const verified = b.verification.status === 'dogrulandi';
+  const pro = isProBusiness(b);
+  const team = !!user && (b.ownerUid === user.uid || b.managers.some((m) => m.uid === user.uid));
+  const page = hasPublicPage(b) || team;
+  const [open, setOpen] = useState(!!initiallyOpen);
+  const [reviews, setReviews] = useState(false);
   const district = locationRepository.getDistrict(b.location.districtId)?.name;
+  const place = [district, b.is24h ? t('business.open24') : b.hoursNote].filter(Boolean).join(' · ');
+  const label = [featured ? t('business.ad') : null, pro ? t('business.pro') : null, b.name, verificationText(b, t, i18n.language), ratingText(b, t, i18n.language), district]
+    .filter(Boolean)
+    .join(', ');
+
+  if (!page) {
+    // Doğrulanmamış: kapalıyken ad, "Doğrulanmadı" ve puan; dokununca kart büyür.
+    return (
+      <View style={[styles.card, { backgroundColor: c.surface, borderColor: c.border, shadowColor: c.shadow }]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          accessibilityHint={t('business.card.expandHint')}
+          accessibilityState={{ expanded: open }}
+          onPress={() => setOpen((v) => !v)}
+          style={({ pressed }) => [styles.compact, { opacity: pressed ? 0.8 : 1 }]}>
+          <View style={styles.grow}>
+            <AppText variant="label" numberOfLines={open ? undefined : 1}>{b.name}</AppText>
+            <View style={styles.line}>
+              <MaterialIcons name="help-outline" size={15} color={c.textMuted} />
+              <AppText variant="caption" muted>{verificationText(b, t, i18n.language)}</AppText>
+              {b.rating.count ? (
+                <>
+                  <MaterialIcons name="star" size={15} color={c.highlight} />
+                  <AppText variant="caption" muted>{ratingText(b, t, i18n.language)}</AppText>
+                </>
+              ) : null}
+            </View>
+          </View>
+          <MaterialIcons name={open ? 'expand-less' : 'expand-more'} size={24} color={c.textSoft} />
+        </Pressable>
+        {open ? (
+          <>
+            <View style={styles.details}>
+              {place ? (
+                <View style={styles.line}>
+                  <MaterialIcons name="place" size={16} color={c.textMuted} />
+                  <AppText variant="caption" muted>{place}</AppText>
+                </View>
+              ) : null}
+              {b.description ? <AppText variant="caption" numberOfLines={4}>{b.description}</AppText> : null}
+              <View style={[styles.warn, { backgroundColor: c.surfaceStrong }]}>
+                <MaterialIcons name="info-outline" size={16} color={c.textMuted} />
+                <AppText variant="caption" muted style={styles.grow}>{t('business.unverifiedWarning')}</AppText>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setReviews(true)}
+                hitSlop={6}
+                style={({ pressed }) => [styles.line, styles.link, { opacity: pressed ? 0.7 : 1 }]}>
+                <MaterialIcons name="rate-review" size={16} color={c.primary} />
+                <AppText variant="caption" style={{ color: c.primary }}>
+                  {b.rating.count ? t('business.card.seeReviews', { count: b.rating.count }) : t('business.card.reviewsEmpty')}
+                </AppText>
+              </Pressable>
+            </View>
+            <ContactButtons business={b} />
+            <ReviewsSheet business={b} open={reviews} onClose={() => setReviews(false)} />
+          </>
+        ) : null}
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.card, { backgroundColor: c.surface, borderColor: featured ? c.accentBorder : c.border, shadowColor: c.shadow }]}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={[featured ? t('business.ad') : null, b.name, verificationText(b, t, i18n.language), ratingText(b, t, i18n.language), district].filter(Boolean).join(', ')}
+        accessibilityLabel={label}
+        accessibilityHint={t('business.card.openHint')}
         onPress={() => router.push({ pathname: '/business/[id]', params: { id: b.id } })}
-        style={({ pressed }) => [styles.body, b.logo ? styles.withLogo : null, { opacity: pressed ? 0.8 : 1 }]}>
+        style={({ pressed }) => [styles.body, styles.withArrow, b.logo ? styles.withLogo : null, { opacity: pressed ? 0.8 : 1 }]}>
         {b.logo ? <Image source={{ uri: b.logo.url }} style={[styles.logo, { backgroundColor: c.surfaceStrong }]} contentFit="cover" accessibilityIgnoresInvertColors /> : null}
-        {featured ? (
-          <View style={[styles.adTag, { borderColor: c.accentBorder }]}>
-            <AppText variant="caption" style={{ color: c.highlight }}>{t('business.ad')}</AppText>
+        <MaterialIcons name="chevron-right" size={24} color={c.textSoft} style={styles.arrow} />
+        {featured || pro ? (
+          <View style={styles.tags}>
+            {featured ? (
+              <View style={[styles.adTag, { borderColor: c.accentBorder }]}>
+                <AppText variant="caption" style={{ color: c.highlight }}>{t('business.ad')}</AppText>
+              </View>
+            ) : null}
+            {pro ? <ProTag /> : null}
           </View>
         ) : null}
         <AppText variant="label">{b.name}</AppText>
@@ -69,7 +162,7 @@ export function BusinessCard({ business: b, featured }: { business: Business; fe
         )}
         <View style={styles.line}>
           <MaterialIcons name="place" size={16} color={c.textMuted} />
-          <AppText variant="caption" muted>{[district, b.is24h ? t('business.open24') : b.hoursNote].filter(Boolean).join(' · ')}</AppText>
+          <AppText variant="caption" muted>{place}</AppText>
         </View>
       </Pressable>
       <ContactButtons business={b} />
@@ -125,11 +218,21 @@ export function ContactButtons({ business: b }: { business: Business }) {
 const styles = StyleSheet.create({
   card: { borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 8 },
   body: { padding: spacing.md, gap: 4 },
-  withLogo: { paddingEnd: spacing.md + 52 },
-  logo: { position: 'absolute', top: spacing.md, end: spacing.md, width: 44, height: 44, borderRadius: 22 },
+  withLogo: { paddingEnd: spacing.md + 52 + 24 },
+  withArrow: { paddingEnd: spacing.md + 24 },
+  arrow: { position: 'absolute', end: spacing.sm, top: '50%', marginTop: -12 },
+  tags: { flexDirection: 'row', gap: spacing.xs, marginBottom: 2 },
+  proTag: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.sm },
+  proText: { fontWeight: '700' },
+  compact: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, minHeight: MIN_TOUCH },
+  grow: { flex: 1, gap: 2 },
+  details: { paddingHorizontal: spacing.md, paddingBottom: spacing.md, gap: spacing.sm },
+  warn: { flexDirection: 'row', gap: spacing.xs, padding: spacing.sm, borderRadius: radius.sm, alignItems: 'flex-start' },
+  link: { alignSelf: 'flex-start', minHeight: 32 },
+  logo: { position: 'absolute', top: spacing.md, end: spacing.md + 24, width: 44, height: 44, borderRadius: 22 },
   line: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   newTag: { alignSelf: 'flex-start', borderRadius: radius.pill, paddingHorizontal: spacing.sm, paddingVertical: 1 },
-  adTag: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.sm, marginBottom: 2 },
+  adTag: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.sm },
   actions: { flexDirection: 'row', borderTopWidth: StyleSheet.hairlineWidth },
   action: { flex: 1, minHeight: MIN_TOUCH, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs },
 });

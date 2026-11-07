@@ -62,7 +62,8 @@ describe('güzergâh çevresindeki mola yerleri', () => {
       id: 'b', name: 'Tesis', type: 'yol-ustu', categoryIds: ['yol-dinlenme-tesisi'], location: { provinceCode: '14', districtId: '14-merkez' },
       phone: '1', whatsapp: false, is24h: true, priceList: [], roadside: ['tuvalet'], geo: geoPoint(mid.lat, mid.lng + 0.5),
       ownerUid: 'u', status: 'yayinda', verification: { status: 'dogrulanmadi' }, membership: { tier: 'ucretsiz' }, rating: { sum: 0, count: 0 },
-      followerCount: 0, managers: [], createdAt: '', updatedAt: '',
+      followerCount: 0,
+    postCount: 0, managers: [], createdAt: '', updatedAt: '',
     })!;
     expect(stopsAlongRoute([shop], ist, ank, { maxOffKm: 30 })).toHaveLength(1);
     const pts = pointsAlongRoute(ist, ank);

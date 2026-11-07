@@ -316,7 +316,7 @@
     "updated": "Angaben zuletzt aktualisiert: {{date}}",
     "infoOnly": "CityJoy ist nur eine Informationsplattform; Vereinbarung und Zahlung erfolgen zwischen Ihnen und dem Betrieb.",
     "rankingTitle": "Wie wird sortiert?",
-    "rankingBody": "Oben stehen höchstens 2 als \"Anzeige\" gekennzeichnete Karten (nur Betriebe mit geprüften Dokumenten). Alle anderen werden für alle gleich sortiert: zuerst Betriebe mit geprüften Dokumenten, dann Bewertung (die Anzahl der Bewertungen zählt mit), dann Betriebe in Ihrem Bezirk, dann die zuletzt aktualisierten. Mitgliedspakete ändern die Reihenfolge nicht.",
+    "rankingBody": "Oben stehen höchstens 2 als \"Anzeige\" gekennzeichnete Karten. Danach gilt für alle dieselbe Regel: zuerst Betriebe mit \"Pro\"-Kennzeichnung, dann Betriebe mit geprüften Dokumenten, zuletzt nicht geprüfte (in einem eigenen Abschnitt). Innerhalb jeder Gruppe: Bewertung (die Anzahl der Bewertungen zählt mit), dann Betriebe in Ihrem Bezirk, dann die zuletzt aktualisierten. Anzeigen und Pro gibt es nur für Betriebe mit geprüften Dokumenten.",
     "notFound": "Dieser Betrieb wurde nicht gefunden oder ist nicht veröffentlicht.",
     "listError": "Betriebe konnten nicht geladen werden.",
     "unverifiedWarning": "Seien Sie bei nicht geprüften Betrieben vorsichtig; klären Sie Identität und Preis vorher.",
@@ -433,7 +433,24 @@
     "galleryHint": "Fotos von Laden, Produkten oder Speisekarte. Füge eigene Fotos oder Fotos mit Nutzungsrecht hinzu; sie werden verkleinert, Standortdaten werden entfernt.",
     "new": "Neu",
     "directions": "Route",
-    "directionsLabel": "Route zu {{name}}"
+    "directionsLabel": "Route zu {{name}}",
+    "pro": "Pro",
+    "card": {
+      "expandHint": "Zeigt Details und Kontaktknöpfe",
+      "openHint": "Öffnet die Seite des Betriebs",
+      "seeReviews": "Bewertungen ansehen ({{count}})",
+      "reviewsEmpty": "Noch keine Bewertungen"
+    },
+    "tiers": {
+      "unverifiedTitle": "Dein Betrieb ist noch nicht geprüft",
+      "unverifiedBody": "Vorerst sehen Besucher statt deiner Seite eine kurze Karte. Deine Seite und Beiträge im Namen des Betriebs werden nach der Prüfung freigeschaltet.",
+      "reviewingBody": "Dein Prüfantrag wird bearbeitet. Nach der Freigabe ist deine Seite für alle sichtbar.",
+      "requestVerification": "Prüfung beantragen",
+      "postLimit": "Im kostenlosen Paket kannst du höchstens {{count}} Beiträge teilen. Für mehr wechsle zu Pro.",
+      "postCount": "{{count}}/{{max}}",
+      "dealsPro": "Wechsle zu Pro, um Angebote zu veröffentlichen.",
+      "unverifiedSection": "Nicht geprüfte Betriebe"
+    }
   },
   "reviews": {
     "title": "Bewertungen",

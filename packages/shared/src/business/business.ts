@@ -229,6 +229,8 @@ export interface Business extends BusinessInput {
   rating: { sum: number; count: number };
   /** İşletmeyi takip edenler (kurallar sayacın tam bir değiştiğini denetler). */
   followerCount: number;
+  /** İşletme adına yayındaki gönderi sayısı (sunucu işlevi sayar; ücretsiz kademede toplam sınır). */
+  postCount: number;
   managers: BusinessManager[];
   /** ISO tarihler. */
   createdAt: string;
@@ -384,6 +386,19 @@ export function weightedRating(r: { sum: number; count: number }): number {
 }
 
 /**
+ * İşletme kademeleri (Karar Eren, 7 Kasım 2026; PROJE.md 5.6):
+ * - Doğrulanmamış: kendi sayfası dışarıya kapalı; listede ve aramada kart olarak yerinde açılır (bilgi, Ara, WhatsApp,
+ *   yorumlar). İşletme adına gönderi ve fırsat yok. Sahibi ve yetkilileri sayfayı görür ve yönetir.
+ * - Doğrulanmış (Ücretsiz): sayfası açık; işletme adına toplam en çok 9 gönderi (Panel > Sınırlar), fırsat yok.
+ * - Doğrulanmış + Pro: sınırlar kalkar (fırsat, daha çok vitrin fotoğrafı); listede "Pro" etiketiyle önce gelir.
+ */
+export const isVerifiedBusiness = (b: Pick<Business, 'verification'>) => b.verification.status === 'dogrulandi';
+/** Pro yalnızca doğrulanmış işletmede geçerli: doğrulanmamış işletme parayla öne geçemez. */
+export const isProBusiness = (b: Pick<Business, 'verification' | 'membership'>) => isVerifiedBusiness(b) && b.membership.tier === 'pro';
+/** Dışarıdan bakan kişi işletmenin sayfasını açabilir mi (doğrulanmamışlarda yalnızca kart). */
+export const hasPublicPage = isVerifiedBusiness;
+
+/**
  * Öne çıkma yalnızca belgeleri doğrulanmış işletmede geçerlidir: doğrulanmamış bir işletme parayla
  * en üste çıkamaz (acil kategorilerde dolandırıcılık riski; kampanya modülü de yalnızca doğrulanmışlarda).
  */
@@ -401,14 +416,15 @@ export interface RankedBusinesses {
 /**
  * Hizmet listesi sıralaması (Karar, Eren; PROJE.md 5.6). Kural herkes için aynıdır ve yayımlanır:
  * 1) en çok 2 öne çıkan (doğrulanmış) kart "Reklam" etiketiyle en üstte,
- * 2) kalanlar: doğrulanmışlar önce, sonra yorum sayısını hesaba katan puan, sonra kullanıcının
- *    ilçesindekiler, sonra bilgisi en yeni güncellenen.
- * Üyelik kademesi sıralamaya girmez (yalnızca vitrin kapasitesini belirler).
+ * 2) kalanlar: önce "Pro" etiketli (doğrulanmış) işletmeler, sonra doğrulanmışlar, en son doğrulanmamışlar; her grupta
+ *    yorum sayısını hesaba katan puan, sonra kullanıcının ilçesindekiler, sonra bilgisi en yeni güncellenen.
+ * Pro öne geçer ama kartında açıkça "Pro" yazar ve kural uygulamada yazılıdır (gizli sıralama yok; Karar Eren, 7 Kasım).
  */
 export function rankBusinesses(list: readonly Business[], opts: { districtId?: string; now?: Date } = {}): RankedBusinesses {
   const now = opts.now ?? new Date();
   const visible = list.filter((b) => b.status === 'yayinda');
   const compare = (a: Business, b: Business) =>
+    Number(isProBusiness(b)) - Number(isProBusiness(a)) ||
     Number(b.verification.status === 'dogrulandi') - Number(a.verification.status === 'dogrulandi') ||
     weightedRating(b.rating) - weightedRating(a.rating) ||
     Number(b.location.districtId === opts.districtId) - Number(a.location.districtId === opts.districtId) ||

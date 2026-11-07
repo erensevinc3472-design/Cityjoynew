@@ -8,7 +8,10 @@ import { useTranslation } from 'react-i18next';
 import {
   averageRating,
   dealLive,
+  DEFAULT_LIMITS,
   findCategory,
+  hasPublicPage,
+  isProBusiness,
   isFoodKind,
   isLodgingKind,
   isRoadsideKind,
@@ -25,7 +28,8 @@ import {
 
 import { AppText } from '@/components/app-text';
 import { TranslatableText } from '@/components/translatable-text';
-import { verificationText } from '@/components/business-card';
+import { BusinessCard, ProTag, verificationText } from '@/components/business-card';
+import { useToast } from '@/components/toast';
 import { DealBox } from '@/components/deal-box';
 import { Tag } from '@/components/inner';
 import { RoundButton } from '@/components/hero-header';
@@ -76,6 +80,7 @@ export default function BusinessScreen() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [tab, setTab] = useState<Tab>('gonderiler');
   const [busy, setBusy] = useState(false);
+  const toast = useToast();
   const following = !!followingBusinesses?.includes(id);
 
   const load = useCallback(() => {
@@ -106,8 +111,22 @@ export default function BusinessScreen() {
   if (error) return shell('', <StateMessage kind="error" onRetry={load} />);
   if (b === undefined) return shell('', <StateMessage kind="loading" />);
   if (!b || (b.status !== 'yayinda' && !team)) return shell('', <StateMessage kind="empty" message={t('business.notFound')} />);
+  // Doğrulanmamış işletmenin sayfası dışarıya kapalı (Karar Eren, 7 Kasım): bağlantıdan, mesajdan ya da gönderiden
+  // gelen kişi de listedeki gibi açık kartı görür.
+  if (!team && !hasPublicPage(b)) {
+    return shell(
+      b.name,
+      <ScrollView contentContainerStyle={styles.briefScroll}>
+        <BusinessCard business={b} initiallyOpen />
+      </ScrollView>,
+    );
+  }
 
   const verified = b.verification.status === 'dogrulandi';
+  const pro = isProBusiness(b);
+  // Ücretsiz (doğrulanmış) işletme adına toplam gönderi sınırı; asıl denetim sunucuda, sayı panelden değişebilir.
+  const postLimit = DEFAULT_LIMITS.isletmeGonderiToplam;
+  const postsFull = verified && !pro && b.postCount >= postLimit;
   const district = locationRepository.getDistrict(b.location.districtId)?.name;
   const province = locationRepository.getProvince(b.location.provinceCode)?.name;
   const services = [
@@ -228,6 +247,7 @@ export default function BusinessScreen() {
             <View style={styles.nameRow}>
               <AppText style={[styles.name, { color: c.textStrong }]}>{b.name}</AppText>
               {verified ? <MaterialIcons name="verified" size={16} color={c.accent} accessibilityLabel={t('business.verified')} /> : null}
+              {pro ? <ProTag /> : null}
               {/* Doğrulanmamış işletme ilk bakışta belli olsun (PROJE.md 1.1: doğrulanmamış doğrulanmış gibi gösterilmez). */}
               {!verified ? <Tag label={verificationText(b, t, i18n.language)} tone="muted" /> : null}
             </View>
@@ -271,21 +291,47 @@ export default function BusinessScreen() {
           {/* Ekip: işletme adına paylaş ve onay bekleyenler. */}
           {team ? (
             <View style={[styles.teamBox, { backgroundColor: c.surface, borderColor: c.border }]}>
-              {postMode ? (
-                <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/explore/new', params: { as: b.id } })} style={({ pressed }) => [styles.teamRow, { opacity: pressed ? 0.75 : 1 }]}>
+              {/* Doğrulanmamış işletmenin ekibi: sayfa dışarıya kapalı; doğrulama başvurusu düzenleme ekranında. */}
+              {!verified ? (
+                <View style={styles.verifyBox}>
+                  <AppText variant="label">{t('business.tiers.unverifiedTitle')}</AppText>
+                  <AppText variant="caption" muted>
+                    {b.verification.status === 'inceleniyor' ? t('business.tiers.reviewingBody') : t('business.tiers.unverifiedBody')}
+                  </AppText>
+                  {isOwner && b.verification.status !== 'inceleniyor' ? (
+                    <View style={styles.buttons}>
+                      {pill(t('business.tiers.requestVerification'), 'verified', () => router.push({ pathname: '/business/edit', params: { id: b.id } }), true)}
+                    </View>
+                  ) : null}
+                </View>
+              ) : postMode ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: postsFull }}
+                  onPress={() =>
+                    postsFull ? toast.show(t('business.tiers.postLimit', { count: postLimit })) : router.push({ pathname: '/explore/new', params: { as: b.id } })
+                  }
+                  style={({ pressed }) => [styles.teamRow, { opacity: postsFull ? 0.5 : pressed ? 0.75 : 1 }]}>
                   <MaterialIcons name="add-box" size={22} color={c.accent} />
                   <AppText style={[styles.grow, styles.teamText, { color: c.textStrong }]}>{t('business.page.postAs')}</AppText>
+                  {!pro ? <AppText variant="caption" muted>{t('business.tiers.postCount', { count: Math.min(b.postCount, postLimit), max: postLimit })}</AppText> : null}
                   {postMode === 'onayla' ? <AppText variant="caption" muted>{t('business.page.needsApproval')}</AppText> : null}
-                  <MaterialIcons name="chevron-right" size={20} color={c.textSoft} />
+                  <MaterialIcons name={postsFull ? 'lock-outline' : 'chevron-right'} size={20} color={c.textSoft} />
                 </Pressable>
               ) : (
                 <AppText variant="caption" muted>{t('business.page.noPostPermission')}</AppText>
               )}
               {isOwner ? (
-                <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/business/deals', params: { id: b.id } })} style={({ pressed }) => [styles.teamRow, { opacity: pressed ? 0.75 : 1 }]}>
+                // Fırsat yalnızca Pro'da: düğme görünür ama soluk; basınca kısa not (Karar Eren, 7 Kasım).
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: !pro }}
+                  onPress={() => (pro ? router.push({ pathname: '/business/deals', params: { id: b.id } }) : toast.show(t('business.tiers.dealsPro')))}
+                  style={({ pressed }) => [styles.teamRow, { opacity: !pro ? 0.5 : pressed ? 0.75 : 1 }]}>
                   <MaterialIcons name="local-offer" size={22} color={c.accent} />
                   <AppText style={[styles.grow, styles.teamText, { color: c.textStrong }]}>{t('deals.mine.title')}</AppText>
-                  <MaterialIcons name="chevron-right" size={20} color={c.textSoft} />
+                  {!pro ? <ProTag /> : null}
+                  <MaterialIcons name={pro ? 'chevron-right' : 'lock-outline'} size={20} color={c.textSoft} />
                 </Pressable>
               ) : null}
               {pending.length ? (
@@ -387,6 +433,7 @@ export default function BusinessScreen() {
         )}
         <View style={{ height: insets.bottom + spacing.lg }} />
       </ScrollView>
+      {toast.node}
     </View>
   );
 }
@@ -417,6 +464,8 @@ const styles = StyleSheet.create({
   // Düğmeler yazıları sığacak genişlikte; sığmayan alt satıra geçer (yazı kesilmez).
   pill: { flexGrow: 1, minHeight: 40, borderRadius: radius.sm, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: spacing.md },
   pillText: { fontFamily: fonts.bodySemi, fontSize: 13 },
+  briefScroll: { paddingBottom: spacing.xl },
+  verifyBox: { gap: spacing.xs },
   teamBox: { borderWidth: 1, borderRadius: radius.md, padding: spacing.md, gap: spacing.sm },
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: MIN_TOUCH },
   teamText: { fontFamily: fonts.bodySemi, fontSize: 14 },

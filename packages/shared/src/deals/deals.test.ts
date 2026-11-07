@@ -40,7 +40,7 @@ describe('Fırsatlar', () => {
   });
 
   it('kademe sınırı ve sıralama: sponsorlu önce, sonra bitişi yakın', () => {
-    expect(activeDealLimit('ucretsiz')).toBe(1);
+    expect(activeDealLimit('ucretsiz')).toBe(0);
     expect(activeDealLimit('pro')).toBe(5);
     const mk = (id: string, endsOn: string, sponsored?: boolean) => ({ id, endsOn, sponsored, createdAt: '' }) as Deal;
     expect(sortDeals([mk('a', '2026-12-01'), mk('b', '2026-11-05'), mk('c', '2026-12-20', true)]).map((d) => d.id)).toEqual(['c', 'b', 'a']);

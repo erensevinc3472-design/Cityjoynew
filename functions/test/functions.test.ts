@@ -4,6 +4,7 @@ import type { NoticePushMessage } from '@cityjoy/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { handleAnnouncementWrite } from '../src/announcements';
+import { handleBusinessPostWrite } from '../src/business-posts';
 import { handleBudgetNotice, handleManualStop } from '../src/budget';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
@@ -263,6 +264,26 @@ describe('gönderi fotoğrafları', () => {
     expect(await handlePostPhotos(db, 'p2', before, { ...before, status: 'kaldirildi' }, async (p) => void deleted.push(p))).toBe(true);
     expect(deleted).toEqual(['posts/u1/p2/']);
     expect((await db.doc('posts/p2').get()).get('video')).toBeUndefined();
+  });
+});
+
+describe('işletme gönderi sayısı', () => {
+  it('yayındaki işletme gönderilerini sayar; beğeni değişiminde saymaz; kaldırılınca düşer', async () => {
+    await db.doc('businesses/b1').set({ name: 'Kahve', postCount: 0 });
+    const p = (status: string) => ({ business: { id: 'b1', name: 'Kahve' }, status, likeCount: 0 });
+    await db.doc('posts/p1').set(p('aktif'));
+    await db.doc('posts/p2').set(p('onay-bekliyor'));
+    await db.doc('posts/p3').set({ authorUid: 'ali', status: 'aktif' });
+    await handleBusinessPostWrite(db, undefined, p('aktif'));
+    expect((await db.doc('businesses/b1').get()).get('postCount')).toBe(1);
+    await db.doc('posts/p2').set(p('aktif'));
+    await handleBusinessPostWrite(db, p('onay-bekliyor'), p('aktif'));
+    expect((await db.doc('businesses/b1').get()).get('postCount')).toBe(2);
+    await db.doc('posts/p1').set(p('kaldirildi'));
+    await handleBusinessPostWrite(db, { ...p('aktif'), likeCount: 0 }, { ...p('aktif'), likeCount: 3 });
+    expect((await db.doc('businesses/b1').get()).get('postCount')).toBe(2);
+    await handleBusinessPostWrite(db, p('aktif'), p('kaldirildi'));
+    expect((await db.doc('businesses/b1').get()).get('postCount')).toBe(1);
   });
 });
 

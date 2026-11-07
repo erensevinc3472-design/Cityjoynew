@@ -35,6 +35,9 @@ const media = (uid: string, kind: string, id = 'abcDEF123456') => {
   const p = `media/${uid}/${kind}/${id}.jpg`;
   return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 800, height: 600 };
 };
+/** Yönetimin doğrulaması (ve istenirse kademe / sunucunun saydığı gönderi sayısı). */
+const verify = (id: string, extra: Record<string, unknown> = {}) =>
+  env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), 'businesses', id), { verification: { status: 'dogrulandi' }, ...extra }));
 const post = (targets: ('genel' | 'takip' | 'bolgesel' | 'mahallem')[], text = 'Bugün öğlen menüsü hazır') => ({ text, category: 'firsat' as const, targets, region: location });
 
 describe('işletme sayfası', () => {
@@ -100,6 +103,7 @@ describe('işletme sayfası', () => {
 
   it('takip: sayaç tam bir değişir, iki kez takip edilemez; takip akışına işletmenin Takip gönderileri düşer', async () => {
     const id = await biz('cengiz').create('cengiz', input);
+    await verify(id);
     await biz('ali').follow(id, 'ali');
     await expect(biz('ali').follow(id, 'ali')).rejects.toThrow();
     await assertFails(updateDoc(doc(fs('ali'), 'businesses', id), { followerCount: 5 }));
@@ -130,6 +134,9 @@ describe('işletme sayfası', () => {
     ]);
     const as = (pending: boolean) => ({ business: { id, name: 'Cengiz Kebap' }, pending });
 
+    // Doğrulanmamış işletme adına paylaşılamaz (Karar Eren, 7 Kasım).
+    await expect(posts('cengiz').create('cengiz', 'Cengiz U.', post(['genel']), as(false))).rejects.toThrow();
+    await verify(id);
     await posts('cengiz').create('cengiz', 'Cengiz U.', post(['genel']), as(false));
     await posts('mehmet').create('mehmet', 'Mehmet S.', post(['genel'], 'Akşam canlı müzik'), as(false));
     const waiting = await posts('ayse').create('ayse', 'Ayşe K.', post(['genel'], 'Yeni tatlı menüsü'), as(true));
@@ -159,5 +166,18 @@ describe('işletme sayfası', () => {
       height: 1200,
     });
     await posts('mehmet').create('mehmet', 'Mehmet S.', { ...post(['genel', 'takip'], ''), photos: Array.from({ length: 10 }, (_, i) => shot(i)) }, as(false), albumId);
+  }, 30000);
+
+  it('Ücretsiz işletme toplam 9 gönderide durur (panelden değişir); Pro kademesinde toplam sınır yok', async () => {
+    const id = await biz('cengiz').create('cengiz', input);
+    const as = { business: { id, name: 'Cengiz Kebap' }, pending: false };
+    await verify(id, { postCount: 9 });
+    await expect(posts('cengiz').create('cengiz', 'Cengiz U.', post(['genel']), as)).rejects.toThrow();
+    // Sayaç sunucu işlevinin: sahibi değiştiremez.
+    await assertFails(updateDoc(doc(fs('cengiz'), 'businesses', id), { postCount: 0 }));
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'config/limits'), { isletmeGonderiToplam: 10 }));
+    await posts('cengiz').create('cengiz', 'Cengiz U.', post(['genel']), as);
+    await verify(id, { postCount: 50, membership: { tier: 'pro' } });
+    await posts('cengiz').create('cengiz', 'Cengiz U.', post(['genel'], 'Pro paylaşımı'), as);
   }, 30000);
 });

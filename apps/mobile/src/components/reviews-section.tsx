@@ -21,7 +21,8 @@ import { errorText } from '@/lib/limits';
  * İşletme sayfasındaki değerlendirmeler: ortalama, son yorumlar, işletmenin cevabı, şikâyet.
  * "Değerlendir" yalnızca işletmeyi uygulamadan arayan / yazan kişiye açılır.
  */
-export function ReviewsSection({ business: b }: { business: Business }) {
+/** `onNavigate`: yorum yazma ekranına geçmeden önce (alttan açılan panel kapansın diye). */
+export function ReviewsSection({ business: b, onNavigate }: { business: Business; onNavigate?: () => void }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
@@ -85,7 +86,10 @@ export function ReviewsSection({ business: b }: { business: Business }) {
         <AppButton
           variant="secondary"
           title={mine ? t('reviews.edit') : t('reviews.write')}
-          onPress={() => router.push({ pathname: '/business/review', params: { id: b.id } })}
+          onPress={() => {
+            onNavigate?.();
+            router.push({ pathname: '/business/review', params: { id: b.id } });
+          }}
         />
       ) : null}
       {writeHint ? <AppText variant="caption" muted>{writeHint}</AppText> : null}

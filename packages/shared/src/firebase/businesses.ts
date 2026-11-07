@@ -51,6 +51,7 @@ function fromDoc(id: string, d: DocumentData): Business {
     featuredUntil: iso(d.featuredUntil),
     rating: { sum: d.rating?.sum ?? 0, count: d.rating?.count ?? 0 },
     followerCount: d.followerCount ?? 0,
+    postCount: d.postCount ?? 0,
     managers: ((d.managerUids ?? []) as string[]).map((uid) => ({ uid, messages: false, ...(d.managers?.[uid] ?? { name: '', post: 'kapali', edit: false, reply: false }) })),
     logo: photoFrom(d.logo),
     gallery: Array.isArray(d.gallery) ? (d.gallery as unknown[]).map(photoFrom).filter((p): p is Photo => !!p) : [],

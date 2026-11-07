@@ -39,6 +39,7 @@ const biz = (over: Partial<Business> = {}): Business => ({
   membership: { tier: 'ucretsiz' },
   rating: { sum: 0, count: 0 },
   followerCount: 0,
+    postCount: 0,
   managers: [],
   createdAt: '2026-10-01T00:00:00Z',
   updatedAt: '2026-10-01T00:00:00Z',
@@ -80,10 +81,11 @@ describe('sıralama (Karar, Eren)', () => {
     expect(others.map((x) => x.id)).toEqual([b.id, d.id, c.id, a.id]);
   });
 
-  it('üyelik kademesi sırayı değiştirmez; öne çıkanlar en çok 2 ve süresi dolan normal sıraya döner', () => {
-    const free = biz({ rating: { sum: 225, count: 50 } });
-    const pro = biz({ membership: { tier: 'pro' }, rating: { sum: 0, count: 0 } });
-    expect(rankBusinesses([pro, free], { now }).others.map((x) => x.id)).toEqual([free.id, pro.id]);
+  it('doğrulanmış Pro önce gelir, doğrulanmamış Pro öne geçemez; öne çıkanlar en çok 2 ve süresi dolan normal sıraya döner', () => {
+    const free = biz({ verification: { status: 'dogrulandi' }, rating: { sum: 225, count: 50 } });
+    const pro = biz({ verification: { status: 'dogrulandi' }, membership: { tier: 'pro' }, rating: { sum: 0, count: 0 } });
+    const proUnverified = biz({ verification: { status: 'dogrulanmadi' }, membership: { tier: 'pro' }, rating: { sum: 250, count: 50 } });
+    expect(rankBusinesses([proUnverified, free, pro], { now }).others.map((x) => x.id)).toEqual([pro.id, free.id, proUnverified.id]);
 
     const f = (over: Partial<Business>) => biz({ featuredUntil: '2026-11-01T00:00:00Z', verification: { status: 'dogrulandi' }, ...over });
     const f1 = f({ rating: { sum: 250, count: 50 } });

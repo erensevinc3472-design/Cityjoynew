@@ -103,7 +103,9 @@ export default function ServiceCategoryScreen() {
   const others = ranked ? ranked.others.filter(keep) : [];
   const total = everyone.length;
   const filtered = !!q || !!district || openNow || verifiedOnly;
-  const anyUnverified = [...featured, ...others].some((b) => b.verification.status !== 'dogrulandi');
+  // Doğrulanmamışlar ayrı bölümde, başında uyarıyla (Karar Eren, 7 Kasım).
+  const verifiedOthers = others.filter((b) => b.verification.status === 'dogrulandi');
+  const unverified = others.filter((b) => b.verification.status !== 'dogrulandi');
 
   const header = (
     <HeroHeader title={name} subtitle={subtitle || undefined} onBack={() => (router.canGoBack() ? router.back() : router.replace('/services'))} />
@@ -163,8 +165,14 @@ export default function ServiceCategoryScreen() {
           <>
             {filtered && !featured.length && !others.length ? <StateMessage kind="empty" message={t('services.noFilterMatch')} /> : null}
             {featured.map((b) => <BusinessCard key={b.id} business={b} featured />)}
-            {others.map((b) => <BusinessCard key={b.id} business={b} />)}
-            {category?.urgent && anyUnverified ? <AppText variant="caption" muted>{t('business.unverifiedWarning')}</AppText> : null}
+            {verifiedOthers.map((b) => <BusinessCard key={b.id} business={b} />)}
+            {unverified.length ? (
+              <View style={styles.section}>
+                <AppText variant="label" accessibilityRole="header">{t('business.tiers.unverifiedSection')}</AppText>
+                <AppText variant="caption" muted>{t('business.unverifiedWarning')}</AppText>
+              </View>
+            ) : null}
+            {unverified.map((b) => <BusinessCard key={b.id} business={b} />)}
             <Pressable
               accessibilityRole="button"
               accessibilityState={{ expanded: showRules }}
@@ -190,6 +198,7 @@ export default function ServiceCategoryScreen() {
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xl },
   flex: { flex: 1 },
+  section: { gap: 2, marginTop: spacing.sm },
   warning: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   callLink: { fontWeight: '700', marginTop: 4, textDecorationLine: 'underline' },
   rules: { borderWidth: 1, borderRadius: radius.md, padding: spacing.sm, gap: spacing.xs },

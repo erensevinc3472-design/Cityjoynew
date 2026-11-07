@@ -316,7 +316,7 @@
     "updated": "Bilgiler son güncelleme: {{date}}",
     "infoOnly": "CityJoy yalnızca bilgi platformudur; anlaşma ve ödeme sizinle işletme arasındadır.",
     "rankingTitle": "Sıralama nasıl yapılır?",
-    "rankingBody": "En üstte en fazla 2 \"Reklam\" etiketli kart bulunur (yalnızca belgeleri doğrulanmış işletmeler). Diğerleri herkes için aynı kuralla sıralanır: önce belgeleri doğrulanan işletmeler, sonra değerlendirme puanı (yorum sayısı da hesaba katılır), sonra ilçenizdekiler, sonra bilgisini en son güncelleyenler. Üyelik paketi sıralamayı değiştirmez.",
+    "rankingBody": "En üstte en fazla 2 \"Reklam\" etiketli kart bulunur. Sonra herkes için aynı kural: önce \"Pro\" etiketli işletmeler, sonra belgeleri doğrulananlar, en son doğrulanmamışlar (ayrı bölümde). Her grupta değerlendirme puanı (yorum sayısı da hesaba katılır), sonra ilçenizdekiler, sonra bilgisini en son güncelleyenler. Reklam ve Pro yalnızca belgeleri doğrulanmış işletmelere verilir.",
     "notFound": "Bu işletme bulunamadı ya da yayında değil.",
     "listError": "İşletmeler yüklenemedi.",
     "unverifiedWarning": "Doğrulanmamış işletmelerle çalışırken dikkatli olun; kimliği ve fiyatı önceden teyit edin.",
@@ -433,7 +433,24 @@
     "galleryHint": "Dükkânın, ürünlerin, menünün fotoğrafları. Kendi çektiğin ya da kullanma iznin olan fotoğrafları ekle; küçültülerek yüklenir, konum bilgisi silinir.",
     "new": "Yeni",
     "directions": "Yol",
-    "directionsLabel": "{{name}} için yol tarifi"
+    "directionsLabel": "{{name}} için yol tarifi",
+    "pro": "Pro",
+    "card": {
+      "expandHint": "Bilgileri ve iletişim düğmelerini açar",
+      "openHint": "İşletmenin sayfasını açar",
+      "seeReviews": "Yorumları gör ({{count}})",
+      "reviewsEmpty": "Henüz yorum yok"
+    },
+    "tiers": {
+      "unverifiedTitle": "İşletmen henüz doğrulanmadı",
+      "unverifiedBody": "Şimdilik dışarıdan bakanlar sayfanı değil, kısa bir kart görür. Sayfan ve işletme adına paylaşım doğrulamadan sonra açılır.",
+      "reviewingBody": "Doğrulama başvurun inceleniyor. Onaylanınca sayfan herkese açılır.",
+      "requestVerification": "Doğrulama iste",
+      "postLimit": "Ücretsiz üyelikte en çok {{count}} gönderi paylaşabilirsin. Daha fazlası için Pro üyeliğe geç.",
+      "postCount": "{{count}}/{{max}}",
+      "dealsPro": "Fırsat yayınlamak için Pro üyeliğe geç.",
+      "unverifiedSection": "Doğrulanmamış işletmeler"
+    }
   },
   "reviews": {
     "title": "Değerlendirmeler",
