@@ -38,7 +38,7 @@ export default function CitySectionScreen() {
   const back = () => (router.canGoBack() ? router.back() : router.replace(g ? '/city/kurumlar' : '/city'));
 
   return (
-    <Screen header={<HeroHeader title={title} subtitle={place} onBack={back} />}>
+    <Screen header={<HeroHeader serif title={title} subtitle={place} onBack={back} />}>
       <CityGuideList section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} />
     </Screen>
   );

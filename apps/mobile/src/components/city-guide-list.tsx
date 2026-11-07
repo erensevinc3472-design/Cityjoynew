@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState, type ReactElement } from 'react';
-import { MaterialIcons } from '@expo/vector-icons';
-import { FlatList, Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Linking, ScrollView, SectionList, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { cityChoiceLabel, mapsUrl, normalizeName, telUrl, type CityGuideItem, type CityGuideSectionId } from '@cityjoy/shared';
 
@@ -10,11 +9,12 @@ import type { Look } from '@/lib/city-look';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, radius, spacing } from '@/theme/tokens';
+import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
+import { CallButton, DistrictTile, ExpandRow, GroupLabel, HubTitle, KindTile, PillButton, SelectionBar, Spotlight, type InfoLine } from './city-hub';
 import { GlassFill } from './glass';
-import { FeaturedCard, FilterChip, FilterRow, ListRow, RowIcon, SectionTitle, Tag } from './inner';
+import { FeaturedCard, FilterChip, FilterRow, PickerModal, Tag } from './inner';
 import type { SceneKind } from './scene-art';
 import { SearchField } from './search-field';
 import { StateMessage } from './state-message';
@@ -28,11 +28,19 @@ const DAYS = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartes
 /** Öne çıkan büyük kartı olan bölümler ve kartın çizimi (Müzeler önizlemesi, 13. madde 35). */
 const FEATURED: Partial<Record<CityGuideSectionId, SceneKind>> = { muzeler: 'townhall', parklar: 'neighbourhood' };
 
+/** Bu kadar ve daha çok kayıt varsa sayfa uzun liste yerine tür / ilçe kutularıyla açılır. */
+const HUB_MIN = 10;
+/** Kutularda gösterilen en çok tür ve ilçe; fazlası "Tüm ilçeler" seçim listesinden. */
+const MAX_KINDS = 6;
+const MAX_DISTRICTS = 5;
+
+const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
+
 /**
- * Benim Şehrim liste sayfası (13. madde 35, Müzeler önizlemesi): arama, tek filtre satırı (ilçe açılır düğmesi + türler,
- * normal harf), pazarlarda gün; filtre yokken öne çıkan büyük kart, altında tek yüzeyde liste. Sayı kutuları, "DİĞER"
- * ve yıldız yok. Otoparkta kapasite / doluluk gösterilmez, ücret yoksa "Ücret bilgisi yok". Kullanıcının ilçesi önce
- * gelir. categories verilirse bölümün yalnızca o kategorileri (Önemli Kurumlar alt başlığı).
+ * Benim Şehrim liste sayfası (cam taslağı, Eren 7 Kasım 2026). Kayıt çoksa önce "Türüne göre" ve "İlçene göre"
+ * kutuları ve kullanıcının ilçesinden öne çıkan bir kayıt (Ara, Yol tarifi) gelir; seçim yapılınca ya da "Tümünü
+ * listele" ile türlere ayrılmış kısa liste açılır. Arama her zaman en üstte. Az kayıtta doğrudan liste. Otoparkta
+ * ücret yoksa "Ücret bilgisi yok". categories verilirse bölümün yalnızca o kategorileri (Önemli Kurumlar alt başlığı).
  */
 export function CityGuideList({ section, look, categories, header }: { section: CityGuideSectionId; look: Look; categories?: string[]; header?: ReactElement }) {
   const { t } = useTranslation();
@@ -41,34 +49,45 @@ export function CityGuideList({ section, look, categories, header }: { section: 
   const { language } = useSettings();
   const lang = language ?? 'tr';
   const { location } = useUserLocation();
+  const mine = location?.districtId;
   const { items, stale, error, retry } = useCityGuideItems(location?.provinceCode, section);
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<string | null>(null);
   const [district, setDistrict] = useState<string | null>(null);
   const [day, setDay] = useState<string | null>(null);
+  const [all, setAll] = useState(false);
+  const [pickDistrict, setPickDistrict] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const own = useMemo(() => (items ?? []).filter((i) => !categories || (i.category && categories.includes(i.category))), [items, categories]);
-  // Türler çoktan aza; "diğer" en sonda.
-  const kinds = useMemo(() => {
+  const kindCount = useMemo(() => {
     const n = new Map<string, number>();
     for (const i of own) if (i.category) n.set(i.category, (n.get(i.category) ?? 0) + 1);
-    return [...n.keys()].sort((a, b) => Number(a === 'diger') - Number(b === 'diger') || n.get(b)! - n.get(a)!);
+    return n;
   }, [own]);
-  const districts = useMemo(() => {
-    const ids = [...new Set(own.map((i) => i.districtId).filter((x): x is string => !!x))];
-    return ids.map((id) => ({ id, name: repo.getDistrict(id)?.name ?? id })).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+  // Türler çoktan aza; "diğer" en sonda.
+  const kinds = useMemo(() => [...kindCount.keys()].sort((a, b) => Number(a === 'diger') - Number(b === 'diger') || kindCount.get(b)! - kindCount.get(a)!), [kindCount]);
+  const districtCount = useMemo(() => {
+    const n = new Map<string, number>();
+    for (const i of own) if (i.districtId) n.set(i.districtId, (n.get(i.districtId) ?? 0) + 1);
+    return n;
   }, [own]);
+  const districts = useMemo(
+    () => [...districtCount.keys()].map((id) => ({ id, name: repo.getDistrict(id)?.name ?? id })).sort((a, b) => a.name.localeCompare(b.name, 'tr')),
+    [districtCount],
+  );
   const isMarket = section === 'pazarlar';
+  const kindName = (k: string) => cityChoiceLabel(k, lang);
+  const districtName = (id?: string | null) => (id ? repo.getDistrict(id)?.name : undefined);
 
   const shown = useMemo(() => {
     const q = normalizeName(query);
-    const mine = location?.districtId;
     return own
       .filter((i) => (!kind || i.category === kind) && (!district || i.districtId === district))
       .filter((i) => !day || (Array.isArray(i.values.gunler) && (i.values.gunler as string[]).includes(day)))
       .filter((i) => !q || normalizeName(`${i.name} ${i.category ? cityChoiceLabel(i.category, lang) : ''} ${repo.getDistrict(i.districtId ?? '')?.name ?? ''}`).includes(q))
       .sort((a, b) => Number(b.districtId === mine) - Number(a.districtId === mine) || a.name.localeCompare(b.name, 'tr'));
-  }, [own, query, kind, district, day, location?.districtId, lang]);
+  }, [own, query, kind, district, day, mine, lang]);
 
   const text = (i: CityGuideItem, keys: string[]) => {
     const key = keys.find((k) => i.values[k] !== undefined && i.values[k] !== '');
@@ -77,67 +96,183 @@ export function CityGuideList({ section, look, categories, header }: { section: 
     if (key === 'ilk_saat_tl') return t('city.firstHour', { price: v });
     return Array.isArray(v) ? v.join(', ') : String(v);
   };
-
-  const featuredKind = FEATURED[section];
-  const filtered = !!(query || kind || district || day);
-  const featured = featuredKind && !filtered ? shown[0] : undefined;
-  // Çizimli kartı olmayan bölümlerde en üstte ilk kayıt (kullanıcının ilçesindeki önce), Ara ve Yol tarifi ile (taslak S-Eczane).
-  const spot = !featuredKind && !filtered && shown.length > 1 ? shown[0] : undefined;
-  const rows = featured || spot ? shown.slice(1) : shown;
   const open = (url: string) => Linking.openURL(url).catch(() => {});
   const phoneOf = (i: CityGuideItem) => (typeof i.values.telefon === 'string' && i.values.telefon.trim() ? i.values.telefon : undefined);
   const mapOf = (i: CityGuideItem) => {
     if (i.location) return mapsUrl(i.location);
     const address = typeof i.values.adres === 'string' ? i.values.adres : '';
-    const place = [i.districtId ? repo.getDistrict(i.districtId)?.name : '', repo.getProvince(i.provinceCode)?.name].filter(Boolean).join(', ');
+    const place = [districtName(i.districtId), repo.getProvince(i.provinceCode)?.name].filter(Boolean).join(', ');
     return address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${i.name}, ${address}, ${place}`)}` : undefined;
   };
   const go = (i: CityGuideItem) => router.push({ pathname: '/city/item', params: { section, id: i.id } });
-  const sectionName = (n: number) => t('city.listAll', { count: n });
+  const spotlight = (i: CityGuideItem) => {
+    const phone = phoneOf(i);
+    const map = mapOf(i);
+    const address = typeof i.values.adres === 'string' ? i.values.adres : '';
+    return (
+      <Spotlight
+        tag={mine && i.districtId === mine ? t('city.inYourDistrict') : districtName(i.districtId)}
+        title={i.name}
+        sub={[address, i.category && i.category !== 'diger' ? kindName(i.category) : ''].filter(Boolean).join(' · ') || undefined}
+        onCall={phone ? () => open(telUrl(phone)) : undefined}
+        onMap={map ? () => open(map) : undefined}
+        onPress={() => go(i)}
+      />
+    );
+  };
+  const reset = () => {
+    setKind(null);
+    setDistrict(null);
+    setDay(null);
+    setQuery('');
+    setAll(false);
+  };
+
+  const featuredKind = FEATURED[section];
+  const filtered = !!(query || kind || district || day);
+  const hub = !filtered && !all && !isMarket && own.length >= HUB_MIN && (kinds.length >= 2 || districts.length >= 3);
+  const featured = !hub && featuredKind && !filtered ? shown[0] : undefined;
+  const spot = !hub && !featuredKind && !filtered && shown.length > 1 ? shown[0] : undefined;
+  const rows = featured || spot ? shown.slice(1) : shown;
+  // Tür seçilmemişse liste türlere ayrılır (DEVLET, ÖZEL…).
+  const sections = useMemo(() => {
+    if (kind || kinds.length < 2) return [{ key: '', title: '', data: rows }];
+    const order = new Map(kinds.map((k, n) => [k, n]));
+    const groups = new Map<string, CityGuideItem[]>();
+    for (const i of rows) {
+      const k = i.category ?? 'diger';
+      groups.set(k, [...(groups.get(k) ?? []), i]);
+    }
+    return [...groups.entries()]
+      .sort(([a], [b]) => (order.get(a) ?? 99) - (order.get(b) ?? 99))
+      .map(([k, data]) => ({ key: k, title: cityChoiceLabel(k, lang), data }));
+  }, [rows, kind, kinds, lang]);
+  const grouped = sections.length > 1;
+
+  // İlçe kutuları: kullanıcının ilçesi başta, sonra kaydı çok olanlar.
+  const topDistricts = [...districtCount.keys()].sort((a, b) => Number(b === mine) - Number(a === mine) || districtCount.get(b)! - districtCount.get(a)!);
+  const districtTiles = topDistricts.length > MAX_DISTRICTS + 1 ? topDistricts.slice(0, MAX_DISTRICTS) : topDistricts;
+  const moreDistricts = topDistricts.length > districtTiles.length;
+  const near = mine && districtCount.has(mine) ? shown.find((i) => i.districtId === mine) : undefined;
+
+  const hubView = (
+    <>
+      {kinds.length >= 2 ? (
+        <>
+          <HubTitle title={t('city.hub.byKind')} />
+          {chunk(kinds.slice(0, MAX_KINDS), 2).map((pair, n) => (
+            <View key={n} style={styles.gridRow}>
+              {pair.map((k) => (
+                <KindTile key={k} icon={look.icon} name={kindName(k)} count={kindCount.get(k)!} onPress={() => setKind(k)} />
+              ))}
+              {pair.length < 2 ? <View style={styles.flex} /> : null}
+            </View>
+          ))}
+        </>
+      ) : null}
+      {districts.length >= 2 ? (
+        <>
+          <HubTitle
+            title={t('city.hub.byDistrict')}
+            aside={moreDistricts ? t('city.hub.districts', { count: districts.length }) : undefined}
+            onAside={moreDistricts ? () => setPickDistrict(true) : undefined}
+          />
+          {chunk([...districtTiles, ...(moreDistricts ? ['*'] : [])], 3).map((row, n) => (
+            <View key={n} style={styles.gridRow}>
+              {row.map((id) =>
+                id === '*' ? (
+                  <DistrictTile key="more" name={t('city.allDistricts')} note={t('city.hub.districts', { count: districts.length })} onPress={() => setPickDistrict(true)} />
+                ) : (
+                  <DistrictTile
+                    key={id}
+                    name={districtName(id) ?? id}
+                    note={id === mine ? t('city.hub.yourDistrict', { count: districtCount.get(id) }) : String(districtCount.get(id))}
+                    mine={id === mine}
+                    onPress={() => setDistrict(id)}
+                  />
+                ),
+              )}
+              {Array.from({ length: 3 - row.length }, (_, k) => <View key={`e${k}`} style={styles.flex} />)}
+            </View>
+          ))}
+        </>
+      ) : null}
+      {near ? (
+        <>
+          <HubTitle title={t('city.hub.nearest')} />
+          {spotlight(near)}
+        </>
+      ) : null}
+      <View style={styles.listAll}>
+        <PillButton icon="format-list-bulleted" label={t('city.hub.listAll', { count: own.length })} onPress={() => setAll(true)} />
+      </View>
+      <PickerModal
+        visible={pickDistrict}
+        title={t('city.district')}
+        options={districts.map((d) => ({ id: d.id, name: `${d.name} (${districtCount.get(d.id)})` }))}
+        selectedId={district ?? ''}
+        onSelect={(id) => {
+          setDistrict(id || null);
+          setPickDistrict(false);
+        }}
+        onClose={() => setPickDistrict(false)}
+      />
+    </>
+  );
+
+  const selection = [districtName(district), kind ? kindName(kind) : ''].filter(Boolean).join(' · ');
 
   return (
-    <FlatList
-      data={rows}
+    <SectionList
+      sections={hub ? [] : sections}
       keyExtractor={(i) => i.id}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
+      stickySectionHeadersEnabled={false}
       ListHeaderComponent={
         <View style={styles.top}>
           {header}
           <SearchField value={query} onChangeText={setQuery} placeholder={t('city.search')} />
-          <FilterRow
-            districts={districts}
-            district={district}
-            onDistrict={setDistrict}
-            kinds={kinds.filter((k) => k !== 'diger').map((k) => ({ id: k, name: cityChoiceLabel(k, lang) }))}
-            kind={kind}
-            onKind={setKind}
-          />
-          {isMarket ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-              <FilterChip label={t('city.allDays')} active={!day} onPress={() => setDay(null)} />
-              {DAYS.map((d) => <FilterChip key={d} label={d} active={day === d} onPress={() => setDay(day === d ? null : d)} />)}
-            </ScrollView>
-          ) : null}
           {stale ? <AppText variant="caption" muted>{t('city.staleNote')}</AppText> : null}
           {lang !== 'tr' ? <AppText variant="caption" muted>{t('city.contentLanguage')}</AppText> : null}
-          {featured ? (
-            <FeaturedCard
-              kind={featuredKind!}
-              badge={t('city.featured')}
-              title={featured.name}
-              meta={[featured.districtId ? repo.getDistrict(featured.districtId)?.name : '', text(featured, META_KEYS)].filter(Boolean).join(' · ')}
-              tag={featured.values.ucret_durumu === 'Ücretsiz' ? <Tag label={cityChoiceLabel('Ücretsiz', lang)} /> : undefined}
-              onPress={() => go(featured)}
-            />
-          ) : null}
-          {spot ? <Spotlight item={spot} look={look} mine={!!location?.districtId && spot.districtId === location.districtId} phone={phoneOf(spot)} map={mapOf(spot)} onOpen={open} onPress={() => go(spot)} /> : null}
-          {rows.length ? <SectionTitle title={sectionName(shown.length)} aside={location?.districtId && !district ? t('city.nearFirst') : undefined} /> : null}
+          {hub ? (
+            hubView
+          ) : (
+            <>
+              {(kind || district || all) && own.length >= HUB_MIN ? <SelectionBar label={selection || t('city.hub.everything', { count: own.length })} onClear={reset} /> : null}
+              <FilterRow
+                districts={districts}
+                district={district}
+                onDistrict={setDistrict}
+                kinds={kinds.filter((k) => k !== 'diger').map((k) => ({ id: k, name: kindName(k) }))}
+                kind={kind}
+                onKind={setKind}
+              />
+              {isMarket ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+                  <FilterChip label={t('city.allDays')} active={!day} onPress={() => setDay(null)} />
+                  {DAYS.map((d) => <FilterChip key={d} label={d} active={day === d} onPress={() => setDay(day === d ? null : d)} />)}
+                </ScrollView>
+              ) : null}
+              {featured ? (
+                <FeaturedCard
+                  kind={featuredKind!}
+                  badge={t('city.featured')}
+                  title={featured.name}
+                  meta={[districtName(featured.districtId), text(featured, META_KEYS)].filter(Boolean).join(' · ')}
+                  tag={featured.values.ucret_durumu === 'Ücretsiz' ? <Tag label={cityChoiceLabel('Ücretsiz', lang)} /> : undefined}
+                  onPress={() => go(featured)}
+                />
+              ) : null}
+              {spot ? spotlight(spot) : null}
+              {rows.length ? <HubTitle title={t('city.listAll', { count: shown.length })} aside={mine && !district ? t('city.nearFirst') : undefined} /> : null}
+            </>
+          )}
         </View>
       }
       ListEmptyComponent={
-        featured || spot ? undefined : error ? (
+        hub || featured || spot ? undefined : error ? (
           <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} />
         ) : items === null ? (
           <StateMessage kind="loading" />
@@ -145,35 +280,51 @@ export function CityGuideList({ section, look, categories, header }: { section: 
           <StateMessage kind="empty" message={own.length ? t('common.noResults') : t('city.empty')} />
         )
       }
-      renderItem={({ item: i, index }) => {
-        const districtName = i.districtId ? repo.getDistrict(i.districtId)?.name : undefined;
+      renderSectionHeader={({ section: s }) => (grouped && s.title ? <GroupLabel label={s.title} /> : null)}
+      renderItem={({ item: i, index, section: s }) => {
         const meta = text(i, META_KEYS);
         const summary = meta || text(i, SUMMARY_KEYS);
         const free = i.values.ucret_durumu === 'Ücretsiz';
         const parking = section === 'otoparklar';
         const phone = phoneOf(i);
-        const last = index === rows.length - 1;
+        const map = mapOf(i);
+        const str = (k: string) => (typeof i.values[k] === 'string' ? (i.values[k] as string).trim() : '');
+        const info = (
+          [
+            { icon: 'place', text: [str('adres'), districtName(i.districtId)].filter(Boolean).join(', ') },
+            { icon: 'call', text: phone ?? '' },
+            { icon: 'schedule', text: meta },
+            { icon: 'info-outline', text: str('kisa_metin') || str('aciklama') },
+          ] as InfoLine[]
+        ).filter((x) => x.text);
+        const first = index === 0;
+        const last = index === s.data.length - 1;
         return (
-          <View style={[styles.surfaceRow, { backgroundColor: c.surface, borderColor: c.border }, index === 0 && styles.surfaceFirst, last && styles.surfaceLast]}>
+          <View style={[styles.surfaceRow, { backgroundColor: c.surface, borderColor: c.border }, first && styles.surfaceFirst, last && styles.surfaceLast]}>
             <GlassFill horizontal />
-            <ListRow
-              first={index === 0}
-              leading={<RowIcon icon={look.icon} tint={look.colors[0]} size={38} />}
+            <ExpandRow
+              first={first}
+              icon={look.icon}
               title={i.name}
-              subtitle={[districtName, i.category && i.category !== 'diger' ? cityChoiceLabel(i.category, lang) : '', summary].filter(Boolean).join(' · ')}
-              accessibilityLabel={[i.name, districtName, i.verified ? '' : t('city.unverified')].filter(Boolean).join(', ')}
+              subtitle={[districtName(i.districtId), !grouped && i.category && i.category !== 'diger' ? kindName(i.category) : '', summary].filter(Boolean).join(' · ')}
+              accessibilityLabel={[i.name, districtName(i.districtId), i.verified ? '' : t('city.unverified')].filter(Boolean).join(', ')}
+              open={openId === i.id}
+              onToggle={() => setOpenId(openId === i.id ? null : i.id)}
+              info={info}
+              onCall={phone ? () => open(telUrl(phone)) : undefined}
+              onMap={map ? () => open(map) : undefined}
+              onDetail={() => go(i)}
               trailing={
                 free ? (
                   <Tag label={cityChoiceLabel('Ücretsiz', lang)} tone="green" />
                 ) : parking && i.values.ilk_saat_tl === undefined ? (
                   <Tag label={t('city.noPrice')} tone="muted" />
                 ) : phone ? (
-                  <CallButton label={t('city.callShort')} onPress={() => open(telUrl(phone))} />
+                  <CallButton onPress={() => open(telUrl(phone))} />
                 ) : !i.verified ? (
                   <Tag label={t('city.unverified')} tone="muted" />
                 ) : undefined
               }
-              onPress={() => go(i)}
             />
           </View>
         );
@@ -182,71 +333,13 @@ export function CityGuideList({ section, look, categories, header }: { section: 
   );
 }
 
-/** Satırın sağında tek dokunuşla arama (telefonun arama ekranı açılır). */
-function CallButton({ label, onPress }: { label: string; onPress(): void }) {
-  const c = useThemeColors();
-  return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} hitSlop={6} onPress={onPress} style={({ pressed }) => [styles.call, { backgroundColor: c.accentSoft, opacity: pressed ? 0.7 : 1 }]}>
-      <MaterialIcons name="call" size={17} color={c.primary} />
-    </Pressable>
-  );
-}
-
-/** Üstte öne çıkan kayıt: altın çerçeveli cam kart, ad, adres, Ara ve Yol tarifi. */
-function Spotlight({ item, look, mine, phone, map, onOpen, onPress }: { item: CityGuideItem; look: Look; mine: boolean; phone?: string; map?: string; onOpen(url: string): void; onPress(): void }) {
-  const { t } = useTranslation();
-  const c = useThemeColors();
-  const district = item.districtId ? repo.getDistrict(item.districtId)?.name : undefined;
-  const address = typeof item.values.adres === 'string' ? item.values.adres : '';
-  const badge = mine ? t('city.inYourDistrict') : district;
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={[item.name, district, address].filter(Boolean).join(', ')}
-      onPress={onPress}
-      style={({ pressed }) => [styles.spot, { backgroundColor: c.surface, borderColor: c.accentBorder, transform: [{ scale: pressed ? 0.985 : 1 }] }]}>
-      <GlassFill strong />
-      <View style={styles.spotHead}>
-        <RowIcon icon={look.icon} tint={look.colors[0]} size={42} />
-        <View style={styles.flex}>
-          {badge ? <Tag label={badge} /> : null}
-          <AppText style={[styles.spotTitle, { color: c.textStrong }]} numberOfLines={2}>{item.name}</AppText>
-        </View>
-      </View>
-      {address ? <AppText style={[styles.spotSub, { color: c.textMuted }]} numberOfLines={2}>{address}</AppText> : null}
-      {phone || map ? (
-        <View style={styles.spotBtns}>
-          {phone ? (
-            <Pressable accessibilityRole="button" onPress={() => onOpen(telUrl(phone))} style={({ pressed }) => [styles.spotBtn, { backgroundColor: c.primary, opacity: pressed ? 0.85 : 1 }]}>
-              <MaterialIcons name="call" size={16} color={c.onPrimary} />
-              <AppText style={[styles.spotBtnText, { color: c.onPrimary }]}>{t('city.callShort')}</AppText>
-            </Pressable>
-          ) : null}
-          {map ? (
-            <Pressable accessibilityRole="button" onPress={() => onOpen(map)} style={({ pressed }) => [styles.spotBtn, { backgroundColor: c.surfaceStrong, opacity: pressed ? 0.85 : 1 }]}>
-              <MaterialIcons name="directions" size={16} color={c.textStrong} />
-              <AppText style={[styles.spotBtnText, { color: c.textStrong }]}>{t('city.directions')}</AppText>
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
-  flex: { flex: 1, gap: 4, alignItems: 'flex-start' },
-  call: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
-  spot: { borderWidth: 1, borderRadius: radius.xl, padding: spacing.md, gap: spacing.sm + 2, overflow: 'hidden' },
-  spotHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 2 },
-  spotTitle: { fontFamily: fonts.heading, fontSize: 17, lineHeight: 22 },
-  spotSub: { fontSize: 12.5, lineHeight: 17 },
-  spotBtns: { flexDirection: 'row', gap: spacing.sm },
-  spotBtn: { flex: 1, minHeight: 44, borderRadius: radius.md, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
-  spotBtnText: { fontFamily: fonts.bodySemi, fontSize: 13.5 },
   content: { paddingBottom: spacing.xl },
   top: { gap: spacing.sm + 2, marginBottom: spacing.sm + 2 },
   chips: { gap: spacing.xs + 2, paddingVertical: 2 },
+  gridRow: { flexDirection: 'row', gap: spacing.sm },
+  flex: { flex: 1 },
+  listAll: { flexDirection: 'row', marginTop: spacing.xs },
   // Satırlar tek yüzeyde: ilk ve son satır köşeleri yuvarlar, kenarlar birleşir.
   surfaceRow: { borderLeftWidth: 1, borderRightWidth: 1, paddingHorizontal: spacing.md, overflow: 'hidden' },
   surfaceFirst: { borderTopWidth: 1, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl },

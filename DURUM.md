@@ -842,7 +842,18 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **Doğrulama iste tek dokunuş (7 Kasım; Eren istedi).** İşletme sayfasında sahibi "Doğrulama iste"ye basınca düzenleme ekranına
   gitmeden istek gönderilir (`components/verify-request.tsx`, mevcut `verificationRequests`); panelde Bekleyen onaylar'a düşer,
   admin onaylar. Ekranda "Talebiniz alındı. En kısa sürede ekibimiz sizinle iletişime geçecek." (5 dil); reddedilirse gerekçe ve
-  "Yeniden iste". Panelde admin Bekleyen onaylar'ı açınca artık tüm bekleyenleri görür. **Bekleyen (Eren):** `npm run panel:deploy`.
+  "Yeniden iste". Panelde admin Bekleyen onaylar'ı açınca artık tüm bekleyenleri görür. Panel Eren tarafından yüklendi (7 Kasım).
+- **Benim Şehrim alt sayfaları, cam görünümü (7 Kasım; Eren taslağı onayladı, https://claude.ai/artifact/BeJFnNmKpDqrNMYB4KSic3).**
+  Eren: "alt sayfalar çok sıradan, uzun liste olmasın, kategori olsun, ama bilgi eksik kalmasın, aşağı açılsın".
+  **Benim Şehrim ana sayfası değişmedi** (Eren: en sona kalsın). `components/city-hub.tsx` (cam kutu, tırnaklı başlık,
+  tür / ilçe kutuları, öne çıkan kart Ara + Yol tarifi, seçim şeridi, **aşağı açılan satır** `ExpandRow`: adres, telefon,
+  saat, açıklama, Ara / Yol tarifi / Ayrıntılar), `components/line-icon.tsx` (lucide-react-native ince simgeler, karşılığı
+  yoksa Material). `city-guide-list.tsx`: 10+ kayıtta sayfa önce "Türüne göre" / "İlçene göre" kutularıyla açılır
+  (kullanıcının ilçesi altın, en çok 5 ilçe + "Tüm ilçeler"), kullanıcının ilçesinden öne çıkan kayıt, "Tümünü listele";
+  seçince türlere ayrılmış (DEVLET / ÖZEL…) liste. Başlık yazı tipi Fraunces (`fonts.serif`, HeroHeader `serif`, yalnızca
+  `app/city/*` alt sayfaları). Kurumlar kutularında ince simge. Tür denetimi temiz, telefon paketi derlendi; **telefonda
+  denenmedi**. Sonraki parça: her il için şehir fotoğrafı (panelden yükleme, sayfa arkasında bulanık; taslaktaki gibi),
+  fotoğrafı olmayan ilde düz zemin.
 - **Küçük fotoğraf ve Çarşı fotoğraf zorunluluğu (7 Kasım).** Sunucu işlevi `photoThumbnail` (`functions/src/thumbs.ts`, sharp)
   her yüklenen JPEG'in 640 piksellik küçüğünü `thumbs/{asıl yol}` yoluna, asıl dosyanın erişim anahtarıyla yazar; uygulama
   adresi asıl adresten hesaplar (`thumbUrl`, kayıt değişmez). Listeler, kartlar, avatarlar, logolar ve kapaklar

@@ -97,6 +97,9 @@ export const fonts = {
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodySemi: 'Inter_600SemiBold',
+  /** Benim Şehrim alt sayfalarında yumuşak tırnaklı başlık (cam taslağı, 7 Kasım 2026). */
+  serif: 'Fraunces_500Medium',
+  serifSemi: 'Fraunces_600SemiBold',
 } as const;
 
 /** Dokunma alanı en az 44 nokta (erişilebilirlik). */

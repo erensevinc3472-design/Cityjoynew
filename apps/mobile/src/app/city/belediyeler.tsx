@@ -72,7 +72,7 @@ export default function MunicipalitiesScreen() {
   );
 
   const header = (
-    <HeroHeader
+    <HeroHeader serif
       title={t('city.townhall')}
       subtitle={t('city.townhallIntro')}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}

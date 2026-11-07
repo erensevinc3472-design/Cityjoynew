@@ -29,13 +29,15 @@ interface Props {
   right?: HeaderAction | HeaderAction[];
   /** Eski ortalı küçük başlık (yalnızca ana sekmelerde). İç ekranlar büyük altın başlığı kullanır (13. madde 35). */
   compact?: boolean;
+  /** Büyük başlık tırnaklı yazıyla (Benim Şehrim alt sayfaları). */
+  serif?: boolean;
 }
 
 /**
  * Üst bant: geri düğmesi ve sağda işlemler; altında sola yaslı büyük altın başlık ve konum / açıklama (iç ekranların
  * ortak dili, 13. madde 35); en altta isteğe bağlı içerik (konum çipi, filtre satırı vb.).
  */
-export function HeroHeader({ title, subtitle, onBack, left, right, compact, children }: PropsWithChildren<Props>) {
+export function HeroHeader({ title, subtitle, onBack, left, right, compact, serif, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
   const { rtl } = useSettings();
   const { t } = useTranslation();
@@ -69,7 +71,7 @@ export function HeroHeader({ title, subtitle, onBack, left, right, compact, chil
       </View>
       {large ? (
         <View style={styles.big}>
-          <AppText accessibilityRole="header" style={[styles.bigTitle, { color: c.heroAccent }]}>{title}</AppText>
+          <AppText accessibilityRole="header" style={[styles.bigTitle, serif && styles.serif, { color: c.heroAccent }]}>{title}</AppText>
           {subtitle ? <AppText style={[styles.bigSub, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
         </View>
       ) : subtitle ? (
@@ -110,6 +112,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 13, lineHeight: 18, marginTop: -spacing.xs },
   big: { gap: 2, marginTop: -spacing.xs },
   bigTitle: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 30, letterSpacing: -0.3 },
+  serif: { fontFamily: fonts.serif, fontSize: 27, lineHeight: 33, letterSpacing: 0 },
   bigSub: { fontSize: 13, lineHeight: 18 },
   spacer: { width: 40 },
   badge: { position: 'absolute', top: 7, right: 7, width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },

@@ -1,9 +1,9 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/app-text';
+import { LineTile } from '@/components/city-hub';
 import { GlassFill } from '@/components/glass';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
@@ -33,7 +33,7 @@ export default function InstitutionsScreen() {
       : !!g.categories && (items ?? []).some((i) => i.category && g.categories!.includes(i.category));
 
   const header = (
-    <HeroHeader
+    <HeroHeader serif
       title={t('city.tiles.kurumlar')}
       subtitle={t('city.kurumlarIntro')}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}
@@ -48,7 +48,6 @@ export default function InstitutionsScreen() {
           {INSTITUTION_GROUPS.map((g) => {
             const on = has(g);
             const title = t(`city.groups.${g.id}.title`);
-            const color = g.look.colors[0];
             const go = () =>
               g.section
                 ? router.push({ pathname: '/city/[section]', params: { section: g.section } })
@@ -63,9 +62,8 @@ export default function InstitutionsScreen() {
                 onPress={go}
                 style={({ pressed }) => [styles.tile, { backgroundColor: c.surface, borderColor: c.border, opacity: on ? 1 : 0.5, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
                 <GlassFill />
-                <View style={[styles.icon, { backgroundColor: `${color}24` }]}>
-                  <MaterialIcons name={g.look.icon} size={20} color={color} />
-                </View>
+                <LineTile icon={g.look.icon} gold />
+
                 <View style={styles.flex}>
                   <AppText style={[styles.title, { color: c.textStrong }]} numberOfLines={2}>{title}</AppText>
                   <AppText style={[styles.hint, { color: c.textMuted }]} numberOfLines={2}>
@@ -87,7 +85,6 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: spacing.sm + 2 },
   tile: { width: '48.5%', minHeight: 124, gap: spacing.sm + 2, padding: spacing.md - 2, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
   flex: { gap: 2 },
-  icon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: fonts.bodySemi, fontSize: 14, lineHeight: 19 },
   hint: { fontSize: 12, lineHeight: 16 },
 });

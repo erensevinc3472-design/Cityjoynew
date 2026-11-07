@@ -70,7 +70,7 @@ export default function CityFoodScreen() {
   }, [all]);
   const total = ranked.featured.length + ranked.others.length;
 
-  const header = <HeroHeader title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
+  const header = <HeroHeader serif title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
     <Screen header={header}>

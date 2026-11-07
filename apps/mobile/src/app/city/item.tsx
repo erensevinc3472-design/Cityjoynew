@@ -61,7 +61,7 @@ export default function CityItemScreen() {
   const def = citySection(section);
 
   const header = (
-    <HeroHeader
+    <HeroHeader serif
       title={item?.name ?? (def ? (def.names[lang] ?? def.names.tr) : '')}
       subtitle={item?.category ? cityChoiceLabel(item.category, lang) : undefined}
       onBack={() => (router.canGoBack() ? router.back() : router.replace({ pathname: '/city/[section]', params: { section } }))}

@@ -738,7 +738,18 @@
     "listAll": "All ({{count}})",
     "callShort": "Call",
     "directions": "Directions",
-    "inYourDistrict": "In your district"
+    "inYourDistrict": "In your district",
+    "hub": {
+      "byKind": "By type",
+      "byDistrict": "By district",
+      "nearest": "Closest to you",
+      "yourDistrict": "{{count}} · your district",
+      "districts": "{{count}} districts",
+      "listAll": "List all ({{count}})",
+      "everything": "All · {{count}} places",
+      "clear": "Clear selection",
+      "details": "Details"
+    }
   },
   "announcements": {
     "title": "Announcements",

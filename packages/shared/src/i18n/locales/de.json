@@ -738,7 +738,18 @@
     "listAll": "Alle ({{count}})",
     "callShort": "Anrufen",
     "directions": "Route",
-    "inYourDistrict": "In deinem Bezirk"
+    "inYourDistrict": "In deinem Bezirk",
+    "hub": {
+      "byKind": "Nach Art",
+      "byDistrict": "Nach Bezirk",
+      "nearest": "In deiner Nähe",
+      "yourDistrict": "{{count}} · dein Bezirk",
+      "districts": "{{count}} Bezirke",
+      "listAll": "Alle anzeigen ({{count}})",
+      "everything": "Alle · {{count}} Einträge",
+      "clear": "Auswahl aufheben",
+      "details": "Details"
+    }
   },
   "announcements": {
     "title": "Bekanntmachungen",

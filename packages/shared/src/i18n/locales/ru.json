@@ -738,7 +738,18 @@
     "listAll": "Все ({{count}})",
     "callShort": "Позвонить",
     "directions": "Маршрут",
-    "inYourDistrict": "В вашем районе"
+    "inYourDistrict": "В вашем районе",
+    "hub": {
+      "byKind": "По типу",
+      "byDistrict": "По району",
+      "nearest": "Ближе всего к вам",
+      "yourDistrict": "{{count}} · ваш район",
+      "districts": "Районов: {{count}}",
+      "listAll": "Показать все ({{count}})",
+      "everything": "Все · {{count}}",
+      "clear": "Сбросить выбор",
+      "details": "Подробнее"
+    }
   },
   "announcements": {
     "title": "Объявления",

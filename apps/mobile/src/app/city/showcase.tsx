@@ -63,7 +63,7 @@ export default function CityShowcaseScreen() {
       ? router.push({ pathname: '/business/[id]', params: { id: item.id } })
       : router.push({ pathname: '/travel/place/[id]', params: { id: item.id } });
 
-  const header = <HeroHeader title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
+  const header = <HeroHeader serif title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
     <Screen header={header}>

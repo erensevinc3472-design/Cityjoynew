@@ -738,7 +738,18 @@
     "listAll": "الكل ({{count}})",
     "callShort": "اتصال",
     "directions": "الاتجاهات",
-    "inYourDistrict": "في منطقتك"
+    "inYourDistrict": "في منطقتك",
+    "hub": {
+      "byKind": "حسب النوع",
+      "byDistrict": "حسب المنطقة",
+      "nearest": "الأقرب إليك",
+      "yourDistrict": "{{count}} · منطقتك",
+      "districts": "{{count}} منطقة",
+      "listAll": "عرض الكل ({{count}})",
+      "everything": "الكل · {{count}}",
+      "clear": "إلغاء التحديد",
+      "details": "التفاصيل"
+    }
   },
   "announcements": {
     "title": "الإعلانات",

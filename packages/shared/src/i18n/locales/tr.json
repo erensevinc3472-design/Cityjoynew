@@ -738,7 +738,18 @@
     "listAll": "Tümü ({{count}})",
     "callShort": "Ara",
     "directions": "Yol tarifi",
-    "inYourDistrict": "İlçende"
+    "inYourDistrict": "İlçende",
+    "hub": {
+      "byKind": "Türüne göre",
+      "byDistrict": "İlçene göre",
+      "nearest": "Sana en yakın",
+      "yourDistrict": "{{count}} · senin ilçen",
+      "districts": "{{count}} ilçe",
+      "listAll": "Tümünü listele ({{count}})",
+      "everything": "Tümü · {{count}} kayıt",
+      "clear": "Seçimi kaldır",
+      "details": "Ayrıntılar"
+    }
   },
   "announcements": {
     "title": "Duyurular",
