@@ -3,6 +3,7 @@ import type { PropsWithChildren, ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ScreenGlow } from '@/components/glass';
 import { GUTTER, spacing } from '@/theme/tokens';
 import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
@@ -24,8 +25,9 @@ export function Screen({ header, footer, children }: PropsWithChildren<Props>) {
   return (
     <View style={[styles.root, { backgroundColor: c.background }]}>
       <StatusBar style={statusStyle} />
+      <ScreenGlow />
       {header ? (
-        <View style={[styles.band, { backgroundColor: c.hero, paddingTop: insets.top + spacing.sm }]}>
+        <View style={[styles.band, { backgroundColor: scheme === 'dark' ? 'transparent' : c.hero, paddingTop: insets.top + spacing.sm }]}>
           <View style={styles.inner}>{header}</View>
         </View>
       ) : (

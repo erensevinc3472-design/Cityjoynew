@@ -212,6 +212,6 @@ const styles = StyleSheet.create({
   section: { gap: spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderWidth: 1, borderRadius: radius.md, padding: spacing.md, minHeight: 56 },
   rowText: { flex: 1, gap: 2 },
-  rowTitle: { fontFamily: fonts.heading, fontSize: 15, lineHeight: 21 },
+  rowTitle: { fontFamily: fonts.heading, fontSize: 14, lineHeight: 19 },
   center: { textAlign: 'center' },
 });

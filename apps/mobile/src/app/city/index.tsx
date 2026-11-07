@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   cover: { height: 172, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
   coverText: { position: 'absolute', start: 0, end: 0, bottom: 0, paddingHorizontal: spacing.md, paddingVertical: 10, backgroundColor: 'rgba(8, 26, 30, 0.6)' },
   kicker: { fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 1 },
-  cityName: { fontFamily: fonts.heading, fontSize: 28, lineHeight: 34, color: white },
+  cityName: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 32, color: white },
   place: { fontSize: 13, color: '#D5E2E3' },
   grid: {},
   row: { flexDirection: 'row' },

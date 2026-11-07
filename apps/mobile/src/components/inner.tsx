@@ -7,6 +7,7 @@ import { useSettings } from '@/lib/settings';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
+import { GlassFill } from './glass';
 import { HeroHeader } from './hero-header';
 import { OptionRow } from './option-row';
 import { SceneArt, type SceneKind } from './scene-art';
@@ -141,7 +142,12 @@ export function SectionTitle({ title, aside, onAside }: { title: string; aside?:
 /** Satırların tek kart yüzeyinde durduğu liste. */
 export function ListSurface({ children }: PropsWithChildren) {
   const c = useThemeColors();
-  return <View style={[styles.surface, { backgroundColor: c.surface, borderColor: c.border }]}>{children}</View>;
+  return (
+    <View style={[styles.surface, { backgroundColor: c.surface, borderColor: c.border }]}>
+      <GlassFill />
+      {children}
+    </View>
+  );
 }
 
 /** Liste satırı: solda simge / küçük resim, ad, alt bilgi, sağda etiket ya da ok. */
@@ -232,13 +238,13 @@ const styles = StyleSheet.create({
   chip: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 36, paddingHorizontal: spacing.md, borderRadius: radius.pill, borderWidth: 1 },
   chipText: { fontFamily: fonts.bodySemi, fontSize: 13 },
   section: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: spacing.sm, paddingTop: spacing.xs },
-  sectionTitle: { flex: 1, fontFamily: fonts.heading, fontSize: 17, lineHeight: 23 },
+  sectionTitle: { flex: 1, fontFamily: fonts.heading, fontSize: 16, lineHeight: 21 },
   sectionAside: { fontSize: 12.5 },
   surface: { borderRadius: radius.xl, borderWidth: 1, paddingHorizontal: spacing.md, overflow: 'hidden' },
-  listRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 64, paddingVertical: spacing.sm + 2 },
+  listRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 58, paddingVertical: spacing.sm + 2 },
   listText: { flex: 1, gap: 2 },
-  listTitle: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
-  listSub: { fontSize: 12.5, lineHeight: 17 },
+  listTitle: { fontFamily: fonts.bodySemi, fontSize: 14, lineHeight: 19 },
+  listSub: { fontSize: 12, lineHeight: 16 },
   tag: { borderRadius: radius.pill, paddingHorizontal: 9, paddingVertical: 2, alignSelf: 'center' },
   tagText: { fontFamily: fonts.bodySemi, fontSize: 11 },
   featured: { height: 190, borderRadius: radius.xl, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)' },
@@ -246,7 +252,7 @@ const styles = StyleSheet.create({
   featuredBadge: { position: 'absolute', top: 12, start: 12, backgroundColor: 'rgba(8, 26, 30, 0.7)', borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
   featuredBadgeText: { fontFamily: fonts.bodySemi, fontSize: 11.5, color: '#FFFFFF' },
   featuredBottom: { position: 'absolute', start: 14, end: 14, bottom: 12, flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm },
-  featuredTitle: { fontFamily: fonts.heading, fontSize: 19, lineHeight: 24, color: '#FFFFFF' },
-  featuredMeta: { fontSize: 12.5, color: '#D5E2E3' },
+  featuredTitle: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23, color: '#FFFFFF' },
+  featuredMeta: { fontSize: 12, color: '#D5E2E3' },
   rowIcon: { borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });
