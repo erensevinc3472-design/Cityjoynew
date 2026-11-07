@@ -846,8 +846,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   albüm ve profil büyütme asıl dosyayı kullanır. Silme işlevleri `thumbs/` kopyalarını da siler; Storage kuralı `thumbs/`'u
   yalnızca okumaya açar. Eski fotoğrafların küçüğü yok (gerekirse sonra toplu üretilir). Çarşı: yeni ilanda en az bir fotoğraf
   (uygulama + kural); düzenlemede fotoğraflar sıfıra indirilemez (fotoğrafsız eski ilan hariç). Testler: ortak 171, sunucu 41,
-  kurallar 159 (Storage dahil) geçti; tür denetimi temiz. **Bekleyen (Eren):** kurallar (Firestore + Storage) ve
-  `photoThumbnail` işlevi yüklenecek. Telefonda denenmedi.
+  kurallar 159 (Storage dahil) geçti; tür denetimi temiz. Kurallar (Firestore + Storage) ve işlevler Eren tarafından yüklendi
+  (8 Kasım 07:22 ve 07:27; Claude doğruladı; kural yüklemesi yanıltıcı 409 hatası verdi ama yüklenmişti). Telefonda denenmedi.
 - **İşletme kademeleri (7 Kasım; Karar Eren, PROJE.md 5.6).** Doğrulanmamış işletme: dışarıdan sayfa yok, listede ve aramada
   dokununca yerinde büyüyen kart (`components/business-card.tsx`; yorumlar `reviews-sheet.tsx`), bağlantıyla açılan sayfa
   da kartı gösterir; ekibine "Doğrulama iste" kutusu. Doğrulanmış: sayfa, toplam 9 işletme gönderisi (sunucu işlevi
