@@ -845,9 +845,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `businessPostCounted` `postCount` sayar; kural `validBusinessPost`), Fırsatlarım soluk + kısa not (`components/toast.tsx`).
   Pro: sınır yok, fırsat açık (kural `dealBizOk` Pro ister). Sıralama: Reklam > Pro (etiketli) > doğrulanmış > doğrulanmamış
   (ayrı bölüm). Panel > Sınırlar'a "İşletme gönderisi (toplam, Ücretsiz)". Testler: ortak 169, sunucu 39, kurallar (deals,
-  business-page) geçti; tür denetimi temiz. Panel yüklendi. **Bekleyen (Eren):** kurallar ve `businessPostCounted` işlevi
-  Firebase'e yüklenecek (Claude'un yükleme izni reddedildi). Yüklenene kadar Panel > Sınırlar "Kaydet" yeni alan yüzünden
-  reddedilir. Telefonda denenmedi.
+  business-page) geçti; tür denetimi temiz. Panel yüklendi. Kurallar ve `businessPostCounted` işlevi Eren tarafından yüklendi (7 Kasım 03:26 ve 03:39; Claude doğruladı).
+  Kural yüklemesinde Google birkaç kez geçici 503 verdi.
+  Telefonda denenmedi.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
