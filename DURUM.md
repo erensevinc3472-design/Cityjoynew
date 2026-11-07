@@ -861,7 +861,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `city.hub.showcaseOf` (5 dil). Webde (8081) Bursa ile denendi; **telefonda denenmedi**. Bursa'nın Seyahat kapak
   fotoğrafı henüz yüklü değil (çizim görünüyor). Eren'in görselindeki "Sosyal Destek" / "Faydalı Bilgiler" adları
   uygulanmadı. **Karar (Eren, 7 Kasım): adlar kalır** (Gönüllülük = yardım etmek isteyen; Sosyal Destek = yardım almak
-  isteyen, ayrı konu). Fikir: ileride ayrı "Sosyal Destek" bölümü (belediye yardımları, panelden), Gönüllülük yanında kalır.
+  isteyen, ayrı konu). Ayrı "Sosyal Destek" bölümü de istenmedi (Eren, 7 Kasım).
 - **Küçük fotoğraf ve Çarşı fotoğraf zorunluluğu (7 Kasım).** Sunucu işlevi `photoThumbnail` (`functions/src/thumbs.ts`, sharp)
   her yüklenen JPEG'in 640 piksellik küçüğünü `thumbs/{asıl yol}` yoluna, asıl dosyanın erişim anahtarıyla yazar; uygulama
   adresi asıl adresten hesaplar (`thumbUrl`, kayıt değişmez). Listeler, kartlar, avatarlar, logolar ve kapaklar
