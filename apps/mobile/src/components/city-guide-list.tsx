@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { Linking, ScrollView, SectionList, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { cityChoiceLabel, mapsUrl, normalizeName, telUrl, type CityGuideItem, type CityGuideSectionId } from '@cityjoy/shared';
@@ -10,10 +10,10 @@ import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
 import { radius, spacing } from '@/theme/tokens';
-import { useThemeColors } from '@/theme/use-theme';
+import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
-import { CallButton, DistrictTile, ExpandRow, GroupLabel, HubTitle, KindTile, PillButton, SelectionBar, Spotlight, type InfoLine } from './city-hub';
-import { GlassFill } from './glass';
+import { CallButton, DistrictTile, ExpandRow, frost, GroupLabel, HubTitle, KindTile, PillButton, SelectionBar, Spotlight, type InfoLine } from './city-hub';
+import { FrostFill } from './glass';
 import { FeaturedCard, FilterChip, FilterRow, PickerModal, Tag } from './inner';
 import type { SceneKind } from './scene-art';
 import { SearchField } from './search-field';
@@ -34,6 +34,21 @@ const HUB_MIN = 10;
 const MAX_KINDS = 6;
 const MAX_DISTRICTS = 5;
 
+/** Türe göre kutuda türün kendi simgesi (bilinmeyende bölümün simgesi). */
+const KIND_ICON: Record<string, Look['icon']> = {
+  'hastane-devlet': 'add-box',
+  'hastane-ozel': 'apartment',
+  emniyet: 'local-police',
+  jandarma: 'shield',
+  okul: 'school',
+  'halk-egitim': 'menu-book',
+  banka: 'account-balance',
+  atm: 'atm',
+  valilik: 'account-balance',
+  kaymakamlik: 'account-balance',
+  adliye: 'gavel',
+};
+
 const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
 
 /**
@@ -42,10 +57,24 @@ const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length
  * listele" ile türlere ayrılmış kısa liste açılır. Arama her zaman en üstte. Az kayıtta doğrudan liste. Otoparkta
  * ücret yoksa "Ücret bilgisi yok". categories verilirse bölümün yalnızca o kategorileri (Önemli Kurumlar alt başlığı).
  */
-export function CityGuideList({ section, look, categories, header }: { section: CityGuideSectionId; look: Look; categories?: string[]; header?: ReactElement }) {
+export function CityGuideList({
+  section,
+  look,
+  categories,
+  header,
+  onCount,
+}: {
+  section: CityGuideSectionId;
+  look: Look;
+  categories?: string[];
+  header?: ReactElement;
+  /** Kayıt sayısı (başlığın altında "Bursa · 46 yer"). */
+  onCount?(n: number): void;
+}) {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const dark = useResolvedScheme() === 'dark';
   const { language } = useSettings();
   const lang = language ?? 'tr';
   const { location } = useUserLocation();
@@ -60,6 +89,9 @@ export function CityGuideList({ section, look, categories, header }: { section: 
   const [openId, setOpenId] = useState<string | null>(null);
 
   const own = useMemo(() => (items ?? []).filter((i) => !categories || (i.category && categories.includes(i.category))), [items, categories]);
+  useEffect(() => {
+    if (items) onCount?.(own.length);
+  }, [items, own.length, onCount]);
   const kindCount = useMemo(() => {
     const n = new Map<string, number>();
     for (const i of own) if (i.category) n.set(i.category, (n.get(i.category) ?? 0) + 1);
@@ -113,7 +145,7 @@ export function CityGuideList({ section, look, categories, header }: { section: 
       <Spotlight
         tag={mine && i.districtId === mine ? t('city.inYourDistrict') : districtName(i.districtId)}
         title={i.name}
-        sub={[address, i.category && i.category !== 'diger' ? kindName(i.category) : ''].filter(Boolean).join(' · ') || undefined}
+        sub={[address || (i.category && i.category !== 'diger' ? kindName(i.category) : ''), districtName(i.districtId)].filter(Boolean).join(' · ') || undefined}
         onCall={phone ? () => open(telUrl(phone)) : undefined}
         onMap={map ? () => open(map) : undefined}
         onPress={() => go(i)}
@@ -163,7 +195,7 @@ export function CityGuideList({ section, look, categories, header }: { section: 
           {chunk(kinds.slice(0, MAX_KINDS), 2).map((pair, n) => (
             <View key={n} style={styles.gridRow}>
               {pair.map((k) => (
-                <KindTile key={k} icon={look.icon} name={kindName(k)} count={kindCount.get(k)!} onPress={() => setKind(k)} />
+                <KindTile key={k} icon={KIND_ICON[k] ?? look.icon} name={kindName(k)} count={kindCount.get(k)!} onPress={() => setKind(k)} />
               ))}
               {pair.length < 2 ? <View style={styles.flex} /> : null}
             </View>
@@ -233,7 +265,7 @@ export function CityGuideList({ section, look, categories, header }: { section: 
       ListHeaderComponent={
         <View style={styles.top}>
           {header}
-          <SearchField value={query} onChangeText={setQuery} placeholder={t('city.search')} />
+          <SearchField compact value={query} onChangeText={setQuery} placeholder={t('city.search')} />
           {stale ? <AppText variant="caption" muted>{t('city.staleNote')}</AppText> : null}
           {lang !== 'tr' ? <AppText variant="caption" muted>{t('city.contentLanguage')}</AppText> : null}
           {hub ? (
@@ -300,8 +332,8 @@ export function CityGuideList({ section, look, categories, header }: { section: 
         const first = index === 0;
         const last = index === s.data.length - 1;
         return (
-          <View style={[styles.surfaceRow, { backgroundColor: c.surface, borderColor: c.border }, first && styles.surfaceFirst, last && styles.surfaceLast]}>
-            <GlassFill horizontal />
+          <View style={[styles.surfaceRow, frost(dark, c.surface, c.border), !first && { borderTopColor: 'transparent' }, first && styles.surfaceFirst, last && styles.surfaceLast]}>
+            <FrostFill />
             <ExpandRow
               first={first}
               icon={look.icon}

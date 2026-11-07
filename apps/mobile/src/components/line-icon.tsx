@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import {
   BookOpen,
   Building,
+  CreditCard,
   Building2,
   Bus,
   CalendarDays,
@@ -20,6 +21,7 @@ import {
   School,
   Shield,
   Siren,
+  SquarePlus,
   SquareParking,
   Stethoscope,
   Store,
@@ -61,6 +63,10 @@ const LINE: Partial<Record<IconName, LucideIcon>> = {
   school: School,
   'menu-book': BookOpen,
   'account-balance-wallet': Wallet,
+  'add-box': SquarePlus,
+  apartment: Building2,
+  shield: Shield,
+  atm: CreditCard,
 };
 
 export function LineIcon({ name, size = 20, color }: { name: IconName; size?: number; color: string }) {

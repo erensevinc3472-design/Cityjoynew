@@ -47,7 +47,7 @@ export default function ParkMarketScreen() {
   );
 
   return (
-    <Screen header={<HeroHeader serif title={t('city.tiles.parkPazar')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />}>
+    <Screen warm header={<HeroHeader serif title={t('city.tiles.parkPazar')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />}>
       <CityGuideList key={tab} section={tab} look={tab === 'parklar' ? LOOK.parkPazar : MARKET} header={tabs} />
     </Screen>
   );

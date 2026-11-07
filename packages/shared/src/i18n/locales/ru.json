@@ -748,7 +748,8 @@
       "listAll": "Показать все ({{count}})",
       "everything": "Все · {{count}}",
       "clear": "Сбросить выбор",
-      "details": "Подробнее"
+      "details": "Подробнее",
+      "places": "Мест: {{count}}"
     }
   },
   "announcements": {

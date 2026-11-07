@@ -70,7 +70,7 @@ export default function CityItemScreen() {
 
   if (!item) {
     return (
-      <Screen header={header}>
+      <Screen warm header={header}>
         {error ? <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} /> : items === null ? <StateMessage kind="loading" /> : <StateMessage kind="empty" message={t('city.notFound')} />}
       </Screen>
     );
@@ -90,7 +90,7 @@ export default function CityItemScreen() {
   const steps = Array.isArray(v.adimlar) ? v.adimlar : [];
 
   return (
-    <Screen header={header}>
+    <Screen warm header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {item.verified ? null : (
           <View style={[styles.notice, { backgroundColor: c.dangerSoft }]} accessibilityRole="alert">

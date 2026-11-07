@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { citySection, type CityGuideSectionId } from '@cityjoy/shared';
 
@@ -35,11 +36,12 @@ export default function CitySectionScreen() {
   const title = g ? t(`city.groups.${g.id}.title`) : def ? (def.names[lang] ?? def.names.tr) : '';
   const { location } = useUserLocation();
   const place = location?.provinceCode ? repo.getProvince(location.provinceCode)?.name : undefined;
+  const [count, setCount] = useState<number | null>(null);
   const back = () => (router.canGoBack() ? router.back() : router.replace(g ? '/city/kurumlar' : '/city'));
 
   return (
-    <Screen header={<HeroHeader serif title={title} subtitle={place} onBack={back} />}>
-      <CityGuideList section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} />
+    <Screen warm header={<HeroHeader serif title={title} subtitle={[place, count ? t('city.hub.places', { count }) : ''].filter(Boolean).join(' · ')} onBack={back} />}>
+      <CityGuideList section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} onCount={setCount} />
     </Screen>
   );
 }

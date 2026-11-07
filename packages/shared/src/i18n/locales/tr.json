@@ -748,7 +748,8 @@
       "listAll": "Tümünü listele ({{count}})",
       "everything": "Tümü · {{count}} kayıt",
       "clear": "Seçimi kaldır",
-      "details": "Ayrıntılar"
+      "details": "Ayrıntılar",
+      "places": "{{count}} yer"
     }
   },
   "announcements": {

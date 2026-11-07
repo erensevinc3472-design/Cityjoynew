@@ -66,7 +66,7 @@ export default function CityShowcaseScreen() {
   const header = <HeroHeader serif title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
-    <Screen header={header}>
+    <Screen warm header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {!provinceCode ? (
           <StateMessage kind="empty" message={t('city.needLocation')} />

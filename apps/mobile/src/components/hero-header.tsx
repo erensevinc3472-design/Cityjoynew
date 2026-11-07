@@ -42,6 +42,30 @@ export function HeroHeader({ title, subtitle, onBack, left, right, compact, seri
   const { rtl } = useSettings();
   const { t } = useTranslation();
   const large = !!title && !compact;
+  if (serif && title) {
+    // Cam taslağı: geri düğmesi, yanında beyaz tırnaklı başlık ve altında konum / sayı.
+    return (
+      <View style={styles.wrap}>
+        <View style={styles.top}>
+          {onBack ? <RoundButton icon={rtl ? 'arrow-forward' : 'arrow-back'} label={t('common.back')} onPress={onBack} /> : null}
+          <View style={styles.flex}>
+            <AppText accessibilityRole="header" numberOfLines={2} style={[styles.serif, { color: c.heroText }]}>{title}</AppText>
+            {subtitle ? <AppText numberOfLines={1} style={[styles.bigSub, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
+          </View>
+          {Array.isArray(right) ? (
+            <View style={styles.row}>
+              {right.map((r) => (
+                <RoundButton key={r.label} {...r} />
+              ))}
+            </View>
+          ) : right ? (
+            <RoundButton {...right} />
+          ) : null}
+        </View>
+        {children}
+      </View>
+    );
+  }
   return (
     <View style={styles.wrap}>
       <View style={styles.top}>
@@ -71,7 +95,7 @@ export function HeroHeader({ title, subtitle, onBack, left, right, compact, seri
       </View>
       {large ? (
         <View style={styles.big}>
-          <AppText accessibilityRole="header" style={[styles.bigTitle, serif && styles.serif, { color: c.heroAccent }]}>{title}</AppText>
+          <AppText accessibilityRole="header" style={[styles.bigTitle, { color: c.heroAccent }]}>{title}</AppText>
           {subtitle ? <AppText style={[styles.bigSub, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
         </View>
       ) : subtitle ? (
@@ -112,7 +136,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 13, lineHeight: 18, marginTop: -spacing.xs },
   big: { gap: 2, marginTop: -spacing.xs },
   bigTitle: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 30, letterSpacing: -0.3 },
-  serif: { fontFamily: fonts.serif, fontSize: 27, lineHeight: 33, letterSpacing: 0 },
+  serif: { fontFamily: fonts.serif, fontSize: 26, lineHeight: 31 },
   bigSub: { fontSize: 13, lineHeight: 18 },
   spacer: { width: 40 },
   badge: { position: 'absolute', top: 7, right: 7, width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },

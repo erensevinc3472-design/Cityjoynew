@@ -748,7 +748,8 @@
       "listAll": "List all ({{count}})",
       "everything": "All · {{count}} places",
       "clear": "Clear selection",
-      "details": "Details"
+      "details": "Details",
+      "places": "{{count}} places"
     }
   },
   "announcements": {

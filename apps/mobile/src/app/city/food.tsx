@@ -73,7 +73,7 @@ export default function CityFoodScreen() {
   const header = <HeroHeader serif title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
-    <Screen header={header}>
+    <Screen warm header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {!provinceCode ? (
           <>

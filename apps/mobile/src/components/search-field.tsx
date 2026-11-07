@@ -11,18 +11,21 @@ export function SearchField({
   placeholder,
   autoFocus,
   onSubmitEditing,
+  compact,
 }: {
   value: string;
   onChangeText(v: string): void;
   placeholder: string;
   autoFocus?: boolean;
   onSubmitEditing?(): void;
+  /** İnce cam görünüm (Benim Şehrim alt sayfaları). */
+  compact?: boolean;
 }) {
   const c = useThemeColors();
   const { rtl } = useSettings();
   return (
-    <View style={[styles.box, { backgroundColor: c.surfaceStrong, borderColor: c.border }]}>
-      <MaterialIcons name="search" size={22} color={c.textMuted} />
+    <View style={[styles.box, compact && styles.compact, { backgroundColor: c.surfaceStrong, borderColor: c.border }]}>
+      <MaterialIcons name="search" size={compact ? 19 : 22} color={c.textMuted} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -35,7 +38,7 @@ export function SearchField({
         autoFocus={autoFocus}
         returnKeyType="search"
         onSubmitEditing={onSubmitEditing}
-        style={[styles.input, { color: c.textStrong, textAlign: rtl ? 'right' : 'left' }]}
+        style={[styles.input, compact && styles.compactInput, { color: c.textStrong, textAlign: rtl ? 'right' : 'left' }]}
       />
     </View>
   );
@@ -51,5 +54,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
   },
+  compact: { minHeight: MIN_TOUCH, paddingHorizontal: 14 },
+  compactInput: { fontSize: 14, paddingVertical: 10 },
   input: { flex: 1, fontFamily: fonts.body, fontSize: 16, paddingVertical: spacing.sm },
 });

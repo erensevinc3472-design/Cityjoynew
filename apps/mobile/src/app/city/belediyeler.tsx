@@ -80,7 +80,7 @@ export default function MunicipalitiesScreen() {
   );
 
   return (
-    <Screen header={header}>
+    <Screen warm header={header}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <SearchField value={query} onChangeText={setQuery} placeholder={t('city.townhallSearch')} />
 

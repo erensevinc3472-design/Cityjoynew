@@ -3,8 +3,8 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/app-text';
-import { LineTile } from '@/components/city-hub';
-import { GlassFill } from '@/components/glass';
+import { frost, LineTile } from '@/components/city-hub';
+import { FrostFill } from '@/components/glass';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
@@ -12,7 +12,7 @@ import { useCityGuideItems, useCityGuideMeta } from '@/lib/city-guide';
 import { INSTITUTION_GROUPS } from '@/lib/city-look';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, radius, spacing } from '@/theme/tokens';
-import { useThemeColors } from '@/theme/use-theme';
+import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
 /**
  * Önemli Kurumlar (taslak S-Kurumlar): iki sütunlu kutular; her kutuda renkli simge, başlık ve kısa açıklama; dokununca o
@@ -22,6 +22,7 @@ export default function InstitutionsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const dark = useResolvedScheme() === 'dark';
   const { location } = useUserLocation();
   const provinceCode = location?.provinceCode;
   const { meta } = useCityGuideMeta(provinceCode);
@@ -41,7 +42,7 @@ export default function InstitutionsScreen() {
   );
 
   return (
-    <Screen header={header}>
+    <Screen warm header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {error ? <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} /> : null}
         <View style={styles.grid}>
@@ -60,8 +61,8 @@ export default function InstitutionsScreen() {
                 accessibilityState={{ disabled: !on }}
                 disabled={!on}
                 onPress={go}
-                style={({ pressed }) => [styles.tile, { backgroundColor: c.surface, borderColor: c.border, opacity: on ? 1 : 0.5, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-                <GlassFill />
+                style={({ pressed }) => [styles.tile, frost(dark, c.surface, c.border), { opacity: on ? 1 : 0.5, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+                <FrostFill />
                 <LineTile icon={g.look.icon} gold />
 
                 <View style={styles.flex}>

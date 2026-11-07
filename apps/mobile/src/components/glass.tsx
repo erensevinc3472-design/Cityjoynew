@@ -27,7 +27,30 @@ export function GlassFill({ strong, horizontal }: { strong?: boolean; horizontal
 }
 
 /** Koyu modda ekranın sağ üstündeki yumuşak ışık (zeminin derinliği). */
-export function ScreenGlow() {
+/** Cam taslağındaki buzlu yüzey: arkadaki ışığı gösteren yarı saydam açık geçiş (yalnızca koyu mod). */
+export function FrostFill() {
+  const scheme = useResolvedScheme();
+  if (scheme !== 'dark') return null;
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <Svg width="100%" height="100%" preserveAspectRatio="none">
+        <Defs>
+          <LinearGradient id="f" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#DCF0EC" stopOpacity={0.12} />
+            <Stop offset="1" stopColor="#DCF0EC" stopOpacity={0.045} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#f)" />
+      </Svg>
+    </View>
+  );
+}
+
+/**
+ * Koyu modda ekranın üstündeki yumuşak ışık. `warm`: Benim Şehrim alt sayfalarında altın tonlu ışık (cam taslağında
+ * şehir fotoğrafının verdiği sıcaklık; il fotoğrafı gelene kadar).
+ */
+export function ScreenGlow({ warm }: { warm?: boolean }) {
   const scheme = useResolvedScheme();
   if (scheme !== 'dark') return null;
   return (
@@ -40,6 +63,18 @@ export function ScreenGlow() {
           </RadialGradient>
         </Defs>
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#r)" />
+        {warm ? (
+          <>
+            <Defs>
+              <RadialGradient id="w" cx="62%" cy="22%" rx="60%" ry="34%" fx="62%" fy="22%">
+                <Stop offset="0" stopColor="#B8954A" stopOpacity={0.42} />
+                <Stop offset="0.55" stopColor="#7C6A35" stopOpacity={0.14} />
+                <Stop offset="1" stopColor="#7C6A35" stopOpacity={0} />
+              </RadialGradient>
+            </Defs>
+            <Rect x="0" y="0" width="100%" height="100%" fill="url(#w)" />
+          </>
+        ) : null}
       </Svg>
     </View>
   );

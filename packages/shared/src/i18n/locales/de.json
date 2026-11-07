@@ -748,7 +748,8 @@
       "listAll": "Alle anzeigen ({{count}})",
       "everything": "Alle · {{count}} Einträge",
       "clear": "Auswahl aufheben",
-      "details": "Details"
+      "details": "Details",
+      "places": "{{count}} Orte"
     }
   },
   "announcements": {

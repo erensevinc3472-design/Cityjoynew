@@ -748,7 +748,8 @@
       "listAll": "عرض الكل ({{count}})",
       "everything": "الكل · {{count}}",
       "clear": "إلغاء التحديد",
-      "details": "التفاصيل"
+      "details": "التفاصيل",
+      "places": "{{count}} مكان"
     }
   },
   "announcements": {

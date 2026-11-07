@@ -4,9 +4,9 @@ import { LayoutAnimation, Pressable, StyleSheet, View, type StyleProp, type View
 import { useTranslation } from 'react-i18next';
 
 import { fonts, radius, spacing } from '@/theme/tokens';
-import { useThemeColors } from '@/theme/use-theme';
+import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
-import { GlassFill } from './glass';
+import { FrostFill } from './glass';
 import { LineIcon } from './line-icon';
 import { Tag } from './inner';
 
@@ -20,21 +20,32 @@ type IconName = ComponentProps<typeof MaterialIcons>['name'];
 /** Cam yüzey: koyu modda petrol yeşili geçişli dolgu, ince açık kenar. */
 export function GlassBox({ children, style, gold, onPress, label }: PropsWithChildren<{ style?: StyleProp<ViewStyle>; gold?: boolean; onPress?(): void; label?: string }>) {
   const c = useThemeColors();
-  const box = [styles.glass, { backgroundColor: c.surface, borderColor: gold ? c.accentBorder : c.border }, style];
+  const dark = useResolvedScheme() === 'dark';
+  const box = [styles.glass, frost(dark, c.surface, gold ? c.accentBorder : c.border), style];
   if (!onPress) {
     return (
       <View style={box}>
-        <GlassFill />
+        <FrostFill />
         {children}
       </View>
     );
   }
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => [box, { opacity: pressed ? 0.8 : 1 }]}>
-      <GlassFill />
+      <FrostFill />
       {children}
     </Pressable>
   );
+}
+
+/**
+ * Cam yüzey renkleri: koyu modda yarı saydam zemin (arkadaki ışık görünür), ince açık kenar ve üstte daha parlak bir çizgi
+ * (ışığın kenara vurması). Açık modda kartın kendi beyaz zemini.
+ */
+export function frost(dark: boolean, surface: string, border: string): ViewStyle {
+  if (!dark) return { backgroundColor: surface, borderColor: border };
+  const gold = border.startsWith('rgba(226');
+  return { backgroundColor: 'rgba(10, 38, 42, 0.42)', borderColor: gold ? border : 'rgba(220, 240, 236, 0.12)', borderTopColor: gold ? border : 'rgba(235, 248, 245, 0.24)' };
 }
 
 /** Bölüm başlığı (tırnaklı yazı); sağda isteğe bağlı bağlantı. */
@@ -95,7 +106,7 @@ export function PillButton({ label, icon, gold, small, onPress }: { label: strin
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.pill, small && styles.pillSmall, gold ? { backgroundColor: c.primary } : { backgroundColor: c.surfaceStrong, borderColor: c.border, borderWidth: 1 }, { opacity: pressed ? 0.85 : 1 }]}>
+      style={({ pressed }) => [styles.pill, small && styles.pillSmall, gold ? { backgroundColor: c.primary } : { backgroundColor: 'rgba(220, 240, 236, 0.10)', borderColor: 'rgba(220, 240, 236, 0.16)', borderWidth: 1 }, { opacity: pressed ? 0.85 : 1 }]}>
       {icon ? <MaterialIcons name={icon} size={16} color={color} /> : null}
       <AppText style={[styles.pillText, { color }]}>{label}</AppText>
     </Pressable>
@@ -120,7 +131,11 @@ export function Spotlight({ tag, title, sub, onCall, onMap, onPress }: { tag?: s
   return (
     <GlassBox gold style={styles.spot}>
       <Pressable accessibilityRole="button" accessibilityLabel={[title, sub].filter(Boolean).join(', ')} onPress={onPress} style={styles.gap8}>
-        {tag ? <Tag label={tag} /> : null}
+        {tag ? (
+          <View style={styles.tagWrap}>
+            <Tag label={tag} />
+          </View>
+        ) : null}
         <AppText style={[styles.spotTitle, { color: c.textStrong }]} numberOfLines={2}>{title}</AppText>
         {sub ? <AppText style={[styles.small, { color: c.textMuted }]} numberOfLines={2}>{sub}</AppText> : null}
       </Pressable>
@@ -232,16 +247,17 @@ export function GroupLabel({ label }: { label: string }) {
 }
 
 const styles = StyleSheet.create({
+  tagWrap: { alignSelf: 'flex-start' },
   glass: { borderWidth: 1, borderRadius: radius.xl, overflow: 'hidden' },
   titleRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: spacing.sm, paddingTop: spacing.sm },
   title: { flex: 1, fontFamily: fonts.serif, fontSize: 18, lineHeight: 24 },
   aside: { fontSize: 12.5 },
   tile: { alignItems: 'center', justifyContent: 'center' },
-  kind: { flex: 1, padding: spacing.md, gap: spacing.md },
+  kind: { flex: 1, padding: 14, gap: 12 },
   gap2: { gap: 2 },
   gap8: { gap: 8, alignItems: 'flex-start' },
-  bigCount: { fontFamily: fonts.serif, fontSize: 24, lineHeight: 28 },
-  kindName: { fontFamily: fonts.bodySemi, fontSize: 13.5, lineHeight: 18 },
+  bigCount: { fontFamily: fonts.serif, fontSize: 26, lineHeight: 30 },
+  kindName: { fontFamily: fonts.bodyMedium, fontSize: 13.5, lineHeight: 18 },
   district: { flex: 1, minHeight: 58, paddingHorizontal: 12, paddingVertical: 9, gap: 1, borderRadius: radius.lg },
   districtName: { fontFamily: fonts.bodyMedium, fontSize: 13.5, lineHeight: 18 },
   small: { fontSize: 12, lineHeight: 16 },

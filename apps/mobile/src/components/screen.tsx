@@ -12,10 +12,12 @@ interface Props {
   header?: ReactNode;
   /** Altta sabit duran içerik (alt gezinme çubuğu); güvenli alanı kendisi bırakır. */
   footer?: ReactNode;
+  /** Üstte altın tonlu ışık (Benim Şehrim alt sayfaları). */
+  warm?: boolean;
 }
 
 /** Güvenli alan, zemin, üst bant ve geniş ekranlarda (tablet, web) ortalanmış içerik. */
-export function Screen({ header, footer, children }: PropsWithChildren<Props>) {
+export function Screen({ header, footer, warm, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
   const scheme = useResolvedScheme();
   const insets = useSafeAreaInsets();
@@ -25,7 +27,7 @@ export function Screen({ header, footer, children }: PropsWithChildren<Props>) {
   return (
     <View style={[styles.root, { backgroundColor: c.background }]}>
       <StatusBar style={statusStyle} />
-      <ScreenGlow />
+      <ScreenGlow warm={warm} />
       {header ? (
         <View style={[styles.band, { backgroundColor: scheme === 'dark' ? 'transparent' : c.hero, paddingTop: insets.top + spacing.sm }]}>
           <View style={styles.inner}>{header}</View>
