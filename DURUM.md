@@ -847,7 +847,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   yalnızca okumaya açar. Eski fotoğrafların küçüğü yok (gerekirse sonra toplu üretilir). Çarşı: yeni ilanda en az bir fotoğraf
   (uygulama + kural); düzenlemede fotoğraflar sıfıra indirilemez (fotoğrafsız eski ilan hariç). Testler: ortak 171, sunucu 41,
   kurallar 159 (Storage dahil) geçti; tür denetimi temiz. Kurallar (Firestore + Storage) ve işlevler Eren tarafından yüklendi
-  (8 Kasım 07:22 ve 07:27; Claude doğruladı; kural yüklemesi yanıltıcı 409 hatası verdi ama yüklenmişti). Telefonda denenmedi.
+  (7 Kasım 10:22 ve 10:27; Claude doğruladı; kural yüklemesi yanıltıcı 409 hatası verdi ama yüklenmişti). Telefonda denenmedi.
 - **İşletme kademeleri (7 Kasım; Karar Eren, PROJE.md 5.6).** Doğrulanmamış işletme: dışarıdan sayfa yok, listede ve aramada
   dokununca yerinde büyüyen kart (`components/business-card.tsx`; yorumlar `reviews-sheet.tsx`), bağlantıyla açılan sayfa
   da kartı gösterir; ekibine "Doğrulama iste" kutusu. Doğrulanmış: sayfa, toplam 9 işletme gönderisi (sunucu işlevi
