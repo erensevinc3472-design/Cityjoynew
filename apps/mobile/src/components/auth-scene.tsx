@@ -46,8 +46,10 @@ export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, glass, log
                 City<AppText style={[styles.logo, { color: GOLD }]}>Joy</AppText>
               </AppText>
             ) : null}
+            {/* İçerik ekranın ortasında (Karar Eren, 8 Kasım 2026): üstte ve altta eşit boşluk. */}
             <View style={styles.spacer} />
             {children}
+            <View style={styles.spacer} />
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
