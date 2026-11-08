@@ -1,6 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
+import { Image } from 'expo-image';
 import { useEffect, useState, type ComponentProps } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -10,12 +11,13 @@ import { UrgentStrip } from '@/components/announcement-card';
 import { AppText } from '@/components/app-text';
 import { BottomNav } from '@/components/bottom-nav';
 import { HeroHeader, LocationChip } from '@/components/hero-header';
-import { SceneArt, sceneRim, type SceneKind } from '@/components/scene-art';
+import { sceneRim, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
 import { SideMenu } from '@/components/side-menu';
 import { VideoModal } from '@/components/video-modal';
 import { VerifyEmailBanner } from '@/components/verify-email-banner';
 import { useAnnouncements } from '@/lib/announcements';
+import { HOME_ART } from '@/lib/app-art';
 import { useIntroVideoUrl } from '@/lib/intro-video';
 import { locationRepository as repo } from '@/lib/locations';
 import { useNotificationFeed, useReadState } from '@/lib/notifications';
@@ -27,7 +29,7 @@ import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
-const MODULES: { key: string; icon: IconName; scene: SceneKind; href?: Href }[] = [
+const MODULES: { key: keyof typeof HOME_ART; icon: IconName; scene: SceneKind; href?: Href }[] = [
   { key: 'myCity', icon: 'location-city', scene: 'city', href: '/city' },
   { key: 'travel', icon: 'explore', scene: 'travel', href: '/travel' as Href },
   { key: 'social', icon: 'groups', scene: 'social', href: '/social' },
@@ -116,7 +118,8 @@ export default function HomeScreen() {
               accessibilityLabel={m.href ? `${t(`modules.${m.key}`)}. ${t(`modules.${m.key}Hint`)}` : `${t(`modules.${m.key}`)}. ${t('home.comingSoon')}`}
               onPress={m.href ? () => router.push(m.href!) : undefined}
               style={({ pressed }) => [styles.module, { borderColor: sceneRim(m.scene), opacity: pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-              <SceneArt kind={m.scene} />
+              {/* Eren'in resimleri (8 Kasım 2026): konu sağ yarıda, sol yarı sade. */}
+              <Image source={HOME_ART[m.key]} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
               <View style={styles.moduleIcon}>
                 <MaterialIcons name={m.icon} size={19} color="#FFFFFF" />
               </View>

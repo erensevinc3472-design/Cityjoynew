@@ -1,11 +1,14 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import type { ComponentProps, PropsWithChildren, ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { SurfaceContext } from '@/theme/use-theme';
+import { AUTH_ART } from '@/lib/app-art';
 import { AppText } from './app-text';
 import { SceneArt, sceneSky, type SceneKind } from './scene-art';
 
@@ -15,17 +18,23 @@ const GOLD = '#E2B277';
  * Giriş akışının ortak zemini (13. madde 35, giriş akışı): arkada tam ekran sahne çizimi ve karartma, üstte CityJoy
  * yazısı, altta içerik. Renk şeması her zaman koyudur; resimler Panel > Uygulama görselleri'nden değişecek (Blaze ile).
  */
-export function AuthScene({ kind = 'cover', glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
+export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; image?: number | null; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   return (
     <SurfaceContext.Provider value={{ scheme: 'dark', glass }}>
       <View style={[styles.root, { backgroundColor: sceneSky(kind) }]}>
         <StatusBar style="light" />
-        <View pointerEvents="none" style={[styles.scene, { height: Math.round(width * 1.35) }]}>
-          <SceneArt kind={kind} />
-        </View>
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dim]} />
+        {image ? (
+          // Dikey resim (Eren, 8 Kasım 2026): üstü boş gökyüzü, konu altta; ekranı tam kaplar.
+          <Image source={image} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
+        ) : (
+          <View pointerEvents="none" style={[styles.scene, { height: Math.round(width * 1.35) }]}>
+            <SceneArt kind={kind} />
+          </View>
+        )}
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, image ? styles.dimPhoto : styles.dim]} />
+        {image ? <BottomShade /> : null}
         <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView
             contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + spacing.lg }]}
@@ -43,6 +52,24 @@ export function AuthScene({ kind = 'cover', glass, logo = true, top, children }:
         </KeyboardAvoidingView>
       </View>
     </SurfaceContext.Provider>
+  );
+}
+
+/** Resmin alt yarısını koyulaştırır: yazılar resmin dolu kısmının üstüne gelince okunsun. */
+function BottomShade() {
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <Svg width="100%" height="100%" preserveAspectRatio="none">
+        <Defs>
+          <LinearGradient id="authBottomShade" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0.3" stopColor="#081A1E" stopOpacity={0} />
+            <Stop offset="0.62" stopColor="#081A1E" stopOpacity={0.6} />
+            <Stop offset="1" stopColor="#081A1E" stopOpacity={0.88} />
+          </LinearGradient>
+        </Defs>
+        <Rect width="100%" height="100%" fill="url(#authBottomShade)" />
+      </Svg>
+    </View>
   );
 }
 
@@ -136,6 +163,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   scene: { position: 'absolute', start: 0, end: 0, bottom: 0, overflow: 'hidden' },
   dim: { backgroundColor: 'rgba(8, 26, 30, 0.5)' },
+  dimPhoto: { backgroundColor: 'rgba(8, 26, 30, 0.3)' },
   content: { flexGrow: 1, width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: GUTTER, gap: spacing.md },
   spacer: { flexGrow: 1, minHeight: spacing.lg },
   logo: { fontFamily: fonts.heading, fontSize: 30, lineHeight: 38, color: white, textAlign: 'center', letterSpacing: -0.4 },

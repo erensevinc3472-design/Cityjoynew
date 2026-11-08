@@ -7,14 +7,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/app-text';
-import { SceneArt, sceneSky, useReduceMotion, type SceneKind } from '@/components/scene-art';
+import { Image } from 'expo-image';
+import { useReduceMotion } from '@/components/scene-art';
+import { AUTH_ART } from '@/lib/app-art';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
-/** Sırayla değişen beş görsel (13. madde 27). Fotoğraflar panelden yüklenebilir olunca (Storage) çizimlerin yerini alacak. */
-const SLIDES: SceneKind[] = ['cover', 'travel', 'events', 'activities', 'social'];
+/** Sırayla değişen görseller (13. madde 27): Eren'in üç dikey resmi (8 Kasım 2026). Panelden değiştirme Blaze ile. */
+const SLIDES = [AUTH_ART.welcome, AUTH_ART.language, AUTH_ART.permission];
 const SLIDE_MS = 4500;
 const HANDLE = 52;
 
@@ -76,11 +78,8 @@ export default function WelcomeScreen() {
     <View style={[styles.root, { backgroundColor: c.background }]}>
       <StatusBar style="light" />
       {SLIDES.map((k, i) => (
-        <Animated.View key={k} pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: fades[i], backgroundColor: sceneSky(k) }]}>
-          {/* Uzun ekranda çizim aşırı büyümesin: alt kısma, ekran genişliğine göre yerleşir. */}
-          <View style={[styles.scene, { height: Math.round(width * 1.25) }]}>
-            <SceneArt kind={k} />
-          </View>
+        <Animated.View key={i} pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: fades[i], backgroundColor: '#0A2226' }]}>
+          <Image source={k} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
         </Animated.View>
       ))}
       <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dim]} />
@@ -98,7 +97,7 @@ export default function WelcomeScreen() {
         <View style={styles.bottom}>
           <View style={styles.bars} accessible accessibilityLabel={`${slide + 1} / ${SLIDES.length}`}>
             {SLIDES.map((k, i) => (
-              <View key={k} style={[styles.bar, { backgroundColor: i === slide ? c.heroAccent : 'rgba(255, 255, 255, 0.25)', flex: i === slide ? 2 : 1 }]} />
+              <View key={i} style={[styles.bar, { backgroundColor: i === slide ? c.heroAccent : 'rgba(255, 255, 255, 0.25)', flex: i === slide ? 2 : 1 }]} />
             ))}
           </View>
           <Pressable

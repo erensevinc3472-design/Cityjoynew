@@ -8,6 +8,7 @@ import { LANGUAGES, type LanguageCode } from '@cityjoy/shared';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { AuthScene } from '@/components/auth-scene';
+import { AUTH_ART } from '@/lib/app-art';
 import { SceneArt, type SceneKind } from '@/components/scene-art';
 import { profileRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
@@ -62,7 +63,7 @@ export default function LanguageScreen() {
   };
 
   return (
-    <AuthScene logo={false} kind="cover">
+    <AuthScene logo={false} kind="cover" image={AUTH_ART.language}>
       <View style={styles.head}>
         {router.canGoBack() ? (
           <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={() => router.back()} hitSlop={8} style={styles.back}>
