@@ -29,8 +29,12 @@ type IconName = ComponentProps<typeof MaterialIcons>['name'];
 const GOLD = '#E2B277';
 const TEAL = '#4FC2A8';
 // Eren'in taslağındaki görseller (8 Kasım 2026): her ilde aynı olan süsler. İlin kendi fotoğrafı panelden gelir.
-const TOWNHALL_ART = require('../../../assets/city/townhall.jpg') as number;
-const SKYLINE_ART = require('../../../assets/city/skyline.jpg') as number;
+// Eren'in ChatGPT ile hazırladığı resimler (8 Kasım 2026), her ilde aynı. Kaynakları masaüstündeki CityJoy-gorseller klasöründe.
+const TOWNHALL_ART = require('../../../assets/city/belediye.jpg') as number;
+const KURUMLAR_ART = require('../../../assets/city/kurumlar.jpg') as number;
+const MAHALLE_ART = require('../../../assets/city/mahalle.jpg') as number;
+const VITRIN_ART = require('../../../assets/city/vitrin.jpg') as number;
+const SKYLINE_ART = require('../../../assets/city/siluet.jpg') as number;
 
 interface Tile {
   key: string;
@@ -188,7 +192,7 @@ export default function MyCityScreen() {
 
         <View style={styles.pair}>
           <PhotoCard
-            flex={1.45}
+            flex={1.2}
             scene="townhall"
             image={TOWNHALL_ART}
             gold
@@ -196,20 +200,13 @@ export default function MyCityScreen() {
             title={townhall.label}
             onPress={() => router.push('/city/belediyeler')}
           />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={kurumlar.label}
+          <PhotoCard
+            scene="townhall"
+            image={KURUMLAR_ART}
+            icon={KURUMLAR.icon}
+            title={kurumlar.label}
             onPress={() => open(KURUMLAR)}
-            style={({ pressed }) => [styles.tall, glass, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-            <FrostFill />
-            <View>
-              <LineIcon name={KURUMLAR.icon} size={30} color={c.textStrong} />
-            </View>
-            <View style={styles.tallFoot}>
-              <AppText numberOfLines={2} style={[styles.tallTitle, { color: c.textStrong }]}>{kurumlar.label}</AppText>
-              <Chevron />
-            </View>
-          </Pressable>
+          />
         </View>
 
         {pairs.map((p) => (
@@ -221,6 +218,7 @@ export default function MyCityScreen() {
         <View style={[styles.pair, styles.bottom]}>
           <PhotoCard
             scene="neighbourhood"
+            image={MAHALLE_ART}
             icon="holiday-village"
             title={t('neighbourhood.title')}
             sub={neighbourhood ?? t('neighbourhood.hint')}
@@ -228,6 +226,7 @@ export default function MyCityScreen() {
           />
           <PhotoCard
             scene="showcase"
+            image={VITRIN_ART}
             gold
             icon="auto-awesome"
             title={province ? t('city.hub.showcaseOf', { city: province }) : t('city.showcase')}
@@ -346,7 +345,7 @@ const styles = StyleSheet.create({
   photoCard: { backgroundColor: '#0B2327' },
   cardArt: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
   coverPhoto: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
-  skyline: { marginHorizontal: -GUTTER, marginBottom: -spacing.xl, marginTop: spacing.sm, aspectRatio: 1179 / 210 },
+  skyline: { marginHorizontal: -GUTTER, marginBottom: -spacing.xl, marginTop: spacing.sm, aspectRatio: 1200 / 262 },
   photoTitle: { fontFamily: fonts.serifSemi, fontSize: 17, lineHeight: 21, color: white },
   photoSub: { fontSize: 12, lineHeight: 16, color: '#E3ECEA', marginTop: 2 },
   flex: { flex: 1 },
