@@ -63,7 +63,7 @@ export default function LanguageScreen() {
   };
 
   return (
-    <AuthScene kind="cover" image={AUTH_ART.language}>
+    <AuthScene kind="cover" image={AUTH_ART.languageBg} shade={false}>
       <View style={styles.head}>
         {router.canGoBack() ? (
           <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={() => router.back()} hitSlop={8} style={styles.back}>

@@ -13,6 +13,8 @@ export const HOME_ART = {
 export const AUTH_ART = {
   welcome: require('../../assets/auth/karsilama.jpg') as number,
   language: require('../../assets/auth/dil.jpg') as number,
+  /** Dil seçiminin arka planı: üstte balonlar, ortası boş, altta şehir (Eren, 8 Kasım 2026). */
+  languageBg: require('../../assets/auth/dil-arka.jpg') as number,
   permission: require('../../assets/auth/izin.jpg') as number,
 };
 

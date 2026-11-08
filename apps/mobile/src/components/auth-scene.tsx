@@ -18,7 +18,7 @@ const GOLD = '#E2B277';
  * Giriş akışının ortak zemini (13. madde 35, giriş akışı): arkada tam ekran sahne çizimi ve karartma, üstte CityJoy
  * yazısı, altta içerik. Renk şeması her zaman koyudur; resimler Panel > Uygulama görselleri'nden değişecek (Blaze ile).
  */
-export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; image?: number | null; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
+export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, shade = true, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; image?: number | null; shade?: boolean; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   return (
@@ -34,7 +34,7 @@ export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, glass, log
           </View>
         )}
         <View pointerEvents="none" style={[StyleSheet.absoluteFill, image ? styles.dimPhoto : styles.dim]} />
-        {image ? <BottomShade /> : null}
+        {image && shade ? <BottomShade /> : null}
         <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView
             contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + spacing.lg }]}
