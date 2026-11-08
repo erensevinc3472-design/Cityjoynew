@@ -15,3 +15,12 @@ export const AUTH_ART = {
   language: require('../../assets/auth/dil.jpg') as number,
   permission: require('../../assets/auth/izin.jpg') as number,
 };
+
+/** Dil seçimi satırlarının resimleri (Eren, 8 Kasım 2026): konu sağda, sol taraf koyu petrol yeşiline eriyor. */
+export const LANGUAGE_ART = {
+  tr: require('../../assets/lang/tr.jpg') as number,
+  en: require('../../assets/lang/en.jpg') as number,
+  de: require('../../assets/lang/de.jpg') as number,
+  ru: require('../../assets/lang/ru.jpg') as number,
+  ar: require('../../assets/lang/ar.jpg') as number,
+};
