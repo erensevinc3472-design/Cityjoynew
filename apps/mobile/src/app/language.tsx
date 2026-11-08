@@ -111,17 +111,18 @@ export default function LanguageScreen() {
 }
 
 const styles = StyleSheet.create({
-  head: { gap: spacing.xs, alignItems: 'center' },
+  // Arka plan resminin ortası boş (üstte dağ ve balonlar, altta İstanbul silüeti): içerik o boşluğa sığsın diye sıkı.
+  head: { gap: 2, alignItems: 'center', paddingTop: 56 },
   back: { position: 'absolute', start: -spacing.sm, top: -2, width: 44, height: 44, justifyContent: 'center', zIndex: 1 },
-  title: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 33, color: '#FFFFFF', textAlign: 'center' },
-  subtitle: { fontSize: 14, lineHeight: 20, color: '#C4D0D3', textAlign: 'center' },
-  list: { gap: 12 },
-  row: { height: 76, borderRadius: radius.lg, overflow: 'hidden', borderWidth: 1.5, backgroundColor: ROW_BG, flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, gap: spacing.md },
+  title: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 30, color: '#FFFFFF', textAlign: 'center' },
+  subtitle: { fontSize: 13, lineHeight: 18, color: '#C4D0D3', textAlign: 'center' },
+  list: { gap: 8 },
+  row: { height: 62, borderRadius: radius.lg, overflow: 'hidden', borderWidth: 1.5, backgroundColor: ROW_BG, flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, gap: spacing.md },
   art: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '62%' },
-  flag: { width: 42, height: 42, borderRadius: 21, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.18)' },
-  flagText: { fontSize: 28, lineHeight: 34 },
+  flag: { width: 38, height: 38, borderRadius: 19, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.18)' },
+  flagText: { fontSize: 25, lineHeight: 30 },
   grow: { flex: 1, gap: 2 },
-  suggested: { fontFamily: fonts.bodySemi, fontSize: 11.5, color: GOLD, letterSpacing: 0.4 },
-  name: { fontFamily: fonts.heading, fontSize: 20, lineHeight: 26, color: '#FFFFFF' },
-  arrow: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: GOLD, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(8, 26, 30, 0.55)' },
+  suggested: { fontFamily: fonts.bodySemi, fontSize: 10.5, color: GOLD, letterSpacing: 0.4 },
+  name: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23, color: '#FFFFFF' },
+  arrow: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: GOLD, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(8, 26, 30, 0.55)' },
 });
