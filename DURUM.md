@@ -862,6 +862,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   fotoğrafı henüz yüklü değil (çizim görünüyor). Eren'in görselindeki "Sosyal Destek" / "Faydalı Bilgiler" adları
   uygulanmadı. **Karar (Eren, 7 Kasım): adlar kalır** (Gönüllülük = yardım etmek isteyen; Sosyal Destek = yardım almak
   isteyen, ayrı konu). Ayrı "Sosyal Destek" bölümü de istenmedi (Eren, 7 Kasım).
+  8 Kasım: Eren "görseldeki hava yok, o resimleri koy" dedi. Görselinden kesilen iki süs uygulamaya kondu
+  (`apps/mobile/assets/city/townhall.jpg` Belediye kartında altın örtüyle, `skyline.jpg` sayfanın en altında silüet; her
+  ilde aynı). İl kapağı fotoğrafı kartı tamamen kaplar, soldan koyulaşır. Görseldeki Bursa resmi
+  `Desktop/CityJoy-gorseller/bursa-kapak.jpg` (430x425, düşük çözünürlük) Eren panelden Seyahat > Bursa kapağına yükleyecek.
 - **Küçük fotoğraf ve Çarşı fotoğraf zorunluluğu (7 Kasım).** Sunucu işlevi `photoThumbnail` (`functions/src/thumbs.ts`, sharp)
   her yüklenen JPEG'in 640 piksellik küçüğünü `thumbs/{asıl yol}` yoluna, asıl dosyanın erişim anahtarıyla yazar; uygulama
   adresi asıl adresten hesaplar (`thumbUrl`, kayıt değişmez). Listeler, kartlar, avatarlar, logolar ve kapaklar

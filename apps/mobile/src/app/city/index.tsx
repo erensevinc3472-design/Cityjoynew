@@ -1,6 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
 import { useEffect, useId, useState, type ComponentProps, type ReactNode } from 'react';
+import { Image } from 'expo-image';
 import { I18nManager, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
@@ -20,13 +21,16 @@ import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useTravelCity } from '@/lib/travel';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, radius, spacing } from '@/theme/tokens';
+import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
 const GOLD = '#E2B277';
 const TEAL = '#4FC2A8';
+// Eren'in taslağındaki görseller (8 Kasım 2026): her ilde aynı olan süsler. İlin kendi fotoğrafı panelden gelir.
+const TOWNHALL_ART = require('../../../assets/city/townhall.jpg') as number;
+const SKYLINE_ART = require('../../../assets/city/skyline.jpg') as number;
 
 interface Tile {
   key: string;
@@ -151,8 +155,14 @@ export default function MyCityScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* İl kapağı: Seyahat panelinde ile yüklenen fotoğraf; yoksa çizim. */}
         <View style={styles.cover}>
-          <CoverArt photo={travelCity?.cover} kind="cover" />
-          <Shade from="#061417" opacity={0.92} />
+          {travelCity?.cover ? (
+            <View style={styles.coverPhoto}>
+              <CoverArt photo={travelCity.cover} kind="cover" />
+            </View>
+          ) : (
+            <CoverArt kind="cover" />
+          )}
+          <Shade from="#0A2226" opacity={0.97} mid={0.72} to={0} />
           <View style={styles.coverText}>
             <AppText style={styles.kicker}>{t('modules.myCity').toLocaleUpperCase(lang)}</AppText>
             <AppText accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit style={styles.cityName}>{province}</AppText>
@@ -180,6 +190,7 @@ export default function MyCityScreen() {
           <PhotoCard
             flex={1.45}
             scene="townhall"
+            image={TOWNHALL_ART}
             gold
             icon="account-balance"
             title={townhall.label}
@@ -191,7 +202,9 @@ export default function MyCityScreen() {
             onPress={() => open(KURUMLAR)}
             style={({ pressed }) => [styles.tall, glass, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
             <FrostFill />
-            <LineIcon name={KURUMLAR.icon} size={30} color={c.textStrong} />
+            <View>
+              <LineIcon name={KURUMLAR.icon} size={30} color={c.textStrong} />
+            </View>
             <View style={styles.tallFoot}>
               <AppText numberOfLines={2} style={[styles.tallTitle, { color: c.textStrong }]}>{kurumlar.label}</AppText>
               <Chevron />
@@ -222,13 +235,19 @@ export default function MyCityScreen() {
             onPress={() => router.push('/city/showcase')}
           />
         </View>
+
+        {/* Taslaktaki şehir silüeti: sayfanın en altında, kenardan kenara. */}
+        <View pointerEvents="none" style={styles.skyline}>
+          <Image source={SKYLINE_ART} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
+          <Fade color={c.background} />
+        </View>
       </ScrollView>
     </Screen>
   );
 }
 
 /** Kartın soldan sağa koyulaşan örtüsü (fotoğraf üstündeki yazı okunsun). */
-function Shade({ from, opacity, to = 0.15 }: { from: string; opacity: number; to?: number }) {
+function Shade({ from, opacity, mid = 0.55, to = 0.15 }: { from: string; opacity: number; mid?: number; to?: number }) {
   const rtl = I18nManager.isRTL;
   const id = 'shade' + useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
@@ -237,8 +256,26 @@ function Shade({ from, opacity, to = 0.15 }: { from: string; opacity: number; to
         <Defs>
           <LinearGradient id={id} x1={rtl ? '1' : '0'} y1="0" x2={rtl ? '0' : '1'} y2="0.3">
             <Stop offset="0" stopColor={from} stopOpacity={opacity} />
-            <Stop offset="0.55" stopColor={from} stopOpacity={opacity * 0.55} />
+            <Stop offset="0.4" stopColor={from} stopOpacity={opacity * mid} />
             <Stop offset="1" stopColor={from} stopOpacity={to} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
+      </Svg>
+    </View>
+  );
+}
+
+/** Silüetin üst kenarını sayfa zeminine eritir. */
+function Fade({ color }: { color: string }) {
+  const id = 'fade' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <Svg width="100%" height="100%" preserveAspectRatio="none">
+        <Defs>
+          <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={color} stopOpacity={1} />
+            <Stop offset="0.45" stopColor={color} stopOpacity={0} />
           </LinearGradient>
         </Defs>
         <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
@@ -258,15 +295,21 @@ function Chevron({ gold }: { gold?: boolean }) {
 }
 
 /** Fotoğraflı (şimdilik çizimli) büyük kart: Belediye, Mahalle Meydanı, Vitrin. `gold`: altın tonlu örtü. */
-function PhotoCard({ scene, gold, icon, title, sub, flex = 1, onPress }: { scene: SceneKind; gold?: boolean; icon: IconName; title: string; sub?: string; flex?: number; onPress(): void }): ReactNode {
+function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, onPress }: { scene: SceneKind; image?: number; gold?: boolean; icon: IconName; title: string; sub?: string; flex?: number; onPress(): void }): ReactNode {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={sub ? `${title}. ${sub}` : title}
       onPress={onPress}
       style={({ pressed }) => [styles.tall, styles.photoCard, { flex, borderColor: gold ? 'rgba(226, 178, 119, 0.55)' : 'rgba(220, 240, 236, 0.18)', transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-      <SceneArt kind={scene} still />
-      <Shade from={gold ? '#9C7434' : '#061417'} opacity={gold ? 0.95 : 0.88} to={gold ? 0.35 : 0.2} />
+      {image ? (
+        <View style={styles.cardArt}>
+          <Image source={image} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
+        </View>
+      ) : (
+        <SceneArt kind={scene} still />
+      )}
+      <Shade from={gold ? '#A87B3E' : '#061417'} opacity={image ? 1 : gold ? 0.95 : 0.88} mid={image ? 0.6 : 0.55} to={image ? 0 : gold ? 0.35 : 0.2} />
       <View>
         <LineIcon name={icon} size={30} color="#FFFFFF" />
       </View>
@@ -284,7 +327,7 @@ function PhotoCard({ scene, gold, icon, title, sub, flex = 1, onPress }: { scene
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
   content: { gap: spacing.sm + 2, paddingBottom: spacing.xl },
-  cover: { height: 184, borderRadius: radius.xl, borderWidth: 1, borderColor: 'rgba(220, 240, 236, 0.16)', overflow: 'hidden', justifyContent: 'center' },
+  cover: { height: 184, borderRadius: radius.xl, borderWidth: 1, borderColor: 'rgba(220, 240, 236, 0.16)', overflow: 'hidden', justifyContent: 'center', backgroundColor: '#0A2226' },
   coverRim: { position: 'absolute', start: 0, end: 0, bottom: 0, height: 2, backgroundColor: GOLD, opacity: 0.7 },
   coverText: { paddingHorizontal: spacing.md + 2, gap: 2, maxWidth: '68%' },
   kicker: { alignSelf: 'flex-start', fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 1.4, color: GOLD, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(226, 178, 119, 0.6)' },
@@ -301,6 +344,9 @@ const styles = StyleSheet.create({
   tallFoot: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
   tallTitle: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
   photoCard: { backgroundColor: '#0B2327' },
+  cardArt: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
+  coverPhoto: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
+  skyline: { marginHorizontal: -GUTTER, marginBottom: -spacing.xl, marginTop: spacing.sm, aspectRatio: 1179 / 210 },
   photoTitle: { fontFamily: fonts.serifSemi, fontSize: 17, lineHeight: 21, color: white },
   photoSub: { fontSize: 12, lineHeight: 16, color: '#E3ECEA', marginTop: 2 },
   flex: { flex: 1 },
