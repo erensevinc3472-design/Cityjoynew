@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import writeExcelFile from 'write-excel-file/node';
-import { citySection, parseCitySheet, type CityGuideSectionId } from '@cityjoy/shared';
+import { CITY_GUIDE_SECTIONS, citySection, parseCitySheet, type CityGuideSectionId } from '@cityjoy/shared';
 
 import districts from '../packages/shared/data/locations/districts.json';
 import provinces from '../packages/shared/data/locations/provinces.json';
@@ -262,6 +262,12 @@ for (const s of SECTIONS) {
   console.log(`${section.sheet.padEnd(18)} ${String(rows.get(s)!.length).padStart(4)} satır · hazır ${String(items.length).padStart(4)} · düzeltilecek ${String(errors.length).padStart(4)}${top ? ` · ${top}` : ''}`);
   sheets.push({ data, sheet: section.sheet });
 }
+// OSM'de olmayan bölümler de boş sekme olarak eklenir; eli ya da yapay zekâyla doldurulsun diye (il ve ilçe yazımı İlçeler sekmesinde).
+for (const section of CITY_GUIDE_SECTIONS) {
+  if (!sheets.some((s) => s.sheet === section.sheet)) sheets.push({ data: [section.columns.map((c) => c.key)], sheet: section.sheet });
+}
+const districtSheet = { sheet: 'İlçeler', data: [['il', 'ilce'], ...districts.filter((d) => d.provinceCode === provinceCode).map((d) => [province.name, d.name])] };
+sheets.sort((a, b) => CITY_GUIDE_SECTIONS.findIndex((s) => s.sheet === a.sheet) - CITY_GUIDE_SECTIONS.findIndex((s) => s.sheet === b.sheet));
 if (skipped.size) console.log(`\nAlınmayanlar: ${[...skipped].map(([k, n]) => `${k} ${n}`).join(', ')}`);
 
 const notes = [
@@ -271,5 +277,5 @@ const notes = [
   ['Yüklemeden önce panelde önizlemeye bakın; hatalı satırlar ve nedenleri orada listelenir.'],
 ];
 const out = path.join(outDir, `osm-${provinceCode}-${province.name}.xlsx`);
-await writeExcelFile([{ data: notes, sheet: 'Okuyun' }, ...sheets.map((s) => ({ ...s, stickyRowsCount: 1 }))]).toFile(out);
+await writeExcelFile([{ data: notes, sheet: 'Okuyun' }, ...sheets.map((s) => ({ ...s, stickyRowsCount: 1 })), districtSheet]).toFile(out);
 console.log(`\nDosya: ${out}`);
