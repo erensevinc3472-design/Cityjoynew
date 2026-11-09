@@ -1087,7 +1087,7 @@
      "key": "telefon",
      "required": false,
      "type": "phone",
-     "hint": "Yalnızca muhtarlığın resmî numarası. Kişisel cep numarası yazılmaz."
+     "hint": "Muhtarlığın resmî numarası ya da belediyenin resmî muhtar rehberinde yayımlanan iletişim numarası (Karar Eren, 9 Kasım 2026). Başka yerden bulunan kişisel numara yazılmaz."
     },
     {
      "key": "adres",
