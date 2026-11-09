@@ -5,24 +5,24 @@ Muhtarlıklar tamam (1060 mahalle, 91 adres). 2. aramadan hastaneler geldi (46);
 
 İşaretle: [ ] yapılmadı, [x] gönderildi.
 
-- [ ] 1. Önemli Kurumlar: Valilik, 17 kaymakamlık, il müdürlükleri
+- [x] 1. Önemli Kurumlar: Valilik, 17 kaymakamlık, il müdürlükleri
 - [x] 2. Önemli Kurumlar: Devlet hastaneleri, şehir hastanesi, büyük özel hastaneler, aile sağlığı merkezleri (ilçe ilçe)
-- [ ] 3. Önemli Kurumlar: Emniyet, jandarma, itfaiye, nüfus müdürlükleri, göç idaresi, adliye
-- [ ] 4. Önemli Kurumlar: Vergi daireleri, SGK merkezleri, noterler, PTT şubeleri
-- [ ] 5. Önemli Kurumlar: Halk kütüphaneleri, halk eğitim merkezleri
-- [ ] 6. Önemli Kurumlar: Taksi durakları (tarife sütunu dahil)
+- [ ] 3. Önemli Kurumlar: Emniyet, jandarma, itfaiye, nüfus müdürlükleri, göç idaresi, adliye (Claude kısmen/bulamadı, DURUM.md 9 Kasım)
+- [ ] 4. Önemli Kurumlar: Vergi daireleri, SGK merkezleri, noterler, PTT şubeleri (Claude kısmen/bulamadı, DURUM.md 9 Kasım)
+- [x] 5. Önemli Kurumlar: Halk kütüphaneleri, halk eğitim merkezleri
+- [ ] 6. Önemli Kurumlar: Taksi durakları (tarife sütunu dahil) (Claude kısmen/bulamadı, DURUM.md 9 Kasım)
 - [x] 7. Müzeler: Bursa'daki tüm müzeler (muze.gov.tr, belediye müzeleri, özel müzeler)
 - [x] 8. Otoparklar: Büyükşehir ve ilçe belediyesi otoparkları (BURULAŞ, belediye siteleri)
 - [x] 9. Otoparklar: AVM otoparkları
 - [x] 10. Parklar: Büyük parklar, millet bahçeleri, kent ormanları, mesire alanları, botanik bahçesi
 - [x] 11. Pazarlar: Semt pazarları ilçe ilçe (hangi gün, hangi mahalle)
-- [ ] 12. Pazarlar: Kapalı pazar yerleri, köylü/organik pazarlar, balık hali
+- [x] 12. Pazarlar: Kapalı pazar yerleri, köylü/organik pazarlar, balık hali
 - [x] 13. Ulaşım: BursaRay, tramvay, teleferik, BUDO, havalimanı servisleri, BursaKart, ana otobüs hatları
 - [x] 14. Toplanma Alanları: AFAD toplanma alanları, ilçe ilçe
-- [ ] 15. Belediye Hizmetleri: Bursa Büyükşehir Belediyesi hizmetleri
-- [ ] 16. Belediye Hizmetleri: Osmangazi, Nilüfer, Yıldırım belediyeleri hizmetleri
-- [ ] 17. Belediye Hizmetleri: Diğer 14 ilçe belediyesinin başlıca hizmetleri
-- [ ] 18. Nasıl Yapılır: Bursa'ya özel pratik rehberler (BursaKart, su aboneliği, emlak vergisi, otopark aboneliği, ikametgâh...)
+- [x] 15. Belediye Hizmetleri: Bursa Büyükşehir Belediyesi hizmetleri
+- [x] 16. Belediye Hizmetleri: Osmangazi, Nilüfer, Yıldırım belediyeleri hizmetleri
+- [ ] 17. Belediye Hizmetleri: Diğer 14 ilçe belediyesinin başlıca hizmetleri (Claude kısmen/bulamadı, DURUM.md 9 Kasım)
+- [x] 18. Nasıl Yapılır: Bursa'ya özel pratik rehberler (BursaKart, su aboneliği, emlak vergisi, otopark aboneliği, ikametgâh...)
 
 ### 1. Önemli Kurumlar: Valilik, 17 kaymakamlık, il müdürlükleri
 
