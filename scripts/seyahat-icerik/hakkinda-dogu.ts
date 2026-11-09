@@ -1,0 +1,161 @@
+// Doğu ve Güneydoğu Anadolu: gezilecek yerlerin "Hakkında" metinleri (CityJoy'un kendi metni). Anahtar: il -> yer adı.
+export const HAKKINDA_DOGU: Record<string, Record<string, string>> = {
+  Ağrı: {
+    'İshak Paşa Sarayı': "Doğubayazıt'ta, Ağrı Dağı'na bakan bir yamaçta 18. yüzyılda tamamlanan saray; cami, harem, mutfaklar ve divan salonuyla farklı mimari geleneklerin buluştuğu eşsiz bir yapıdır.",
+    'Ağrı Dağı Millî Parkı': "Türkiye'nin en yüksek dağı Ağrı Dağı'nı çevreleyen milli park; zirve tırmanışları izinle ve rehberle yapılır, eteklerdeki manzara bile etkileyicidir.",
+    'Balık Gölü': "Yüksek rakımdaki dağ gölü; kışın donan yüzeyi ve yazın serin havasıyla doğaseverlerin ilgisini çeker.",
+  },
+  Ardahan: {
+    'Ardahan Kalesi': "Kura Nehri kıyısındaki kale; 16. yüzyılda Osmanlı döneminde yeniden yapılmış surları ve burçlarıyla şehrin simgesidir.",
+    'Çıldır Gölü': "Kışın tamamen donan büyük göl; buz üstünde atlı kızak gezileri ve buzda balık avıyla tanınır.",
+    'Posof Ilgar Dağı': "Posof'un yeşil yaylaları ve ormanlarıyla çevrili dağ; serin havası ve geniş manzarasıyla bilinir.",
+  },
+  Bingöl: {
+    'Yüzen Adalar Tabiat Anıtı': "Solhan'daki gölde, üstünde bitkiler yetişen ve rüzgârla yer değiştiren turba adacıkları; dünyada benzeri az görülen bir doğa olayıdır.",
+    'Hesarek Kayak Merkezi': "Bingöl'e yakın kayak merkezi; kış aylarında kayak ve kar etkinlikleri için tercih edilir.",
+    'Karlıova Gün Doğumu': "Karlıova'nın yüksek yaylalarında izlenen gün doğumu; geniş ufku ve sakin doğasıyla fotoğrafçıların ilgisini çeker.",
+  },
+  Bitlis: {
+    'Ahlat Selçuklu Meydan Mezarlığı': "Van Gölü kıyısındaki Ahlat'ta, işlemeli Selçuklu mezar taşlarıyla dünyanın en büyük Türk-İslam mezarlıklarından biri; kümbetleriyle birlikte gezilir.",
+    'Ahlat Müzesi': "Ahlat'ın Selçuklu ve Urartu dönemlerine ait eserlerini sergileyen müze; mezarlığın hemen yanındadır.",
+    'Nemrut Krater Gölü': "Tatvan'daki Nemrut Dağı'nın kraterinde yer alan, Türkiye'nin en büyük krater gölü; yanında sıcak su kaynaklarının beslediği küçük bir göl daha bulunur.",
+    'Bitlis Kalesi': "Bitlis'in dar vadisinin ortasındaki kayalık tepede yükselen kale; şehrin taş evlerine bakar.",
+  },
+  Elazığ: {
+    'Harput Kalesi': "Harput'taki tepede yer alan kale, halk arasında Süt Kalesi efsanesiyle anılır; eski Harput'un camileri ve türbeleriyle birlikte gezilir.",
+    'Harput Ulu Camii': "12. yüzyılda yapılan Artuklu camisi; eğik tuğla minaresiyle tanınır.",
+    'Hazar Gölü': "Sivrice'deki göl; yaz aylarında plajları, su sporları ve gölün altındaki eski yerleşim kalıntılarıyla ilgi çeker.",
+    'Harput Buzluk Mağarası': "Yazın içinde buz oluşan, kışın ise görece ılık kalan ilginç mağara; doğal hava dolaşımıyla açıklanır.",
+  },
+  Erzincan: {
+    'Girlevik Şelalesi': "Erzincan'a yakın şelale; kışın donarak buz sarkıtlarına dönüşen görüntüsüyle bilinir.",
+    'Karanlık Kanyon': "Kemaliye'de, Fırat'ın oyduğu derin kanyon; kayaya oyulmuş tüneller boyunca uzanan yol, Türkiye'nin en etkileyici güzergâhlarındandır.",
+    'Mama Hatun Külliyesi': "Tercan'daki Saltuklu döneminden kalma külliye; kümbeti ve kervansarayıyla görülmeye değer.",
+    'Ergan Dağı Kayak Merkezi': "Erzincan'a yakın kayak merkezi; kar kalitesi ve şehir manzarasıyla bilinir.",
+  },
+  Erzurum: {
+    'Çifte Minareli Medrese': "13. yüzyılda yapılan medrese; iki minaresi ve işlemeli taç kapısıyla Erzurum'un simgesidir.",
+    'Yakutiye Medresesi': "14. yüzyılın başında İlhanlılar döneminde yapılan medrese; çinili minaresi ve bugün içindeki Türk-İslam Eserleri ve Etnografya Müzesi ile ziyaret edilir.",
+    'Erzurum Kalesi': "Şehrin tarihî merkezindeki kale; saat kulesi ve surlarından şehir manzarası görülür.",
+    'Palandöken Kayak Merkezi': "Türkiye'nin en bilinen kayak merkezlerinden; uzun pistleri ve kuru karıyla kışın kalabalıklaşır.",
+    'Tortum Şelalesi': "Uzundere'de, Tortum Gölü'nden dökülen yüksek şelale; ilkbaharda su en gürdür.",
+  },
+  Hakkâri: {
+    'Meydan Medresesi': "Hakkari merkezdeki tarihî medrese; yöre beylerinin döneminden kalma taş yapısıyla bilinir.",
+    'Cilo ve Sat Dağları Millî Parkı': "Türkiye'nin en yüksek dağlarından Cilo ve Sat'ı kapsayan milli park; buzulları ve buzul gölleriyle bilinir. Ziyaret izin ve rehber gerektirebilir.",
+    'Taş Köprü': "Hakkari'deki tarihî taş köprü; dağlık bölgenin eski yollarına tanıklık eder.",
+  },
+  Iğdır: {
+    'Iğdır Soykırım Anıtı ve Müzesi': "Birinci Dünya Savaşı yıllarında bölgede hayatını kaybedenler anısına yapılan anıt ve müze; şehrin girişindeki büyük kılıç biçimli anıtla tanınır.",
+    'Tuz Mağaraları': "Tuzluca'daki tuz madeni galerileri; serin ve kuru havasıyla ziyaret edilir.",
+    'Karakoyunlu Koçbaşlı Mezar Taşları': "Koç biçiminde oyulmuş mezar taşları; bölgenin Türkmen geçmişine tanıklık eden ilginç eserlerdir.",
+  },
+  Kars: {
+    'Ani Örenyeri': "Arpaçay kıyısındaki ortaçağ kenti; katedral, kiliseler, Ebu'l Menuçehr Camii ve surlarıyla bin bir kilisenin şehri olarak anılır. 2016'dan beri UNESCO Dünya Mirası.",
+    'Kars Müzesi': "Kars ve Ani'den çıkan arkeolojik eserler ile yöresel halı ve kilimleri sergileyen müze.",
+    'Kars Kalesi': "Şehre hâkim tepedeki kale; eteklerindeki tarihî taş köprü ve Kümbet Camii ile birlikte gezilir.",
+    'Kafkas Cephesi Harp Tarihi Müzesi': "Birinci Dünya Savaşı'ndaki Kafkas Cephesi'ni ve Sarıkamış Harekâtı'nı anlatan müze.",
+    'Sarıkamış Kayak Merkezi': "Sarıçam ormanları arasındaki kayak merkezi; kristal kar olarak anılan kuru karıyla bilinir.",
+  },
+  Malatya: {
+    'Arslantepe Höyüğü': "Battalgazi'deki höyük; ilk devlet örgütlenmesinin izleri ve dünyanın bilinen en eski kılıçlarıyla 2021'de UNESCO Dünya Mirası Listesi'ne girdi.",
+    'Malatya Müzesi': "Arslantepe başta olmak üzere ildeki kazılardan çıkan eserleri sergileyen müze.",
+    'Silahtar Mustafa Paşa Kervansarayı': "Battalgazi'deki 17. yüzyıl kervansarayı; eski Malatya'nın tarihî yapılarından.",
+    'Günpınar Şelalesi': "Malatya'daki şelale; yeşil çevresi ve serin suyuyla piknik için sevilir.",
+    'Somuncu Baba Türbesi ve Külliyesi': "Darende'deki türbe ve külliye; Tohma Çayı kenarındaki konumu ve yakındaki kanyonla birlikte ziyaret edilir.",
+  },
+  Muş: {
+    'Muş Ulu Camii': "Muş merkezdeki tarihî cami; şehrin eski dokusunun önemli yapılarındandır.",
+    'Murat Köprüsü': "Murat Nehri üzerinde, Selçuklu döneminden kalma taş köprü; çok kemerli yapısıyla görülmeye değer.",
+    'Malazgirt Meydan Muharebesi Tarihî Millî Parkı': "1071 Malazgirt Savaşı'nın yapıldığı alan; anıtları ve her yıl ağustosta düzenlenen anma törenleriyle bilinir.",
+  },
+  Tunceli: {
+    'Munzur Vadisi Millî Parkı': "Türkiye'nin büyük milli parklarından; Munzur Çayı boyunca uzanan vadisi, ormanları ve zengin yaban hayatıyla bilinir.",
+    'Munzur Gözeleri': "Ovacık'ta, dağın eteğinden kaynayan buz gibi su kaynakları; yöre halkı için kutsal sayılan bir yerdir.",
+    'Tunceli Müzesi': "Tunceli'nin tarihini ve yöresel kültürünü anlatan müze.",
+    'Pertek Kalesi': "Keban Baraj Gölü'nün ortasında kalmış kale; feribotla geçerken göl manzarasıyla izlenir.",
+  },
+  Van: {
+    'Akdamar Adası ve Kilisesi': "Van Gölü'ndeki adada, 10. yüzyılda yapılan Kutsal Haç Kilisesi; dış duvarlarındaki kabartmalarla ünlüdür. Gevaş'tan teknelerle gidilir.",
+    'Van Kalesi': "Urartu başkenti Tuşpa'nın kalesi; göl kıyısındaki uzun kayalık üzerinde yükselir, yazıtları ve gün batımı manzarasıyla bilinir.",
+    'Van Müzesi': "Urartu dönemine ait takılar, kemerler ve yazıtlarla bölgenin binlerce yıllık tarihini anlatan müze.",
+    'Hoşap Kalesi': "Gürpınar'da, kayalık bir tepe üzerine 17. yüzyılda yapılan kale; görkemli girişi ve surlarıyla etkileyicidir.",
+    'Çavuştepe Örenyeri': "Gürpınar'daki Urartu kalesi; tapınak kalıntıları ve yazıtlarıyla gezilir.",
+  },
+  Adıyaman: {
+    'Nemrut Dağı Örenyeri': "Kommagene Kralı I. Antiokhos'un dağın zirvesine yaptırdığı anıt mezar; tanrı ve kral heykellerinin dev başları gün doğumunda ve batımında ayrı güzel görünür. 1987'den beri UNESCO Dünya Mirası.",
+    'Arsameia Örenyeri': "Kommagene Krallığı'nın yazlık başkenti; kral ile Herakles'in tokalaştığı kabartma ve uzun Grekçe yazıtıyla bilinir.",
+    'Cendere Köprüsü': "Roma İmparatoru Septimius Severus ve ailesi adına yapılan tek kemerli Roma köprüsü; hâlâ ayakta ve çok etkileyicidir.",
+    'Karakuş Tümülüsü': "Kommagene kraliyet ailesinin kadınları için yapılmış tümülüs; çevresindeki sütunların üstündeki kartal heykeliyle adını alır.",
+    'Perre Örenyeri': "Adıyaman'a yakın antik kent; kayalara oyulmuş çok sayıda mezarıyla gezilir.",
+  },
+  Batman: {
+    'Hasankeyf Müzesi': "Ilısu Barajı nedeniyle sular altında kalan eski Hasankeyf'in eserlerini ve hikâyesini anlatan müze.",
+    'Zeynel Bey Türbesi': "Akkoyunlu döneminden kalan çinili türbe; baraj nedeniyle bütün olarak yeni yerine taşındı.",
+    'Mehmet Cabir Alper Arkeoloji Müzesi': "Batman ve çevresindeki kazılardan çıkan eserleri sergileyen müze.",
+    'Kozluk Kalesi': "Kozluk'taki tarihî kale kalıntısı; çevresindeki doğa ile gezilir.",
+  },
+  Diyarbakır: {
+    'Diyarbakır Surları': "Şehri çevreleyen, yaklaşık 5,5 kilometrelik bazalt surlar; burçları ve kapılarıyla farklı dönemlerin izlerini taşır. Hevsel Bahçeleri ile birlikte 2015'ten beri UNESCO Dünya Mirası.",
+    'Hevsel Bahçeleri': "Surlar ile Dicle Nehri arasında binlerce yıldır işlenen bahçeler; şehre yeşil bir kuşak oluşturur.",
+    'Diyarbakır Ulu Camii': "Anadolu'nun en eski camilerinden biri; avlusundaki farklı dönemlere ait sütun ve süslemelerle görülmeye değer.",
+    'İçkale Müze Kompleksi (Diyarbakır Arkeoloji Müzesi)': "Surların içindeki tarihî kale alanı; onarılan yapılarında arkeoloji müzesi ve sergiler bulunur.",
+    'On Gözlü Köprü': "Dicle Nehri üzerinde, 11. yüzyılda yapılan on kemerli taş köprü; gün batımında özellikle güzeldir.",
+    'Cahit Sıtkı Tarancı Müzesi': "Şair Cahit Sıtkı Tarancı'nın doğduğu geleneksel Diyarbakır evi; şairin eşyaları ve eserleri sergilenir.",
+  },
+  Gaziantep: {
+    'Zeugma Mozaik Müzesi': "Dünyanın büyük mozaik müzelerinden; Fırat kıyısındaki Zeugma'dan kurtarılan mozaikler arasında Çingene Kızı en ünlüsüdür.",
+    'Gaziantep Kalesi': "Şehrin tarihî merkezindeki tepede yer alan kale; çevresindeki çarşılarla birlikte gezilir. Depremler sonrası ziyaret durumunu kontrol edin.",
+    'Bakırcılar Çarşısı': "Bakır ustalarının çekiç seslerinin yükseldiği tarihî çarşı; el yapımı bakır eşyalar ve hediyelik ürünler bulunur.",
+    'Emine Göğüş Mutfak Müzesi': "Gaziantep mutfağının geleneklerini, yemeklerini ve mutfak eşyalarını anlatan müze.",
+    'Zeugma Örenyeri': "Fırat kıyısındaki antik kent; villaları ve mozaikleri kazılarla ortaya çıkarıldı, bir bölümü baraj gölünün altında kaldı.",
+    'Yesemek Açık Hava Müzesi': "İslahiye'deki Hitit dönemi taş ocağı ve heykel atölyesi; yarım kalmış aslan ve sfenks heykelleri yerinde görülür.",
+  },
+  Kilis: {
+    'Ravanda Kalesi': "Kilis'e yakın tepedeki ortaçağ kalesi; geniş ova manzarasıyla gezilir.",
+    'Kilis Ulu Camii': "Kilis merkezdeki tarihî cami; şehrin eski dokusunun önemli yapılarındandır.",
+    'Kilis Müzesi': "Kilis ve çevresindeki arkeolojik eserleri sergileyen müze.",
+    'Oylum Höyük': "Bölgenin büyük höyüklerinden; Tunç Çağı'na uzanan yerleşim katmanları kazılarla araştırılıyor.",
+  },
+  Mardin: {
+    'Deyrulzafaran Manastırı': "Mardin'e yakın, 5. yüzyıla uzanan Süryani Ortodoks manastırı; uzun yıllar patrikhane olarak kullanıldı ve bugün de ibadete açıktır.",
+    'Dara Örenyeri': "Oğuz köyündeki Bizans garnizon kenti; büyük sarnıçları, kaya mezarları ve su yapılarıyla etkileyicidir.",
+    'Mardin Müzesi': "Tarihî bir patrikhane binasındaki müze; Mardin ve çevresinin arkeolojik eserlerini sergiler.",
+    'Kasımiye Medresesi': "15. yüzyılda tamamlanan medrese; avlusundaki su kanalı ve Mezopotamya ovasına bakan konumuyla görülmeye değer.",
+    'Zinciriye Medresesi': "14. yüzyıl Artuklu medresesi; kubbeleri ve terasından ovaya uzanan manzarasıyla bilinir.",
+    'Mor Gabriel Manastırı': "Midyat'taki, 4. yüzyılın sonunda kurulan manastır; dünyada hâlâ kullanılan en eski manastırlardan biridir.",
+  },
+  Siirt: {
+    'İsmail Fakirullah Türbesi': "Tillo'daki türbe; yılın belirli günlerinde içeri düşen güneş ışığının oluşturduğu ışık olayıyla bilinir.",
+    'Siirt Ulu Camii': "Selçuklu döneminden kalan cami; çinili minaresiyle şehrin simgesidir.",
+    'Botan Vadisi Millî Parkı': "Botan Çayı'nın oyduğu derin kanyon ve çevresi; sarp yamaçları ve manzarasıyla bilinir.",
+    'Tillo Tabiat Parkı': "Tillo'daki doğal alan; yeşil çevresi ve dinlenme alanlarıyla ziyaret edilir.",
+  },
+  Şanlıurfa: {
+    'Göbeklitepe Örenyeri': "Yaklaşık 12 bin yıl önce yapılan, hayvan kabartmalı T biçimli dikilitaşlarıyla insanlığın bilinen en eski anıtsal yapılarından. 2018'den beri UNESCO Dünya Mirası.",
+    'Şanlıurfa Arkeoloji Müzesi': "Türkiye'nin büyük müzelerinden; Göbeklitepe buluntuları ve dünyanın en eski insan heykellerinden Urfa Adamı burada sergilenir.",
+    'Haleplibahçe Mozaik Müzesi': "Bir Roma villasının mozaiklerinin yerinde korunduğu müze; Amazon kraliçelerini anlatan mozaikler ünlüdür.",
+    Balıklıgöl: "Hz. İbrahim'in ateşe atıldığı yer olarak kabul edilen, kutsal sayılan balıkların yüzdüğü havuz; çevresindeki camiler ve çarşıyla şehrin kalbidir.",
+    'Harran Örenyeri': "Kümbet biçimli kerpiç evleri ve ilk İslam üniversitelerinden birinin kalıntılarıyla bilinen antik kent.",
+    'Eski Halfeti': "Birecik Barajı'nın suları altında kısmen kalan eski kasaba; tekne turlarıyla gezilir ve kara gülüyle tanınır.",
+    Karahantepe: "Göbeklitepe ile aynı döneme ait, Taş Tepeler bölgesindeki Neolitik alan; kayaya oyulmuş yapıları ve insan başı heykeliyle dikkat çeker.",
+  },
+  Şırnak: {
+    'Mem û Zîn Türbesi': "Cizre'de, Ehmedê Xanî'nin ünlü aşk destanının kahramanları Mem ile Zîn'e ait olduğuna inanılan türbe.",
+    'Kırmızı Medrese': "Cizre'deki tarihî medrese; şair Melayê Cizîrî'nin türbesinin bulunduğu yerdir.",
+    'Cizre Ulu Camii': "Cizre'nin tarihî camisi; eski kapı tokmağı ve taş işçiliğiyle bilinir.",
+    'Mor Yakup Kilisesi': "Şırnak'taki tarihî Süryani kilisesi; bölgenin çok kültürlü geçmişine tanıklık eder.",
+  },
+};
+
+// Bursa: tohumda olmayan ek yerler (Gezilecek Yerler satırı olarak eklenir).
+const BKTB = 'Bursa İl Kültür ve Turizm Müdürlüğü';
+export const BURSA_EK: Record<string, string>[] = [
+  { il: 'Bursa', ilce: 'Yıldırım', ad: 'Emir Sultan Camii ve Türbesi', tur: 'Cami', kategori: 'tarih', ozet: "Bursa'nın manevi önderlerinden Emir Sultan'ın türbesi ve camisi; şehre bakan bir sırttadır.", hakkinda: "Yıldırım Bayezid'in damadı Emir Sultan adına 15. yüzyılda yapılan külliye, depremler ve onarımlarla bugünkü görünümüne kavuştu. Bursalıların en çok ziyaret ettiği yerlerdendir; avlusundan şehir manzarası görülür.", kaynak: BKTB, sira: '20' },
+  { il: 'Bursa', ilce: 'Osmangazi', ad: 'Irgandı Köprüsü', tur: 'Tarihî köprü', kategori: 'alisveris', ozet: 'Gökdere üzerinde, üstünde dükkânlar bulunan Osmanlı dönemi çarşılı köprü.', hakkinda: "15. yüzyılda yapılan köprü, üzerindeki küçük dükkânlarıyla dünyada az bulunan çarşılı köprülerdendir. Bugün el sanatları atölyeleri ve hediyelik dükkânlarla gezilir.", kaynak: BKTB, sira: '21' },
+  { il: 'Bursa', ilce: 'İznik', ad: 'İznik Ayasofya Orhan Camii', tur: 'Tarihî yapı', kategori: 'tarih', ozet: 'İznik konsillerinden birine ev sahipliği yapmış, sonradan camiye çevrilmiş Bizans yapısı.', hakkinda: "İznik'in merkezindeki yapı Bizans döneminde kilise olarak inşa edildi; 787'deki konsil burada toplandı. Orhan Gazi döneminde camiye çevrildi. İznik'in surları, kapıları ve çini atölyeleriyle aynı gün gezilebilir.", kaynak: BKTB, sira: '22' },
+  { il: 'Bursa', ilce: 'İznik', ad: 'İznik Surları ve Kapıları', tur: 'Tarihî yapı', kategori: 'tarih', ozet: 'Roma ve Bizans dönemlerinden kalan, şehri çevreleyen surlar ve anıtsal kapılar.', hakkinda: "İznik'i çevreleyen surlar ve İstanbul, Lefke, Yenişehir, Göl kapıları antik çağdan beri ayaktadır. Kapılar arasında yürümek, şehrin binlerce yıllık geçmişini adım adım görmeyi sağlar. İznik Gölü kıyısı gün batımı için güzeldir.", kaynak: BKTB, sira: '23' },
+  { il: 'Bursa', ilce: 'Nilüfer', ad: 'Gölyazı', tur: 'Göl köyü', kategori: 'doga', ozet: "Uluabat Gölü'ne uzanan yarımadadaki, leylekleri ve gün batımıyla ünlü balıkçı köyü.", hakkinda: "Antik Apollonia kentinin üzerine kurulan Gölyazı, göle uzanan yarımadası, taş evleri ve balıkçı tekneleriyle bilinir. Uluabat Gölü kuş türleriyle önemli bir sulak alandır; gün batımında tekne turları yapılır.", kaynak: BKTB, sira: '24' },
+  { il: 'Bursa', ilce: 'Mudanya', ad: 'Mudanya Mütareke Evi', tur: 'Müze', kategori: 'tarih', ozet: "1922'de Mudanya Mütarekesi'nin imzalandığı ev; bugün müze.", hakkinda: "Kurtuluş Savaşı'nın ardından 1922'de ateşkesin imzalandığı köşk müze olarak düzenlendi. Mudanya'nın deniz kıyısındaki eski evleri ve sahil yürüyüşüyle birlikte gezilebilir.", kaynak: BKTB, sira: '25' },
+  { il: 'Bursa', ilce: 'İnegöl', ad: 'Oylat Kaplıcaları', tur: 'Kaplıca', kategori: 'doga', ozet: 'Uludağ eteklerinde, orman içindeki sıcak su kaynakları ve yakınındaki mağara.', hakkinda: "İnegöl'deki Oylat, şifalı termal suları ve ormanlık vadideki konumuyla bilinir. Yakınındaki Oylat Mağarası ve şelale de gezilebilir.", kaynak: BKTB, sira: '26' },
+];
