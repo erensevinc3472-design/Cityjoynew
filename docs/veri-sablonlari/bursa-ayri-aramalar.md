@@ -1,7 +1,7 @@
 # Bursa bilgileri: ayrı ayrı aramalar (8 Kasım 2026)
 
 Her aramayı ChatGPT'de **ayrı bir sohbette** yap (İnternette ara ya da Deep research açık). Çıkan Excel'i Claude'a gönder; Claude denetleyip panele yüklenecek dosyayı hazırlar.
-Muhtarlıklar tamam (1060 mahalle).
+Muhtarlıklar tamam (1060 mahalle, 91 adres). 2. aramadan hastaneler geldi (46); aile sağlığı merkezleri eksik.
 
 İşaretle: [ ] yapılmadı, [x] gönderildi.
 
@@ -11,8 +11,8 @@ Muhtarlıklar tamam (1060 mahalle).
 - [ ] 4. Önemli Kurumlar: Vergi daireleri, SGK merkezleri, noterler, PTT şubeleri
 - [ ] 5. Önemli Kurumlar: Halk kütüphaneleri, halk eğitim merkezleri
 - [ ] 6. Önemli Kurumlar: Taksi durakları (tarife sütunu dahil)
-- [ ] 7. Müzeler: Bursa'daki tüm müzeler (muze.gov.tr, belediye müzeleri, özel müzeler)
-- [ ] 8. Otoparklar: Büyükşehir ve ilçe belediyesi otoparkları (BURULAŞ, belediye siteleri)
+- [x] 7. Müzeler: Bursa'daki tüm müzeler (muze.gov.tr, belediye müzeleri, özel müzeler)
+- [x] 8. Otoparklar: Büyükşehir ve ilçe belediyesi otoparkları (BURULAŞ, belediye siteleri)
 - [ ] 9. Otoparklar: AVM otoparkları
 - [ ] 10. Parklar: Büyük parklar, millet bahçeleri, kent ormanları, mesire alanları, botanik bahçesi
 - [ ] 11. Pazarlar: Semt pazarları ilçe ilçe (hangi gün, hangi mahalle)
