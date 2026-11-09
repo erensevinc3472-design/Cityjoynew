@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 
 import { SEED_CITIES, SEED_LOCAL, SEED_PLACES, SEED_REGIONS, SEED_ROUTES } from '../travel/seed';
+import { travelPlaceId, type TravelImport } from '../travel/sheet';
 import type {
   TravelCityContent,
   TravelLocalInput,
@@ -187,8 +188,8 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
       local: TravelLocalItem[];
       municipal: TravelMunicipal[];
     }> {
-      const all = (col: string) => getDocs(query(collection(db, col), limit(1000)));
-      const [r, c, p, ro, lo, mu] = await Promise.all([all(REGIONS), all(CITIES), all(PLACES), all(ROUTES), all(LOCAL), all(MUNICIPAL)]);
+      const all = (col: string, n = 1000) => getDocs(query(collection(db, col), limit(n)));
+      const [r, c, p, ro, lo, mu] = await Promise.all([all(REGIONS), all(CITIES), all(PLACES, 5000), all(ROUTES), all(LOCAL), all(MUNICIPAL)]);
       return {
         regions: r.docs.map((d) => region(d.id, d.data())),
         cities: c.docs.map((d) => city(d.id, d.data())),
@@ -282,6 +283,51 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
       batch.delete(doc(db, PLACES, p.id));
       audit(batch, p.id, 'sil', `Gezilecek yer silindi: ${p.name}`);
       await batch.commit();
+    },
+
+    /**
+     * Excel'den toplu yükleme (bölge, şehir, gezilecek yer). Yeni kayıt taslak girer; var olanın alanları güncellenir,
+     * yayın durumu ve kapak fotoğrafı korunur. Gezilecek yer, aynı ildeki aynı adlı yerle eşleşir (başlangıç
+     * içeriğindeki yerler dahil). Hiçbir şey silinmez. Döner: eklenen ve güncellenen sayısı.
+     */
+    async importContent(input: Pick<TravelImport, 'regions' | 'cities' | 'places'>): Promise<{ added: number; updated: number }> {
+      let added = 0;
+      let updated = 0;
+      const writes: { col: string; id: string; data: Record<string, unknown>; isNew: boolean }[] = [];
+      const exists = async (col: string, id: string) => (await getDoc(doc(db, col, id))).exists();
+      for (const r of input.regions) {
+        const { id, ...rest } = r;
+        writes.push({ col: REGIONS, id, data: rest, isNew: !(await exists(REGIONS, id)) });
+      }
+      for (const c of input.cities) {
+        const { id, ...rest } = c;
+        writes.push({ col: CITIES, id, data: rest, isNew: !(await exists(CITIES, id)) });
+      }
+      const byCity = new Map<string, Map<string, string>>();
+      for (const p of input.places) {
+        let names = byCity.get(p.data.cityId);
+        if (!names) {
+          const snap = await getDocs(query(collection(db, PLACES), where('cityId', '==', p.data.cityId), limit(1000)));
+          names = new Map(snap.docs.map((d) => [travelPlaceId(p.data.cityId, String(d.data().name ?? '')), d.id]));
+          byCity.set(p.data.cityId, names);
+        }
+        const existing = names.get(p.id);
+        writes.push({ col: PLACES, id: existing ?? p.id, data: p.data as unknown as Record<string, unknown>, isNew: !existing && !(await exists(PLACES, p.id)) });
+      }
+      for (let i = 0; i < writes.length; i += 400) {
+        const part = writes.slice(i, i + 400);
+        const batch = writeBatch(db);
+        for (const w of part) {
+          const data = { ...clean(w.data), updatedAt: serverTimestamp(), ...(w.isNew ? { status: 'taslak' } : {}) };
+          batch.set(doc(db, w.col, w.id), data, { merge: true });
+          if (w.isNew) added++;
+          else updated++;
+        }
+        const n = part.filter((w) => w.isNew).length;
+        audit(batch, `seyahat-excel-${i / 400 + 1}`, 'ekle', `Seyahat Excel yüklemesi: ${n} yeni, ${part.length - n} güncellenen kayıt`);
+        await batch.commit();
+      }
+      return { added, updated };
     },
 
     /** Başlangıç içeriği (Marmara, Bursa): yalnızca olmayanlar taslak olarak eklenir. Döner: eklenen sayısı. */

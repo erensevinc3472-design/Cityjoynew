@@ -1,0 +1,10 @@
+// Seyahat > Keşfet ve Öğren: 7 coğrafi bölgenin tanıtımı (CityJoy'un kendi metni).
+export const BOLGELER = [
+  { bolge: 'marmara', slogan: 'İki kıta, iki deniz, köklü şehirler', tanitim: "İstanbul'un Boğaz kıyıları, Osmanlı'nın ilk başkenti Bursa, Selimiye'nin şehri Edirne ve Truva ile Gelibolu'nun Çanakkale'si. Marmara; tarihi, deniz kıyıları, ormanları ve kaplıcalarıyla Türkiye'nin en kalabalık ve en hareketli bölgesidir." },
+  { bolge: 'ege', slogan: 'Antik kentler ve zeytin kokulu koylar', tanitim: "Efes, Bergama ve Afrodisias gibi antik kentler, Pamukkale'nin travertenleri, zeytinlikler ve masmavi koylar. Ege; ılık iklimi, otlu mutfağı ve sakin kasabalarıyla yavaş gezmeye davet eder." },
+  { bolge: 'akdeniz', slogan: 'Güneş, deniz ve Toros eteklerinde tarih', tanitim: "Antalya'nın uzun kumsalları, Likya Yolu, Toroslar'ın yaylaları ve kanyonları, Hatay'ın sofrası ve Mersin'in antik limanları. Akdeniz yılın büyük bölümünde güneşli, doğası ve tarihiyle dört mevsim gezilir." },
+  { bolge: 'ic-anadolu', slogan: 'Bozkırın ortasında medeniyetler', tanitim: "Kapadokya'nın peri bacaları ve yeraltı şehirleri, Hititlerin başkenti Hattuşa, Mevlânâ'nın Konya'sı ve başkent Ankara. İç Anadolu, geniş bozkırları ve binlerce yıllık yerleşimleriyle Anadolu'nun kalbidir." },
+  { bolge: 'karadeniz', slogan: 'Yeşil yaylalar, sisli vadiler', tanitim: "Sümela Manastırı, Uzungöl, Ayder ve Kaçkarlar'ın yaylaları, Safranbolu'nun konakları ve Amasya'nın kaya mezarları. Karadeniz; yeşilin her tonu, çay bahçeleri, hamsisi ve horonuyla bambaşka bir dünyadır." },
+  { bolge: 'dogu-anadolu', slogan: 'Yüksek dağlar, derin tarih', tanitim: "Ağrı Dağı, Van Gölü ve Akdamar, Ani Ören Yeri, Nemrut kraterinin gölleri ve Erzurum'un kümbetleri. Doğu Anadolu, yüksek yaylaları, sert kışları ve köklü kültürüyle etkileyici manzaralar sunar." },
+  { bolge: 'guneydogu', slogan: 'Bereketli Hilal ve lezzet durakları', tanitim: "Göbeklitepe, Nemrut Dağı'nın dev heykelleri, Mardin'in taş evleri ve Gaziantep'in mutfağı. Güneydoğu, insanlığın ilk tapınaklarından bugünün sofralarına uzanan bir yolculuktur." },
+];

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import readXlsxFile from 'read-excel-file/browser';
 import { Link } from 'react-router';
 import {
   can,
   NEARBY_KINDS,
+  parseTravelWorkbook,
   TR_REGIONS,
   TRAVEL_CATEGORIES,
   TRAVEL_MODES,
@@ -101,6 +103,27 @@ function AdminTravelPage() {
     } finally {
       setBusy(false);
     }
+  };
+  /** Excel'den toplu yükleme: önce denetlenir, özet onaylanınca taslak olarak eklenir / güncellenir. */
+  const importExcel = async (file: File) => {
+    setMessage(undefined);
+    let parsed: ReturnType<typeof parseTravelWorkbook>;
+    try {
+      const sheets = (await readXlsxFile(file)) as { sheet: string; data: unknown[][] }[];
+      const provinces = locationRepository.getProvinces();
+      parsed = parseTravelWorkbook(sheets, { provinces, districts: provinces.flatMap((p) => locationRepository.getDistricts(p.code)) });
+    } catch {
+      return setMessage({ kind: 'error', text: t('travel.excel.readError') });
+    }
+    const { regions, cities, places, errors } = parsed;
+    const errText = errors.slice(0, 8).map((e) => `${e.sheet} ${e.row}: ${e.message}`).join('\n');
+    if (!regions.length && !cities.length && !places.length) return setMessage({ kind: 'error', text: t('travel.excel.empty') + (errText ? '\n' + errText : '') });
+    const summary = t('travel.excel.confirm', { regions: regions.length, cities: cities.length, places: places.length, errors: errors.length });
+    if (!window.confirm(summary + (errText ? '\n\n' + errText : ''))) return;
+    await act(async () => {
+      const r = await admin!.importContent({ regions, cities, places });
+      return t('travel.excel.done', { added: r.added, updated: r.updated, errors: errors.length });
+    });
   };
   const statusPill = (s?: TravelReviewStatus) => <StatusPill status={s} />;
   const toggle = (kind: TravelAdminKind, id: string, s: TravelReviewStatus, label: string) =>
@@ -237,6 +260,13 @@ function AdminTravelPage() {
         {canEdit || isAdminUser(user) ? (
           <div className="actions">
             {isAdminUser(user) ? <Link className="btn secondary" to="/yolculuk-fiyatlari">{t('prices.title')}</Link> : null}
+            {canEdit ? <a className="btn secondary" href="./seyahat-sablon.xlsx" download>{t('travel.excel.template')}</a> : null}
+            {canEdit ? (
+              <label className="btn secondary">
+                {t('travel.excel.upload')}
+                <input type="file" accept=".xlsx" className="sr-only" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) importExcel(f); }} />
+              </label>
+            ) : null}
             {canEdit ? <button className="btn secondary" disabled={busy} onClick={() => window.confirm(t('travel.seedConfirm')) && act(async () => t('travel.seeded', { count: await admin!.importSeed() }))}>
               {t('travel.seed')}
             </button> : null}
