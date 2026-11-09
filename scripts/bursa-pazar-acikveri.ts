@@ -10,7 +10,7 @@ import districts from '../packages/shared/data/locations/districts.json';
 const out = process.argv[process.argv.length - 1]!;
 const SOURCE = 'https://acikyesil.bursa.bel.tr/dataset/carsi-ve-pazar-alanlari';
 const today = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-const title = (s: string) => s.trim().replace(/\s+/g, ' ').toLocaleLowerCase('tr').split(/(\s+|-|\.|\/)/).map((w) => w.charAt(0).toLocaleUpperCase('tr') + w.slice(1)).join('');
+const title = (s: string) => s.trim().replace(/\s+/g, ' ').toLocaleLowerCase('tr').split(/(\s+|-|\.|\/|\()/).map((w) => w.charAt(0).toLocaleUpperCase('tr') + w.slice(1)).join('');
 const bursa = districts.filter((d) => d.provinceCode === '16');
 const district = (s: string) => bursa.find((d) => d.name.toLocaleLowerCase('tr') === s.toLocaleLowerCase('tr'))?.name;
 
@@ -60,10 +60,13 @@ for (const p of list) {
   seen.set(key(ad), 1);
   const durum = p.acikMiKapaliMi as string | null;
   const saat = durum && /\d/.test(durum) ? durum.replace('.', ':').replace('.', ':') : '';
+  // Adında "Üretici" geçen pazarlar köylü (üretici) pazarı, "Balık" geçenler balık pazarı sayılır.
+  const tur = /balık (hali|pazarı)/i.test(ad) ? 'balik-pazari' : /üretici|köylü/i.test(ad) ? 'koylu-pazari' : 'semt-pazari';
+  const extra = tur === 'balik-pazari' ? 'Balık' : tur === 'koylu-pazari' ? 'Köy ürünleri' : '';
   rows.push({
-    tur: 'semt-pazari', ad, il: 'Bursa', ilce, mahalle, adres: p.adres ? title(p.adres) : '',
+    tur, ad, il: 'Bursa', ilce, mahalle, adres: p.adres ? title(p.adres) : '',
     gunler: days(p.gunu), saatler: saat, kapali_alan: durum === 'KAPALI' ? 'Evet' : durum === 'AÇIK' ? 'Hayır' : '',
-    urunler: products(p.turu),
+    urunler: [products(p.turu), extra].filter(Boolean).join(', '),
     enlem: Number.isFinite(lat) ? lat.toFixed(6) : '', boylam: Number.isFinite(lng) ? lng.toFixed(6) : '',
     kaynak: SOURCE, kaynak_tarihi: today, not: 'Bursa Büyükşehir Belediyesi açık verisi',
   });
