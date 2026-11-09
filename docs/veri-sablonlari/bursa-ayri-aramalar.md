@@ -18,7 +18,7 @@ Muhtarlıklar tamam (1060 mahalle, 91 adres). 2. aramadan hastaneler geldi (46);
 - [ ] 11. Pazarlar: Semt pazarları ilçe ilçe (hangi gün, hangi mahalle)
 - [ ] 12. Pazarlar: Kapalı pazar yerleri, köylü/organik pazarlar, balık hali
 - [ ] 13. Ulaşım: BursaRay, tramvay, teleferik, BUDO, havalimanı servisleri, BursaKart, ana otobüs hatları
-- [ ] 14. Toplanma Alanları: AFAD toplanma alanları, ilçe ilçe
+- [x] 14. Toplanma Alanları: AFAD toplanma alanları, ilçe ilçe
 - [ ] 15. Belediye Hizmetleri: Bursa Büyükşehir Belediyesi hizmetleri
 - [ ] 16. Belediye Hizmetleri: Osmangazi, Nilüfer, Yıldırım belediyeleri hizmetleri
 - [ ] 17. Belediye Hizmetleri: Diğer 14 ilçe belediyesinin başlıca hizmetleri
