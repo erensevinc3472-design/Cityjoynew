@@ -14,7 +14,7 @@ Muhtarlıklar tamam (1060 mahalle, 91 adres). 2. aramadan hastaneler geldi (46);
 - [x] 7. Müzeler: Bursa'daki tüm müzeler (muze.gov.tr, belediye müzeleri, özel müzeler)
 - [x] 8. Otoparklar: Büyükşehir ve ilçe belediyesi otoparkları (BURULAŞ, belediye siteleri)
 - [ ] 9. Otoparklar: AVM otoparkları
-- [ ] 10. Parklar: Büyük parklar, millet bahçeleri, kent ormanları, mesire alanları, botanik bahçesi
+- [x] 10. Parklar: Büyük parklar, millet bahçeleri, kent ormanları, mesire alanları, botanik bahçesi
 - [ ] 11. Pazarlar: Semt pazarları ilçe ilçe (hangi gün, hangi mahalle)
 - [ ] 12. Pazarlar: Kapalı pazar yerleri, köylü/organik pazarlar, balık hali
 - [x] 13. Ulaşım: BursaRay, tramvay, teleferik, BUDO, havalimanı servisleri, BursaKart, ana otobüs hatları
