@@ -6,7 +6,7 @@ Muhtarlıklar tamam (1060 mahalle, 91 adres). 2. aramadan hastaneler geldi (46);
 İşaretle: [ ] yapılmadı, [x] gönderildi.
 
 - [ ] 1. Önemli Kurumlar: Valilik, 17 kaymakamlık, il müdürlükleri
-- [ ] 2. Önemli Kurumlar: Devlet hastaneleri, şehir hastanesi, büyük özel hastaneler, aile sağlığı merkezleri (ilçe ilçe)
+- [x] 2. Önemli Kurumlar: Devlet hastaneleri, şehir hastanesi, büyük özel hastaneler, aile sağlığı merkezleri (ilçe ilçe)
 - [ ] 3. Önemli Kurumlar: Emniyet, jandarma, itfaiye, nüfus müdürlükleri, göç idaresi, adliye
 - [ ] 4. Önemli Kurumlar: Vergi daireleri, SGK merkezleri, noterler, PTT şubeleri
 - [ ] 5. Önemli Kurumlar: Halk kütüphaneleri, halk eğitim merkezleri
