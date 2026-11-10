@@ -7,11 +7,11 @@ import { CITY_GUIDE_SECTIONS, type CityGuideSectionId } from '@cityjoy/shared';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { GlassRow, GOLD, KURUMLAR_ART, MAHALLE_ART, PhotoCard, SectionHeading, Shade, TOWNHALL_ART, VITRIN_ART, type IconName } from '@/components/city-tiles';
-import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
+import { PageHead, PAGE_CONTENT } from '@/components/page-head';
 import { LineIcon } from '@/components/line-icon';
 import { CoverArt } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
-import { Skyline } from '@/components/skyline';
+import { BottomNav } from '@/components/bottom-nav';
 import { StateMessage } from '@/components/state-message';
 import { useCityGuideMeta } from '@/lib/city-guide';
 import { locationRepository as repo } from '@/lib/locations';
@@ -67,7 +67,6 @@ export default function MyCityScreen() {
   const province = provinceCode ? repo.getProvince(provinceCode)?.name : undefined;
   const district = location?.districtId ? repo.getDistrict(location.districtId)?.name : undefined;
   const [neighbourhood, setNeighbourhood] = useState<string>();
-  const bottom = usePageBottom();
 
   useEffect(() => {
     setNeighbourhood(undefined);
@@ -122,8 +121,8 @@ export default function MyCityScreen() {
   for (let i = 0; i < TILES.length; i += 2) pairs.push(TILES.slice(i, i + 2));
 
   return (
-    <Screen warm bleed>
-      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
+    <Screen warm bleed footer={<BottomNav />}>
+      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: spacing.lg }]} showsVerticalScrollIndicator={false}>
         {header}
         {/* İl kapağı: Seyahat panelinde ile yüklenen fotoğraf; yoksa çizim. */}
         <View style={styles.cover}>
@@ -197,8 +196,6 @@ export default function MyCityScreen() {
           />
         </View>
 
-        {/* Taslaktaki şehir silüeti: sayfanın en altında, kenardan kenara. */}
-        <Skyline />
       </ScrollView>
     </Screen>
   );

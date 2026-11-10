@@ -23,7 +23,8 @@ const TABS: { key: TabKey; icon: IconName; href: Href }[] = [
  * Alt gezinme çubuğu (PROJE.md 5, 13. madde 29 ve 31): Ana Sayfa, Keşfet, Ara, Profil (Mesajlar profilin sağ üstünde). Dört ana ekranın altında durur;
  * sekmeler arasında geçişte yığın büyümesin diye ekran değiştirilir, geri tuşu ana sayfaya döner.
  */
-export function BottomNav({ active }: { active: TabKey }) {
+/** `active` yoksa (ör. Benim Şehrim) hiçbir sekme seçili değil; dokununca sayfa üstüne açılır, geri tuşu buraya döner. */
+export function BottomNav({ active }: { active?: TabKey }) {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
@@ -43,7 +44,7 @@ export function BottomNav({ active }: { active: TabKey }) {
               onPress={() => {
                 if (selected) return;
                 if (tab.key === 'home') router.dismissTo('/home');
-                else if (active === 'home') router.push(tab.href);
+                else if (!active || active === 'home') router.push(tab.href);
                 else router.replace(tab.href);
               }}
               style={({ pressed }) => [styles.tab, { opacity: pressed ? 0.7 : 1 }]}>

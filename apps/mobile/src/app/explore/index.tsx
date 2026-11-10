@@ -1,8 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, FlatList, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions, type FlatListProps, type ScrollViewInstance } from 'react-native';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
+import { ActivityIndicator, Alert, Animated, FlatList, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, View, useWindowDimensions, type FlatListProps } from 'react-native';
 // Sekme sayfaları hareket kütüphanesinin listesiyle: içindeki fotoğraf kaydırması önceliklidir (post-photos.tsx).
 import { FlatList as PagerList } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,7 +15,9 @@ import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BottomNav } from '@/components/bottom-nav';
 import { FormMessage } from '@/components/form-message';
+import { GOLD } from '@/components/city-tiles';
 import { FilterChip } from '@/components/inner';
+import { LineIcon } from '@/components/line-icon';
 import { RoundButton } from '@/components/hero-header';
 import { PostCard } from '@/components/post-card';
 import { SideMenu } from '@/components/side-menu';
@@ -33,15 +35,14 @@ import { limitText } from '@/lib/limits';
 
 type Tag = PostCategory | 'all';
 const TAGS: Tag[] = ['all', ...POST_CATEGORIES];
-/** Sekme şeridinde aynı anda görünen sekme (Eren'in örneği: Takip'e geçince Mahallem gizlenir). */
-const VISIBLE_TABS = 3;
+const TAB_ICON: Record<PostTarget, ComponentProps<typeof LineIcon>['name']> = { mahallem: 'holiday-village', bolgesel: 'place', genel: 'public', takip: 'group' };
 /** Aşağı inerken üst çubuk bu kadar kayınca gizlenir; yukarı çekince bu kadar kayınca geri gelir (Eren, 7 Kasım). */
 const HIDE_AFTER = 12;
 const SHOW_AFTER = 60;
 
 /**
  * Keşfet (PROJE.md 5.5; Eren'in örnek ekranı, 13. madde 30). Üstte menü, "KEŞFET" ve açık sekme, yeni gönderi ve bildirim.
- * Mahallem / Bölgesel / Genel / Takip: şeritte üçü görünür, parmakla sağa sola kaydırınca sekme değişir. Etiketlerle
+ * Mahallem / Bölgesel / Genel / Takip: dört simgeli cam düğme, parmakla sağa sola kaydırınca sekme değişir. Etiketlerle
  * (#Soru, #Kayıp...) süzülür. Acil duyurular akışın en üstünde. Engellediklerimin gönderileri hiçbir sekmede görünmez.
  */
 export default function ExploreScreen() {
@@ -79,19 +80,12 @@ export default function ExploreScreen() {
     if (drift.current > HIDE_AFTER) showHeader(false);
     else if (drift.current < -SHOW_AFTER) showHeader(true);
   };
-  const strip = useRef<ScrollViewInstance>(null);
-  // Sekmeler kenar boşluklu cam kutunun içinde (13. madde 35, Keşfet önizlemesi).
-  const tabW = (width - GUTTER * 2 - 8) / VISIBLE_TABS;
-  const line = useRef(new Animated.Value(0)).current;
   const feed = useNotificationFeed(false);
   const [read] = useReadState();
   const hasUnread = (feed ?? []).some((n) => isUnread(n, read));
   const tab = POST_TARGETS[index];
 
   useEffect(() => {
-    // Şerit kayar: açık sekme hep görünür, Takip'teyken Mahallem dışarıda kalır.
-    strip.current?.scrollTo({ x: Math.max(0, index - (VISIBLE_TABS - 1)) * tabW, animated: true });
-    Animated.spring(line, { toValue: index * tabW, useNativeDriver: true, friction: 9 }).start();
     setVisited((v) => (v.has(index) ? v : new Set(v).add(index)));
     // Sekme değişince üst çubuk görünür.
     lastY.current = 0;
@@ -100,7 +94,7 @@ export default function ExploreScreen() {
       shown.current = true;
       Animated.timing(hidden, { toValue: 0, duration: 200, useNativeDriver: true }).start();
     }
-  }, [index, tabW, line, hidden]);
+  }, [index, hidden]);
 
   const goTab = (i: number) => {
     setIndex(i);
@@ -128,27 +122,25 @@ export default function ExploreScreen() {
             {user ? <RoundButton icon="notifications-none" label={hasUnread ? t('notifications.titleUnread') : t('notifications.title')} onPress={() => router.push('/notifications')} badge={hasUnread} /> : null}
           </View>
         </View>
-        <View style={[styles.glass, { marginHorizontal: GUTTER }]}>
-        <ScrollView ref={strip} horizontal scrollEnabled={false} showsHorizontalScrollIndicator={false} accessibilityRole="tablist">
-          <View>
-            <Animated.View style={[styles.pill, { width: tabW - 8, backgroundColor: c.heroAccent, transform: [{ translateX: Animated.add(line, 4) }] }]} />
-            <View style={styles.tabs}>
-              {POST_TARGETS.map((x, i) => (
-                <Pressable
-                  key={x}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: i === index }}
-                  accessibilityLabel={t(`explore.targets.${x}`)}
-                  onPress={() => goTab(i)}
-                  style={[styles.tab, { width: tabW }]}>
-                  <AppText numberOfLines={1} style={[styles.tabText, { color: i === index ? '#14262A' : c.heroMuted, fontFamily: i === index ? fonts.bodySemi : fonts.bodyMedium }]}>
-                    {t(`explore.targets.${x}`)}
-                  </AppText>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        </ScrollView>
+        {/* Benim Şehrim kutuları gibi simgeli cam düğmeler (Eren, 10 Kasım 2026); yana kaydırınca da sekme değişir. */}
+        <View style={[styles.tabs, { marginHorizontal: GUTTER }]} accessibilityRole="tablist">
+          {POST_TARGETS.map((x, i) => {
+            const on = i === index;
+            return (
+              <Pressable
+                key={x}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: on }}
+                accessibilityLabel={t(`explore.targets.${x}`)}
+                onPress={() => goTab(i)}
+                style={({ pressed }) => [styles.tab, on ? styles.tabOn : null, { transform: [{ scale: pressed ? 0.96 : 1 }] }]}>
+                <LineIcon name={TAB_ICON[x]} size={19} color={on ? GOLD : c.heroMuted} />
+                <AppText numberOfLines={1} style={[styles.tabText, { color: on ? c.heroText : c.heroMuted, fontFamily: on ? fonts.bodySemi : fonts.bodyMedium }]}>
+                  {t(`explore.targets.${x}`)}
+                </AppText>
+              </Pressable>
+            );
+          })}
         </View>
       </Animated.View>
       {/* Saat ve pil çubuğunun altı, üst çubuk gizliyken de aynı renkte kalır. */}
@@ -341,11 +333,10 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.headingSemi, fontSize: 17, lineHeight: 22, letterSpacing: 5 },
   subtitle: { fontSize: 12, lineHeight: 16, marginTop: 1 },
   row: { flexDirection: 'row', gap: spacing.xs },
-  tabs: { flexDirection: 'row' },
-  glass: { padding: 4, marginBottom: spacing.sm, borderRadius: radius.pill, backgroundColor: 'rgba(255, 255, 255, 0.07)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.12)', overflow: 'hidden' },
-  tab: { minHeight: 38, alignItems: 'center', justifyContent: 'center' },
-  tabText: { fontSize: 13.5 },
-  pill: { position: 'absolute', top: 0, bottom: 0, start: 0, borderRadius: radius.pill },
+  tabs: { flexDirection: 'row', gap: 6, marginBottom: spacing.sm },
+  tab: { flex: 1, minHeight: 54, alignItems: 'center', justifyContent: 'center', gap: 3, borderRadius: radius.lg, borderWidth: 1, backgroundColor: 'rgba(255, 255, 255, 0.06)', borderColor: 'rgba(255, 255, 255, 0.12)', borderTopColor: 'rgba(255, 255, 255, 0.22)' },
+  tabOn: { backgroundColor: 'rgba(226, 178, 119, 0.16)', borderColor: 'rgba(226, 178, 119, 0.7)', borderTopColor: 'rgba(226, 178, 119, 0.7)' },
+  tabText: { fontSize: 12.5 },
   page: { paddingHorizontal: GUTTER, paddingBottom: spacing.xl },
   top: { gap: spacing.sm, paddingTop: spacing.sm },
   tagsScroll: { marginHorizontal: -GUTTER, flexGrow: 0 },
