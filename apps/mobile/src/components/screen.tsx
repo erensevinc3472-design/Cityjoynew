@@ -18,10 +18,12 @@ interface Props {
   warm?: boolean;
   /** Üst bandın arkasında, sayfaya eriyen fotoğraf (Benim Şehrim alt sayfalarında ilin kapağı). */
   cover?: Pick<Photo, 'url' | 'path'>;
+  /** Fotoğraf varken bandın alt boşluğu; başlığın altında arama / süzgeç duran sayfalarda daha az. */
+  coverPad?: number;
 }
 
 /** Güvenli alan, zemin, üst bant ve geniş ekranlarda (tablet, web) ortalanmış içerik. */
-export function Screen({ header, footer, warm, cover, children }: PropsWithChildren<Props>) {
+export function Screen({ header, footer, warm, cover, coverPad = 92, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
   const scheme = useResolvedScheme();
   const insets = useSafeAreaInsets();
@@ -39,7 +41,7 @@ export function Screen({ header, footer, warm, cover, children }: PropsWithChild
       {header ? (
         <View
           onLayout={(e) => setBandHeight(Math.round(e.nativeEvent.layout.height))}
-          style={[styles.band, cover && styles.bandCover, { backgroundColor: scheme === 'dark' || cover ? 'transparent' : c.hero, paddingTop: insets.top + spacing.sm }]}>
+          style={[styles.band, cover ? { paddingBottom: coverPad } : null, { backgroundColor: scheme === 'dark' || cover ? 'transparent' : c.hero, paddingTop: insets.top + spacing.sm }]}>
           <View style={styles.inner}>{header}</View>
         </View>
       ) : (
@@ -54,7 +56,6 @@ export function Screen({ header, footer, warm, cover, children }: PropsWithChild
 const styles = StyleSheet.create({
   root: { flex: 1 },
   band: { alignItems: 'center', paddingBottom: spacing.lg },
-  bandCover: { paddingBottom: 92 },
   inner: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER },
   body: { flex: 1, paddingTop: spacing.md, gap: spacing.md },
 });

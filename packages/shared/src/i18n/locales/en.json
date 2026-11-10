@@ -644,6 +644,9 @@
     "parks": "Parks",
     "markets": "Markets",
     "kurumlarIntro": "Neighbourhood heads, public offices and health",
+    "kurumlarSearch": "Search institutions or services",
+    "noneInDistrict": "Nothing listed in this district",
+    "matches": "Matching institutions",
     "groups": {
       "muhtarlik": {
         "title": "Neighbourhood heads",

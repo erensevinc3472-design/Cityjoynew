@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 10 Kasım 2026 (dal claude/blaze-kurulum: Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 10 Kasım 2026 (dal claude/blaze-kurulum: Önemli Kurumlar arama + ilçe düğmeleri + yeni kartlar; Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -935,6 +935,14 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   görünür. (Not: emülatördeki `ara-deneme@cityjoy.test` hesabının şifresi bu denemede yenilendi.)
   Sırada (aynı örneklerden): Önemli Kurumlar'da arama + Tümü/Kamu/Sağlık/Acil süzgeci, Müzeler tür kutularında sayı ve
   en yakın kartta fotoğraf.
+- **Önemli Kurumlar örneğe göre (10 Kasım).** Karar (Eren, 10 Kasım): örnekteki Tümü/Kamu/Sağlık/Acil yerine **ilçe
+  düğmeleri** (Tümü, kullanıcının ilçesi, sonra abece sırasıyla ilin ilçeleri). Arama kutusu ve ilçe düğmeleri fotoğrafın
+  üstünde, başlığın altında. Kartlar iki sütun: solda altın simge, ince altın çizgi, başlık + kısa açıklama, sağda ok.
+  İlçe seçilince kartta o ilçedeki kayıt sayısı (yoksa "Bu ilçede kayıt yok", soluk); alt sayfa o ilçe seçili açılır
+  (`[section]` yeni `district` alanı, `CityGuideList` yeni `initialDistrict`). Aramada eşleşen başlıklar ve en çok 12
+  kurum listelenir. `Screen` yeni `coverPad` (fotoğraf altındaki boşluk). Beş dilde 3 yeni metin. Emülatörde örnek
+  kurumlarla koyu/açık denendi, telefonda denenmedi. Sırada: alt sayfalarda (Hastaneler vb.) arama + ilçe düğmelerini
+  de fotoğrafın üstüne taşıyıp altındaki boşluğu kaldırmak, aynı kart dili; sonra Müzeler.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

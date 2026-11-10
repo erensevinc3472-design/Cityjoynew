@@ -644,6 +644,9 @@
     "parks": "الحدائق",
     "markets": "الأسواق",
     "kurumlarIntro": "المخاتير والمؤسسات العامة والصحة",
+    "kurumlarSearch": "ابحث عن مؤسسة أو خدمة",
+    "noneInDistrict": "لا توجد سجلات في هذه المنطقة",
+    "matches": "المؤسسات المطابقة",
     "groups": {
       "muhtarlik": {
         "title": "المخاتير",

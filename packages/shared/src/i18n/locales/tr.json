@@ -644,6 +644,9 @@
     "parks": "Parklar",
     "markets": "Pazar alanları",
     "kurumlarIntro": "Muhtarlıklar, kamu kurumları ve sağlık",
+    "kurumlarSearch": "Kurum veya hizmet ara",
+    "noneInDistrict": "Bu ilçede kayıt yok",
+    "matches": "Bulunan kurumlar",
     "groups": {
       "muhtarlik": {
         "title": "Muhtarlıklar",

@@ -63,6 +63,7 @@ export function CityGuideList({
   categories,
   header,
   onCount,
+  initialDistrict,
 }: {
   section: CityGuideSectionId;
   look: Look;
@@ -70,6 +71,8 @@ export function CityGuideList({
   header?: ReactElement;
   /** Kayıt sayısı (başlığın altında "Bursa · 46 yer"). */
   onCount?(n: number): void;
+  /** Açılışta seçili ilçe (Önemli Kurumlar'da seçilen ilçe). */
+  initialDistrict?: string;
 }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -82,7 +85,7 @@ export function CityGuideList({
   const { items, stale, error, retry } = useCityGuideItems(location?.provinceCode, section);
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<string | null>(null);
-  const [district, setDistrict] = useState<string | null>(null);
+  const [district, setDistrict] = useState<string | null>(initialDistrict ?? null);
   const [day, setDay] = useState<string | null>(null);
   const [all, setAll] = useState(false);
   const [pickDistrict, setPickDistrict] = useState(false);

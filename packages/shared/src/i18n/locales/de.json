@@ -644,6 +644,9 @@
     "parks": "Parks",
     "markets": "Märkte",
     "kurumlarIntro": "Ortsvorsteher, Behörden und Gesundheit",
+    "kurumlarSearch": "Einrichtung oder Dienst suchen",
+    "noneInDistrict": "In diesem Bezirk nichts eingetragen",
+    "matches": "Gefundene Einrichtungen",
     "groups": {
       "muhtarlik": {
         "title": "Ortsvorsteher",

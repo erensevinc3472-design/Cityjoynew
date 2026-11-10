@@ -30,7 +30,7 @@ export default function CitySectionScreen() {
   const { t } = useTranslation();
   const cover = useProvinceCover();
   const router = useRouter();
-  const { section, group } = useLocalSearchParams<{ section: CityGuideSectionId; group?: string }>();
+  const { section, group, district } = useLocalSearchParams<{ section: CityGuideSectionId; group?: string; district?: string }>();
   const def = citySection(section);
   const { language } = useSettings();
   const lang = language ?? 'tr';
@@ -43,7 +43,7 @@ export default function CitySectionScreen() {
 
   return (
     <Screen warm cover={cover} header={<HeroHeader serif title={title} subtitle={[place, count ? t('city.hub.places', { count }) : ''].filter(Boolean).join(' · ')} onBack={back} />}>
-      <CityGuideList section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} onCount={setCount} />
+      <CityGuideList section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} onCount={setCount} initialDistrict={district} />
     </Screen>
   );
 }
