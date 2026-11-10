@@ -1086,8 +1086,9 @@ toplamak olmaz, dron ve Wi-Fi Direct ayrı bir Ar-Ge projesi. Temeli bu duyuru b
    Moderasyon'dan yasaklı kelime listesini (26. madde) ve isterse önerilen aramaları (28. madde) doldurmalı.
 0b. Keşfet'in kalanı: fotoğraf/video (Storage, Blaze). Kalan ekranların tasarım uygulaması (32. madde: liste ve
    ayrıntı ekranları, formlar) Claude'un ölçütleriyle sürüyor. Blaze ve Eren gerektirmeyen büyük iş kalmadı: sıradakiler
-   Eren'e bağlı (Benim Şehrim Excel'i, nöbetçi eczane onayı, Expo hesabı / EAS ile telefon sürümü, Blaze plana geçiş)
-   ya da avukat teyidi isteyen haber yayıncısı başvurusu. Blaze isteyenler:
+   Eren'e bağlı (Benim Şehrim Excel'i, nöbetçi eczane onayı, Expo hesabı / EAS ile telefon sürümü; Blaze 6 Kasım'da
+   tamam, işlevler 7 Kasım'da yüklendi, harcama sigortasının iki ayarı Eren'de) ya da avukat teyidi isteyen haber
+   yayıncısı başvurusu. Blaze ile artık yapılabilecekler:
    aktivite/etkinlik değişiklik bildirimleri, günlük sınırlar. (Kurum içerikleri tamam: profil, Mahalle Meydanı, aktiviteler, sabit duyuru.)
 1. Telefonda deneme sürümü (Expo hesabı, EAS): SOS bildirimini ve arka plan konumunu gerçek telefonda denemek, QR okutma,
    Google/Apple girişi bununla gelir. Eren'den ücretsiz Expo hesabı ve erişim anahtarı gerekir.
