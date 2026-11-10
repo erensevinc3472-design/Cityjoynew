@@ -893,6 +893,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `apps/mobile/src/components/search-tree/`: sahne tek HTML sayfası (canvas), telefonda WebView, webde iframe; resim
   sayfaya gömülü (`tree-image.ts`, resim değişirse `node scripts/search-tree-image.mjs`). Başka ekrandayken çizim durur,
   "hareketi azalt" açıksa ağaç canlandırılmadan yanar. Webde (emülatör, test hesabı) denendi; telefonda denenmedi.
+  **Resim değişti (10 Kasım akşamı, Eren):** daha gerçekçi ağaç (`assets/search/agac.jpg`, kaynak masaüstü
+  CityJoy-gorseller/ara-agac-yeni.png). Işık yolları yeni gövde, dal ve köklere göre yeniden çizildi; kabuk gri-zeytin
+  olduğu için ışık katmanı formülü değişti (koyu dallar hafif, kabuk çıkıntıları güçlü yanar). Sahne tek başına webde denendi.
 
 - **Bursa muhtarlık adresleri (10 Kasım, Eren sordu).** Masaüstü `CityJoy-Bursa-muhtarliklar-panel.xlsx`: 1060 muhtarlık, ad ve
   telefon tam (Büyükşehir muhtar rehberi), adres 144 (Mudanya ve Nilüfer belediyesi, Osmangazi'nin 11 muhtarlık binası,
