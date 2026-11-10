@@ -7,7 +7,10 @@ import { eventRepository } from './services';
 const cache = new Map<string, { at: number; list: CityEvent[] }>();
 const TTL = 5 * 60 * 1000;
 
-/** İldeki yaklaşan etkinlikler (yayında ya da iptal edilmiş, bitmemiş), başlama sırasıyla. */
+/** Türkiye geneli liste için önbellek anahtarı. */
+export const NATIONWIDE = 'TR';
+
+/** İldeki (ya da `NATIONWIDE` ile Türkiye genelindeki) yaklaşan etkinlikler (yayında ya da iptal edilmiş, bitmemiş), başlama sırasıyla. */
 export function useEvents(provinceCode: string | undefined) {
   const [list, setList] = useState<CityEvent[] | null>(() => (provinceCode ? (cache.get(provinceCode)?.list ?? null) : []));
   const [failed, setFailed] = useState(false);
@@ -19,7 +22,7 @@ export function useEvents(provinceCode: string | undefined) {
       if (hit && !force && Date.now() - hit.at < TTL) return setList(hit.list);
       setFailed(false);
       try {
-        const fresh = await eventRepository.listUpcoming(provinceCode);
+        const fresh = provinceCode === NATIONWIDE ? await eventRepository.listUpcomingNationwide() : await eventRepository.listUpcoming(provinceCode);
         cache.set(provinceCode, { at: Date.now(), list: fresh });
         setList(fresh);
       } catch {

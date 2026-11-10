@@ -27,7 +27,7 @@ export function eventDateRange(item: Pick<CityEvent, 'startsAt' | 'endsAt'>, lan
  * üstünde "Ücretsiz"; sağda tür ve ilçe, ad, kısa açıklama, tarih ve saat, "Detay". İptal edilmişse etiket. Örnekteki
  * kaydet düğmesi yeni özellik olduğundan yok.
  */
-export function EventCard({ item, onPress }: { item: CityEvent; onPress(): void }) {
+export function EventCard({ item, showProvince, onPress }: { item: CityEvent; /** Başka ilin etkinliği (Türkiye geneli liste): il adı da yazar. */ showProvince?: boolean; onPress(): void }) {
   const { t } = useTranslation();
   const c = useThemeColors();
   const dark = useResolvedScheme() === 'dark';
@@ -35,7 +35,8 @@ export function EventCard({ item, onPress }: { item: CityEvent; onPress(): void 
   const lang = language ?? 'tr';
   const start = new Date(item.startsAt);
   const cancelled = item.status === 'iptal';
-  const district = item.region.districtId ? repo.getDistrict(item.region.districtId)?.name : undefined;
+  const districtName = item.region.districtId ? repo.getDistrict(item.region.districtId)?.name : undefined;
+  const district = showProvince ? [districtName, repo.getProvince(item.region.provinceCode)?.name].filter(Boolean).join(', ') : districtName;
   const time = start.toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' });
   const gold = dark ? c.heroAccent : c.primary;
 

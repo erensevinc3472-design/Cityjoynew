@@ -85,6 +85,12 @@ export function createFirestoreEventRepository(db: Firestore) {
       return (await getDocs(q)).docs.map((d) => fromDoc(d.id, d.data()));
     },
 
+    /** Türkiye geneli yaklaşan etkinlikler (Eren, 10 Kasım 2026: "Bursa'daki bir fuar başka illerin de dikkatini çeker"). Tek sorgu, en yakın 100. */
+    async listUpcomingNationwide(): Promise<CityEvent[]> {
+      const q = query(collection(db, COLLECTION), where('status', 'in', ['yayinda', 'iptal']), where('endsAt', '>=', Timestamp.now()), orderBy('endsAt', 'asc'), limit(100));
+      return (await getDocs(q)).docs.map((d) => fromDoc(d.id, d.data()));
+    },
+
     async get(id: string): Promise<CityEvent | null> {
       const snap = await getDoc(doc(db, COLLECTION, id));
       return snap.exists() ? fromDoc(snap.id, snap.data()) : null;

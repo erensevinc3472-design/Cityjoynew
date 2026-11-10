@@ -14,7 +14,7 @@ import { BLEED_STRIP, BLEED_STRIP_CONTENT, PageHead, PAGE_CONTENT, usePageBottom
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { ThumbImage } from '@/components/thumb-image';
-import { useEvents } from '@/lib/events';
+import { NATIONWIDE, useEvents } from '@/lib/events';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
@@ -48,8 +48,11 @@ export default function EventsScreen() {
   const { language } = useSettings();
   const lang = language ?? 'tr';
   const { location } = useUserLocation();
-  const { list, failed, reload } = useEvents(location?.provinceCode);
   const [onlyDistrict, setOnlyDistrict] = useState(true);
+  // Bölgesel: ilin listesi; Genel: Türkiye geneli liste (yalnızca seçilince okunur).
+  const local = useEvents(location?.provinceCode);
+  const national = useEvents(location && !onlyDistrict ? NATIONWIDE : undefined);
+  const { list, failed, reload } = onlyDistrict ? local : national;
   const [day, setDay] = useState<number | null>(null);
   const [category, setCategory] = useState<EventCategory | null>(null);
   const [width, setWidth] = useState(0);
@@ -126,7 +129,7 @@ export default function EventsScreen() {
           </View>
         ) : null}
 
-        {district ? (
+        {location ? (
           <View style={[styles.segment, { borderColor: dark ? 'rgba(226, 178, 119, 0.3)' : c.border, backgroundColor: dark ? 'rgba(10, 38, 42, 0.42)' : c.surface }]}>
             {[true, false].map((only) => {
               const on = onlyDistrict === only;
@@ -135,7 +138,7 @@ export default function EventsScreen() {
                   key={String(only)}
                   accessibilityRole="button"
                   accessibilityState={{ selected: on }}
-                  accessibilityHint={only ? t('events.regionalHint', { district: district.name }) : t('events.generalHint', { place: province ?? '' })}
+                  accessibilityHint={only ? t('events.regionalHint', { district: district?.name ?? province ?? '' }) : t('events.generalHint')}
                   onPress={() => setOnlyDistrict(only)}
                   style={[styles.segmentItem, on && { backgroundColor: c.primary }]}>
                   <MaterialIcons name={only ? 'place' : 'public'} size={16} color={on ? c.onPrimary : c.textMuted} />
@@ -197,7 +200,7 @@ export default function EventsScreen() {
         ) : (
           <>
             <AppText style={[styles.found, { color: c.textMuted }]}>{t('events.found', { count: shown.length })}</AppText>
-            {shown.map((e) => <EventCard key={e.id} item={e} onPress={() => open(e)} />)}
+            {shown.map((e) => <EventCard key={e.id} item={e} showProvince={e.region.provinceCode !== location?.provinceCode} onPress={() => open(e)} />)}
           </>
         )}
         <AppText variant="caption" muted>{t('events.note')}</AppText>

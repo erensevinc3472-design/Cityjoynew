@@ -838,7 +838,7 @@
     "regional": "Bölgesel",
     "general": "Genel",
     "regionalHint": "{{district}} ve il geneli etkinlikler",
-    "generalHint": "Tüm {{place}} etkinlikleri"
+    "generalHint": "Türkiye genelindeki etkinlikler"
   },
   "social": {
     "sections": {

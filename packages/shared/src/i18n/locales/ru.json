@@ -838,7 +838,7 @@
     "regional": "Регион",
     "general": "Все",
     "regionalHint": "События в {{district}} и по всей провинции",
-    "generalHint": "Все события: {{place}}"
+    "generalHint": "События по всей Турции"
   },
   "social": {
     "sections": {

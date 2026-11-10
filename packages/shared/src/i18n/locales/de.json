@@ -838,7 +838,7 @@
     "regional": "Regional",
     "general": "Allgemein",
     "regionalHint": "Veranstaltungen in {{district}} und landesweit",
-    "generalHint": "Alle Veranstaltungen in {{place}}"
+    "generalHint": "Veranstaltungen in der ganzen Türkei"
   },
   "social": {
     "sections": {

@@ -838,7 +838,7 @@
     "regional": "Regional",
     "general": "General",
     "regionalHint": "Events in {{district}} and province-wide",
-    "generalHint": "All events in {{place}}"
+    "generalHint": "Events across Türkiye"
   },
   "social": {
     "sections": {
