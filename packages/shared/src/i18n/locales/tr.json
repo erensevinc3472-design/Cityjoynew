@@ -759,7 +759,14 @@
       "details": "Ayrıntılar",
       "places": "{{count}} yer",
       "explore": "Şehrinde keşfet",
-      "showcaseOf": "{{city}} Vitrini"
+      "showcaseOf": "{{city}} Vitrini",
+      "all": "Tümü ({{count}})",
+      "units": {
+        "muzeler": "{{count}} müze",
+        "parklar": "{{count}} park",
+        "pazarlar": "{{count}} pazar",
+        "otoparklar": "{{count}} otopark"
+      }
     }
   },
   "announcements": {
@@ -827,7 +834,11 @@
     "detail": "Detay",
     "found": "{{count}} etkinlik bulundu",
     "today": "Bugün",
-    "thisWeek": "Bu hafta"
+    "thisWeek": "Bu hafta",
+    "regional": "Bölgesel",
+    "general": "Genel",
+    "regionalHint": "{{district}} ve il geneli etkinlikler",
+    "generalHint": "Tüm {{place}} etkinlikleri"
   },
   "social": {
     "sections": {
@@ -1766,7 +1777,21 @@
     "issue": "Sayı {{n}}",
     "editorsPick": "Editör seçkisi",
     "archive": "Geçmiş sayılar",
-    "empty": "{{city}} Vitrini'nin ilk sayısı hazırlanıyor. Her hafta şehrin en iyileri burada."
+    "empty": "{{city}} Vitrini'nin ilk sayısı hazırlanıyor. Her hafta şehrin en iyileri burada.",
+    "themes": {
+      "lezzet": "Lezzet",
+      "tarih": "Tarih",
+      "doga": "Doğa",
+      "konaklama": "Konaklama",
+      "alisveris": "Alışveriş",
+      "kultur": "Kültür",
+      "aile": "Aile",
+      "gece": "Gece"
+    },
+    "soonPanel": "Yakında bu panoda",
+    "soonPanelSub": "İlk sayı çıkınca şehrin seçkin yerleri burada olacak.",
+    "archiveEmpty": "Henüz geçmiş sayı yok. Yeni sayılar çıktıkça burada birikir.",
+    "soonIssue": "Yakında"
   },
   "roadside": {
     "title": "Yol üstü tesis",

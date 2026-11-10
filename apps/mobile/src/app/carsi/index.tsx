@@ -17,7 +17,9 @@ import {
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { Chips } from '@/components/chips';
-import { HeroHeader } from '@/components/hero-header';
+import { PillButton } from '@/components/city-hub';
+import { useProvinceCover } from '@/components/city-cover';
+import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { ListingArt, ListingCard } from '@/components/listing-card';
 import { OptionRow } from '@/components/option-row';
 import { Screen } from '@/components/screen';
@@ -41,6 +43,8 @@ type KindFilter = ListingKind | 'hepsi';
 export default function CarsiScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const cover = useProvinceCover();
+  const bottom = usePageBottom();
   const c = useThemeColors();
   const { user } = useSession();
   const { location } = useUserLocation();
@@ -113,26 +117,23 @@ export default function CarsiScreen() {
   };
 
   const back = () => (router.canGoBack() ? router.back() : router.replace('/city'));
+  // Mahalle Meydanı gibi üstte il görseli (Eren, 10 Kasım 2026); İlanlarım ve İlan ver başlığın altında.
   const header = (
-    <HeroHeader
-      title={t('carsi.title')}
-      subtitle={province}
-      onBack={back}
-      right={
-        user
-          ? [
-              { icon: 'inventory-2', label: t('carsi.mine'), onPress: () => router.push('/carsi/mine') },
-              { icon: 'add', label: t('carsi.new'), onPress: () => router.push('/carsi/new') },
-            ]
-          : undefined
-      }
-    />
+    <PageHead cover={cover} title={t('carsi.title')} subtitle={[province, t('carsi.slogan')].filter(Boolean).join(' · ')} onBack={back}>
+      {user ? (
+        <View style={styles.actions}>
+          <PillButton small icon="inventory-2" label={t('carsi.mine')} onPress={() => router.push('/carsi/mine')} />
+          <PillButton small gold icon="add" label={t('carsi.new')} onPress={() => router.push('/carsi/new')} />
+        </View>
+      ) : null}
+    </PageHead>
   );
 
   if (!location) {
     return (
-      <Screen header={header}>
-        <View style={styles.content}>
+      <Screen bleed cover={cover}>
+        <View style={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]}>
+          {header}
           <StateMessage kind="empty" message={t('carsi.needLocation')} />
           <AppButton title={t('home.changeLocation')} onPress={() => router.push('/location?edit=1')} />
         </View>
@@ -141,9 +142,9 @@ export default function CarsiScreen() {
   }
 
   return (
-    <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
-        <AppText variant="caption" muted>{t('carsi.slogan')}</AppText>
+    <Screen bleed cover={cover}>
+      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
+        {header}
         <SearchField value={query} onChangeText={(v) => (setQuery(v), v.trim() ? null : setSearched(''))} placeholder={t('carsi.searchPlaceholder')} onSubmitEditing={() => setSearched(query.trim())} />
         <Chips<KindFilter>
           label={t('carsi.kind')}
@@ -205,11 +206,12 @@ export default function CarsiScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.xl },
+  content: { gap: spacing.md },
   filters: { gap: spacing.xs },
   cats: { gap: spacing.xs, paddingVertical: spacing.xs },
   cat: { width: 76, alignItems: 'center', gap: 4, paddingVertical: spacing.xs, borderRadius: radius.md, borderWidth: 1 },
   catLabel: { textAlign: 'center' },
   safety: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start', borderWidth: 1, borderRadius: radius.md, padding: spacing.md },
   grow: { flex: 1 },
+  actions: { flexDirection: 'row', gap: spacing.sm },
 });

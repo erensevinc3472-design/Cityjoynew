@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import type { ComponentProps, PropsWithChildren, ReactNode } from 'react';
-import { LayoutAnimation, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { I18nManager, LayoutAnimation, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { fonts, radius, spacing } from '@/theme/tokens';
@@ -49,15 +49,19 @@ export function frost(dark: boolean, surface: string, border: string): ViewStyle
 }
 
 /** Bölüm başlığı (tırnaklı yazı); sağda isteğe bağlı bağlantı. */
-export function HubTitle({ title, aside, onAside }: { title: string; aside?: string; onAside?(): void }) {
+export function HubTitle({ title, icon, aside, onAside }: { title: string; icon?: IconName; aside?: string; onAside?(): void }) {
   const c = useThemeColors();
+  const dark = useResolvedScheme() === 'dark';
+  const gold = dark ? c.heroAccent : c.primary;
   return (
     <View style={styles.titleRow}>
+      {icon ? <LineIcon name={icon} size={22} color={gold} /> : null}
       <AppText accessibilityRole="header" style={[styles.title, { color: c.textStrong }]}>{title}</AppText>
       {aside ? (
-        <AppText onPress={onAside} accessibilityRole={onAside ? 'link' : undefined} style={[styles.aside, { color: onAside ? c.primary : c.textMuted }]}>
-          {aside}
-        </AppText>
+        <Pressable disabled={!onAside} onPress={onAside} accessibilityRole={onAside ? 'button' : undefined} accessibilityLabel={aside} hitSlop={8} style={styles.asideRow}>
+          <AppText style={[styles.aside, { color: onAside || icon ? gold : c.textMuted }]}>{aside}</AppText>
+          {onAside ? <MaterialIcons name={I18nManager.isRTL ? 'chevron-left' : 'chevron-right'} size={18} color={gold} /> : null}
+        </Pressable>
       ) : null}
     </View>
   );
@@ -73,16 +77,18 @@ export function LineTile({ icon, size = 38, gold }: { icon: IconName; size?: num
   );
 }
 
-/** "Türüne göre" kutusu: simge, büyük sayı, ad. */
-export function KindTile({ icon, name, count, onPress }: { icon: IconName; name: string; count: number; onPress(): void }) {
+/** "Türüne göre" kutusu (Eren'in örneği muzeler.png): simge, ad, altında sayı ("3 müze"), sağda ok. */
+export function KindTile({ icon, name, note, onPress }: { icon: IconName; name: string; note: string; onPress(): void }) {
   const c = useThemeColors();
+  const dark = useResolvedScheme() === 'dark';
   return (
-    <GlassBox style={styles.kind} onPress={onPress} label={`${name}, ${count}`}>
-      <LineTile icon={icon} size={40} gold />
-      <View style={styles.gap2}>
-        <AppText style={[styles.bigCount, { color: c.textStrong }]}>{count}</AppText>
-        <AppText style={[styles.kindName, { color: c.textStrong }]} numberOfLines={2}>{name}</AppText>
+    <GlassBox style={styles.kind} onPress={onPress} label={`${name}, ${note}`}>
+      <LineTile icon={icon} size={36} gold />
+      <View style={[styles.gap2, styles.grow]}>
+        <AppText style={[styles.kindName, { color: c.textStrong }]} numberOfLines={1}>{name}</AppText>
+        <AppText style={[styles.small, { color: c.textMuted }]} numberOfLines={1}>{note}</AppText>
       </View>
+      <MaterialIcons name={I18nManager.isRTL ? 'chevron-left' : 'chevron-right'} size={18} color={dark ? c.textStrong : c.textMuted} />
     </GlassBox>
   );
 }
@@ -252,15 +258,16 @@ export function GroupLabel({ label }: { label: string }) {
 const styles = StyleSheet.create({
   tagWrap: { alignSelf: 'flex-start' },
   glass: { borderWidth: 1, borderRadius: radius.xl, overflow: 'hidden' },
-  titleRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: spacing.sm, paddingTop: spacing.sm },
+  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm, paddingTop: spacing.sm },
   title: { flex: 1, fontFamily: fonts.serif, fontSize: 18, lineHeight: 24 },
-  aside: { fontSize: 12.5 },
+  aside: { fontFamily: fonts.bodySemi, fontSize: 12.5 },
+  asideRow: { flexDirection: 'row', alignItems: 'center' },
+  grow: { flex: 1 },
   tile: { alignItems: 'center', justifyContent: 'center' },
-  kind: { flex: 1, padding: 14, gap: 12 },
+  kind: { flex: 1, flexDirection: 'row', alignItems: 'center', minHeight: 62, paddingStart: 10, paddingEnd: 6, paddingVertical: 10, gap: 8, borderRadius: radius.lg },
+  kindName: { fontFamily: fonts.bodySemi, fontSize: 14, lineHeight: 18 },
   gap2: { gap: 2 },
   gap8: { gap: 8, alignItems: 'flex-start' },
-  bigCount: { fontFamily: fonts.serif, fontSize: 26, lineHeight: 30 },
-  kindName: { fontFamily: fonts.bodyMedium, fontSize: 13.5, lineHeight: 18 },
   district: { flex: 1, minHeight: 58, paddingHorizontal: 12, paddingVertical: 9, gap: 1, borderRadius: radius.lg },
   districtName: { fontFamily: fonts.bodyMedium, fontSize: 13.5, lineHeight: 18 },
   small: { fontSize: 12, lineHeight: 16 },

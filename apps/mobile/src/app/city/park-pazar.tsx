@@ -1,10 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { CityGuideSectionId } from '@cityjoy/shared';
 
-import { AppText } from '@/components/app-text';
+import { PhotoCard } from '@/components/city-tiles';
 import { CityGuideList } from '@/components/city-guide-list';
 import { useProvinceCover } from '@/components/city-cover';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
@@ -12,8 +12,7 @@ import { Screen } from '@/components/screen';
 import { useCityGuideMeta } from '@/lib/city-guide';
 import { LOOK } from '@/lib/city-look';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, radius } from '@/theme/tokens';
-import { useThemeColors } from '@/theme/use-theme';
+import { spacing } from '@/theme/tokens';
 
 const MARKET = { icon: 'storefront', colors: ['#FFB25C', '#EE5A24'] } as const;
 
@@ -22,28 +21,28 @@ export default function ParkMarketScreen() {
   const { t } = useTranslation();
   const cover = useProvinceCover();
   const router = useRouter();
-  const c = useThemeColors();
   const bottom = usePageBottom();
   const { location } = useUserLocation();
   const { meta } = useCityGuideMeta(location?.provinceCode);
   const hasParks = (meta?.sections.parklar?.count ?? 0) > 0;
   const [tab, setTab] = useState<CityGuideSectionId>(hasParks || !meta ? 'parklar' : 'pazarlar');
 
+  // Benim Şehrim kartları gibi iki büyük kart; seçili olan altın (Eren, 10 Kasım 2026).
   const tabs = (
-    <View style={[styles.tabs, { backgroundColor: c.surface, borderColor: c.border }]} accessibilityRole="tablist">
+    <View style={styles.tabs} accessibilityRole='tablist'>
       {(['parklar', 'pazarlar'] as const).map((s) => {
-        const on = tab === s;
+        const count = meta?.sections[s]?.count ?? 0;
         return (
-          <Pressable
+          <PhotoCard
             key={s}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: on }}
+            scene={s === 'parklar' ? 'neighbourhood' : 'market'}
+            gold={tab === s}
+            height={92}
+            icon={s === 'parklar' ? 'park' : 'storefront'}
+            title={t(s === 'parklar' ? 'city.parks' : 'city.markets')}
+            sub={count ? t(`city.hub.units.${s}`, { count }) : t('city.soon')}
             onPress={() => setTab(s)}
-            style={[styles.tab, on ? { backgroundColor: c.accent } : null]}>
-            <AppText style={[styles.tabText, { color: on ? c.onPrimary : c.textMuted }]}>
-              {t(s === 'parklar' ? 'city.parks' : 'city.markets')} {meta?.sections[s]?.count ? `(${meta.sections[s]!.count})` : ''}
-            </AppText>
-          </Pressable>
+          />
         );
       })}
     </View>
@@ -67,7 +66,5 @@ export default function ParkMarketScreen() {
 }
 
 const styles = StyleSheet.create({
-  tabs: { flexDirection: 'row', padding: 4, borderRadius: radius.pill, borderWidth: 1 },
-  tab: { flex: 1, minHeight: 36, alignItems: 'center', justifyContent: 'center', borderRadius: radius.pill },
-  tabText: { fontFamily: fonts.bodySemi, fontSize: 13 },
+  tabs: { flexDirection: 'row', gap: spacing.sm },
 });

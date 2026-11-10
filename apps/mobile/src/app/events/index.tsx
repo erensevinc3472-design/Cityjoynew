@@ -49,7 +49,7 @@ export default function EventsScreen() {
   const lang = language ?? 'tr';
   const { location } = useUserLocation();
   const { list, failed, reload } = useEvents(location?.provinceCode);
-  const [onlyDistrict, setOnlyDistrict] = useState(false);
+  const [onlyDistrict, setOnlyDistrict] = useState(true);
   const [day, setDay] = useState<number | null>(null);
   const [category, setCategory] = useState<EventCategory | null>(null);
   const [width, setWidth] = useState(0);
@@ -128,18 +128,19 @@ export default function EventsScreen() {
 
         {district ? (
           <View style={[styles.segment, { borderColor: dark ? 'rgba(226, 178, 119, 0.3)' : c.border, backgroundColor: dark ? 'rgba(10, 38, 42, 0.42)' : c.surface }]}>
-            {[false, true].map((only) => {
+            {[true, false].map((only) => {
               const on = onlyDistrict === only;
               return (
                 <Pressable
                   key={String(only)}
                   accessibilityRole="button"
                   accessibilityState={{ selected: on }}
+                  accessibilityHint={only ? t('events.regionalHint', { district: district.name }) : t('events.generalHint', { place: province ?? '' })}
                   onPress={() => setOnlyDistrict(only)}
                   style={[styles.segmentItem, on && { backgroundColor: c.primary }]}>
                   <MaterialIcons name={only ? 'place' : 'public'} size={16} color={on ? c.onPrimary : c.textMuted} />
                   <AppText style={[styles.segmentText, { color: on ? c.onPrimary : c.text }]} numberOfLines={1}>
-                    {only ? t('events.onlyDistrict', { place: district.name }) : t('events.wholeProvince', { place: province ?? '' })}
+                    {only ? t('events.regional') : t('events.general')}
                   </AppText>
                 </Pressable>
               );

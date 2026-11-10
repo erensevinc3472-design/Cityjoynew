@@ -29,6 +29,8 @@ const THEME_SCENES: Record<ShowcaseTheme, SceneKind> = {
   gece: 'city',
 };
 
+const PLACEHOLDER_THEMES: ShowcaseTheme[] = ['lezzet', 'tarih', 'doga'];
+
 /**
  * İl Vitrini (tasarım: bursa-vitrini.html; Karar Eren, 3 Kasım 2026): şehirdeki reklam panoları gibi bir reklam vitrini.
  * En son sayı açılır; panolar Sosyal Harmoni'deki gibi yana kaydırılır, her panoda seçilen işletmeler ve gezilecek yerler
@@ -66,6 +68,21 @@ export default function CityShowcaseScreen() {
       ? router.push({ pathname: '/business/[id]', params: { id: item.id } })
       : router.push({ pathname: '/travel/place/[id]', params: { id: item.id } });
 
+  // Geçmiş sayı yokken de yeri görünsün (Eren, 10 Kasım 2026): soluk, kesik çizgili boş kapaklar.
+  const emptyArchive = (
+    <>
+      <SectionTitle title={t('showcase.archive')} />
+      <View style={styles.covers} accessible accessibilityLabel={t('showcase.archiveEmpty')}>
+        {[0, 1, 2].map((k) => (
+          <View key={k} style={[styles.cover, styles.coverEmpty, { borderColor: c.border, backgroundColor: c.surface }]}>
+            <MaterialIcons name="auto-stories" size={26} color={c.textSoft} />
+          </View>
+        ))}
+      </View>
+      <AppText style={[styles.note, { color: c.textMuted }]}>{t('showcase.archiveEmpty')}</AppText>
+    </>
+  );
+
   const header = <PageHead cover={cover} title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
@@ -79,7 +96,45 @@ export default function CityShowcaseScreen() {
         ) : issues === null ? (
           <StateMessage kind="loading" />
         ) : !issue ? (
-          <StateMessage kind="empty" message={t('showcase.empty', { city: province })} />
+          <>
+            {/* İlk sayı çıkana kadar boş panolar: kayan kartların yeri görünsün, uydurma içerik yok. */}
+            <ScrollView horizontal snapToInterval={panelW + spacing.sm} decelerationRate="fast" showsHorizontalScrollIndicator={false} contentContainerStyle={styles.panels}>
+              {PLACEHOLDER_THEMES.map((theme, i) => {
+                const scene = THEME_SCENES[theme];
+                return (
+                  <View key={theme} accessible accessibilityLabel={`${t(`showcase.themes.${theme}`)}. ${t('showcase.soonPanel')}`} style={[styles.story, { width: panelW, backgroundColor: c.surface, borderColor: c.border }]}>
+                    <View style={[styles.storyArt, { backgroundColor: sceneSky(scene) }]}>
+                      <View style={StyleSheet.absoluteFill}>
+                        <SceneArt kind={scene} still />
+                      </View>
+                      <View style={[StyleSheet.absoluteFill, styles.shade]} />
+                      <View style={styles.adTag}>
+                        <Tag label={t('showcase.soonIssue')} />
+                      </View>
+                      <View style={styles.storyHead}>
+                        <AppText style={styles.storyNo}>{String(i + 1).padStart(2, '0')} · {t(`showcase.themes.${theme}`)}</AppText>
+                        <AppText style={styles.storyTitle}>{t('showcase.soonPanel')}</AppText>
+                      </View>
+                    </View>
+                    <AppText style={[styles.body, { color: c.textMuted }]}>{t('showcase.soonPanelSub')}</AppText>
+                    {[0, 1, 2].map((j) => (
+                      <View key={j} style={[styles.item, { borderTopColor: c.border }]}>
+                        <View style={[styles.rank, { backgroundColor: c.accentSoft }]}>
+                          <AppText style={[styles.rankText, { color: c.accent }]}>{j + 1}</AppText>
+                        </View>
+                        <View style={styles.flex}>
+                          <View style={[styles.bar, { width: `${70 - j * 12}%`, backgroundColor: c.border }]} />
+                          <View style={[styles.bar, styles.barSmall, { width: `${45 - j * 8}%`, backgroundColor: c.border }]} />
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                );
+              })}
+            </ScrollView>
+            <AppText style={[styles.intro, { color: c.textMuted }]}>{t('showcase.empty', { city: province })}</AppText>
+            {emptyArchive}
+          </>
         ) : (
           <>
             <View style={[styles.masthead, { backgroundColor: c.hero }]}>
@@ -164,7 +219,9 @@ export default function CityShowcaseScreen() {
                 })}
                 </View>
               </>
-            ) : null}
+            ) : (
+              emptyArchive
+            )}
           </>
         )}
       </ScrollView>
@@ -188,6 +245,9 @@ const styles = StyleSheet.create({
   coverNo: { color: '#E2B277', fontFamily: fonts.bodySemi, fontSize: 10.5 },
   coverTitle: { color: '#FFFFFF', fontFamily: fonts.heading, fontSize: 13, lineHeight: 17 },
   coverDate: { color: 'rgba(255, 255, 255, 0.75)', fontSize: 10 },
+  coverEmpty: { borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', opacity: 0.7 },
+  bar: { height: 10, borderRadius: 5 },
+  barSmall: { height: 8, marginTop: 4 },
   coverCheck: { position: 'absolute', top: 6, end: 6 },
   story: { borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden' },
   storyArt: { height: 150, justifyContent: 'flex-end', overflow: 'hidden' },

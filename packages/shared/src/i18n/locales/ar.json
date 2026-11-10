@@ -759,7 +759,14 @@
       "details": "التفاصيل",
       "places": "{{count}} مكان",
       "explore": "اكتشف مدينتك",
-      "showcaseOf": "واجهة {{city}}"
+      "showcaseOf": "واجهة {{city}}",
+      "all": "الكل ({{count}})",
+      "units": {
+        "muzeler": "{{count}} متحف",
+        "parklar": "{{count}} حديقة",
+        "pazarlar": "{{count}} سوق",
+        "otoparklar": "{{count}} موقف"
+      }
     }
   },
   "announcements": {
@@ -827,7 +834,11 @@
     "detail": "التفاصيل",
     "found": "تم العثور على {{count}} فعالية",
     "today": "اليوم",
-    "thisWeek": "هذا الأسبوع"
+    "thisWeek": "هذا الأسبوع",
+    "regional": "إقليمي",
+    "general": "عام",
+    "regionalHint": "فعاليات {{district}} والمحافظة",
+    "generalHint": "كل فعاليات {{place}}"
   },
   "social": {
     "sections": {
@@ -1766,7 +1777,21 @@
     "issue": "العدد {{n}}",
     "editorsPick": "اختيار المحرر",
     "archive": "الأعداد السابقة",
-    "empty": "العدد الأول من واجهة {{city}} قيد الإعداد. كل أسبوع أفضل ما في المدينة."
+    "empty": "العدد الأول من واجهة {{city}} قيد الإعداد. كل أسبوع أفضل ما في المدينة.",
+    "themes": {
+      "lezzet": "المذاق",
+      "tarih": "التاريخ",
+      "doga": "الطبيعة",
+      "konaklama": "الإقامة",
+      "alisveris": "التسوق",
+      "kultur": "الثقافة",
+      "aile": "العائلة",
+      "gece": "الليل"
+    },
+    "soonPanel": "قريبًا في هذه اللوحة",
+    "soonPanelSub": "عند صدور العدد الأول ستجد هنا أفضل أماكن المدينة.",
+    "archiveEmpty": "لا توجد أعداد سابقة بعد. ستتجمع هنا مع صدور أعداد جديدة.",
+    "soonIssue": "قريبًا"
   },
   "roadside": {
     "title": "منشأة على الطريق",

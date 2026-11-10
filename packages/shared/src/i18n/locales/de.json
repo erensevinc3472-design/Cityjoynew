@@ -759,7 +759,14 @@
       "details": "Details",
       "places": "{{count}} Orte",
       "explore": "Entdecke deine Stadt",
-      "showcaseOf": "Schaufenster {{city}}"
+      "showcaseOf": "Schaufenster {{city}}",
+      "all": "Alle ({{count}})",
+      "units": {
+        "muzeler": "{{count}} Museen",
+        "parklar": "{{count}} Parks",
+        "pazarlar": "{{count}} Märkte",
+        "otoparklar": "{{count}} Parkplätze"
+      }
     }
   },
   "announcements": {
@@ -827,7 +834,11 @@
     "detail": "Details",
     "found": "{{count}} Veranstaltungen gefunden",
     "today": "Heute",
-    "thisWeek": "Diese Woche"
+    "thisWeek": "Diese Woche",
+    "regional": "Regional",
+    "general": "Allgemein",
+    "regionalHint": "Veranstaltungen in {{district}} und landesweit",
+    "generalHint": "Alle Veranstaltungen in {{place}}"
   },
   "social": {
     "sections": {
@@ -1766,7 +1777,21 @@
     "issue": "Ausgabe {{n}}",
     "editorsPick": "Redaktionstipp",
     "archive": "Frühere Ausgaben",
-    "empty": "Die erste Ausgabe des {{city}} Schaufensters ist in Arbeit. Jede Woche das Beste der Stadt."
+    "empty": "Die erste Ausgabe des {{city}} Schaufensters ist in Arbeit. Jede Woche das Beste der Stadt.",
+    "themes": {
+      "lezzet": "Genuss",
+      "tarih": "Geschichte",
+      "doga": "Natur",
+      "konaklama": "Unterkunft",
+      "alisveris": "Einkaufen",
+      "kultur": "Kultur",
+      "aile": "Familie",
+      "gece": "Nacht"
+    },
+    "soonPanel": "Bald auf dieser Tafel",
+    "soonPanelSub": "Sobald die erste Ausgabe erscheint, findest du hier die besten Orte der Stadt.",
+    "archiveEmpty": "Noch keine früheren Ausgaben. Neue Ausgaben sammeln sich hier.",
+    "soonIssue": "Bald"
   },
   "roadside": {
     "title": "Raststätte / Rastplatz",

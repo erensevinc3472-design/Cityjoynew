@@ -45,7 +45,7 @@ export default function CitySectionScreen() {
   return (
     <Screen bleed cover={cover}>
       <CityGuideList
-        header={<PageHead cover={cover} title={title} subtitle={[place, count ? t('city.hub.places', { count }) : ''].filter(Boolean).join(' · ')} onBack={back} />}
+        header={<PageHead cover={cover} title={title} subtitle={[place, count ? t(`city.hub.units.${section}`, { count, defaultValue: t('city.hub.places', { count }) }) : ''].filter(Boolean).join(' · ')} onBack={back} />}
         contentStyle={[PAGE_CONTENT, { paddingBottom: bottom }]}
         section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} onCount={setCount} initialDistrict={district} />
     </Screen>

@@ -47,6 +47,15 @@ const KIND_ICON: Record<string, Look['icon']> = {
   valilik: 'account-balance',
   kaymakamlik: 'account-balance',
   adliye: 'gavel',
+  tarih: 'account-balance',
+  arkeoloji: 'history-edu',
+  sanat: 'palette',
+  sanayi: 'factory',
+  kultur: 'theater-comedy',
+  etnografya: 'diversity-3',
+  bilim: 'science',
+  kent: 'location-city',
+  diger: 'grid-view',
 };
 
 const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
@@ -166,6 +175,8 @@ export function CityGuideList({
     setAll(false);
   };
 
+  /** "3 müze", "5 park"; bölüme özel ad yoksa "3 yer". */
+  const unit = (count: number) => t(`city.hub.units.${section}`, { count, defaultValue: t('city.hub.places', { count }) });
   const featuredKind = FEATURED[section];
   const filtered = !!(query || kind || district || day);
   const hub = !filtered && !all && !isMarket && own.length >= HUB_MIN && (kinds.length >= 2 || districts.length >= 3);
@@ -197,11 +208,11 @@ export function CityGuideList({
     <>
       {kinds.length >= 2 ? (
         <>
-          <HubTitle title={t('city.hub.byKind')} />
+          <HubTitle icon={look.icon} title={t('city.hub.byKind')} aside={t('city.hub.all', { count: own.length })} onAside={() => setAll(true)} />
           {chunk(kinds.slice(0, MAX_KINDS), 2).map((pair, n) => (
             <View key={n} style={styles.gridRow}>
               {pair.map((k) => (
-                <KindTile key={k} icon={KIND_ICON[k] ?? look.icon} name={kindName(k)} count={kindCount.get(k)!} onPress={() => setKind(k)} />
+                <KindTile key={k} icon={KIND_ICON[k] ?? look.icon} name={kindName(k)} note={unit(kindCount.get(k)!)} onPress={() => setKind(k)} />
               ))}
               {pair.length < 2 ? <View style={styles.flex} /> : null}
             </View>
@@ -211,8 +222,9 @@ export function CityGuideList({
       {districts.length >= 2 ? (
         <>
           <HubTitle
+            icon="location-on"
             title={t('city.hub.byDistrict')}
-            aside={moreDistricts ? t('city.hub.districts', { count: districts.length }) : undefined}
+            aside={t('city.hub.districts', { count: districts.length })}
             onAside={moreDistricts ? () => setPickDistrict(true) : undefined}
           />
           {chunk([...districtTiles, ...(moreDistricts ? ['*'] : [])], 3).map((row, n) => (
@@ -224,7 +236,7 @@ export function CityGuideList({
                   <DistrictTile
                     key={id}
                     name={districtName(id) ?? id}
-                    note={id === mine ? t('city.hub.yourDistrict', { count: districtCount.get(id) }) : String(districtCount.get(id))}
+                    note={unit(districtCount.get(id)!)}
                     mine={id === mine}
                     onPress={() => setDistrict(id)}
                   />
@@ -237,7 +249,7 @@ export function CityGuideList({
       ) : null}
       {near ? (
         <>
-          <HubTitle title={t('city.hub.nearest')} />
+          <HubTitle icon="my-location" title={t('city.hub.nearest')} />
           {spotlight(near)}
         </>
       ) : null}

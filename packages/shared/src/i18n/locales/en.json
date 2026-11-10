@@ -759,7 +759,14 @@
       "details": "Details",
       "places": "{{count}} places",
       "explore": "Explore your city",
-      "showcaseOf": "{{city}} Showcase"
+      "showcaseOf": "{{city}} Showcase",
+      "all": "All ({{count}})",
+      "units": {
+        "muzeler": "{{count}} museums",
+        "parklar": "{{count}} parks",
+        "pazarlar": "{{count}} markets",
+        "otoparklar": "{{count}} car parks"
+      }
     }
   },
   "announcements": {
@@ -827,7 +834,11 @@
     "detail": "Details",
     "found": "{{count}} events found",
     "today": "Today",
-    "thisWeek": "This week"
+    "thisWeek": "This week",
+    "regional": "Regional",
+    "general": "General",
+    "regionalHint": "Events in {{district}} and province-wide",
+    "generalHint": "All events in {{place}}"
   },
   "social": {
     "sections": {
@@ -1766,7 +1777,21 @@
     "issue": "Issue {{n}}",
     "editorsPick": "Editor's pick",
     "archive": "Past issues",
-    "empty": "The first {{city}} Showcase is on its way. Every week, the city's best in one place."
+    "empty": "The first {{city}} Showcase is on its way. Every week, the city's best in one place.",
+    "themes": {
+      "lezzet": "Food",
+      "tarih": "History",
+      "doga": "Nature",
+      "konaklama": "Stays",
+      "alisveris": "Shopping",
+      "kultur": "Culture",
+      "aile": "Family",
+      "gece": "Night"
+    },
+    "soonPanel": "Coming to this panel",
+    "soonPanelSub": "When the first issue is out, the city’s best places will be here.",
+    "archiveEmpty": "No past issues yet. They will gather here as new ones come out.",
+    "soonIssue": "Soon"
   },
   "roadside": {
     "title": "Roadside facility",

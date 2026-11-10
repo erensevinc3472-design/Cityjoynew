@@ -1,19 +1,15 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
-import { useEffect, useId, useState, type ComponentProps, type ReactNode } from 'react';
-import { Image } from 'expo-image';
-import { I18nManager, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { CITY_GUIDE_SECTIONS, type CityGuideSectionId } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
-import { frost } from '@/components/city-hub';
-import { FrostFill } from '@/components/glass';
+import { GlassRow, GOLD, KURUMLAR_ART, MAHALLE_ART, PhotoCard, SectionHeading, Shade, TOWNHALL_ART, VITRIN_ART, type IconName } from '@/components/city-tiles';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { LineIcon } from '@/components/line-icon';
-import { CoverArt, SceneArt, type SceneKind } from '@/components/scene-art';
+import { CoverArt } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
 import { Skyline } from '@/components/skyline';
 import { StateMessage } from '@/components/state-message';
@@ -25,16 +21,6 @@ import { useUserLocation } from '@/lib/user-location';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
-type IconName = ComponentProps<typeof MaterialIcons>['name'];
-
-const GOLD = '#E2B277';
-const TEAL = '#4FC2A8';
-// Eren'in taslağındaki görseller (8 Kasım 2026): her ilde aynı olan süsler. İlin kendi fotoğrafı panelden gelir.
-// Eren'in ChatGPT ile hazırladığı resimler (8 Kasım 2026), her ilde aynı. Kaynakları masaüstündeki CityJoy-gorseller klasöründe.
-const TOWNHALL_ART = require('../../../assets/city/belediye.jpg') as number;
-const KURUMLAR_ART = require('../../../assets/city/kurumlar.jpg') as number;
-const MAHALLE_ART = require('../../../assets/city/mahalle.jpg') as number;
-const VITRIN_ART = require('../../../assets/city/vitrin.jpg') as number;
 
 interface Tile {
   key: string;
@@ -125,29 +111,9 @@ export default function MyCityScreen() {
     return { ready: !!meta && (count > 0 || tile.section === 'nasil-yapilir'), label: sectionName(tile.section) };
   };
   const open = (tile: Tile) => (tile.href ? router.push(tile.href) : router.push({ pathname: '/city/[section]', params: { section: tile.section! } }));
-  const tintOf = (tile: Tile) => (tile.tint === 'gold' ? GOLD : tile.tint === 'teal' ? TEAL : c.textStrong);
-  const glass = frost(dark, c.surface, c.border);
-
-  const soonChip = <AppText style={[styles.soon, { backgroundColor: c.surfaceStrong, color: c.textMuted }]}>{t('city.soon')}</AppText>;
-
   const renderRow = (tile: Tile) => {
     const { ready, label } = tileState(tile);
-    return (
-      <Pressable
-        key={tile.key}
-        accessibilityRole="button"
-        accessibilityLabel={ready ? label : `${label}. ${t('city.soon')}`}
-        accessibilityState={{ disabled: !ready }}
-        disabled={!ready}
-        onPress={() => open(tile)}
-        style={({ pressed }) => [styles.row, glass, { opacity: !ready ? 0.5 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-        <FrostFill />
-        <LineIcon name={tile.icon} size={21} color={tintOf(tile)} />
-        <AppText numberOfLines={2} style={[styles.rowTitle, { color: c.textStrong }]}>{label}</AppText>
-        {!ready ? soonChip : null}
-        <Chevron plain={!dark} />
-      </Pressable>
-    );
+    return <GlassRow key={tile.key} icon={tile.icon} tint={tile.tint} title={label} soon={!ready} onPress={() => open(tile)} />;
   };
 
   const townhall = tileState({ key: 'belediye-hizmetleri', section: 'belediye-hizmetleri', icon: 'apartment' });
@@ -184,13 +150,7 @@ export default function MyCityScreen() {
         {stale ? <AppText variant="caption" muted>{t('city.staleNote')}</AppText> : null}
         {failed && !meta ? <StateMessage kind="error" message={t('city.loadError')} /> : !meta ? <StateMessage kind="loading" /> : null}
 
-        <View style={styles.heading}>
-          <View style={styles.headingIcon}>
-            <LineIcon name="explore" size={15} color="#2A1C06" />
-          </View>
-          <AppText accessibilityRole="header" style={[styles.headingText, { color: c.textStrong }]}>{t('city.hub.explore')}</AppText>
-          <View style={[styles.headingLine, { backgroundColor: c.border }]} />
-        </View>
+        <SectionHeading title={t('city.hub.explore')} />
 
         <View style={styles.pair}>
           <PhotoCard
@@ -244,67 +204,6 @@ export default function MyCityScreen() {
   );
 }
 
-/** Kartın soldan sağa koyulaşan örtüsü (fotoğraf üstündeki yazı okunsun). */
-function Shade({ from, opacity, mid = 0.55, to = 0.15 }: { from: string; opacity: number; mid?: number; to?: number }) {
-  const rtl = I18nManager.isRTL;
-  const id = 'shade' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <Svg width="100%" height="100%" preserveAspectRatio="none">
-        <Defs>
-          <LinearGradient id={id} x1={rtl ? '1' : '0'} y1="0" x2={rtl ? '0' : '1'} y2="0.3">
-            <Stop offset="0" stopColor={from} stopOpacity={opacity} />
-            <Stop offset="0.4" stopColor={from} stopOpacity={opacity * mid} />
-            <Stop offset="1" stopColor={from} stopOpacity={to} />
-          </LinearGradient>
-        </Defs>
-        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
-      </Svg>
-    </View>
-  );
-}
-
-/** Silüetin üst kenarını sayfa zeminine eritir. */
-/** Sağdaki küçük yuvarlak ok. */
-function Chevron({ gold, plain }: { gold?: boolean; plain?: boolean }) {
-  const rtl = I18nManager.isRTL;
-  return (
-    <View style={[styles.chevron, gold ? styles.chevronGold : null, plain ? styles.chevronPlain : null]}>
-      <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={16} color={gold ? '#2A1C06' : plain ? '#0E5A55' : '#EAF1EF'} />
-    </View>
-  );
-}
-
-/** Fotoğraflı (şimdilik çizimli) büyük kart: Belediye, Mahalle Meydanı, Vitrin. `gold`: altın tonlu örtü. */
-function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, onPress }: { scene: SceneKind; image?: number; gold?: boolean; icon: IconName; title: string; sub?: string; flex?: number; onPress(): void }): ReactNode {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={sub ? `${title}. ${sub}` : title}
-      onPress={onPress}
-      style={({ pressed }) => [styles.tall, styles.photoCard, { flex, borderColor: gold ? 'rgba(226, 178, 119, 0.55)' : 'rgba(220, 240, 236, 0.18)', transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-      {image ? (
-        <View style={styles.cardArt}>
-          <Image source={image} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
-        </View>
-      ) : (
-        <SceneArt kind={scene} still />
-      )}
-      <Shade from={gold ? '#A87B3E' : '#061417'} opacity={image ? 1 : gold ? 0.95 : 0.88} mid={image ? 0.6 : 0.55} to={image ? 0 : gold ? 0.35 : 0.2} />
-      <View>
-        <LineIcon name={icon} size={24} color="#FFFFFF" />
-      </View>
-      <View style={styles.tallFoot}>
-        <View style={styles.flex}>
-          <AppText numberOfLines={2} style={styles.photoTitle}>{title}</AppText>
-          {sub ? <AppText numberOfLines={1} style={styles.photoSub}>{sub}</AppText> : null}
-        </View>
-        <Chevron gold={gold} />
-      </View>
-    </Pressable>
-  );
-}
-
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
   content: { gap: spacing.sm },
@@ -315,26 +214,7 @@ const styles = StyleSheet.create({
   cityName: { fontFamily: fonts.serifSemi, fontSize: 30, lineHeight: 36, color: white, marginTop: 2 },
   placeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   place: { flexShrink: 1, fontSize: 12, color: '#E3ECEA' },
-  heading: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: spacing.xs },
-  headingIcon: { width: 24, height: 24, borderRadius: 12, backgroundColor: GOLD, alignItems: 'center', justifyContent: 'center' },
-  headingText: { fontFamily: fonts.serif, fontSize: 17, lineHeight: 22 },
-  headingLine: { flex: 1, height: 1, marginStart: 6 },
   pair: { flexDirection: 'row', gap: spacing.sm },
   bottom: { marginTop: spacing.sm },
-  tall: { flex: 1, height: 100, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden', padding: spacing.sm + 2, justifyContent: 'space-between' },
-  tallFoot: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  tallTitle: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
-  photoCard: { backgroundColor: '#0B2327' },
-  cardArt: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
   coverPhoto: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
-  photoTitle: { fontFamily: fonts.serifSemi, fontSize: 15, lineHeight: 18, color: white },
-  photoSub: { fontSize: 11, lineHeight: 14, color: '#E3ECEA', marginTop: 2 },
-  flex: { flex: 1 },
-  row: { flex: 1, minHeight: 50, borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 8, paddingStart: 12, paddingEnd: 8, paddingVertical: 8 },
-  rowTitle: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 16 },
-  soon: { position: 'absolute', top: 3, end: 6, fontFamily: fonts.bodySemi, fontSize: 9, paddingHorizontal: 6, paddingVertical: 1, borderRadius: radius.pill, overflow: 'hidden' },
-  chevron: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(220, 240, 236, 0.14)' },
-  chevronGold: { backgroundColor: GOLD },
-  // Açık modda beyaz kart üstünde: açık yeşil zemin, koyu ok.
-  chevronPlain: { backgroundColor: 'rgba(14, 90, 85, 0.10)' },
 });
