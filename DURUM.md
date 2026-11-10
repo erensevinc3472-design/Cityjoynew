@@ -909,8 +909,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   saati yalnızca kuralı kesin türlere yazıldı (347 satır): emniyet, jandarma, itfaiye 7/24; devlet hastanesi poliklinik
   08:00-17:00 + acil 7/24; ASM hafta içi 08:00-17:00 (teyit notlu). Noter, PTT, kütüphane, özel hastane boş (şubeye göre
   değişir). Bakanlık müzeleri (6) muze.gov.tr'den: saat 08:00-17:00 (gişe 16:30), kapalı gün, ücret, Müzekart; Arkeoloji,
-  17. yy Osmanlı Evi ve Yenişehir Şemaki Evi şu an kapalı (notta). Denetim 4 dosyada 0 hata. Açık: ASM telefonları için
-  İl Sağlık Müdürlüğü'nün resmî iletişim Excel'i (indirme izni Eren'den bekleniyor).
+  17. yy Osmanlı Evi ve Yenişehir Şemaki Evi şu an kapalı (notta). Denetim 4 dosyada 0 hata. ASM telefonları: İl Sağlık
+  Müdürlüğü'nün resmî "ASM iletişim" Excel'i indirildi; içinde telefon sütunu yok (ilçe, ad, birimler, adres). 241 ASM
+  panel dosyasıyla birebir aynı (dosya zaten bu listeden yapılmış). Telefonlar boş kalır; ASM uygulamaya katılınca kurum
+  profilinden girer.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
