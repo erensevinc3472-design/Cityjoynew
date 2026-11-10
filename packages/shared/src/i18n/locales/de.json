@@ -823,7 +823,11 @@
       "saglik": "Gesundheit",
       "gonulluluk": "Ehrenamt",
       "diger": "Sonstiges"
-    }
+    },
+    "detail": "Details",
+    "found": "{{count}} Veranstaltungen gefunden",
+    "today": "Heute",
+    "thisWeek": "Diese Woche"
   },
   "social": {
     "sections": {
@@ -940,7 +944,19 @@
     "noGathering": "Angaben zu Sammelplätzen wurden noch nicht hinzugefügt. Sie finden sie bei e-Devlet (Suche „Notfall-Sammelplatz“).",
     "municipalities": "Meine Gemeinde",
     "feedSoon": "Der Viertel-Feed (Beiträge der Nachbarn) kommt mit „Entdecken“.",
-    "places": "In deinem Viertel"
+    "places": "In deinem Viertel",
+    "muhtarHint": "Dein Muhtar, Telefon und Öffnungszeiten",
+    "announcementsHint": "Ankündigungen für dein Viertel",
+    "eventsHint": "Treffen, Veranstaltungen und Begegnungen",
+    "gatheringHint": "Die nächsten sicheren Sammelplätze",
+    "servicesTitle": "Dienste in der Nähe",
+    "servicesHint": "Banken, Geldautomaten, Notare und mehr",
+    "municipalitiesHint": "Kontaktdaten deiner Gemeinde",
+    "health": "Gesundheit",
+    "change": "Ändern",
+    "newCount": "{{count}} neu",
+    "education": "Schulen",
+    "worship": "Gebetsorte"
   },
   "activities": {
     "title": "Aktivitäten",

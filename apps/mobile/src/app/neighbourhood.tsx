@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentProps, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
@@ -12,24 +12,27 @@ import {
 } from '@cityjoy/shared';
 
 import { AnnouncementCard } from '@/components/announcement-card';
-import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { frost, PillButton } from '@/components/city-hub';
+import { useProvinceCover } from '@/components/city-cover';
 import { EventCard } from '@/components/event-card';
-import { GlossyIcon } from '@/components/glossy-icon';
-import { HeroHeader, LocationChip } from '@/components/hero-header';
+import { FrostFill } from '@/components/glass';
 import { OfficialProfileCard } from '@/components/official-profile-card';
+import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useAnnouncements } from '@/lib/announcements';
 import { useCityGuideItems } from '@/lib/city-guide';
-import { INSTITUTION_GROUPS } from '@/lib/city-look';
 import { useEvents } from '@/lib/events';
 import { locationRepository as repo } from '@/lib/locations';
 import { useOfficialProfiles } from '@/lib/official-profiles';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, radius, spacing } from '@/theme/tokens';
-import { useThemeColors } from '@/theme/use-theme';
+import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
+
+type IconName = ComponentProps<typeof MaterialIcons>['name'];
+type RowId = 'muhtar' | 'announcements' | 'events' | 'gathering' | 'municipalities';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : undefined);
 
@@ -39,21 +42,36 @@ function guideMuhtar(item: CityGuideItem): OfficialProfile {
   return { id: item.id, type: 'muhtar', name: str(v.muhtar_adi) ?? '', phone: str(v.telefon), address: str(v.adres), hours: str(v.calisma_saatleri), updatedAt: '' };
 }
 
+/** Üstteki dört kutudan üçü: o ilçedeki okullar, aile sağlığı merkezleri, ibadethaneler (Önemli Kurumlar grupları). */
+const PLACE_TILES: { id: string; icon: IconName; label: 'neighbourhood.education' | 'neighbourhood.health' | 'neighbourhood.worship' }[] = [
+  { id: 'egitim', icon: 'school', label: 'neighbourhood.education' },
+  { id: 'asm', icon: 'medical-services', label: 'neighbourhood.health' },
+  { id: 'ibadethane', icon: 'mosque', label: 'neighbourhood.worship' },
+];
+
 /**
- * Mahalle Meydanı (PROJE.md 5.1, Eren onayladı): mahallenin künyesi, akış değil. Muhtarlık (resmî profil, yoksa şehir
- * rehberindeki kayıt), mahalleye özel duyurular, yakındaki etkinlikler, afet toplanma alanları ve belediyeler.
+ * Mahalle Meydanı (PROJE.md 5.1, Eren onayladı; tasarım örneği `mahalle-meydani.png`, 10 Kasım 2026): mahallenin künyesi,
+ * akış değil. Kayan ince başlık ve il fotoğrafı; dört kutu (Muhtarlık, Eğitim, Sağlık, İbadethane); açılır satırlar
+ * (muhtarlık, mahalle duyuruları, etkinlikler, afet toplanma alanları, belediye) ve çevredeki hizmetler; en altta mahalle
+ * kartı ve "Değiştir". Örnekteki bildirim / menü düğmeleri ve gömülü harita yeni özellik / maliyet olduğundan yok.
  * Okumalar önbellekli: duyuru ve etkinlik il başına tek sorgu, profiller tek tek okuma (en çok 3).
  */
 export default function NeighbourhoodScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const dark = useResolvedScheme() === 'dark';
+  const cover = useProvinceCover();
+  const bottom = usePageBottom();
   const { rtl } = useSettings();
   const { location } = useUserLocation();
   const [name, setName] = useState<string>();
+  const [open, setOpen] = useState<RowId | null>(null);
   const nb = location?.neighbourhoodId;
   const districtId = location?.districtId;
   const provinceCode = location?.provinceCode;
+  const gold = dark ? c.heroAccent : c.primary;
+  const chevron = rtl ? 'chevron-left' : 'chevron-right';
 
   useEffect(() => {
     setName(undefined);
@@ -73,20 +91,18 @@ export default function NeighbourhoodScreen() {
   const province = provinceCode ? repo.getProvince(provinceCode)?.name : undefined;
   const place = [district, province].filter(Boolean).join(', ');
   const inMahalle = (i: CityGuideItem) => i.districtId === districtId && !!name && sameNeighbourhoodName(str(i.values.mahalle) ?? '', name);
-
-  const header = (
-    <HeroHeader title={t('neighbourhood.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}>
-      <LocationChip label={[name, district, province].filter(Boolean).join(', ') || t('home.noLocation')} onPress={() => router.push('/location?edit=1')} />
-    </HeroHeader>
-  );
+  const back = () => (router.canGoBack() ? router.back() : router.replace('/city'));
+  const changePlace = () => router.push('/location?edit=1');
+  const subtitle = [name, place].filter(Boolean).join(' · ') || t('home.noLocation');
 
   if (!nb) {
     return (
-      <Screen header={header}>
-        <View style={styles.content}>
+      <Screen bleed cover={cover}>
+        <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]}>
+          <PageHead cover={cover} extend={40} title={t('neighbourhood.title')} subtitle={place || undefined} onBack={back} />
           <StateMessage kind="empty" message={t('neighbourhood.needNeighbourhood')} />
-          <AppButton title={t('home.changeLocation')} onPress={() => router.push('/location?edit=1')} />
-        </View>
+          <PillButton gold icon="edit-location-alt" label={t('home.changeLocation')} onPress={changePlace} />
+        </ScrollView>
       </Screen>
     );
   }
@@ -101,99 +117,160 @@ export default function NeighbourhoodScreen() {
   const nearby = (events ?? []).filter((e) => e.region.neighbourhoodId === nb || (!e.region.neighbourhoodId && e.region.districtId === districtId)).slice(0, 5);
   const ownAreas = (gathering.items ?? []).filter(inMahalle);
   const areas = ownAreas.length ? ownAreas : (gathering.items ?? []).filter((i) => i.districtId === districtId).slice(0, 5);
+  const toggle = (id: RowId) => setOpen((cur) => (cur === id ? null : id));
+  const openGroup = (group: string) =>
+    router.push({ pathname: '/city/[section]', params: districtId ? { section: 'onemli-kurumlar', group, district: districtId } : { section: 'onemli-kurumlar', group } });
+  const card = frost(dark, c.surface, c.border);
 
-  const section = (title: string, children: React.ReactNode) => (
-    <View style={styles.section}>
-      <AppText variant="label" accessibilityRole="header">{title}</AppText>
-      {children}
-    </View>
+  /** Örnekteki satır: altın ince simge, başlık ve kısa açıklama, sağda sayı ve ok; dokununca altında açılır. */
+  const row = (id: RowId, icon: IconName, title: string, hint: string, body: ReactNode, badge?: string) => {
+    const expanded = open === id;
+    return (
+      <View key={id} style={[styles.row, card]}>
+        <FrostFill />
+        <Pressable accessibilityRole="button" accessibilityState={{ expanded }} accessibilityLabel={[title, hint, badge].filter(Boolean).join('. ')} onPress={() => toggle(id)} style={({ pressed }) => [styles.rowHead, { opacity: pressed ? 0.8 : 1 }]}>
+          <MaterialIcons name={icon} size={26} color={gold} />
+          <View style={styles.flex}>
+            <AppText style={[styles.rowTitle, { color: c.textStrong }]} numberOfLines={1}>{title}</AppText>
+            <AppText style={[styles.rowHint, { color: c.textMuted }]} numberOfLines={1}>{hint}</AppText>
+          </View>
+          {badge ? (
+            <View style={[styles.badge, { backgroundColor: dark ? c.heroAccent : c.primary }]}>
+              <AppText style={[styles.badgeText, { color: dark ? '#1B2A2C' : c.onPrimary }]}>{badge}</AppText>
+            </View>
+          ) : null}
+          <MaterialIcons name={expanded ? 'expand-less' : 'expand-more'} size={22} color={c.textMuted} />
+        </Pressable>
+        {expanded ? <View style={styles.rowBody}>{body}</View> : null}
+      </View>
+    );
+  };
+
+  const muhtarBody =
+    loading && official === undefined ? (
+      <StateMessage kind="loading" />
+    ) : muhtar ? (
+      <>
+        <OfficialProfileCard title={muhtar.name || muhtarlik} subtitle={muhtar.name ? muhtarlik : undefined} profile={muhtar} place={place} />
+        {fallback ? <AppText variant="caption" muted>{fallback.verified ? t('neighbourhood.fromGuide') : t('neighbourhood.fromGuideUnverified')}</AppText> : null}
+      </>
+    ) : (
+      <AppText variant="caption" muted>{t('neighbourhood.noMuhtar')}</AppText>
+    );
+
+  const announcementsBody = (
+    <>
+      {mine.length ? (
+        mine.slice(0, 5).map((a) => <AnnouncementCard key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />)
+      ) : announcements ? (
+        <AppText variant="caption" muted>{t('neighbourhood.noAnnouncements')}</AppText>
+      ) : (
+        <StateMessage kind="loading" />
+      )}
+      <PillButton small icon="campaign" label={t('announcements.seeAll')} onPress={() => router.push('/announcements')} />
+    </>
+  );
+
+  const eventsBody = (
+    <>
+      {nearby.length ? (
+        nearby.map((e) => <EventCard key={e.id} item={e} onPress={() => router.push({ pathname: '/events/[id]', params: { id: e.id } })} />)
+      ) : events ? (
+        <AppText variant="caption" muted>{t('neighbourhood.noEvents')}</AppText>
+      ) : (
+        <StateMessage kind="loading" />
+      )}
+      <PillButton small icon="event" label={t('neighbourhood.allEvents')} onPress={() => router.push('/events')} />
+    </>
+  );
+
+  const gatheringBody =
+    gathering.items === null && !gathering.error ? (
+      <StateMessage kind="loading" />
+    ) : areas.length ? (
+      <>
+        {!ownAreas.length ? <AppText variant="caption" muted>{t('neighbourhood.gatheringDistrict', { place: district ?? '' })}</AppText> : null}
+        {areas.map((i) => (
+          <Pressable
+            key={i.id}
+            accessibilityRole="button"
+            onPress={() => router.push({ pathname: '/city/item', params: { section: 'toplanma-alanlari', id: i.id } })}
+            style={({ pressed }) => [styles.area, { borderColor: c.border, opacity: pressed ? 0.8 : 1 }]}>
+            <MaterialIcons name="place" size={18} color={gold} />
+            <View style={styles.flex}>
+              <AppText style={[styles.areaTitle, { color: c.textStrong }]}>{i.name}</AppText>
+              {str(i.values.mahalle) ? <AppText style={[styles.rowHint, { color: c.textMuted }]}>{str(i.values.mahalle)}</AppText> : null}
+            </View>
+            <MaterialIcons name={chevron} size={20} color={c.textMuted} />
+          </Pressable>
+        ))}
+      </>
+    ) : (
+      <AppText variant="caption" muted>{t('neighbourhood.noGathering')}</AppText>
+    );
+
+  const tile = (key: string, icon: IconName, label: string, onPress: () => void, active?: boolean) => (
+    <Pressable
+      key={key}
+      accessibilityRole="button"
+      accessibilityState={active === undefined ? undefined : { expanded: active }}
+      onPress={onPress}
+      style={({ pressed }) => [styles.tile, card, active && { borderColor: dark ? 'rgba(226, 178, 119, 0.55)' : c.primary }, { transform: [{ scale: pressed ? 0.96 : 1 }] }]}>
+      <FrostFill />
+      <MaterialIcons name={icon} size={26} color={gold} />
+      <AppText style={[styles.tileText, { color: c.textStrong }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{label}</AppText>
+    </Pressable>
   );
 
   return (
-    <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {section(
-          t('neighbourhood.muhtarlik'),
-          loading && official === undefined ? (
-            <StateMessage kind="loading" />
-          ) : muhtar ? (
-            <>
-              <OfficialProfileCard title={muhtar.name || muhtarlik} subtitle={muhtar.name ? muhtarlik : undefined} profile={muhtar} place={place} />
-              {fallback ? <AppText variant="caption" muted>{fallback.verified ? t('neighbourhood.fromGuide') : t('neighbourhood.fromGuideUnverified')}</AppText> : null}
-            </>
-          ) : (
-            <AppText variant="caption" muted>{t('neighbourhood.noMuhtar')}</AppText>
-          ),
-        )}
+    <Screen bleed cover={cover}>
+      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
+        <PageHead cover={cover} extend={60} title={t('neighbourhood.title')} subtitle={subtitle} onBack={back} />
 
-        {section(
-          t('neighbourhood.places'),
-          <View style={styles.grid}>
-            {PLACE_GROUPS.map((id) => {
-              const g = INSTITUTION_GROUPS.find((x) => x.id === id)!;
-              return (
-                <Pressable
-                  key={id}
-                  accessibilityRole="button"
-                  onPress={() => router.push({ pathname: '/city/[section]', params: { section: 'onemli-kurumlar', group: id } })}
-                  style={({ pressed }) => [styles.tile, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
-                  <GlossyIcon icon={g.look.icon} colors={g.look.colors} size={36} />
-                  <AppText style={[styles.tileText, { color: c.textStrong }]} numberOfLines={2}>{t(`city.groups.${id}.title`)}</AppText>
-                </Pressable>
-              );
-            })}
-          </View>,
-        )}
+        <View style={styles.tiles}>
+          {tile('muhtar', 'person-outline', t('neighbourhood.muhtarlik'), () => toggle('muhtar'), open === 'muhtar')}
+          {PLACE_TILES.map((p) => tile(p.id, p.icon, t(p.label), () => openGroup(p.id)))}
+        </View>
 
-        {section(
-          t('neighbourhood.announcements'),
-          <>
-            {mine.length ? mine.slice(0, 5).map((a) => <AnnouncementCard key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />) : announcements ? <AppText variant="caption" muted>{t('neighbourhood.noAnnouncements')}</AppText> : <StateMessage kind="loading" />}
-            <AppButton variant="secondary" title={t('announcements.seeAll')} onPress={() => router.push('/announcements')} />
-          </>,
-        )}
+        <View style={styles.rows}>
+          {row('muhtar', 'location-city', t('neighbourhood.muhtarlik'), muhtar?.name || t('neighbourhood.muhtarHint'), muhtarBody)}
+          {row('announcements', 'campaign', t('neighbourhood.announcements'), t('neighbourhood.announcementsHint'), announcementsBody, mine.length ? t('neighbourhood.newCount', { count: mine.length }) : undefined)}
+          {row('events', 'event', t('neighbourhood.events'), t('neighbourhood.eventsHint'), eventsBody, nearby.length ? String(nearby.length) : undefined)}
+          {row('gathering', 'emoji-people', t('neighbourhood.gathering'), t('neighbourhood.gatheringHint'), gatheringBody)}
+          {municipalities.length
+            ? row(
+                'municipalities',
+                'account-balance',
+                t('neighbourhood.municipalities'),
+                t('neighbourhood.municipalitiesHint'),
+                municipalities.map((p) => <OfficialProfileCard key={p.id} title={p.name} profile={p} place={place} />),
+              )
+            : null}
+          <Pressable accessibilityRole="button" onPress={() => router.push('/city/kurumlar')} style={({ pressed }) => [styles.row, styles.rowHead, card, { opacity: pressed ? 0.8 : 1 }]}>
+            <FrostFill />
+            <MaterialIcons name="share-location" size={26} color={gold} />
+            <View style={styles.flex}>
+              <AppText style={[styles.rowTitle, { color: c.textStrong }]} numberOfLines={1}>{t('neighbourhood.servicesTitle')}</AppText>
+              <AppText style={[styles.rowHint, { color: c.textMuted }]} numberOfLines={1}>{t('neighbourhood.servicesHint')}</AppText>
+            </View>
+            <MaterialIcons name={chevron} size={22} color={c.textMuted} />
+          </Pressable>
+        </View>
 
-        {section(
-          t('neighbourhood.events'),
-          <>
-            {nearby.length ? nearby.map((e) => <EventCard key={e.id} item={e} onPress={() => router.push({ pathname: '/events/[id]', params: { id: e.id } })} />) : events ? <AppText variant="caption" muted>{t('neighbourhood.noEvents')}</AppText> : <StateMessage kind="loading" />}
-            <AppButton variant="secondary" title={t('neighbourhood.allEvents')} onPress={() => router.push('/events')} />
-          </>,
-        )}
-
-        {section(
-          t('neighbourhood.gathering'),
-          gathering.items === null && !gathering.error ? (
-            <StateMessage kind="loading" />
-          ) : areas.length ? (
-            <>
-              {!ownAreas.length ? <AppText variant="caption" muted>{t('neighbourhood.gatheringDistrict', { place: district ?? '' })}</AppText> : null}
-              {areas.map((i) => (
-                <Pressable
-                  key={i.id}
-                  accessibilityRole="button"
-                  onPress={() => router.push({ pathname: '/city/item', params: { section: 'toplanma-alanlari', id: i.id } })}
-                  style={({ pressed }) => [styles.row, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
-                  <MaterialIcons name="emoji-people" size={22} color={c.icon} />
-                  <View style={styles.rowText}>
-                    <AppText style={[styles.rowTitle, { color: c.textStrong }]}>{i.name}</AppText>
-                    {str(i.values.mahalle) ? <AppText variant="caption" muted>{str(i.values.mahalle)}</AppText> : null}
-                  </View>
-                  <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={22} color={c.textSoft} />
-                </Pressable>
-              ))}
-            </>
-          ) : (
-            <AppText variant="caption" muted>{t('neighbourhood.noGathering')}</AppText>
-          ),
-        )}
-
-        {municipalities.length
-          ? section(
-              t('neighbourhood.municipalities'),
-              municipalities.map((p) => <OfficialProfileCard key={p.id} title={p.name} profile={p} place={place} />),
-            )
-          : null}
+        <View style={[styles.placeCard, card]}>
+          <FrostFill />
+          <View style={[styles.pin, { backgroundColor: dark ? 'rgba(226, 178, 119, 0.12)' : c.accentSoft }]}>
+            <MaterialIcons name="place" size={20} color={gold} />
+          </View>
+          <View style={styles.flex}>
+            <AppText style={[styles.rowTitle, { color: c.textStrong }]} numberOfLines={1}>{name ?? t('neighbourhood.title')}</AppText>
+            <AppText style={[styles.rowHint, { color: c.textMuted }]} numberOfLines={1}>{place}</AppText>
+          </View>
+          <Pressable accessibilityRole="button" onPress={changePlace} hitSlop={6} style={({ pressed }) => [styles.change, { borderColor: dark ? 'rgba(226, 178, 119, 0.6)' : c.primary, opacity: pressed ? 0.75 : 1 }]}>
+            <MaterialIcons name="edit-location-alt" size={16} color={gold} />
+            <AppText style={[styles.changeText, { color: gold }]}>{t('neighbourhood.change')}</AppText>
+          </Pressable>
+        </View>
 
         <AppText variant="caption" muted style={styles.center}>{t('neighbourhood.feedSoon')}</AppText>
       </ScrollView>
@@ -201,17 +278,26 @@ export default function NeighbourhoodScreen() {
   );
 }
 
-/** Mahalle Meydanı'ndaki yerler (13. madde 35): okullar, aile sağlığı merkezleri, ibadethaneler, ATM'ler, noterler. */
-const PLACE_GROUPS = ['egitim', 'asm', 'ibadethane', 'banka', 'noter'] as const;
-
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  tile: { flexBasis: '47%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: radius.lg, borderWidth: 1 },
-  tileText: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 13.5 },
-  content: { gap: spacing.lg, paddingBottom: spacing.xl },
-  section: { gap: spacing.sm },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderWidth: 1, borderRadius: radius.md, padding: spacing.md, minHeight: 56 },
-  rowText: { flex: 1, gap: 2 },
-  rowTitle: { fontFamily: fonts.heading, fontSize: 14, lineHeight: 19 },
+  content: { gap: spacing.sm + 4 },
+  flex: { flex: 1, gap: 2 },
+  // Dört eşit kutu: altın ince simge, altında kısa ad.
+  tiles: { flexDirection: 'row', gap: spacing.sm },
+  tile: { flex: 1, minHeight: 78, alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 4, borderRadius: radius.lg + 2, borderWidth: 1, overflow: 'hidden' },
+  tileText: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 15 },
+  rows: { gap: spacing.sm },
+  row: { borderRadius: radius.lg + 2, borderWidth: 1, overflow: 'hidden' },
+  rowHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 4, minHeight: 64, paddingVertical: spacing.sm + 2, paddingHorizontal: spacing.md },
+  rowTitle: { fontFamily: fonts.heading, fontSize: 14.5, lineHeight: 19 },
+  rowHint: { fontSize: 12, lineHeight: 16 },
+  rowBody: { gap: spacing.sm, paddingHorizontal: spacing.md - 4, paddingBottom: spacing.md - 4 },
+  badge: { borderRadius: radius.pill, paddingHorizontal: 9, minHeight: 22, justifyContent: 'center' },
+  badgeText: { fontFamily: fonts.bodySemi, fontSize: 11.5 },
+  area: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderTopWidth: 1, paddingTop: spacing.sm },
+  areaTitle: { fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 18 },
+  placeCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 2, padding: spacing.md - 2, borderRadius: radius.lg + 2, borderWidth: 1, overflow: 'hidden', marginTop: spacing.xs },
+  pin: { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  change: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 36, paddingHorizontal: 12, borderRadius: radius.pill, borderWidth: 1 },
+  changeText: { fontFamily: fonts.bodySemi, fontSize: 12.5 },
   center: { textAlign: 'center' },
 });

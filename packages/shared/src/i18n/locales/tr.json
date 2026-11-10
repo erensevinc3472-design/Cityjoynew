@@ -823,7 +823,11 @@
       "saglik": "Sağlık",
       "gonulluluk": "Gönüllülük",
       "diger": "Diğer"
-    }
+    },
+    "detail": "Detay",
+    "found": "{{count}} etkinlik bulundu",
+    "today": "Bugün",
+    "thisWeek": "Bu hafta"
   },
   "social": {
     "sections": {
@@ -940,7 +944,19 @@
     "noGathering": "Toplanma alanı bilgisi henüz eklenmedi. e-Devlet'te \"Acil Toplanma Alanı Sorgulama\" ile öğrenebilirsiniz.",
     "municipalities": "Belediyem",
     "feedSoon": "Mahallem akışı (komşu paylaşımları) Keşfet ile gelecek.",
-    "places": "Mahallende"
+    "places": "Mahallende",
+    "muhtarHint": "Muhtarın, telefonu ve çalışma saatleri",
+    "announcementsHint": "Muhtarlık ve mahallene özel duyurular",
+    "eventsHint": "Toplantı, etkinlik ve buluşmalar",
+    "gatheringHint": "Mahallene en yakın güvenli alanlar",
+    "servicesTitle": "Çevredeki hizmetler",
+    "servicesHint": "Banka, ATM, noter ve diğerleri",
+    "municipalitiesHint": "Belediyenin iletişim bilgileri",
+    "health": "Sağlık",
+    "change": "Değiştir",
+    "newCount": "{{count}} yeni",
+    "education": "Eğitim",
+    "worship": "İbadethane"
   },
   "activities": {
     "title": "Aktiviteler",

@@ -823,7 +823,11 @@
       "saglik": "Health",
       "gonulluluk": "Volunteering",
       "diger": "Other"
-    }
+    },
+    "detail": "Details",
+    "found": "{{count}} events found",
+    "today": "Today",
+    "thisWeek": "This week"
   },
   "social": {
     "sections": {
@@ -940,7 +944,19 @@
     "noGathering": "Assembly area details have not been added yet. You can look them up on e-Devlet (\"Emergency Assembly Area\" search).",
     "municipalities": "My municipality",
     "feedSoon": "The neighbourhood feed (posts from neighbours) will come with Discover.",
-    "places": "In your neighbourhood"
+    "places": "In your neighbourhood",
+    "muhtarHint": "Your muhtar, phone and opening hours",
+    "announcementsHint": "Announcements for your neighbourhood",
+    "eventsHint": "Meetings, events and get-togethers",
+    "gatheringHint": "Safe areas closest to you",
+    "servicesTitle": "Services nearby",
+    "servicesHint": "Banks, ATMs, notaries and more",
+    "municipalitiesHint": "Your municipality contact details",
+    "health": "Health",
+    "change": "Change",
+    "newCount": "{{count}} new",
+    "education": "Schools",
+    "worship": "Worship"
   },
   "activities": {
     "title": "Activities",

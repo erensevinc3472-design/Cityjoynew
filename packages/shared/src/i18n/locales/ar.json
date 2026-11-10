@@ -823,7 +823,11 @@
       "saglik": "الصحة",
       "gonulluluk": "التطوع",
       "diger": "أخرى"
-    }
+    },
+    "detail": "التفاصيل",
+    "found": "تم العثور على {{count}} فعالية",
+    "today": "اليوم",
+    "thisWeek": "هذا الأسبوع"
   },
   "social": {
     "sections": {
@@ -940,7 +944,19 @@
     "noGathering": "لم تُضف معلومات مناطق التجمع بعد. يمكنك الاستعلام عنها عبر e-Devlet.",
     "municipalities": "بلديتي",
     "feedSoon": "سيأتي موجز الحي (منشورات الجيران) مع قسم «اكتشف».",
-    "places": "في حيّك"
+    "places": "في حيّك",
+    "muhtarHint": "مختار حيّك وهاتفه وساعات العمل",
+    "announcementsHint": "إعلانات خاصة بحيّك",
+    "eventsHint": "اجتماعات وفعاليات ولقاءات",
+    "gatheringHint": "أقرب المناطق الآمنة إليك",
+    "servicesTitle": "الخدمات القريبة",
+    "servicesHint": "بنوك وصرّافات وكتّاب عدل وغيرها",
+    "municipalitiesHint": "معلومات الاتصال بالبلدية",
+    "health": "الصحة",
+    "change": "تغيير",
+    "newCount": "{{count}} جديد",
+    "education": "التعليم",
+    "worship": "دور العبادة"
   },
   "activities": {
     "title": "الأنشطة",
