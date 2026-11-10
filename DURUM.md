@@ -901,6 +901,17 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   alınmaz (Google şartları). Kaymakamlık sitelerinde ve diğer belediye sitelerinde muhtarlık adresi yok. Kalan ~916 adres
   için yol: muhtar uygulamaya katılınca kendi profilinden girer; toplu liste için Büyükşehir'e bilgi edinme başvurusu.
 
+- **Bursa panel dosyalarında eksik tamamlama (10 Kasım, Eren "tamamlayabileceklerine başla" dedi).** `scripts/bursa-tamamla.ts`
+  dört masaüstü dosyasını (aile sağlığı, hastane-müze-otopark, kurumlar, kurumlar-ek) günceller; eski hâlleri scratchpad
+  `yedek/`. Konumu eksik 623 satırdan 259'una konum: 77'si OSM'de aynı adla kayıtlı yer, 182'si adresteki sokağın doğru
+  ilçe ve mahallede bulunması (notta "sokak düzeyi, kapı teyit edilmeli"). Kalan ~364 boş (uydurulmadı). Kaynak OSM ve
+  Nominatim (ODbL, notta OSM bağlantısı); uygulamada haritada "© OpenStreetMap katkıcıları" yazısı gerekir. Çalışma
+  saati yalnızca kuralı kesin türlere yazıldı (347 satır): emniyet, jandarma, itfaiye 7/24; devlet hastanesi poliklinik
+  08:00-17:00 + acil 7/24; ASM hafta içi 08:00-17:00 (teyit notlu). Noter, PTT, kütüphane, özel hastane boş (şubeye göre
+  değişir). Bakanlık müzeleri (6) muze.gov.tr'den: saat 08:00-17:00 (gişe 16:30), kapalı gün, ücret, Müzekart; Arkeoloji,
+  17. yy Osmanlı Evi ve Yenişehir Şemaki Evi şu an kapalı (notta). Denetim 4 dosyada 0 hata. Açık: ASM telefonları için
+  İl Sağlık Müdürlüğü'nün resmî iletişim Excel'i (indirme izni Eren'den bekleniyor).
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Seyahat > Planla (Eren onayladı 29 Ekim 2026: tek ekran, fiyatlar panelden elle): `/travel/planla`, Seyahat girişinde "Yolculuğunu planla". Nereden-nereye (il), tarih (7 gün), yolcu sayısı; Kendi aracım / Otobüs / Uçak / Tren kartları (süre, tahmini ücret); yolculuk kartı (İST ━ BUR, süre, km, maliyet, notlar); araba için güzergâh çevresindeki mola yerleri (OSM + yol üstü işletmeler, yaklaşık); varınca (şehri keşfet, yöresel, başkanlarla); hazırlık listesi; "Yola çık" Yoldayım'ı varış iliyle açar (kalan km, varınca "Vardın!" kartı). Planlar yalnızca telefonda (en çok 5). Hesap: il merkezleri arası kuş uçuşu x 1,3; araba 90 km/s + 2,5 saatte 15 dk mola; otobüs 70 km/s + 20 dk; uçak 650 km/s + 30 dk, iki ilde havalimanı ve 150 km üstü. Panel > Seyahat > Yolculuk fiyatları (yalnızca admin): akaryakıt (benzin, dizel, LPG, elektrik kWh), otobüs km aralığı, ay; boşsa ücret gösterilmez. **Kurallar değişti (config/travelPrices): yüklenmeli. Eren fiyatları girmeli.** Olmayanlar: bilet, sefer, firma adları, canlı yol durumu, yapay zekâ, hava durumu.
