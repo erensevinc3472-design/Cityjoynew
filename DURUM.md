@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 10 Kasım 2026 (dal claude/blaze-kurulum: Önemli Kurumlar arama + ilçe düğmeleri + yeni kartlar; Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 10 Kasım 2026 (dal claude/blaze-kurulum: Eren'in örneklerine göre ince kayan başlık, ayrıntı sayfası, Mahalle Meydanı, Etkinlikler; Önemli Kurumlar arama + ilçe düğmeleri + yeni kartlar; Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -950,6 +950,24 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Sonra (Eren: "arkadaki ışığı kaldır, biraz daha küçült"): altın ışık kapalı, başlık 19, ince ilçe düğmeleri
   (`FilterChip` yeni `small`, dokunma alanı korunur), kartlar 70 yükseklik, simge 36; ekrana ~20 kart sığar.
   Ayrıca Expo Go telefonda güncellenmişti: 12 Expo paketi uyduruldu (ExpoAsset hatası).
+  Eren onayladı ("Şimdi oldu") ve "kalan sayfaları yap" dedi (10 Kasım). Yapılanlar:
+  - Ortak `PageHead` (components/page-head.tsx): sayfayla kayan ince başlık, geri düğmesi, altın çizgi, isteğe bağlı il
+    fotoğrafı ve altına arama/düğmeler. Tüm liste sayfaları (bölüm listeleri, Park & Pazar, Belediyeler, Yeme içme,
+    Vitrin) buna geçti.
+  - Ayrıntı sayfası (`city/item.tsx`, örnek `ayrinti-muze.png`): tür etiketi, açıklama "Daha fazla", simgeli bilgi şeridi
+    (saatler, ücret…), adres kartı, Ara + Yol tarifi, diğer bilgiler, aynı ilçedeki diğer noktalar. Paylaş, favori, puan,
+    sekmeler, gömülü harita yok (yeni özellik / maliyet).
+  - Mahalle Meydanı (örnek `mahalle-meydani.png`): dört kutu (Muhtarlık, Eğitim, Sağlık, İbadethane), açılır satırlar
+    (muhtarlık, duyurular "N yeni", etkinlikler, toplanma alanları, belediye), Çevredeki hizmetler, mahalle kartı ve
+    "Değiştir". Bildirim / menü düğmesi ve harita yok.
+  - Etkinlikler (örnek `etkinlikler.png`): kapaklı etkinlikler tepede kayan görsel, il geneli / yalnızca ilçe seçimi, yedi
+    günlük gün şeridi, tür düğmeleri, yeni etkinlik kartı (görsel, Ücretsiz, tür ve ilçe, tarih aralığı, Detay). Kaydet,
+    Bölgesel/Genel, alt menü yok.
+  - Benim Şehrim ana sayfa zaten örneğe göreydi; başlık ince ve kayan oldu, açık modda satır okları görünür.
+  - Dil seçimi 8 Kasım'da örneğe göre yapılmıştı; değişmedi.
+  - `PillButton` açık modda beyaz zemin ve kenarlık (zeminde kayboluyordu).
+  - Nöbetçi Eczane yapılmadı: ekran yok, veri kaynağı önerisi Eren'in onayını bekliyor (aşağıda SORULACAK).
+  Telefonda henüz denenmedi (yalnızca web deneme sürümünde ekran görüntüsü).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
