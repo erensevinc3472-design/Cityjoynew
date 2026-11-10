@@ -2,14 +2,15 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { cityChoiceLabel, normalizeName } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { frost, GroupLabel } from '@/components/city-hub';
 import { FrostFill } from '@/components/glass';
-import { useProvinceCover } from '@/components/city-cover';
-import { HeroHeader } from '@/components/hero-header';
+import { CoverBackdrop, useProvinceCover } from '@/components/city-cover';
+import { RoundButton } from '@/components/hero-header';
 import { FilterChip } from '@/components/inner';
 import { Screen } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
@@ -19,7 +20,7 @@ import { INSTITUTION_GROUPS } from '@/lib/city-look';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, radius, spacing } from '@/theme/tokens';
+import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
 type Group = (typeof INSTITUTION_GROUPS)[number];
@@ -49,6 +50,8 @@ export default function InstitutionsScreen() {
   const { items, error, retry } = useCityGuideItems(provinceCode, 'onemli-kurumlar');
   const [query, setQuery] = useState('');
   const [district, setDistrict] = useState<string | null>(null);
+  const [headH, setHeadH] = useState(0);
+  const insets = useSafeAreaInsets();
 
   // İlçe düğmeleri: "Tümü", kullanıcının ilçesi, sonra abece sırasıyla ilin diğer ilçeleri.
   const districts = useMemo(
@@ -85,29 +88,34 @@ export default function InstitutionsScreen() {
       .slice(0, MAX_MATCHES);
   }, [items, q, district, mine, lang]);
 
-  const header = (
-    <HeroHeader serif
-      title={t('city.tiles.kurumlar')}
-      subtitle={t('city.kurumlarIntro')}
-      onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}>
-      <View style={styles.tools}>
-        <SearchField compact value={query} onChangeText={setQuery} placeholder={t('city.kurumlarSearch')} />
-        {districts.length > 1 ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-            <FilterChip icon="apps" label={t('city.all')} active={!district} onPress={() => setDistrict(null)} />
-            {districts.map((d) => (
-              <FilterChip
-                key={d.id}
-                icon={d.id === mine ? 'near-me' : undefined}
-                label={d.name}
-                active={district === d.id}
-                onPress={() => setDistrict(district === d.id ? null : d.id)}
-              />
-            ))}
-          </ScrollView>
-        ) : null}
+  // Fotoğraf varsa ya da koyu modda başlık açık renk; açık modda fotoğraf yoksa koyu.
+  const light = dark || !!cover;
+  const head = (
+    <View onLayout={(e) => setHeadH(Math.round(e.nativeEvent.layout.height))} style={[styles.head, { paddingTop: insets.top + spacing.sm }]}>
+      <View style={styles.titleRow}>
+        <RoundButton icon={rtl ? 'arrow-forward' : 'arrow-back'} label={t('common.back')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />
+        <View style={styles.flex}>
+          <AppText accessibilityRole="header" numberOfLines={1} style={[styles.pageTitle, { color: light ? c.heroText : c.textStrong }]}>{t('city.tiles.kurumlar')}</AppText>
+          <AppText numberOfLines={1} style={[styles.pageSub, { color: light ? c.heroMuted : c.textMuted }]}>{t('city.kurumlarIntro')}</AppText>
+          <View style={[styles.goldRule, { backgroundColor: c.heroAccent }]} />
+        </View>
       </View>
-    </HeroHeader>
+      <SearchField glass value={query} onChangeText={setQuery} placeholder={t('city.kurumlarSearch')} />
+      {districts.length > 1 ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips} style={styles.chipStrip}>
+          <FilterChip icon="apps" label={t('city.all')} active={!district} onPress={() => setDistrict(null)} />
+          {districts.map((d) => (
+            <FilterChip
+              key={d.id}
+              icon={d.id === mine ? 'near-me' : undefined}
+              label={d.name}
+              active={district === d.id}
+              onPress={() => setDistrict(district === d.id ? null : d.id)}
+            />
+          ))}
+        </ScrollView>
+      ) : null}
+    </View>
   );
 
   const open = (g: Group) => {
@@ -119,8 +127,10 @@ export default function InstitutionsScreen() {
   };
 
   return (
-    <Screen cover={cover} coverPad={spacing.lg} warm header={header}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+    <Screen bleed cover={cover} warm={!cover}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        {cover && headH ? <CoverBackdrop photo={cover} height={headH + 24} /> : null}
+        {head}
         {error ? <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} /> : null}
         <View style={styles.grid}>
           {groups.map((g) => {
@@ -140,15 +150,15 @@ export default function InstitutionsScreen() {
                 onPress={() => open(g)}
                 style={({ pressed }) => [styles.tile, frost(dark, c.surface, c.border), { opacity: live ? 1 : 0.5, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
                 <FrostFill />
-                <View style={[styles.icon, { backgroundColor: c.accentSoft, borderColor: c.border }]}>
-                  <MaterialIcons name={g.look.icon} size={21} color={c.primary} />
+                <View style={[styles.icon, dark ? styles.iconDark : { backgroundColor: c.accentSoft, borderColor: c.border }]}>
+                  <MaterialIcons name={g.look.icon} size={22} color={dark ? c.heroAccent : c.primary} />
                 </View>
-                <View style={[styles.rule, { backgroundColor: c.primary }]} />
+                <View style={[styles.rule, { backgroundColor: dark ? c.heroAccent : c.primary }]} />
                 <View style={styles.flex}>
                   <AppText style={[styles.title, { color: c.textStrong }]} numberOfLines={2}>{title}</AppText>
-                  <AppText style={[styles.hint, { color: district && n && live ? c.primary : c.textMuted }]} numberOfLines={2}>{sub}</AppText>
+                  <AppText style={[styles.hint, { color: district && n && live ? c.primary : live ? c.text : c.textMuted, opacity: live ? 0.82 : 1 }]} numberOfLines={2}>{sub}</AppText>
                 </View>
-                {live ? <MaterialIcons name={chevron} size={18} color={c.textMuted} /> : null}
+                {live ? <MaterialIcons name={chevron} size={16} color={c.textMuted} style={styles.chev} /> : null}
               </Pressable>
             );
           })}
@@ -181,16 +191,25 @@ export default function InstitutionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  tools: { gap: spacing.sm + 2, marginTop: spacing.sm },
-  chips: { gap: spacing.xs + 2, paddingVertical: 2, paddingEnd: spacing.md },
-  content: { gap: spacing.md, paddingBottom: spacing.xl },
+  // Üst kısım sayfayla birlikte kayar (sabit bant yok; Eren 10 Kasım: sabit kalın başlık kaba duruyordu).
+  head: { gap: spacing.sm + 4, paddingBottom: spacing.xs },
+  titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm + 2 },
+  pageTitle: { fontFamily: fonts.heading, fontSize: 22, lineHeight: 28, letterSpacing: -0.3, textShadowColor: 'rgba(0, 0, 0, 0.3)', textShadowRadius: 6 },
+  pageSub: { fontSize: 13, lineHeight: 18 },
+  goldRule: { width: 30, height: 3, borderRadius: 2, marginTop: 7 },
+  chipStrip: { marginHorizontal: -GUTTER },
+  chips: { gap: spacing.xs + 2, paddingVertical: 2, paddingHorizontal: GUTTER },
+  content: { gap: spacing.md, paddingHorizontal: GUTTER, width: '100%', maxWidth: 640, alignSelf: 'center' },
   // İki sütunlu kartlar: solda simge ve ince altın çizgi, başlık ve açıklama, sağda ok.
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: spacing.sm + 2 },
-  tile: { width: '48.5%', minHeight: 80, flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 3, paddingVertical: spacing.sm + 2, paddingStart: spacing.sm, paddingEnd: 2, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  icon: { width: 38, height: 38, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  rule: { width: 1.5, alignSelf: 'stretch', marginVertical: spacing.xs, borderRadius: 1, opacity: 0.55 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: spacing.sm + 2, marginHorizontal: -6 },
+  tile: { width: '48.8%', minHeight: 80, flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: spacing.sm + 2, paddingStart: spacing.sm + 2, paddingEnd: 0, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
+  icon: { width: 40, height: 40, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  // Koyu modda simge kutusu: hafif açık cam, altın tonlu ince çerçeve (örnekteki gibi).
+  iconDark: { backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(226, 178, 119, 0.28)' },
+  chev: { marginStart: -4 },
+  rule: { width: 1.5, alignSelf: 'stretch', marginVertical: spacing.sm, borderRadius: 1, opacity: 0.8 },
   flex: { flex: 1, gap: 2 },
-  title: { fontFamily: fonts.bodySemi, fontSize: 13.5, lineHeight: 17 },
+  title: { fontFamily: fonts.heading, fontSize: 14, lineHeight: 17 },
   hint: { fontSize: 11.5, lineHeight: 15 },
   matches: { gap: spacing.sm },
   match: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md - 2, borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden' },

@@ -943,6 +943,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   kurum listelenir. `Screen` yeni `coverPad` (fotoğraf altındaki boşluk). Beş dilde 3 yeni metin. Emülatörde örnek
   kurumlarla koyu/açık denendi, telefonda denenmedi. Sırada: alt sayfalarda (Hastaneler vb.) arama + ilçe düğmelerini
   de fotoğrafın üstüne taşıyıp altındaki boşluğu kaldırmak, aynı kart dili; sonra Müzeler.
+  Düzeltme (10 Kasım akşam, Eren telefonda baktı: "sabit kalın başlık ve büyük yazılar kaba gösteriyor", "örnekteki gibi
+  ekrana otursun, fotoğraf olmasa da olur"): üst kısım artık sabit değil, sayfayla kayıyor (`Screen` yeni `bleed`);
+  başlık düz kalın yazı 22, altında kısa altın çizgi; arama cam kutu (`SearchField` yeni `glass`); kartlar daha geniş,
+  açıklama en çok 2 satır, ekrana ~14 kart sığar. İl fotoğrafı daha aydınlık. Aynı düzen alt sayfalara da uygulanacak.
+  Ayrıca Expo Go telefonda güncellenmişti: 12 Expo paketi uyduruldu (ExpoAsset hatası).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

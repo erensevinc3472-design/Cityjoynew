@@ -20,16 +20,18 @@ interface Props {
   cover?: Pick<Photo, 'url' | 'path'>;
   /** Fotoğraf varken bandın alt boşluğu; başlığın altında arama / süzgeç duran sayfalarda daha az. */
   coverPad?: number;
+  /** Sayfa kendi üst kısmını çizer ve onu içerikle birlikte kaydırır: üstte boşluk, yan boşluk ve sabit bant yok. */
+  bleed?: boolean;
 }
 
 /** Güvenli alan, zemin, üst bant ve geniş ekranlarda (tablet, web) ortalanmış içerik. */
-export function Screen({ header, footer, warm, cover, coverPad = 92, children }: PropsWithChildren<Props>) {
+export function Screen({ header, footer, warm, cover, coverPad = 92, bleed, children }: PropsWithChildren<Props>) {
   const c = useThemeColors();
   const scheme = useResolvedScheme();
   const insets = useSafeAreaInsets();
   const [bandHeight, setBandHeight] = useState(0);
   // Üst bant her iki modda da koyu: durum çubuğu yazısı açık renk.
-  const statusStyle = header || scheme === 'dark' ? 'light' : 'dark';
+  const statusStyle = header || (bleed && cover) || scheme === 'dark' ? 'light' : 'dark';
 
   return (
     <View style={[styles.root, { backgroundColor: c.background }]}>
@@ -44,10 +46,14 @@ export function Screen({ header, footer, warm, cover, coverPad = 92, children }:
           style={[styles.band, cover ? { paddingBottom: coverPad } : null, { backgroundColor: scheme === 'dark' || cover ? 'transparent' : c.hero, paddingTop: insets.top + spacing.sm }]}>
           <View style={styles.inner}>{header}</View>
         </View>
-      ) : (
+      ) : bleed ? null : (
         <View style={{ height: insets.top }} />
       )}
-      <View style={[styles.inner, styles.body, { paddingBottom: footer ? 0 : insets.bottom }]}>{children}</View>
+      {bleed ? (
+        <View style={styles.flex}>{children}</View>
+      ) : (
+        <View style={[styles.inner, styles.body, { paddingBottom: footer ? 0 : insets.bottom }]}>{children}</View>
+      )}
       {footer}
     </View>
   );
@@ -55,6 +61,7 @@ export function Screen({ header, footer, warm, cover, coverPad = 92, children }:
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
+  flex: { flex: 1 },
   band: { alignItems: 'center', paddingBottom: spacing.lg },
   inner: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER },
   body: { flex: 1, paddingTop: spacing.md, gap: spacing.md },

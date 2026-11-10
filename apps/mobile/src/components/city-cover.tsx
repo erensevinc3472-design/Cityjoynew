@@ -33,9 +33,10 @@ export function CoverBackdrop({ photo, height }: { photo: Pick<Photo, 'url' | 'p
       <Svg width="100%" height="100%" preserveAspectRatio="none" style={StyleSheet.absoluteFill}>
         <Defs>
           <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={shade} stopOpacity={0.62} />
-            <Stop offset="0.45" stopColor={shade} stopOpacity={dark ? 0.28 : 0.34} />
-            <Stop offset="0.72" stopColor={c.background} stopOpacity={dark ? 0.55 : 0.5} />
+            <Stop offset="0" stopColor={shade} stopOpacity={0.5} />
+            <Stop offset="0.3" stopColor={shade} stopOpacity={0.08} />
+            <Stop offset="0.55" stopColor={shade} stopOpacity={dark ? 0.12 : 0.16} />
+            <Stop offset="0.8" stopColor={c.background} stopOpacity={dark ? 0.55 : 0.5} />
             <Stop offset="1" stopColor={c.background} stopOpacity={1} />
           </LinearGradient>
         </Defs>
