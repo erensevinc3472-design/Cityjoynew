@@ -9,7 +9,7 @@ import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BusinessCard } from '@/components/business-card';
 import { useProvinceCover } from '@/components/city-cover';
-import { HeroHeader } from '@/components/hero-header';
+import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { FilterChip, FilterRow } from '@/components/inner';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
@@ -29,6 +29,7 @@ import { useThemeColors } from '@/theme/use-theme';
 export default function CityFoodScreen() {
   const { t } = useTranslation();
   const cover = useProvinceCover();
+  const bottom = usePageBottom();
   const router = useRouter();
   const c = useThemeColors();
   const { location } = useUserLocation();
@@ -72,11 +73,12 @@ export default function CityFoodScreen() {
   }, [all]);
   const total = ranked.featured.length + ranked.others.length;
 
-  const header = <HeroHeader serif title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
+  const header = <PageHead cover={cover} title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
-    <Screen warm cover={cover} header={header}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <Screen bleed cover={cover}>
+      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
+        {header}
         {!provinceCode ? (
           <>
             <StateMessage kind="empty" message={t('city.needLocation')} />

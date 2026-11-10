@@ -7,7 +7,7 @@ import type { CityGuideSectionId } from '@cityjoy/shared';
 import { AppText } from '@/components/app-text';
 import { CityGuideList } from '@/components/city-guide-list';
 import { useProvinceCover } from '@/components/city-cover';
-import { HeroHeader } from '@/components/hero-header';
+import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { useCityGuideMeta } from '@/lib/city-guide';
 import { LOOK } from '@/lib/city-look';
@@ -23,6 +23,7 @@ export default function ParkMarketScreen() {
   const cover = useProvinceCover();
   const router = useRouter();
   const c = useThemeColors();
+  const bottom = usePageBottom();
   const { location } = useUserLocation();
   const { meta } = useCityGuideMeta(location?.provinceCode);
   const hasParks = (meta?.sections.parklar?.count ?? 0) > 0;
@@ -49,14 +50,24 @@ export default function ParkMarketScreen() {
   );
 
   return (
-    <Screen warm cover={cover} header={<HeroHeader serif title={t('city.tiles.parkPazar')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />}>
-      <CityGuideList key={tab} section={tab} look={tab === 'parklar' ? LOOK.parkPazar : MARKET} header={tabs} />
+    <Screen bleed cover={cover}>
+      <CityGuideList
+        key={tab}
+        section={tab}
+        look={tab === 'parklar' ? LOOK.parkPazar : MARKET}
+        contentStyle={[PAGE_CONTENT, { paddingBottom: bottom }]}
+        header={
+          <PageHead cover={cover} title={t('city.tiles.parkPazar')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}>
+            {tabs}
+          </PageHead>
+        }
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   tabs: { flexDirection: 'row', padding: 4, borderRadius: radius.pill, borderWidth: 1 },
-  tab: { flex: 1, minHeight: 40, alignItems: 'center', justifyContent: 'center', borderRadius: radius.pill },
+  tab: { flex: 1, minHeight: 36, alignItems: 'center', justifyContent: 'center', borderRadius: radius.pill },
   tabText: { fontFamily: fonts.bodySemi, fontSize: 13 },
 });

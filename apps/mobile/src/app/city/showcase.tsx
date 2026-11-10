@@ -7,7 +7,7 @@ import type { CityShowcase, ShowcaseItem, ShowcaseTheme } from '@cityjoy/shared'
 
 import { AppText } from '@/components/app-text';
 import { useProvinceCover } from '@/components/city-cover';
-import { HeroHeader } from '@/components/hero-header';
+import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { SectionTitle, Tag } from '@/components/inner';
 import { SceneArt, sceneSky, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
@@ -37,6 +37,7 @@ const THEME_SCENES: Record<ShowcaseTheme, SceneKind> = {
 export default function CityShowcaseScreen() {
   const { t, i18n } = useTranslation();
   const cover = useProvinceCover();
+  const bottom = usePageBottom();
   const router = useRouter();
   const c = useThemeColors();
   const { width } = useWindowDimensions();
@@ -65,11 +66,12 @@ export default function CityShowcaseScreen() {
       ? router.push({ pathname: '/business/[id]', params: { id: item.id } })
       : router.push({ pathname: '/travel/place/[id]', params: { id: item.id } });
 
-  const header = <HeroHeader serif title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
+  const header = <PageHead cover={cover} title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
-    <Screen warm cover={cover} header={header}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <Screen bleed cover={cover}>
+      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
+        {header}
         {!provinceCode ? (
           <StateMessage kind="empty" message={t('city.needLocation')} />
         ) : error ? (

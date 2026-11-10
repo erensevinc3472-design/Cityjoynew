@@ -8,7 +8,7 @@ import { listMunicipalities, municipalityIdsFor, normalizeName, type Municipalit
 import { AppText } from '@/components/app-text';
 import { GlossyIcon } from '@/components/glossy-icon';
 import { useProvinceCover } from '@/components/city-cover';
-import { HeroHeader } from '@/components/hero-header';
+import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
 import { useCityGuideMeta } from '@/lib/city-guide';
@@ -35,6 +35,7 @@ const FREQUENT = [
 export default function MunicipalitiesScreen() {
   const { t } = useTranslation();
   const cover = useProvinceCover();
+  const bottom = usePageBottom();
   const router = useRouter();
   const c = useThemeColors();
   const { rtl, language } = useSettings();
@@ -74,7 +75,7 @@ export default function MunicipalitiesScreen() {
   );
 
   const header = (
-    <HeroHeader serif
+    <PageHead cover={cover}
       title={t('city.townhall')}
       subtitle={t('city.townhallIntro')}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}
@@ -82,8 +83,9 @@ export default function MunicipalitiesScreen() {
   );
 
   return (
-    <Screen warm cover={cover} header={header}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+    <Screen bleed cover={cover}>
+      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        {header}
         <SearchField value={query} onChangeText={setQuery} placeholder={t('city.townhallSearch')} />
 
         {found ? (

@@ -5,7 +5,7 @@ import { citySection, type CityGuideSectionId } from '@cityjoy/shared';
 
 import { CityGuideList } from '@/components/city-guide-list';
 import { useProvinceCover } from '@/components/city-cover';
-import { HeroHeader } from '@/components/hero-header';
+import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { INSTITUTION_GROUPS, LOOK, type Look } from '@/lib/city-look';
 import { locationRepository as repo } from '@/lib/locations';
@@ -39,11 +39,15 @@ export default function CitySectionScreen() {
   const { location } = useUserLocation();
   const place = location?.provinceCode ? repo.getProvince(location.provinceCode)?.name : undefined;
   const [count, setCount] = useState<number | null>(null);
+  const bottom = usePageBottom();
   const back = () => (router.canGoBack() ? router.back() : router.replace(g ? '/city/kurumlar' : '/city'));
 
   return (
-    <Screen warm cover={cover} header={<HeroHeader serif title={title} subtitle={[place, count ? t('city.hub.places', { count }) : ''].filter(Boolean).join(' · ')} onBack={back} />}>
-      <CityGuideList section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} onCount={setCount} initialDistrict={district} />
+    <Screen bleed cover={cover}>
+      <CityGuideList
+        header={<PageHead cover={cover} title={title} subtitle={[place, count ? t('city.hub.places', { count }) : ''].filter(Boolean).join(' · ')} onBack={back} />}
+        contentStyle={[PAGE_CONTENT, { paddingBottom: bottom }]}
+        section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} onCount={setCount} initialDistrict={district} />
     </Screen>
   );
 }

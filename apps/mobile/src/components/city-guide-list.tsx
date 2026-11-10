@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
-import { Linking, ScrollView, SectionList, StyleSheet, View } from 'react-native';
+import { Linking, ScrollView, SectionList, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { cityChoiceLabel, mapsUrl, normalizeName, telUrl, type CityGuideItem, type CityGuideSectionId } from '@cityjoy/shared';
 
@@ -64,6 +64,7 @@ export function CityGuideList({
   header,
   onCount,
   initialDistrict,
+  contentStyle,
 }: {
   section: CityGuideSectionId;
   look: Look;
@@ -73,6 +74,8 @@ export function CityGuideList({
   onCount?(n: number): void;
   /** Açılışta seçili ilçe (Önemli Kurumlar'da seçilen ilçe). */
   initialDistrict?: string;
+  /** Liste içeriğine ek stil (PageHead kullanan sayfada yan boşluk ve alt boşluk). */
+  contentStyle?: StyleProp<ViewStyle>;
 }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -261,14 +264,14 @@ export function CityGuideList({
     <SectionList
       sections={hub ? [] : sections}
       keyExtractor={(i) => i.id}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, contentStyle]}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
       stickySectionHeadersEnabled={false}
       ListHeaderComponent={
         <View style={styles.top}>
           {header}
-          <SearchField compact value={query} onChangeText={setQuery} placeholder={t('city.search')} />
+          <SearchField glass value={query} onChangeText={setQuery} placeholder={t('city.search')} />
           {stale ? <AppText variant="caption" muted>{t('city.staleNote')}</AppText> : null}
           {lang !== 'tr' ? <AppText variant="caption" muted>{t('city.contentLanguage')}</AppText> : null}
           {hub ? (
