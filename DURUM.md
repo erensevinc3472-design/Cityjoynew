@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 11 Kasım 2026 (dal claude/blaze-kurulum: Sosyal Harmoni ve Fırsatlar kartlarında Eren'in resimleri; Bölgesel/Türkiye geneli etkinlik seçimi, Belediye Hizmetleri ve Park & Pazar Benim Şehrim kutularıyla, Müzeler örneğe göre, Çarşı üst görseli, Vitrin boş panolar, Keşfet cam düğmeler, Benim Şehrim alt çubuğu; Eren'in örneklerine göre ince kayan başlık, ayrıntı sayfası, Mahalle Meydanı, Etkinlikler; Önemli Kurumlar arama + ilçe düğmeleri + yeni kartlar; Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 11 Kasım 2026 (dal claude/blaze-kurulum: Sosyal Harmoni canlı şerit, sponsor bandı ve Panel > Sponsorlar; Sosyal Harmoni ve Fırsatlar kartlarında Eren'in resimleri; Bölgesel/Türkiye geneli etkinlik seçimi, Belediye Hizmetleri ve Park & Pazar Benim Şehrim kutularıyla, Müzeler örneğe göre, Çarşı üst görseli, Vitrin boş panolar, Keşfet cam düğmeler, Benim Şehrim alt çubuğu; Eren'in örneklerine göre ince kayan başlık, ayrıntı sayfası, Mahalle Meydanı, Etkinlikler; Önemli Kurumlar arama + ilçe düğmeleri + yeni kartlar; Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -887,6 +887,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 
 - **Sosyal Harmoni resimleri (11 Kasım; Eren verdi).** 10 resim `assets/social/*.jpg` (720 genişlik), asılları masaüstünde
   `CityJoy-gorseller/sosyal-harmoni`. Kartta ve arkada tam ekran görünür; Spor ve Sağlık için resim yok, çizim kalır (Eren verince eklenir).
+- **Sosyal Harmoni alt kısmı: canlı şerit ve sponsor bandı (11 Kasım; Eren iki katlı düzeni seçti).** Arkadaki resim
+  bulanık (blurRadius 14) ve biraz daha koyu. Kartların altında ortadaki kartın bölümünden en yeni şey (`components/social-peek.tsx`):
+  sıradaki etkinlik/aktivite, son haber, açık yarışma/anket, kategorinin fırsat sayısı ve ilk fırsatı; yalnızca ortadaki
+  kartın verisi okunur, oturumda saklanır; içerik yoksa şerit görünmez. En altta "Sponsorlu" bant (`sponsors` koleksiyonu,
+  `packages/shared/src/sponsors`): il ya da Türkiye geneli, Sosyal Harmoni ve/veya Fırsatlar, başlangıç-bitiş günü, açık/kapalı;
+  ilin sponsoru Türkiye genelinden önce, birden çoksa her gün sırayla; sponsor yoksa bant yok. **Panel > Sosyal > Sponsorlar**
+  (yalnızca admin; öneri: sponsoru yalnızca merkez ekler, Eren değiştirmek isterse il yöneticisine açılabilir). Logo `kurum`
+  türüyle yüklenir; silinen logoyu `sponsorLogoChanged` işlevi siler. Kural testi `firebase/sponsors.test.ts` geçti.
+  **Yayına alınacak:** Firestore kuralları ve sunucu işlevleri (birleştirmeden sonra Eren'e adım adım). Telefonda denenmedi.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
   Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu

@@ -921,7 +921,17 @@
         "tag": "Kurs ve kitap",
         "desc": "Yeni bir şey öğrenmenin tam zamanı."
       }
-    }
+    },
+    "peek": {
+      "event": "Sıradaki etkinlik",
+      "activity": "Sıradaki aktivite",
+      "news": "Son haber",
+      "contest": "Yarışma",
+      "poll": "Açık anket",
+      "deals_one": "{{count}} aktif fırsat",
+      "deals_other": "{{count}} aktif fırsat"
+    },
+    "sponsored": "Sponsorlu"
   },
   "official": {
     "title": "Resmî profil",

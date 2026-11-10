@@ -11,6 +11,7 @@ import { BusinessesPage } from './pages/businesses-page';
 import { CityGuidePage } from './pages/city-guide-page';
 import { RoadsidePage } from './pages/roadside-page';
 import { HolidayPage } from './pages/holiday-page';
+import { SponsorsPage } from './pages/sponsors-page';
 import { ShowcasePage } from './pages/showcase-page';
 import { DealsPage } from './pages/deals-page';
 import { TravelPage } from './pages/travel-page';
@@ -65,6 +66,7 @@ const router = createHashRouter([
       { path: 'diger-ihtiyaclar', element: <NeedsPage /> },
       { path: 'anketler', element: <PollsPage /> },
       { path: 'yarismalar', element: <ContestsPage /> },
+      { path: 'sponsorlar', element: <SponsorsPage /> },
       { path: 'isletmeler', element: <BusinessesPage /> },
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },

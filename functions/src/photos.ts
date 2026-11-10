@@ -33,6 +33,8 @@ export const MEDIA_FIELDS = {
   activities: [{ key: 'cover', owners: (d) => [d.organizerUid] }],
   // Seyahat kapakları (bölge, şehir, yer, rota, yöresel, belediye tanıtımı): yükleyen admin ya da belediye personeli.
   travel: [{ key: 'cover' }],
+  // Sponsor logosu (yükleyen admin).
+  sponsors: [{ key: 'logo' }],
 } satisfies Record<string, MediaField[]>;
 
 const pathsOf = (v: unknown): string[] =>

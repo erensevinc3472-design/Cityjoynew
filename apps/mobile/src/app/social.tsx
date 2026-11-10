@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState, type ComponentProps, type ReactNode } from 'react';
+import type { Sponsor } from '@cityjoy/shared';
 import { Animated, Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type ScrollViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -11,8 +12,10 @@ import { Image } from 'expo-image';
 import { AppText } from '@/components/app-text';
 import { RoundButton } from '@/components/hero-header';
 import { SceneArt, sceneRim, sceneSky, type SceneKind } from '@/components/scene-art';
+import { SocialPeek, SponsorBand } from '@/components/social-peek';
 import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
+import { useSponsor } from '@/lib/sponsors';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -70,6 +73,9 @@ export default function SocialScreen() {
   const province = location ? repo.getProvince(location.provinceCode)?.name : undefined;
   const pager = useRef<ScrollViewInstance>(null);
   const [page, setPage] = useState(0);
+  const socialSponsor = useSponsor(location?.provinceCode, 'sosyal');
+  const dealsSponsor = useSponsor(location?.provinceCode, 'firsatlar');
+  const peek = (key: string) => <SocialPeek cardKey={key} location={location} />;
 
   // Şehir yalnızca bilgi olarak görünür; konum burada değiştirilmez (bölgesel / genel ayrımı ilgili ekranlarda).
   const cityLine = province ? (
@@ -113,6 +119,8 @@ export default function SocialScreen() {
                 <MaterialIcons name="keyboard-double-arrow-down" size={22} color={c.heroAccent} />
               </Pressable>
             }
+            peek={peek}
+            sponsor={socialSponsor}
             insetTop={insets.top}
             insetBottom={insets.bottom}
           />
@@ -133,6 +141,8 @@ export default function SocialScreen() {
               </View>
             }
             chip={<AppText style={styles.dealsNote}>{t('social.dealsNote')}</AppText>}
+            peek={peek}
+            sponsor={dealsSponsor}
             insetTop={insets.top}
             insetBottom={insets.bottom}
             active={page === 1}
@@ -151,6 +161,8 @@ function Carousel({
   top,
   chip,
   footer,
+  peek,
+  sponsor,
   insetTop,
   insetBottom,
   active = true,
@@ -161,6 +173,10 @@ function Carousel({
   top: ReactNode;
   chip?: ReactNode;
   footer?: ReactNode;
+  /** Kartın altındaki canlı bilgi şeridi (ortadaki kartın bölümünden). */
+  peek?(key: string): ReactNode;
+  /** En alttaki "Sponsorlu" bant; yoksa görünmez. */
+  sponsor?: Sponsor;
   insetTop: number;
   insetBottom: number;
   active?: boolean;
@@ -168,8 +184,9 @@ function Carousel({
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { width } = useWindowDimensions();
-  const cardW = Math.min(Math.round(width * 0.62), 290);
+  const { width, height } = useWindowDimensions();
+  // Kısa ekranlarda kart küçülür; şerit ve bant da sığsın.
+  const cardW = Math.max(150, Math.min(Math.round(width * 0.62), 290, Math.round((height - 440) / 1.25)));
   const gap = 14;
   const step = cardW + gap;
   const side = (Math.min(width, 640) - cardW) / 2;
@@ -195,7 +212,7 @@ function Carousel({
           style={[StyleSheet.absoluteFill, { backgroundColor: sceneSky(s.scene), opacity: x.interpolate({ inputRange: [(i - 1) * step, i * step, (i + 1) * step], outputRange: [0, 1, 0], extrapolate: 'clamp' }) }]}>
           {/* Resim tüm ekranı kaplar; çizim alttan ekran genişliğinde durur, üstü gök rengiyle dolar. */}
           {s.image ? (
-            <Image source={s.image} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
+            <Image source={s.image} style={StyleSheet.absoluteFill} contentFit="cover" blurRadius={14} accessible={false} />
           ) : (
             <View style={[styles.scene, { height: Math.round(width * 1.25) }]}>
               <SceneArt kind={s.scene} still />
@@ -203,7 +220,7 @@ function Carousel({
           )}
         </Animated.View>
       ))}
-      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dim]} />
+      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dim, current.image ? styles.dimPhoto : null]} />
 
       <View style={[styles.top, { paddingTop: insetTop + spacing.sm }]}>
         {top}
@@ -253,12 +270,15 @@ function Carousel({
         }}
       />
 
+      {peek ? <View style={styles.peek}>{peek(current.key)}</View> : null}
+
       <View style={[styles.bottom, { paddingBottom: insetBottom + spacing.md }]}>
         <View style={styles.dots} accessible accessibilityLabel={`${index + 1} / ${cards.length}`}>
           {cards.map((s, i) => (
             <View key={s.key} style={[styles.dot, i === index ? { width: 18, backgroundColor: c.heroAccent } : { backgroundColor: 'rgba(255, 255, 255, 0.3)' }]} />
           ))}
         </View>
+        {sponsor ? <SponsorBand sponsor={sponsor} /> : null}
         {footer}
       </View>
     </View>
@@ -271,6 +291,9 @@ const styles = StyleSheet.create({
   page: { flex: 1 },
   scene: { position: 'absolute', start: 0, end: 0, bottom: 0, overflow: 'hidden' },
   dim: { backgroundColor: 'rgba(8, 26, 30, 0.62)' },
+  // Resimli arka plan bulanık ve biraz daha koyu: öndeki kart öne çıksın (Eren, 11 Kasım 2026).
+  dimPhoto: { backgroundColor: 'rgba(8, 26, 30, 0.7)' },
+  peek: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER, marginTop: spacing.md },
   top: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER, gap: spacing.sm },
   bar: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   titleBox: { flex: 1, alignItems: 'center' },
@@ -303,7 +326,7 @@ const styles = StyleSheet.create({
   cardTag: { fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 0.6 },
   cardTitle: { fontFamily: fonts.heading, fontSize: 19, lineHeight: 25, color: white },
   cardHint: { fontSize: 12, color: '#D5E2E3', marginTop: 2 },
-  bottom: { marginTop: 'auto', alignItems: 'center', gap: spacing.sm, paddingTop: spacing.sm },
+  bottom: { marginTop: 'auto', width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER, alignItems: 'center', gap: spacing.sm, paddingTop: spacing.sm },
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 6 },
   dot: { width: 6, height: 6, borderRadius: 3 },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 44 },

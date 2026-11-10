@@ -921,7 +921,17 @@
         "tag": "Kurse und Bücher",
         "desc": "Genau die richtige Zeit, etwas Neues zu lernen."
       }
-    }
+    },
+    "peek": {
+      "event": "Nächste Veranstaltung",
+      "activity": "Nächste Aktivität",
+      "news": "Neueste Nachricht",
+      "contest": "Wettbewerb",
+      "poll": "Offene Umfrage",
+      "deals_one": "{{count}} aktives Angebot",
+      "deals_other": "{{count}} aktive Angebote"
+    },
+    "sponsored": "Gesponsert"
   },
   "official": {
     "title": "Offizielles Profil",

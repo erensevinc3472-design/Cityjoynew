@@ -921,7 +921,17 @@
         "tag": "Courses and books",
         "desc": "The perfect time to learn something new."
       }
-    }
+    },
+    "peek": {
+      "event": "Next event",
+      "activity": "Next activity",
+      "news": "Latest news",
+      "contest": "Contest",
+      "poll": "Open poll",
+      "deals_one": "{{count}} active deal",
+      "deals_other": "{{count}} active deals"
+    },
+    "sponsored": "Sponsored"
   },
   "official": {
     "title": "Official profile",

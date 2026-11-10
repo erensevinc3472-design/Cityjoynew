@@ -832,6 +832,27 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Sponsor bandı (Sosyal Harmoni ve Fırsatlar altında, "Sponsorlu" etiketli): herkes okur, yalnızca admin yazar.
+    match /sponsors/{id} {
+      allow read: if true;
+      function _sp(nw) {
+        return isAdmin()
+        && nw.keys().hasOnly(['name', 'line', 'url', 'logo', 'provinceCode', 'places', 'startsOn', 'endsOn', 'active', 'updatedBy', 'updatedAt'])
+        && nw.name is string && nw.name.size() >= 2 && nw.name.size() <= 60
+        && nw.line is string && nw.line.size() >= 3 && nw.line.size() <= 90
+        && (!('url' in nw) || (nw.url is string && nw.url.size() <= 300 && nw.url.matches('https://[^ ]+')))
+        && mediaKeptOrOwn(nw, 'logo', 'kurum')
+        && nw.provinceCode is string && nw.provinceCode.matches('^(TR|[0-8][0-9])$')
+        && nw.places is list && nw.places.size() >= 1 && nw.places.hasOnly(['sosyal', 'firsatlar'])
+        && nw.startsOn is string && nw.startsOn.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && nw.endsOn is string && nw.endsOn.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') && nw.endsOn >= nw.startsOn
+        && nw.active is bool
+        && nw.updatedBy == request.auth.uid && nw.updatedAt == request.time;
+      }
+      allow create, update: if _sp(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
     // Seyahat > Planla: ekibin temadaki il düzenlemesi (sıra, gizle, dönem, not). Herkes okur, admin yazar.
     match /holidayThemes/{theme} {
       allow read: if true;

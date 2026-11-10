@@ -1701,7 +1701,8 @@
       "anketler": "Anketler",
       "yarismalar": "Yarışmalar",
       "tatil-fikirleri": "Tatil fikirleri",
-      "harcama": "Harcama"
+      "harcama": "Harcama",
+      "sponsorlar": "Sponsorlar"
     },
     "audience": "Takipçiler"
   },
@@ -2083,5 +2084,57 @@
     "reopenTitle": "Yeniden aç",
     "reopenHint": "Bağlantı kopunca sunucu çalışmaz, bu yüzden panelden açılamaz. Google Cloud'da cityjoynew projesini \"Firebase Payment\" hesabına yeniden bağla.",
     "reopen": "Google Cloud'da yeniden bağla"
+  },
+  "sponsors": {
+    "title": "Sponsorlar",
+    "intro": "Sosyal Harmoni ve Fırsatlar sayfalarının altındaki ince \"Sponsorlu\" bant. Anlaşma uygulama dışında, faturayla yapılır.",
+    "rules": "Bant her zaman \"Sponsorlu\" etiketiyle görünür. İlin kendi sponsoru Türkiye geneli sponsordan önce gelir; aynı yerde birden çok sponsor varsa her gün sırayla biri görünür. Süresi dolan ya da kapatılan sponsor kendiliğinden kalkar. Sponsor yoksa bant hiç görünmez.",
+    "adminOnly": "Sponsorları yalnızca admin yönetir.",
+    "new": "Yeni sponsor",
+    "editTitle": "Sponsoru düzenle",
+    "name": "Sponsor adı",
+    "line": "Bantta yazacak tek satır",
+    "linePlaceholder": "Bu sayfa Osmangazi Belediyesi katkılarıyla",
+    "url": "Dokununca açılacak sayfa (isteğe bağlı)",
+    "logo": "Logo (isteğe bağlı)",
+    "logoHint": "Kare logo en iyi görünür.",
+    "where": "Nerede görünsün",
+    "nationwide": "Türkiye geneli (her il)",
+    "places": "Hangi sayfada",
+    "place": {
+      "sosyal": "Sosyal Harmoni",
+      "firsatlar": "Fırsatlar"
+    },
+    "startsOn": "Başlangıç günü",
+    "endsOn": "Bitiş günü",
+    "active": "Açık (kapatırsan tarihe bakılmadan gizlenir)",
+    "add": "Sponsoru ekle",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "confirmDelete": "{{name}} silinsin mi? Bu geri alınamaz.",
+    "saved": "Kaydedildi.",
+    "deleted": "Silindi.",
+    "error": "Kaydedilemedi. Bağlantını kontrol edip yeniden dene.",
+    "loadError": "Sponsorlar yüklenemedi.",
+    "retry": "Yeniden dene",
+    "loading": "Yükleniyor…",
+    "empty": "Henüz sponsor yok.",
+    "statusCol": "Durum",
+    "actionsCol": "İşlemler",
+    "state": {
+      "live": "Yayında",
+      "waiting": "Başlamadı",
+      "ended": "Süresi doldu",
+      "off": "Kapalı"
+    },
+    "errors": {
+      "name": "Ad 2-60 harf olmalı.",
+      "line": "Satır 3-90 harf olmalı.",
+      "url": "Bağlantı https:// ile başlamalı.",
+      "places": "En az bir sayfa seç.",
+      "dates": "Bitiş günü başlangıçtan önce olamaz (en çok 400 gün)."
+    }
   }
 }

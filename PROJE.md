@@ -831,6 +831,7 @@ Eren'in kararları: kullanıcılar ücretsiz, güven bilgisi ücretsiz, SOS ve a
 6. **VIP/öne çıkan ilanlar** (ilan platformu).
 7. **Sponsorlu yarışmalar** (marka sponsorluğu, ödül sponsorluğu).
 8. **Reklam**: ilk sürümde sınırlı tutulur, güveni zedelememek için.
+9. **Sponsor bandı** (Karar Eren, 11 Kasım 2026): Sosyal Harmoni ve Fırsatlar sayfalarının altında, kartın bölümünden canlı bilgi şeridinin altında ince "Sponsorlu" bant. İl ya da Türkiye geneli, tarihli; sponsor yoksa görünmez. Anlaşma uygulama dışında faturayla; panelde yalnızca admin ekler (Panel > Sosyal > Sponsorlar).
 
 **Başlıca maliyetler:** video depolama ve aktarım, bildirim altyapısı, harita/mekân verisi (lisans), yapay zekâ asistanı ve konuşma tanıma, doğrulama ekibinin emeği (belge inceleme, görüntülü görüşme), moderasyon, hukuk ve avukat, muhasebe/fatura, mağaza hesapları, il temsilcisi payı.
 

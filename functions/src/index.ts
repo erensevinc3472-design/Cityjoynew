@@ -113,6 +113,11 @@ export const travelCoverChanged = Object.fromEntries(
   ]),
 );
 
+// Sponsordan çıkan logo dosyası silinir.
+export const sponsorLogoChanged = onDocumentWritten('sponsors/{id}', async (e) => {
+  await handleMediaChange(MEDIA_FIELDS.sponsors, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+});
+
 // Kaldırılan aktivitenin kapak dosyası silinir.
 export const activityCoverChanged = onDocumentWritten('activities/{id}', async (e) => {
   await handleActivityCover(db, e.params.id, e.data?.before.data(), e.data?.after.data(), deleteFiles);

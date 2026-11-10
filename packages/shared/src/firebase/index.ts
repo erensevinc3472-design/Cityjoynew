@@ -69,3 +69,4 @@ export { createRoadsidePackAdmin, createRoadsidePackRepository, type RoadsidePac
 export { createTravelPrices } from './travel-prices';
 export { createFirebaseStats, type FirebaseStats, type StatsRange } from './stats';
 export { createTranslationClient } from './translate';
+export { createSponsorAdmin, createSponsorRepository } from './sponsors';
