@@ -741,6 +741,11 @@
     "listAll": "Все ({{count}})",
     "callShort": "Позвонить",
     "directions": "Маршрут",
+    "address": "Адрес",
+    "nearby": "Другие места поблизости",
+    "readMore": "Подробнее",
+    "readLess": "Свернуть",
+    "infoTitle": "Сведения",
     "inYourDistrict": "В вашем районе",
     "hub": {
       "byKind": "По типу",

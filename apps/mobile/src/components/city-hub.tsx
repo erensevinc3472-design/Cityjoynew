@@ -101,12 +101,15 @@ export function DistrictTile({ name, note, mine, onPress }: { name: string; note
 /** Altın ya da cam yuvarlak düğme (Ara, Yol tarifi, Tümünü listele). */
 export function PillButton({ label, icon, gold, small, onPress }: { label: string; icon?: IconName; gold?: boolean; small?: boolean; onPress(): void }) {
   const c = useThemeColors();
+  const dark = useResolvedScheme() === 'dark';
   const color = gold ? c.onPrimary : c.textStrong;
+  // Açık modda cam düğme zeminde kayboluyordu: beyaz zemin ve görünür kenarlık.
+  const glass = dark ? { backgroundColor: 'rgba(220, 240, 236, 0.10)', borderColor: 'rgba(220, 240, 236, 0.16)' } : { backgroundColor: c.surface, borderColor: c.border };
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.pill, small && styles.pillSmall, gold ? { backgroundColor: c.primary } : { backgroundColor: 'rgba(220, 240, 236, 0.10)', borderColor: 'rgba(220, 240, 236, 0.16)', borderWidth: 1 }, { opacity: pressed ? 0.85 : 1 }]}>
+      style={({ pressed }) => [styles.pill, small && styles.pillSmall, gold ? { backgroundColor: c.primary } : [glass, { borderWidth: 1 }], { opacity: pressed ? 0.85 : 1 }]}>
       {icon ? <MaterialIcons name={icon} size={16} color={color} /> : null}
       <AppText style={[styles.pillText, { color }]}>{label}</AppText>
     </Pressable>

@@ -741,6 +741,11 @@
     "listAll": "All ({{count}})",
     "callShort": "Call",
     "directions": "Directions",
+    "address": "Address",
+    "nearby": "Other places nearby",
+    "readMore": "Read more",
+    "readLess": "Show less",
+    "infoTitle": "Details",
     "inYourDistrict": "In your district",
     "hub": {
       "byKind": "By type",

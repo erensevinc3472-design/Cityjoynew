@@ -741,6 +741,11 @@
     "listAll": "الكل ({{count}})",
     "callShort": "اتصال",
     "directions": "الاتجاهات",
+    "address": "العنوان",
+    "nearby": "أماكن أخرى قريبة",
+    "readMore": "المزيد",
+    "readLess": "أقل",
+    "infoTitle": "المعلومات",
     "inYourDistrict": "في منطقتك",
     "hub": {
       "byKind": "حسب النوع",

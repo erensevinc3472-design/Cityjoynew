@@ -741,6 +741,11 @@
     "listAll": "Alle ({{count}})",
     "callShort": "Anrufen",
     "directions": "Route",
+    "address": "Adresse",
+    "nearby": "Weitere Orte in der Nähe",
+    "readMore": "Mehr lesen",
+    "readLess": "Weniger",
+    "infoTitle": "Angaben",
     "inYourDistrict": "In deinem Bezirk",
     "hub": {
       "byKind": "Nach Art",

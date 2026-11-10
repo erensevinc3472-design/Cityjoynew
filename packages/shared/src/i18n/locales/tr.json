@@ -741,6 +741,11 @@
     "listAll": "Tümü ({{count}})",
     "callShort": "Ara",
     "directions": "Yol tarifi",
+    "address": "Adres",
+    "nearby": "Yakındaki diğer noktalar",
+    "readMore": "Daha fazla",
+    "readLess": "Daha az",
+    "infoTitle": "Bilgiler",
     "inYourDistrict": "İlçende",
     "hub": {
       "byKind": "Türüne göre",
