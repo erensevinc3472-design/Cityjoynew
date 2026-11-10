@@ -43,12 +43,12 @@ export function TreeScene({ box, dim, paused, reduce, onEvent, style }: TreeScen
         title: '',
         tabIndex: -1,
         'aria-hidden': true,
-        style: { border: 0, width: '100%', height: '100%', display: 'block', pointerEvents: 'none', opacity: ready ? 1 : 0, transition: 'opacity .3s ease', backgroundColor: '#062227' },
+        style: { border: 0, width: '100%', height: '100%', display: 'block', pointerEvents: 'none', opacity: ready ? 1 : 0, transition: 'opacity .3s ease', backgroundColor: '#001A1F' },
       })}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { backgroundColor: '#062227', overflow: 'hidden' },
+  wrap: { backgroundColor: '#001A1F', overflow: 'hidden' },
 });

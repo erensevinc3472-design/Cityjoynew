@@ -48,7 +48,7 @@ import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 /** Ağaç resminin zemin rengi: sahne yüklenirken de aynı renk görünür. */
-const TREE_GROUND = '#062227';
+const TREE_GROUND = '#001A1F';
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 /** Tümü sekmesinde her bölümden gösterilen sonuç. */
 const PREVIEW = 3;

@@ -67,6 +67,6 @@ export function TreeScene({ box, dim, paused, reduce, onEvent, style }: TreeScen
 }
 
 const styles = StyleSheet.create({
-  wrap: { backgroundColor: '#062227', overflow: 'hidden' },
-  web: { flex: 1, backgroundColor: '#062227' },
+  wrap: { backgroundColor: '#001A1F', overflow: 'hidden' },
+  web: { flex: 1, backgroundColor: '#001A1F' },
 });

@@ -12,28 +12,30 @@ export type TreeEvent = { type: 'ready' } | { type: 'arrive' } | { type: 'lit' }
 /**
  * Ara ekranının ağaç sahnesi (Eren onayladı, 10 Kasım 2026; taslak "Ara ağacı"): kökler yanar, ışık gövdeden dallara
  * çıkar, dal uçlarından bir kez taneler hâlinde arama kutusuna uçar; kutu yandıktan sonra kökler sakinleşir, ışık
- * gövdede dolaşmaya devam eder. Çizgi yok: resimde kahverengi olan yerler (kabuk) içeriden aydınlanır.
+ * gövdede dolaşmaya devam eder. Çizgi yok: resimde gri-kahverengi olan yerler (kabuk) içeriden aydınlanır. Resim 10 Kasım'da daha gerçekçi
+ * olanıyla değişti (Eren); yollar ve kabuk ölçütü yeni resme göre.
  * Arama kutusu ve yazılar uygulamanın kendi parçalarıdır; bu sayfa yalnız resmi ve ışığı çizer.
  */
 export function treeHtml(reduce: boolean): string {
   return `<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <style>
-html,body{margin:0;height:100%;overflow:hidden;background:#062227;-webkit-user-select:none;user-select:none}
-body{background:linear-gradient(180deg,#012328 0%,#042C32 24%,#0B3333 42%,#0A2A24 56%,#0C2A27 76%,#001C1F 100%)}
-#stage{position:absolute;transform-origin:50% 68%;animation:breathe 9s ease-in-out infinite}
+html,body{margin:0;height:100%;overflow:hidden;background:#001A1F;-webkit-user-select:none;user-select:none}
+body{background:linear-gradient(180deg,#002026 0%,#002026 45%,#0D2421 76%,#00191E 100%)}
+#stage{position:absolute;transform-origin:50% 71%;animation:breathe 9s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.012)}}
 #stage.edge{-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
 #stage>*{position:absolute;inset:0;width:100%;height:100%;display:block}
 #art{transition:filter .5s ease}
+#fade{background:linear-gradient(180deg,#002026 0%,rgba(0,32,38,0) 14%)}
 .l{mix-blend-mode:screen;transition:opacity .5s ease}
-#pool{left:4%;right:4%;width:auto;top:62.5%;height:10.5%;border-radius:50%;opacity:0;mix-blend-mode:screen;background:radial-gradient(50% 50% at 50% 50%,rgba(255,170,70,.6),rgba(255,140,40,.22) 45%,transparent 75%)}
+#pool{left:2%;right:2%;width:auto;top:66.5%;height:10.5%;border-radius:50%;opacity:0;mix-blend-mode:screen;background:radial-gradient(50% 50% at 50% 50%,rgba(255,170,70,.6),rgba(255,140,40,.22) 45%,transparent 75%)}
 #sparks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen}
-body.dim #art{filter:brightness(.3) saturate(.7)}
+body.dim #art,body.dim #fade{filter:brightness(.3) saturate(.7)}
 body.dim .l,body.dim #pool,body.dim #sparks{opacity:.2!important}
 ${reduce ? '#stage{animation:none}' : ''}
 </style></head><body>
-<div id="stage"><img id="art" alt="" src="${TREE_IMAGE}"><div id="pool"></div>
+<div id="stage"><img id="art" alt="" src="${TREE_IMAGE}"><div id="fade"></div><div id="pool"></div>
 <canvas class="l" id="bloom" width="450" height="876" style="filter:blur(8px);opacity:.95"></canvas>
 <canvas class="l" id="glow" width="450" height="876"></canvas></div>
 <canvas id="sparks"></canvas>
@@ -50,11 +52,11 @@ var mask=mk(),mctx=mask.getContext('2d'),lit=mk();
 
 // Işığın izlediği yollar (resmin 900x1752 koordinatında); her biri küp eğri, önceden noktalara bölünür.
 var PATHS={
- trunk:[440,1185,430,1100,418,1000,440,905],
- b0:[436,900,420,835,382,780,350,708], b1:[448,895,488,835,520,782,505,716], b2:[462,900,505,815,560,760,615,712],
- b3:[468,935,560,902,640,868,705,820], b4:[428,918,380,890,320,860,258,830],
- r0:[85,1165,200,1160,340,1162,435,1180], r1:[112,1202,230,1200,350,1192,436,1185], r2:[300,1252,350,1226,400,1206,437,1188],
- r3:[600,1255,540,1226,480,1206,445,1188], r4:[790,1205,680,1200,540,1192,447,1185], r5:[800,1165,690,1160,550,1162,447,1180]};
+ trunk:[440,1235,435,1150,408,1050,430,945],
+ b0:[415,945,370,860,292,780,285,680], b1:[438,935,470,850,500,770,505,680], b2:[450,940,520,840,580,760,650,700],
+ b3:[445,1010,540,955,650,915,790,880], b4:[405,960,340,905,230,860,120,810],
+ r0:[40,1265,170,1255,320,1235,430,1225], r1:[90,1300,220,1290,340,1265,432,1235], r2:[290,1320,340,1290,395,1260,435,1238],
+ r3:[600,1320,540,1290,480,1260,445,1238], r4:[820,1300,690,1290,550,1265,448,1235], r5:[880,1265,740,1255,580,1235,450,1225]};
 var BR=['b0','b1','b2','b3','b4'],RT=['r0','r1','r2','r3','r4','r5'],TBL={};
 function cub(p,t){var u=1-t;return{x:u*u*u*p[0]+3*u*u*t*p[2]+3*u*t*t*p[4]+t*t*t*p[6],y:u*u*u*p[1]+3*u*u*t*p[3]+3*u*t*t*p[5]+t*t*t*p[7]};}
 Object.keys(PATHS).forEach(function(k){var p=PATHS[k],pts=[],len=[0],N=64;for(var i=0;i<=N;i++){pts.push(cub(p,i/N));if(i)len.push(len[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));}TBL[k]={pts:pts,len:len};});
@@ -63,7 +65,7 @@ function at(k,u){var T=TBL[k],L=T.len,tot=L[L.length-1],d=Math.max(0,Math.min(1,
 
 var ok=true;
 function buildLit(){var t=mk().getContext('2d');t.drawImage(img,0,0,W,H);var d;try{d=t.getImageData(0,0,W,H);}catch(e){ok=false;return;}
- var px=d.data;for(var i=0;i<px.length;i+=4){var r=px[i],g=px[i+1],b=px[i+2],bark=Math.max(0,(r-g)+(r-b)*.6)/24,lum=(r+g+b)/765;
+ var px=d.data;for(var i=0;i<px.length;i+=4){var r=px[i],g=px[i+1],b=px[i+2],bark=Math.max(0,r-g*.7+6)/26,lum=(r+g+b)/765;
  var a=Math.min(1,Math.max(Math.pow(Math.min(1,bark),.7),bark>.05?.12:0))*Math.min(1,.5+lum*1.8);px[i]=255;px[i+1]=150+lum*105;px[i+2]=55+lum*90;px[i+3]=a*255;}
  lit.getContext('2d').putImageData(d,0,0);}
 function blob(c,x,y,r,a,rgb){if(a<=0||r<=0)return;rgb=rgb||'255,255,255';var g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba('+rgb+','+Math.min(1,a)+')');g.addColorStop(1,'rgba('+rgb+',0)');c.fillStyle=g;c.fillRect(x-r,y-r,r*2,r*2);}
@@ -74,7 +76,7 @@ function along(k,u,r,a){var p=at(k,u);blob(mctx,p.x*S,p.y*S,r,a);}
 // Ağacın tepesi arama kutusunun altında kalır (minTop).
 var L={s:1,ox:0,oy:0,W:0,H:0},box=null;
 function layout(){var Wv=innerWidth,Hv=innerHeight,s=Math.max(Hv/1752,Math.min(Wv/900,Hv/1400)),w=900*s,h=1752*s,ox=(Wv-w)/2,oy=(Hv-h)/2;
- if(box&&box.minTop)oy=Math.max(oy,box.minTop-540*s);
+ if(box&&box.minTop)oy=Math.max(oy,box.minTop-420*s);
  L={s:s,ox:ox,oy:oy,W:Wv,H:Hv};stage.style.left=ox+'px';stage.style.top=oy+'px';stage.style.width=w+'px';stage.style.height=h+'px';
  stage.classList.toggle('edge',w<Wv-2);var dpr=Math.min(2,devicePixelRatio||1);sp.width=Wv*dpr;sp.height=Hv*dpr;sctx.setTransform(dpr,0,0,dpr,0,0);}
 addEventListener('resize',layout);
@@ -96,7 +98,7 @@ var t0=0,raf=0,paused=false,started=false,burst=false;
 function frame(now){var t=REDUCE?1e9:now-t0,breath=REDUCE?1:.86+.14*Math.sin(now/950);mctx.clearRect(0,0,W,H);
  // Kökler: tabanda güçlü bir kor yanar, ışık bütün köklere yayılır; kutu yandıktan sonra (~5,5 sn) sakin bir kora iner.
  var ign=ease(t/1500),settle=REDUCE?1:ease((t-5500)/1800),deep=ign*breath*(1-.6*settle);
- mctx.save();mctx.translate(222,595);mctx.scale(1,.3);blob(mctx,0,0,80+200*ign,Math.min(1,1.15*deep));mctx.restore();blob(mctx,220,585,60*ign,deep);
+ mctx.save();mctx.translate(220,622);mctx.scale(1,.3);blob(mctx,0,0,80+200*ign,Math.min(1,1.15*deep));mctx.restore();blob(mctx,219,612,60*ign,deep);
  RT.forEach(function(r,i){var spread=ease((t-200-i*90)/1300);for(var j=0;j<=14&&j/14<=spread;j++)along(r,1-j/14,19,.6*breath*(1-.6*settle));
   if(spread>=1&&settle<1){var u=((now/2600)+i*.37)%1;along(r,u,22,.75*Math.sin(u*Math.PI)*(1-settle));}});
  pool.style.opacity=(.95*deep).toFixed(3);

@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 10 Kasım 2026 (dal claude/blaze-kurulum: Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 10 Kasım 2026 (dal claude/focused-brown-1frmpo: Ara ağacı daha gerçekçi resimle değişti). Önceki: 10 Kasım (dal claude/blaze-kurulum: Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -893,6 +893,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `apps/mobile/src/components/search-tree/`: sahne tek HTML sayfası (canvas), telefonda WebView, webde iframe; resim
   sayfaya gömülü (`tree-image.ts`, resim değişirse `node scripts/search-tree-image.mjs`). Başka ekrandayken çizim durur,
   "hareketi azalt" açıksa ağaç canlandırılmadan yanar. Webde (emülatör, test hesabı) denendi; telefonda denenmedi.
+  **Resim değişti (10 Kasım, Eren: "daha gerçekçi"; dal claude/focused-brown-1frmpo, blaze-kurulum üzerine).** Yeni
+  `assets/search/agac.jpg` (900x1752). Işık yolları (`PATHS`), kök koru, havuz ve ağaç tepesi payı yeni ağaca göre;
+  yeni resim yeşil-mavi tonlu olduğundan kabuk "kızıllık" yerine "yeşilden ayrışma" ile bulunur (`r-0.7g`). Resmin üst
+  kenarı gökyüzüne eritildi. Tarayıcıda (390x844) ekran görüntüleriyle denendi.
 
 - **Bursa muhtarlık adresleri (10 Kasım, Eren sordu).** Masaüstü `CityJoy-Bursa-muhtarliklar-panel.xlsx`: 1060 muhtarlık, ad ve
   telefon tam (Büyükşehir muhtar rehberi), adres 144 (Mudanya ve Nilüfer belediyesi, Osmangazi'nin 11 muhtarlık binası,
