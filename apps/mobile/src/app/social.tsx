@@ -6,6 +6,8 @@ import { Animated, Pressable, ScrollView, StyleSheet, View, useWindowDimensions,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { Image } from 'expo-image';
+
 import { AppText } from '@/components/app-text';
 import { RoundButton } from '@/components/hero-header';
 import { SceneArt, sceneRim, sceneSky, type SceneKind } from '@/components/scene-art';
@@ -21,6 +23,8 @@ interface Card {
   icon: IconName;
   scene: SceneKind;
   href?: Href;
+  /** Eren'in hazırladığı resim (11 Kasım 2026; asılları masaüstünde CityJoy-gorseller/sosyal-harmoni). Yoksa çizim. */
+  image?: number;
 }
 
 /**
@@ -28,11 +32,11 @@ interface Card {
  * Hazır olanlar açılır, diğerleri "yakında".
  */
 const SOCIAL: Card[] = [
-  { key: 'events', icon: 'event', scene: 'events', href: '/events' },
-  { key: 'activities', icon: 'groups', scene: 'activities', href: '/activities' },
-  { key: 'news', icon: 'newspaper', scene: 'news', href: '/news' },
-  { key: 'contests', icon: 'emoji-events', scene: 'contests', href: '/contests' },
-  { key: 'polls', icon: 'poll', scene: 'polls', href: '/polls' },
+  { key: 'events', icon: 'event', scene: 'events', href: '/events', image: require('../../assets/social/etkinlikler.jpg') },
+  { key: 'activities', icon: 'groups', scene: 'activities', href: '/activities', image: require('../../assets/social/aktiviteler.jpg') },
+  { key: 'news', icon: 'newspaper', scene: 'news', href: '/news', image: require('../../assets/social/haberler.jpg') },
+  { key: 'contests', icon: 'emoji-events', scene: 'contests', href: '/contests', image: require('../../assets/social/yarismalar.jpg') },
+  { key: 'polls', icon: 'poll', scene: 'polls', href: '/polls', image: require('../../assets/social/anketler.jpg') },
 ];
 
 /**
@@ -41,13 +45,13 @@ const SOCIAL: Card[] = [
  */
 const deal = (category: string): Href => ({ pathname: '/deals/[category]', params: { category } });
 const DEALS: Card[] = [
-  { key: 'food', icon: 'restaurant', scene: 'food', href: deal('food') },
-  { key: 'market', icon: 'shopping-cart', scene: 'market', href: deal('market') },
+  { key: 'food', icon: 'restaurant', scene: 'food', href: deal('food'), image: require('../../assets/social/yemek.jpg') },
+  { key: 'market', icon: 'shopping-cart', scene: 'market', href: deal('market'), image: require('../../assets/social/market.jpg') },
   { key: 'sport', icon: 'fitness-center', scene: 'clubs', href: deal('sport') },
-  { key: 'fun', icon: 'theater-comedy', scene: 'events', href: deal('fun') },
-  { key: 'craft', icon: 'storefront', scene: 'neighbourhood', href: deal('craft') },
+  { key: 'fun', icon: 'theater-comedy', scene: 'events', href: deal('fun'), image: require('../../assets/social/eglence.jpg') },
+  { key: 'craft', icon: 'storefront', scene: 'neighbourhood', href: deal('craft'), image: require('../../assets/social/zanaat.jpg') },
   { key: 'health', icon: 'health-and-safety', scene: 'health', href: deal('health') },
-  { key: 'education', icon: 'school', scene: 'education', href: deal('education') },
+  { key: 'education', icon: 'school', scene: 'education', href: deal('education'), image: require('../../assets/social/egitim.jpg') },
 ];
 
 /**
@@ -189,9 +193,14 @@ function Carousel({
           key={s.key}
           pointerEvents="none"
           style={[StyleSheet.absoluteFill, { backgroundColor: sceneSky(s.scene), opacity: x.interpolate({ inputRange: [(i - 1) * step, i * step, (i + 1) * step], outputRange: [0, 1, 0], extrapolate: 'clamp' }) }]}>
-          <View style={[styles.scene, { height: Math.round(width * 1.25) }]}>
-            <SceneArt kind={s.scene} still />
-          </View>
+          {/* Resim tüm ekranı kaplar; çizim alttan ekran genişliğinde durur, üstü gök rengiyle dolar. */}
+          {s.image ? (
+            <Image source={s.image} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
+          ) : (
+            <View style={[styles.scene, { height: Math.round(width * 1.25) }]}>
+              <SceneArt kind={s.scene} still />
+            </View>
+          )}
         </Animated.View>
       ))}
       <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dim]} />
@@ -228,7 +237,7 @@ function Carousel({
                 disabled={!s.href}
                 onPress={s.href ? () => router.push(s.href!) : undefined}
                 style={({ pressed }) => [styles.card, { height: Math.round(cardW * 1.25), borderColor: sceneRim(s.scene), opacity: pressed ? 0.9 : 1 }]}>
-                <SceneArt kind={s.scene} />
+                {s.image ? <Image source={s.image} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} /> : <SceneArt kind={s.scene} />}
                 <View style={styles.cardIcon}>
                   <MaterialIcons name={s.icon} size={20} color="#FFFFFF" />
                 </View>
