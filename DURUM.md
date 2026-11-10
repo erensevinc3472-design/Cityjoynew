@@ -894,6 +894,13 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sayfaya gömülü (`tree-image.ts`, resim değişirse `node scripts/search-tree-image.mjs`). Başka ekrandayken çizim durur,
   "hareketi azalt" açıksa ağaç canlandırılmadan yanar. Webde (emülatör, test hesabı) denendi; telefonda denenmedi.
 
+- **Bursa muhtarlık adresleri (10 Kasım, Eren sordu).** Masaüstü `CityJoy-Bursa-muhtarliklar-panel.xlsx`: 1060 muhtarlık, ad ve
+  telefon tam (Büyükşehir muhtar rehberi), adres 144 (Mudanya ve Nilüfer belediyesi, Osmangazi'nin 11 muhtarlık binası,
+  teyit notlu ikincil rehberler). Yeni: `scripts/bursa-muhtarlik-konum.ts` OSM'deki muhtarlık noktalarından 32 satıra
+  harita konumu ekledi (ODbL notu; aynı adlı mahalleler atlandı); panel denetimi 0 hata. Google Haritalar'dan veri
+  alınmaz (Google şartları). Kaymakamlık sitelerinde ve diğer belediye sitelerinde muhtarlık adresi yok. Kalan ~916 adres
+  için yol: muhtar uygulamaya katılınca kendi profilinden girer; toplu liste için Büyükşehir'e bilgi edinme başvurusu.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Seyahat > Planla (Eren onayladı 29 Ekim 2026: tek ekran, fiyatlar panelden elle): `/travel/planla`, Seyahat girişinde "Yolculuğunu planla". Nereden-nereye (il), tarih (7 gün), yolcu sayısı; Kendi aracım / Otobüs / Uçak / Tren kartları (süre, tahmini ücret); yolculuk kartı (İST ━ BUR, süre, km, maliyet, notlar); araba için güzergâh çevresindeki mola yerleri (OSM + yol üstü işletmeler, yaklaşık); varınca (şehri keşfet, yöresel, başkanlarla); hazırlık listesi; "Yola çık" Yoldayım'ı varış iliyle açar (kalan km, varınca "Vardın!" kartı). Planlar yalnızca telefonda (en çok 5). Hesap: il merkezleri arası kuş uçuşu x 1,3; araba 90 km/s + 2,5 saatte 15 dk mola; otobüs 70 km/s + 20 dk; uçak 650 km/s + 30 dk, iki ilde havalimanı ve 150 km üstü. Panel > Seyahat > Yolculuk fiyatları (yalnızca admin): akaryakıt (benzin, dizel, LPG, elektrik kWh), otobüs km aralığı, ay; boşsa ücret gösterilmez. **Kurallar değişti (config/travelPrices): yüklenmeli. Eren fiyatları girmeli.** Olmayanlar: bilet, sefer, firma adları, canlı yol durumu, yapay zekâ, hava durumu.
