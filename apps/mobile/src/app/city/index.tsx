@@ -11,7 +11,7 @@ import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { frost } from '@/components/city-hub';
 import { FrostFill } from '@/components/glass';
-import { HeroHeader } from '@/components/hero-header';
+import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { LineIcon } from '@/components/line-icon';
 import { CoverArt, SceneArt, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
@@ -22,7 +22,7 @@ import { locationRepository as repo } from '@/lib/locations';
 import { useSettings } from '@/lib/settings';
 import { useTravelCity } from '@/lib/travel';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
+import { fonts, radius, spacing } from '@/theme/tokens';
 import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
@@ -81,6 +81,7 @@ export default function MyCityScreen() {
   const province = provinceCode ? repo.getProvince(provinceCode)?.name : undefined;
   const district = location?.districtId ? repo.getDistrict(location.districtId)?.name : undefined;
   const [neighbourhood, setNeighbourhood] = useState<string>();
+  const bottom = usePageBottom();
 
   useEffect(() => {
     setNeighbourhood(undefined);
@@ -93,8 +94,7 @@ export default function MyCityScreen() {
   }, [location]);
 
   const header = (
-    <HeroHeader
-      serif
+    <PageHead
       title={t('modules.myCity')}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
       right={{ icon: 'edit-location-alt', label: t('home.changeLocation'), onPress: () => router.push('/location?edit=1') }}
@@ -103,8 +103,9 @@ export default function MyCityScreen() {
 
   if (!provinceCode) {
     return (
-      <Screen warm header={header}>
-        <View style={styles.content}>
+      <Screen warm bleed>
+        <View style={[PAGE_CONTENT, styles.content]}>
+          {header}
           <StateMessage kind="empty" message={t('city.needLocation')} />
           <AppButton title={t('home.changeLocation')} onPress={() => router.push('/location?edit=1')} />
         </View>
@@ -144,7 +145,7 @@ export default function MyCityScreen() {
         <LineIcon name={tile.icon} size={24} color={tintOf(tile)} />
         <AppText numberOfLines={2} style={[styles.rowTitle, { color: c.textStrong }]}>{label}</AppText>
         {!ready ? soonChip : null}
-        <Chevron />
+        <Chevron plain={!dark} />
       </Pressable>
     );
   };
@@ -155,8 +156,9 @@ export default function MyCityScreen() {
   for (let i = 0; i < TILES.length; i += 2) pairs.push(TILES.slice(i, i + 2));
 
   return (
-    <Screen warm header={header}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <Screen warm bleed>
+      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
+        {header}
         {/* İl kapağı: Seyahat panelinde ile yüklenen fotoğraf; yoksa çizim. */}
         <View style={styles.cover}>
           {travelCity?.cover ? (
@@ -264,11 +266,11 @@ function Shade({ from, opacity, mid = 0.55, to = 0.15 }: { from: string; opacity
 
 /** Silüetin üst kenarını sayfa zeminine eritir. */
 /** Sağdaki küçük yuvarlak ok. */
-function Chevron({ gold }: { gold?: boolean }) {
+function Chevron({ gold, plain }: { gold?: boolean; plain?: boolean }) {
   const rtl = I18nManager.isRTL;
   return (
-    <View style={[styles.chevron, gold ? styles.chevronGold : null]}>
-      <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={18} color={gold ? '#2A1C06' : '#EAF1EF'} />
+    <View style={[styles.chevron, gold ? styles.chevronGold : null, plain ? styles.chevronPlain : null]}>
+      <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={18} color={gold ? '#2A1C06' : plain ? '#0E5A55' : '#EAF1EF'} />
     </View>
   );
 }
@@ -305,9 +307,7 @@ function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, onPress }: 
 
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
-  // Kaydırma alanı kenardan kenara (silüet kırpılmasın); içerik yine kenar boşluklu.
-  scroll: { marginHorizontal: -GUTTER },
-  content: { gap: spacing.sm + 2, paddingBottom: spacing.xl, paddingHorizontal: GUTTER },
+  content: { gap: spacing.sm + 2 },
   cover: { height: 184, borderRadius: radius.xl, borderWidth: 1, borderColor: 'rgba(220, 240, 236, 0.16)', overflow: 'hidden', justifyContent: 'center', backgroundColor: '#0A2226' },
   coverRim: { position: 'absolute', start: 0, end: 0, bottom: 0, height: 2, backgroundColor: GOLD, opacity: 0.7 },
   coverText: { paddingHorizontal: spacing.md + 2, gap: 2, maxWidth: '68%' },
@@ -335,4 +335,6 @@ const styles = StyleSheet.create({
   soon: { position: 'absolute', top: 5, end: 8, fontFamily: fonts.bodySemi, fontSize: 9.5, paddingHorizontal: 6, paddingVertical: 1, borderRadius: radius.pill, overflow: 'hidden' },
   chevron: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(220, 240, 236, 0.14)' },
   chevronGold: { backgroundColor: GOLD },
+  // Açık modda beyaz kart üstünde: açık yeşil zemin, koyu ok.
+  chevronPlain: { backgroundColor: 'rgba(14, 90, 85, 0.10)' },
 });
