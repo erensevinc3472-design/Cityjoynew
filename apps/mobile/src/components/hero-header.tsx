@@ -51,6 +51,7 @@ export function HeroHeader({ title, subtitle, onBack, left, right, compact, seri
           <View style={styles.flex}>
             <AppText accessibilityRole="header" numberOfLines={2} style={[styles.serif, { color: c.heroText }]}>{title}</AppText>
             {subtitle ? <AppText numberOfLines={1} style={[styles.bigSub, { color: c.heroMuted }]}>{subtitle}</AppText> : null}
+            <View style={[styles.rule, { backgroundColor: c.heroAccent }]} />
           </View>
           {Array.isArray(right) ? (
             <View style={styles.row}>
@@ -136,7 +137,8 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 13, lineHeight: 18, marginTop: -spacing.xs },
   big: { gap: 2, marginTop: -spacing.xs },
   bigTitle: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 30, letterSpacing: -0.3 },
-  serif: { fontFamily: fonts.serif, fontSize: 26, lineHeight: 31 },
+  serif: { fontFamily: fonts.serif, fontSize: 26, lineHeight: 31, textShadowColor: 'rgba(0, 0, 0, 0.35)', textShadowRadius: 8 },
+  rule: { width: 34, height: 3, borderRadius: 2, marginTop: 8 },
   bigSub: { fontSize: 13, lineHeight: 18 },
   spacer: { width: 40 },
   badge: { position: 'absolute', top: 7, right: 7, width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },

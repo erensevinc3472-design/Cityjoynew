@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { CityShowcase, ShowcaseItem, ShowcaseTheme } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
+import { useProvinceCover } from '@/components/city-cover';
 import { HeroHeader } from '@/components/hero-header';
 import { SectionTitle, Tag } from '@/components/inner';
 import { SceneArt, sceneSky, type SceneKind } from '@/components/scene-art';
@@ -35,6 +36,7 @@ const THEME_SCENES: Record<ShowcaseTheme, SceneKind> = {
  */
 export default function CityShowcaseScreen() {
   const { t, i18n } = useTranslation();
+  const cover = useProvinceCover();
   const router = useRouter();
   const c = useThemeColors();
   const { width } = useWindowDimensions();
@@ -66,7 +68,7 @@ export default function CityShowcaseScreen() {
   const header = <HeroHeader serif title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
-    <Screen warm header={header}>
+    <Screen warm cover={cover} header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {!provinceCode ? (
           <StateMessage kind="empty" message={t('city.needLocation')} />

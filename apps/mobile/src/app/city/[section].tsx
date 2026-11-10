@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { citySection, type CityGuideSectionId } from '@cityjoy/shared';
 
 import { CityGuideList } from '@/components/city-guide-list';
+import { useProvinceCover } from '@/components/city-cover';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { INSTITUTION_GROUPS, LOOK, type Look } from '@/lib/city-look';
@@ -27,6 +28,7 @@ const SECTION_LOOK: Partial<Record<CityGuideSectionId, Look>> = {
 /** Bir Benim Şehrim bölümünün listesi; ?group= ile Önemli Kurumlar'ın bir alt başlığı (hastaneler, noterler…). */
 export default function CitySectionScreen() {
   const { t } = useTranslation();
+  const cover = useProvinceCover();
   const router = useRouter();
   const { section, group } = useLocalSearchParams<{ section: CityGuideSectionId; group?: string }>();
   const def = citySection(section);
@@ -40,7 +42,7 @@ export default function CitySectionScreen() {
   const back = () => (router.canGoBack() ? router.back() : router.replace(g ? '/city/kurumlar' : '/city'));
 
   return (
-    <Screen warm header={<HeroHeader serif title={title} subtitle={[place, count ? t('city.hub.places', { count }) : ''].filter(Boolean).join(' · ')} onBack={back} />}>
+    <Screen warm cover={cover} header={<HeroHeader serif title={title} subtitle={[place, count ? t('city.hub.places', { count }) : ''].filter(Boolean).join(' · ')} onBack={back} />}>
       <CityGuideList section={section} look={g?.look ?? SECTION_LOOK[section] ?? LOOK.kurumlar} categories={g?.categories} onCount={setCount} />
     </Screen>
   );

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { AppText } from '@/components/app-text';
 import { frost, LineTile } from '@/components/city-hub';
 import { FrostFill } from '@/components/glass';
+import { useProvinceCover } from '@/components/city-cover';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
@@ -20,6 +21,7 @@ import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
  */
 export default function InstitutionsScreen() {
   const { t } = useTranslation();
+  const cover = useProvinceCover();
   const router = useRouter();
   const c = useThemeColors();
   const dark = useResolvedScheme() === 'dark';
@@ -42,7 +44,7 @@ export default function InstitutionsScreen() {
   );
 
   return (
-    <Screen warm header={header}>
+    <Screen warm cover={cover} header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {error ? <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} /> : null}
         <View style={styles.grid}>

@@ -8,6 +8,7 @@ import { averageRating, FOOD_KINDS, openState, rankBusinesses, type Business } f
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BusinessCard } from '@/components/business-card';
+import { useProvinceCover } from '@/components/city-cover';
 import { HeroHeader } from '@/components/hero-header';
 import { FilterChip, FilterRow } from '@/components/inner';
 import { Screen } from '@/components/screen';
@@ -27,6 +28,7 @@ import { useThemeColors } from '@/theme/use-theme';
  */
 export default function CityFoodScreen() {
   const { t } = useTranslation();
+  const cover = useProvinceCover();
   const router = useRouter();
   const c = useThemeColors();
   const { location } = useUserLocation();
@@ -73,7 +75,7 @@ export default function CityFoodScreen() {
   const header = <HeroHeader serif title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
-    <Screen warm header={header}>
+    <Screen warm cover={cover} header={header}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {!provinceCode ? (
           <>

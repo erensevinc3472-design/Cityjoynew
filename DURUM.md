@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 10 Kasım 2026 (dal claude/blaze-kurulum: Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 10 Kasım 2026 (dal claude/blaze-kurulum: Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -922,6 +922,19 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   kaynaklar masaüstü `CityJoy-gorseller/ana-sayfa-yeni`). Sayfanın altına Benim Şehrim'deki şehir silüeti eklendi; ortak
   parça `components/skyline.tsx`. Kaydırma alanı kenardan kenara yapıldı (silüet iki yanda kırpılıyordu; Benim Şehrim'de
   de düzeldi). Webde (koyu mod) denendi; telefonda denenmedi.
+
+- **Benim Şehrim alt sayfalarında il fotoğrafı (10 Kasım; Eren'in tasarım örnekleri `onemli-kurumlar-*.png`, `muzeler.png`).**
+  İlin kapak fotoğrafı (Seyahat panelinde ile yüklenen kapak) alt sayfaların tepesinde, başlığın arkasında: üstte başlık
+  okunsun diye koyulaşır, altında bir şerit kadar açık görünür, sonra sayfa zeminine erir (açık modda açık zemine).
+  Sayfalar: Önemli Kurumlar, bölüm listeleri (`[section]`), Belediye Hizmetleri, Cafe ve Restoran, Park & Pazar, Vitrin
+  (ayrıntı sayfası `item` değil). Fotoğrafı olmayan ilde görünüm eskisi gibi. Teknik: `components/city-cover.tsx`
+  (`useProvinceCover`, `CoverBackdrop`), `Screen` yeni `cover` alanı (fotoğraf varken bant uzar, altın ışık kapanır);
+  ek okuma yok (il kaydı Benim Şehrim ana sayfasıyla aynı önbellekten); fotoğrafın küçük kopyası kullanılır. Tırnaklı
+  başlığın altına örneklerdeki kısa altın çizgi. Emülatörde sahte Bursa kapağıyla webde açık ve koyu modda denendi;
+  telefonda denenmedi. Gerçek projede henüz hiçbir ilin kapağı yok: Eren Panel > Seyahat > Bursa kapağını yükleyince
+  görünür. (Not: emülatördeki `ara-deneme@cityjoy.test` hesabının şifresi bu denemede yenilendi.)
+  Sırada (aynı örneklerden): Önemli Kurumlar'da arama + Tümü/Kamu/Sağlık/Acil süzgeci, Müzeler tür kutularında sayı ve
+  en yakın kartta fotoğraf.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

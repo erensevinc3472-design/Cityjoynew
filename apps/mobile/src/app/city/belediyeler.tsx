@@ -7,6 +7,7 @@ import { listMunicipalities, municipalityIdsFor, normalizeName, type Municipalit
 
 import { AppText } from '@/components/app-text';
 import { GlossyIcon } from '@/components/glossy-icon';
+import { useProvinceCover } from '@/components/city-cover';
 import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
@@ -33,6 +34,7 @@ const FREQUENT = [
 
 export default function MunicipalitiesScreen() {
   const { t } = useTranslation();
+  const cover = useProvinceCover();
   const router = useRouter();
   const c = useThemeColors();
   const { rtl, language } = useSettings();
@@ -80,7 +82,7 @@ export default function MunicipalitiesScreen() {
   );
 
   return (
-    <Screen warm header={header}>
+    <Screen warm cover={cover} header={header}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <SearchField value={query} onChangeText={setQuery} placeholder={t('city.townhallSearch')} />
 
