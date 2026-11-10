@@ -3,6 +3,7 @@
  * CityJoy-gorseller klasöründe, tarifler docs/gorsel-listesi.md). Her ilde aynıdır. Panel > Uygulama görselleri
  * (Blaze ile) gelince giriş resimleri oradan değiştirilebilecek; bunlar varsayılan olarak kalır.
  */
+/** Şehrim (ada) ve Sosyal (park) kartları 10 Kasım 2026'da Eren'in yeni resimleriyle değişti (kaynak ana-sayfa-yeni). */
 export const HOME_ART = {
   myCity: require('../../assets/home/sehrim.jpg') as number,
   travel: require('../../assets/home/seyahat.jpg') as number,

@@ -914,6 +914,12 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   panel dosyasıyla birebir aynı (dosya zaten bu listeden yapılmış). Telefonlar boş kalır; ASM uygulamaya katılınca kurum
   profilinden girer.
 
+- **Ana sayfa görselleri (10 Kasım, Eren istedi).** Benim Şehrim kartı yeni "ada" resmi (cami, teleferik, saat kulesi,
+  tren), Sosyal Harmoni kartı yeni "park" resmi (konser, piknik, koşu, kayak); kare kırpıldı, ortalı (`assets/home`,
+  kaynaklar masaüstü `CityJoy-gorseller/ana-sayfa-yeni`). Sayfanın altına Benim Şehrim'deki şehir silüeti eklendi; ortak
+  parça `components/skyline.tsx`. Kaydırma alanı kenardan kenara yapıldı (silüet iki yanda kırpılıyordu; Benim Şehrim'de
+  de düzeldi). Webde (koyu mod) denendi; telefonda denenmedi.
+
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 
 - Seyahat > Planla (Eren onayladı 29 Ekim 2026: tek ekran, fiyatlar panelden elle): `/travel/planla`, Seyahat girişinde "Yolculuğunu planla". Nereden-nereye (il), tarih (7 gün), yolcu sayısı; Kendi aracım / Otobüs / Uçak / Tren kartları (süre, tahmini ücret); yolculuk kartı (İST ━ BUR, süre, km, maliyet, notlar); araba için güzergâh çevresindeki mola yerleri (OSM + yol üstü işletmeler, yaklaşık); varınca (şehri keşfet, yöresel, başkanlarla); hazırlık listesi; "Yola çık" Yoldayım'ı varış iliyle açar (kalan km, varınca "Vardın!" kartı). Planlar yalnızca telefonda (en çok 5). Hesap: il merkezleri arası kuş uçuşu x 1,3; araba 90 km/s + 2,5 saatte 15 dk mola; otobüs 70 km/s + 20 dk; uçak 650 km/s + 30 dk, iki ilde havalimanı ve 150 km üstü. Panel > Seyahat > Yolculuk fiyatları (yalnızca admin): akaryakıt (benzin, dizel, LPG, elektrik kWh), otobüs km aralığı, ay; boşsa ücret gösterilmez. **Kurallar değişti (config/travelPrices): yüklenmeli. Eren fiyatları girmeli.** Olmayanlar: bilet, sefer, firma adları, canlı yol durumu, yapay zekâ, hava durumu.

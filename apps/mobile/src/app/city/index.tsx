@@ -15,6 +15,7 @@ import { HeroHeader } from '@/components/hero-header';
 import { LineIcon } from '@/components/line-icon';
 import { CoverArt, SceneArt, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
+import { Skyline } from '@/components/skyline';
 import { StateMessage } from '@/components/state-message';
 import { useCityGuideMeta } from '@/lib/city-guide';
 import { locationRepository as repo } from '@/lib/locations';
@@ -34,7 +35,6 @@ const TOWNHALL_ART = require('../../../assets/city/belediye.jpg') as number;
 const KURUMLAR_ART = require('../../../assets/city/kurumlar.jpg') as number;
 const MAHALLE_ART = require('../../../assets/city/mahalle.jpg') as number;
 const VITRIN_ART = require('../../../assets/city/vitrin.jpg') as number;
-const SKYLINE_ART = require('../../../assets/city/siluet.jpg') as number;
 
 interface Tile {
   key: string;
@@ -156,7 +156,7 @@ export default function MyCityScreen() {
 
   return (
     <Screen warm header={header}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* İl kapağı: Seyahat panelinde ile yüklenen fotoğraf; yoksa çizim. */}
         <View style={styles.cover}>
           {travelCity?.cover ? (
@@ -236,10 +236,7 @@ export default function MyCityScreen() {
         </View>
 
         {/* Taslaktaki şehir silüeti: sayfanın en altında, kenardan kenara. */}
-        <View pointerEvents="none" style={styles.skyline}>
-          <Image source={SKYLINE_ART} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
-          <Fade color={c.background} />
-        </View>
+        <Skyline />
       </ScrollView>
     </Screen>
   );
@@ -266,23 +263,6 @@ function Shade({ from, opacity, mid = 0.55, to = 0.15 }: { from: string; opacity
 }
 
 /** Silüetin üst kenarını sayfa zeminine eritir. */
-function Fade({ color }: { color: string }) {
-  const id = 'fade' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <Svg width="100%" height="100%" preserveAspectRatio="none">
-        <Defs>
-          <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={color} stopOpacity={1} />
-            <Stop offset="0.45" stopColor={color} stopOpacity={0} />
-          </LinearGradient>
-        </Defs>
-        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
-      </Svg>
-    </View>
-  );
-}
-
 /** Sağdaki küçük yuvarlak ok. */
 function Chevron({ gold }: { gold?: boolean }) {
   const rtl = I18nManager.isRTL;
@@ -325,7 +305,9 @@ function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, onPress }: 
 
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
-  content: { gap: spacing.sm + 2, paddingBottom: spacing.xl },
+  // Kaydırma alanı kenardan kenara (silüet kırpılmasın); içerik yine kenar boşluklu.
+  scroll: { marginHorizontal: -GUTTER },
+  content: { gap: spacing.sm + 2, paddingBottom: spacing.xl, paddingHorizontal: GUTTER },
   cover: { height: 184, borderRadius: radius.xl, borderWidth: 1, borderColor: 'rgba(220, 240, 236, 0.16)', overflow: 'hidden', justifyContent: 'center', backgroundColor: '#0A2226' },
   coverRim: { position: 'absolute', start: 0, end: 0, bottom: 0, height: 2, backgroundColor: GOLD, opacity: 0.7 },
   coverText: { paddingHorizontal: spacing.md + 2, gap: 2, maxWidth: '68%' },
@@ -345,7 +327,6 @@ const styles = StyleSheet.create({
   photoCard: { backgroundColor: '#0B2327' },
   cardArt: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
   coverPhoto: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
-  skyline: { marginHorizontal: -GUTTER, marginBottom: -spacing.xl, marginTop: spacing.sm, aspectRatio: 1200 / 262 },
   photoTitle: { fontFamily: fonts.serifSemi, fontSize: 17, lineHeight: 21, color: white },
   photoSub: { fontSize: 12, lineHeight: 16, color: '#E3ECEA', marginTop: 2 },
   flex: { flex: 1 },

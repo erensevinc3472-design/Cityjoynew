@@ -14,6 +14,7 @@ import { HeroHeader, LocationChip } from '@/components/hero-header';
 import { sceneRim, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
 import { SideMenu } from '@/components/side-menu';
+import { Skyline } from '@/components/skyline';
 import { VideoModal } from '@/components/video-modal';
 import { VerifyEmailBanner } from '@/components/verify-email-banner';
 import { useAnnouncements } from '@/lib/announcements';
@@ -24,7 +25,7 @@ import { useNotificationFeed, useReadState } from '@/lib/notifications';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
-import { fonts, radius, spacing } from '@/theme/tokens';
+import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
@@ -103,7 +104,7 @@ export default function HomeScreen() {
 
   return (
     <Screen header={header} footer={<BottomNav active="home" />}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <VerifyEmailBanner />
         {/* Acil duyurular en üstte (PROJE.md 5.5); yoksa bu alan hiç görünmez. */}
         {urgent.map((a) => (
@@ -118,8 +119,8 @@ export default function HomeScreen() {
               accessibilityLabel={m.href ? `${t(`modules.${m.key}`)}. ${t(`modules.${m.key}Hint`)}` : `${t(`modules.${m.key}`)}. ${t('home.comingSoon')}`}
               onPress={m.href ? () => router.push(m.href!) : undefined}
               style={({ pressed }) => [styles.module, { borderColor: sceneRim(m.scene), opacity: pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-              {/* Eren'in resimleri (8 Kasım 2026): konu sağ yarıda, sol yarı sade. */}
-              <Image source={HOME_ART[m.key]} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
+              {/* Eren'in resimleri: Seyahat ve Acil'de konu sağ yarıda (8 Kasım); Şehrim ve Sosyal kare, ortalı (10 Kasım). */}
+              <Image source={HOME_ART[m.key]} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition={m.key === 'myCity' || m.key === 'social' ? 'center' : 'right'} accessible={false} />
               <View style={styles.moduleIcon}>
                 <MaterialIcons name={m.icon} size={19} color="#FFFFFF" />
               </View>
@@ -151,6 +152,8 @@ export default function HomeScreen() {
           </View>
           {videoUrl ? <AppText style={[styles.watch, { color: c.accent, backgroundColor: c.accentSoft }]}>{t('home.watch')}</AppText> : null}
         </Pressable>
+        {/* Eren'in taslağındaki şehir silüeti (10 Kasım 2026): sayfanın en altında. */}
+        <Skyline />
       </ScrollView>
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <VideoModal src={playing} title={t('home.introVideo')} onClose={() => setPlaying(null)} />
@@ -159,7 +162,9 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  content: { gap: spacing.md, paddingBottom: spacing.lg },
+  // Kaydırma alanı kenardan kenara (silüet kırpılmasın); içerik yine kenar boşluklu.
+  scroll: { marginHorizontal: -GUTTER },
+  content: { gap: spacing.md, paddingBottom: spacing.xl, paddingHorizontal: GUTTER },
   heroText: { gap: 2 },
   greeting: { fontFamily: fonts.heading, fontSize: 24, lineHeight: 30 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
