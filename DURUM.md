@@ -947,6 +947,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   ekrana otursun, fotoğraf olmasa da olur"): üst kısım artık sabit değil, sayfayla kayıyor (`Screen` yeni `bleed`);
   başlık düz kalın yazı 22, altında kısa altın çizgi; arama cam kutu (`SearchField` yeni `glass`); kartlar daha geniş,
   açıklama en çok 2 satır, ekrana ~14 kart sığar. İl fotoğrafı daha aydınlık. Aynı düzen alt sayfalara da uygulanacak.
+  Sonra (Eren: "arkadaki ışığı kaldır, biraz daha küçült"): altın ışık kapalı, başlık 19, ince ilçe düğmeleri
+  (`FilterChip` yeni `small`, dokunma alanı korunur), kartlar 70 yükseklik, simge 36; ekrana ~20 kart sığar.
   Ayrıca Expo Go telefonda güncellenmişti: 12 Expo paketi uyduruldu (ExpoAsset hatası).
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)

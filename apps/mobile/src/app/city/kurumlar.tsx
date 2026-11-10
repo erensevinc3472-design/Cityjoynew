@@ -103,9 +103,10 @@ export default function InstitutionsScreen() {
       <SearchField glass value={query} onChangeText={setQuery} placeholder={t('city.kurumlarSearch')} />
       {districts.length > 1 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips} style={styles.chipStrip}>
-          <FilterChip icon="apps" label={t('city.all')} active={!district} onPress={() => setDistrict(null)} />
+          <FilterChip small icon="apps" label={t('city.all')} active={!district} onPress={() => setDistrict(null)} />
           {districts.map((d) => (
             <FilterChip
+              small
               key={d.id}
               icon={d.id === mine ? 'near-me' : undefined}
               label={d.name}
@@ -127,7 +128,7 @@ export default function InstitutionsScreen() {
   };
 
   return (
-    <Screen bleed cover={cover} warm={!cover}>
+    <Screen bleed cover={cover}>
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {cover && headH ? <CoverBackdrop photo={cover} height={headH + 24} /> : null}
         {head}
@@ -151,7 +152,7 @@ export default function InstitutionsScreen() {
                 style={({ pressed }) => [styles.tile, frost(dark, c.surface, c.border), { opacity: live ? 1 : 0.5, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
                 <FrostFill />
                 <View style={[styles.icon, dark ? styles.iconDark : { backgroundColor: c.accentSoft, borderColor: c.border }]}>
-                  <MaterialIcons name={g.look.icon} size={22} color={dark ? c.heroAccent : c.primary} />
+                  <MaterialIcons name={g.look.icon} size={19} color={dark ? c.heroAccent : c.primary} />
                 </View>
                 <View style={[styles.rule, { backgroundColor: dark ? c.heroAccent : c.primary }]} />
                 <View style={styles.flex}>
@@ -192,25 +193,25 @@ export default function InstitutionsScreen() {
 
 const styles = StyleSheet.create({
   // Üst kısım sayfayla birlikte kayar (sabit bant yok; Eren 10 Kasım: sabit kalın başlık kaba duruyordu).
-  head: { gap: spacing.sm + 4, paddingBottom: spacing.xs },
-  titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm + 2 },
-  pageTitle: { fontFamily: fonts.heading, fontSize: 22, lineHeight: 28, letterSpacing: -0.3, textShadowColor: 'rgba(0, 0, 0, 0.3)', textShadowRadius: 6 },
-  pageSub: { fontSize: 13, lineHeight: 18 },
-  goldRule: { width: 30, height: 3, borderRadius: 2, marginTop: 7 },
+  head: { gap: spacing.sm + 2, paddingBottom: 2 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 2 },
+  pageTitle: { fontFamily: fonts.heading, fontSize: 19, lineHeight: 24, letterSpacing: -0.3, textShadowColor: 'rgba(0, 0, 0, 0.3)', textShadowRadius: 6 },
+  pageSub: { fontSize: 12, lineHeight: 16 },
+  goldRule: { width: 26, height: 2.5, borderRadius: 2, marginTop: 6 },
   chipStrip: { marginHorizontal: -GUTTER },
   chips: { gap: spacing.xs + 2, paddingVertical: 2, paddingHorizontal: GUTTER },
-  content: { gap: spacing.md, paddingHorizontal: GUTTER, width: '100%', maxWidth: 640, alignSelf: 'center' },
+  content: { gap: spacing.sm + 4, paddingHorizontal: GUTTER, width: '100%', maxWidth: 640, alignSelf: 'center' },
   // İki sütunlu kartlar: solda simge ve ince altın çizgi, başlık ve açıklama, sağda ok.
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: spacing.sm + 2, marginHorizontal: -6 },
-  tile: { width: '48.8%', minHeight: 80, flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: spacing.sm + 2, paddingStart: spacing.sm + 2, paddingEnd: 0, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  icon: { width: 40, height: 40, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: spacing.sm, marginHorizontal: -6 },
+  tile: { width: '48.8%', minHeight: 70, flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: spacing.sm + 1, paddingStart: spacing.sm + 2, paddingEnd: 0, borderRadius: radius.lg + 2, borderWidth: 1, overflow: 'hidden' },
+  icon: { width: 36, height: 36, borderRadius: 11, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   // Koyu modda simge kutusu: hafif açık cam, altın tonlu ince çerçeve (örnekteki gibi).
   iconDark: { backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(226, 178, 119, 0.28)' },
   chev: { marginStart: -4 },
-  rule: { width: 1.5, alignSelf: 'stretch', marginVertical: spacing.sm, borderRadius: 1, opacity: 0.8 },
+  rule: { width: 1, alignSelf: 'stretch', marginVertical: spacing.sm, borderRadius: 1, opacity: 0.7 },
   flex: { flex: 1, gap: 2 },
-  title: { fontFamily: fonts.heading, fontSize: 14, lineHeight: 17 },
-  hint: { fontSize: 11.5, lineHeight: 15 },
+  title: { fontFamily: fonts.heading, fontSize: 13, lineHeight: 16 },
+  hint: { fontSize: 11, lineHeight: 14 },
   matches: { gap: spacing.sm },
   match: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, padding: spacing.md - 2, borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden' },
 });

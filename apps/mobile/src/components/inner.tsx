@@ -21,16 +21,17 @@ import { Screen } from './screen';
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
 /** Altın seçili filtre düğmesi. */
-export function FilterChip({ label, active, onPress, icon }: { label: string; active: boolean; onPress(): void; icon?: IconName }) {
+export function FilterChip({ label, active, onPress, icon, small }: { label: string; active: boolean; onPress(): void; icon?: IconName; /** Daha ince düğme (dokunma alanı hitSlop ile korunur). */ small?: boolean }) {
   const c = useThemeColors();
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
       onPress={onPress}
-      style={[styles.chip, active ? { backgroundColor: c.primary, borderColor: c.primary } : { backgroundColor: c.surface, borderColor: c.border }]}>
-      {icon ? <MaterialIcons name={icon} size={15} color={active ? c.onPrimary : c.textMuted} /> : null}
-      <AppText style={[styles.chipText, { color: active ? c.onPrimary : c.textStrong }]}>{label}</AppText>
+      hitSlop={small ? 6 : undefined}
+      style={[styles.chip, small && styles.chipSmall, active ? { backgroundColor: c.primary, borderColor: c.primary } : { backgroundColor: c.surface, borderColor: c.border }]}>
+      {icon ? <MaterialIcons name={icon} size={small ? 13 : 15} color={active ? c.onPrimary : c.textMuted} /> : null}
+      <AppText style={[styles.chipText, small && styles.chipTextSmall, { color: active ? c.onPrimary : c.textStrong }]}>{label}</AppText>
     </Pressable>
   );
 }
@@ -237,6 +238,8 @@ const styles = StyleSheet.create({
   row: { gap: spacing.xs + 2, paddingVertical: 2 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 36, paddingHorizontal: spacing.md, borderRadius: radius.pill, borderWidth: 1 },
   chipText: { fontFamily: fonts.bodySemi, fontSize: 13 },
+  chipSmall: { minHeight: 32, paddingHorizontal: 12 },
+  chipTextSmall: { fontSize: 12.5 },
   section: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: spacing.sm, paddingTop: spacing.xs },
   sectionTitle: { flex: 1, fontFamily: fonts.heading, fontSize: 16, lineHeight: 21 },
   sectionAside: { fontSize: 12.5 },

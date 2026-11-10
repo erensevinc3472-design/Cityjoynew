@@ -30,7 +30,7 @@ export function SearchField({
   const bg = glass && dark ? { backgroundColor: 'rgba(8, 32, 36, 0.55)', borderColor: 'rgba(235, 248, 245, 0.22)' } : { backgroundColor: c.surfaceStrong, borderColor: c.border };
   return (
     <View style={[styles.box, compact && styles.compact, glass && styles.glass, bg]}>
-      <MaterialIcons name="search" size={compact ? 19 : 22} color={c.textMuted} />
+      <MaterialIcons name="search" size={compact || glass ? 19 : 22} color={c.textMuted} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -59,9 +59,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
   },
-  glass: { minHeight: 48 },
+  glass: { minHeight: MIN_TOUCH, paddingHorizontal: 14 },
   compact: { minHeight: MIN_TOUCH, paddingHorizontal: 14 },
   compactInput: { fontSize: 14, paddingVertical: 10 },
-  glassInput: { fontSize: 15 },
+  glassInput: { fontSize: 14, paddingVertical: 9 },
   input: { flex: 1, fontFamily: fonts.body, fontSize: 16, paddingVertical: spacing.sm },
 });
