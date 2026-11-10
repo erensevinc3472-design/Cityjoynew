@@ -142,7 +142,7 @@ export default function MyCityScreen() {
         onPress={() => open(tile)}
         style={({ pressed }) => [styles.row, glass, { opacity: !ready ? 0.5 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
         <FrostFill />
-        <LineIcon name={tile.icon} size={24} color={tintOf(tile)} />
+        <LineIcon name={tile.icon} size={21} color={tintOf(tile)} />
         <AppText numberOfLines={2} style={[styles.rowTitle, { color: c.textStrong }]}>{label}</AppText>
         {!ready ? soonChip : null}
         <Chevron plain={!dark} />
@@ -174,7 +174,7 @@ export default function MyCityScreen() {
             <AppText accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit style={styles.cityName}>{province}</AppText>
             {district || neighbourhood ? (
             <View style={styles.placeRow}>
-              <LineIcon name="location-on" size={16} color={GOLD} />
+              <LineIcon name="location-on" size={14} color={GOLD} />
               <AppText numberOfLines={1} style={styles.place}>{[district, neighbourhood].filter(Boolean).join(' · ')}</AppText>
             </View>
             ) : null}
@@ -186,7 +186,7 @@ export default function MyCityScreen() {
 
         <View style={styles.heading}>
           <View style={styles.headingIcon}>
-            <LineIcon name="explore" size={17} color="#2A1C06" />
+            <LineIcon name="explore" size={15} color="#2A1C06" />
           </View>
           <AppText accessibilityRole="header" style={[styles.headingText, { color: c.textStrong }]}>{t('city.hub.explore')}</AppText>
           <View style={[styles.headingLine, { backgroundColor: c.border }]} />
@@ -270,7 +270,7 @@ function Chevron({ gold, plain }: { gold?: boolean; plain?: boolean }) {
   const rtl = I18nManager.isRTL;
   return (
     <View style={[styles.chevron, gold ? styles.chevronGold : null, plain ? styles.chevronPlain : null]}>
-      <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={18} color={gold ? '#2A1C06' : plain ? '#0E5A55' : '#EAF1EF'} />
+      <MaterialIcons name={rtl ? 'chevron-left' : 'chevron-right'} size={16} color={gold ? '#2A1C06' : plain ? '#0E5A55' : '#EAF1EF'} />
     </View>
   );
 }
@@ -292,7 +292,7 @@ function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, onPress }: 
       )}
       <Shade from={gold ? '#A87B3E' : '#061417'} opacity={image ? 1 : gold ? 0.95 : 0.88} mid={image ? 0.6 : 0.55} to={image ? 0 : gold ? 0.35 : 0.2} />
       <View>
-        <LineIcon name={icon} size={30} color="#FFFFFF" />
+        <LineIcon name={icon} size={24} color="#FFFFFF" />
       </View>
       <View style={styles.tallFoot}>
         <View style={styles.flex}>
@@ -307,33 +307,33 @@ function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, onPress }: 
 
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
-  content: { gap: spacing.sm + 2 },
-  cover: { height: 184, borderRadius: radius.xl, borderWidth: 1, borderColor: 'rgba(220, 240, 236, 0.16)', overflow: 'hidden', justifyContent: 'center', backgroundColor: '#0A2226' },
+  content: { gap: spacing.sm },
+  cover: { height: 128, borderRadius: radius.xl, borderWidth: 1, borderColor: 'rgba(220, 240, 236, 0.16)', overflow: 'hidden', justifyContent: 'center', backgroundColor: '#0A2226' },
   coverRim: { position: 'absolute', start: 0, end: 0, bottom: 0, height: 2, backgroundColor: GOLD, opacity: 0.7 },
-  coverText: { paddingHorizontal: spacing.md + 2, gap: 2, maxWidth: '68%' },
-  kicker: { alignSelf: 'flex-start', fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 1.4, color: GOLD, paddingBottom: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(226, 178, 119, 0.6)' },
-  cityName: { fontFamily: fonts.serifSemi, fontSize: 40, lineHeight: 48, color: white, marginTop: 4 },
+  coverText: { paddingHorizontal: spacing.md, gap: 1, maxWidth: '68%' },
+  kicker: { alignSelf: 'flex-start', fontFamily: fonts.bodySemi, fontSize: 10.5, letterSpacing: 1.3, color: GOLD, paddingBottom: 3, borderBottomWidth: 1, borderBottomColor: 'rgba(226, 178, 119, 0.6)' },
+  cityName: { fontFamily: fonts.serifSemi, fontSize: 30, lineHeight: 36, color: white, marginTop: 2 },
   placeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  place: { flexShrink: 1, fontSize: 13, color: '#E3ECEA' },
-  heading: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: spacing.sm },
-  headingIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: GOLD, alignItems: 'center', justifyContent: 'center' },
-  headingText: { fontFamily: fonts.serif, fontSize: 20, lineHeight: 26 },
+  place: { flexShrink: 1, fontSize: 12, color: '#E3ECEA' },
+  heading: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: spacing.xs },
+  headingIcon: { width: 24, height: 24, borderRadius: 12, backgroundColor: GOLD, alignItems: 'center', justifyContent: 'center' },
+  headingText: { fontFamily: fonts.serif, fontSize: 17, lineHeight: 22 },
   headingLine: { flex: 1, height: 1, marginStart: 6 },
-  pair: { flexDirection: 'row', gap: spacing.sm + 2 },
+  pair: { flexDirection: 'row', gap: spacing.sm },
   bottom: { marginTop: spacing.sm },
-  tall: { flex: 1, height: 128, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden', padding: spacing.md - 2, justifyContent: 'space-between' },
+  tall: { flex: 1, height: 100, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden', padding: spacing.sm + 2, justifyContent: 'space-between' },
   tallFoot: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
   tallTitle: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
   photoCard: { backgroundColor: '#0B2327' },
   cardArt: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
   coverPhoto: { position: 'absolute', top: 0, bottom: 0, end: 0, width: '100%' },
-  photoTitle: { fontFamily: fonts.serifSemi, fontSize: 17, lineHeight: 21, color: white },
-  photoSub: { fontSize: 12, lineHeight: 16, color: '#E3ECEA', marginTop: 2 },
+  photoTitle: { fontFamily: fonts.serifSemi, fontSize: 15, lineHeight: 18, color: white },
+  photoSub: { fontSize: 11, lineHeight: 14, color: '#E3ECEA', marginTop: 2 },
   flex: { flex: 1 },
-  row: { flex: 1, minHeight: 62, borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 10, paddingStart: 14, paddingEnd: 10, paddingVertical: 10 },
-  rowTitle: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 14, lineHeight: 18 },
-  soon: { position: 'absolute', top: 5, end: 8, fontFamily: fonts.bodySemi, fontSize: 9.5, paddingHorizontal: 6, paddingVertical: 1, borderRadius: radius.pill, overflow: 'hidden' },
-  chevron: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(220, 240, 236, 0.14)' },
+  row: { flex: 1, minHeight: 50, borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 8, paddingStart: 12, paddingEnd: 8, paddingVertical: 8 },
+  rowTitle: { flex: 1, fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 16 },
+  soon: { position: 'absolute', top: 3, end: 6, fontFamily: fonts.bodySemi, fontSize: 9, paddingHorizontal: 6, paddingVertical: 1, borderRadius: radius.pill, overflow: 'hidden' },
+  chevron: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(220, 240, 236, 0.14)' },
   chevronGold: { backgroundColor: GOLD },
   // Açık modda beyaz kart üstünde: açık yeşil zemin, koyu ok.
   chevronPlain: { backgroundColor: 'rgba(14, 90, 85, 0.10)' },
