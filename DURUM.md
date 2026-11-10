@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 10 Kasım 2026 (dal claude/blaze-kurulum: Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -884,6 +884,15 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   business-page) geçti; tür denetimi temiz. Panel yüklendi. Kurallar ve `businessPostCounted` işlevi Eren tarafından yüklendi (7 Kasım 03:26 ve 03:39; Claude doğruladı).
   Kural yüklemesinde Google birkaç kez geçici 503 verdi.
   Telefonda denenmedi.
+
+- **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
+  ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
+  Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu
+  parlak kalır; sonra kökler sönükleşir, ışık dalgaları gövdede akmaya devam eder. Kutuya dokununca (ya da aramayla
+  gelince) ağaç kararır, geri düğmesi, sekmeler ve eski sonuç alanı açılır (bütün arama mantığı aynı). Teknik:
+  `apps/mobile/src/components/search-tree/`: sahne tek HTML sayfası (canvas), telefonda WebView, webde iframe; resim
+  sayfaya gömülü (`tree-image.ts`, resim değişirse `node scripts/search-tree-image.mjs`). Başka ekrandayken çizim durur,
+  "hareketi azalt" açıksa ağaç canlandırılmadan yanar. Webde (emülatör, test hesabı) denendi; telefonda denenmedi.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

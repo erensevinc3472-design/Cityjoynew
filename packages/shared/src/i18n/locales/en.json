@@ -1293,6 +1293,7 @@
   },
   "search": {
     "title": "Search",
+    "ask": "What are you looking for?",
     "placeholder": "People, businesses, places, events or posts",
     "tabs": {
       "tumu": "All",

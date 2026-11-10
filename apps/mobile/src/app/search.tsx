@@ -2,7 +2,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps, type ReactNode } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { AccessibilityInfo, Animated, BackHandler, Easing, Keyboard, Pressable, ScrollView, StyleSheet, TextInput, View, type TextInputInstance, type ViewInstance } from 'react-native';
+import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
@@ -31,6 +32,8 @@ import { BottomNav } from '@/components/bottom-nav';
 import { RoundButton } from '@/components/hero-header';
 import { OptionRow } from '@/components/option-row';
 import { PostCard } from '@/components/post-card';
+import type { TreeEvent } from '@/components/search-tree/tree-html';
+import { TreeScene } from '@/components/search-tree/tree-scene';
 import { StateMessage } from '@/components/state-message';
 import { useEvents } from '@/lib/events';
 import { locationRepository as repo } from '@/lib/locations';
@@ -44,6 +47,8 @@ import { useUserLocation } from '@/lib/user-location';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
+/** Ağaç resminin zemin rengi: sahne yüklenirken de aynı renk görünür. */
+const TREE_GROUND = '#062227';
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 /** Tümü sekmesinde her bölümden gösterilen sonuç. */
 const PREVIEW = 3;
@@ -99,6 +104,83 @@ export default function SearchScreen() {
   }, [tabParam]);
   const insets = useSafeAreaInsets();
   const [likes, setLikes] = useState<Record<string, number>>({});
+
+  // Boşta ağaç sahnesi görünür; kutuya dokununca (ya da bir aramayla gelince) sonuç alanı açılır.
+  const [open, setOpen] = useState(!!params.q || !!tabParam);
+  useEffect(() => {
+    if (tabParam || params.q) setOpen(true);
+  }, [tabParam, params.q]);
+  const inputRef = useRef<TextInputInstance>(null);
+  const close = useCallback(() => {
+    setInput('');
+    setQuery('');
+    Keyboard.dismiss();
+    inputRef.current?.blur();
+    setOpen(false);
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      close();
+      return true;
+    });
+    return () => sub.remove();
+  }, [open, close]);
+
+  // Başka ekrandayken ağaç çizimi durur (pil ve işlemci).
+  const [focused, setFocused] = useState(true);
+  useFocusEffect(useCallback(() => {
+    setFocused(true);
+    return () => setFocused(false);
+  }, []));
+  // "Hareketi azalt" açıksa ağaç ışığı canlandırılmadan, tek seferde yanar.
+  const [reduce, setReduce] = useState<boolean | null>(null);
+  useEffect(() => {
+    let alive = true;
+    AccessibilityInfo.isReduceMotionEnabled().then((v) => alive && setReduce(v), () => alive && setReduce(false));
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduce);
+    return () => {
+      alive = false;
+      sub.remove();
+    };
+  }, []);
+
+  // Ağaç sahnesine arama kutusunun yeri bildirilir: ışık kutunun alt kenarına uçar, ağacın tepesi kutunun altında kalır.
+  const sceneRef = useRef<ViewInstance>(null);
+  const boxRef = useRef<ViewInstance>(null);
+  const [box, setBox] = useState<{ x0: number; x1: number; y: number; minTop: number } | null>(null);
+  const measureBox = () => {
+    if (open) return;
+    sceneRef.current?.measureInWindow((sx, sy) => {
+      boxRef.current?.measureInWindow((x, y, w, h) => {
+        if (!w) return;
+        const next = { x0: x - sx, x1: x - sx + w, y: y - sy + h, minTop: y - sy + h + 16 };
+        setBox((b) => (b && Math.abs(b.x0 - next.x0) < 1 && Math.abs(b.y - next.y) < 1 && Math.abs(b.x1 - next.x1) < 1 ? b : next));
+      });
+    });
+  };
+
+  // Kutunun parlaklığı: her ışık parçası vardığında biraz artar, sonra sabit bir ışıltıda kalır.
+  const lit = useRef(new Animated.Value(0)).current;
+  const litNow = useRef(0);
+  useEffect(() => {
+    const id = lit.addListener(({ value }) => (litNow.current = value));
+    return () => lit.removeListener(id);
+  }, [lit]);
+  const onTree = useCallback((e: TreeEvent) => {
+    if (e.type === 'arrive') {
+      lit.stopAnimation();
+      Animated.sequence([
+        Animated.timing(lit, { toValue: Math.min(1, litNow.current + 0.25), duration: 140, easing: Easing.out(Easing.quad), useNativeDriver: false }),
+        Animated.timing(lit, { toValue: 0.6, duration: 1100, easing: Easing.inOut(Easing.quad), useNativeDriver: false }),
+      ]).start();
+    } else if (e.type === 'lit') {
+      Animated.timing(lit, { toValue: 0.7, duration: 600, useNativeDriver: false }).start();
+    }
+  }, [lit]);
+  const district = location?.districtId ? repo.getDistrict(location.districtId)?.name : undefined;
+  const provinceName = location?.provinceCode ? repo.getProvince(location.provinceCode)?.name : undefined;
+  const whereText = [district, provinceName].filter(Boolean).join(', ') || t('home.noLocation');
 
   // Yazarken her harfte sorgu atılmaz: kısa bir duraklamadan sonra aranır.
   useEffect(() => {
@@ -258,32 +340,68 @@ export default function SearchScreen() {
   );
 
   return (
-    <View style={[styles.root, { backgroundColor: c.background }]}>
+    <View style={[styles.root, { backgroundColor: TREE_GROUND }]}>
       <StatusBar style="light" />
-      {/* Üst bölüm (tasarım: ara.html): yazarken başlık küçülür, arama kutusu ve sekmeler kalır. */}
-      <View style={[styles.hero, { backgroundColor: c.hero, paddingTop: insets.top + spacing.xs }]}>
-        <View style={styles.heroInner}>
-          <View style={styles.row}>
-            <RoundButton icon="arrow-back" label={t('common.back')} onPress={() => router.dismissTo('/home')} />
-            {typing ? <AppText accessibilityRole="header" style={[styles.barTitle, { color: c.heroText }]}>{t('search.title')}</AppText> : null}
-          </View>
-          {!typing ? (
-            <View style={styles.titleBox}>
-              <AppText accessibilityRole="header" style={[styles.heroTitle, { color: c.heroText }]}>
-                {t('search.heroLine1')}{' '}
-                <AppText style={[styles.heroTitle, { color: c.heroAccent }]}>{t('search.heroLine2')}</AppText>
-              </AppText>
-              <AppText style={[styles.heroSub, { color: c.heroMuted }]}>{t('search.heroSub')}</AppText>
+      {/* Ara (Eren onayladı, 10 Kasım 2026): köklerden yükselen ışık arama kutusunu bir kez aydınlatır, sonra gövdede akmaya devam eder. */}
+      <View ref={sceneRef} style={styles.flex} onLayout={measureBox}>
+        {reduce !== null ? <TreeScene box={box} dim={open} paused={!focused} reduce={reduce} onEvent={onTree} style={StyleSheet.absoluteFill} /> : null}
+        <View style={[styles.top, { paddingTop: insets.top + (open ? spacing.xs : spacing.xl) }]}>
+          {open ? (
+            <View style={styles.row}>
+              <RoundButton icon="arrow-back" label={t('common.back')} onPress={close} />
+              <AppText accessibilityRole="header" style={[styles.barTitle, { color: c.heroText }]}>{t('search.title')}</AppText>
             </View>
-          ) : null}
-          <View style={styles.searchRow}>
-            <View style={[styles.box, { borderColor: typing ? c.heroAccent : 'rgba(224, 176, 122, 0.35)' }]}>
-              <MaterialIcons name="search" size={20} color={c.heroAccent} />
+          ) : (
+            <View style={styles.titleBox}>
+              <AppText accessibilityRole="header" style={styles.ask}>{t('search.ask')}</AppText>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${whereText}. ${t('home.changeLocation')}`}
+                onPress={() => router.push('/location?edit=1')}
+                hitSlop={6}
+                style={({ pressed }) => [styles.where, { opacity: pressed ? 0.75 : 1 }]}>
+                <MaterialIcons name="place" size={16} color={c.heroAccent} />
+                <AppText numberOfLines={1} style={styles.whereText}>{whereText}</AppText>
+              </Pressable>
+            </View>
+          )}
+          <View style={styles.boxWrap}>
+            {/* Kutunun çevresindeki sıcak hale */}
+            <Animated.View pointerEvents="none" style={[styles.halo, { opacity: lit }]}>
+              <Svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 100">
+                <Defs>
+                  <RadialGradient id="halo" cx="50" cy="52" rx="50" ry="48" fx="50" fy="56" gradientUnits="userSpaceOnUse">
+                    <Stop offset="0.4" stopColor="#FFAA46" stopOpacity="0.45" />
+                    <Stop offset="0.75" stopColor="#FFAA46" stopOpacity="0.12" />
+                    <Stop offset="1" stopColor="#FFAA46" stopOpacity="0" />
+                  </RadialGradient>
+                </Defs>
+                <Rect x="0" y="0" width="100" height="100" fill="url(#halo)" />
+              </Svg>
+            </Animated.View>
+            <Animated.View
+              ref={boxRef}
+              onLayout={measureBox}
+              style={[styles.box, { borderColor: lit.interpolate({ inputRange: [0, 1], outputRange: ['rgba(160, 214, 205, 0.28)', 'rgba(255, 208, 138, 0.9)'] }) }]}>
+              <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: lit }]}>
+                <Svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 100">
+                  <Defs>
+                    <LinearGradient id="boxLit" x1="0" y1="0" x2="0" y2="1">
+                      <Stop offset="0.2" stopColor="#FFC46E" stopOpacity="0" />
+                      <Stop offset="1" stopColor="#FFC46E" stopOpacity="0.38" />
+                    </LinearGradient>
+                  </Defs>
+                  <Rect x="0" y="0" width="100" height="100" fill="url(#boxLit)" />
+                </Svg>
+              </Animated.View>
+              <MaterialIcons name="search" size={21} color="#FFD08A" />
               <TextInput
+                ref={inputRef}
                 value={input}
                 onChangeText={setInput}
+                onFocus={() => setOpen(true)}
                 placeholder={t('search.placeholder')}
-                placeholderTextColor="rgba(199, 216, 218, 0.6)"
+                placeholderTextColor="rgba(232, 214, 186, 0.75)"
                 accessibilityLabel={t('search.placeholder')}
                 autoCorrect={false}
                 autoCapitalize="none"
@@ -297,30 +415,29 @@ export default function SearchScreen() {
                   <MaterialIcons name="close" size={20} color={c.heroMuted} />
                 </Pressable>
               ) : null}
-            </View>
-            <Pressable accessibilityRole="button" accessibilityLabel={t('search.title')} onPress={submit} style={({ pressed }) => [styles.go, { backgroundColor: c.heroAccent, opacity: pressed ? 0.8 : 1 }]}>
-              <MaterialIcons name="search" size={24} color="#1A1408" />
-            </Pressable>
+            </Animated.View>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={styles.tabsScroll} contentContainerStyle={styles.tabs} accessibilityRole="tablist">
-            {SEARCH_TABS.map((x) => {
-              const selected = x === tab;
-              return (
-                <Pressable
-                  key={x}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected }}
-                  onPress={() => setTab(x)}
-                  style={[styles.tab, selected ? { backgroundColor: c.heroAccent, borderColor: c.heroAccent } : { borderColor: 'rgba(255, 255, 255, 0.18)' }]}>
-                  <AppText style={[styles.tabText, { color: selected ? '#1A1408' : c.heroText }]}>{t(`search.tabs.${x}`)}</AppText>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
+          {open ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={styles.tabsScroll} contentContainerStyle={styles.tabs} accessibilityRole="tablist">
+              {SEARCH_TABS.map((x) => {
+                const selected = x === tab;
+                return (
+                  <Pressable
+                    key={x}
+                    accessibilityRole="tab"
+                    accessibilityState={{ selected }}
+                    onPress={() => setTab(x)}
+                    style={[styles.tab, selected ? { backgroundColor: c.heroAccent, borderColor: c.heroAccent } : { borderColor: 'rgba(255, 255, 255, 0.18)', backgroundColor: 'rgba(6, 22, 26, 0.5)' }]}>
+                    <AppText style={[styles.tabText, { color: selected ? '#1A1408' : c.heroText }]}>{t(`search.tabs.${x}`)}</AppText>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          ) : null}
         </View>
-      </View>
 
-      <ScrollView style={styles.flex} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        {open ? (
+      <ScrollView style={[styles.sheet, { backgroundColor: c.background }]} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {!query ? (
           <>
             {recent.list.length ? (
@@ -407,6 +524,8 @@ export default function SearchScreen() {
           </>
         )}
       </ScrollView>
+        ) : null}
+      </View>
       <BottomNav active="search" />
     </View>
   );
@@ -417,20 +536,31 @@ const styles = StyleSheet.create({
   personInitial: { fontFamily: fonts.heading, fontSize: 16 },
   root: { flex: 1 },
   flex: { flex: 1 },
-  hero: { borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl, paddingBottom: spacing.md },
-  heroInner: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER, gap: spacing.md },
+  top: { width: '100%', maxWidth: 640, alignSelf: 'center', paddingHorizontal: GUTTER, paddingBottom: spacing.md, gap: spacing.md },
   barTitle: { fontFamily: fonts.heading, fontSize: 18 },
-  titleBox: { gap: 6, paddingTop: spacing.xs },
-  heroTitle: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, letterSpacing: -0.3 },
-  heroSub: { fontSize: 13, lineHeight: 19 },
-  searchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  box: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 50, paddingHorizontal: 14, borderRadius: radius.lg, borderWidth: 1.5, backgroundColor: 'rgba(23, 70, 75, 0.6)' },
-  input: { flex: 1, fontFamily: fonts.body, fontSize: 15, paddingVertical: 10, color: '#FFFFFF' },
-  go: { width: 50, height: 50, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center' },
+  titleBox: { alignItems: 'center', gap: spacing.md },
+  ask: {
+    fontFamily: fonts.heading,
+    fontSize: 32,
+    lineHeight: 38,
+    letterSpacing: -0.4,
+    textAlign: 'center',
+    color: '#F2F6F4',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 14,
+  },
+  where: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%', minHeight: 34, paddingStart: 10, paddingEnd: 12, borderRadius: radius.pill, borderWidth: 1, borderColor: 'rgba(160, 214, 205, 0.28)', backgroundColor: 'rgba(10, 38, 43, 0.55)' },
+  whereText: { flexShrink: 1, fontFamily: fonts.bodyMedium, fontSize: 14, color: '#F2F6F4' },
+  boxWrap: { position: 'relative' },
+  halo: { position: 'absolute', left: -32, right: -32, top: -30, bottom: -46 },
+  box: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: 52, paddingHorizontal: 16, borderRadius: radius.pill, borderWidth: 1, backgroundColor: 'rgba(10, 38, 43, 0.78)', overflow: 'hidden' },
+  input: { flex: 1, minWidth: 0, fontFamily: fonts.body, fontSize: 14, paddingVertical: 12, color: '#F2F6F4' },
   tabsScroll: { marginHorizontal: -GUTTER, flexGrow: 0 },
   tabs: { paddingHorizontal: GUTTER, gap: spacing.sm },
   tab: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, justifyContent: 'center' },
   tabText: { fontFamily: fonts.bodySemi, fontSize: 13 },
+  sheet: { flex: 1, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl },
   content: { width: '100%', maxWidth: 640, alignSelf: 'center', padding: GUTTER, gap: spacing.lg, paddingBottom: spacing.xl },
   group: { gap: spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },

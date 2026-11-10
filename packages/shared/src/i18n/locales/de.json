@@ -1293,6 +1293,7 @@
   },
   "search": {
     "title": "Suche",
+    "ask": "Wonach suchst du?",
     "placeholder": "Personen, Betriebe, Orte, Events oder Beiträge",
     "tabs": {
       "tumu": "Alle",

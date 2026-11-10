@@ -1293,6 +1293,7 @@
   },
   "search": {
     "title": "Ara",
+    "ask": "Ne arıyorsun?",
     "placeholder": "Kişi, işletme, yer, etkinlik ya da gönderi",
     "tabs": {
       "tumu": "Tümü",
