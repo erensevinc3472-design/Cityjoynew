@@ -1754,7 +1754,12 @@
     "framesShare": "Share a photo",
     "framesSignIn": "Sign in to see the snapshots.",
     "framesFeatured": "Featured",
-    "frameN": "Snapshot {{n}}"
+    "frameN": "Snapshot {{n}}",
+    "pickCity": "Choose your city",
+    "exploreCity": "Explore {{name}}",
+    "preparing": "Guide in preparation",
+    "prevCity": "Previous city",
+    "nextCity": "Next city"
   },
   "food": {
     "kinds": {

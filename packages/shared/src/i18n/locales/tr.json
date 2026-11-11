@@ -1754,7 +1754,12 @@
     "framesShare": "Fotoğraf paylaş",
     "framesSignIn": "Kareleri görmek için giriş yap.",
     "framesFeatured": "Öne çıkan",
-    "frameN": "Kare {{n}}"
+    "frameN": "Kare {{n}}",
+    "pickCity": "Şehrini seç",
+    "exploreCity": "{{name}} keşfet",
+    "preparing": "Tanıtım hazırlanıyor",
+    "prevCity": "Önceki şehir",
+    "nextCity": "Sonraki şehir"
   },
   "food": {
     "kinds": {

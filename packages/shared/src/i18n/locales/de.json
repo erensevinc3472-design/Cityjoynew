@@ -1754,7 +1754,12 @@
     "framesShare": "Foto teilen",
     "framesSignIn": "Melde dich an, um die Bilder zu sehen.",
     "framesFeatured": "Hervorgehoben",
-    "frameN": "Bild {{n}}"
+    "frameN": "Bild {{n}}",
+    "pickCity": "Wähle deine Stadt",
+    "exploreCity": "{{name}} entdecken",
+    "preparing": "Porträt in Vorbereitung",
+    "prevCity": "Vorherige Stadt",
+    "nextCity": "Nächste Stadt"
   },
   "food": {
     "kinds": {

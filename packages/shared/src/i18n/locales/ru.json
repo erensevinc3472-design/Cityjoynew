@@ -1756,7 +1756,12 @@
     "framesShare": "Поделиться фото",
     "framesSignIn": "Войдите, чтобы посмотреть кадры.",
     "framesFeatured": "Избранное",
-    "frameN": "Кадр {{n}}"
+    "frameN": "Кадр {{n}}",
+    "pickCity": "Выбери город",
+    "exploreCity": "Открыть: {{name}}",
+    "preparing": "Обзор готовится",
+    "prevCity": "Предыдущий город",
+    "nextCity": "Следующий город"
   },
   "food": {
     "kinds": {

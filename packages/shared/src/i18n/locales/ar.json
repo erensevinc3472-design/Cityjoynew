@@ -1758,7 +1758,12 @@
     "framesShare": "شارك صورة",
     "framesSignIn": "سجّل الدخول لرؤية اللقطات.",
     "framesFeatured": "مميزة",
-    "frameN": "لقطة {{n}}"
+    "frameN": "لقطة {{n}}",
+    "pickCity": "اختر مدينتك",
+    "exploreCity": "اكتشف {{name}}",
+    "preparing": "التعريف قيد الإعداد",
+    "prevCity": "المدينة السابقة",
+    "nextCity": "المدينة التالية"
   },
   "food": {
     "kinds": {
