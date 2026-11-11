@@ -928,7 +928,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `Desktop/CityJoy-gorseller/ulu-camii/anlatimlar.txt`, panelden kopyalanacak.
   **Dört yer daha (11 Kasım; Eren'in resimleri):** Yeşil Türbe (Dış görünüm, İç mekân; 8 nokta), Cumalıkızık (Köy, Sokak,
   Köy evi; 12), Koza Han (Kuş bakışı, Avlu; 9), Tophane (Osman Gazi dış/iç, Orhan Gazi dış/iç; 14). Resimler ve
-  hikâyeler  klasörlerinde ( noktaların yerini de yazar). Osman/Orhan
+  hikâyeler `Desktop/CityJoy-gorseller/<yer>/` klasörlerinde (`anlatimlar.txt` noktaların yerini de yazar). Osman/Orhan
   iç resimlerinin eşleşmesi tahmin (mozaik zeminli olan Orhan Gazi); Eren yanlışsa değiştirilir.
   **Kalan:** gezileri yayına yüklemek (panelden ya da Eren izin verirse betikle). Yazılar yayından önce kontrol edilmeli.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
