@@ -54,6 +54,12 @@ describe('seyahat', () => {
     await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', 'x'), { ...input, category: 'gece', updatedAt: new Date() }));
     const id = await admin.savePlace(null, { ...input, name: 'Irgandı Köprüsü', status: 'yayinda', order: 10 });
     expect((await app.listPlaces('16')).map((p) => p.id)).toContain(id);
+    // İçini gez: sahneler yazılır ve okunur; 6'dan fazla sahne reddedilir.
+    const image = { path: 'media/eren/seyahat/aaaaaaaaaa.jpg', url: 'https://firebasestorage.googleapis.com/v0/b/b/o/media%2Feren%2Fseyahat%2Faaaaaaaaaa.jpg?alt=media', width: 900, height: 1200 };
+    const tour = [{ label: 'İç mekân', image, points: [{ x: 0.5, y: 0.6, title: 'Şadırvan', look: 'Ortadaki şadırvana bak.', why: '' }] }];
+    await admin.savePlace(id, { ...input, name: 'Irgandı Köprüsü', status: 'yayinda', order: 10, tour });
+    expect((await app.getPlace(id))?.tour?.[0]?.points[0]?.title).toBe('Şadırvan');
+    await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, tour: Array.from({ length: 7 }, () => tour[0]), updatedAt: new Date() }));
     await admin.deletePlace({ ...base, id });
     expect((await app.listPlaces('16')).map((p) => p.id)).not.toContain(id);
 

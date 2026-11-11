@@ -1761,7 +1761,16 @@
     "prevCity": "Previous city",
     "nextCity": "Next city",
     "more": "Read more",
-    "less": "Show less"
+    "less": "Show less",
+    "tour": {
+      "illustrative": "Illustration",
+      "look": "What to look at?",
+      "why": "Why it matters?",
+      "listen": "Listen",
+      "stop": "Stop",
+      "next": "Next detail",
+      "hint": "Tap a number to see the detail"
+    }
   },
   "food": {
     "kinds": {

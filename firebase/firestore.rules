@@ -3367,8 +3367,8 @@ service cloud.firestore {
         return isAdmin() && validTravelStatus(nw)
         && nw.keys().hasOnly(['cityId', 'districtId', 'name', 'kind', 'category', 'summary', 'about', 'history',
              'architecture', 'visitingHours', 'entranceFee', 'suggestedDuration', 'address', 'howToGet', 'nearby', 'tips',
-             'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
-        && mediaKeptOrOwn(nw, 'cover', 'seyahat')
+             'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'tour', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
+        && mediaKeptOrOwn(nw, 'cover', 'seyahat') && (!('tour' in nw) || (nw.tour is list && nw.tour.size() <= 6))
         && nw.cityId is string && nw.cityId.matches('^[0-8][0-9]$')
         && nw.name is string && nw.name.size() >= 2 && nw.name.size() <= 80
         && nw.category in ['tarih', 'doga', 'deniz', 'lezzet', 'kultur', 'alisveris']

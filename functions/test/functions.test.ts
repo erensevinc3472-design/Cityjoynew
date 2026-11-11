@@ -388,6 +388,15 @@ describe('etkinlik, kurum ve işletme görselleri', () => {
     expect(gone).toEqual([a.path, b.path]);
   });
 
+  it('İçini gez: çıkarılan sahnenin resmi silinir, kalanınki silinmez', async () => {
+    const del = async () => {};
+    const a = m('u1', 'seyahat', 'aaaaaaaaaa');
+    const b = m('u1', 'seyahat', 'bbbbbbbbbb');
+    const before = { tour: [{ label: 'Dış', image: a, points: [] }, { label: 'İç', image: b, points: [] }] };
+    expect(await handleMediaChange(MEDIA_FIELDS.travel, before, { tour: [before.tour[1]] }, del)).toEqual([a.path]);
+    expect(await handleMediaChange(MEDIA_FIELDS.travel, before, undefined, del)).toEqual([a.path, b.path]);
+  });
+
   it('etkinlik kapağı yalnızca hazırlayanın klasöründense silinir; yeni kayıtta bir şey yapılmaz', async () => {
     const del = async () => {
       throw new Error('silinmemeli');

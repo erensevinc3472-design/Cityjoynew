@@ -21,6 +21,8 @@ export async function handlePostPhotos(db: Firestore, id: string, before: Docume
 export interface MediaField {
   key: string;
   owners?: (d: DocumentData) => unknown[];
+  /** Liste öğelerinin içindeki görsel alanı (ör. 'İçini gez' sahnesinin `image`'ı). */
+  inner?: string;
 }
 
 /** Etkinlik kapağı, kurum logosu, işletme logosu ve vitrini, profil fotoğrafı, ilan fotoğrafları, aktivite kapağı, Seyahat kapakları (`media/{yükleyen}/{tür}/...`). */
@@ -32,13 +34,13 @@ export const MEDIA_FIELDS = {
   listings: [{ key: 'photos', owners: (d) => [d.ownerUid] }],
   activities: [{ key: 'cover', owners: (d) => [d.organizerUid] }],
   // Seyahat kapakları (bölge, şehir, yer, rota, yöresel, belediye tanıtımı): yükleyen admin ya da belediye personeli.
-  travel: [{ key: 'cover' }],
+  travel: [{ key: 'cover' }, { key: 'tour', inner: 'image' }],
   // Sponsor logosu (yükleyen admin).
   sponsors: [{ key: 'logo' }],
 } satisfies Record<string, MediaField[]>;
 
-const pathsOf = (v: unknown): string[] =>
-  (Array.isArray(v) ? v : v ? [v] : []).map((p) => (p as { path?: unknown })?.path).filter((p): p is string => typeof p === 'string' && p.startsWith('media/'));
+const pathsOf = (v: unknown, inner?: string): string[] =>
+  (Array.isArray(v) ? v : v ? [v] : []).map((x) => (inner ? (x as Record<string, unknown>)?.[inner] : x)).map((p) => (p as { path?: unknown })?.path).filter((p): p is string => typeof p === 'string' && p.startsWith('media/'));
 
 /**
  * Kayıttan çıkan (değiştirilen, kaldırılan ya da kayıt silinince) görsellerin dosyalarını siler. Kurallar yeni bağlanan
@@ -48,9 +50,9 @@ export async function handleMediaChange(fields: MediaField[], before: DocumentDa
   if (!before) return [];
   const gone: string[] = [];
   for (const f of fields) {
-    const kept = new Set(pathsOf(after?.[f.key]));
+    const kept = new Set(pathsOf(after?.[f.key], f.inner));
     const owners = f.owners?.(before).filter((u): u is string => typeof u === 'string');
-    for (const p of pathsOf(before[f.key])) {
+    for (const p of pathsOf(before[f.key], f.inner)) {
       if (kept.has(p) || (owners && !owners.includes(p.split('/')[1]))) continue;
       gone.push(p);
     }

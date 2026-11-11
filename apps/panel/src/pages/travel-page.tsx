@@ -29,6 +29,7 @@ import { locationRepository } from '../lib/locations';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { ImageField } from '../components/image-field';
+import { TourEditor } from '../components/tour-editor';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 import { FramesTab, LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
 
@@ -497,6 +498,7 @@ function AdminTravelPage() {
               {field('p-web', t('travel.website'), P.website ?? '', (v) => setP({ website: v }), { hint: t('travel.httpsHint') })}
               {field('p-video', t('travel.videoUrl'), P.videoUrl ?? '', (v) => setP({ videoUrl: v }), { hint: t('travel.videoHint') })}
               {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={P.cover} onChange={(cover) => setP({ cover })} disabled={busy} /> : null}
+              {user ? <TourEditor uid={user.uid} value={P.tour ?? []} onChange={(tour) => setP({ tour })} disabled={busy} /> : null}
               {field('p-source', t('travel.source'), P.source ?? '', (v) => setP({ source: v }), { max: 200 })}
               <div className="field">
                 <label htmlFor="p-order">{t('travel.order')}</label>

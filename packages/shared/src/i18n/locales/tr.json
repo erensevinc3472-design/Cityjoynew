@@ -1761,7 +1761,16 @@
     "prevCity": "Önceki şehir",
     "nextCity": "Sonraki şehir",
     "more": "Devamını oku",
-    "less": "Daha az göster"
+    "less": "Daha az göster",
+    "tour": {
+      "illustrative": "Temsilî çizim",
+      "look": "Neye bakmalı?",
+      "why": "Neden önemli?",
+      "listen": "Sesli dinle",
+      "stop": "Durdur",
+      "next": "Sonraki ayrıntı",
+      "hint": "Numaralara dokun, ayrıntıyı gör"
+    }
   },
   "food": {
     "kinds": {

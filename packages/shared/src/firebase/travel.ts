@@ -27,6 +27,7 @@ import type {
   TravelReviewStatus,
   TravelRoute,
   TravelRouteInput,
+  TourScene,
 } from '../travel/travel';
 import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
 import { addAudit, iso } from './grants';
@@ -82,10 +83,40 @@ const city = (id: string, d: DocumentData): TravelCityContent => ({
   updatedAt: iso(d.updatedAt) ?? '',
 });
 
+/** Okunan sahneler: resmi geçersiz olan sahne atlanır, nokta yerleri 0-1 arasına sıkıştırılır. */
+const tourOf = (d: DocumentData): { tour?: TourScene[] } => {
+  if (!Array.isArray(d.tour)) return {};
+  const unit = (n: unknown) => (typeof n === 'number' && Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0.5);
+  const tour = (d.tour as DocumentData[]).flatMap((s): TourScene[] => {
+    const image = photoFrom(s?.image);
+    if (!image) return [];
+    const points = (Array.isArray(s.points) ? s.points : []).map((p: DocumentData) => ({
+      x: unit(p?.x),
+      y: unit(p?.y),
+      title: String(p?.title ?? ''),
+      look: String(p?.look ?? ''),
+      why: String(p?.why ?? ''),
+    }));
+    return [{ label: String(s.label ?? ''), image, points }];
+  });
+  return tour.length ? { tour } : {};
+};
+
+/** Yazılacak sahneler: resim dört alanıyla, yazılar kırpılmış. Boşsa alan yazılmaz. */
+const cleanTour = (tour: TourScene[] | undefined) =>
+  tour?.length
+    ? tour.map((s) => ({
+        label: s.label.trim(),
+        image: cleanPhoto(s.image),
+        points: s.points.map((p) => ({ x: p.x, y: p.y, title: p.title.trim(), look: p.look.trim(), why: p.why.trim() })),
+      }))
+    : undefined;
+
 const placeOf = (id: string, d: DocumentData): TravelPlace => ({
   ...(withoutCover(d) as TravelPlace),
   id,
   ...coverOf(d),
+  ...tourOf(d),
   howToGet: d.howToGet ?? [],
   nearby: d.nearby ?? [],
   tips: d.tips ?? [],
@@ -220,7 +251,7 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
     async savePlace(id: string | null, p: TravelPlaceInput): Promise<string> {
       const ref = id ? doc(db, PLACES, id) : doc(collection(db, PLACES));
       const batch = writeBatch(db);
-      batch.set(ref, { ...clean(p as unknown as Record<string, unknown>), updatedAt: serverTimestamp() });
+      batch.set(ref, { ...clean({ ...p, tour: cleanTour(p.tour) } as unknown as Record<string, unknown>), updatedAt: serverTimestamp() });
       audit(batch, ref.id, id ? 'duzenle' : 'ekle', `Gezilecek yer: ${p.name}`);
       await batch.commit();
       return ref.id;

@@ -4,7 +4,7 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 11 Kasım 2026 (dal claude/blaze-kurulum: Seyahat şehir sayfası sadeleşti; Seyahat bölge sayfası kayan şehir kartlarıyla; Sosyal Harmoni canlı şerit, sponsor bandı ve Panel > Sponsorlar; Sosyal Harmoni ve Fırsatlar kartlarında Eren'in resimleri; Bölgesel/Türkiye geneli etkinlik seçimi, Belediye Hizmetleri ve Park & Pazar Benim Şehrim kutularıyla, Müzeler örneğe göre, Çarşı üst görseli, Vitrin boş panolar, Keşfet cam düğmeler, Benim Şehrim alt çubuğu; Eren'in örneklerine göre ince kayan başlık, ayrıntı sayfası, Mahalle Meydanı, Etkinlikler; Önemli Kurumlar arama + ilçe düğmeleri + yeni kartlar; Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
+Son güncelleme: 11 Kasım 2026 (dal claude/blaze-kurulum: Seyahat yer sayfasında "İçini gez"; Seyahat şehir sayfası sadeleşti; Seyahat bölge sayfası kayan şehir kartlarıyla; Sosyal Harmoni canlı şerit, sponsor bandı ve Panel > Sponsorlar; Sosyal Harmoni ve Fırsatlar kartlarında Eren'in resimleri; Bölgesel/Türkiye geneli etkinlik seçimi, Belediye Hizmetleri ve Park & Pazar Benim Şehrim kutularıyla, Müzeler örneğe göre, Çarşı üst görseli, Vitrin boş panolar, Keşfet cam düğmeler, Benim Şehrim alt çubuğu; Eren'in örneklerine göre ince kayan başlık, ayrıntı sayfası, Mahalle Meydanı, Etkinlikler; Önemli Kurumlar arama + ilçe düğmeleri + yeni kartlar; Benim Şehrim alt sayfalarında il fotoğrafı; öncesinde Ara ekranına ışıklı ağaç). Önceki: 7 Kasım 2026 (dal claude/blaze-kurulum: Blaze kuruldu, sunucu işlevleri yüklendi, harcama sigortası ve Panel > Harcama). Önceki: 6 Kasım (PR #72 "Çevir" düğmesi birleşti; kurallar ve panel yüklendi). Önceki: 6 Kasım (dal claude/iki-kademe: işletme kademeleri ikiye indi, Panel > Sınırlar kaydetme hatası). Önceki: 4 Kasım (dal claude/magical-maxwell-0tnmeh: kural yükleme hatası giderildi, aşağıdaki not). Önceki: 4 Kasım (dal claude/ic-ekranlar: Acil alt sayfaları, Sosyal Harmoni iç sayfaları, Seyahat > Planla tatil keşfi ve Panel > Tatil fikirleri). Önceki: 3 Kasım, PR #55 kuralları yüklendi.
 
 > **Eren'in bilgisayarında çalışma (28 Ekim):** `Desktop\Cityjoynew-main` artık GitHub deposunun git kopyası (`origin`,
 > `core.autocrlf=false`). Her iş `claude/...` dalında; bu bilgisayarda `gh` yok, git Eren'in tarayıcıdan verdiği GitHub
@@ -907,6 +907,16 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   kalktı (panelde girilen bilgiler veride duruyor). Üst kapak alçaldı (en çok 220). Tanıtım 3 satır, uzunsa "Devamını oku".
   Kareler / Başkanlarla Keşif / Yöresel kutuları ve altın Hazır rotalar şeridi eski hâlinde kaldı (Eren, dört büyük kutuyu
   denedikten sonra eskisini istedi). Gezilecek yerler aynı. Şehir sayfasının Eren'in örneğine göre yenisi yine sonra yapılabilir.
+- **Seyahat yer sayfası: "İçini gez" (11 Kasım; Eren'in fikri ve resimleri).** Yerin maket görünümlü resimleri (en çok 6
+  sahne) arasında sinematik kamera geçişi (ileri giderken eski resim büyüyüp kaybolur, yenisi yakından gelip oturur; hareket
+  azaltma açıksa yumuşak geçiş). Her resimde numaralı noktalar (en çok 8): dokununca krem kart "Neye bakmalı? / Neden
+  önemli?", "Sesli dinle" (telefonun kendi sesi, ücretsiz, expo-speech) ve "Sonraki ayrıntı" (sahneler arası da geçer).
+  Köşede "Temsilî çizim". Gezi varsa üstteki kapak yerine gelir, yoksa eski kapak kalır. Panel > Seyahat > yer formunda
+  "İçini gez" düzenleyicisi: sahne resmi yükle, adını yaz, resmin üstüne tıklayıp nokta koy, yazılarını gir. Veride
+   (sahne: label, image, points[x,y 0-1, title, look, why]); kural yalnız yönetici, en çok 6 sahne;
+  silinen resimler sunucuda temizlenir ( inner alanı). Eren'in Ulu Camii resimleri
+   klasöründe (Dış görünüm, Kesit, Giriş, İç mekân); gerçek yayında panelden yüklenecek.
+  **Eren yükleyecek:** kurallar ve sunucu işlevleri (birleşmeden sonra). Yazılar yayından önce kontrol edilmeli.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
   Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu

@@ -10,6 +10,7 @@ import { videoEmbedUrl } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { RoundButton } from '@/components/hero-header';
+import { PlaceTour } from '@/components/place-tour';
 import { CoverArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
@@ -79,29 +80,40 @@ export default function TravelPlaceScreen() {
     { icon: 'timelapse' as IconName, label: t('travel.duration'), value: p.suggestedDuration },
   ].filter((x) => x.value);
 
+  const tags = (
+    <>
+      <View style={styles.tag}>
+        <MaterialIcons name="place" size={11} color="#E0B07A" />
+        <AppText style={styles.tagText}>{[district, cityName].filter(Boolean).join(', ')}</AppText>
+      </View>
+      {p.mustSee ? (
+        <View style={[styles.tag, styles.mustTag]}>
+          <MaterialIcons name="star" size={11} color="#FFD7A0" />
+          <AppText style={styles.tagText}>{t('travel.mustSee')}</AppText>
+        </View>
+      ) : null}
+    </>
+  );
+
   return (
     <View style={[styles.root, { backgroundColor: c.background }]}>
       <StatusBar style="light" />
       <TravelHeader subtitle={p.kind} title={p.name} onBack={back} right={<RoundButton icon="share" label={t('travel.share')} onPress={share} />} />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}>
+        {p.tour?.length ? (
+          <>
+            <View style={styles.tourTags}>{tags}</View>
+            <PlaceTour tour={p.tour} />
+          </>
+        ) : (
         <View style={[styles.hero, { height: Math.round(width * 0.62), backgroundColor: sceneSky(scene) }]}>
           <View style={StyleSheet.absoluteFill}>
             <CoverArt photo={p.cover} kind={scene} />
           </View>
           <View style={[StyleSheet.absoluteFill, styles.heroShade]} />
-          <View style={styles.heroTags}>
-            <View style={styles.tag}>
-              <MaterialIcons name="place" size={11} color="#E0B07A" />
-              <AppText style={styles.tagText}>{[district, cityName].filter(Boolean).join(', ')}</AppText>
-            </View>
-            {p.mustSee ? (
-              <View style={[styles.tag, styles.mustTag]}>
-                <MaterialIcons name="star" size={11} color="#FFD7A0" />
-                <AppText style={styles.tagText}>{t('travel.mustSee')}</AppText>
-              </View>
-            ) : null}
-          </View>
+          <View style={styles.heroTags}>{tags}</View>
         </View>
+        )}
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.actions}>
           {actions.map((a) => (
@@ -204,6 +216,7 @@ const styles = StyleSheet.create({
   hero: { maxHeight: 320, justifyContent: 'flex-end', overflow: 'hidden' },
   heroShade: { backgroundColor: 'rgba(8,31,36,0.3)' },
   heroTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, padding: GUTTER },
+  tourTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: GUTTER, paddingTop: spacing.md },
   tag: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: 'rgba(8,31,36,0.65)', borderWidth: 1, borderColor: 'rgba(224,176,122,0.35)' },
   mustTag: { backgroundColor: 'rgba(166,72,52,0.75)' },
   tagText: { color: '#FFFFFF', fontFamily: fonts.bodySemi, fontSize: 11 },

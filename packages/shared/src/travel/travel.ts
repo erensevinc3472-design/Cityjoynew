@@ -94,6 +94,28 @@ export interface TravelNearby {
   text: string;
 }
 
+/**
+ * "İçini gez" (Eren, 11 Kasım 2026): yerin maket görünümlü resimleri (ör. dış görünüm, kesit, giriş, iç mekân).
+ * Resimler arasında sinematik kamera geçişi yapılır; resmin üstündeki numaralı noktaya dokununca "Neye bakmalı?" ve
+ * "Neden önemli?" açılır. Noktanın yeri resmin genişliğine/yüksekliğine göre 0-1 arası oran olarak saklanır.
+ */
+export interface TourPoint {
+  x: number;
+  y: number;
+  title: string;
+  look: string;
+  why: string;
+}
+
+export interface TourScene {
+  /** "Dış görünüm", "İç mekân" gibi kısa ad. */
+  label: string;
+  image: Photo;
+  points: TourPoint[];
+}
+
+export const TOUR_LIMITS = { scenes: 6, points: 8, label: 24, title: 50, text: 300 } as const;
+
 /** Gezilecek yer (deneyim). */
 export interface TravelPlace {
   id: string;
@@ -122,6 +144,8 @@ export interface TravelPlace {
   videoUrl?: string;
   /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
   cover?: Photo;
+  /** "İçini gez" sahneleri; yoksa bölüm görünmez. */
+  tour?: TourScene[];
   /** "Mutlaka gör" işareti (puan değildir). */
   mustSee: boolean;
   /** Bilginin kaynağı (ör. "Kültür ve Turizm Bakanlığı"). */
@@ -146,7 +170,24 @@ export const TRAVEL_LIMITS = {
 
 export type TravelPlaceInput = Omit<TravelPlace, 'id' | 'updatedAt'>;
 
-export type TravelError = 'name' | 'kind' | 'summary' | 'about' | 'tagline' | 'description' | 'lists' | 'website' | 'video';
+export type TravelError = 'name' | 'kind' | 'summary' | 'about' | 'tagline' | 'description' | 'lists' | 'website' | 'video' | 'tour';
+
+/** Sahne sayısı, adlar, nokta yerleri (0-1) ve yazı uzunlukları. */
+export function validateTour(tour: TourScene[] | undefined): boolean {
+  const L = TOUR_LIMITS;
+  const t = tour ?? [];
+  const unit = (n: number) => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1;
+  return (
+    t.length <= L.scenes &&
+    t.every(
+      (s) =>
+        !!s.image &&
+        len(s.label) >= 1 && len(s.label) <= L.label &&
+        s.points.length <= L.points &&
+        s.points.every((p) => unit(p.x) && unit(p.y) && len(p.title) >= 2 && len(p.title) <= L.title && len(p.look) <= L.text && len(p.why) <= L.text && len(p.look) + len(p.why) > 0),
+    )
+  );
+}
 
 const len = (s?: string) => (s ?? '').trim().length;
 const httpsOk = (s?: string) => !s || /^https:\/\/\S+$/.test(s.trim());
@@ -172,6 +213,7 @@ export function validateTravelPlace(p: TravelPlaceInput): TravelError[] {
     e.push('lists');
   if (!httpsOk(p.website)) e.push('website');
   if (!httpsOk(p.videoUrl)) e.push('video');
+  if (!validateTour(p.tour)) e.push('tour');
   return e;
 }
 

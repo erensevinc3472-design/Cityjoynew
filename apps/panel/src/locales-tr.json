@@ -1353,7 +1353,8 @@
       "description": "Tanıtım yazısı 10-600 karakter olmalı.",
       "lists": "Kısa alanlar en çok 200 karakter, listeler en çok 10 satır olmalı. Rotada 2-12 durak ve süre (saat) olmalı.",
       "website": "Web sitesi https ile başlamalı.",
-      "video": "Video bağlantısı https ile başlamalı."
+      "video": "Video bağlantısı https ile başlamalı.",
+      "tour": "İçini gez: her sahnenin adı olmalı; her noktanın başlığı ve en az bir açıklaması olmalı."
     },
     "cityNotPublished": "{{city}} şehir tanıtımı yayında değil. Bu yerler uygulamada görünmez: Şehirler sekmesinden {{city}} için \"Yayına al\"a basın.",
     "routeThemes": {
@@ -1457,7 +1458,26 @@
     "framesUnfeatured": "Öne çıkarma kaldırıldı.",
     "framesRemove": "Karelerden kaldır",
     "framesRemoveConfirm": "Bu gönderi karelerden çıkarılsın mı? Keşfet'te kalır ve geri eklenemez.",
-    "framesRemoved": "Karelerden kaldırıldı."
+    "framesRemoved": "Karelerden kaldırıldı.",
+    "tour": {
+      "title": "İçini gez",
+      "intro": "Yerin içini ve dışını gösteren en çok {{scenes}} resim ekle (ör. dış görünüm, kesit, giriş, iç mekân). Uygulamada sırayla, kamera geçişiyle gösterilir. Her resme en çok {{points}} numaralı nokta koyabilirsin. Aynı tarzda, aynı ışıkta ve dikey (3:4) resimler en iyi sonucu verir. Yapay zekâ çizimlerinde ayrıntıları yayına almadan kontrol et; uygulama köşede \"temsilî çizim\" yazar.",
+      "scene": "{{n}}. sahne",
+      "up": "Yukarı",
+      "down": "Aşağı",
+      "removeScene": "Sahneyi kaldır",
+      "confirmRemove": "Bu sahne ve noktaları kaldırılsın mı?",
+      "label": "Sahne adı",
+      "labelPlaceholder": "Dış görünüm",
+      "clickHint": "Nokta eklemek için resmin üstünde ilgili yere tıkla.",
+      "point": "{{n}}. nokta",
+      "removePoint": "Noktayı kaldır",
+      "pointTitle": "Başlık (ör. Şadırvan)",
+      "look": "Neye bakmalı?",
+      "why": "Neden önemli?",
+      "addScene": "Sahne ekle",
+      "addHint": "Resim seçince yeni sahne eklenir."
+    }
   },
   "sort": {
     "column": "Sırala",

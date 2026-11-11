@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { SEED_LOCAL, SEED_PLACES, SEED_ROUTES } from './seed';
-import { byPopulation, regionOfProvince, routeHours, TR_REGIONS, validateTravelLocal, validateTravelMunicipal, validateTravelPlace, validateTravelRoute } from './travel';
+import { byPopulation, regionOfProvince, routeHours, TR_REGIONS, validateTravelLocal, validateTravelMunicipal, validateTravelPlace, validateTravelRoute, validateTour } from './travel';
 
 describe('seyahat', () => {
   it('7 bölge 81 ilin her birini bir kez kapsar', () => {
@@ -39,5 +39,20 @@ describe('seyahat', () => {
     expect(routeHours(45)).toEqual({ minutes: 45 });
     const list = [{ name: 'Keles' }, { name: 'Nilüfer', population: 500 }, { name: 'Osmangazi', population: 900 }, { name: 'Gemlik' }];
     expect([...list].sort(byPopulation).map((x) => x.name)).toEqual(['Osmangazi', 'Nilüfer', 'Gemlik', 'Keles']);
+  });
+});
+
+describe('validateTour (İçini gez)', () => {
+  const image = { path: 'media/u1/seyahat/a.jpg', url: 'https://x/a.jpg', width: 900, height: 1200 };
+  const point = { x: 0.5, y: 0.4, title: 'Şadırvan', look: 'Ortadaki şadırvana bak.', why: '' };
+  it('boş ya da geçerli sahneleri kabul eder', () => {
+    expect(validateTour(undefined)).toBe(true);
+    expect(validateTour([{ label: 'İç mekân', image, points: [point] }])).toBe(true);
+  });
+  it('sınır dışı nokta, boş ad ve yazısız noktayı reddeder', () => {
+    expect(validateTour([{ label: 'İç', image, points: [{ ...point, x: 1.2 }] }])).toBe(false);
+    expect(validateTour([{ label: ' ', image, points: [] }])).toBe(false);
+    expect(validateTour([{ label: 'İç', image, points: [{ ...point, look: '', why: '' }] }])).toBe(false);
+    expect(validateTour(Array.from({ length: 7 }, () => ({ label: 'A', image, points: [] })))).toBe(false);
   });
 });
