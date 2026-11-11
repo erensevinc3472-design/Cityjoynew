@@ -905,8 +905,8 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   açık renk. Kart fotoğrafı Panel > Seyahat'te şehre yüklenen kapak (panel değişmedi). Şehir sayfasının yenisi sonra.
 - **Seyahat şehir sayfası sadeleşti (11 Kasım; Eren istedi).** UNESCO ve "En yüksek nokta" bilgi kutuları sayfadan
   kalktı (panelde girilen bilgiler veride duruyor). Üst kapak alçaldı (en çok 220). Tanıtım 3 satır, uzunsa "Devamını oku".
-  Küçük üç kutu ve ayrı rota şeridi yerine iki sütunlu, büyük yazılı dört kutu: Kareler, Başkanlarla Keşif, Yöresel ve altın
-  renkli Hazır rotalar. Gezilecek yerler aynı. Şehir sayfasının Eren'in örneğine göre yenisi yine sonra yapılabilir.
+  Kareler / Başkanlarla Keşif / Yöresel kutuları ve altın Hazır rotalar şeridi eski hâlinde kaldı (Eren, dört büyük kutuyu
+  denedikten sonra eskisini istedi). Gezilecek yerler aynı. Şehir sayfasının Eren'in örneğine göre yenisi yine sonra yapılabilir.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
   Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu

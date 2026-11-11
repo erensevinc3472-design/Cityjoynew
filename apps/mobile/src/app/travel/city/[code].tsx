@@ -60,11 +60,10 @@ export default function TravelCityScreen() {
     if (embed) setPlaying(embed);
     else WebBrowser.openBrowserAsync(url).catch(() => {});
   };
-  const boxes: { icon: IconName; title: string; hint: string; go: () => void; gold?: boolean }[] = [
+  const boxes: { icon: IconName; title: string; hint: string; go: () => void }[] = [
     { icon: 'photo-library', title: t('travel.frames', { name }), hint: t('travel.framesHint'), go: () => router.push({ pathname: '/travel/frames/[code]', params: { code } }) },
     { icon: 'explore', title: t('travel.mayors'), hint: t('travel.mayorsHint'), go: () => router.push({ pathname: '/travel/mayors/[code]', params: { code } }) },
     { icon: 'diversity-3', title: t('travel.local', { name }), hint: t('travel.localHint'), go: () => router.push({ pathname: '/travel/local/[code]', params: { code } }) },
-    { icon: 'route', title: t('travel.routesShort'), hint: t('travel.routesHint'), gold: true, go: () => router.push({ pathname: '/travel/routes/[code]', params: { code } }) },
   ];
 
   return (
@@ -113,22 +112,33 @@ export default function TravelCityScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={`${b.title}. ${b.hint}`}
                   onPress={b.go}
-                  style={({ pressed }) => [
-                    styles.box,
-                    b.gold ? { backgroundColor: '#E0B07A', borderColor: '#E0B07A' } : { backgroundColor: c.surface, borderColor: c.border },
-                    { opacity: pressed ? 0.85 : 1 },
-                  ]}>
+                  style={({ pressed }) => [styles.box, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
                   <View style={styles.boxTop}>
-                    <View style={[styles.boxIcon, { backgroundColor: b.gold ? 'rgba(255,255,255,0.35)' : c.accentSoft }]}>
-                      <MaterialIcons name={b.icon} size={20} color={b.gold ? navy : c.accent} />
+                    <View style={[styles.boxIcon, { backgroundColor: c.accentSoft }]}>
+                      <MaterialIcons name={b.icon} size={16} color={c.accent} />
                     </View>
-                    <MaterialIcons name={I18nManager.isRTL ? 'arrow-back' : 'arrow-forward'} size={18} color={b.gold ? navy : c.accent} />
+                    <MaterialIcons name={I18nManager.isRTL ? 'arrow-back' : 'arrow-forward'} size={14} color={c.accent} />
                   </View>
-                  <AppText style={[styles.boxTitle, { color: b.gold ? navy : c.textStrong }]} numberOfLines={2}>{b.title}</AppText>
-                  <AppText style={[styles.boxHint, { color: b.gold ? 'rgba(8,31,36,0.75)' : c.textMuted }]} numberOfLines={2}>{b.hint}</AppText>
+                  <AppText style={[styles.boxTitle, { color: c.textStrong }]} numberOfLines={2}>{b.title}</AppText>
+                  <AppText style={[styles.boxHint, { color: c.textMuted }]} numberOfLines={2}>{b.hint}</AppText>
                 </Pressable>
               ))}
             </View>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`${t('travel.routes')}. ${t('travel.routesHint')}`}
+              onPress={() => router.push({ pathname: '/travel/routes/[code]', params: { code } })}
+              style={({ pressed }) => [styles.routes, { opacity: pressed ? 0.9 : 1 }]}>
+              <View style={styles.routesIcon}>
+                <MaterialIcons name="route" size={24} color={navy} />
+              </View>
+              <View style={styles.flex}>
+                <AppText style={styles.routesTitle}>{t('travel.routes')}</AppText>
+                <AppText style={styles.routesHint}>{t('travel.routesHint')}</AppText>
+              </View>
+              <MaterialIcons name={I18nManager.isRTL ? 'arrow-back' : 'arrow-forward'} size={22} color={navy} />
+            </Pressable>
           </View>
         ) : null}
 
@@ -217,12 +227,16 @@ const styles = StyleSheet.create({
   desc: { fontSize: 14, lineHeight: 21 },
   moreBtn: { alignSelf: 'flex-start', minHeight: MIN_TOUCH - 12, justifyContent: 'center', marginTop: 2 },
   moreText: { fontFamily: fonts.bodySemi, fontSize: 13 },
-  boxes: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  box: { flexBasis: '46%', flexGrow: 1, minHeight: 112, padding: 12, borderRadius: radius.lg, borderWidth: 1, gap: 6 },
-  boxTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 },
-  boxIcon: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
-  boxTitle: { fontFamily: fonts.heading, fontSize: 15, lineHeight: 20 },
-  boxHint: { fontSize: 12, lineHeight: 16 },
+  boxes: { flexDirection: 'row', gap: spacing.sm },
+  box: { flex: 1, padding: 10, borderRadius: radius.md, borderWidth: 1, gap: 4 },
+  boxTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  boxIcon: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  boxTitle: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 16 },
+  boxHint: { fontSize: 10, lineHeight: 13 },
+  routes: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.lg, backgroundColor: '#E0B07A', minHeight: MIN_TOUCH + 20 },
+  routesIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
+  routesTitle: { color: navy, fontFamily: fonts.heading, fontSize: 15, lineHeight: 20 },
+  routesHint: { color: 'rgba(8,31,36,0.75)', fontSize: 12, lineHeight: 16 },
   filters: { paddingHorizontal: GUTTER, paddingTop: spacing.lg, gap: spacing.sm },
   filter: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, justifyContent: 'center' },
   filterText: { fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 0.5 },
