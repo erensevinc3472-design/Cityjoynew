@@ -1,8 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState, type ComponentProps } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
+import { Pressable, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { placeImage } from '@cityjoy/shared';
@@ -12,7 +12,7 @@ import { CoverArt, sceneSky } from '@/components/scene-art';
 import { StateMessage } from '@/components/state-message';
 import { TravelHeader } from '@/components/travel-header';
 import { locationRepository as repo } from '@/lib/locations';
-import { CATEGORY_SCENES, cityMunicipalities, MODE_ICONS, NEARBY_ICONS, ROUTE_THEME_ICONS, ROUTE_THEME_SCENES, useDurationText, useTravelPlaces, useTravelRoute } from '@/lib/travel';
+import { CATEGORY_SCENES, cityMunicipalities, MODE_ICONS, NEARBY_ICONS, ROUTE_THEME_ICONS, ROUTE_THEME_SCENES, useDurationText, useTravelCity, useTravelPlaces, useTravelRoute } from '@/lib/travel';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -32,7 +32,12 @@ export default function TravelRouteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { value: route, failed, retry } = useTravelRoute(id);
   const { value: places } = useTravelPlaces(route?.cityId);
+  const { value: travelCity } = useTravelCity(route?.cityId);
+  const cityCover = travelCity?.cover;
   const [step, setStep] = useState(-1);
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  // Her durak (ve özet) en üstten açılsın, tepe fotoğrafı görünsün.
+  useEffect(() => scrollRef.current?.scrollTo({ y: 0, animated: false }), [step]);
   const city = route ? repo.getProvince(route.cityId)?.name ?? '' : '';
   const back = () => {
     if (step >= 0) return setStep(-1);
@@ -58,6 +63,15 @@ export default function TravelRouteScreen() {
   const stop = step >= 0 && step < total ? route.stops[step] : null;
   const place = stop?.placeId ? places?.find((p) => p.id === stop.placeId) : undefined;
   const done = step >= total;
+  // Tepe resmi (12 Kasım 2026): rotanın kapağı, yoksa fotoğrafı olan ilk durak, o da yoksa il kapağı; en son çizim.
+  const heroPhoto =
+    route.cover ??
+    route.stops
+      .map((s) => (s.placeId ? places?.find((p) => p.id === s.placeId) : undefined))
+      .map((p) => (p ? placeImage(p) : undefined))
+      .find(Boolean) ??
+    cityCover ??
+    undefined;
 
   const info = (icon: IconName, label: string, value?: string) =>
     value ? (
@@ -91,12 +105,12 @@ export default function TravelRouteScreen() {
         </View>
       ) : null}
 
-      <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 96 }]}>
+      <ScrollView ref={scrollRef} contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 96 }]}>
         {step < 0 ? (
           <>
             <View style={[styles.hero, { backgroundColor: sceneSky(scene) }]}>
               <View style={StyleSheet.absoluteFill}>
-                <CoverArt photo={route.cover} kind={scene} />
+                <CoverArt photo={heroPhoto} kind={scene} />
               </View>
               <View style={[StyleSheet.absoluteFill, styles.shade]} />
               <View style={styles.heroText}>
