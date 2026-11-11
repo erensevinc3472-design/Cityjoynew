@@ -5,6 +5,7 @@ import { useState, type ComponentProps } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { placeImage } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { CoverArt, sceneSky } from '@/components/scene-art';
@@ -167,7 +168,7 @@ export default function TravelRouteScreen() {
           <>
             <View style={[styles.stopHero, { backgroundColor: sceneSky(place ? CATEGORY_SCENES[place.category] : scene) }]}>
               <View style={StyleSheet.absoluteFill}>
-                <CoverArt photo={place?.cover} kind={place ? CATEGORY_SCENES[place.category] : scene} />
+                <CoverArt photo={place ? placeImage(place) : undefined} kind={place ? CATEGORY_SCENES[place.category] : scene} />
               </View>
               <View style={[StyleSheet.absoluteFill, styles.shade]} />
               <View style={styles.heroText}>

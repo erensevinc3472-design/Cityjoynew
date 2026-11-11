@@ -5,7 +5,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useState, type ComponentProps } from 'react';
 import { I18nManager, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { regionOfProvince, TRAVEL_CATEGORIES, videoEmbedUrl, type TravelCategory } from '@cityjoy/shared';
+import { placeImage, regionOfProvince, TRAVEL_CATEGORIES, videoEmbedUrl, type TravelCategory } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { CoverArt, sceneSky } from '@/components/scene-art';
@@ -178,7 +178,7 @@ export default function TravelCityScreen() {
                 onPress={() => router.push({ pathname: '/travel/place/[id]', params: { id: p.id } })}
                 style={({ pressed }) => [styles.place, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.9 : 1 }]}>
                 <View style={[styles.placeArt, { backgroundColor: sceneSky(sc) }]}>
-                  <CoverArt photo={p.cover} kind={sc} />
+                  <CoverArt photo={placeImage(p)} kind={sc} />
                 </View>
                 <View style={styles.placeBody}>
                   <View style={styles.placeTop}>

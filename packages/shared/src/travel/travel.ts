@@ -419,3 +419,6 @@ export function byPopulation<T extends { name: string; population?: number }>(a:
   if (b.population != null) return 1;
   return a.name.localeCompare(b.name, 'tr');
 }
+
+/** Kartta gösterilecek resim: kapak yoksa "İçini gez"in ilk sahnesi (genelde dış görünüm). */
+export const placeImage = (p: Pick<TravelPlace, 'cover' | 'tour'>): Photo | undefined => p.cover ?? p.tour?.[0]?.image;
