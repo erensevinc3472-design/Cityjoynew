@@ -913,9 +913,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   önemli?", "Sesli dinle" (telefonun kendi sesi, ücretsiz, expo-speech) ve "Sonraki ayrıntı" (sahneler arası da geçer).
   Köşede "Temsilî çizim". Gezi varsa üstteki kapak yerine gelir, yoksa eski kapak kalır. Panel > Seyahat > yer formunda
   "İçini gez" düzenleyicisi: sahne resmi yükle, adını yaz, resmin üstüne tıklayıp nokta koy, yazılarını gir. Veride
-   (sahne: label, image, points[x,y 0-1, title, look, why]); kural yalnız yönetici, en çok 6 sahne;
-  silinen resimler sunucuda temizlenir ( inner alanı). Eren'in Ulu Camii resimleri
-   klasöründe (Dış görünüm, Kesit, Giriş, İç mekân); gerçek yayında panelden yüklenecek.
+  `travelPlaces.tour` (sahne: label, image, points[x,y 0-1, title, look, why]); kural yalnız yönetici, en çok 6 sahne;
+  silinen resimler sunucuda temizlenir (`photos.ts` inner alanı). Eren'in Ulu Camii resimleri
+  `Desktop/CityJoy-gorseller/ulu-camii/` klasöründe (Dış görünüm, Kesit, Giriş, İç mekân); gerçek yayında panelden yüklenecek.
   **Eren yükleyecek:** kurallar ve sunucu işlevleri (birleşmeden sonra). Yazılar yayından önce kontrol edilmeli.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
