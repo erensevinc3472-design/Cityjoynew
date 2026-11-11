@@ -78,7 +78,14 @@ export default function TravelPlaceScreen() {
     { icon: 'payments' as IconName, label: t('travel.entranceFee'), value: p.entranceFee },
     { icon: 'place' as IconName, label: t('travel.address'), value: p.address },
     { icon: 'timelapse' as IconName, label: t('travel.duration'), value: p.suggestedDuration },
+    { icon: 'child-care' as IconName, label: t('travel.ageInfo'), value: p.ageInfo },
   ].filter((x) => x.value);
+  // İpuçları kartı: yanına alınacaklar, kurallar ve diğer ipuçları ayrı başlıklarla.
+  const tipGroups = [
+    { icon: 'backpack' as IconName, title: t('travel.bring'), items: p.bring ?? [] },
+    { icon: 'gavel' as IconName, title: t('travel.rules'), items: p.rules ?? [] },
+    { icon: 'check-circle' as IconName, title: t('travel.goodToKnow'), items: p.tips },
+  ].filter((g) => g.items.length);
 
   const tags = (
     <>
@@ -135,6 +142,9 @@ export default function TravelPlaceScreen() {
             </Pressable>
           ) : null}
           {quick.length ? (
+            <AppText accessibilityRole="header" style={[styles.sectionTitle, { color: c.textStrong }]}>{t('travel.practical')}</AppText>
+          ) : null}
+          {quick.length ? (
             <View style={styles.grid}>
               {quick.map((q) => (
                 <View key={q.label} style={[styles.quick, { backgroundColor: c.surface, borderColor: c.border }]}>
@@ -183,15 +193,22 @@ export default function TravelPlaceScreen() {
                 </View>,
               )
             : null}
-          {p.tips.length
+          {tipGroups.length
             ? card(
                 'lightbulb-outline',
                 t('travel.tips'),
-                <View style={styles.list}>
-                  {p.tips.map((tip, i) => (
-                    <View key={i} style={styles.tip}>
-                      <MaterialIcons name="check-circle" size={16} color={c.accent} />
-                      <AppText style={[styles.small, styles.flex, { color: c.text }]}>{tip}</AppText>
+                <View style={styles.groups}>
+                  {tipGroups.map((g) => (
+                    <View key={g.title} style={styles.list}>
+                      {tipGroups.length > 1 ? (
+                        <AppText accessibilityRole="header" style={[styles.stepMode, { color: c.textStrong }]}>{g.title}</AppText>
+                      ) : null}
+                      {g.items.map((tip, i) => (
+                        <View key={i} style={styles.tip}>
+                          <MaterialIcons name={g.icon} size={16} color={c.accent} />
+                          <AppText style={[styles.small, styles.flex, { color: c.text }]}>{tip}</AppText>
+                        </View>
+                      ))}
                     </View>
                   ))}
                 </View>,
@@ -236,6 +253,8 @@ const styles = StyleSheet.create({
   quickLabel: { fontFamily: fonts.bodySemi, fontSize: 12 },
   quickValue: { fontSize: 12, lineHeight: 17 },
   list: { gap: spacing.sm },
+  groups: { gap: spacing.md },
+  sectionTitle: { fontFamily: fonts.heading, fontSize: 15 },
   step: { borderLeftWidth: 2, paddingLeft: spacing.sm, gap: 2 },
   stepMode: { fontFamily: fonts.bodySemi, fontSize: 12 },
   small: { fontSize: 13, lineHeight: 19 },

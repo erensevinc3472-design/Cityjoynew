@@ -1656,6 +1656,11 @@
     "address": "Adresse",
     "duration": "Empfohlene Dauer",
     "checkNote": "Zeiten und Preise können sich ändern; prüfe vor dem Besuch eine offizielle Quelle.",
+    "practical": "Praktische Infos",
+    "ageInfo": "Alter und Kinder",
+    "bring": "Mitnehmen",
+    "rules": "Regeln",
+    "goodToKnow": "Gut zu wissen",
     "howToGet": "Anfahrt",
     "modes": {
       "metro": "U-Bahn",

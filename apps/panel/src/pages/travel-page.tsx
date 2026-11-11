@@ -38,7 +38,7 @@ type Data = Awaited<ReturnType<ReturnType<typeof createTravelAdmin>['listAll']>>
 const TABS: Tab[] = ['bolge', 'sehir', 'yer', 'rota', 'yoresel', 'belediye', 'kareler'];
 type RegionDraft = { id: string; tagline: string; description: string; videoUrl: string; cover?: Photo; isNew: boolean; status: TravelStatus };
 type CityDraft = { id: string; regionId: string; tagline: string; description: string; videoUrl: string; cover?: Photo; categories: TravelCategory[]; highlights: string; facts: string; isNew: boolean; status: TravelStatus };
-type PlaceDraft = Omit<TravelPlaceInput, 'howToGet' | 'nearby' | 'tips'> & { id: string | null; howToGet: string; nearby: string; tips: string };
+type PlaceDraft = Omit<TravelPlaceInput, 'howToGet' | 'nearby' | 'tips' | 'bring' | 'rules'> & { id: string | null; howToGet: string; nearby: string; tips: string; bring: string; rules: string };
 
 const provinceName = (code: string) => locationRepository.getProvince(code)?.name ?? code;
 const lines = (s: string) => s.split('\n').map((x) => x.trim()).filter(Boolean);
@@ -94,7 +94,7 @@ function AdminTravelPage() {
 
   // Yalnızca geliştirme bilgisayarında görünür (bkz. lib/tour-import).
   const importTours = async () => {
-    if (!user || !window.confirm('Emülatördeki Bursa gezileri yayındaki uygulamaya aktarılsın mı?')) return;
+    if (!user || !window.confirm('Emülatördeki Bursa gezileri ve pratik bilgileri yayındaki uygulamaya aktarılsın mı?')) return;
     setBusy(true);
     try {
       const { importEmulatorTours } = await import('../lib/tour-import');
@@ -194,12 +194,14 @@ function AdminTravelPage() {
 
   const savePlace = (e: FormEvent) => {
     e.preventDefault();
-    const { id, howToGet, nearby, tips, ...rest } = placeDraft!;
+    const { id, howToGet, nearby, tips, bring, rules, ...rest } = placeDraft!;
     const input: TravelPlaceInput = {
       ...rest,
       howToGet: pairs<TravelMode>(howToGet, TRAVEL_MODES).map((x) => ({ mode: x.k, text: x.text })),
       nearby: pairs<NearbyKind>(nearby, NEARBY_KINDS).map((x) => ({ kind: x.k, text: x.text })),
       tips: lines(tips),
+      bring: lines(bring),
+      rules: lines(rules),
     };
     const errs = validateTravelPlace(input);
     if (errs.length) return setMessage({ kind: 'error', text: t(`travel.errors.${errs[0]}`) });
@@ -218,6 +220,8 @@ function AdminTravelPage() {
             howToGet: p.howToGet.map((s) => `${s.mode}: ${s.text}`).join('\n'),
             nearby: p.nearby.map((s) => `${s.kind}: ${s.text}`).join('\n'),
             tips: p.tips.join('\n'),
+            bring: (p.bring ?? []).join('\n'),
+            rules: (p.rules ?? []).join('\n'),
           }
         : {
             id: null,
@@ -230,6 +234,8 @@ function AdminTravelPage() {
             howToGet: '',
             nearby: '',
             tips: '',
+            bring: '',
+            rules: '',
             mustSee: false,
             order: (data?.places.filter((x) => x.cityId === cityId).length ?? 0) + 1,
             status: 'taslak',
@@ -287,7 +293,7 @@ function AdminTravelPage() {
               {t('travel.seed')}
             </button> : null}
             {import.meta.env.DEV && import.meta.env.VITE_FIREBASE_EMULATOR !== '1' && isAdminUser(user) && !user!.isDemo ? (
-              <button className="btn" disabled={busy} onClick={importTours}>Gezileri yayına aktar (Bursa)</button>
+              <button className="btn" disabled={busy} onClick={importTours}>Gezileri ve pratik bilgileri yayına aktar (Bursa)</button>
             ) : null}
           </div>
         ) : null}
@@ -509,6 +515,9 @@ function AdminTravelPage() {
               {field('p-how', t('travel.howToGet'), P.howToGet, (v) => setP({ howToGet: v }), { multiline: true, hint: t('travel.howHint', { modes: TRAVEL_MODES.join(', ') }) })}
               {field('p-near', t('travel.nearby'), P.nearby, (v) => setP({ nearby: v }), { multiline: true, hint: t('travel.nearbyHint', { kinds: NEARBY_KINDS.join(', ') }) })}
               {field('p-tips', t('travel.tips'), P.tips, (v) => setP({ tips: v }), { multiline: true, hint: t('travel.tipsHint') })}
+              {field('p-bring', t('travel.bring'), P.bring, (v) => setP({ bring: v }), { multiline: true, hint: t('travel.bringHint') })}
+              {field('p-rules', t('travel.rules'), P.rules, (v) => setP({ rules: v }), { multiline: true, hint: t('travel.rulesHint') })}
+              {field('p-age', t('travel.ageInfo'), P.ageInfo ?? '', (v) => setP({ ageInfo: v }), { max: 200, hint: t('travel.ageInfoHint') })}
               {field('p-hist', t('travel.history'), P.history ?? '', (v) => setP({ history: v }), { multiline: true, max: 2000 })}
               {field('p-arch', t('travel.architecture'), P.architecture ?? '', (v) => setP({ architecture: v }), { multiline: true, max: 2000 })}
               {field('p-acc', t('travel.accessibility'), P.accessibility ?? '', (v) => setP({ accessibility: v }), { max: 200 })}

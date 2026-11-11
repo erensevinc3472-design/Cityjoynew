@@ -139,6 +139,12 @@ export interface TravelPlace {
   howToGet: TravelStep[];
   nearby: TravelNearby[];
   tips: string[];
+  /** Yanına alınacaklar (kalın giysi, su gibi); her öğe kısa. */
+  bring?: string[];
+  /** Uyulması gereken kurallar (kıyafet, fotoğraf, ateş yakma gibi). */
+  rules?: string[];
+  /** Yaş sınırı, çocuklar ve bebek arabası için uygunluk. */
+  ageInfo?: string;
   accessibility?: string;
   phone?: string;
   website?: string;
@@ -200,7 +206,7 @@ export function validateTravelPlace(p: TravelPlaceInput): TravelError[] {
   if (len(p.kind) < 2 || len(p.kind) > L.kind) e.push('kind');
   if (len(p.summary) < 10 || len(p.summary) > L.summary) e.push('summary');
   if (len(p.about) < 10 || len(p.about) > L.longText) e.push('about');
-  const short = [p.visitingHours, p.entranceFee, p.suggestedDuration, p.address, p.accessibility, p.phone];
+  const short = [p.visitingHours, p.entranceFee, p.suggestedDuration, p.address, p.accessibility, p.phone, p.ageInfo];
   const long = [p.history, p.architecture];
   if (
     short.some((s) => len(s) > L.shortText) ||
@@ -208,6 +214,9 @@ export function validateTravelPlace(p: TravelPlaceInput): TravelError[] {
     p.howToGet.length > L.listItems ||
     p.nearby.length > L.listItems ||
     p.tips.length > L.listItems ||
+    (p.bring ?? []).length > L.listItems ||
+    (p.rules ?? []).length > L.listItems ||
+    [...(p.bring ?? []), ...(p.rules ?? [])].some((x) => !len(x) || len(x) > L.shortText) ||
     [...p.howToGet, ...p.nearby].some((x) => !len(x.text) || len(x.text) > L.shortText) ||
     p.tips.some((x) => !len(x) || len(x) > L.shortText)
   )

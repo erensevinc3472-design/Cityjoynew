@@ -1656,6 +1656,11 @@
     "address": "Adres",
     "duration": "Önerilen süre",
     "checkNote": "Saat ve ücretler değişebilir; gitmeden resmî kaynaktan kontrol et.",
+    "practical": "Pratik bilgiler",
+    "ageInfo": "Yaş ve çocuklar",
+    "bring": "Yanına al",
+    "rules": "Kurallar",
+    "goodToKnow": "Bilmekte fayda var",
     "howToGet": "Nasıl gidilir?",
     "modes": {
       "metro": "Metro",

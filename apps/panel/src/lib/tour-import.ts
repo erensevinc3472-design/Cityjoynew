@@ -8,9 +8,10 @@ import { prepareImage } from './image';
 /**
  * Yalnızca geliştirme bilgisayarında (vite dev): emülatörde hazırlanan "İçini gez" gezilerini, panele giriş yapmış
  * admin'in yetkisiyle yayındaki projeye taşır. Resimler tarayıcıda küçültülüp admin'in klasörüne yüklenir, kayıt
- * Panel > Seyahat'in kaydetme koduyla (işlem kaydı dahil) yazılır. Yayında olan yerde yalnızca gezi değişir; olmayan
+ * Panel > Seyahat'in kaydetme koduyla (işlem kaydı dahil) yazılır. Yayında olan yerde yalnızca gezi ve pratik bilgiler değişir; olmayan
  * yer emülatördeki hâliyle eklenir. Yüklenen resimler tarayıcıda hatırlanır, yarıda kalırsa kaldığı yerden sürer.
  */
+const PRACTICAL = ['visitingHours', 'entranceFee', 'suggestedDuration', 'accessibility', 'ageInfo', 'nearby', 'tips', 'bring', 'rules'] as const;
 const EMU = 'http://127.0.0.1:8080/v1/projects/cityjoynew/databases/(default)/documents';
 
 const plain = (v: any): any =>
@@ -72,10 +73,13 @@ export async function importEmulatorTours(uid: string, cityId: string, progress:
     }
     const snap = await getDoc(doc(firestore, 'travelPlaces', p.id));
     const live = snap.exists() ? snap.data() : null;
-    const { updatedAt: _u, ...base } = (live ?? p.data) as Record<string, unknown>;
+    const { updatedAt: _u, ...kept } = (live ?? p.data) as Record<string, unknown>;
+    // Pratik bilgiler emülatörde hazırlanır; yayındaki yerde de onlarla güncellenir (diğer alanlara dokunulmaz).
+    const practical = Object.fromEntries(PRACTICAL.filter((k) => p.data[k] !== undefined).map((k) => [k, p.data[k]]));
+    const base = { ...kept, ...practical };
     await admin.savePlace(p.id, { ...(base as any), tour });
     if (live) updated++;
     else added++;
   }
-  return `${places.length} yerin gezisi yayına aktarıldı: ${updated} var olan yere gezi eklendi, ${added} yeni yer eklendi.`;
+  return `${places.length} yerin gezisi ve pratik bilgileri yayına aktarıldı: ${updated} var olan yer güncellendi, ${added} yeni yer eklendi.`;
 }

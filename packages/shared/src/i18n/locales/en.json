@@ -1656,6 +1656,11 @@
     "address": "Address",
     "duration": "Suggested time",
     "checkNote": "Hours and fees can change; check an official source before you go.",
+    "practical": "Practical info",
+    "ageInfo": "Age and children",
+    "bring": "Bring along",
+    "rules": "Rules",
+    "goodToKnow": "Good to know",
     "howToGet": "How to get there",
     "modes": {
       "metro": "Metro",
