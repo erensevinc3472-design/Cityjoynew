@@ -952,7 +952,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   kendi sesiyle) Eren'in fikri; bekliyor, bütün geziler bitince sorulacak. 3B döndürme maliyet yüzünden yapılmayacak.
   **Son grup (11 Kasım, Bölüm 4):** Panorama 1326 Bursa Fetih Müzesi (Genel, Salon ve galeri, Fetih panoraması, Panorama
   ayrıntısı; 24; yeni yer `bursa-panorama-1326`, `16-osmangazi`). Eren 23 yerin hepsini istedi, bu yüzden
-  Sarıalan (Genel, Orman yolu, Çayırlık, Ormanın kenarı; 25; `bursa-sarialan`) ve Bakacak Seyir Noktası (Genel,
+  Sarıalan (Genel, Orman yolu, Çayırlık, Ormanın kenarı; 24; `bursa-sarialan`) ve Bakacak Seyir Noktası (Genel,
   Terasa giriş, Bursa Ovası, Akşam ışıkları; 25; `bursa-bakacak`) da ayrı yer oldu (ilçe yazılmadı, Uludağ gibi).
   md'deki 23 yer gezilerle tek tek karşılaştırıldı, hepsi doğru resimlerle eşli. Bakacak akşam resminde sağ altta
   istenmeyen küçük yazı var. Bütün Bursa gezileri bitti. Kaynak: `CityJoy-gorseller/chatgpt-hikayeler-4.md`.
