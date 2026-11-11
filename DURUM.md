@@ -950,7 +950,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   beşi deneme ortamına yeni yer olarak eklendi (`bursa-misi`, `bursa-kumyaka`, `bursa-balat-ormani`, `bursa-suuctu`,
   `bursa-iznik-golu`). Kaynak: Eren'in ChatGPT "Bölüm 3" dosyası. Sesli anlatım (yerin tamamını anlatan tek metin, telefonun
   kendi sesiyle) Eren'in fikri; bekliyor, bütün geziler bitince sorulacak. 3B döndürme maliyet yüzünden yapılmayacak.
-**Son grup (11 Kasım, Bölüm 4):** Panorama 1326 Bursa Fetih Müzesi (Genel, Salon ve galeri, Fetih panoraması, Panorama  ayrıntısı; 24; yeni yer `bursa-panorama-1326`, `16-osmangazi`). Bölüm 4'teki Sarıalan ve Bakacak ayrı yer yapılmadı:  ikisi de Uludağ gezisinde sahne olarak var (Eren gereksiz olanları eklememe iznini verdi). Eren'e göre bu son gruptu;  bütün Bursa gezileri bitti. Kaynak: `CityJoy-gorseller/chatgpt-hikayeler-4.md`.
+  **Son grup (11 Kasım, Bölüm 4):** Panorama 1326 Bursa Fetih Müzesi (Genel, Salon ve galeri, Fetih panoraması, Panorama
+  ayrıntısı; 24; yeni yer `bursa-panorama-1326`, `16-osmangazi`). Bölüm 4'teki Sarıalan ve Bakacak ayrı yer yapılmadı:
+  ikisi de Uludağ gezisinde sahne olarak var (Eren gereksiz olanları eklememe iznini verdi). Eren'e göre bu son gruptu;
+  bütün Bursa gezileri bitti. Kaynak: `CityJoy-gorseller/chatgpt-hikayeler-4.md`.
   **Kalan:** gezileri yayına yüklemek (panelden ya da Eren izin verirse betikle). Yazılar yayından önce kontrol edilmeli.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
