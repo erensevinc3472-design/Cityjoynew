@@ -971,7 +971,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   yüklendi (ilk denemelerde 503, tekrarla geçti; boyut sınırına takılmadı), panelden aktarıldı: 23 yerin hepsinde
   pratik bilgiler yayında. Telefondaki uygulama yeni başlıkları yeni sürümle gösterir.
 - **Yer kartlarında gezi resmi (11 Kasım; Eren istedi).** Kapak fotoğrafı olmayan yerin kartında (Bursa listesi, rota
-  durakları) çizim yerine "İçini gez"in ilk sahnesi (dış görünüm) görünür:  (shared/travel). Panelden
+  durakları) çizim yerine "İçini gez"in ilk sahnesi (dış görünüm) görünür: `placeImage()` (shared/travel). Panelden
   kapak yüklenirse kapak öne geçer. Gezisi olmayan yerlerde (İskender, kestane şekeri) çizim kalır.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
