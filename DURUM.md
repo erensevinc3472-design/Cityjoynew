@@ -973,6 +973,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **Yer kartlarında gezi resmi (11 Kasım; Eren istedi).** Kapak fotoğrafı olmayan yerin kartında (Bursa listesi, rota
   durakları) çizim yerine "İçini gez"in ilk sahnesi (dış görünüm) görünür: `placeImage()` (shared/travel). Panelden
   kapak yüklenirse kapak öne geçer. Gezisi olmayan yerlerde (İskender, kestane şekeri) çizim kalır.
+- **İçini gez: parmakla kaydırma (11 Kasım; Eren istedi).** Sahne resmini sola kaydırınca sonraki, sağa kaydırınca önceki
+  sahne gelir (Arapçada ters). Yalnızca belirgin yatay harekette çalışır; noktalara dokunma, sahne düğmeleri ve sayfayı
+  aşağı kaydırma aynı. `place-tour.tsx` (PanResponder; başlangıç noktası ayrıca tutulur, web'de art arda kaydırma
+  hatası yüzünden). Web kopyasında art arda sola/sağa kaydırma denendi; telefonda henüz denenmedi.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
   Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu
