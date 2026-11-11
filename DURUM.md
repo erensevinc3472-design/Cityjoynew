@@ -956,7 +956,11 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   Terasa giriş, Bursa Ovası, Akşam ışıkları; 25; `bursa-bakacak`) da ayrı yer oldu (ilçe yazılmadı, Uludağ gibi).
   md'deki 23 yer gezilerle tek tek karşılaştırıldı, hepsi doğru resimlerle eşli. Bakacak akşam resminde sağ altta
   istenmeyen küçük yazı var. Bütün Bursa gezileri bitti. Kaynak: `CityJoy-gorseller/chatgpt-hikayeler-4.md`.
-  **Kalan:** gezileri yayına yüklemek (panelden ya da Eren izin verirse betikle). Yazılar yayından önce kontrol edilmeli.
+  **Yayında (11 Kasım, Eren izin verdi):** 23 yerin gezisi (87 sahne) yayındaki projeye aktarıldı: 7 var olan yere
+  yalnızca gezi eklendi, 16 yer yeni eklendi (yayında 25 Bursa yeri). Aktarma Panel > Seyahat > "Gezileri yayına
+  aktar (Bursa)" düğmesiyle yapıldı: yalnızca geliştirme bilgisayarında (vite dev, emülatör dışı) admin'e görünür,
+  emülatördeki gezileri okur, resimleri JPEG yapıp `media/{uid}/seyahat/` altına yükler (`apps/panel/src/lib/tour-import.ts`).
+  Eren panele Google ile giriyor (şifre yok). Yazılar ileride gözden geçirilebilir.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
   Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu
