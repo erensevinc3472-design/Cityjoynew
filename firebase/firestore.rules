@@ -200,8 +200,7 @@ service cloud.firestore {
         && nw.keys().hasOnly(['names', 'order', 'active', 'updatedAt', 'updatedBy'])
         && nw.names is map && nw.names.tr is string
         && nw.order is int && nw.active is bool
-        && nw.updatedBy == request.auth.uid
-        && nw.updatedAt == request.time;
+        && stamped(nw);
       }
       allow create, update: if _k6(request.resource.data);
       allow delete: if false; // Silmek yerine pasifleştirilir; seçmiş kullanıcıların kaydı bozulmaz.
@@ -224,8 +223,7 @@ service cloud.firestore {
         && (!('notes' in nw) || validLocalized(nw.notes))
         && nw.icon is string && nw.icon.size() <= 40
         && nw.order is int && nw.active is bool
-        && nw.updatedBy == request.auth.uid
-        && nw.updatedAt == request.time;
+        && stamped(nw);
       }
       allow create, update: if _k7(request.resource.data);
       allow delete: if false;
@@ -246,8 +244,7 @@ service cloud.firestore {
             || (nw.parentId is string && nw.parentId != id
                 && existsAfter(/databases/$(database)/documents/serviceCategories/$(nw.parentId))
                 && getAfter(/databases/$(database)/documents/serviceCategories/$(nw.parentId)).data.parentId == null))
-        && nw.updatedBy == request.auth.uid
-        && nw.updatedAt == request.time;
+        && stamped(nw);
       }
       allow create, update: if _k8(request.resource.data);
       allow delete: if false;
@@ -258,8 +255,7 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin()
         && request.resource.data.keys().hasOnly(['updatedAt', 'updatedBy'])
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+        && stamped(request.resource.data);
     }
 
     // "Eksik hizmet mi var? Bildir": giriş yapmış kullanıcı gönderir, admin okur ve "incelendi" yapar.
@@ -847,7 +843,7 @@ service cloud.firestore {
         && nw.startsOn is string && nw.startsOn.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
         && nw.endsOn is string && nw.endsOn.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') && nw.endsOn >= nw.startsOn
         && nw.active is bool
-        && nw.updatedBy == request.auth.uid && nw.updatedAt == request.time;
+        && stamped(nw);
       }
       allow create, update: if _sp(request.resource.data);
       allow delete: if isAdmin();
@@ -859,8 +855,7 @@ service cloud.firestore {
       allow write: if isAdmin() && theme in ['deniz', 'kayak', 'termal', 'kultur', 'doga', 'lezzet', 'aile', 'balayi', 'gorulmesi-gereken']
         && request.resource.data.keys().hasOnly(['places', 'updatedBy', 'updatedAt'])
         && request.resource.data.places is map && request.resource.data.places.size() <= 81
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+        && stamped(request.resource.data);
     }
 
     match /businesses/{bid}/reviews/{uid} {
@@ -1223,80 +1218,87 @@ service cloud.firestore {
         && limitValue(d, 'kurumDuyuruHafta')
         && limitValue(d, 'acil')
         && limitValue(d, 'etkinlik')
-        && d.updatedBy == request.auth.uid
-        && d.updatedAt == request.time;
+        && stamped(d);
       }
       allow write: if isAdmin() && id == 'limits' && limitsOk(request.resource.data);
       allow read: if true;
-      allow write: if isAdmin() && id == 'sos'
-        && request.resource.data.keys().hasOnly(['liveMinutes', 'countdownSeconds', 'updatedBy', 'updatedAt'])
-        && request.resource.data.liveMinutes is int && request.resource.data.liveMinutes >= 10 && request.resource.data.liveMinutes <= 120
-        && request.resource.data.countdownSeconds is int && request.resource.data.countdownSeconds >= 3 && request.resource.data.countdownSeconds <= 10
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function _c_sos(nw) {
+        return nw.keys().hasOnly(['liveMinutes', 'countdownSeconds', 'updatedBy', 'updatedAt'])
+        && nw.liveMinutes is int && nw.liveMinutes >= 10 && nw.liveMinutes <= 120
+        && nw.countdownSeconds is int && nw.countdownSeconds >= 3 && nw.countdownSeconds <= 10
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'sos' && _c_sos(request.resource.data);
       // Seyahat > Planla tahmini ücretleri: akaryakıt (TL/litre, elektrikte TL/kWh) ve otobüs km ücreti; admin girer.
-      allow write: if isAdmin() && id == 'travelPrices'
-        && request.resource.data.keys().hasOnly(['fuel', 'busPerKm', 'month', 'updatedBy', 'updatedAt'])
-        && request.resource.data.fuel is map && request.resource.data.fuel.keys().hasOnly(['benzin', 'dizel', 'lpg', 'elektrik'])
-        && fuelPrice(request.resource.data.fuel, 'benzin') && fuelPrice(request.resource.data.fuel, 'dizel')
-        && fuelPrice(request.resource.data.fuel, 'lpg') && fuelPrice(request.resource.data.fuel, 'elektrik')
-        && (!('busPerKm' in request.resource.data) || (request.resource.data.busPerKm is map
-              && request.resource.data.busPerKm.keys().hasOnly(['min', 'max'])
-              && request.resource.data.busPerKm.min is number && request.resource.data.busPerKm.min >= 0.1
-              && request.resource.data.busPerKm.max is number && request.resource.data.busPerKm.max <= 20
-              && request.resource.data.busPerKm.min <= request.resource.data.busPerKm.max))
-        && request.resource.data.month is string && request.resource.data.month.matches('^20[0-9]{2}-(0[1-9]|1[0-2])$')
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function _c_travelPrices(nw) {
+        return nw.keys().hasOnly(['fuel', 'busPerKm', 'month', 'updatedBy', 'updatedAt'])
+        && nw.fuel is map && nw.fuel.keys().hasOnly(['benzin', 'dizel', 'lpg', 'elektrik'])
+        && fuelPrice(nw.fuel, 'benzin') && fuelPrice(nw.fuel, 'dizel')
+        && fuelPrice(nw.fuel, 'lpg') && fuelPrice(nw.fuel, 'elektrik')
+        && (!('busPerKm' in nw) || (nw.busPerKm is map
+              && nw.busPerKm.keys().hasOnly(['min', 'max'])
+              && nw.busPerKm.min is number && nw.busPerKm.min >= 0.1
+              && nw.busPerKm.max is number && nw.busPerKm.max <= 20
+              && nw.busPerKm.min <= nw.busPerKm.max))
+        && nw.month is string && nw.month.matches('^20[0-9]{2}-(0[1-9]|1[0-2])$')
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'travelPrices' && _c_travelPrices(request.resource.data);
       // Keşfet yasaklı kelime listesi (madde 8): admin yönetir, uygulama okur.
-      allow write: if isAdmin() && id == 'bannedWords'
-        && request.resource.data.keys().hasOnly(['words', 'updatedBy', 'updatedAt'])
-        && request.resource.data.words is list && request.resource.data.words.size() <= 1000
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function _c_bannedWords(nw) {
+        return nw.keys().hasOnly(['words', 'updatedBy', 'updatedAt'])
+        && nw.words is list && nw.words.size() <= 1000
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'bannedWords' && _c_bannedWords(request.resource.data);
       // Ara: önerilen aramalar (PROJE.md 5.10), dil başına en çok 12; admin yönetir, uygulama okur.
-      allow write: if isAdmin() && id == 'searchSuggestions'
-        && request.resource.data.keys().hasOnly(['terms', 'updatedBy', 'updatedAt'])
-        && request.resource.data.terms is map && request.resource.data.terms.keys().hasOnly(['tr', 'en', 'de', 'ar', 'ru'])
-        && termList(request.resource.data.terms, 'tr') && termList(request.resource.data.terms, 'en')
-        && termList(request.resource.data.terms, 'de') && termList(request.resource.data.terms, 'ar')
-        && termList(request.resource.data.terms, 'ru')
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function _c_searchSuggestions(nw) {
+        return nw.keys().hasOnly(['terms', 'updatedBy', 'updatedAt'])
+        && nw.terms is map && nw.terms.keys().hasOnly(['tr', 'en', 'de', 'ar', 'ru'])
+        && termList(nw.terms, 'tr') && termList(nw.terms, 'en')
+        && termList(nw.terms, 'de') && termList(nw.terms, 'ar')
+        && termList(nw.terms, 'ru')
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'searchSuggestions' && _c_searchSuggestions(request.resource.data);
       // Diğer İhtiyaçlar eşleşmesi (13. madde 35): durum başına en çok 12 hizmet kimliği; admin yönetir, uygulama okur.
-      allow write: if isAdmin() && id == 'needs'
-        && request.resource.data.keys().hasOnly(['map', 'updatedBy', 'updatedAt'])
-        && request.resource.data.map is map
-        && request.resource.data.map.keys().hasOnly(['yeni-tasindim', 'yogunum', 'tatil', 'hasta', 'yasli-yakin', 'ozel-gun'])
-        && needList(request.resource.data.map, 'yeni-tasindim') && needList(request.resource.data.map, 'yogunum')
-        && needList(request.resource.data.map, 'tatil') && needList(request.resource.data.map, 'hasta')
-        && needList(request.resource.data.map, 'yasli-yakin') && needList(request.resource.data.map, 'ozel-gun')
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function _c_needs(nw) {
+        return nw.keys().hasOnly(['map', 'updatedBy', 'updatedAt'])
+        && nw.map is map
+        && nw.map.keys().hasOnly(['yeni-tasindim', 'yogunum', 'tatil', 'hasta', 'yasli-yakin', 'ozel-gun'])
+        && needList(nw.map, 'yeni-tasindim') && needList(nw.map, 'yogunum')
+        && needList(nw.map, 'tatil') && needList(nw.map, 'hasta')
+        && needList(nw.map, 'yasli-yakin') && needList(nw.map, 'ozel-gun')
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'needs' && _c_needs(request.resource.data);
       // Seyahat ülkeleri (Panel > Seyahat > Ülkeler): açık ülke kodları; Türkiye her zaman açık.
-      allow write: if isAdmin() && id == 'travelCountries'
-        && request.resource.data.keys().hasOnly(['open', 'updatedBy', 'updatedAt'])
-        && request.resource.data.open is list && request.resource.data.open.size() <= 40
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function _c_travelCountries(nw) {
+        return nw.keys().hasOnly(['open', 'updatedBy', 'updatedAt'])
+        && nw.open is list && nw.open.size() <= 40
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'travelCountries' && _c_travelCountries(request.resource.data);
       // Ana sayfadaki tanıtım videosu bağlantısı (13. madde 29): admin yönetir; boş ya da https bağlantısı.
-      allow write: if isAdmin() && id == 'introVideo'
-        && request.resource.data.keys().hasOnly(['url', 'updatedBy', 'updatedAt'])
-        && request.resource.data.url is string && request.resource.data.url.size() <= 500
-        && (request.resource.data.url == '' || request.resource.data.url.matches('https://[^ ]+'))
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function _c_introVideo(nw) {
+        return nw.keys().hasOnly(['url', 'updatedBy', 'updatedAt'])
+        && nw.url is string && nw.url.size() <= 500
+        && (nw.url == '' || nw.url.matches('https://[^ ]+'))
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'introVideo' && _c_introVideo(request.resource.data);
       // Bildirim tetikleyicileri (PROJE.md 7): admin yönetir; acil duyuru ve SOS kapatılamaz.
       // Aynı belgede telefon bildirimi öncelikleri (her zaman / normal / uygulama içi) ve günlük sesli tavan (1-50).
-      allow write: if isAdmin() && id == 'notificationTriggers'
-        && request.resource.data.keys().hasOnly(['triggers', 'priorities', 'dailySoundCap', 'updatedBy', 'updatedAt'])
-        && (!('priorities' in request.resource.data) || validPriorities(request.resource.data.priorities))
-        && (!('dailySoundCap' in request.resource.data)
-            || (request.resource.data.dailySoundCap is int && request.resource.data.dailySoundCap >= 1 && request.resource.data.dailySoundCap <= 50))
-        && validNotificationMap(request.resource.data.triggers)
-        && request.resource.data.triggers.acil == true && request.resource.data.triggers.sos == true
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+      function _c_notificationTriggers(nw) {
+        return nw.keys().hasOnly(['triggers', 'priorities', 'dailySoundCap', 'updatedBy', 'updatedAt'])
+        && (!('priorities' in nw) || validPriorities(nw.priorities))
+        && (!('dailySoundCap' in nw)
+            || (nw.dailySoundCap is int && nw.dailySoundCap >= 1 && nw.dailySoundCap <= 50))
+        && validNotificationMap(nw.triggers)
+        && nw.triggers.acil == true && nw.triggers.sos == true
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'notificationTriggers' && _c_notificationTriggers(request.resource.data);
     }
 
     match /admins/{uid} {
@@ -1309,8 +1311,7 @@ service cloud.firestore {
       allow write: if isAdmin() && id == 'settings'
         && request.resource.data.keys().hasOnly(['cap', 'updatedBy', 'updatedAt'])
         && request.resource.data.cap is int && request.resource.data.cap >= 100 && request.resource.data.cap <= 100000
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
+        && stamped(request.resource.data);
     }
 
     // ---- Yetkiler (PROJE.md 6.7): admin il yöneticisi, muhtar ve moderatör verir; il yöneticisi kendi ilinde muhtar
@@ -1572,8 +1573,7 @@ service cloud.firestore {
         return (p == 'tr' || p.matches('^[0-8][0-9]$')) && canEditGuide(p)
         && nw.keys().hasOnly(['sections', 'updatedAt', 'updatedBy'])
         && nw.sections is map && nw.sections.keys().size() <= 10
-        && nw.updatedBy == request.auth.uid
-        && nw.updatedAt == request.time;
+        && stamped(nw);
       }
       allow create, update: if _k56(request.resource.data);
       allow delete: if false;
@@ -1610,8 +1610,7 @@ service cloud.firestore {
         && nw.items is list && nw.items.size() <= 2500
         && nw.count == nw.items.size()
         && nw.source == 'osm'
-        && nw.updatedBy == request.auth.uid
-        && nw.updatedAt == request.time;
+        && stamped(nw);
       }
       allow create, update: if _k58(request.resource.data);
       allow delete: if isAdmin();
@@ -1625,8 +1624,7 @@ service cloud.firestore {
         && nw.part is int && nw.part >= 0 && nw.part < 50
         && id == nw.provinceCode + '__' + nw.section + '__' + string(nw.part)
         && nw.items is list && nw.items.size() <= 400
-        && nw.updatedBy == request.auth.uid
-        && nw.updatedAt == request.time;
+        && stamped(nw);
       }
       allow create, update: if _k59(request.resource.data);
       allow delete: if canEditGuide(resource.data.provinceCode);
@@ -2254,6 +2252,10 @@ service cloud.firestore {
         && p.path is string && p.path.matches('media/' + uid + '/' + kind + '/[A-Za-z0-9]{10,40}[.]jpg')
         && storageUrlOk(p.url, p.path.replace('/', '%2F'))
         && p.width is int && p.height is int && p.width > 0 && p.width <= 4000 && p.height > 0 && p.height <= 4000;
+    }
+    // Yazanın kendisi ve sunucu saati (yönetici ayarlarında).
+    function stamped(d) {
+      return d.updatedBy == request.auth.uid && d.updatedAt == request.time;
     }
     function mediaKeptOrOwn(d, key, kind) {
       return !(key in d)
@@ -3176,8 +3178,7 @@ service cloud.firestore {
         && (!('address' in d) || (d.address is string && d.address.size() >= 1 && d.address.size() <= 200))
         && (!('hours' in d) || (d.hours is string && d.hours.size() >= 1 && d.hours.size() <= 200))
         && mediaKeptOrOwn(d, 'logo', 'kurum')
-        && d.updatedBy == request.auth.uid
-        && d.updatedAt == request.time;
+        && stamped(d);
     }
     function orgProfileOk(id, d) {
       let org = get(orgPath(id)).data;

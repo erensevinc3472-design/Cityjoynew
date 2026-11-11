@@ -5,7 +5,7 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 
 ## 1. Hemen (bugün yarın, kısa işler)
 
-- [ ] **claude/blaze-kurulum yüklemeleri (11 Kasım; ana dala birleştirme Claude tarafından yapıldı, yüklemeler bekliyor):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/blaze-kurulum?expand=1
+- [x] **claude/blaze-kurulum birleştirme ve yüklemeler (yapıldı, 11 Kasım; Eren izin verdi, Claude yaptı):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/blaze-kurulum?expand=1
   > "Create pull request" > "Create pull request" > "Merge pull request" > "Confirm merge". Sonra proje klasöründe terminalde sırayla:
   > `npx firebase-tools@15.34.1 deploy --only firestore:rules,firestore:indexes --project cityjoynew`
   > `npx firebase-tools@15.34.1 deploy --only functions --project cityjoynew`
