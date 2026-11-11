@@ -46,4 +46,15 @@ describe('seyahat excel', () => {
     expect(r.places[0]!.data).toMatchObject({ districtId: '16-osmangazi', mustSee: true, howToGet: [{ mode: 'yuruyus', text: "Heykel'den 5 dakika" }] });
     expect(r.errors).toHaveLength(3);
   });
+
+  it('pratik bilgi sütunlarını okur; olmayan eski dosyayı da kabul eder', () => {
+    const { yer } = TRAVEL_SHEETS;
+    const base = { il: 'Bursa', ad: 'Ulu Cami', tur: 'Cami', kategori: 'tarih', ozet: 'Yirmi kubbeli cami.', hakkinda: 'Yıldırım Bayezid döneminde yapıldı.', kaynak: 'x' };
+    const yeni = parseTravelWorkbook([{ sheet: yer.sheet, data: [[...yer.columns], row(yer.columns, { ...base, yas_bilgisi: 'Yaş sınırı yok.', yanina_al: 'Başörtüsü | Çorap', kurallar: 'Ayakkabı çıkarılır' })] }], ctx);
+    expect(yeni.places[0]!.data).toMatchObject({ ageInfo: 'Yaş sınırı yok.', bring: ['Başörtüsü', 'Çorap'], rules: ['Ayakkabı çıkarılır'] });
+    const eskiCols = yer.columns.filter((c) => !['yas_bilgisi', 'yanina_al', 'kurallar'].includes(c));
+    const eski = parseTravelWorkbook([{ sheet: yer.sheet, data: [[...eskiCols], row(eskiCols, base)] }], ctx);
+    expect(eski.errors).toEqual([]);
+    expect(eski.places[0]!.data).not.toHaveProperty('bring');
+  });
 });

@@ -31,7 +31,7 @@ export const TRAVEL_SHEETS = {
     columns: [
       'il', 'ilce', 'ad', 'tur', 'kategori', 'ozet', 'hakkinda', 'tarihce', 'mimari', 'ziyaret_saatleri', 'giris_ucreti',
       'onerilen_sure', 'adres', 'nasil_gidilir', 'yakindakiler', 'ipuclari', 'erisilebilirlik', 'telefon', 'web', 'video',
-      'mutlaka_gor', 'kaynak', 'sira',
+      'mutlaka_gor', 'kaynak', 'sira', 'yas_bilgisi', 'yanina_al', 'kurallar',
     ],
   },
 } as const;
@@ -67,6 +67,9 @@ export const TRAVEL_SHEET_HELP: Record<string, string> = {
   mutlaka_gor: 'Evet / Hayır',
   kaynak: 'Bilginin alındığı resmî kaynak (kurum adı ya da adres)',
   sira: 'Şehir sayfasındaki sıra (1, 2, 3...)',
+  yas_bilgisi: 'İsteğe bağlı: yaş sınırı, çocuklar ve bebek arabası için kısa not',
+  yanina_al: `İsteğe bağlı: giderken yanına alınacaklar, en çok ${TRAVEL_LIMITS.listItems}, " | " ile`,
+  kurallar: `İsteğe bağlı: uyulması gereken kurallar, en çok ${TRAVEL_LIMITS.listItems}, " | " ile`,
 };
 
 export interface TravelSheetError {
@@ -85,6 +88,8 @@ export interface TravelImport {
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v).trim());
 const list = (v: unknown) => str(v).split('|').map((x) => x.trim()).filter(Boolean);
 const keyOf = (s: string) => normalizeName(s);
+/** Sonradan eklenen sütunlar: eski dosyalarda olmayabilir. */
+const OPTIONAL_COLUMNS: readonly string[] = ['yas_bilgisi', 'yanina_al', 'kurallar'];
 
 /** "il + ad"dan kalıcı kimlik: aynı yer yeniden yüklenince güncellenir. */
 export function travelPlaceId(cityId: string, name: string): string {
@@ -135,7 +140,7 @@ export function parseTravelWorkbook(
     const def = Object.values(TRAVEL_SHEETS).find((d) => d.sheet === sheet);
     if (!def || !data.length) continue;
     const head = (data[0] ?? []).map((h) => str(h));
-    const missing = def.columns.filter((c) => !head.includes(c));
+    const missing = def.columns.filter((c) => !head.includes(c) && !OPTIONAL_COLUMNS.includes(c));
     if (missing.length) {
       res.errors.push({ sheet, row: 1, message: `Eksik sütun: ${missing.join(', ')}` });
       continue;
@@ -143,7 +148,7 @@ export function parseTravelWorkbook(
     const seen = new Set<string>();
     data.slice(1).forEach((raw, idx) => {
       const row = idx + 2;
-      const v = (k: string) => str(raw[head.indexOf(k)]);
+      const v = (k: string) => (head.includes(k) ? str(raw[head.indexOf(k)]) : '');
       if (!raw.some((c) => str(c))) return;
       const err = (message: string) => res.errors.push({ sheet, row, message });
 
@@ -224,6 +229,9 @@ export function parseTravelWorkbook(
           ...opt('video', 'videoUrl'),
           mustSee: must === 'evet',
           ...opt('kaynak', 'source'),
+          ...opt('yas_bilgisi', 'ageInfo'),
+          ...(list(v('yanina_al')).length ? { bring: list(v('yanina_al')) } : {}),
+          ...(list(v('kurallar')).length ? { rules: list(v('kurallar')) } : {}),
           order,
         };
         const e = validateTravelPlace({ ...data, status: 'taslak' });
