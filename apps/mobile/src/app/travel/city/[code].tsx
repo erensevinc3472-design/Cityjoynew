@@ -3,7 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
 import { useState, type ComponentProps } from 'react';
-import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { I18nManager, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { regionOfProvince, TRAVEL_CATEGORIES, videoEmbedUrl, type TravelCategory } from '@cityjoy/shared';
 
@@ -21,8 +21,9 @@ type IconName = ComponentProps<typeof MaterialIcons>['name'];
 type Filter = 'all' | TravelCategory;
 
 /**
- * Şehir sayfası (tasarım: bursa.html): kapak, kısa tanıtım, kaynaklı bilgiler (UNESCO, rakım...), Kareler / Başkanlarla
- * Keşif / Yöresel kutuları ve Hazır Rotalar, kategoriye göre gezilecek yerler.
+ * Şehir sayfası (tasarım: bursa.html): alçak kapak, kısa tanıtım (uzunsa "Devamını oku"), iki sütunlu dört kutu
+ * (Kareler, Başkanlarla Keşif, Yöresel, Hazır Rotalar), kategoriye göre gezilecek yerler. UNESCO / en yüksek nokta gibi
+ * bilgi kutuları sayfada gösterilmez (Eren, 11 Kasım 2026); panelde girilen bilgiler veride durur.
  * Puan, nüfus gibi kaynaksız sayılar yok; yapay zekâ rehberi bilgi tabanı dolunca gelecek.
  */
 export default function TravelCityScreen() {
@@ -36,6 +37,7 @@ export default function TravelCityScreen() {
   const { value: places, failed, retry } = useTravelPlaces(code);
   const [filter, setFilter] = useState<Filter>('all');
   const [playing, setPlaying] = useState<string | null>(null);
+  const [more, setMore] = useState(false);
   const city = cities?.find((x) => x.id === code);
   const name = repo.getProvince(code)?.name ?? '';
   const regionName = region ? t(`travel.regions.${region.id}`) : '';
@@ -58,10 +60,11 @@ export default function TravelCityScreen() {
     if (embed) setPlaying(embed);
     else WebBrowser.openBrowserAsync(url).catch(() => {});
   };
-  const boxes: { icon: IconName; title: string; hint: string; go?: () => void }[] = [
+  const boxes: { icon: IconName; title: string; hint: string; go: () => void; gold?: boolean }[] = [
     { icon: 'photo-library', title: t('travel.frames', { name }), hint: t('travel.framesHint'), go: () => router.push({ pathname: '/travel/frames/[code]', params: { code } }) },
     { icon: 'explore', title: t('travel.mayors'), hint: t('travel.mayorsHint'), go: () => router.push({ pathname: '/travel/mayors/[code]', params: { code } }) },
     { icon: 'diversity-3', title: t('travel.local', { name }), hint: t('travel.localHint'), go: () => router.push({ pathname: '/travel/local/[code]', params: { code } }) },
+    { icon: 'route', title: t('travel.routesShort'), hint: t('travel.routesHint'), gold: true, go: () => router.push({ pathname: '/travel/routes/[code]', params: { code } }) },
   ];
 
   return (
@@ -69,7 +72,7 @@ export default function TravelCityScreen() {
       <StatusBar style="light" />
       <TravelHeader subtitle={regionName} title={name} onBack={back} />
       <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={[styles.hero, { height: Math.round(width * 0.8), backgroundColor: sceneSky(scene) }]}>
+        <View style={[styles.hero, { height: Math.round(Math.min(220, width * 0.52)), backgroundColor: sceneSky(scene) }]}>
           <View style={StyleSheet.absoluteFill}>
             <CoverArt photo={city?.cover} kind={scene} />
           </View>
@@ -92,59 +95,40 @@ export default function TravelCityScreen() {
 
         {city ? (
           <View style={styles.pad}>
-            <AppText style={[styles.desc, { color: c.text }]}>{city.description}</AppText>
-            {city.facts.length ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.facts}>
-                {city.facts.map((f) => (
-                  <View key={f.label} style={[styles.fact, { backgroundColor: c.surface, borderColor: c.border }]}>
-                    <AppText style={[styles.factLabel, { color: c.textMuted }]}>{f.label}</AppText>
-                    <AppText style={[styles.factValue, { color: c.textStrong }]}>{f.value}</AppText>
-                    {f.source ? <AppText style={[styles.factSource, { color: c.textSoft }]}>{[f.source, f.asOf].filter(Boolean).join(', ')}</AppText> : null}
-                  </View>
-                ))}
-              </ScrollView>
+            {city.description ? (
+              <View>
+                <AppText numberOfLines={more ? undefined : 3} style={[styles.desc, { color: c.text }]}>{city.description}</AppText>
+                {city.description.length > 140 ? (
+                  <Pressable accessibilityRole="button" onPress={() => setMore(!more)} hitSlop={8} style={styles.moreBtn}>
+                    <AppText style={[styles.moreText, { color: c.accent }]}>{more ? t('travel.less') : t('travel.more')}</AppText>
+                  </Pressable>
+                ) : null}
+              </View>
             ) : null}
 
             <View style={styles.boxes}>
               {boxes.map((b) => (
                 <Pressable
                   key={b.title}
-                  disabled={!b.go}
                   accessibilityRole="button"
-                  accessibilityState={{ disabled: !b.go }}
-                  accessibilityLabel={b.go ? `${b.title}. ${b.hint}` : `${b.title}. ${t('travel.soon')}`}
+                  accessibilityLabel={`${b.title}. ${b.hint}`}
                   onPress={b.go}
-                  style={({ pressed }) => [styles.box, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
+                  style={({ pressed }) => [
+                    styles.box,
+                    b.gold ? { backgroundColor: '#E0B07A', borderColor: '#E0B07A' } : { backgroundColor: c.surface, borderColor: c.border },
+                    { opacity: pressed ? 0.85 : 1 },
+                  ]}>
                   <View style={styles.boxTop}>
-                    <View style={[styles.boxIcon, { backgroundColor: c.accentSoft }]}>
-                      <MaterialIcons name={b.icon} size={16} color={c.accent} />
+                    <View style={[styles.boxIcon, { backgroundColor: b.gold ? 'rgba(255,255,255,0.35)' : c.accentSoft }]}>
+                      <MaterialIcons name={b.icon} size={20} color={b.gold ? navy : c.accent} />
                     </View>
-                    {b.go ? (
-                      <MaterialIcons name="arrow-forward" size={14} color={c.accent} />
-                    ) : (
-                      <AppText style={[styles.soon, { color: c.accent }]}>{t('travel.soon').toLocaleUpperCase(i18n.language)}</AppText>
-                    )}
+                    <MaterialIcons name={I18nManager.isRTL ? 'arrow-back' : 'arrow-forward'} size={18} color={b.gold ? navy : c.accent} />
                   </View>
-                  <AppText style={[styles.boxTitle, { color: c.textStrong }]} numberOfLines={2}>{b.title}</AppText>
-                  <AppText style={[styles.boxHint, { color: c.textMuted }]} numberOfLines={2}>{b.hint}</AppText>
+                  <AppText style={[styles.boxTitle, { color: b.gold ? navy : c.textStrong }]} numberOfLines={2}>{b.title}</AppText>
+                  <AppText style={[styles.boxHint, { color: b.gold ? 'rgba(8,31,36,0.75)' : c.textMuted }]} numberOfLines={2}>{b.hint}</AppText>
                 </Pressable>
               ))}
             </View>
-
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`${t('travel.routes')}. ${t('travel.routesHint')}`}
-              onPress={() => router.push({ pathname: '/travel/routes/[code]', params: { code } })}
-              style={({ pressed }) => [styles.routes, { opacity: pressed ? 0.9 : 1 }]}>
-              <View style={styles.routesIcon}>
-                <MaterialIcons name="route" size={24} color="#081F24" />
-              </View>
-              <View style={styles.flex}>
-                <AppText style={styles.routesTitle}>{t('travel.routes')}</AppText>
-                <AppText style={styles.routesHint}>{t('travel.routesHint')}</AppText>
-              </View>
-              <MaterialIcons name="arrow-forward" size={22} color="#081F24" />
-            </Pressable>
           </View>
         ) : null}
 
@@ -223,30 +207,22 @@ const styles = StyleSheet.create({
   scroll: { paddingBottom: spacing.xl },
   hero: { maxHeight: 380, justifyContent: 'flex-end', overflow: 'hidden' },
   heroShade: { backgroundColor: 'rgba(8,31,36,0.4)' },
-  heroText: { padding: GUTTER + 4, gap: spacing.sm },
+  heroText: { paddingHorizontal: GUTTER + 4, paddingBottom: spacing.md, gap: 6 },
   badge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.pill, borderWidth: 1, borderColor: 'rgba(224,176,122,0.45)', backgroundColor: 'rgba(47,93,58,0.75)' },
   badgeText: { color: '#E0B07A', fontFamily: fonts.bodySemi, fontSize: 9, letterSpacing: 1.5 },
-  heroTitle: { color: white, fontFamily: fonts.display, fontSize: 32, lineHeight: 38 },
-  video: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#E0B07A', paddingVertical: 9, paddingHorizontal: 16, borderRadius: radius.pill, minHeight: 44 },
+  heroTitle: { color: white, fontFamily: fonts.display, fontSize: 28, lineHeight: 34 },
+  video: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#E0B07A', paddingVertical: 6, paddingHorizontal: 14, borderRadius: radius.pill, minHeight: 40 },
   videoText: { color: navy, fontFamily: fonts.heading, fontSize: 12, letterSpacing: 1 },
   pad: { paddingHorizontal: GUTTER, paddingTop: spacing.md, gap: spacing.md, width: '100%', maxWidth: 640, alignSelf: 'center' },
   desc: { fontSize: 14, lineHeight: 21 },
-  facts: { gap: spacing.sm },
-  fact: { width: 170, padding: 10, borderRadius: radius.md, borderWidth: 1, gap: 2 },
-  factLabel: { fontSize: 11, lineHeight: 14 },
-  factValue: { fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 18 },
-  factSource: { fontSize: 10, lineHeight: 13 },
-  boxes: { flexDirection: 'row', gap: spacing.sm },
-  box: { flex: 1, padding: 10, borderRadius: radius.md, borderWidth: 1, gap: 4 },
-  boxTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  boxIcon: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  soon: { fontFamily: fonts.bodySemi, fontSize: 8, letterSpacing: 1 },
-  boxTitle: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 16 },
-  boxHint: { fontSize: 10, lineHeight: 13 },
-  routes: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.lg, backgroundColor: '#E0B07A', minHeight: MIN_TOUCH + 20 },
-  routesIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
-  routesTitle: { color: navy, fontFamily: fonts.heading, fontSize: 15, lineHeight: 20 },
-  routesHint: { color: 'rgba(8,31,36,0.75)', fontSize: 12, lineHeight: 16 },
+  moreBtn: { alignSelf: 'flex-start', minHeight: MIN_TOUCH - 12, justifyContent: 'center', marginTop: 2 },
+  moreText: { fontFamily: fonts.bodySemi, fontSize: 13 },
+  boxes: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  box: { flexBasis: '46%', flexGrow: 1, minHeight: 112, padding: 12, borderRadius: radius.lg, borderWidth: 1, gap: 6 },
+  boxTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 },
+  boxIcon: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
+  boxTitle: { fontFamily: fonts.heading, fontSize: 15, lineHeight: 20 },
+  boxHint: { fontSize: 12, lineHeight: 16 },
   filters: { paddingHorizontal: GUTTER, paddingTop: spacing.lg, gap: spacing.sm },
   filter: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, justifyContent: 'center' },
   filterText: { fontFamily: fonts.bodySemi, fontSize: 12, letterSpacing: 0.5 },

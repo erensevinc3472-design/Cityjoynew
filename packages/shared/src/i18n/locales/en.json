@@ -1759,7 +1759,10 @@
     "exploreCity": "Explore {{name}}",
     "preparing": "Guide in preparation",
     "prevCity": "Previous city",
-    "nextCity": "Next city"
+    "nextCity": "Next city",
+    "routesShort": "Ready routes",
+    "more": "Read more",
+    "less": "Show less"
   },
   "food": {
     "kinds": {

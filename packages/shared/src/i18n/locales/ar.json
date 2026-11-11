@@ -1763,7 +1763,10 @@
     "exploreCity": "اكتشف {{name}}",
     "preparing": "التعريف قيد الإعداد",
     "prevCity": "المدينة السابقة",
-    "nextCity": "المدينة التالية"
+    "nextCity": "المدينة التالية",
+    "routesShort": "مسارات جاهزة",
+    "more": "اقرأ المزيد",
+    "less": "عرض أقل"
   },
   "food": {
     "kinds": {

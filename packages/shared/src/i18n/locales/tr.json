@@ -1759,7 +1759,10 @@
     "exploreCity": "{{name}} keşfet",
     "preparing": "Tanıtım hazırlanıyor",
     "prevCity": "Önceki şehir",
-    "nextCity": "Sonraki şehir"
+    "nextCity": "Sonraki şehir",
+    "routesShort": "Hazır rotalar",
+    "more": "Devamını oku",
+    "less": "Daha az göster"
   },
   "food": {
     "kinds": {
