@@ -1780,12 +1780,7 @@
     "routeCount_one": "{{count}} rota",
     "routeCount_other": "{{count}} rota",
     "moreStops_one": "+{{count}} durak daha",
-    "moreStops_other": "+{{count}} durak daha",
-    "mayorsStrip": "Başkanlar",
-    "mayorLabel": "Belediye Başkanı",
-    "actingMayor": "Başkan Vekili",
-    "actingMayorOf": "Başkan Vekili: {{name}}",
-    "metropolitan": "{{name}} Büyükşehir"
+    "moreStops_other": "+{{count}} durak daha"
   },
   "food": {
     "kinds": {

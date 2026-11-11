@@ -1784,12 +1784,7 @@
     "routeCount_one": "مسار واحد",
     "routeCount_other": "{{count}} مسارات",
     "moreStops_one": "+محطة أخرى",
-    "moreStops_other": "+{{count}} محطات أخرى",
-    "mayorsStrip": "رؤساء البلديات",
-    "mayorLabel": "رئيس البلدية",
-    "actingMayor": "رئيس البلدية بالوكالة",
-    "actingMayorOf": "رئيس البلدية بالوكالة: {{name}}",
-    "metropolitan": "بلدية {{name}} الكبرى"
+    "moreStops_other": "+{{count}} محطات أخرى"
   },
   "food": {
     "kinds": {

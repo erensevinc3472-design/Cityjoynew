@@ -43,7 +43,7 @@ const MUNICIPAL = 'travelMunicipal';
 const clean = <T extends Record<string, unknown>>(o: T) =>
   Object.fromEntries(
     Object.entries(o)
-      .map(([k, v]) => [k, (k === 'cover' || k === 'mayorPhoto') && v ? cleanPhoto(v as Photo) : typeof v === 'string' ? v.trim() : v])
+      .map(([k, v]) => [k, k === 'cover' && v ? cleanPhoto(v as Photo) : typeof v === 'string' ? v.trim() : v])
       .filter(([, v]) => v !== undefined && v !== ''),
   ) as T;
 
@@ -146,18 +146,13 @@ const localOf = (id: string, d: DocumentData): TravelLocalItem => ({
   order: d.order ?? 0,
   updatedAt: iso(d.updatedAt) ?? '',
 });
-const municipalOf = (id: string, d: DocumentData): TravelMunicipal => {
-  const { mayorPhoto: raw, ...rest } = withoutCover(d);
-  const mayorPhoto = photoFrom(raw);
-  return {
-  ...(rest as TravelMunicipal),
+const municipalOf = (id: string, d: DocumentData): TravelMunicipal => ({
+  ...(withoutCover(d) as TravelMunicipal),
   id,
   ...coverOf(d),
-  ...(mayorPhoto ? { mayorPhoto } : {}),
   showMayor: d.showMayor !== false,
   updatedAt: iso(d.updatedAt) ?? '',
-  };
-};
+});
 const ordered = <T extends { order: number; title: string }>(a: T, b: T) => a.order - b.order || a.title.localeCompare(b.title, 'tr');
 
 /** Durakların boş isteğe bağlı alanları yazılmaz. */
@@ -284,8 +279,7 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
     async saveMunicipal(m: Omit<TravelMunicipal, 'updatedAt'>, label: string) {
       const batch = writeBatch(db);
       const { id, ...rest } = m;
-      // Slogan ve tanıtım boş olabilir (yalnızca başkan bilgisi); boş metin de yazılır.
-      batch.set(doc(db, MUNICIPAL, id), { ...clean(rest as unknown as Record<string, unknown>), slogan: rest.slogan.trim(), description: rest.description.trim(), updatedAt: serverTimestamp() });
+      batch.set(doc(db, MUNICIPAL, id), { ...clean(rest as unknown as Record<string, unknown>), updatedAt: serverTimestamp() });
       audit(batch, id, 'duzenle', `Belediye tanıtımı: ${label}`);
       await batch.commit();
     },
@@ -420,8 +414,6 @@ export function createMunicipalTravel(db: Firestore, actorUid: string, org: { id
           videoUrl: text.videoUrl?.trim() ? text.videoUrl.trim() : deleteField(),
           mayorName: text.mayorName?.trim() ? text.mayorName.trim() : deleteField(),
           cover: text.cover ? cleanPhoto(text.cover) : deleteField(),
-          mayorPhoto: text.mayorPhoto ? cleanPhoto(text.mayorPhoto) : deleteField(),
-          mayorActing: text.mayorActing ? true : deleteField(),
           status: submit ? 'onay-bekliyor' : 'taslak',
           updatedAt: serverTimestamp(),
         },

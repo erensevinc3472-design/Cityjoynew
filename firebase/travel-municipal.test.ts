@@ -147,28 +147,6 @@ describe('seyahat 2. aşama', () => {
     await expect(admin.saveRegion({ id: 'ege', tagline: 'Ege', description: 'Ege.', cover: media('basin'), status: 'taslak' }, true)).rejects.toThrow();
   });
 
-  it('başkan fotoğrafı ve vekillik: tanıtım yazısı olmadan da girilir, fotoğraf kendi dosyası olmalı', async () => {
-    const media = (uid: string, kind = 'seyahat') => {
-      const p = `media/${uid}/${kind}/baskanFoto001.jpg`;
-      return { path: p, url: `http://127.0.0.1:9199/v0/b/demo-cityjoy.appspot.com/o/${p.replaceAll('/', '%2F')}?alt=media&token=t`, width: 600, height: 800 };
-    };
-    const admin = createTravelAdmin(fs('eren'), 'eren');
-    const bld = createMunicipalTravel(fs('basin'), 'basin', nilufer);
-    // Admin yalnızca başkanı girer (slogan ve tanıtım boş), yayına alır.
-    await admin.saveMunicipal({ id: 'bld-16', cityId: '16', slogan: '', description: '', mayorName: 'Vekil Başkan', mayorActing: true, mayorPhoto: media('eren'), showMayor: true, status: 'yayinda' }, 'Büyükşehir');
-    const [bb] = await createFirestoreTravelRepository(fs('ali')).listMunicipal('16');
-    expect([bb?.mayorName, bb?.mayorActing, bb?.mayorPhoto?.path]).toEqual(['Vekil Başkan', true, 'media/eren/seyahat/baskanFoto001.jpg']);
-    // Belediye kendi başkanının fotoğrafını kendi dosyasıyla bağlar; başkasının ya da başka türün dosyası olmaz.
-    const text = { slogan: 'Modern Bursa', description: 'Göller, köyler ve kültür merkezleriyle Nilüfer.', mayorName: 'Başkan' };
-    await expect(bld.saveText({ ...text, mayorPhoto: media('ali') }, true)).rejects.toThrow();
-    await expect(bld.saveText({ ...text, mayorPhoto: media('basin', 'profil') }, true)).rejects.toThrow();
-    await bld.saveText({ ...text, mayorPhoto: media('basin'), mayorActing: true }, true);
-    expect([(await bld.get())?.mayorPhoto?.path, (await bld.get())?.mayorActing]).toEqual(['media/basin/seyahat/baskanFoto001.jpg', true]);
-    // Vekillik yalnızca doğru / yanlış; tek harfli slogan olmaz.
-    await assertFails(updateDoc(doc(fs('basin'), 'travelMunicipal', nilufer.id), { mayorActing: 'evet', updatedAt: serverTimestamp() }));
-    await assertFails(updateDoc(doc(fs('basin'), 'travelMunicipal', nilufer.id), { slogan: 'A', updatedAt: serverTimestamp() }));
-  });
-
   it('seyahat bölümü yalnızca belediyeye verilebilir', async () => {
     const kulup = (modules: string[]) => ({
       name: 'Kulüp', kind: 'kulup', scope: { level: 'il', provinceCode: '16' }, modules,
