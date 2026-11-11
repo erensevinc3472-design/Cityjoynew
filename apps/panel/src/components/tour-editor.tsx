@@ -7,7 +7,7 @@ import { t } from '../lib/t';
 /**
  * "İçini gez" düzenleyicisi (Eren, 11 Kasım 2026). Her sahne bir resim ve kısa addır (ör. "Dış görünüm", "İç mekân");
  * sahneler sırayla gösterilir, aralarında uygulamada sinematik geçiş olur. Resmin üstüne tıklanınca o noktaya numaralı
- * bir işaret eklenir; işaretin "Neye bakmalı?" ve "Neden önemli?" yazıları altta girilir. Resim yapay zekâ çizimiyse
+ * bir işaret eklenir; işaretin "Neye bakmalı?" ve "Hikâyesi" yazıları altta girilir. Resim yapay zekâ çizimiyse
  * uygulama köşede "temsilî çizim" yazar; ayrıntılar yayına almadan kontrol edilmeli.
  */
 export function TourEditor({ uid, value, onChange, disabled }: { uid: string; value: TourScene[]; onChange(v: TourScene[]): void; disabled?: boolean }) {
@@ -25,7 +25,7 @@ export function TourEditor({ uid, value, onChange, disabled }: { uid: string; va
     const r = e.currentTarget.getBoundingClientRect();
     const x = Math.round(((e.clientX - r.left) / r.width) * 1000) / 1000;
     const y = Math.round(((e.clientY - r.top) / r.height) * 1000) / 1000;
-    set(i, { points: [...value[i].points, { x, y, title: '', look: '', why: '' }] });
+    set(i, { points: [...value[i].points, { x, y, title: '', look: '', story: '' }] });
   };
 
   return (
@@ -78,8 +78,9 @@ export function TourEditor({ uid, value, onChange, disabled }: { uid: string; va
                 <textarea id={`tp-${i}-${j}-l`} rows={2} value={p.look} maxLength={L.text} disabled={disabled} onChange={(e) => setPoint(i, j, { look: e.target.value })} />
               </div>
               <div className="field">
-                <label htmlFor={`tp-${i}-${j}-w`}>{t('travel.tour.why')}</label>
-                <textarea id={`tp-${i}-${j}-w`} rows={2} value={p.why} maxLength={L.text} disabled={disabled} onChange={(e) => setPoint(i, j, { why: e.target.value })} />
+                <label htmlFor={`tp-${i}-${j}-s`}>{t('travel.tour.story')}</label>
+                <textarea id={`tp-${i}-${j}-s`} rows={8} value={p.story} maxLength={L.story} disabled={disabled} onChange={(e) => setPoint(i, j, { story: e.target.value })} />
+                <p className="meta">{t('travel.tour.storyHint', { n: p.story.length, max: L.story })}</p>
               </div>
             </div>
           ))}

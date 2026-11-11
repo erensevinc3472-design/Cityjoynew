@@ -1765,11 +1765,11 @@
     "tour": {
       "illustrative": "Illustration",
       "look": "What to look at?",
-      "why": "Why it matters?",
       "listen": "Listen",
       "stop": "Stop",
       "next": "Next detail",
-      "hint": "Tap a number to see the detail"
+      "hint": "Tap a number to see the detail",
+      "story": "The story"
     }
   },
   "food": {

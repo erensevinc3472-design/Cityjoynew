@@ -95,7 +95,7 @@ const tourOf = (d: DocumentData): { tour?: TourScene[] } => {
       y: unit(p?.y),
       title: String(p?.title ?? ''),
       look: String(p?.look ?? ''),
-      why: String(p?.why ?? ''),
+      story: String(p?.story ?? ''),
     }));
     return [{ label: String(s.label ?? ''), image, points }];
   });
@@ -108,7 +108,7 @@ const cleanTour = (tour: TourScene[] | undefined) =>
     ? tour.map((s) => ({
         label: s.label.trim(),
         image: cleanPhoto(s.image),
-        points: s.points.map((p) => ({ x: p.x, y: p.y, title: p.title.trim(), look: p.look.trim(), why: p.why.trim() })),
+        points: s.points.map((p) => ({ x: p.x, y: p.y, title: p.title.trim(), look: p.look.trim(), story: p.story.trim() })),
       }))
     : undefined;
 

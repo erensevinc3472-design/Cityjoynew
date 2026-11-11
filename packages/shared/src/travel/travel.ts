@@ -97,14 +97,15 @@ export interface TravelNearby {
 /**
  * "İçini gez" (Eren, 11 Kasım 2026): yerin maket görünümlü resimleri (ör. dış görünüm, kesit, giriş, iç mekân).
  * Resimler arasında sinematik kamera geçişi yapılır; resmin üstündeki numaralı noktaya dokununca "Neye bakmalı?" ve
- * "Neden önemli?" açılır. Noktanın yeri resmin genişliğine/yüksekliğine göre 0-1 arası oran olarak saklanır.
+ * "Hikâyesi" açılır. Noktanın yeri resmin genişliğine/yüksekliğine göre 0-1 arası oran olarak saklanır.
  */
 export interface TourPoint {
   x: number;
   y: number;
   title: string;
   look: string;
-  why: string;
+  /** Rehber anlatımı: hikâye tarzında uzun metin (Eren, 11 Kasım 2026). "Sesli dinle" bunu okur. */
+  story: string;
 }
 
 export interface TourScene {
@@ -114,7 +115,7 @@ export interface TourScene {
   points: TourPoint[];
 }
 
-export const TOUR_LIMITS = { scenes: 6, points: 8, label: 24, title: 50, text: 300 } as const;
+export const TOUR_LIMITS = { scenes: 6, points: 8, label: 24, title: 50, text: 300, story: 2000 } as const;
 
 /** Gezilecek yer (deneyim). */
 export interface TravelPlace {
@@ -184,7 +185,7 @@ export function validateTour(tour: TourScene[] | undefined): boolean {
         !!s.image &&
         len(s.label) >= 1 && len(s.label) <= L.label &&
         s.points.length <= L.points &&
-        s.points.every((p) => unit(p.x) && unit(p.y) && len(p.title) >= 2 && len(p.title) <= L.title && len(p.look) <= L.text && len(p.why) <= L.text && len(p.look) + len(p.why) > 0),
+        s.points.every((p) => unit(p.x) && unit(p.y) && len(p.title) >= 2 && len(p.title) <= L.title && len(p.look) <= L.text && len(p.story) <= L.story && len(p.look) + len(p.story) > 0),
     )
   );
 }

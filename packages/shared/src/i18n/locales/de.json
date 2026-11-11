@@ -1765,11 +1765,11 @@
     "tour": {
       "illustrative": "Illustration",
       "look": "Worauf achten?",
-      "why": "Warum wichtig?",
       "listen": "Anhören",
       "stop": "Stopp",
       "next": "Nächstes Detail",
-      "hint": "Tippe auf eine Zahl für Details"
+      "hint": "Tippe auf eine Zahl für Details",
+      "story": "Die Geschichte"
     }
   },
   "food": {

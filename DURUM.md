@@ -916,6 +916,10 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   `travelPlaces.tour` (sahne: label, image, points[x,y 0-1, title, look, why]); kural yalnız yönetici, en çok 6 sahne;
   silinen resimler sunucuda temizlenir (`photos.ts` inner alanı). Eren'in Ulu Camii resimleri
   `Desktop/CityJoy-gorseller/ulu-camii/` klasöründe (Dış görünüm, Kesit, Giriş, İç mekân); gerçek yayında panelden yüklenecek.
+  **Hikâye anlatımı (11 Kasım; Eren: rehber anlatımı hikâye gibi uzun olsun):** "Neden önemli?" yerine "Hikâyesi" (`story`,
+  en çok 2000 karakter); "Neye bakmalı?" kısa kalır (300). Kartta hikâyenin ilk 5 satırı, "Devamını oku" ile tamamı; "Sesli dinle"
+  başlık + bakılacak yer + hikâyeyi okur. Ulu Camii için 13 noktanın hikâyeleri yazıldı (rivayetler "anlatılır" diye):
+  `Desktop/CityJoy-gorseller/ulu-camii/anlatimlar.txt`, panelden kopyalanacak.
   **Eren yükleyecek:** kurallar ve sunucu işlevleri (birleşmeden sonra). Yazılar yayından önce kontrol edilmeli.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.

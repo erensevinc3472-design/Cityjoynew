@@ -1765,11 +1765,11 @@
     "tour": {
       "illustrative": "Temsilî çizim",
       "look": "Neye bakmalı?",
-      "why": "Neden önemli?",
       "listen": "Sesli dinle",
       "stop": "Durdur",
       "next": "Sonraki ayrıntı",
-      "hint": "Numaralara dokun, ayrıntıyı gör"
+      "hint": "Numaralara dokun, ayrıntıyı gör",
+      "story": "Hikâyesi"
     }
   },
   "food": {

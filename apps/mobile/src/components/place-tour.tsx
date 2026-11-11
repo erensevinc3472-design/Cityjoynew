@@ -19,7 +19,7 @@ const SPEECH_LANG: Record<string, string> = { tr: 'tr-TR', en: 'en-US', de: 'de-
 /**
  * "İçini gez" (Eren, 11 Kasım 2026): yerin maket görünümlü resimleri arasında sinematik kamera geçişi. İleri giderken
  * eski resim kameraya doğru büyüyüp kaybolur, yenisi biraz yakından gelip yerine oturur (geri giderken tersi). Resmin
- * üstündeki numaralı noktaya dokununca altta "Neye bakmalı?" / "Neden önemli?" kartı açılır; "Sesli dinle" yazıyı
+ * üstündeki numaralı noktaya dokununca altta "Neye bakmalı?" ve hikâye tarzı rehber anlatımı kartı açılır; "Sesli dinle" yazıyı
  * telefonun kendi sesiyle okur (ücretsiz). Hareket azaltma açıksa yalnızca yumuşak geçiş yapılır.
  */
 export function PlaceTour({ tour }: { tour: TourScene[] }) {
@@ -33,7 +33,11 @@ export function PlaceTour({ tour }: { tour: TourScene[] }) {
   const [point, setPoint] = useState<number | null>(null);
   const [speaking, setSpeaking] = useState(false);
   const [reduce, setReduce] = useState(false);
+  const [open, setOpen] = useState(false);
   const progress = useRef(new Animated.Value(1)).current;
+
+  // Başka ayrıntıya geçince hikâye yeniden kısa görünür.
+  useEffect(() => setOpen(false), [scene, point]);
 
   useEffect(() => {
     AccessibilityInfo.isReduceMotionEnabled().then(setReduce).catch(() => {});
@@ -86,7 +90,7 @@ export function PlaceTour({ tour }: { tour: TourScene[] }) {
   const speak = () => {
     if (!sel) return;
     if (speaking) return stopSpeech();
-    const text = [sel.title, sel.look && `${t('travel.tour.look')} ${sel.look}`, sel.why && `${t('travel.tour.why')} ${sel.why}`].filter(Boolean).join('. ');
+    const text = [sel.title, sel.look, sel.story].filter(Boolean).join('.\n');
     setSpeaking(true);
     Speech.speak(text, {
       language: SPEECH_LANG[i18n.language.slice(0, 2)] ?? 'tr-TR',
@@ -180,11 +184,19 @@ export function PlaceTour({ tour }: { tour: TourScene[] }) {
                 <AppText style={styles.rowText}>{sel.look}</AppText>
               </View>
             ) : null}
-            {sel.look && sel.why ? <View style={styles.rule} /> : null}
-            {sel.why ? (
+            {sel.look && sel.story ? <View style={styles.rule} /> : null}
+            {sel.story ? (
               <View style={styles.row}>
-                <AppText style={styles.rowLabel}>{t('travel.tour.why')}</AppText>
-                <AppText style={styles.rowText}>{sel.why}</AppText>
+                <AppText style={styles.rowLabel}>{t('travel.tour.story')}</AppText>
+                <AppText style={styles.story} numberOfLines={open ? undefined : 5}>
+                  {sel.story}
+                </AppText>
+                {sel.story.length > 220 ? (
+                  <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} hitSlop={8} onPress={() => setOpen(!open)} style={styles.more}>
+                    <AppText style={styles.nextText}>{open ? t('travel.less') : t('travel.more')}</AppText>
+                    <MaterialIcons name={open ? 'expand-less' : 'expand-more'} size={18} color="#9A6A2E" />
+                  </Pressable>
+                ) : null}
               </View>
             ) : null}
             <View style={styles.sheetActions}>
@@ -229,6 +241,8 @@ const styles = StyleSheet.create({
   close: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   row: { gap: 2 },
   rowLabel: { fontFamily: fonts.heading, fontSize: 13, color: INK },
+  story: { fontSize: 15, lineHeight: 24, color: '#2A3B3F' },
+  more: { flexDirection: 'row', alignItems: 'center', gap: 2, alignSelf: 'flex-start', minHeight: 36 },
   rowText: { fontSize: 14, lineHeight: 21, color: '#2A3B3F' },
   rule: { height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(11,35,40,0.2)' },
   sheetActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.xs },

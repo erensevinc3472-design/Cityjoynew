@@ -44,7 +44,7 @@ describe('seyahat', () => {
 
 describe('validateTour (İçini gez)', () => {
   const image = { path: 'media/u1/seyahat/a.jpg', url: 'https://x/a.jpg', width: 900, height: 1200 };
-  const point = { x: 0.5, y: 0.4, title: 'Şadırvan', look: 'Ortadaki şadırvana bak.', why: '' };
+  const point = { x: 0.5, y: 0.4, title: 'Şadırvan', look: 'Ortadaki şadırvana bak.', story: '' };
   it('boş ya da geçerli sahneleri kabul eder', () => {
     expect(validateTour(undefined)).toBe(true);
     expect(validateTour([{ label: 'İç mekân', image, points: [point] }])).toBe(true);
@@ -52,7 +52,7 @@ describe('validateTour (İçini gez)', () => {
   it('sınır dışı nokta, boş ad ve yazısız noktayı reddeder', () => {
     expect(validateTour([{ label: 'İç', image, points: [{ ...point, x: 1.2 }] }])).toBe(false);
     expect(validateTour([{ label: ' ', image, points: [] }])).toBe(false);
-    expect(validateTour([{ label: 'İç', image, points: [{ ...point, look: '', why: '' }] }])).toBe(false);
+    expect(validateTour([{ label: 'İç', image, points: [{ ...point, look: '', story: '' }] }])).toBe(false);
     expect(validateTour(Array.from({ length: 7 }, () => ({ label: 'A', image, points: [] })))).toBe(false);
   });
 });
