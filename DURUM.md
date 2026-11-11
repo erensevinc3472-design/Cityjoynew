@@ -961,6 +961,14 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   aktar (Bursa)" düğmesiyle yapıldı: yalnızca geliştirme bilgisayarında (vite dev, emülatör dışı) admin'e görünür,
   emülatördeki gezileri okur, resimleri JPEG yapıp `media/{uid}/seyahat/` altına yükler (`apps/panel/src/lib/tour-import.ts`).
   Eren panele Google ile giriyor (şifre yok). Yazılar ileride gözden geçirilebilir.
+- **Pratik bilgiler (11 Kasım; Eren istedi ve listeyi onayladı).** Yer sayfasında "Pratik bilgiler" başlığı altında
+  ziyaret saatleri, giriş ücreti, önerilen süre ve yeni **Yaş ve çocuklar** (`ageInfo`); "Yakındaki hizmetler"de
+  otopark, tuvalet, yemek, ATM (var olan `nearby`); "Ziyaretçi ipuçları" kartında üç başlık: **Yanına al** (`bring`),
+  **Kurallar** (`rules`), **Bilmekte fayda var** (`tips`). Panel formunda yeni alanlar, beş dilde etiketler. Kurala
+  yalnızca üç alan adı eklendi (boyut sınırı yüzünden uzunluk denetimi panelde/uygulamada). 23 Bursa yerinin bilgileri
+  emülatörde (kaynak: `CityJoy-gorseller/pratik-bilgiler-bursa.cjs`); kesin saat ve fiyat yazılmadı (yalnızca
+  ücretsiz/ücretli ve genel bilgi, "kontrol et" notu var). **Kalan:** kuralları yayına yüklemek, sonra panelde
+  "Gezileri ve pratik bilgileri yayına aktar (Bursa)" ile bilgileri yayına taşımak (resimler tekrar yüklenmez).
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
   Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu
