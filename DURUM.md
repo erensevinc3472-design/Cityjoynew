@@ -1085,6 +1085,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
     çerçeveli); yana kaydırma sürüyor. Benim Şehrim'in altındaki silüet kalktı, yerine alt çubuk (Ana Sayfa, Keşfet, Ara,
     Profil; Karar Eren, 10 Kasım 2026). `BottomNav` artık seçili sekmesiz de kullanılabiliyor.
   Web deneme sürümünde koyu/açık denendi (emülatöre örnek müzeler eklendi), telefonda denenmedi.
+- Seyahat girişi (TravelJoy, 12 Kasım 2026): iki yarıdaki eski çizimin (gri daireler) yerine Eren'in resimleri: üstte sahil yolu (Keşfet ve Öğren), altta havalimanı ve uçak (Planla ve Navigasyon). `assets/travel/kesfet.jpg`, `yolculuk.jpg` (`TRAVEL_ART`, app-art.ts); asılları masaüstünde CityJoy-gorseller/seyahat. Karartma 0,5 yerine 0,38. Web'de denendi, telefonda denenmedi.
 
 ## Bu oturumlarda alınan kararlar (PROJE.md'ye işlendi)
 

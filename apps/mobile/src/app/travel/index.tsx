@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
@@ -7,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 
 import { AppText } from '@/components/app-text';
 import { RoundButton } from '@/components/hero-header';
-import { SceneArt, sceneSky } from '@/components/scene-art';
+import { sceneSky } from '@/components/scene-art';
+import { TRAVEL_ART } from '@/lib/app-art';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -35,9 +37,7 @@ export default function TravelIntroScreen() {
       <StatusBar style="light" />
       {/* Alt yarı: tüm ekran; üst yarı onun üstüne çapraz kesilerek konur. */}
       <View style={StyleSheet.absoluteFill}>
-        <View style={[styles.scene, { height: Math.round(W * 1.25) }]}>
-          <SceneArt kind="city" />
-        </View>
+        <Image source={TRAVEL_ART.journey} contentFit="cover" style={StyleSheet.absoluteFill} accessible={false} />
         <View style={[StyleSheet.absoluteFill, styles.dim]} />
       </View>
       <View
@@ -53,9 +53,7 @@ export default function TravelIntroScreen() {
           transform: [{ rotate: `${-angle}rad` }],
         }}>
         <View style={{ position: 'absolute', width: W, height: H, left: S / 2 - W / 2, top: S - H / 2, transform: [{ rotate: `${angle}rad` }], backgroundColor: sceneSky('travel') }}>
-          <View style={[styles.scene, { height: Math.round(W * 1.25) }]}>
-            <SceneArt kind="travel" />
-          </View>
+          <Image source={TRAVEL_ART.explore} contentFit="cover" style={StyleSheet.absoluteFill} accessible={false} />
           <View style={[StyleSheet.absoluteFill, styles.dim]} />
         </View>
       </View>
@@ -105,8 +103,7 @@ export default function TravelIntroScreen() {
 const white = '#FFFFFF';
 const styles = StyleSheet.create({
   root: { flex: 1, overflow: 'hidden' },
-  scene: { position: 'absolute', start: 0, end: 0, bottom: 0, overflow: 'hidden' },
-  dim: { backgroundColor: 'rgba(11, 46, 52, 0.5)' },
+  dim: { backgroundColor: 'rgba(11, 46, 52, 0.38)' },
   header: { position: 'absolute', left: spacing.lg, right: spacing.lg, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   brand: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 7, borderRadius: radius.pill, backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   brandText: { color: white, fontFamily: fonts.heading, fontSize: 16, letterSpacing: 0.5 },

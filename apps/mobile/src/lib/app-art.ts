@@ -27,3 +27,9 @@ export const LANGUAGE_ART = {
   ru: require('../../assets/lang/ru.jpg') as number,
   ar: require('../../assets/lang/ar.jpg') as number,
 };
+
+/** Seyahat girişinin iki yarısı (Eren, 11 Kasım 2026): üstte sahil yolu (Keşfet), altta havalimanı (Yolculuk). */
+export const TRAVEL_ART = {
+  explore: require('../../assets/travel/kesfet.jpg') as number,
+  journey: require('../../assets/travel/yolculuk.jpg') as number,
+};
