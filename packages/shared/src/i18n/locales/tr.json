@@ -1775,7 +1775,12 @@
       "next": "Sonraki ayrıntı",
       "hint": "Numaralara dokun, ayrıntıyı gör",
       "story": "Hikâyesi"
-    }
+    },
+    "districtList": "İlçeler",
+    "routeCount_one": "{{count}} rota",
+    "routeCount_other": "{{count}} rota",
+    "moreStops_one": "+{{count}} durak daha",
+    "moreStops_other": "+{{count}} durak daha"
   },
   "food": {
     "kinds": {

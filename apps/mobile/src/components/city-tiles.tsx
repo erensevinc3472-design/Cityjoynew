@@ -47,6 +47,25 @@ export function Shade({ from, opacity, mid = 0.55, to = 0.15 }: { from: string; 
   );
 }
 
+/** Fotoğrafın altını koyulaştıran dikey geçiş (alttaki yazı okunsun). */
+export function BottomShade({ color = '#061417', top = 0.15, bottom = 0.92 }: { color?: string; top?: number; bottom?: number }) {
+  const id = 'bshade' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <Svg width="100%" height="100%" preserveAspectRatio="none">
+        <Defs>
+          <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={color} stopOpacity={top} />
+            <Stop offset="0.45" stopColor={color} stopOpacity={top * 0.6} />
+            <Stop offset="1" stopColor={color} stopOpacity={bottom} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
+      </Svg>
+    </View>
+  );
+}
+
 /** Sağdaki küçük yuvarlak ok. `plain`: açık modda beyaz kart üstünde. */
 export function Chevron({ gold, plain, open }: { gold?: boolean; plain?: boolean; open?: boolean }) {
   const rtl = I18nManager.isRTL;

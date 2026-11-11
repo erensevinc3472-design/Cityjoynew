@@ -1779,7 +1779,12 @@
       "next": "التفصيل التالي",
       "hint": "المس رقمًا لرؤية التفاصيل",
       "story": "الحكاية"
-    }
+    },
+    "districtList": "المناطق",
+    "routeCount_one": "مسار واحد",
+    "routeCount_other": "{{count}} مسارات",
+    "moreStops_one": "+محطة أخرى",
+    "moreStops_other": "+{{count}} محطات أخرى"
   },
   "food": {
     "kinds": {

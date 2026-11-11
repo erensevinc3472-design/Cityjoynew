@@ -1775,7 +1775,12 @@
       "next": "Nächstes Detail",
       "hint": "Tippe auf eine Zahl für Details",
       "story": "Die Geschichte"
-    }
+    },
+    "districtList": "Bezirke",
+    "routeCount_one": "{{count}} Route",
+    "routeCount_other": "{{count}} Routen",
+    "moreStops_one": "+{{count}} weiterer Halt",
+    "moreStops_other": "+{{count}} weitere Halte"
   },
   "food": {
     "kinds": {
