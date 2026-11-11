@@ -967,8 +967,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   **Kurallar** (`rules`), **Bilmekte fayda var** (`tips`). Panel formunda yeni alanlar, beş dilde etiketler. Kurala
   yalnızca üç alan adı eklendi (boyut sınırı yüzünden uzunluk denetimi panelde/uygulamada). 23 Bursa yerinin bilgileri
   emülatörde (kaynak: `CityJoy-gorseller/pratik-bilgiler-bursa.cjs`); kesin saat ve fiyat yazılmadı (yalnızca
-  ücretsiz/ücretli ve genel bilgi, "kontrol et" notu var). **Kalan:** kuralları yayına yüklemek, sonra panelde
-  "Gezileri ve pratik bilgileri yayına aktar (Bursa)" ile bilgileri yayına taşımak (resimler tekrar yüklenmez).
+  ücretsiz/ücretli ve genel bilgi, "kontrol et" notu var). **Yayında (11 Kasım, Eren izin verdi):** kurallar
+  yüklendi (ilk denemelerde 503, tekrarla geçti; boyut sınırına takılmadı), panelden aktarıldı: 23 yerin hepsinde
+  pratik bilgiler yayında. Telefondaki uygulama yeni başlıkları yeni sürümle gösterir.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
   Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu
