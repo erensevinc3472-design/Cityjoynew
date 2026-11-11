@@ -1,5 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { Stack } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, I18nManager, PanResponder, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
@@ -167,6 +168,9 @@ export function PlaceTour({ tour }: { tour: TourScene[] }) {
 
   return (
     <View>
+      {/* iOS 26 ekranın her yerinden sağa kaydırmayı "geri" sayıyor; resmi sağa kaydırınca sayfa kapanmasın diye geri
+          hareketi bu sayfada sol kenardaki ince şeritle sınırlanır (eski iPhone davranışı). */}
+      <Stack.Screen options={{ gestureResponseDistance: { start: -1, end: 30, top: -1, bottom: -1 } }} />
       {/* Sahneler */}
       {tour.length > 1 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips} accessibilityRole="tablist">

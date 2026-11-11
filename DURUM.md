@@ -976,7 +976,9 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
 - **İçini gez: parmakla kaydırma (11 Kasım; Eren istedi).** Sahne resmini sola kaydırınca sonraki, sağa kaydırınca önceki
   sahne gelir (Arapçada ters). Yalnızca belirgin yatay harekette çalışır; noktalara dokunma, sahne düğmeleri ve sayfayı
   aşağı kaydırma aynı. `place-tour.tsx` (PanResponder; başlangıç noktası ayrıca tutulur, web'de art arda kaydırma
-  hatası yüzünden). Web kopyasında art arda sola/sağa kaydırma denendi; telefonda henüz denenmedi.
+  hatası yüzünden). Web kopyasında art arda sola/sağa kaydırma denendi. Eren telefonda denedi: sağa kaydırınca sayfa
+  geri çıkıyordu (iOS 26 ekranın her yerinden geri kaydırma). Gezi olan sayfada geri hareketi sol kenardaki 30 noktalık
+  şeritle sınırlandı (`gestureResponseDistance`); telefonda yeniden denenecek.
 - **Ara ekranı: ışıklı ağaç (10 Kasım; Eren onayladı, PROJE.md 5.10 ve 13. madde 32).** Boştayken Eren'in ağaç resmi tam
   ekran: başlık "Ne arıyorsun?" (5 dil, `search.ask`), kişinin ilçe ve ili (dokununca konum değişir), arama kutusu.
   Kısayol düğmesi yok. Işık kökleri yakar, gövdeden dallara çıkar; 3,5. saniyede dal uçlarından kutuya bir kez uçar ve kutu
