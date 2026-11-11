@@ -1782,7 +1782,12 @@
     "routeCount_one": "{{count}} маршрут",
     "routeCount_other": "{{count}} маршрутов",
     "moreStops_one": "+ещё {{count}} остановка",
-    "moreStops_other": "+ещё {{count}} остановок"
+    "moreStops_other": "+ещё {{count}} остановок",
+    "mayorsStrip": "Мэры",
+    "mayorLabel": "Мэр",
+    "actingMayor": "Исполняющий обязанности мэра",
+    "actingMayorOf": "И. о. мэра: {{name}}",
+    "metropolitan": "{{name}} (мегаполис)"
   },
   "food": {
     "kinds": {

@@ -1780,7 +1780,12 @@
     "routeCount_one": "{{count}} Route",
     "routeCount_other": "{{count}} Routen",
     "moreStops_one": "+{{count}} weiterer Halt",
-    "moreStops_other": "+{{count}} weitere Halte"
+    "moreStops_other": "+{{count}} weitere Halte",
+    "mayorsStrip": "Bürgermeister",
+    "mayorLabel": "Bürgermeister",
+    "actingMayor": "Amtierender Bürgermeister",
+    "actingMayorOf": "Amtierend: {{name}}",
+    "metropolitan": "{{name}} Großstadt"
   },
   "food": {
     "kinds": {
