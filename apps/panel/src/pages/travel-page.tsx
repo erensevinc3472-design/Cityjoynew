@@ -92,6 +92,21 @@ function AdminTravelPage() {
     load();
   }, [load]);
 
+  // Yalnızca geliştirme bilgisayarında görünür (bkz. lib/tour-import).
+  const importTours = async () => {
+    if (!user || !window.confirm('Emülatördeki Bursa gezileri yayındaki uygulamaya aktarılsın mı?')) return;
+    setBusy(true);
+    try {
+      const { importEmulatorTours } = await import('../lib/tour-import');
+      setMessage({ kind: 'ok', text: await importEmulatorTours(user.uid, '16', (text) => setMessage({ kind: 'ok', text })) });
+      await load();
+    } catch (e) {
+      setMessage({ kind: 'error', text: `Aktarma durdu: ${(e as Error).message}` });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const act = async (fn: () => Promise<string>, after?: () => void) => {
     setBusy(true);
     setMessage(undefined);
@@ -271,6 +286,9 @@ function AdminTravelPage() {
             {canEdit ? <button className="btn secondary" disabled={busy} onClick={() => window.confirm(t('travel.seedConfirm')) && act(async () => t('travel.seeded', { count: await admin!.importSeed() }))}>
               {t('travel.seed')}
             </button> : null}
+            {import.meta.env.DEV && import.meta.env.VITE_FIREBASE_EMULATOR !== '1' && isAdminUser(user) && !user!.isDemo ? (
+              <button className="btn" disabled={busy} onClick={importTours}>Gezileri yayına aktar (Bursa)</button>
+            ) : null}
           </div>
         ) : null}
       </header>
