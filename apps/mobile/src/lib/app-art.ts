@@ -28,7 +28,7 @@ export const LANGUAGE_ART = {
   ar: require('../../assets/lang/ar.jpg') as number,
 };
 
-/** Seyahat girişinin iki yarısı (Eren, 11 Kasım 2026): üstte sahil yolu (Keşfet), altta havalimanı (Yolculuk). */
+/** Seyahat girişinin iki yarısı (Eren, 11 Kasım 2026): üstte eski dünya haritası (Keşfet), altta valiz ve telefon (Yolculuk). */
 export const TRAVEL_ART = {
   explore: require('../../assets/travel/kesfet.jpg') as number,
   journey: require('../../assets/travel/yolculuk.jpg') as number,
