@@ -257,21 +257,6 @@ export default function NeighbourhoodScreen() {
           </Pressable>
         </View>
 
-        <View style={[styles.placeCard, card]}>
-          <FrostFill />
-          <View style={[styles.pin, { backgroundColor: dark ? 'rgba(226, 178, 119, 0.12)' : c.accentSoft }]}>
-            <MaterialIcons name="place" size={20} color={gold} />
-          </View>
-          <View style={styles.flex}>
-            <AppText style={[styles.rowTitle, { color: c.textStrong }]} numberOfLines={1}>{name ?? t('neighbourhood.title')}</AppText>
-            <AppText style={[styles.rowHint, { color: c.textMuted }]} numberOfLines={1}>{place}</AppText>
-          </View>
-          <Pressable accessibilityRole="button" onPress={changePlace} hitSlop={6} style={({ pressed }) => [styles.change, { borderColor: dark ? 'rgba(226, 178, 119, 0.6)' : c.primary, opacity: pressed ? 0.75 : 1 }]}>
-            <MaterialIcons name="edit-location-alt" size={16} color={gold} />
-            <AppText style={[styles.changeText, { color: gold }]}>{t('neighbourhood.change')}</AppText>
-          </Pressable>
-        </View>
-
         <AppText variant="caption" muted style={styles.center}>{t('neighbourhood.feedSoon')}</AppText>
       </ScrollView>
     </Screen>
@@ -295,9 +280,5 @@ const styles = StyleSheet.create({
   badgeText: { fontFamily: fonts.bodySemi, fontSize: 11.5 },
   area: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderTopWidth: 1, paddingTop: spacing.sm },
   areaTitle: { fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 18 },
-  placeCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 2, padding: spacing.md - 2, borderRadius: radius.lg + 2, borderWidth: 1, overflow: 'hidden', marginTop: spacing.xs },
-  pin: { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
-  change: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 36, paddingHorizontal: 12, borderRadius: radius.pill, borderWidth: 1 },
-  changeText: { fontFamily: fonts.bodySemi, fontSize: 12.5 },
   center: { textAlign: 'center' },
 });
