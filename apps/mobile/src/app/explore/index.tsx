@@ -270,7 +270,7 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
       {/* Bölümün kendi süzgeçleri, tek satırda eşit genişlikte (yana kaymaz, sayfa kaydırmasına takılmaz). */}
       {tags.length ? (
         (() => {
-          // Az süzgeçli bölümde eşit genişlikte tek satır; Genel gibi çok süzgeçlide sağa sola kayan tek satır (Eren, 12 Kasım 2026).
+          // Kutusuz, alt çizgili yazı sekmeleri (Eren, 12 Kasım 2026: "daha modern"). Az süzgeçte eşit genişlik; Genel gibi çok süzgeçte sağa sola kayar.
           const slide = tags.length > 4;
           const chips = tags.map((x) => {
             const on = x === tag;
@@ -280,17 +280,18 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
                 accessibilityRole="tab"
                 accessibilityState={{ selected: on }}
                 onPress={() => setTag(x)}
-                style={({ pressed }) => [styles.chip, slide && styles.chipSlide, on ? { backgroundColor: c.primary, borderColor: c.primary } : { backgroundColor: c.surface, borderColor: c.border }, { opacity: pressed ? 0.85 : 1 }]}>
-                <AppText numberOfLines={1} adjustsFontSizeToFit={!slide} style={[styles.chipText, { color: on ? c.onPrimary : c.textStrong }]}>{t(`explore.tags.${x}`)}</AppText>
+                style={({ pressed }) => [styles.chip, slide && styles.chipSlide, { opacity: pressed ? 0.7 : 1 }]}>
+                <AppText numberOfLines={1} adjustsFontSizeToFit={!slide} style={[styles.chipText, { color: on ? c.textStrong : c.textMuted, fontFamily: on ? fonts.bodySemi : fonts.bodyMedium }]}>{t(`explore.tags.${x}`)}</AppText>
+                <View style={[styles.chipBar, { backgroundColor: on ? GOLD : 'transparent' }]} />
               </Pressable>
             );
           });
           return slide ? (
-            <ChipScroll horizontal showsHorizontalScrollIndicator={false} style={styles.slideScroll} contentContainerStyle={styles.slideRow} accessibilityRole="tablist" accessibilityLabel={t('explore.tagsLabel')}>
+            <ChipScroll horizontal showsHorizontalScrollIndicator={false} style={[styles.slideScroll, { borderBottomColor: c.border }]} contentContainerStyle={styles.slideRow} accessibilityRole="tablist" accessibilityLabel={t('explore.tagsLabel')}>
               {chips}
             </ChipScroll>
           ) : (
-            <View style={styles.tags} accessibilityRole="tablist" accessibilityLabel={t('explore.tagsLabel')}>
+            <View style={[styles.tags, { borderBottomColor: c.border }]} accessibilityRole="tablist" accessibilityLabel={t('explore.tagsLabel')}>
               {chips}
             </View>
           );
@@ -380,12 +381,13 @@ const styles = StyleSheet.create({
   tabText: { fontSize: 12.5 },
   page: { paddingHorizontal: GUTTER, paddingBottom: spacing.xl },
   top: { gap: spacing.sm, paddingTop: spacing.sm },
-  tags: { flexDirection: 'row', gap: 6 },
-  slideScroll: { marginHorizontal: -GUTTER, flexGrow: 0 },
-  slideRow: { paddingHorizontal: GUTTER, gap: 6 },
-  chipSlide: { flexGrow: 0, flexShrink: 0, flexBasis: 'auto', paddingHorizontal: 16 },
-  chip: { flex: 1, minHeight: 36, paddingHorizontal: 8, borderRadius: radius.pill, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  chipText: { fontFamily: fonts.bodyMedium, fontSize: 13 },
+  tags: { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth },
+  slideScroll: { marginHorizontal: -GUTTER, flexGrow: 0, borderBottomWidth: StyleSheet.hairlineWidth },
+  slideRow: { paddingHorizontal: GUTTER - 4, gap: 4 },
+  chipSlide: { flexGrow: 0, flexShrink: 0, flexBasis: 'auto', paddingHorizontal: 12 },
+  chip: { flex: 1, minHeight: 40, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'flex-end' },
+  chipText: { fontSize: 14, paddingBottom: 8 },
+  chipBar: { alignSelf: 'stretch', height: 3, borderTopLeftRadius: 3, borderTopRightRadius: 3, marginBottom: -StyleSheet.hairlineWidth },
   ann: { paddingVertical: spacing.sm },
   center: { textAlign: 'center', paddingTop: spacing.md },
 });
