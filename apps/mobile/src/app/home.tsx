@@ -120,7 +120,7 @@ export default function HomeScreen() {
               onPress={m.href ? () => router.push(m.href!) : undefined}
               style={({ pressed }) => [styles.module, { borderColor: sceneRim(m.scene), opacity: pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
               {/* Eren'in resimleri: Seyahat ve Acil'de konu sağ yarıda (8 Kasım); Şehrim ve Sosyal kare, ortalı (10 Kasım). */}
-              <Image source={HOME_ART[m.key]} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition={m.key === 'myCity' || m.key === 'social' ? 'center' : 'right'} accessible={false} />
+              <Image source={HOME_ART[m.key]} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition={m.key === 'travel' ? 'right' : 'center'} accessible={false} />
               <View style={styles.moduleIcon}>
                 <MaterialIcons name={m.icon} size={19} color="#FFFFFF" />
               </View>
