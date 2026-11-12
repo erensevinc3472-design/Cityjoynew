@@ -535,6 +535,8 @@ export function MunicipalTab({
       videoUrl: m?.videoUrl ?? '',
       mayorName: m?.mayorName ?? '',
       cover: m?.cover,
+      mayorPhoto: m?.mayorPhoto,
+      mayorActing: m?.mayorActing,
       showMayor: m?.showMayor ?? true,
       zone: m?.zone,
       population: m?.population != null ? String(m.population) : '',
@@ -566,7 +568,11 @@ export function MunicipalTab({
           <Field id="m-desc" label={t('travel.description')} value={D.description} onChange={(v) => set({ description: v })} multiline max={600} />
           <Field id="m-video" label={t('travel.videoUrl')} value={D.videoUrl ?? ''} onChange={(v) => set({ videoUrl: v })} hint={t('travel.videoHint')} />
           {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={D.cover} onChange={(cover) => set({ cover })} disabled={busy} /> : null}
-          <Field id="m-mayor" label={t('travel.mayorName')} value={D.mayorName ?? ''} onChange={(v) => set({ mayorName: v })} max={80} />
+          <Field id="m-mayor" label={t('travel.mayorName')} value={D.mayorName ?? ''} onChange={(v) => set({ mayorName: v })} max={80} hint={t('travel.mayorOnlyHint')} />
+          {user ? <ImageField label={t('travel.mayorPhoto')} hint={t('travel.mayorPhotoHint')} kind="seyahat" uid={user.uid} value={D.mayorPhoto} onChange={(mayorPhoto) => set({ mayorPhoto })} disabled={busy} /> : null}
+          <label className="check">
+            <input type="checkbox" checked={!!D.mayorActing} onChange={(e) => set({ mayorActing: e.target.checked || undefined })} /> {t('travel.mayorActing')}
+          </label>
           <label className="check">
             <input type="checkbox" checked={D.showMayor} onChange={(e) => set({ showMayor: e.target.checked })} /> {t('travel.showMayor')}
           </label>
@@ -673,7 +679,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
   const canDelete = !demo && actions.includes('sil');
   const api = createMunicipalTravel(firestore, user.uid, { id: org.id, name: org.name, cityId, ...(districtId ? { districtId } : {}) });
   const [intro, setIntro] = useState<TravelMunicipal | null>(null);
-  const [text, setText] = useState<{ slogan: string; description: string; videoUrl: string; mayorName: string; cover?: Photo }>({ slogan: '', description: '', videoUrl: '', mayorName: '' });
+  const [text, setText] = useState<{ slogan: string; description: string; videoUrl: string; mayorName: string; cover?: Photo; mayorPhoto?: Photo; mayorActing?: boolean }>({ slogan: '', description: '', videoUrl: '', mayorName: '' });
   const [routes, setRoutes] = useState<TravelRoute[]>([]);
   const [places, setPlaces] = useState<TravelPlace[]>([]);
   const [draft, setDraft] = useState<RouteDraft | null>(null);
@@ -687,7 +693,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
       const places = createFirestoreTravelRepository(firestore).listPlaces(cityId).catch(() => []);
       const [m, r, p] = demo ? [null, [], await places] : await Promise.all([api.get(), api.listRoutes(), places]);
       setIntro(m);
-      setText({ slogan: m?.slogan ?? '', description: m?.description ?? '', videoUrl: m?.videoUrl ?? '', mayorName: m?.mayorName ?? '', cover: m?.cover });
+      setText({ slogan: m?.slogan ?? '', description: m?.description ?? '', videoUrl: m?.videoUrl ?? '', mayorName: m?.mayorName ?? '', cover: m?.cover, mayorPhoto: m?.mayorPhoto, mayorActing: m?.mayorActing });
       setRoutes(r);
       setPlaces(p);
     } catch {
@@ -752,6 +758,10 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
         <Field id="mi-video" label={t('travel.videoUrl')} value={text.videoUrl} onChange={(v) => setText({ ...text, videoUrl: v })} hint={t('travel.videoHint')} />
         <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={text.cover} onChange={(cover) => setText({ ...text, cover })} disabled={busy || demo || !canWrite} />
         <Field id="mi-mayor" label={t('travel.mayorName')} value={text.mayorName} onChange={(v) => setText({ ...text, mayorName: v })} max={80} hint={t('travel.mayorNameHint')} />
+        <ImageField label={t('travel.mayorPhoto')} hint={t('travel.mayorPhotoHint')} kind="seyahat" uid={user.uid} value={text.mayorPhoto} onChange={(mayorPhoto) => setText({ ...text, mayorPhoto })} disabled={busy || demo || !canWrite} />
+        <label className="check">
+          <input type="checkbox" checked={!!text.mayorActing} disabled={busy || demo || !canWrite} onChange={(e) => setText({ ...text, mayorActing: e.target.checked || undefined })} /> {t('travel.mayorActing')}
+        </label>
         {canWrite ? (
           <div className="actions">
             <button className="btn" type="submit" disabled={busy || demo}>{t('travel.submit')}</button>

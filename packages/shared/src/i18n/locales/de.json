@@ -1845,7 +1845,9 @@
     "planSwapHint": "Orte in der Nähe, die nicht im Plan sind:",
     "planTomorrow": "Auf morgen verschieben",
     "planRemove": "Aus dem Plan entfernen",
-    "localGov": "Kommunalverwaltungen"
+    "localGov": "Kommunalverwaltungen",
+    "mayorTitle": "Bürgermeister von {{name}}",
+    "mayorActingTitle": "Amtierender Bürgermeister von {{name}}"
   },
   "food": {
     "kinds": {

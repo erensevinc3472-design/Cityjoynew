@@ -1845,7 +1845,9 @@
     "planSwapHint": "Nearby places not in your plan:",
     "planTomorrow": "Move to tomorrow",
     "planRemove": "Remove from plan",
-    "localGov": "Local governments"
+    "localGov": "Local governments",
+    "mayorTitle": "Mayor of {{name}}",
+    "mayorActingTitle": "Acting Mayor of {{name}}"
   },
   "food": {
     "kinds": {

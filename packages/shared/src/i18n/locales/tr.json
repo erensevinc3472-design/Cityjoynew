@@ -1845,7 +1845,9 @@
     "planSwapHint": "Programında olmayan, yakındaki yerler:",
     "planTomorrow": "Yarına taşı",
     "planRemove": "Programdan çıkar",
-    "localGov": "Yerel Yönetimler"
+    "localGov": "Yerel Yönetimler",
+    "mayorTitle": "{{name}} Belediye Başkanı",
+    "mayorActingTitle": "{{name}} Belediye Başkan Vekili"
   },
   "food": {
     "kinds": {

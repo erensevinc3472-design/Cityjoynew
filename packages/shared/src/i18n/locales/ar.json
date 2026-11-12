@@ -1849,7 +1849,9 @@
     "planSwapHint": "أماكن قريبة ليست في برنامجك:",
     "planTomorrow": "انقله إلى الغد",
     "planRemove": "احذفه من البرنامج",
-    "localGov": "الإدارات المحلية"
+    "localGov": "الإدارات المحلية",
+    "mayorTitle": "رئيس بلدية {{name}}",
+    "mayorActingTitle": "القائم بأعمال رئيس بلدية {{name}}"
   },
   "food": {
     "kinds": {

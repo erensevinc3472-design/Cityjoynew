@@ -1509,7 +1509,11 @@
       "storyHint": "Bir rehber anlatır gibi yaz: kim yaptırdı, o gün ne oldu, hangi rivayet anlatılır, bugün ne hissettirir. Uygulamada ilk satırlar görünür, gerisi \"Devamını oku\" ile açılır; \"Sesli dinle\" tamamını okur. {{n}} / {{max}} karakter.",
       "addScene": "Sahne ekle",
       "addHint": "Resim seçince yeni sahne eklenir."
-    }
+    },
+    "mayorPhoto": "Başkanın fotoğrafı",
+    "mayorPhotoHint": "Dikey (portre), yüzün üst kısımda olduğu bir fotoğraf en iyi görünür. Uygulamada belediyenin Başkanlarla Keşif tanıtım sayfasının en üstünde çıkar. Belediyenin resmî fotoğrafını kullanın; parti işareti olmasın.",
+    "mayorActing": "Başkan vekili (kartta \"Başkan Vekili\" yazar)",
+    "mayorOnlyHint": "Tanıtım yazısı hazır değilse slogan ve tanıtımı boş bırakıp yalnızca başkan bilgisini kaydedebilirsiniz."
   },
   "sort": {
     "column": "Sırala",

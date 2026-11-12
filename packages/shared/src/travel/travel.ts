@@ -423,6 +423,10 @@ export interface TravelMunicipal {
   /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
   cover?: Photo;
   mayorName?: string;
+  /** Başkanın fotoğrafı (Başkanlarla Keşif'te sinematik kartta ve ilçe satırında; Eren, 12 Kasım 2026). */
+  mayorPhoto?: Photo;
+  /** Başkan vekili (görevden alma, vefat vb.): kartta "Başkan Vekili" yazar. */
+  mayorActing?: boolean;
   /** Admin: seçim döneminde false (yalnızca "Belediye" görünür). */
   showMayor: boolean;
   zone?: DistrictZone;
@@ -434,7 +438,7 @@ export interface TravelMunicipal {
 }
 
 /** Belediyenin değiştirebildiği alanlar. */
-export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'mayorName' | 'cover'>;
+export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'mayorName' | 'cover' | 'mayorPhoto' | 'mayorActing'>;
 
 export const ROUTE_LIMITS = { title: 60, summary: 300, stops: 12, note: 300, tips: 6 } as const;
 
@@ -465,8 +469,10 @@ export function validateTravelLocal(x: TravelLocalInput): TravelError[] {
 
 export function validateTravelMunicipal(m: TravelMunicipalText): TravelError[] {
   const e: TravelError[] = [];
-  if (len(m.slogan) < 2 || len(m.slogan) > TRAVEL_LIMITS.tagline) e.push('tagline');
-  if (len(m.description) < 10 || len(m.description) > TRAVEL_LIMITS.description) e.push('description');
+  // Tanıtım yazısı henüz yokken yalnızca başkan bilgisi girilebilir (ikisi de boş).
+  const onlyMayor = !len(m.slogan) && !len(m.description);
+  if (!onlyMayor && (len(m.slogan) < 2 || len(m.slogan) > TRAVEL_LIMITS.tagline)) e.push('tagline');
+  if (!onlyMayor && (len(m.description) < 10 || len(m.description) > TRAVEL_LIMITS.description)) e.push('description');
   if (len(m.mayorName) > TRAVEL_LIMITS.name) e.push('name');
   if (!httpsOk(m.videoUrl)) e.push('video');
   return e;
