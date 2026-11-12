@@ -1334,6 +1334,13 @@ service cloud.firestore {
         && stamped(request.resource.data);
     }
 
+    // Pro abonelik ödemeleri (Karar Eren, 12 Kasım 2026; PROJE.md 15.2): mağaza bildirimiyle yalnızca sunucu yazar.
+    // Admin hepsini (Panel > Üyelikler ve Gelir), işletme sahibi yalnızca kendi işletmesininkileri okur.
+    match /payments/{id} {
+      allow read: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+      allow write: if false;
+    }
+
     // ---- Yetkiler (PROJE.md 6.7): admin il yöneticisi, muhtar ve moderatör verir; il yöneticisi kendi ilinde muhtar
     // ve moderatör verir, kendinde olmayan yetkiyi veremez. Admin rolü panelden verilmez (yalnızca konsol, admins).
     // Rol sınırları ortak paketteki ROLE_CAPS ile aynıdır.

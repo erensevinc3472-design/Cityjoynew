@@ -3,6 +3,16 @@
 Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterli; Claude bu listeyi günceller.
 Şifre, kart bilgisi, anahtar gibi şeyleri sohbete yazma; gerekiyorsa Claude nereye gireceğini söyler.
 
+## Pro abonelik için (yayından önce, acele yok; 12 Kasım 2026)
+
+Uygulama ve panel hazır; satın almanın gerçekten çalışması için bu hesap işleri gerekiyor. Sırası geldiğinde Claude her adımı tek tek anlatır.
+
+- [ ] **Pro fiyatı:** aylık ve yıllık kaç TL olsun? (Mağaza payı %15 düşülür.) Fiyatı mağaza panelinde sen girersin, sonra istediğin zaman oradan değiştirirsin.
+- [ ] **Ücretli uygulama sözleşmesi:** Apple Developer (App Store Connect > İş) ve Google Play Console (Ödemeler profili). Şirket/vergi ve banka bilgisi gerekir; mali müşavire danış.
+- [ ] **İki mağazada abonelik ürünü:** `cityjoy_pro_aylik` ve `cityjoy_pro_yillik` (Claude ekran ekran anlatır).
+- [ ] **RevenueCat hesabı** (revenuecat.com, ücretsiz başlangıç) ve iki mağazanın bağlanması. Anahtarları sohbete yazma; Claude nereye gireceğini söyler.
+- [ ] **Avukat:** abonelik, otomatik yenileme, iptal ve iade metinleri (mesafeli satış). **Mali müşavir:** mağaza gelirinin faturası ve kaydı.
+
 ## 1. Hemen (bugün yarın, kısa işler)
 
 - [x] **claude/blaze-kurulum birleştirme ve yüklemeler (yapıldı, 11 Kasım; Eren izin verdi, Claude yaptı):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/blaze-kurulum?expand=1

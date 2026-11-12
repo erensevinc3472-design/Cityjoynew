@@ -470,7 +470,81 @@
     "suspendedReason": "Reason: {{reason}}.",
     "suspendedUntil": "It reopens automatically on {{date}}.",
     "bannedNew": "You can't open a new business right now because a business linked to your account is suspended.",
-    "bannedUntil": "You can open one after {{date}}."
+    "bannedUntil": "You can open one after {{date}}.",
+    "membership": {
+      "title": "Membership",
+      "pro": "Pro",
+      "free": "Free",
+      "freeIntro": "Pro unlocks more photos, video, reviews, deals and featured placement.",
+      "verifyFirst": "Your business needs to be verified before you can go Pro. This button turns on once it is verified.",
+      "goPro": "Go Pro",
+      "manage": "Membership & payments",
+      "screen": "Membership & payments",
+      "renewsOn": "Renews automatically on {{date}}.",
+      "endsOn": "Ends on {{date}} (renewal off).",
+      "noEnd": "No end date",
+      "tier": "Plan level",
+      "plan": "Plan",
+      "started": "Started",
+      "renews": "Renews",
+      "ends": "Ends",
+      "source": "Paid via",
+      "sources": {
+        "app-store": "App Store",
+        "google-play": "Google Play",
+        "web": "Website",
+        "manuel": "Granted by CityJoy",
+        "kurucu-donem": "Founding business period"
+      },
+      "cancelledNote": "You cancelled your subscription. Pro stays on until {{date}}, then you move to Free.",
+      "manageStore": "Manage subscription (cancel, change plan)",
+      "restored": "Your previous purchases were checked. If a subscription was found, it will appear here in a few seconds.",
+      "history": "Payment history",
+      "noPayments": "No payments yet.",
+      "kinds": {
+        "ilk": "Purchase",
+        "yenileme": "Renewal",
+        "plan-degisti": "Plan change",
+        "iade": "Refund"
+      },
+      "invoiceNote": "Payments are taken by Apple or Google; the store emails you the receipt."
+    },
+    "proPlan": {
+      "title": "Go Pro",
+      "lead": "Make your business stand out and show customers everything.",
+      "perks": {
+        "photos": "Up to 10 photos and a photo strip in lists",
+        "video": "Intro video",
+        "details": "Detailed description",
+        "prices": "Services and prices list",
+        "reviews": "Customer reviews and rating",
+        "map": "Address and directions",
+        "deals": "5 deals at the same time",
+        "featured": "\"Sponsored\" featured placement in lists",
+        "stats": "Page statistics"
+      },
+      "plans": {
+        "aylik": "Monthly",
+        "yillik": "Yearly"
+      },
+      "periods": {
+        "aylik": "month",
+        "yillik": "year"
+      },
+      "perMonth": "{{price}} per month",
+      "buy": "Start Pro subscription",
+      "terms": "The subscription fee ({{price}} / {{period}}) is charged to your Apple ID or Google account when you confirm the purchase. It renews automatically for the same period and price unless cancelled at least 24 hours before the period ends. You can manage and cancel it in your store account settings or on the \"Membership & payments\" screen.",
+      "restore": "Restore purchases",
+      "restoreError": "Purchases could not be restored. Check your connection and try again.",
+      "buyError": "The purchase could not be completed. You were not charged; you can try again.",
+      "activating": "Payment received, turning on your Pro membership…",
+      "done": "Your Pro membership is on. You can use Pro features on your business page.",
+      "late": "Payment received. Your Pro membership will turn on within a few minutes; if it does not, tap \"Restore purchases\".",
+      "restoreLate": "Your previous purchases were checked. No active Pro subscription was found.",
+      "soon": "The Pro subscription will be available here very soon.",
+      "noOffers": "Pro plans could not be loaded right now. Try again in a moment.",
+      "back": "Back to my business"
+    }
   },
   "reviews": {
     "title": "Reviews",

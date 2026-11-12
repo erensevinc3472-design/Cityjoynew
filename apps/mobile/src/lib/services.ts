@@ -12,6 +12,7 @@ import {
   createFirestoreCommunityRepository,
   createHolidayRepository,
   createSponsorRepository,
+  createOwnerPayments,
   createFirestoreTravelRepository,
   createFirestorePostRepository,
   createFirestoreSocialRepository,
@@ -84,6 +85,7 @@ export const communityRepository = createFirestoreCommunityRepository(firestore)
 /** Seyahat > Planla: tatil fikirlerinin konaklama tesisleri ve ekip düzenlemesi. */
 export const holidayRepository = createHolidayRepository(firestore);
 export const sponsorRepository = createSponsorRepository(firestore);
+export const ownerPayments = createOwnerPayments(firestore);
 export const pushTokenRepository = createFirestorePushTokenRepository(firestore);
 /** Benim Şehrim sabit bilgileri: il başına özet tek okuma, bölüm yalnızca değişince indirilir. */
 export const cityGuide = createCityGuideStore(createFirestoreCityGuideRepository(firestore), deviceStorage);

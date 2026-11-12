@@ -30,6 +30,7 @@ import { ContestsPage, PollsPage } from './pages/community-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { LimitsPage } from './pages/limits-page';
 import { BillingPage } from './pages/billing-page';
+import { MembershipsPage } from './pages/memberships-page';
 import { NotificationsPage } from './pages/notifications-page';
 import { TodayPage } from './pages/today-page';
 import { StatsPage } from './pages/stats-page';
@@ -75,6 +76,7 @@ const router = createHashRouter([
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
       { path: 'sinirlar', element: <LimitsPage /> },
       { path: 'harcama', element: <BillingPage /> },
+      { path: 'uyelikler', element: <MembershipsPage /> },
       { path: 'bildirimler', element: <NotificationsPage /> },
       { path: 'onaylar', element: <ApprovalsPage /> },
       { path: 'duyurular', element: <AnnouncementsPage /> },

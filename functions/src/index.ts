@@ -2,6 +2,7 @@
  * CityJoy sunucu işlevleri (Firebase Cloud Functions; Blaze plan ister). İş mantığı ayrı dosyalarda, burada yalnızca
  * tetikleyiciler var; testler mantığı emülatördeki veritabanıyla doğrudan çağırır.
  */
+import { timingSafeEqual } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
@@ -9,7 +10,8 @@ import { getStorage } from 'firebase-admin/storage';
 import * as functionsV1 from 'firebase-functions/v1';
 import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from 'firebase-functions/v2/firestore';
-import { HttpsError, onCall } from 'firebase-functions/v2/https';
+import { defineSecret } from 'firebase-functions/params';
+import { HttpsError, onCall, onRequest } from 'firebase-functions/v2/https';
 import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { onObjectFinalized } from 'firebase-functions/v2/storage';
@@ -21,6 +23,7 @@ import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
 import { expoSender } from './push';
+import { expireMemberships, handleStoreEvent, revenueCatState } from './memberships';
 import { handleFollowWrite, handleMessageCreate } from './social';
 import { handleLift, handleSuspend, liftExpiredSuspensions, SuspensionError, type AccountSwitch } from './suspensions';
 import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensions } from './business-suspensions';
@@ -131,6 +134,7 @@ export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 
   await deleteExpiredSos(db, now);
   await deleteExpiredPushLog(db, now);
   await deleteOldTranslations(db, now);
+  await expireMemberships(db, now);
 });
 
 // Hesap askıya alma (yalnızca admin, panelden): giriş kapanır, açık oturumlar düşer.
@@ -212,3 +216,27 @@ export const userDeleted = functionsV1
   .region(REGION)
   .auth.user()
   .onDelete((user) => deleteUserLeftovers(db, user.uid, deleteFiles));
+
+// Pro abonelik (Karar Eren, 12 Kasım 2026; PROJE.md 15.2): satın alma servisi (RevenueCat) her mağaza olayında buraya
+// bildirir. Gizli bilgiler Secret Manager'da: REVENUECAT_WEBHOOK_AUTH (servis panelinde webhook'a yazılan
+// "Authorization" değeri) ve REVENUECAT_API_KEY (servisin gizli API anahtarı). Koda ve repoya konmaz.
+const storeWebhookAuth = defineSecret('REVENUECAT_WEBHOOK_AUTH');
+const storeApiKey = defineSecret('REVENUECAT_API_KEY');
+export const storeEvents = onRequest({ secrets: [storeWebhookAuth, storeApiKey], maxInstances: 2 }, async (req, res) => {
+  const expected = storeWebhookAuth.value();
+  const given = String(req.get('authorization') ?? '');
+  const a = Buffer.from(given);
+  const b = Buffer.from(expected);
+  if (req.method !== 'POST' || !expected || a.length !== b.length || !timingSafeEqual(a, b)) {
+    res.status(401).send('yetkisiz');
+    return;
+  }
+  try {
+    await handleStoreEvent(db, req.body, { fetchState: revenueCatState(storeApiKey.value()), now: new Date() });
+    res.status(200).send('ok');
+  } catch (e) {
+    console.error('storeEvents', e);
+    // 5xx: servis bildirimi sonra yeniden dener.
+    res.status(500).send('hata');
+  }
+});

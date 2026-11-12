@@ -29,7 +29,7 @@ import {
   type VerificationStatus,
 } from '../business/business';
 import { photoFrom, type Photo } from '../media/photo';
-import { toTier, type MembershipTier } from '../models/membership';
+import { toTier, type BusinessMembership, type MembershipSource, type MembershipTier } from '../models/membership';
 import type { Action, Module } from '../permissions/types';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { deleteVerificationRequest } from './approvals';
@@ -42,12 +42,25 @@ const nameKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.businessKeys);
 
 const iso = (v: unknown): string | undefined => (v instanceof Timestamp ? v.toDate().toISOString() : undefined);
 
+/** Üyelik alanı; mağaza aboneliğinin ayrıntıları (plan, yenileme, kaynak) sunucunun yazdığı biçimde okunur. */
+export function membershipFrom(m: DocumentData | undefined): BusinessMembership {
+  const plan = m?.plan === 'aylik' || m?.plan === 'yillik' ? m.plan : undefined;
+  return {
+    tier: toTier(m?.tier),
+    ...(iso(m?.endsAt) ? { endsAt: iso(m!.endsAt) } : {}),
+    ...(iso(m?.startedAt) ? { startedAt: iso(m!.startedAt) } : {}),
+    ...(typeof m?.autoRenew === 'boolean' ? { autoRenew: m.autoRenew } : {}),
+    ...(typeof m?.source === 'string' ? { source: m.source as MembershipSource } : {}),
+    ...(plan ? { plan } : {}),
+  };
+}
+
 function fromDoc(id: string, d: DocumentData): Business {
   return {
     ...(d as Business),
     id,
     verification: { status: d.verification?.status ?? 'dogrulanmadi', ...(iso(d.verification?.verifiedAt) ? { verifiedAt: iso(d.verification.verifiedAt) } : {}) },
-    membership: { tier: toTier(d.membership?.tier), ...(iso(d.membership?.endsAt) ? { endsAt: iso(d.membership.endsAt) } : {}) },
+    membership: membershipFrom(d.membership),
     featuredUntil: iso(d.featuredUntil),
     rating: { sum: d.rating?.sum ?? 0, count: d.rating?.count ?? 0 },
     followerCount: d.followerCount ?? 0,
@@ -276,7 +289,7 @@ export function createBusinessAdmin(db: Firestore, actorUid: string) {
       change(b, { status: removed ? 'kaldirildi' : 'yayinda' }, removed ? 'sil' : 'duzenle', removed ? 'Yayından kaldırıldı' : 'Yeniden yayına alındı'),
 
     setTier: (b: Business, tier: MembershipTier, endsAt?: Date) =>
-      change(b, { membership: endsAt && tier !== 'ucretsiz' ? { tier, endsAt: Timestamp.fromDate(endsAt) } : { tier } }, 'duzenle', `Üyelik kademesi: ${tier}`),
+      change(b, { membership: endsAt && tier !== 'ucretsiz' ? { tier, endsAt: Timestamp.fromDate(endsAt), source: 'manuel' } : { tier } }, 'duzenle', `Üyelik kademesi: ${tier}`),
 
     /** Yetkiliyi işletmeden çıkarır (kötüye kullanım, sahibinin talebi). */
     removeManager: (b: Business, uid: string) => {

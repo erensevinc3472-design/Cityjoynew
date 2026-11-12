@@ -30,6 +30,7 @@ import { AppText } from '@/components/app-text';
 import { BusinessManagers } from '@/components/business-managers';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
+import { MembershipSection } from '@/components/membership-section';
 import { MediaPicker } from '@/components/media-picker';
 import { OptionRow } from '@/components/option-row';
 import { CategoryPicker, FoodKindPicker, IconChipPicker, RegionPicker } from '@/components/pickers';
@@ -364,6 +365,7 @@ export default function EditBusinessScreen() {
       {existing && isOwner && !removed ? <BusinessManagers business={existing} onSaved={(managers) => setExisting({ ...existing, managers })} /> : null}
       {existing && !isOwner ? <LeaveManaged businessId={existing.id} uid={user.uid} /> : null}
       {existing && isOwner && !removed ? <VerificationSection business={existing} uid={user.uid} /> : <AppText variant="caption" muted>{t('business.myVerifyNote')}</AppText>}
+      {existing && isOwner && !removed ? <MembershipSection business={existing} /> : null}
 
       {existing && isOwner && !removed ? (
         <AppButton

@@ -1,5 +1,5 @@
 import { cleanPhoto, type Photo } from '../media/photo';
-import type { MembershipTier } from '../models/membership';
+import type { BusinessMembership, MembershipTier } from '../models/membership';
 import { isReservedName } from '../organizations/municipalities';
 import { cleanLodging, validateLodging, type LodgingInfo } from '../travel/holiday';
 
@@ -222,7 +222,7 @@ export interface Business extends BusinessInput {
   ownerUid: string;
   status: BusinessStatus;
   verification: { status: VerificationStatus; verifiedAt?: string };
-  membership: { tier: MembershipTier; endsAt?: string };
+  membership: BusinessMembership;
   /** Ücretli öne çıkma bitişi (ISO); kartta "Reklam" etiketi çıkar. */
   featuredUntil?: string;
   /** Yayındaki değerlendirmelerin yıldız toplamı ve sayısı; ortalama hesaplanır (kurallar toplamı denetler). */

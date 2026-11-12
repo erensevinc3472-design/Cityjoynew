@@ -470,7 +470,81 @@
     "suspendedReason": "Grund: {{reason}}.",
     "suspendedUntil": "Es wird am {{date}} automatisch wieder freigegeben.",
     "bannedNew": "Du kannst derzeit kein neues Unternehmen eröffnen, weil ein mit deinem Konto verbundenes Unternehmen gesperrt ist.",
-    "bannedUntil": "Ab dem {{date}} ist es wieder möglich."
+    "bannedUntil": "Ab dem {{date}} ist es wieder möglich.",
+    "membership": {
+      "title": "Mitgliedschaft",
+      "pro": "Pro",
+      "free": "Kostenlos",
+      "freeIntro": "Pro schaltet mehr Fotos, Video, Bewertungen, Angebote und Hervorhebung frei.",
+      "verifyFirst": "Dein Unternehmen muss zuerst verifiziert werden, bevor du zu Pro wechseln kannst. Danach wird diese Schaltfläche aktiv.",
+      "goPro": "Zu Pro wechseln",
+      "manage": "Mitgliedschaft & Zahlungen",
+      "screen": "Mitgliedschaft & Zahlungen",
+      "renewsOn": "Verlängert sich automatisch am {{date}}.",
+      "endsOn": "Endet am {{date}} (Verlängerung aus).",
+      "noEnd": "Unbefristet",
+      "tier": "Stufe",
+      "plan": "Tarif",
+      "started": "Beginn",
+      "renews": "Verlängerung",
+      "ends": "Ende",
+      "source": "Bezahlt über",
+      "sources": {
+        "app-store": "App Store",
+        "google-play": "Google Play",
+        "web": "Website",
+        "manuel": "Von CityJoy vergeben",
+        "kurucu-donem": "Gründungsphase"
+      },
+      "cancelledNote": "Du hast dein Abo gekündigt. Pro bleibt bis {{date}} aktiv, danach wechselst du zu Kostenlos.",
+      "manageStore": "Abo verwalten (kündigen, Tarif ändern)",
+      "restored": "Deine früheren Käufe wurden geprüft. Wenn ein Abo gefunden wurde, erscheint es in wenigen Sekunden hier.",
+      "history": "Zahlungsverlauf",
+      "noPayments": "Noch keine Zahlungen.",
+      "kinds": {
+        "ilk": "Kauf",
+        "yenileme": "Verlängerung",
+        "plan-degisti": "Tarifwechsel",
+        "iade": "Erstattung"
+      },
+      "invoiceNote": "Die Zahlung erfolgt über Apple oder Google; der Store schickt dir den Beleg per E-Mail."
+    },
+    "proPlan": {
+      "title": "Zu Pro wechseln",
+      "lead": "Hebe dein Unternehmen hervor und zeige deinen Kunden alles.",
+      "perks": {
+        "photos": "Bis zu 10 Fotos und Fotoleiste in Listen",
+        "video": "Vorstellungsvideo",
+        "details": "Ausführliche Beschreibung",
+        "prices": "Leistungen und Preise",
+        "reviews": "Kundenbewertungen und Punkte",
+        "map": "Adresse und Wegbeschreibung",
+        "deals": "5 Angebote gleichzeitig",
+        "featured": "„Gesponsert“-Hervorhebung in Listen",
+        "stats": "Seitenstatistiken"
+      },
+      "plans": {
+        "aylik": "Monatlich",
+        "yillik": "Jährlich"
+      },
+      "periods": {
+        "aylik": "Monat",
+        "yillik": "Jahr"
+      },
+      "perMonth": "{{price}} pro Monat",
+      "buy": "Pro-Abo starten",
+      "terms": "Die Abogebühr ({{price}} / {{period}}) wird bei Bestätigung des Kaufs deiner Apple-ID oder deinem Google-Konto belastet. Das Abo verlängert sich automatisch zum gleichen Zeitraum und Preis, sofern es nicht mindestens 24 Stunden vor Ablauf gekündigt wird. Du kannst es in den Kontoeinstellungen des Stores oder unter „Mitgliedschaft & Zahlungen“ verwalten und kündigen.",
+      "restore": "Käufe wiederherstellen",
+      "restoreError": "Käufe konnten nicht wiederhergestellt werden. Prüfe deine Verbindung und versuche es erneut.",
+      "buyError": "Der Kauf konnte nicht abgeschlossen werden. Es wurde nichts berechnet; du kannst es erneut versuchen.",
+      "activating": "Zahlung erhalten, deine Pro-Mitgliedschaft wird aktiviert…",
+      "done": "Deine Pro-Mitgliedschaft ist aktiv. Du kannst die Pro-Funktionen auf deiner Unternehmensseite nutzen.",
+      "late": "Zahlung erhalten. Deine Pro-Mitgliedschaft wird in wenigen Minuten aktiv; falls nicht, tippe auf „Käufe wiederherstellen“.",
+      "restoreLate": "Deine früheren Käufe wurden geprüft. Es wurde kein aktives Pro-Abo gefunden.",
+      "soon": "Das Pro-Abo ist hier bald erhältlich.",
+      "noOffers": "Die Pro-Tarife konnten gerade nicht geladen werden. Versuche es gleich noch einmal.",
+      "back": "Zurück zu meinem Unternehmen"
+    }
   },
   "reviews": {
     "title": "Bewertungen",

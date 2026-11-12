@@ -73,6 +73,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
     items: [
       { key: 'istatistikler', show: (u) => canSeeStats(u), path: '/istatistikler', icon: 'chart' },
       { key: 'kitle', show: (u) => canSeeAudience(u, isAdminUser(u)), path: '/takipciler', icon: 'users' },
+      { key: 'uyelikler', show: admin, path: '/uyelikler', icon: 'badge' },
       { key: 'harcama', show: admin, path: '/harcama', icon: 'gauge' },
       { key: 'islem-kayitlari', module: 'islem-kayitlari', path: '/islem-kayitlari', icon: 'file' },
     ],

@@ -14,6 +14,7 @@ import { handleFollowWrite, handleMessageCreate } from '../src/social';
 import { handleLift, handleSuspend, liftExpiredSuspensions } from '../src/suspensions';
 import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensions } from '../src/business-suspensions';
 import { handleThumb, type ThumbStore } from '../src/thumbs';
+import { expireMemberships, handleStoreEvent, type ProState } from '../src/memberships';
 import sharp from 'sharp';
 import { deleteOldTranslations, handleTranslate, translationId, type Translator } from '../src/translate';
 
@@ -701,5 +702,58 @@ describe('işletme askıya alma', () => {
     await db.doc('businesses/b2').set({ name: 'Eski', ownerUid: 'V', status: 'kaldirildi', location: { provinceCode: '16', districtId: 'x' } });
     await handleBusinessLift(db, 'A', 'b2', NOW);
     expect((await db.doc('businesses/b2').get()).get('status')).toBe('yayinda');
+  });
+});
+
+describe('Pro abonelik', () => {
+  const biz = { name: 'Usta Fırın', ownerUid: 'sahip', location: { provinceCode: '16', districtId: 'nilufer' }, verification: { status: 'dogrulandi' }, membership: { tier: 'ucretsiz' } };
+  const pro: ProState = { expiresAt: new Date('2026-12-01T09:00:00Z'), startedAt: NOW, productId: 'cityjoy_pro_aylik', store: 'app-store', autoRenew: true };
+  const event = (over: Record<string, unknown> = {}) => ({
+    event: { id: 'olay-1', type: 'INITIAL_PURCHASE', app_user_id: 'biz_b1', product_id: 'cityjoy_pro_aylik', store: 'APP_STORE', environment: 'PRODUCTION', purchased_at_ms: NOW.getTime(), price: 9.99, price_in_purchased_currency: 349.99, currency: 'TRY', takehome_percentage: 0.85, ...over },
+  });
+
+  it('satın alınca işletme Pro olur, ödeme bir kez kaydedilir, işlem kaydı düşer', async () => {
+    await db.doc('businesses/b1').set(biz);
+    const deps = { fetchState: async () => pro, now: NOW };
+    expect(await handleStoreEvent(db, event(), deps)).toEqual({ synced: 1, payment: true });
+    await handleStoreEvent(db, event(), deps); // aynı bildirim ikinci kez
+    const m = (await db.doc('businesses/b1').get()).get('membership');
+    expect(m.tier).toBe('pro');
+    expect(m.plan).toBe('aylik');
+    expect(m.autoRenew).toBe(true);
+    expect(m.endsAt.toDate()).toEqual(pro.expiresAt);
+    const pays = await db.collection('payments').get();
+    expect(pays.size).toBe(1);
+    expect(pays.docs[0].data()).toMatchObject({ businessId: 'b1', ownerUid: 'sahip', amount: 349.99, currency: 'TRY', kind: 'ilk', plan: 'aylik', sandbox: false, provinceCode: '16' });
+    expect((await db.collection('auditLog').get()).size).toBe(1);
+  });
+
+  it('iptal edince süre sonuna kadar Pro sürer, yenileme kapanır; süre bitince Ücretsiz', async () => {
+    await db.doc('businesses/b1').set(biz);
+    await handleStoreEvent(db, event({ type: 'CANCELLATION', cancel_reason: 'UNSUBSCRIBE' }), { fetchState: async () => ({ ...pro, autoRenew: false }), now: NOW });
+    let m = (await db.doc('businesses/b1').get()).get('membership');
+    expect(m).toMatchObject({ tier: 'pro', autoRenew: false });
+    expect((await db.collection('payments').get()).size).toBe(0);
+    await handleStoreEvent(db, event({ id: 'olay-2', type: 'EXPIRATION' }), { fetchState: async () => ({ ...pro, expiresAt: new Date('2026-10-01T00:00:00Z') }), now: NOW });
+    m = (await db.doc('businesses/b1').get()).get('membership');
+    expect(m.tier).toBe('ucretsiz');
+  });
+
+  it('başka ürün, test bildirimi ve işletme olmayan kimlik yok sayılır; elle verilen Pro korunur', async () => {
+    await db.doc('businesses/b1').set({ ...biz, membership: { tier: 'pro', source: 'manuel', endsAt: Timestamp.fromDate(new Date('2026-12-01')) } });
+    const none = { fetchState: async () => null, now: NOW };
+    expect(await handleStoreEvent(db, event({ product_id: 'baska_urun' }), none)).toEqual({ synced: 0, payment: false });
+    expect(await handleStoreEvent(db, { event: { type: 'TEST' } }, none)).toEqual({ synced: 0, payment: false });
+    expect(await handleStoreEvent(db, event({ app_user_id: 'kisi-123' }), none)).toEqual({ synced: 0, payment: false });
+    await handleStoreEvent(db, event({ type: 'EXPIRATION' }), none);
+    expect((await db.doc('businesses/b1').get()).get('membership.tier')).toBe('pro');
+  });
+
+  it('günlük denetim süresi bir günden fazla geçen Pro üyeliği indirir', async () => {
+    await db.doc('businesses/eski').set({ ...biz, membership: { tier: 'pro', endsAt: Timestamp.fromDate(new Date('2026-10-30T00:00:00Z')) } });
+    await db.doc('businesses/yeni').set({ ...biz, membership: { tier: 'pro', endsAt: Timestamp.fromDate(new Date('2026-10-31T20:00:00Z')) } });
+    expect(await expireMemberships(db, NOW)).toBe(1);
+    expect((await db.doc('businesses/eski').get()).get('membership.tier')).toBe('ucretsiz');
+    expect((await db.doc('businesses/yeni').get()).get('membership.tier')).toBe('pro');
   });
 });

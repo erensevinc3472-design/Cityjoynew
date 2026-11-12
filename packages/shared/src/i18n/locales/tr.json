@@ -470,7 +470,81 @@
     "suspendedReason": "Sebep: {{reason}}.",
     "suspendedUntil": "{{date}} tarihinde kendiliğinden açılır.",
     "bannedNew": "Hesabına bağlı bir işletme askıda olduğu için şu an yeni işletme açamazsın.",
-    "bannedUntil": "{{date}} tarihinden sonra açabilirsin."
+    "bannedUntil": "{{date}} tarihinden sonra açabilirsin.",
+    "membership": {
+      "title": "Üyelik",
+      "pro": "Pro",
+      "free": "Ücretsiz",
+      "freeIntro": "Pro ile daha çok fotoğraf, video, yorumlar, fırsatlar ve öne çıkma hakkı açılır.",
+      "verifyFirst": "Pro'ya geçmek için önce işletmeni doğrulatman gerekiyor. Doğrulanınca bu düğme açılır.",
+      "goPro": "Pro'ya geç",
+      "manage": "Üyelik ve Ödemeler",
+      "screen": "Üyelik ve Ödemeler",
+      "renewsOn": "{{date}} tarihinde kendiliğinden yenilenir.",
+      "endsOn": "{{date}} tarihinde biter (yenileme kapalı).",
+      "noEnd": "Süresiz",
+      "tier": "Kademe",
+      "plan": "Plan",
+      "started": "Başlangıç",
+      "renews": "Yenilenme",
+      "ends": "Bitiş",
+      "source": "Ödeme yeri",
+      "sources": {
+        "app-store": "App Store",
+        "google-play": "Google Play",
+        "web": "İnternet sitesi",
+        "manuel": "CityJoy tarafından verildi",
+        "kurucu-donem": "Kurucu işletme dönemi"
+      },
+      "cancelledNote": "Aboneliğini iptal ettin. Pro {{date}} tarihine kadar sürer, sonra Ücretsiz üyeliğe geçersin.",
+      "manageStore": "Aboneliği yönet (iptal, plan değiştir)",
+      "restored": "Önceki satın almaların kontrol edildi. Bir abonelik bulunduysa birkaç saniye içinde burada görünür.",
+      "history": "Ödeme geçmişi",
+      "noPayments": "Henüz ödeme yok.",
+      "kinds": {
+        "ilk": "Satın alma",
+        "yenileme": "Yenileme",
+        "plan-degisti": "Plan değişikliği",
+        "iade": "İade"
+      },
+      "invoiceNote": "Ödeme Apple ya da Google üzerinden alınır; makbuzu mağaza e-postayla gönderir."
+    },
+    "proPlan": {
+      "title": "Pro'ya geç",
+      "lead": "İşletmeni öne çıkar, müşterilerine her şeyi göster.",
+      "perks": {
+        "photos": "En çok 10 fotoğraf ve listede fotoğraf şeridi",
+        "video": "Tanıtım videosu",
+        "details": "Detaylı tanıtım yazısı",
+        "prices": "Hizmetler ve ücretler listesi",
+        "reviews": "Müşteri yorumları ve puan",
+        "map": "Adres ve yol tarifi",
+        "deals": "Aynı anda 5 fırsat",
+        "featured": "Listelerde \"Sponsorlu\" öne çıkma hakkı",
+        "stats": "Sayfa istatistikleri"
+      },
+      "plans": {
+        "aylik": "Aylık",
+        "yillik": "Yıllık"
+      },
+      "periods": {
+        "aylik": "ay",
+        "yillik": "yıl"
+      },
+      "perMonth": "Aylık {{price}}",
+      "buy": "Pro aboneliği başlat",
+      "terms": "Abonelik ücreti ({{price}} / {{period}}) satın almayı onaylayınca Apple Kimliğine ya da Google hesabına yansır. Dönem bitmeden en az 24 saat önce iptal edilmezse aynı süre ve ücretle kendiliğinden yenilenir. Aboneliğini mağaza hesap ayarlarından ya da \"Üyelik ve Ödemeler\" ekranından yönetebilir ve iptal edebilirsin.",
+      "restore": "Satın almayı geri yükle",
+      "restoreError": "Satın almalar geri yüklenemedi. Bağlantını kontrol edip tekrar dene.",
+      "buyError": "Satın alma tamamlanamadı. Ücret alınmadı; tekrar deneyebilirsin.",
+      "activating": "Ödemen alındı, Pro üyeliğin açılıyor…",
+      "done": "Pro üyeliğin açık. Pro özellikleri işletme sayfanda kullanabilirsin.",
+      "late": "Ödemen alındı. Pro üyeliğin birkaç dakika içinde açılır; açılmazsa \"Satın almayı geri yükle\"ye dokun.",
+      "restoreLate": "Önceki satın almaların kontrol edildi. Etkin bir Pro aboneliği bulunmadı.",
+      "soon": "Pro aboneliği çok yakında burada satın alınabilecek.",
+      "noOffers": "Pro planları şu an yüklenemedi. Biraz sonra tekrar dene.",
+      "back": "İşletmeme dön"
+    }
   },
   "reviews": {
     "title": "Değerlendirmeler",
