@@ -3,23 +3,11 @@ import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import type { Photo } from '@cityjoy/shared';
 
-import { useTravelCity } from '@/lib/travel';
-import { useUserLocation } from '@/lib/user-location';
 import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 import { ThumbImage } from './thumb-image';
 
 /**
- * Kullanıcının ilinin kapak fotoğrafı (Seyahat panelinde ile yüklenen kapak). Önbellekten gelir; Benim Şehrim ana
- * sayfası zaten okuduğu için alt sayfalarda ek okuma olmaz. Fotoğraf yoksa `undefined`.
- */
-export function useProvinceCover(): Pick<Photo, 'url' | 'path'> | undefined {
-  const { location } = useUserLocation();
-  const { value } = useTravelCity(location?.provinceCode);
-  return value?.cover ?? undefined;
-}
-
-/**
- * Sayfanın tepesinde il fotoğrafı (Eren'in tasarım örnekleri, 8 Kasım 2026): üstte başlık okunsun diye koyulaşır,
+ * Sayfanın tepesinde il fotoğrafı (Eren'in tasarım örnekleri, 8 Kasım 2026). 12 Kasım: Benim Şehrim alt sayfalarından kaldırıldı (Eren: "en tepede arka planda resme gerek yok"); yalnızca Seyahat sayfalarında kalır: üstte başlık okunsun diye koyulaşır,
  * altta sayfa zeminine erir. Dokunmaları engellemez.
  */
 export function CoverBackdrop({ photo, height }: { photo: Pick<Photo, 'url' | 'path'>; height: number }) {

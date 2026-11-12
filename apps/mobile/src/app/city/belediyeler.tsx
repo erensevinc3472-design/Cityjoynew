@@ -6,7 +6,6 @@ import { listMunicipalities, municipalityIdsFor, normalizeName, type Municipalit
 
 import { AppText } from '@/components/app-text';
 import { GlassRow, KURUMLAR_ART, PhotoCard, SectionHeading, TOWNHALL_ART } from '@/components/city-tiles';
-import { useProvinceCover } from '@/components/city-cover';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
@@ -30,7 +29,6 @@ const FREQUENT = [
 
 export default function MunicipalitiesScreen() {
   const { t } = useTranslation();
-  const cover = useProvinceCover();
   const bottom = usePageBottom();
   const router = useRouter();
   const { location } = useUserLocation();
@@ -70,7 +68,7 @@ export default function MunicipalitiesScreen() {
   const toGuide = () => router.push({ pathname: '/city/[section]', params: { section: 'belediye-hizmetleri' } });
 
   const header = (
-    <PageHead cover={cover}
+    <PageHead
       title={t('city.townhall')}
       subtitle={t('city.townhallIntro')}
       onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}
@@ -78,7 +76,7 @@ export default function MunicipalitiesScreen() {
   );
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
         {header}
         <SearchField value={query} onChangeText={setQuery} placeholder={t('city.townhallSearch')} />

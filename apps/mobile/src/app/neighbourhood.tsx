@@ -14,7 +14,6 @@ import {
 import { AnnouncementCard } from '@/components/announcement-card';
 import { AppText } from '@/components/app-text';
 import { frost, PillButton } from '@/components/city-hub';
-import { useProvinceCover } from '@/components/city-cover';
 import { EventCard } from '@/components/event-card';
 import { FrostFill } from '@/components/glass';
 import { OfficialProfileCard } from '@/components/official-profile-card';
@@ -61,7 +60,6 @@ export default function NeighbourhoodScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const dark = useResolvedScheme() === 'dark';
-  const cover = useProvinceCover();
   const bottom = usePageBottom();
   const { rtl } = useSettings();
   const { location } = useUserLocation();
@@ -97,9 +95,9 @@ export default function NeighbourhoodScreen() {
 
   if (!nb) {
     return (
-      <Screen bleed cover={cover}>
+      <Screen bleed>
         <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]}>
-          <PageHead cover={cover} extend={40} title={t('neighbourhood.title')} subtitle={place || undefined} onBack={back} />
+          <PageHead extend={40} title={t('neighbourhood.title')} subtitle={place || undefined} onBack={back} />
           <StateMessage kind="empty" message={t('neighbourhood.needNeighbourhood')} />
           <PillButton gold icon="edit-location-alt" label={t('home.changeLocation')} onPress={changePlace} />
         </ScrollView>
@@ -223,9 +221,9 @@ export default function NeighbourhoodScreen() {
   );
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
-        <PageHead cover={cover} extend={60} title={t('neighbourhood.title')} subtitle={subtitle} onBack={back} />
+        <PageHead extend={60} title={t('neighbourhood.title')} subtitle={subtitle} onBack={back} />
 
         <View style={styles.tiles}>
           {tile('muhtar', 'person-outline', t('neighbourhood.muhtarlik'), () => toggle('muhtar'), open === 'muhtar')}

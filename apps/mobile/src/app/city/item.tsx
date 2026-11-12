@@ -18,7 +18,6 @@ import {
 
 import { AppText } from '@/components/app-text';
 import { frost, PillButton } from '@/components/city-hub';
-import { useProvinceCover } from '@/components/city-cover';
 import { FrostFill } from '@/components/glass';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
@@ -76,7 +75,6 @@ export default function CityItemScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const dark = useResolvedScheme() === 'dark';
-  const cover = useProvinceCover();
   const bottom = usePageBottom();
   const { section, id } = useLocalSearchParams<{ section: CityGuideSectionId; id: string }>();
   const { language, rtl } = useSettings();
@@ -97,9 +95,9 @@ export default function CityItemScreen() {
 
   if (!item) {
     return (
-      <Screen bleed cover={cover}>
+      <Screen bleed>
         <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]}>
-          <PageHead cover={cover} title={def ? (def.names[lang] ?? def.names.tr) : ''} onBack={back} />
+          <PageHead title={def ? (def.names[lang] ?? def.names.tr) : ''} onBack={back} />
           {error ? <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} /> : items === null ? <StateMessage kind="loading" /> : <StateMessage kind="empty" message={t('city.notFound')} />}
         </ScrollView>
       </Screen>
@@ -136,9 +134,9 @@ export default function CityItemScreen() {
   const card = [styles.card, frost(dark, c.surface, c.border)];
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
-        <PageHead cover={cover} title={item.name} subtitle={place || undefined} onBack={back} extend={40} />
+        <PageHead title={item.name} subtitle={place || undefined} onBack={back} extend={40} />
 
         {kind ? (
           <View style={[styles.kind, { borderColor: dark ? 'rgba(226, 178, 119, 0.45)' : c.border, backgroundColor: dark ? 'rgba(226, 178, 119, 0.10)' : c.accentSoft }]}>

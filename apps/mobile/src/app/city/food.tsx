@@ -8,7 +8,6 @@ import { averageRating, FOOD_KINDS, openState, rankBusinesses, type Business } f
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BusinessCard } from '@/components/business-card';
-import { useProvinceCover } from '@/components/city-cover';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { FilterChip, FilterRow } from '@/components/inner';
 import { Screen } from '@/components/screen';
@@ -28,7 +27,6 @@ import { useThemeColors } from '@/theme/use-theme';
  */
 export default function CityFoodScreen() {
   const { t } = useTranslation();
-  const cover = useProvinceCover();
   const bottom = usePageBottom();
   const router = useRouter();
   const c = useThemeColors();
@@ -73,10 +71,10 @@ export default function CityFoodScreen() {
   }, [all]);
   const total = ranked.featured.length + ranked.others.length;
 
-  const header = <PageHead cover={cover} title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
+  const header = <PageHead title={t('city.tiles.cafe')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
         {header}
         {!provinceCode ? (

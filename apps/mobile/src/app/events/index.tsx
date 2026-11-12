@@ -7,7 +7,6 @@ import { EVENT_CATEGORIES, type CityEvent, type EventCategory } from '@cityjoy/s
 
 import { AppText } from '@/components/app-text';
 import { PillButton } from '@/components/city-hub';
-import { useProvinceCover } from '@/components/city-cover';
 import { EventCard, eventDateRange } from '@/components/event-card';
 import { FilterChip } from '@/components/inner';
 import { BLEED_STRIP, BLEED_STRIP_CONTENT, PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
@@ -43,7 +42,6 @@ export default function EventsScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const dark = useResolvedScheme() === 'dark';
-  const cover = useProvinceCover();
   const bottom = usePageBottom();
   const { language } = useSettings();
   const lang = language ?? 'tr';
@@ -75,12 +73,12 @@ export default function EventsScreen() {
   const featured = (regional ?? []).filter((e) => e.cover && e.status !== 'iptal').slice(0, MAX_FEATURED);
 
   const head = (
-    <PageHead cover={cover} extend={featured.length ? 24 : 60} title={t('events.title')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/social'))} />
+    <PageHead extend={featured.length ? 24 : 60} title={t('events.title')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/social'))} />
   );
 
   if (!location) {
     return (
-      <Screen bleed cover={cover}>
+      <Screen bleed>
         <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]}>
           {head}
           <StateMessage kind="empty" message={t('events.needLocation')} />
@@ -91,7 +89,7 @@ export default function EventsScreen() {
   }
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView
         contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]}
         showsVerticalScrollIndicator={false}

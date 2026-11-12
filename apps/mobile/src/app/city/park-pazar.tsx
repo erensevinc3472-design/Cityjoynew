@@ -6,7 +6,6 @@ import type { CityGuideSectionId } from '@cityjoy/shared';
 
 import { PhotoCard } from '@/components/city-tiles';
 import { CityGuideList } from '@/components/city-guide-list';
-import { useProvinceCover } from '@/components/city-cover';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { useCityGuideMeta } from '@/lib/city-guide';
@@ -19,7 +18,6 @@ const MARKET = { icon: 'storefront', colors: ['#FFB25C', '#EE5A24'] } as const;
 /** Park ve Pazar (tasarım: park-pazar.html): tek ekran, iki sekme; pazarlarda gün seçimi. */
 export default function ParkMarketScreen() {
   const { t } = useTranslation();
-  const cover = useProvinceCover();
   const router = useRouter();
   const bottom = usePageBottom();
   const { location } = useUserLocation();
@@ -49,14 +47,14 @@ export default function ParkMarketScreen() {
   );
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <CityGuideList
         key={tab}
         section={tab}
         look={tab === 'parklar' ? LOOK.parkPazar : MARKET}
         contentStyle={[PAGE_CONTENT, { paddingBottom: bottom }]}
         header={
-          <PageHead cover={cover} title={t('city.tiles.parkPazar')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}>
+          <PageHead title={t('city.tiles.parkPazar')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))}>
             {tabs}
           </PageHead>
         }

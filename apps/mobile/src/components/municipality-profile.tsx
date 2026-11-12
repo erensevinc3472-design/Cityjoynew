@@ -8,7 +8,6 @@ import { telUrl, type OfficialProfile } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { BottomShade, GlassRow, SectionHeading, TOWNHALL_ART, type IconName } from '@/components/city-tiles';
-import { useProvinceCover } from '@/components/city-cover';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
@@ -59,7 +58,6 @@ export function MunicipalityProfile({
   const router = useRouter();
   const c = useThemeColors();
   const bottom = usePageBottom();
-  const cover = useProvinceCover();
   const code = /^bld-(\d{2})/.exec(id)?.[1] ?? '';
   const { value: intros } = useTravelMunicipal(code);
   const intro = intros?.find((x) => x.id === id);
@@ -89,9 +87,9 @@ export function MunicipalityProfile({
   for (let i = 0; i < SERVICES.length; i += 2) pairs.push(SERVICES.slice(i, i + 2));
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
-        <PageHead cover={cover} title={t('official.title')} subtitle={place} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city/belediyeler'))} />
+        <PageHead title={t('official.title')} subtitle={place} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city/belediyeler'))} />
 
         {/* Kapak: belediyenin fotoğrafı, logo, ad, resmî hesap. */}
         <View style={[styles.hero, { borderColor: c.border }]}>
