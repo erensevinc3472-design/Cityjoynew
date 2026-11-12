@@ -236,11 +236,12 @@ service cloud.firestore {
       allow read: if true;
       function _k8(nw) {
         return isAdmin()
-        && nw.keys().hasOnly(['parentId', 'names', 'icon', 'order', 'active', 'urgent', 'updatedAt', 'updatedBy'])
+        && nw.keys().hasOnly(['parentId', 'names', 'icon', 'order', 'active', 'urgent', 'keywords', 'updatedAt', 'updatedBy'])
         && validLocalized(nw.names)
         && nw.icon is string && nw.icon.size() <= 40
         && nw.order is int && nw.active is bool
         && (!('urgent' in nw) || nw.urgent is bool)
+        && (!('keywords' in nw) || (nw.keywords is string && nw.keywords.size() <= 300))
         && (nw.parentId == null
             || (nw.parentId is string && nw.parentId != id
                 && existsAfter(/databases/$(database)/documents/serviceCategories/$(nw.parentId))

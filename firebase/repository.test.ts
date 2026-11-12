@@ -158,7 +158,7 @@ describe('hizmet kategorileri (admin) ve öneriler', () => {
     expect(await store.refresh()).toEqual([]);
 
     const admin = createServiceCategoryAdmin(adminDb, 'eren');
-    expect(await admin.seedDefaults(new Set())).toBe(102);
+    expect(await admin.seedDefaults(new Set())).toBe(264);
     const cilingir = (await admin.listAll()).find((c) => c.id === 'cilingir')!;
     expect(cilingir).toMatchObject({ parentId: 'ev-tesisat', urgent: true });
     await admin.setActive(cilingir, false);

@@ -97,6 +97,7 @@ export function createServiceCategoryAdmin(db: Firestore, actorUid: string) {
     order: c.order,
     active: c.active,
     ...(c.urgent ? { urgent: true } : {}),
+    ...(c.keywords?.trim() ? { keywords: c.keywords.trim() } : {}),
     updatedBy: actorUid,
     updatedAt: serverTimestamp(),
   });

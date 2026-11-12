@@ -452,7 +452,13 @@
       "unverifiedSection": "أعمال غير موثّقة",
       "requestSent": "تم استلام طلبك. سيتواصل معك فريقنا في أقرب وقت ممكن.",
       "requestFailed": "تعذّر إرسال الطلب. تحقّق من الاتصال وحاول مرة أخرى."
-    }
+    },
+    "categoryBrowseHint": "اختر مجموعتك ثم حدّد خدماتك، أو ابحث في الأعلى.",
+    "categoryGroupsBack": "المجموعات",
+    "categoryNotFound": "لا توجد خدمة بهذه الكلمة. جرّب كلمة أخرى أو راسلنا.",
+    "categoryNotListed": "عملك غير موجود؟ اختر «أخرى» في مجموعتك وراسلنا لنضيفه.",
+    "categorySuggest": "أبلغ عن خدمة ناقصة",
+    "categorySelectedCount": "{{count}} محدد"
   },
   "reviews": {
     "title": "التقييمات",

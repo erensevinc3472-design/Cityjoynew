@@ -253,7 +253,11 @@
     "sortTitle": "Sıralamayı değiştir",
     "sortGroup": "Sıralanacak liste",
     "sortMains": "Ana kategoriler",
-    "sortChildrenOf": "{{name}} alt kategorileri"
+    "sortChildrenOf": "{{name}} alt kategorileri",
+    "keywords": "Arama kelimeleri",
+    "keywordsHint": "Virgülle ayırın (ör. kuaför için \"saç, fön, boya\"). İnsanlar bu kelimelerle aradığında da bu hizmet çıkar. Yalnızca Türkçe.",
+    "missingDefaults": "CityJoy'un hazır listesinde veritabanınızda olmayan {{count}} kategori var (yeni gruplar ve \"Diğer\" seçenekleri). Var olan kategorileriniz değişmez.",
+    "addMissing": "Eksik kategorileri ekle"
   },
   "businesses": {
     "title": "İşletmeler",

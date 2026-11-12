@@ -19,14 +19,18 @@ export interface ServiceCategory {
   active: boolean;
   /** Acil kategori (çilingir, çekici...): dolandırıcılık riskine karşı doğrulama aranır (PROJE.md 5.6). */
   urgent?: boolean;
+  /** Aramada da eşleşen Türkçe kelimeler, virgülle (ör. kuaför için "saç, fön"): kişi işini kendi deyişiyle bulur. */
+  keywords?: string;
 }
+
+export const CATEGORY_KEYWORDS_MAX = 300;
 
 export interface CategoryNode {
   category: ServiceCategory;
   children: ServiceCategory[];
 }
 
-type DefaultMain = { id: string; icon: string; names: LocalizedText; children: { id: string; icon: string; names: LocalizedText; urgent?: boolean }[] };
+type DefaultMain = { id: string; icon: string; names: LocalizedText; children: { id: string; icon: string; names: LocalizedText; urgent?: boolean; keywords?: string }[] };
 
 /** Veritabanı boşken kullanılan başlangıç listesi (tasarımdaki kategoriler). */
 export const DEFAULT_SERVICE_CATEGORIES: ServiceCategory[] = (defaults as DefaultMain[]).flatMap((m, i) => [
@@ -39,6 +43,7 @@ export const DEFAULT_SERVICE_CATEGORIES: ServiceCategory[] = (defaults as Defaul
     order: j + 1,
     active: true,
     ...(c.urgent ? { urgent: true } : {}),
+    ...(c.keywords ? { keywords: c.keywords } : {}),
   })),
 ]);
 
@@ -61,14 +66,14 @@ export function buildCategoryTree(all: readonly ServiceCategory[]): CategoryNode
 }
 
 /**
- * Aramada Türkçe karakter farkı yok sayılır; seçili dil ve Türkçe adlarda aranır.
+ * Aramada Türkçe karakter farkı yok sayılır; seçili dil, Türkçe ad ve arama kelimelerinde aranır.
  * Ana kategori eşleşirse tüm alt kategorileri, yoksa yalnızca eşleşen alt kategoriler kalır.
  */
 export function searchCategoryTree(tree: readonly CategoryNode[], query: string, language: LanguageCode): CategoryNode[] {
   const q = foldForSearch(query);
   if (!q) return [...tree];
   const matches = (c: ServiceCategory) =>
-    [localized(c.names, language), c.names.tr].some((n) => !!n && foldForSearch(n).includes(q));
+    [localized(c.names, language), c.names.tr, c.keywords].some((n) => !!n && foldForSearch(n).includes(q));
   return tree
     .map((n) => (matches(n.category) ? n : { ...n, children: n.children.filter(matches) }))
     .filter((n) => n.children.length > 0);

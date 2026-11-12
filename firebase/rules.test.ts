@@ -164,6 +164,9 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(setDoc(doc(db('ali'), 'serviceCategories/ev'), c('ali', null)));
     await assertSucceeds(setDoc(doc(db('eren'), 'serviceCategories/ev'), c('eren', null)));
     await assertSucceeds(setDoc(doc(db('eren'), 'serviceCategories/cilingir'), c('eren', 'ev', { urgent: true })));
+    // Arama kelimeleri (en çok 300 harf).
+    await assertSucceeds(setDoc(doc(db('eren'), 'serviceCategories/berber'), c('eren', 'ev', { keywords: 'tıraş, sakal' })));
+    await assertFails(setDoc(doc(db('eren'), 'serviceCategories/berber'), c('eren', 'ev', { keywords: 'x'.repeat(301) })));
     // Üstü olmayan ya da üçüncü seviye kategori kurulamaz.
     await assertFails(setDoc(doc(db('eren'), 'serviceCategories/x'), c('eren', 'yok')));
     await assertFails(setDoc(doc(db('eren'), 'serviceCategories/y'), c('eren', 'cilingir')));

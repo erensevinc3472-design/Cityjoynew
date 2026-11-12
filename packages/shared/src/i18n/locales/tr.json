@@ -452,7 +452,13 @@
       "unverifiedSection": "Doğrulanmamış işletmeler",
       "requestSent": "Talebiniz alındı. En kısa sürede ekibimiz sizinle iletişime geçecek.",
       "requestFailed": "Talep gönderilemedi. Bağlantını kontrol edip tekrar dene."
-    }
+    },
+    "categoryBrowseHint": "Grubunu seç, sonra hizmetlerini işaretle. Ya da yukarıdan ara.",
+    "categoryGroupsBack": "Gruplar",
+    "categoryNotFound": "Bu kelimeyle hizmet bulunamadı. Başka bir kelime dene ya da aşağıdan bize yaz.",
+    "categoryNotListed": "İşin listede yok mu? Grubunun \"Diğer\" seçeneğini işaretle ve bize yaz, ekleyelim.",
+    "categorySuggest": "Eksik hizmeti bildir",
+    "categorySelectedCount": "{{count}} seçili"
   },
   "reviews": {
     "title": "Değerlendirmeler",

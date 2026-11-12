@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import {
   can,
+  CATEGORY_KEYWORDS_MAX,
   DEFAULT_SERVICE_CATEGORIES,
   isGrantActive,
   LANGUAGES,
@@ -25,6 +26,7 @@ type Draft = {
   order: number;
   active: boolean;
   urgent: boolean;
+  keywords: string;
 };
 
 /**
@@ -83,6 +85,7 @@ export function ServiceCategoriesPage() {
   const mains = all.filter((c) => c.parentId === null).sort(byOrder);
   const childrenOf = (id: string) => all.filter((c) => c.parentId === id).sort(byOrder);
   const showActions = canEdit && !usingDefaults;
+  const missingDefaults = usingDefaults || list === null ? [] : DEFAULT_SERVICE_CATEGORIES.filter((d) => !list.some((c) => c.id === d.id));
   const anyReview = canReview() || suggestionProvinces.some((p) => canReview(p));
 
   const act = async (fn: () => Promise<string>) => {
@@ -101,7 +104,7 @@ export function ServiceCategoriesPage() {
   const nextOrder = (parentId: string | null) =>
     all.filter((c) => c.parentId === parentId).reduce((m, c) => Math.max(m, c.order), 0) + 1;
 
-  const newDraft = (parentId: string | null): Draft => ({ parentId, names: {}, icon: 'category', order: nextOrder(parentId), active: true, urgent: false });
+  const newDraft = (parentId: string | null): Draft => ({ parentId, names: {}, icon: 'category', order: nextOrder(parentId), active: true, urgent: false, keywords: '' });
 
   const submitDraft = (e: FormEvent) => {
     e.preventDefault();
@@ -121,6 +124,7 @@ export function ServiceCategoriesPage() {
           order: draft.order,
           active: draft.active,
           ...(draft.parentId && draft.urgent ? { urgent: true } : {}),
+          ...(draft.parentId && draft.keywords.trim() ? { keywords: draft.keywords.trim() } : {}),
         },
         isNew,
       );
@@ -130,7 +134,7 @@ export function ServiceCategoriesPage() {
   };
 
   const edit = (c: ServiceCategory) =>
-    setDraft({ id: c.id, parentId: c.parentId, names: { ...c.names }, icon: c.icon, order: c.order, active: c.active, urgent: !!c.urgent });
+    setDraft({ id: c.id, parentId: c.parentId, names: { ...c.names }, icon: c.icon, order: c.order, active: c.active, urgent: !!c.urgent, keywords: c.keywords ?? '' });
 
   const row = (c: ServiceCategory, isChild: boolean) => {
     const missing = LANGUAGES.filter((l) => !c.names[l.code]).length;
@@ -189,6 +193,14 @@ export function ServiceCategoriesPage() {
               {t('services.seed')}
             </button>
           ) : null}
+        </div>
+      ) : null}
+      {showActions && missingDefaults.length ? (
+        <div className="note">
+          <p>{t('services.missingDefaults', { count: missingDefaults.length })}</p>
+          <button className="btn" disabled={busy} onClick={() => act(async () => t('services.seeded', { count: await admin!.seedDefaults(new Set(list!.map((c) => c.id))) }))}>
+            {t('services.addMissing')}
+          </button>
         </div>
       ) : null}
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -273,6 +285,13 @@ export function ServiceCategoriesPage() {
                 {t('services.urgentLabel')}
               </label>
               <span className="meta">{t('services.urgentHint')}</span>
+            </div>
+          ) : null}
+          {draft.parentId ? (
+            <div className="field">
+              <label htmlFor="sc-keywords">{t('services.keywords')}</label>
+              <input id="sc-keywords" maxLength={CATEGORY_KEYWORDS_MAX} value={draft.keywords} onChange={(e) => setDraft({ ...draft, keywords: e.target.value })} />
+              <span className="meta">{t('services.keywordsHint')}</span>
             </div>
           ) : null}
           <h2 className="form-section">{t('services.names')}</h2>

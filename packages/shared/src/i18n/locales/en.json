@@ -452,7 +452,13 @@
       "unverifiedSection": "Unverified businesses",
       "requestSent": "Your request has been received. Our team will contact you as soon as possible.",
       "requestFailed": "The request could not be sent. Check your connection and try again."
-    }
+    },
+    "categoryBrowseHint": "Pick your group, then tick your services. Or search above.",
+    "categoryGroupsBack": "Groups",
+    "categoryNotFound": "No service matches this word. Try another word or tell us below.",
+    "categoryNotListed": "Your work isn't listed? Tick \"Other\" in your group and tell us, we'll add it.",
+    "categorySuggest": "Report a missing service",
+    "categorySelectedCount": "{{count}} selected"
   },
   "reviews": {
     "title": "Reviews",
