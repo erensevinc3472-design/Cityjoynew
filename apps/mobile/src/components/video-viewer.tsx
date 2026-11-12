@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { VideoView } from 'expo-video';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef, useState, type ComponentProps } from 'react';
+import { useEffect, useRef, useState, type ComponentProps, type ComponentRef, type MutableRefObject } from 'react';
 import { ActivityIndicator, Animated, FlatList, I18nManager, Modal, PanResponder, Pressable, Share, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ import type { Post } from '@cityjoy/shared';
 import { AppText } from '@/components/app-text';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { PostSheet } from '@/components/post-sheet';
-import { useResumingPlayer } from '@/components/post-video';
+import { handOffVideo, useResumingPlayer } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { useAuthor, useBusinessInfo } from '@/lib/profile-photos';
 import { fonts, radius, spacing } from '@/theme/tokens';
@@ -38,6 +38,12 @@ interface Props {
 }
 
 type Page = { kind: 'post'; post: Post } | { kind: 'loading' } | { kind: 'end' };
+/** Zaman çubuğunun oynatıcıya erişimi. */
+interface Seeker {
+  seek(ratio: number): void;
+  step(sec: number): void;
+  hold(on: boolean): void;
+}
 // Sona gelince en çok bu kadar sayfa (20'şer gönderi) üst üste video aranır; bulunmazsa "başka video yok" (okuma maliyeti).
 const MAX_EMPTY_LOADS = 3;
 
@@ -76,18 +82,30 @@ export function VideoViewer({ posts, startId, onClose, hasMore, loadingMore, onL
     onLoadMore?.();
   }, [startId, searching, loadingMore, index, posts.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const pages: Page[] = [...posts.map((post) => ({ kind: 'post' as const, post })), searching ? { kind: 'loading' } : { kind: 'end' }];
+  const closeViewer = () => {
+    const p = pages[index];
+    if (p?.kind === 'post' && p.post.video) handOffVideo(p.post.video.url);
+    onClose();
+  };
+  // Zaman çubuğu sürüklenirken sayfa kaymaz, kaydırıp kapatma çalışmaz.
+  const scrubbing = useRef(false);
+  const [scrollOk, setScrollOk] = useState(true);
+  const onScrub = (on: boolean) => {
+    scrubbing.current = on;
+    setScrollOk(!on);
+  };
 
   // Soldan sağa kaydırınca (Arapçada sağdan sola) tam ekran kapanır, arkada akış görünür.
   const dir = I18nManager.isRTL ? -1 : 1;
   const dx = useRef(new Animated.Value(0)).current;
-  const close = useRef(onClose);
-  close.current = onClose;
+  const close = useRef(closeViewer);
+  close.current = closeViewer;
   useEffect(() => {
     if (startId) dx.setValue(0);
   }, [startId, dx]);
   const swipe = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponderCapture: (_, g) => dir * g.dx > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+      onMoveShouldSetPanResponderCapture: (_, g) => !scrubbing.current && dir * g.dx > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
       onPanResponderTerminationRequest: () => false,
       onPanResponderMove: (_, g) => dx.setValue(Math.max(0, dir * g.dx) * dir),
       onPanResponderRelease: (_, g) => {
@@ -102,7 +120,7 @@ export function VideoViewer({ posts, startId, onClose, hasMore, loadingMore, onL
   ).current;
 
   return (
-    <Modal visible={!!startId} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent supportedOrientations={['portrait']}>
+    <Modal visible={!!startId} transparent animationType="fade" onRequestClose={closeViewer} statusBarTranslucent supportedOrientations={['portrait']}>
       <StatusBar style="light" />
       <Animated.View
         {...swipe.panHandlers}
@@ -113,6 +131,7 @@ export function VideoViewer({ posts, startId, onClose, hasMore, loadingMore, onL
             data={pages}
             keyExtractor={(p) => (p.kind === 'post' ? p.post.id : p.kind)}
             pagingEnabled
+            scrollEnabled={scrollOk}
             showsVerticalScrollIndicator={false}
             initialScrollIndex={start}
             getItemLayout={(_, i) => ({ length: height, offset: height * i, index: i })}
@@ -123,7 +142,7 @@ export function VideoViewer({ posts, startId, onClose, hasMore, loadingMore, onL
             renderItem={({ item, index: i }) => (
               <View style={{ width, height }}>
                 {item.kind === 'post' ? (
-                  <Reel post={item.post} active={i === index} onClose={onClose} {...rest} />
+                  <Reel post={item.post} active={i === index} onClose={closeViewer} onScrub={onScrub} {...rest} />
                 ) : item.kind === 'loading' ? (
                   <View style={styles.center}>
                     <ActivityIndicator color={WHITE} accessibilityLabel={t('common.loading')} />
@@ -132,7 +151,7 @@ export function VideoViewer({ posts, startId, onClose, hasMore, loadingMore, onL
                   <View style={[styles.center, styles.endPage, { paddingBottom: insets.bottom }]}>
                     <MaterialIcons name="video-library" size={44} color="rgba(255,255,255,0.7)" />
                     <AppText style={styles.endText}>{t('explore.video.end')}</AppText>
-                    <Pressable accessibilityRole="button" onPress={onClose} style={({ pressed }) => [styles.endBtn, { opacity: pressed ? 0.7 : 1 }]}>
+                    <Pressable accessibilityRole="button" onPress={closeViewer} style={({ pressed }) => [styles.endBtn, { opacity: pressed ? 0.7 : 1 }]}>
                       <AppText style={styles.followText}>{t('explore.video.backToFeed')}</AppText>
                     </Pressable>
                   </View>
@@ -146,7 +165,19 @@ export function VideoViewer({ posts, startId, onClose, hasMore, loadingMore, onL
   );
 }
 
-function Reel({ post: given, active, onClose, isLiked, onLike, isSaved, onSave, followOf, onFollow, onAuthor }: Omit<Props, 'posts' | 'startId'> & { post: Post; active: boolean }) {
+function Reel({
+  post: given,
+  active,
+  onClose,
+  onScrub,
+  isLiked,
+  onLike,
+  isSaved,
+  onSave,
+  followOf,
+  onFollow,
+  onAuthor,
+}: Omit<Props, 'posts' | 'startId'> & { post: Post; active: boolean; onScrub(on: boolean): void }) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const reduce = useReduceMotion();
@@ -158,6 +189,7 @@ function Reel({ post: given, active, onClose, isLiked, onLike, isSaved, onSave, 
   const [expanded, setExpanded] = useState(false);
   const heart = useRef(new Animated.Value(0)).current;
   const progress = useRef(new Animated.Value(0)).current;
+  const seeker = useRef<Seeker | null>(null);
   const lastTap = useRef(0);
   const single = useRef<ReturnType<typeof setTimeout>>(undefined);
   const author = useAuthor(post.business ? undefined : post.authorUid);
@@ -211,7 +243,7 @@ function Reel({ post: given, active, onClose, isLiked, onLike, isSaved, onSave, 
         accessibilityHint={t('explore.doubleTapHint')}
         onPress={tap}
         style={StyleSheet.absoluteFill}>
-        {active ? <ReelVideo url={post.video!.url} paused={paused} progress={progress} /> : null}
+        {active ? <ReelVideo url={post.video!.url} paused={paused} progress={progress} seeker={seeker} /> : null}
       </Pressable>
       {paused ? (
         <View pointerEvents="none" style={styles.center}>
@@ -263,9 +295,7 @@ function Reel({ post: given, active, onClose, isLiked, onLike, isSaved, onSave, 
             {post.text}
           </AppText>
         ) : null}
-        <View style={styles.track} accessibilityLabel={t('explore.video.progress')}>
-          <Animated.View style={[styles.fill, { transform: [{ scaleX: progress }] }]} />
-        </View>
+        <Scrubber progress={progress} seeker={seeker} onScrub={onScrub} />
         <Pressable accessibilityRole="button" onPress={() => setSheet('input')} style={({ pressed }) => [styles.addComment, { opacity: pressed ? 0.75 : 1 }]}>
           <AppText style={styles.addCommentText}>{post.commentsOff ? t('explore.comments.off') : t('explore.comments.add')}</AppText>
         </Pressable>
@@ -286,17 +316,101 @@ function Reel({ post: given, active, onClose, isLiked, onLike, isSaved, onSave, 
   );
 }
 
+/**
+ * Zaman çubuğu (Eren, 12 Kasım 2026: "zaman çubuğundan ileri geri alınmıyor"): dokunulan yere atlar, parmakla sürüklenir.
+ * Sürüklerken çubuk kalınlaşır, ucunda tutamaç görünür, video durur; bırakınca kaldığı yerden sürer. Ekran okuyucuda
+ * yukarı/aşağı kaydırma 5 saniye ileri/geri alır.
+ */
+function Scrubber({ progress, seeker, onScrub }: { progress: Animated.Value; seeker: MutableRefObject<Seeker | null>; onScrub(on: boolean): void }) {
+  const { t } = useTranslation();
+  const ref = useRef<ComponentRef<typeof View>>(null);
+  const box = useRef({ x: 0, w: 1 });
+  const [w, setW] = useState(1);
+  const [held, setHeld] = useState(false);
+  const scrub = useRef(onScrub);
+  scrub.current = onScrub;
+  const seekAt = (pageX: number) => {
+    let r = Math.min(1, Math.max(0, (pageX - box.current.x) / box.current.w));
+    if (I18nManager.isRTL) r = 1 - r;
+    progress.setValue(r);
+    seeker.current?.seek(r);
+  };
+  const end = () => {
+    setHeld(false);
+    seeker.current?.hold(false);
+    scrub.current(false);
+  };
+  const pan = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: (e) => {
+        setHeld(true);
+        scrub.current(true);
+        seeker.current?.hold(true);
+        seekAt(e.nativeEvent.pageX);
+      },
+      onPanResponderMove: (e) => seekAt(e.nativeEvent.pageX),
+      onPanResponderRelease: end,
+      onPanResponderTerminate: end,
+    }),
+  ).current;
+  const thumbX = progress.interpolate({ inputRange: [0, 1], outputRange: I18nManager.isRTL ? [0, -w] : [0, w] });
+  return (
+    <View
+      ref={ref}
+      {...pan.panHandlers}
+      onLayout={(e) => {
+        setW(Math.max(1, e.nativeEvent.layout.width));
+        ref.current?.measureInWindow((x, _y, width) => (box.current = { x, w: Math.max(1, width) }));
+      }}
+      accessible
+      accessibilityRole="adjustable"
+      accessibilityLabel={t('explore.video.progress')}
+      accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+      onAccessibilityAction={(e) => seeker.current?.step(e.nativeEvent.actionName === 'increment' ? 5 : -5)}
+      style={styles.scrubArea}>
+      <View style={[styles.track, held && styles.trackHeld]}>
+        <Animated.View style={[styles.fill, held && styles.trackHeld, { transform: [{ scaleX: progress }] }]} />
+      </View>
+      {held ? <Animated.View pointerEvents="none" style={[styles.thumb, { transform: [{ translateX: thumbX }] }]} /> : null}
+    </View>
+  );
+}
+
 /** Açık sayfanın oynatıcısı: sesli, döngüde, akışta kaldığı saniyeden sürer; ilerlemeyi ekranı yeniden çizmeden çizgiye yazar. */
-function ReelVideo({ url, paused, progress }: { url: string; paused: boolean; progress: Animated.Value }) {
+function ReelVideo({ url, paused, progress, seeker }: { url: string; paused: boolean; progress: Animated.Value; seeker: MutableRefObject<Seeker | null> }) {
+  const holding = useRef(false);
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
   const player = useResumingPlayer(url, (p) => {
     p.loop = true;
     p.muted = false;
   });
   useEffect(() => {
     progress.setValue(0);
-    const sub = player.addListener('timeUpdate', (e) => progress.setValue(player.duration > 0 ? Math.min(1, e.currentTime / player.duration) : 0));
-    return () => sub.remove();
-  }, [player, progress]);
+    const sub = player.addListener('timeUpdate', (e) => {
+      if (!holding.current) progress.setValue(player.duration > 0 ? Math.min(1, e.currentTime / player.duration) : 0);
+    });
+    seeker.current = {
+      seek: (r) => {
+        if (player.duration > 0) player.currentTime = r * player.duration;
+      },
+      step: (sec) => {
+        if (player.duration > 0) player.currentTime = Math.min(player.duration, Math.max(0, player.currentTime + sec));
+      },
+      hold: (on) => {
+        holding.current = on;
+        if (on) player.pause();
+        else if (!pausedRef.current) player.play();
+      },
+    };
+    return () => {
+      sub.remove();
+      seeker.current = null;
+    };
+  }, [player, progress, seeker]);
   useEffect(() => {
     if (paused) player.pause();
     else player.play();
@@ -328,7 +442,11 @@ const styles = StyleSheet.create({
   followOn: { backgroundColor: 'rgba(255,255,255,0.2)', borderColor: 'transparent' },
   followText: { color: WHITE, fontFamily: fonts.bodySemi, fontSize: 13 },
   caption: { color: WHITE, fontSize: 14, lineHeight: 20, ...shadow },
-  track: { height: 2, borderRadius: 1, backgroundColor: 'rgba(255,255,255,0.3)', marginEnd: -56, overflow: 'hidden' },
+  // Dokunma alanı çubuktan geniş (parmakla kolay tutulsun).
+  scrubArea: { height: 28, justifyContent: 'center', marginEnd: -56, marginVertical: -spacing.sm },
+  track: { height: 2, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.3)', overflow: 'hidden' },
+  trackHeld: { height: 5 },
+  thumb: { position: 'absolute', start: -7, width: 14, height: 14, borderRadius: 7, backgroundColor: WHITE },
   // Çizgi soldan dolar (Arapçada sağdan): ölçek başlangıç kenarından.
   fill: { height: 2, backgroundColor: WHITE, width: '100%', transformOrigin: I18nManager.isRTL ? 'right' : 'left' },
   addComment: { minHeight: 42, marginEnd: -56, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', paddingHorizontal: spacing.md, justifyContent: 'center' },

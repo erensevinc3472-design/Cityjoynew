@@ -12,16 +12,23 @@ export const ratioOf = (v: Pick<PostVideo, 'width' | 'height'>) => (v.width > 0 
 
 export const formatDuration = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.round(sec) % 60).padStart(2, '0')}`;
 
-// Kaldığı yer (Eren, 12 Kasım 2026: "tam ekrana geçince baştan başlamasın"): akış ile tam ekran arasında video aynı
-// saniyeden sürer. Uygulama açıkken bellekte tutulur.
+// Kaldığı yer (Eren, 12 Kasım 2026: "tam ekrana geçince baştan başlamasın, ama ekrandan gidip gelince baştan başlasın"):
+// yalnızca akıştan tam ekrana geçerken ve tam ekrandan akışa dönerken video aynı saniyeden sürer (handOffVideo). Kaydırıp
+// ekrandan çıkan video geri gelince baştan başlar.
 const resumeAt = new Map<string, number>();
+const handoff = new Map<string, number>();
+const HANDOFF_MS = 1500;
+/** Bu video birazdan başka oynatıcıda (tam ekran ya da akış) kaldığı yerden sürsün. */
+export function handOffVideo(url: string) {
+  handoff.set(url, Date.now() + HANDOFF_MS);
+}
 
 /**
  * Kaldığı yerden süren oynatıcı. Telefon videoyu önbelleğe alır (useCaching): akıştan tam ekrana geçerken ya da geri
  * dönerken yeniden indirilmez; hem açılış hızlanır hem veri maliyeti düşer.
  */
 export function useResumingPlayer(url: string, setup: (p: VideoPlayer) => void): VideoPlayer {
-  const start = resumeAt.get(url) ?? 0;
+  const [start] = useState(() => ((handoff.get(url) ?? 0) > Date.now() ? (resumeAt.get(url) ?? 0) : 0));
   const player = useVideoPlayer({ uri: url, useCaching: true }, (p) => {
     p.timeUpdateEventInterval = 0.25;
     setup(p);
@@ -94,7 +101,10 @@ export function PostVideoView({ video, maxWidth, active, onOpen }: Props) {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${t('explore.video.open')}, ${formatDuration(video.durationSec)}`}
-        onPress={onOpen}
+        onPress={() => {
+          if (active) handOffVideo(video.url);
+          onOpen();
+        }}
         style={[styles.poster, { width, height }]}>
         {active ? <AutoPlayer url={video.url} width={width} height={height} /> : (
           <View style={styles.play}>
