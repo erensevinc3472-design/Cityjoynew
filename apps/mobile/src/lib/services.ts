@@ -17,6 +17,7 @@ import {
   createFirestoreTravelRepository,
   createFirestorePostRepository,
   createFirestoreSocialRepository,
+  createBadgeReader,
   createFirestoreMessageRepository,
   createFirestoreListingRepository,
   createFirestoreCityGuideRepository,
@@ -68,6 +69,8 @@ export const activityRepository = createFirestoreActivityRepository(firestore);
 export const postRepository = createFirestorePostRepository(firestore);
 /** Keşfet profili, takip ve engelleme. */
 export const socialRepository = createFirestoreSocialRepository(firestore);
+/** Keşfet rozetleri listesi (oturumda bir kez okunur). */
+export const badgeReader = createBadgeReader(firestore);
 /** Birebir mesajlar (yalnızca iki taraf okur). */
 export const messageRepository = createFirestoreMessageRepository(firestore);
 /** Çarşı ilanları (ikinci el eşya). */

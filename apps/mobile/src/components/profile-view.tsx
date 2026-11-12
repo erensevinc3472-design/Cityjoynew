@@ -32,6 +32,7 @@ import { RoundButton } from '@/components/hero-header';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { TopBar } from '@/components/top-bar';
+import { BadgeChips } from '@/components/user-badges';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { storage } from '@/lib/firebase';
 import { useChats } from '@/lib/messages';
@@ -369,6 +370,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                 <AppText variant="caption" style={{ color: c.accent }}>{t(`locationBadge.badge.${profile.locationVerified}`)}</AppText>
               </View>
             ) : null}
+            <BadgeChips ids={profile.badges} />
             {profile.bio ? <AppText selectable style={styles.bioText}>{profile.bio}</AppText> : null}
           </View>
           {error ? <FormMessage kind="error" text={error} /> : null}

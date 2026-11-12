@@ -45,6 +45,7 @@ export * from './posts/feed-rank';
 export * from './posts/social';
 export * from './posts/word-filter';
 export * from './posts/default-banned-words';
+export * from './posts/badges';
 export * from './posts/suspension';
 export * from './search/search';
 export * from './media/photo';

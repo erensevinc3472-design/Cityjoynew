@@ -7,6 +7,7 @@ import type { Post } from '@cityjoy/shared';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
 import { TranslatableText } from '@/components/translatable-text';
+import { BadgeIcons } from '@/components/user-badges';
 import { PostPhotos } from '@/components/post-photos';
 import { PostSheet } from '@/components/post-sheet';
 import { PostVideoView } from '@/components/post-video';
@@ -146,6 +147,7 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
               {!item.business && author.locationVerified ? (
                 <MaterialIcons name="where-to-vote" size={14} color={c.accent} accessibilityLabel={t(`locationBadge.badge.${author.locationVerified}`)} />
               ) : null}
+              {!item.business ? <BadgeIcons ids={author.badges} /> : null}
               {item.business && biz.verified ? (
                 <MaterialIcons name="verified" size={15} color={c.accent} accessibilityLabel={t('explore.verifiedBusiness')} />
               ) : null}

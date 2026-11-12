@@ -29,6 +29,7 @@ import { NeedsPage } from './pages/needs-page';
 import { ContestsPage, PollsPage } from './pages/community-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { LimitsPage } from './pages/limits-page';
+import { BadgesPage } from './pages/badges-page';
 import { BillingPage } from './pages/billing-page';
 import { MembershipsPage } from './pages/memberships-page';
 import { NotificationsPage } from './pages/notifications-page';
@@ -62,6 +63,7 @@ const router = createHashRouter([
       { index: true, element: <TodayPage /> },
       { path: 'istatistikler', element: <StatsPage /> },
       { path: 'profiller', element: <ProfilesPage /> },
+      { path: 'rozetler', element: <BadgesPage /> },
       { path: 'takipciler', element: <AudiencePage /> },
       { path: 'konumlar', element: <LocationsPage /> },
       { path: 'meslekler', element: <OccupationsPage /> },

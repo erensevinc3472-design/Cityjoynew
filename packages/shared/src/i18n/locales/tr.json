@@ -1476,7 +1476,8 @@
       "yeniDesc": "Yalnızca zamana göre, en yeni üstte",
       "how": "Nasıl sıralanıyor?",
       "rules": "Herkes için aynı açık kurallar: yeni paylaşımlar öne çıkar ve zamanla geriler. Beğeni ve yorum (yorum daha değerli) biraz öne alır. Takip ettiğin kişiler, kendi mahallen ve resmî duyurular öne gelir. Aynı kişinin paylaşımları arka arkaya gelmez. Şikâyet alan paylaşım geri düşer. Ne kadar baktığın izlenmez, parayla gizli öne çıkma yoktur."
-    }
+    },
+    "badge": "Rozet: {{name}}"
   },
   "news": {
     "title": "Haberler",

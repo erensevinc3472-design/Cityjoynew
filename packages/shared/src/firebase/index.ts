@@ -54,6 +54,7 @@ export { deletePhotos, PhotoTooLargeError, uploadMedia, uploadPostPhotos, upload
 export { createFirestorePostRepository, createFramesAdmin, createPostModeration, type CommentReport, type FeedFilter, type FeedPage, type PostReport } from './posts';
 export { createFirestoreSocialRepository, createProfileModeration, type ProfileReport } from './social';
 export { createBannedWords } from './word-filter';
+export { createBadgeAdmin, createBadgeReader } from './badges';
 export { createSearchSuggestions } from './search';
 export { cleanVideoUrl, createIntroVideo, INTRO_VIDEO_URL_MAX } from './intro';
 export { createNeedsConfig } from './needs';

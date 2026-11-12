@@ -1476,7 +1476,8 @@
       "yeniDesc": "By time only, newest on top",
       "how": "How is it sorted?",
       "rules": "The same open rules for everyone: new posts rise and fade over time. Likes and comments (comments count more) lift a post a little. People you follow, your own neighbourhood and official announcements come first. Posts from the same person never come back to back. Reported posts drop down. How long you look is not tracked, and there is no hidden paid boosting."
-    }
+    },
+    "badge": "Badge: {{name}}"
   },
   "news": {
     "title": "News",

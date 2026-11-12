@@ -1271,6 +1271,13 @@ service cloud.firestore {
         && stamped(nw);
       }
       allow write: if isAdmin() && id == 'bannedWords' && _c_bannedWords(request.resource.data);
+      // Keşfet rozetleri (Eren, 13 Kasım 2026): admin rozet listesini yönetir, uygulama okur.
+      function _c_badges(nw) {
+        return nw.keys().hasOnly(['items', 'updatedBy', 'updatedAt'])
+        && nw.items is list && nw.items.size() <= 30
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'badges' && _c_badges(request.resource.data);
       // Ara: önerilen aramalar (PROJE.md 5.10), dil başına en çok 12; admin yönetir, uygulama okur.
       function _c_searchSuggestions(nw) {
         return nw.keys().hasOnly(['terms', 'updatedBy', 'updatedAt'])
@@ -3044,7 +3051,7 @@ service cloud.firestore {
       // fotoğrafı kaldırıldıysa yenisini koyamaz. Fotoğraf kendi yüklediği dosya olmalı.
       function _k122(nw, od) {
         return isSelf(uid)
-        && nw.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'searchKeys', 'updatedAt'])
+        && nw.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'badges', 'searchKeys', 'updatedAt'])
         && nw.diff(od).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'locationVerified', 'searchKeys', 'updatedAt'])
         // Konum rozeti yalnızca kişinin kaydındaki doğrulamayla aynı yazımda ve aynı düzeyde.
         && (!nw.diff(od).affectedKeys().hasAny(['locationVerified'])
@@ -3077,6 +3084,14 @@ service cloud.firestore {
         && nw.updatedAt == request.time;
       }
       allow update: if _k124(request.resource.data);
+      // Rozet (Eren, 13 Kasım 2026): yalnızca admin verir ya da geri alır; kişi isteyemez, kendisi değiştiremez.
+      function _k125(nw) {
+        return isAdmin()
+        && nw.diff(resource.data).affectedKeys().hasOnly(['badges', 'updatedAt'])
+        && nw.badges is list && nw.badges.size() <= 3
+        && nw.updatedAt == request.time;
+      }
+      allow update: if _k125(request.resource.data);
       allow delete: if isSelf(uid);
     }
 

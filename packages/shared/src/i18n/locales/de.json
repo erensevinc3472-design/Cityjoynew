@@ -1476,7 +1476,8 @@
       "yeniDesc": "Nur nach Zeit, neueste oben",
       "how": "Wie wird sortiert?",
       "rules": "Für alle die gleichen offenen Regeln: Neue Beiträge steigen auf und sinken mit der Zeit. Likes und Kommentare (Kommentare zählen mehr) heben einen Beitrag etwas an. Personen, denen du folgst, dein Viertel und offizielle Mitteilungen kommen zuerst. Beiträge derselben Person folgen nie direkt aufeinander. Gemeldete Beiträge rutschen nach unten. Wie lange du schaust, wird nicht erfasst, und es gibt keine versteckte bezahlte Hervorhebung."
-    }
+    },
+    "badge": "Abzeichen: {{name}}"
   },
   "news": {
     "title": "Nachrichten",

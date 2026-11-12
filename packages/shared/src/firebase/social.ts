@@ -29,7 +29,7 @@ const REPORTS = 'profileReports';
 
 const nameKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.profileKeys);
 
-function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
+export function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
   const photo = photoFrom(d.photo);
   return {
     uid,
@@ -41,6 +41,7 @@ function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
     photoRemoved: d.photoRemoved === true,
     ...(d.locationVerified === 'mahalle' || d.locationVerified === 'ilce' ? { locationVerified: d.locationVerified } : {}),
     ...(d.suspended === true ? { suspended: true } : {}),
+    ...(Array.isArray(d.badges) && d.badges.length ? { badges: d.badges.filter((b: unknown): b is string => typeof b === 'string').slice(0, 3) } : {}),
   };
 }
 

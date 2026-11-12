@@ -1,13 +1,14 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router';
-import { searchWords, SEARCH_LIMITS, type PublicProfile } from '@cityjoy/shared';
-import { createFirestoreSocialRepository } from '@cityjoy/shared/firebase';
+import { searchWords, SEARCH_LIMITS, type BadgeDefinition, type PublicProfile } from '@cityjoy/shared';
+import { createBadgeAdmin, createFirestoreSocialRepository } from '@cityjoy/shared/firebase';
 
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { Intro } from '../components/intro';
 import { SuspendControl, SuspendedList } from '../components/suspend-control';
+import { BadgeControl, BadgePills } from '../components/badge-control';
 
 interface Row extends PublicProfile {
   followers: number | null;
@@ -27,6 +28,14 @@ export function ProfilesPage() {
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [refresh, setRefresh] = useState(0);
   const [lastKey, setLastKey] = useState('');
+  // Rozet listesi (Rozet ver için) sayfa açılınca bir kez okunur.
+  const [badgeDefs, setBadgeDefs] = useState<BadgeDefinition[]>([]);
+  useEffect(() => {
+    if (!user || !isAdminUser(user)) return;
+    createBadgeAdmin(firestore, user.uid)
+      .load()
+      .then((r) => setBadgeDefs(r.items), () => setBadgeDefs([]));
+  }, [user]);
   useEffect(() => {
     const key = searchWords(params.get('q') ?? '')[0]?.slice(0, SEARCH_LIMITS.keyLength) ?? '';
     if (key.length < SEARCH_LIMITS.minName || !user || !isAdminUser(user)) return;
@@ -108,11 +117,25 @@ export function ProfilesPage() {
                     <td>
                       {p.isPrivate ? <span className="pill">{t('profiles.private')}</span> : null}{' '}
                       {p.locationVerified ? <span className="pill ok">{t('profiles.verified')}</span> : null}{' '}
-                      {p.suspended ? <span className="pill warn">{t('suspend.pill')}</span> : null}
+                      {p.suspended ? <span className="pill warn">{t('suspend.pill')}</span> : null}{' '}
+                      <BadgePills ids={p.badges} defs={badgeDefs} />
                     </td>
                     {user.isDemo ? null : (
                       <td>
-                        <SuspendControl uid={p.uid} name={p.displayName} suspended={!!p.suspended} onDone={done} />
+                        <div className="row-actions start">
+                          {badgeDefs.length && !p.suspended ? (
+                            <BadgeControl
+                              actorUid={user.uid}
+                              profile={p}
+                              defs={badgeDefs}
+                              onDone={(ok, badges) => {
+                                setMessage(ok ? { kind: 'ok', text: t('badges.given') } : { kind: 'error', text: t('badges.saveError') });
+                                if (ok) setRows((rs) => (rs ?? []).map((r) => (r.uid === p.uid ? { ...r, badges: badges ?? [] } : r)));
+                              }}
+                            />
+                          ) : null}
+                          <SuspendControl uid={p.uid} name={p.displayName} suspended={!!p.suspended} onDone={done} />
+                        </div>
                       </td>
                     )}
                   </tr>

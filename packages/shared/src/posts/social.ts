@@ -24,6 +24,8 @@ export interface PublicProfile {
   locationVerified?: LocationBadge;
   /** Hesap askıya alındı (yalnızca sunucu koyar): profil ve gönderiler başkalarına gösterilmez. */
   suspended?: boolean;
+  /** Admin'in verdiği rozetlerin kimlikleri (posts/badges.ts); kişi kendisi değiştiremez. */
+  badges?: string[];
 }
 
 export const PROFILE_LIMITS = {
