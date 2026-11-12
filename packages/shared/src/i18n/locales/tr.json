@@ -1155,7 +1155,13 @@
       "firsat": "Fırsat",
       "soru-yardim": "Soru / Yardım",
       "kayip-buluntu": "Kayıp - Buluntu",
-      "taziye": "Taziye"
+      "taziye": "Taziye",
+      "haber": "Haber",
+      "ekonomi": "Ekonomi",
+      "spor": "Spor",
+      "teknoloji": "Teknoloji",
+      "kultur-sanat": "Kültür-Sanat",
+      "saglik": "Sağlık"
     },
     "reasons": {
       "nefret": "Nefret söylemi",
@@ -1287,7 +1293,13 @@
       "firsat": "Fırsat",
       "soru-yardim": "Yardım",
       "kayip-buluntu": "Kayıp",
-      "taziye": "Taziye"
+      "taziye": "Taziye",
+      "haber": "Haber",
+      "ekonomi": "Ekonomi",
+      "spor": "Spor",
+      "teknoloji": "Teknoloji",
+      "kultur-sanat": "Kültür-Sanat",
+      "saglik": "Sağlık"
     },
     "businessTag": "İşletme",
     "business": {

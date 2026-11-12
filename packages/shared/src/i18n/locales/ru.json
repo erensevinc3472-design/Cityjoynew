@@ -1157,7 +1157,13 @@
       "firsat": "Скидка",
       "soru-yardim": "Вопрос / Помощь",
       "kayip-buluntu": "Потери и находки",
-      "taziye": "Соболезнование"
+      "taziye": "Соболезнование",
+      "haber": "Новости",
+      "ekonomi": "Экономика",
+      "spor": "Спорт",
+      "teknoloji": "Технологии",
+      "kultur-sanat": "Культура",
+      "saglik": "Здоровье"
     },
     "reasons": {
       "nefret": "Язык вражды",
@@ -1289,7 +1295,13 @@
       "firsat": "Выгода",
       "soru-yardim": "Помощь",
       "kayip-buluntu": "Потеряшки",
-      "taziye": "Соболезнование"
+      "taziye": "Соболезнование",
+      "haber": "Новости",
+      "ekonomi": "Экономика",
+      "spor": "Спорт",
+      "teknoloji": "Технологии",
+      "kultur-sanat": "Культура",
+      "saglik": "Здоровье"
     },
     "businessTag": "Бизнес",
     "business": {

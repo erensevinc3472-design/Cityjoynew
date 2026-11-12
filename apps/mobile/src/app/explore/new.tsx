@@ -11,6 +11,7 @@ import {
   isVerifiedBusiness,
   ltr,
   POST_CATEGORIES,
+  isPostTopic,
   POST_LIMITS,
   POST_TARGETS,
   postModeFor,
@@ -110,6 +111,11 @@ export default function NewPostScreen() {
   const bizFull = !!biz && !isProBusiness(biz) && biz.postCount >= DEFAULT_LIMITS.isletmeGonderiToplam;
 
   const toggle = (x: PostTarget) => setTargets((cur) => (cur.includes(x) ? cur.filter((y) => y !== x) : [...cur, x]));
+  // Gündem konuları (haber, ekonomi, spor...) yalnızca Genel seçiliyken; Genel kalkınca tür "Genel"e döner.
+  const withTopics = targets.includes('genel');
+  useEffect(() => {
+    if (!withTopics && isPostTopic(category)) setCategory('genel');
+  }, [withTopics, category]);
 
   const submit = async () => {
     if (bizNoHood || bizFull) return;
@@ -225,7 +231,7 @@ export default function NewPostScreen() {
       {errors.includes('banned') ? <FormMessage kind="error" text={t('explore.errors.banned')} /> : null}
       <View style={styles.block}>
         <AppText variant="label">{t('explore.fields.category')}</AppText>
-        <Chips<PostCategory> label={t('explore.fields.category')} value={category} onChange={setCategory} options={POST_CATEGORIES.filter((c) => !biz || c !== 'taziye').map((c) => ({ value: c, label: t(`explore.categories.${c}`) }))} />
+        <Chips<PostCategory> label={t('explore.fields.category')} value={category} onChange={setCategory} options={POST_CATEGORIES.filter((c) => (!biz || c !== 'taziye') && (withTopics || !isPostTopic(c))).map((c) => ({ value: c, label: t(`explore.categories.${c}`) }))} />
       </View>
       {category === 'taziye' ? (
         <>

@@ -1155,7 +1155,13 @@
       "firsat": "Deal",
       "soru-yardim": "Question / Help",
       "kayip-buluntu": "Lost & Found",
-      "taziye": "Condolence"
+      "taziye": "Condolence",
+      "haber": "News",
+      "ekonomi": "Economy",
+      "spor": "Sports",
+      "teknoloji": "Technology",
+      "kultur-sanat": "Culture & Arts",
+      "saglik": "Health"
     },
     "reasons": {
       "nefret": "Hate speech",
@@ -1287,7 +1293,13 @@
       "firsat": "Deal",
       "soru-yardim": "Help",
       "kayip-buluntu": "LostFound",
-      "taziye": "Condolence"
+      "taziye": "Condolence",
+      "haber": "News",
+      "ekonomi": "Economy",
+      "spor": "Sports",
+      "teknoloji": "Technology",
+      "kultur-sanat": "Culture & Arts",
+      "saglik": "Health"
     },
     "businessTag": "Business",
     "business": {

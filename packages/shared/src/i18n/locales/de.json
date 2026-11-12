@@ -1155,7 +1155,13 @@
       "firsat": "Angebot",
       "soru-yardim": "Frage / Hilfe",
       "kayip-buluntu": "Verloren & Gefunden",
-      "taziye": "Beileid"
+      "taziye": "Beileid",
+      "haber": "Nachrichten",
+      "ekonomi": "Wirtschaft",
+      "spor": "Sport",
+      "teknoloji": "Technik",
+      "kultur-sanat": "Kultur",
+      "saglik": "Gesundheit"
     },
     "reasons": {
       "nefret": "Hassrede",
@@ -1287,7 +1293,13 @@
       "firsat": "Angebot",
       "soru-yardim": "Hilfe",
       "kayip-buluntu": "Fundsache",
-      "taziye": "Beileid"
+      "taziye": "Beileid",
+      "haber": "Nachrichten",
+      "ekonomi": "Wirtschaft",
+      "spor": "Sport",
+      "teknoloji": "Technik",
+      "kultur-sanat": "Kultur",
+      "saglik": "Gesundheit"
     },
     "businessTag": "Betrieb",
     "business": {

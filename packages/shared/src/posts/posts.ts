@@ -12,8 +12,11 @@ export const POST_TARGETS = ['mahallem', 'bolgesel', 'genel', 'takip'] as const;
 export type PostTarget = (typeof POST_TARGETS)[number];
 
 /** Keşfet kuralları madde 6. Taziyeyi yalnızca yakını paylaşır (kullanıcı beyan eder) ya da muhtar. */
-export const POST_CATEGORIES = ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye'] as const;
+/** Gündem konuları: yalnızca Genel (ülke geneli) akışında (Eren, 12 Kasım 2026: "ekonomi, haber, spor gibi şeyler"). */
+export const POST_TOPICS = ['haber', 'ekonomi', 'spor', 'teknoloji', 'kultur-sanat', 'saglik'] as const;
+export const POST_CATEGORIES = ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye', ...POST_TOPICS] as const;
 export type PostCategory = (typeof POST_CATEGORIES)[number];
+export const isPostTopic = (c: PostCategory) => (POST_TOPICS as readonly string[]).includes(c);
 
 /** onay-bekliyor: işletme yetkilisinin paylaşımı, sahibi onaylayana kadar akışta görünmez. */
 export type PostStatus = 'aktif' | 'kaldirildi' | 'onay-bekliyor';
@@ -129,7 +132,8 @@ export function validatePost(p: PostInput): PostError[] {
   if ((len < POST_LIMITS.text[0] && !photos && !p.video) || len > POST_LIMITS.text[1]) errors.push('text');
   if (photos > POST_LIMITS.photos) errors.push('photos');
   if (p.video && (photos || !(p.video.durationSec >= 1 && p.video.durationSec <= POST_LIMITS.videoSeconds))) errors.push('video');
-  if (!POST_CATEGORIES.includes(p.category)) errors.push('category');
+  // Gündem konusu seçilen gönderi Genel'de de yayınlanmalı.
+  if (!POST_CATEGORIES.includes(p.category) || (isPostTopic(p.category) && !p.targets.includes('genel'))) errors.push('category');
   if (!p.targets.length || new Set(p.targets).size !== p.targets.length || p.targets.some((x) => !POST_TARGETS.includes(x))) errors.push('targets');
   const r = p.region;
   if (!/^[0-8][0-9]$/.test(r.provinceCode) || !r.districtId.startsWith(`${r.provinceCode}-`) || !r.neighbourhoodId.startsWith(`${r.districtId}-`)) errors.push('region');

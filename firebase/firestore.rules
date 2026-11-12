@@ -2228,7 +2228,7 @@ service cloud.firestore {
         && (!('frames' in d) || (d.frames is bool && (d.frames == false || ('photos' in d && d.targets.genel == true))))
         && (!('framesFeatured' in d) || d.framesFeatured is bool)
         && validSearchKeys(d, 300)
-        && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
+        && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye', 'haber', 'ekonomi', 'spor', 'teknoloji', 'kultur-sanat', 'saglik']
         && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip'])
         && d.targets.keys().hasAll(['mahallem', 'bolgesel', 'genel'])
         && d.targets.mahallem is bool && d.targets.bolgesel is bool && d.targets.genel is bool

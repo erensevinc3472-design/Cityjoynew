@@ -1159,7 +1159,13 @@
       "firsat": "عرض",
       "soru-yardim": "سؤال / مساعدة",
       "kayip-buluntu": "مفقودات وموجودات",
-      "taziye": "تعزية"
+      "taziye": "تعزية",
+      "haber": "أخبار",
+      "ekonomi": "اقتصاد",
+      "spor": "رياضة",
+      "teknoloji": "تقنية",
+      "kultur-sanat": "ثقافة وفنون",
+      "saglik": "صحة"
     },
     "reasons": {
       "nefret": "خطاب كراهية",
@@ -1291,7 +1297,13 @@
       "firsat": "عرض",
       "soru-yardim": "مساعدة",
       "kayip-buluntu": "مفقودات",
-      "taziye": "تعزية"
+      "taziye": "تعزية",
+      "haber": "أخبار",
+      "ekonomi": "اقتصاد",
+      "spor": "رياضة",
+      "teknoloji": "تقنية",
+      "kultur-sanat": "ثقافة وفنون",
+      "saglik": "صحة"
     },
     "businessTag": "نشاط تجاري",
     "business": {
