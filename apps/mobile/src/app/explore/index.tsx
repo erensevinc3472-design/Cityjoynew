@@ -236,6 +236,16 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
   const sort = useFeedSort();
   // Otomatik oynatma (Eren, 12 Kasım 2026): ekranda en az %60'ı görünen ilk videolu gönderi oynar; sekme açık değilse,
   // başka ekrana geçildiyse ya da tam ekran açıksa hiçbiri oynamaz.
+  // Aşağı çekip yenileme: yeni gönderiler gelene kadar üstte dönen işaret görünür.
+  const [refreshing, setRefreshing] = useState(false);
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      await reload();
+    } finally {
+      setRefreshing(false);
+    }
+  };
   const [visibleVideo, setVisibleVideo] = useState<string | null>(null);
   const [viewer, setViewer] = useState<string | null>(null);
   const [focused, setFocused] = useState(true);
@@ -430,7 +440,7 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
         maxToRenderPerBatch={4}
         windowSize={7}
         removeClippedSubviews={Platform.OS === 'android'}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={reload} progressViewOffset={topInset} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} progressViewOffset={topInset} />}
       />
       <VideoViewer
         posts={videoPosts}
