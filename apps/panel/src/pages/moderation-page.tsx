@@ -26,6 +26,7 @@ import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 import { Intro } from '../components/intro';
+import { SuspendControl } from '../components/suspend-control';
 
 /** Sekmeler (Eren, 12 Kasım 2026 panel yenileme): alt alta uzun liste yerine türlere göre, yeni şikâyet sayısıyla. */
 const TABS = ['degerlendirmeler', 'gonderiler', 'yorumlar', 'aktiviteler', 'ilanlar', 'profiller', 'mesajlar', 'ayarlar'] as const;
@@ -846,6 +847,7 @@ function ProfileReports({ user, onCount }: { user: PanelUser; onCount?: (n: numb
                     {r.bio ? <p dir="auto" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{r.bio}</p> : null}
                     {!r.current ? <span className="pill warn">{t('moderation.profiles.deleted')}</span> : r.current.bioRemoved ? <span className="pill warn">{t('moderation.profiles.bioRemoved')}</span> : null}
                     {r.current?.photoRemoved ? <span className="pill warn">{t('moderation.profiles.photoRemoved')}</span> : null}
+                    {r.current?.suspended ? <span className="pill warn">{t('suspend.pill')}</span> : null}
                   </td>
                   <td>{t(`moderation.profiles.reasons.${r.reason}`)}</td>
                   <td><span className={r.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`moderation.statuses.${r.status}`)}</span></td>
@@ -855,6 +857,9 @@ function ProfileReports({ user, onCount }: { user: PanelUser; onCount?: (n: numb
                         {r.current && !r.current.bioRemoved && r.current.bio ? <button className="link" disabled={busy} onClick={() => act(() => mod.removeBio(r))}>{t('moderation.profiles.removeBio')}</button> : null}
                         {r.current?.photo ? <button className="link" disabled={busy} onClick={() => act(() => mod.removePhoto(r))}>{t('moderation.profiles.removePhoto')}</button> : null}
                         {r.status === 'yeni' ? <button className="link" disabled={busy} onClick={() => act(() => mod.dismiss(r))}>{t('moderation.profiles.dismiss')}</button> : null}
+                        {r.current ? (
+                          <SuspendControl uid={r.targetUid} name={r.current.displayName} suspended={!!r.current.suspended} onDone={(ok) => { setMessage({ kind: ok ? 'ok' : 'error', text: t(ok ? 'suspend.saved' : 'suspend.error') }); if (ok) load(); }} />
+                        ) : null}
                       </div>
                     </td>
                   )}

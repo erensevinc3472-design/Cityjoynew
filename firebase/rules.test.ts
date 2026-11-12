@@ -432,3 +432,22 @@ describe('günlük sınırlar', () => {
     await assertSucceeds(bump(db('ali'), 3, 'serviceSuggestions/a'));
   });
 });
+
+describe('hesap askıları', () => {
+  it('askı kaydını admin ve kişinin kendisi okur, başkası okuyamaz, kimse yazamaz', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    await seed('suspensions/ali', { uid: 'ali', active: true, reason: 'spam' });
+    await assertSucceeds(getDoc(doc(db('eren'), 'suspensions/ali')));
+    await assertSucceeds(getDoc(doc(db('ali'), 'suspensions/ali')));
+    await assertFails(getDoc(doc(db('veli'), 'suspensions/ali')));
+    await assertFails(setDoc(doc(db('eren'), 'suspensions/veli'), { uid: 'veli', active: true }));
+    await assertFails(setDoc(doc(db('ali'), 'suspensions/ali'), { uid: 'ali', active: false }));
+  });
+
+  it('kişi profiline askı işareti koyamaz ya da silemez; askıdaki profili düzenleyemez', async () => {
+    await seed('publicProfiles/ali', { displayName: 'Ali', bio: '', isPrivate: false, searchKeys: ['ali'], updatedAt: serverTimestamp() });
+    await assertFails(updateDoc(doc(db('ali'), 'publicProfiles/ali'), { suspended: true, updatedAt: serverTimestamp() }));
+    await seed('publicProfiles/veli', { displayName: 'Veli', bio: '', isPrivate: false, searchKeys: ['veli'], suspended: true, updatedAt: serverTimestamp() });
+    await assertFails(updateDoc(doc(db('veli'), 'publicProfiles/veli'), { bio: 'merhaba', updatedAt: serverTimestamp() }));
+  });
+});

@@ -89,6 +89,8 @@ export interface Post extends PostInput {
   cleared: boolean;
   /** CityJoy (admin) Karelerde öne çıkardı. */
   framesFeatured?: boolean;
+  /** Yazarın hesabı askıda (yalnızca sunucu koyar): gönderi akışlarda görünmez. */
+  authorSuspended?: boolean;
   createdAt: string;
 }
 
@@ -142,8 +144,8 @@ export function validatePost(p: PostInput): PostError[] {
 }
 
 /** Akışta görünür mü: kaldırılmamış ve şikâyetle düşmemiş. */
-export function isPostListed(p: Pick<Post, 'status' | 'reportCount' | 'cleared'>): boolean {
-  return p.status === 'aktif' && (p.cleared || p.reportCount < POST_LIMITS.reportThreshold);
+export function isPostListed(p: Pick<Post, 'status' | 'reportCount' | 'cleared' | 'authorSuspended'>): boolean {
+  return p.status === 'aktif' && !p.authorSuspended && (p.cleared || p.reportCount < POST_LIMITS.reportThreshold);
 }
 
 /**

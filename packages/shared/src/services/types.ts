@@ -24,6 +24,8 @@ export type AuthErrorCode =
   | 'network'
   | 'requires-recent-login'
   | 'popup-closed'
+  /** Hesap askıya alındı (giriş kapalı). */
+  | 'account-suspended'
   | 'unknown';
 
 export class AuthError extends Error {

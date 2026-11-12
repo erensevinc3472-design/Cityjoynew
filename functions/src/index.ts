@@ -3,6 +3,7 @@
  * tetikleyiciler var; testler mantığı emülatördeki veritabanıyla doğrudan çağırır.
  */
 import { initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import * as functionsV1 from 'firebase-functions/v1';
@@ -21,6 +22,7 @@ import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './c
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
 import { expoSender } from './push';
 import { handleFollowWrite, handleMessageCreate } from './social';
+import { handleLift, handleSuspend, liftExpiredSuspensions, SuspensionError, type AccountSwitch } from './suspensions';
 import { handleThumb } from './thumbs';
 import { deleteOldTranslations, googleTranslator, handleTranslate, TranslateError } from './translate';
 
@@ -128,6 +130,39 @@ export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 
   await deleteExpiredSos(db, now);
   await deleteExpiredPushLog(db, now);
   await deleteOldTranslations(db, now);
+});
+
+// Hesap askıya alma (yalnızca admin, panelden): giriş kapanır, açık oturumlar düşer.
+const accounts: AccountSwitch = {
+  disable: async (uid) => {
+    await getAuth().updateUser(uid, { disabled: true });
+    await getAuth().revokeRefreshTokens(uid);
+  },
+  enable: async (uid) => {
+    await getAuth().updateUser(uid, { disabled: false });
+  },
+};
+const suspensionCall = async (fn: () => Promise<void>) => {
+  try {
+    await fn();
+    return { ok: true };
+  } catch (e) {
+    if (!(e instanceof SuspensionError)) throw new HttpsError('internal', 'yapilamadi');
+    const code = e.code === 'yetki' ? 'permission-denied' : e.code === 'yok' ? 'not-found' : e.code === 'admin' ? 'failed-precondition' : 'invalid-argument';
+    throw new HttpsError(code, e.code);
+  }
+};
+export const suspendAccount = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return suspensionCall(() => handleSuspend(db, accounts, req.auth!.uid, req.data, new Date()));
+});
+export const liftSuspension = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return suspensionCall(() => handleLift(db, accounts, req.auth!.uid, (req.data as { uid?: unknown } | null)?.uid, new Date()));
+});
+// Süreli askılar saatte bir denetlenir (askı yoksa tek okuma).
+export const suspensionExpiry = onSchedule({ schedule: 'every 1 hours', maxInstances: 1 }, async () => {
+  await liftExpiredSuspensions(db, accounts, new Date());
 });
 
 // "Çevir" düğmesi: yalnızca giriş yapmış kişi; sınır ve önbellek translate.ts'de.

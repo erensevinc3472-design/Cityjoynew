@@ -32,6 +32,7 @@ const CODES: Record<string, AuthErrorCode> = {
   'auth/requires-recent-login': 'requires-recent-login',
   'auth/popup-closed-by-user': 'popup-closed',
   'auth/cancelled-popup-request': 'popup-closed',
+  'auth/user-disabled': 'account-suspended',
 };
 
 function toAuthError(e: unknown): AuthError {

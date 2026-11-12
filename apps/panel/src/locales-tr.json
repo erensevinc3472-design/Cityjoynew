@@ -488,7 +488,7 @@
       "bioRemoved": "Tanıtım kaldırıldı",
       "removeBio": "Tanıtımı kaldır",
       "dismiss": "İşlem gerekmiyor",
-      "note": "Taklit ya da uygunsuz ad için kişiyle iletişime geçin ya da hesabı kapatın (şimdilik Firebase konsolundan). Her işlem işlem kaydına yazılır.",
+      "note": "Taklit, taciz ya da uygunsuz profil için hesabı askıya alabilirsin; kişi giriş yapamaz, profili başkalarına görünmez. Her işlem işlem kaydına yazılır.",
       "reasons": {
         "taklit": "Başkasını taklit ediyor",
         "nefret": "Nefret söylemi",
@@ -1867,7 +1867,7 @@
   },
   "profiles": {
     "title": "Profiller",
-    "intro": "Uygulamadaki kişileri adla ara. Yalnızca herkese açık profil bilgileri görünür.",
+    "intro": "Uygulamadaki kişileri adla ara. Yalnızca herkese açık profil bilgileri görünür. Kurallara uymayan bir hesabı buradan askıya alabilirsin. Askıdaki kişi uygulamaya giriş yapamaz, açık oturumu kapanır; profili ve gönderileri başkalarına \"askıya alınmış\" görünür. Süreli askı süresi dolunca kendiliğinden kalkar. Hesap silinmez, askı her zaman kaldırılabilir.",
     "search": "Ara",
     "placeholder": "Ad yaz (en az 2 harf)",
     "error": "Profiller okunamadı.",
@@ -2248,5 +2248,40 @@
   },
   "common": {
     "howItWorks": "Nasıl çalışır?"
+  },
+  "suspend": {
+    "open": "Askıya al",
+    "lift": "Askıyı kaldır",
+    "pill": "Askıda",
+    "liftConfirm": "{{name}} hesabının askısı kaldırılsın mı? Kişi yeniden giriş yapabilir.",
+    "formLabel": "{{name}} hesabını askıya al",
+    "reason": "Sebep",
+    "duration": "Süre",
+    "note": "Not (yalnızca yöneticiler görür)",
+    "notePlaceholder": "İsteğe bağlı, kısa",
+    "effect": "Kişi giriş yapamaz, açık oturumu kapanır, profili başkalarına görünmez.",
+    "confirm": "Askıya al",
+    "cancel": "Vazgeç",
+    "saved": "Kaydedildi.",
+    "error": "Yapılamadı. Bağlantıyı ya da yetkini kontrol edip yeniden dene.",
+    "listTitle": "Askıdaki hesaplar",
+    "listEmpty": "Askıda hesap yok.",
+    "listError": "Askıdaki hesaplar okunamadı.",
+    "since": "Askı tarihi",
+    "until": "Bitiş",
+    "reasons": {
+      "uygunsuz-icerik": "Uygunsuz içerik",
+      "taciz": "Taciz ya da zorbalık",
+      "spam": "Spam ya da reklam",
+      "sahte-hesap": "Sahte ya da taklit hesap",
+      "yasa-disi": "Yasa dışı içerik",
+      "diger": "Diğer"
+    },
+    "days": {
+      "d1": "1 gün",
+      "d7": "7 gün",
+      "d30": "30 gün",
+      "forever": "Süresiz"
+    }
   }
 }

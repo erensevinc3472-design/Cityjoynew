@@ -84,6 +84,7 @@ function fromDoc(id: string, d: DocumentData): Post {
     ...postVideoOf(d),
     ...(d.frames === true ? { frames: true } : {}),
     ...(d.framesFeatured === true ? { framesFeatured: true } : {}),
+    ...(d.authorSuspended === true ? { authorSuspended: true } : {}),
     createdAt: iso(d.createdAt) ?? '',
   };
 }

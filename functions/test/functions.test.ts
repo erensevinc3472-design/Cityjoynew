@@ -11,6 +11,7 @@ import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
+import { handleLift, handleSuspend, liftExpiredSuspensions } from '../src/suspensions';
 import { handleThumb, type ThumbStore } from '../src/thumbs';
 import sharp from 'sharp';
 import { deleteOldTranslations, handleTranslate, translationId, type Translator } from '../src/translate';
@@ -590,5 +591,75 @@ describe('küçük kopya', () => {
     expect(await handleThumb('posts/u1/p1/video.mp4', 'video/mp4', 't', store)).toBeNull();
     expect(await handleThumb('baska/x.jpg', 'image/jpeg', 't', store)).toBeNull();
     expect(written).toHaveLength(0);
+  });
+});
+
+describe('hesap askıya alma', () => {
+  const fake = () => {
+    const off = new Set<string>();
+    return { off, accounts: { disable: async (u: string) => void off.add(u), enable: async (u: string) => void off.delete(u) } };
+  };
+  beforeEach(async () => {
+    await db.doc('admins/A').set({ at: Timestamp.now() });
+    await db.doc('publicProfiles/U').set({ displayName: 'Ali V.', bio: '', isPrivate: false });
+    await db.doc('users/U').set({ uid: 'U' });
+  });
+
+  it('admin askıya alır: giriş kapanır, profil işaretlenir, kayıt ve işlem kaydı yazılır', async () => {
+    const { off, accounts } = fake();
+    await handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'taciz', days: 7, note: 'üç şikâyet' }, NOW);
+    expect(off.has('U')).toBe(true);
+    expect((await db.doc('publicProfiles/U').get()).get('suspended')).toBe(true);
+    const s = await db.doc('suspensions/U').get();
+    expect(s.get('active')).toBe(true);
+    expect(s.get('displayName')).toBe('Ali V.');
+    expect((s.get('until') as Timestamp).toMillis()).toBe(NOW.getTime() + 7 * 86_400_000);
+    expect((await db.collection('auditLog').where('targetId', '==', 'U').get()).size).toBe(1);
+  });
+
+  it('admin olmayan, admini ya da kendini askıya alamaz; geçersiz istek reddedilir', async () => {
+    const { off, accounts } = fake();
+    await expect(handleSuspend(db, accounts, 'U', { uid: 'A', reason: 'spam', days: null }, NOW)).rejects.toThrow('yetki');
+    await db.doc('admins/B').set({ at: Timestamp.now() });
+    await expect(handleSuspend(db, accounts, 'A', { uid: 'B', reason: 'spam', days: null }, NOW)).rejects.toThrow('admin');
+    await expect(handleSuspend(db, accounts, 'A', { uid: 'A', reason: 'spam', days: null }, NOW)).rejects.toThrow('admin');
+    await expect(handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'kotu', days: 7 }, NOW)).rejects.toThrow('gecersiz');
+    await expect(handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'spam', days: 5 }, NOW)).rejects.toThrow('gecersiz');
+    expect(off.size).toBe(0);
+  });
+
+  it('askı kaldırılınca giriş açılır ve profil işareti silinir', async () => {
+    const { off, accounts } = fake();
+    await handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'spam', days: null }, NOW);
+    await handleLift(db, accounts, 'A', 'U', NOW);
+    expect(off.has('U')).toBe(false);
+    expect((await db.doc('publicProfiles/U').get()).get('suspended')).toBeUndefined();
+    expect((await db.doc('suspensions/U').get()).get('active')).toBe(false);
+    await expect(handleLift(db, accounts, 'A', 'U', NOW)).rejects.toThrow('yok');
+  });
+
+  it('askıda kişinin kendi gönderileri akıştan gizlenir, işletme adına olanlar kalır; askı kalkınca geri açılır', async () => {
+    const { accounts } = fake();
+    await db.doc('posts/p1').set({ authorUid: 'U', status: 'aktif' });
+    await db.doc('posts/p2').set({ authorUid: 'U', status: 'aktif', business: { id: 'b1', name: 'Kafe' } });
+    await db.doc('posts/p3').set({ authorUid: 'X', status: 'aktif' });
+    await handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'spam', days: null }, NOW);
+    expect((await db.doc('posts/p1').get()).get('authorSuspended')).toBe(true);
+    expect((await db.doc('posts/p2').get()).get('authorSuspended')).toBeUndefined();
+    expect((await db.doc('posts/p3').get()).get('authorSuspended')).toBeUndefined();
+    await handleLift(db, accounts, 'A', 'U', NOW);
+    expect((await db.doc('posts/p1').get()).get('authorSuspended')).toBeUndefined();
+  });
+
+  it('süresi dolan askı kendiliğinden kalkar, süresiz olan kalır', async () => {
+    const { off, accounts } = fake();
+    await db.doc('publicProfiles/V').set({ displayName: 'Veli', bio: '', isPrivate: false });
+    await handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'spam', days: 1 }, NOW);
+    await handleSuspend(db, accounts, 'A', { uid: 'V', reason: 'spam', days: null }, NOW);
+    expect(await liftExpiredSuspensions(db, accounts, new Date(NOW.getTime() + 3_600_000))).toBe(0);
+    expect(await liftExpiredSuspensions(db, accounts, new Date(NOW.getTime() + 2 * 86_400_000))).toBe(1);
+    expect(off.has('U')).toBe(false);
+    expect(off.has('V')).toBe(true);
+    expect(await liftExpiredSuspensions(db, accounts, new Date(NOW.getTime() + 3 * 86_400_000))).toBe(0);
   });
 });

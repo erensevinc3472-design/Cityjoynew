@@ -114,7 +114,8 @@
     "requiresRecentLogin": "Güvenliğin için şifreni tekrar girmen gerekiyor.",
     "unknown": "Bir sorun oluştu. Lütfen tekrar dene.",
     "notConfigured": "Uygulama henüz sunucuya bağlı değil.",
-    "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Başka bir ad yazın."
+    "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Başka bir ad yazın.",
+    "accountSuspended": "Bu hesap askıya alındı. Bir yanlışlık olduğunu düşünüyorsan bizimle iletişime geç."
   },
   "reset": {
     "title": "Şifreni sıfırla",
@@ -1284,7 +1285,9 @@
       "photo": "Profil fotoğrafı",
       "photoHint": "Herkese açık görünür. Kare kırpılır, küçültülür; konum bilgisi silinir.",
       "photoRemoved": "Profil fotoğrafın şikâyet üzerine kaldırıldı; yeni fotoğraf koyamazsın.",
-      "photoZoom": "Profil fotoğrafını büyüt"
+      "photoZoom": "Profil fotoğrafını büyüt",
+      "suspended": "Bu profil askıya alındı.",
+      "suspendedNote": "Profili ve gönderileri şu an görünmüyor."
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
     "share": "Paylaş",

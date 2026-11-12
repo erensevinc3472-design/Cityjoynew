@@ -97,6 +97,8 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     const p = await socialRepository.getProfile(uid).catch(() => null);
     setProfile(p);
     if (!p) return;
+    // Askıdaki hesabın profili ve gönderileri başkalarına gösterilmez.
+    if (p.suspended && !own) return setPosts([]);
     socialRepository.counts(uid).then(setCounts, () => setCounts(null));
     if (own) {
       socialRepository.requests(uid).then(setRequests, () => setRequests([]));
@@ -135,6 +137,18 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
         {top(own ? t('explore.profile.mine') : t('explore.profile.title'))}
         <View style={styles.pad}>
           {!user ? <FormMessage kind="info" text={t('explore.signIn')} /> : profile === undefined ? <StateMessage kind="loading" /> : <StateMessage kind="empty" message={t('explore.profile.missing')} />}
+        </View>
+        {footer}
+      </View>
+    );
+  }
+
+  if (profile.suspended && !own) {
+    return (
+      <View style={[styles.root, { backgroundColor: c.background }]}>
+        {top(t('explore.profile.title'))}
+        <View style={styles.pad}>
+          <StateMessage kind="empty" message={`${t('explore.profile.suspended')} ${t('explore.profile.suspendedNote')}`} />
         </View>
         {footer}
       </View>

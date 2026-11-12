@@ -1,5 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState, type PropsWithChildren } from 'react';
-import type { AuthUser, UserProfile } from '@cityjoy/shared';
+import { Alert, AppState } from 'react-native';
+import { AuthError, type AuthUser, type UserProfile } from '@cityjoy/shared';
+
+import i18n from './i18n';
 
 import { isFirebaseConfigured } from './firebase-config';
 import { reconcileOfficialFollows } from './official-follow-sync';
@@ -58,6 +61,22 @@ export function SessionProvider({ children }: PropsWithChildren) {
       setReady(true);
     });
   }, [adopt]);
+
+  // Hesap askıya alındıysa açık oturum da kapanır: açılışta ve uygulamaya her dönüşte hesap yeniden denetlenir.
+  const uid = user?.uid;
+  useEffect(() => {
+    if (!isFirebaseConfigured || !uid) return;
+    const check = () =>
+      authService.reload().catch(async (e) => {
+        if (!(e instanceof AuthError) || e.code !== 'account-suspended') return;
+        await authService.signOut().catch(() => {});
+        await adopt(null);
+        Alert.alert(i18n.t('errors.accountSuspended'));
+      });
+    check();
+    const sub = AppState.addEventListener('change', (s) => s === 'active' && check());
+    return () => sub.remove();
+  }, [uid, adopt]);
 
   const refreshProfile = useCallback(async () => (user ? loadProfile(user.uid) : null), [user, loadProfile]);
   const refreshUser = useCallback(async () => {

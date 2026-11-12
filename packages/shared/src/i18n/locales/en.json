@@ -114,7 +114,8 @@
     "requiresRecentLogin": "For your security, please enter your password again.",
     "unknown": "Something went wrong. Please try again.",
     "notConfigured": "The app isn't connected to the server yet.",
-    "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Please choose another name."
+    "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Please choose another name.",
+    "accountSuspended": "This account has been suspended. If you think this is a mistake, please contact us."
   },
   "reset": {
     "title": "Reset your password",
@@ -1284,7 +1285,9 @@
       "photo": "Profile photo",
       "photoHint": "Visible to everyone. It is cropped square and resized; location data is removed.",
       "photoRemoved": "Your profile photo was removed after a report; you cannot add a new one.",
-      "photoZoom": "Enlarge profile photo"
+      "photoZoom": "Enlarge profile photo",
+      "suspended": "This profile has been suspended.",
+      "suspendedNote": "Its profile and posts are not visible right now."
     },
     "takipFeedHint": "posts shared only with followers by people you follow",
     "share": "Share",

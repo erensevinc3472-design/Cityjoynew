@@ -105,7 +105,7 @@ async function lookup<T>(cacheKey: string, query: string, min: number, fetch: (k
 }
 
 export const searchPeople = (query: string) =>
-  lookup<PublicProfile>('kisi', query, SEARCH_LIMITS.minName, (k) => socialRepository.searchPeople(k), (p) => p.displayName);
+  lookup<PublicProfile>('kisi', query, SEARCH_LIMITS.minName, (k) => socialRepository.searchPeople(k).then((l) => l.filter((p) => !p.suspended)), (p) => p.displayName);
 
 export const searchBusinesses = (query: string, provinceCode: string) =>
   lookup<Business>(`isletme|${provinceCode}`, query, SEARCH_LIMITS.minName, (k) => businessRepository.searchByName(provinceCode, k), (b) => b.name);

@@ -22,6 +22,8 @@ export interface PublicProfile {
   photoRemoved: boolean;
   /** Konum rozeti (madde 5): mahallesi ya da ilçesi telefonun konumuyla doğrulandı; mahallenin adı görünmez. */
   locationVerified?: LocationBadge;
+  /** Hesap askıya alındı (yalnızca sunucu koyar): profil ve gönderiler başkalarına gösterilmez. */
+  suspended?: boolean;
 }
 
 export const PROFILE_LIMITS = {

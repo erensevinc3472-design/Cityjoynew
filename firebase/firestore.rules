@@ -1188,6 +1188,12 @@ service cloud.firestore {
       allow update: if _k49(request.resource.data, resource.data);
     }
 
+    // Hesap askıları (Eren, 12 Kasım 2026): yalnızca sunucu işlevi yazar; admin hepsini, kişi kendi kaydını okur.
+    match /suspensions/{uid} {
+      allow read: if isAdmin() || isSelf(uid);
+      allow write: if false;
+    }
+
     match /config/{id} {
       // Günlük sınır sayıları (Panel > Sınırlar, yalnızca admin).
       function limitsOk(d) {
