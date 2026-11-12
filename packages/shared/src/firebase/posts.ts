@@ -518,7 +518,11 @@ export function createPostModeration(db: Firestore, actorUid: string) {
       return Promise.all(
         snap.docs.map(async (d) => {
           const data = d.data();
-          const c = await getDoc(commentRef(db, data.postId, data.commentId)).catch(() => null);
+          // Aynı gönderiye birden çok şikâyet olsa da her biri ayrı okunur; liste en çok 100 olduğu için yeterli.
+          const [c, p] = await Promise.all([
+            getDoc(commentRef(db, data.postId, data.commentId)).catch(() => null),
+            getDoc(postRef(db, data.postId)).catch(() => null),
+          ]);
           return {
             id: d.id,
             postId: data.postId,
@@ -530,6 +534,7 @@ export function createPostModeration(db: Firestore, actorUid: string) {
             status: data.status,
             createdAt: iso(data.createdAt) ?? '',
             comment: c?.exists() ? commentFromDoc(data.postId, c.id, c.data()) : null,
+            post: p?.exists() ? fromDoc(p.id, p.data()) : null,
           };
         }),
       );
@@ -583,6 +588,8 @@ export interface CommentReport {
   status: 'yeni' | 'incelendi';
   createdAt: string;
   comment: PostComment | null;
+  /** Yorumun yapıldığı gönderi (moderatör yorumu bağlamıyla görsün diye); silinmişse null. */
+  post: Post | null;
 }
 
 /**

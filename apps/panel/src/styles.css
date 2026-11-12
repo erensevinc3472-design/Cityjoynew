@@ -355,3 +355,7 @@ td.handle-cell { width: 40px; padding-inline: 4px; }
 .group-toggle:disabled { cursor: default; }
 .group-toggle > span:first-child { width: 1.1rem; color: var(--accent); font-size: 1.1rem; line-height: 1; }
 .group-toggle .meta { font-size: 0.8rem; }
+/* Moderasyon: şikâyet edilen yorumun yapıldığı gönderi. */
+.post-context { margin-top: 0.5rem; padding: 0.5rem 0.75rem; border-inline-start: 3px solid var(--border); background: var(--hover); border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.post-context-text { margin: 0; font-size: 0.85rem; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-wrap; }
+.panel-form .full-row { grid-column: 1 / -1; }

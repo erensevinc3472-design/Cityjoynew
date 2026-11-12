@@ -43,6 +43,7 @@ export * from './activities/activities';
 export * from './posts/posts';
 export * from './posts/social';
 export * from './posts/word-filter';
+export * from './posts/default-banned-words';
 export * from './search/search';
 export * from './media/photo';
 export * from './media/video';

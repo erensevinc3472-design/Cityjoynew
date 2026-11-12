@@ -476,7 +476,9 @@
       "counts": "{{reports}} şikâyet",
       "deleted": "Yorum silinmiş",
       "remove": "Yorumu sil",
-      "note": "Nefret söylemi, taciz, dolandırıcılık, reklam ya da uygunsuz içerikte silin. Yazı, şikâyet anındaki kopyadır. Her işlem işlem kaydına yazılır."
+      "note": "Nefret söylemi, taciz, dolandırıcılık, reklam ya da uygunsuz içerikte silin. Yazı, şikâyet anındaki kopyadır. Her işlem işlem kaydına yazılır.",
+      "onPost": "Yorum yapılan gönderi: {{name}}",
+      "postMissing": "Yorum yapılan gönderi silinmiş."
     },
     "profiles": {
       "title": "Keşfet profil şikâyetleri",
@@ -522,7 +524,8 @@
       "label": "Her satıra bir kelime ya da ifade",
       "hint": "Büyük-küçük harf, Türkçe karakter (ı/i, ğ/g), rakamla yazım (s4l4k) ve harf tekrarı (salaaak) fark etmez. 4 harf ve üstü kelimeler ekli hâlleriyle de yakalanır. Kısa kelimelerde (3 harf ve altı) yalnızca tam eşleşme aranır.",
       "save": "Listeyi kaydet",
-      "saved": "Kaydedildi: {{count}} kelime. Uygulama yeni listeyi bir sonraki açılışta kullanır."
+      "saved": "Kaydedildi: {{count}} kelime. Uygulama yeni listeyi bir sonraki açılışta kullanır.",
+      "defaultNote": "Bu CityJoy'un hazır listesi (Türkçe, İngilizce, Almanca, Arapça, Rusça küfür ve argo) ve şu an uygulamada geçerli. İstediğiniz kelimeyi silip ekleyin; Kaydet'e basınca sizin listeniz geçerli olur."
     },
     "suggestions": {
       "title": "Önerilen aramalar",

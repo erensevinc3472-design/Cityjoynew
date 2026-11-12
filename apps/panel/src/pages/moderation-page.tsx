@@ -216,6 +216,28 @@ export function ModerationPage() {
   );
 }
 
+/** Yorumun yapıldığı gönderi: kim paylaştı, yazının başı ve fotoğrafları (tıklayınca büyük açılır). */
+function PostContext({ post }: { post: CommentReport['post'] }) {
+  if (!post) return <div className="post-context meta">{t('moderation.comments.postMissing')}</div>;
+  return (
+    <div className="post-context">
+      <span className="meta">{t('moderation.comments.onPost', { name: post.authorName })}</span>
+      {post.text ? <p dir="auto" className="post-context-text">{post.text}</p> : null}
+      {post.photos?.length ? (
+        <div className="photo-row">
+          {post.photos.map((p, i) => (
+            <a key={p.path} href={p.url} target="_blank" rel="noreferrer noopener" title={t('moderation.posts.photo', { n: i + 1 })}>
+              <img src={p.url} alt={t('moderation.posts.photo', { n: i + 1 })} loading="lazy" />
+            </a>
+          ))}
+        </div>
+      ) : null}
+      {post.video ? <video className="mod-video" src={post.video.url} controls preload="metadata" aria-label={t('moderation.posts.video', { seconds: post.video.durationSec })} /> : null}
+      {post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : null}
+    </div>
+  );
+}
+
 /**
  * Aktivite şikâyetleri (PROJE.md 5.3): admin hepsini, il yöneticisi ve il düzeyindeki gönüllü moderatör kendi ilini görür.
  * Üç şikâyet alan aktivite uygulamada listeden düşer; "Kaldır" tamamen kaldırır, "Yerinde kalsın" geri getirir.
@@ -713,6 +735,7 @@ function CommentReports({ user, onCount }: { user: PanelUser; onCount?: (n: numb
                       <span className="pill warn">{t('moderation.comments.deleted')}</span>
                     )}
                     {r.comment?.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
+                    <PostContext post={r.post} />
                   </td>
                   <td>{t(`moderation.posts.reasons.${r.reason}`)}</td>
                   <td><span className={r.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`moderation.statuses.${r.status}`)}</span></td>
@@ -954,6 +977,7 @@ function MessageReports({ user, onCount }: { user: PanelUser; onCount?: (n: numb
  */
 function BannedWords({ user }: { user: PanelUser }) {
   const [text, setText] = useState<string | null>(null);
+  const [saved, setSaved] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -962,7 +986,9 @@ function BannedWords({ user }: { user: PanelUser }) {
   const load = useCallback(async () => {
     setLoadError(false);
     try {
-      setText((await store.get()).join('\n'));
+      const r = await store.load();
+      setText(r.words.join('\n'));
+      setSaved(r.saved);
     } catch {
       setLoadError(true);
     }
@@ -980,6 +1006,7 @@ function BannedWords({ user }: { user: PanelUser }) {
     try {
       const saved = await store.save(user.uid, text.split('\n'));
       setText(saved.join('\n'));
+      setSaved(true);
       setMessage({ kind: 'ok', text: t('moderation.words.saved', { count: saved.length }) });
     } catch {
       setMessage({ kind: 'error', text: t('moderation.error') });
@@ -1006,9 +1033,10 @@ function BannedWords({ user }: { user: PanelUser }) {
         <div className="state" aria-live="polite">{t('moderation.loading')}</div>
       ) : (
         <form className="form panel-form" onSubmit={submit}>
-          <div className="field">
+          {!saved ? <p className="note full-row">{t('moderation.words.defaultNote')}</p> : null}
+          <div className="field full-row">
             <label htmlFor="banned-words">{t('moderation.words.label')}</label>
-            <textarea id="banned-words" rows={8} value={text} disabled={user.isDemo} onChange={(e) => setText(e.target.value)} />
+            <textarea id="banned-words" rows={14} value={text} disabled={user.isDemo} onChange={(e) => setText(e.target.value)} />
             <span className="meta">{t('moderation.words.hint')}</span>
           </div>
           {user.isDemo ? null : (
