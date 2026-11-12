@@ -55,6 +55,7 @@ export * from './billing/billing';
 export * from './limits/limits';
 export * from './travel/travel';
 export * from './travel/plan';
+export * from './travel/itinerary';
 export * from './travel/seed';
 export * from './travel/holiday';
 export * from './travel/sheet';

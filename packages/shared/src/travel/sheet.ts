@@ -6,7 +6,9 @@ import {
   TRAVEL_CATEGORIES,
   TRAVEL_LIMITS,
   TRAVEL_MODES,
+  parseGeo,
   validateTravelPlace,
+  validHours,
   validateTravelText,
   type NearbyKind,
   type TravelCategory,
@@ -31,7 +33,8 @@ export const TRAVEL_SHEETS = {
     columns: [
       'il', 'ilce', 'ad', 'tur', 'kategori', 'ozet', 'hakkinda', 'tarihce', 'mimari', 'ziyaret_saatleri', 'giris_ucreti',
       'onerilen_sure', 'adres', 'nasil_gidilir', 'yakindakiler', 'ipuclari', 'erisilebilirlik', 'telefon', 'web', 'video',
-      'mutlaka_gor', 'kaynak', 'sira', 'yas_bilgisi', 'yanina_al', 'kurallar',
+      'mutlaka_gor', 'kaynak', 'sira', 'yas_bilgisi', 'yanina_al', 'kurallar', 'konum', 'kalis_dk', 'acilis', 'kapanis',
+      'kapali_gunler', 'namaz',
     ],
   },
 } as const;
@@ -70,6 +73,12 @@ export const TRAVEL_SHEET_HELP: Record<string, string> = {
   yas_bilgisi: 'İsteğe bağlı: yaş sınırı, çocuklar ve bebek arabası için kısa not',
   yanina_al: `İsteğe bağlı: giderken yanına alınacaklar, en çok ${TRAVEL_LIMITS.listItems}, " | " ile`,
   kurallar: `İsteğe bağlı: uyulması gereken kurallar, en çok ${TRAVEL_LIMITS.listItems}, " | " ile`,
+  konum: 'İsteğe bağlı (Gezimi planla, Yakınımda): Google Haritalar koordinatı, "40.1826, 29.0619" gibi',
+  kalis_dk: 'İsteğe bağlı: önerilen kalış, dakika (45)',
+  acilis: 'İsteğe bağlı: açılış saati "09:00"; her zaman açıksa "Her zaman"',
+  kapanis: 'İsteğe bağlı: kapanış saati "18:00"',
+  kapali_gunler: 'İsteğe bağlı: kapalı günler, " | " ile (Pazartesi | Salı)',
+  namaz: 'İsteğe bağlı: namaz vakitlerinde ziyaret kısıtlıysa Evet',
 };
 
 export interface TravelSheetError {
@@ -89,7 +98,46 @@ const str = (v: unknown) => (v === null || v === undefined ? '' : String(v).trim
 const list = (v: unknown) => str(v).split('|').map((x) => x.trim()).filter(Boolean);
 const keyOf = (s: string) => normalizeName(s);
 /** Sonradan eklenen sütunlar: eski dosyalarda olmayabilir. */
-const OPTIONAL_COLUMNS: readonly string[] = ['yas_bilgisi', 'yanina_al', 'kurallar'];
+const OPTIONAL_COLUMNS: readonly string[] = ['yas_bilgisi', 'yanina_al', 'kurallar', 'konum', 'kalis_dk', 'acilis', 'kapanis', 'kapali_gunler', 'namaz'];
+
+const DAY_KEYS = ['pazar', 'pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi'];
+
+/** Excel saat hücresi (0,375 gibi gün kesri) ya da "9:00" → "09:00". */
+function clock(s: string): string {
+  const pad = (n: number | string) => String(n).padStart(2, '0');
+  if (/^0?\.\d+$/.test(s)) {
+    const m = Math.round(Number(s) * 24 * 60);
+    return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+  }
+  const m = s.match(/^(\d{1,2})[.:](\d{2})$/);
+  return m ? `${pad(m[1]!)}:${m[2]}` : s;
+}
+
+/** Konum, kalış ve açılış saatleri sütunları (hepsi isteğe bağlı). Hata varsa açıklama döner. */
+function planColumns(v: (k: string) => string): Pick<TravelPlaceInput, 'location' | 'hours' | 'durationMinutes'> | string {
+  const out: Pick<TravelPlaceInput, 'location' | 'hours' | 'durationMinutes'> = {};
+  if (v('konum')) {
+    const g = parseGeo(v('konum'));
+    if (!g) return 'Konum "40.1826, 29.0619" biçiminde olmalı';
+    out.location = g;
+  }
+  if (v('kalis_dk')) {
+    const n = Number(v('kalis_dk'));
+    if (!Number.isInteger(n) || n < 10 || n > 720) return 'Kalış 10-720 dakika arasında tam sayı olmalı';
+    out.durationMinutes = n;
+  }
+  const open = clock(v('acilis'));
+  const days = list(v('kapali_gunler')).map((d) => DAY_KEYS.indexOf(keyOf(d)));
+  if (days.some((d) => d < 0)) return 'Kapalı günler gün adı olmalı (Pazartesi | Salı)';
+  const prayer = keyOf(v('namaz')) === 'evet';
+  if (open || v('kapanis') || days.length || prayer) {
+    const allDay = keyOf(open) === 'her zaman';
+    const hours = allDay ? { allDay, closedDays: days, prayer } : { allDay, open, close: clock(v('kapanis')), closedDays: days, prayer };
+    if (!validHours(hours)) return 'Açılış ve kapanış "09:00" biçiminde olmalı, açılış kapanıştan önce';
+    out.hours = hours;
+  }
+  return out;
+}
 
 /** "il + ad"dan kalıcı kimlik: aynı yer yeniden yüklenince güncellenir. */
 export function travelPlaceId(cityId: string, name: string): string {
@@ -204,6 +252,8 @@ export function parseTravelWorkbook(
         const order = v('sira') ? Number(v('sira')) : idx + 1;
         if (!Number.isFinite(order)) return err('Sıra sayı olmalı');
         const opt = (k: string, key: string) => (v(k) ? { [key]: v(k) } : {});
+        const plan = planColumns(v);
+        if (typeof plan === 'string') return err(plan);
         const tel = v('telefon').replace(/\D/g, '');
         if (v('telefon') && (tel.length < 7 || /^0?5\d{9}$/.test(tel))) return err('Telefon yalnızca kurumun sabit/çağrı merkezi numarası');
         const data: Omit<TravelPlaceInput, 'status' | 'cover'> = {
@@ -232,6 +282,7 @@ export function parseTravelWorkbook(
           ...opt('yas_bilgisi', 'ageInfo'),
           ...(list(v('yanina_al')).length ? { bring: list(v('yanina_al')) } : {}),
           ...(list(v('kurallar')).length ? { rules: list(v('kurallar')) } : {}),
+          ...plan,
           order,
         };
         const e = validateTravelPlace({ ...data, status: 'taslak' });

@@ -30,6 +30,7 @@ import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { ImageField } from '../components/image-field';
 import { TourEditor } from '../components/tour-editor';
+import { PlacePlanFields } from '../components/place-plan-fields';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 import { FramesTab, LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
 
@@ -512,6 +513,7 @@ function AdminTravelPage() {
               {field('p-fee', t('travel.entranceFee'), P.entranceFee ?? '', (v) => setP({ entranceFee: v }), { max: 200 })}
               {field('p-dur', t('travel.duration'), P.suggestedDuration ?? '', (v) => setP({ suggestedDuration: v }), { max: 200 })}
               {field('p-addr', t('travel.address'), P.address ?? '', (v) => setP({ address: v }), { max: 200 })}
+              <PlacePlanFields key={P.id ?? 'yeni'} value={{ location: P.location, hours: P.hours, durationMinutes: P.durationMinutes }} onChange={setP} disabled={busy} />
               {field('p-how', t('travel.howToGet'), P.howToGet, (v) => setP({ howToGet: v }), { multiline: true, hint: t('travel.howHint', { modes: TRAVEL_MODES.join(', ') }) })}
               {field('p-near', t('travel.nearby'), P.nearby, (v) => setP({ nearby: v }), { multiline: true, hint: t('travel.nearbyHint', { kinds: NEARBY_KINDS.join(', ') }) })}
               {field('p-tips', t('travel.tips'), P.tips, (v) => setP({ tips: v }), { multiline: true, hint: t('travel.tipsHint') })}

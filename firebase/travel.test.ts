@@ -60,6 +60,16 @@ describe('seyahat', () => {
     await admin.savePlace(id, { ...input, name: 'Irgandı Köprüsü', status: 'yayinda', order: 10, tour });
     expect((await app.getPlace(id))?.tour?.[0]?.points[0]?.title).toBe('Şadırvan');
     await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, tour: Array.from({ length: 7 }, () => tour[0]), updatedAt: new Date() }));
+    // Gezimi planla: konum, açılış saatleri ve kalış süresi yazılır; bozuk saat ve konum reddedilir.
+    const plan = { location: { lat: 40.184, lng: 29.062 }, hours: { allDay: false, open: '09:00', close: '18:00', closedDays: [1], prayer: true }, durationMinutes: 45 };
+    await admin.savePlace(id, { ...input, name: 'Irgandı Köprüsü', status: 'yayinda', order: 10, ...plan });
+    const read = await app.getPlace(id);
+    expect([read?.location, read?.hours, read?.durationMinutes]).toEqual([plan.location, plan.hours, 45]);
+    await admin.savePlace(id, { ...input, name: 'Irgandı Köprüsü', status: 'yayinda', order: 10, hours: { allDay: true, closedDays: [], prayer: false } });
+    expect((await app.getPlace(id))?.hours).toEqual({ allDay: true, closedDays: [], prayer: false });
+    await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, hours: { ...plan.hours, open: '19:00' }, updatedAt: new Date() }));
+    await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, location: { lat: 140, lng: 29 }, updatedAt: new Date() }));
+    await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, durationMinutes: 5, updatedAt: new Date() }));
     await admin.deletePlace({ ...base, id });
     expect((await app.listPlaces('16')).map((p) => p.id)).not.toContain(id);
 

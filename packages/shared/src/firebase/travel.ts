@@ -27,6 +27,7 @@ import type {
   TravelReviewStatus,
   TravelRoute,
   TravelRouteInput,
+  PlaceHours,
   TourScene,
 } from '../travel/travel';
 import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
@@ -101,6 +102,10 @@ const tourOf = (d: DocumentData): { tour?: TourScene[] } => {
   });
   return tour.length ? { tour } : {};
 };
+
+/** Açılış saatleri: her zaman açıkta saat alanı yazılmaz (Firestore boş değer kabul etmez). */
+const cleanHours = (h: PlaceHours | undefined) =>
+  h ? { allDay: h.allDay, ...(h.allDay ? {} : { open: h.open, close: h.close }), closedDays: [...h.closedDays].sort((a, b) => a - b), prayer: h.prayer } : undefined;
 
 /** Yazılacak sahneler: resim dört alanıyla, yazılar kırpılmış. Boşsa alan yazılmaz. */
 const cleanTour = (tour: TourScene[] | undefined) =>
@@ -251,7 +256,7 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
     async savePlace(id: string | null, p: TravelPlaceInput): Promise<string> {
       const ref = id ? doc(db, PLACES, id) : doc(collection(db, PLACES));
       const batch = writeBatch(db);
-      batch.set(ref, { ...clean({ ...p, tour: cleanTour(p.tour) } as unknown as Record<string, unknown>), updatedAt: serverTimestamp() });
+      batch.set(ref, { ...clean({ ...p, tour: cleanTour(p.tour), hours: cleanHours(p.hours) } as unknown as Record<string, unknown>), updatedAt: serverTimestamp() });
       audit(batch, ref.id, id ? 'duzenle' : 'ekle', `Gezilecek yer: ${p.name}`);
       await batch.commit();
       return ref.id;
@@ -343,7 +348,8 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
           byCity.set(p.data.cityId, names);
         }
         const existing = names.get(p.id);
-        writes.push({ col: PLACES, id: existing ?? p.id, data: p.data as unknown as Record<string, unknown>, isNew: !existing && !(await exists(PLACES, p.id)) });
+        const data = { ...p.data, hours: cleanHours(p.data.hours) };
+        writes.push({ col: PLACES, id: existing ?? p.id, data: data as unknown as Record<string, unknown>, isNew: !existing && !(await exists(PLACES, p.id)) });
       }
       for (let i = 0; i < writes.length; i += 400) {
         const part = writes.slice(i, i + 400);

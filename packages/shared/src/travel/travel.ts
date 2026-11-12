@@ -117,6 +117,25 @@ export interface TourScene {
 
 export const TOUR_LIMITS = { scenes: 6, points: 8, label: 24, title: 50, text: 300, story: 2000 } as const;
 
+/** Konum (enlem, boylam). Yakınımda ve Gezimi planla kullanır (Karar, Eren, 12 Kasım 2026). */
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+/**
+ * Hesaplanabilir açılış saatleri (Gezimi planla). Düz yazı `visitingHours` kullanıcıya gösterilmeye devam eder.
+ * `allDay`: her zaman açık (köprü, köy, park); değilse `open`–`close` ("09:00", "18:30"). `closedDays`: kapalı günler
+ * (0 = pazar … 6 = cumartesi). `prayer`: namaz vakitlerinde ziyaret kısıtlı (cami); planlayıcı cuma öğlesine koymaz.
+ */
+export interface PlaceHours {
+  allDay: boolean;
+  open?: string;
+  close?: string;
+  closedDays: number[];
+  prayer: boolean;
+}
+
 /** Gezilecek yer (deneyim). */
 export interface TravelPlace {
   id: string;
@@ -135,6 +154,10 @@ export interface TravelPlace {
   visitingHours?: string;
   entranceFee?: string;
   suggestedDuration?: string;
+  /** Planlayıcı için önerilen kalış (dakika); yoksa kategoriye göre tahmin edilir. */
+  durationMinutes?: number;
+  hours?: PlaceHours;
+  location?: LatLng;
   address?: string;
   howToGet: TravelStep[];
   nearby: TravelNearby[];
@@ -177,7 +200,7 @@ export const TRAVEL_LIMITS = {
 
 export type TravelPlaceInput = Omit<TravelPlace, 'id' | 'updatedAt'>;
 
-export type TravelError = 'name' | 'kind' | 'summary' | 'about' | 'tagline' | 'description' | 'lists' | 'website' | 'video' | 'tour';
+export type TravelError = 'name' | 'kind' | 'summary' | 'about' | 'tagline' | 'description' | 'lists' | 'website' | 'video' | 'tour' | 'location' | 'hours' | 'duration';
 
 /** Sahne sayısı, adlar, nokta yerleri (0-1) ve yazı uzunlukları. */
 export function validateTour(tour: TourScene[] | undefined): boolean {
@@ -224,7 +247,49 @@ export function validateTravelPlace(p: TravelPlaceInput): TravelError[] {
   if (!httpsOk(p.website)) e.push('website');
   if (!httpsOk(p.videoUrl)) e.push('video');
   if (!validateTour(p.tour)) e.push('tour');
+  if (p.location && !validGeo(p.location)) e.push('location');
+  if (p.hours && !validHours(p.hours)) e.push('hours');
+  if (p.durationMinutes !== undefined && !(Number.isInteger(p.durationMinutes) && p.durationMinutes >= 10 && p.durationMinutes <= 720)) e.push('duration');
   return e;
+}
+
+export const validGeo = (g: LatLng) =>
+  Number.isFinite(g.lat) && Number.isFinite(g.lng) && Math.abs(g.lat) <= 90 && Math.abs(g.lng) <= 180 && !(g.lat === 0 && g.lng === 0);
+
+const HHMM = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+
+/** "09:30" → 570 (gün içindeki dakika). */
+export const minutesOf = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
+
+export function validHours(h: PlaceHours): boolean {
+  const days = h.closedDays ?? [];
+  const daysOk = days.length <= 6 && days.every((d) => Number.isInteger(d) && d >= 0 && d <= 6) && new Set(days).size === days.length;
+  if (!daysOk || typeof h.prayer !== 'boolean') return false;
+  if (h.allDay) return !h.open && !h.close;
+  return !!h.open && !!h.close && HHMM.test(h.open) && HHMM.test(h.close) && minutesOf(h.open) < minutesOf(h.close);
+}
+
+/**
+ * Panelde yapıştırılan Google Haritalar bağlantısından ya da "40.18, 29.06" yazısından konum çıkarır. Kısa bağlantılar
+ * (maps.app.goo.gl) açılmadan çözülemez; o zaman `null` döner, panel koordinatın yapıştırılmasını ister.
+ */
+export function parseGeo(text: string): LatLng | null {
+  const t = text.trim();
+  const num = '(-?\\d+(?:\\.\\d+)?)';
+  const pats = [
+    new RegExp(`!3d${num}!4d${num}`),
+    new RegExp(`@${num},\\s*${num}`),
+    new RegExp(`[?&](?:q|query|ll|destination)=${num}(?:,|%2C)\\s*${num}`, 'i'),
+    new RegExp(`^${num}\\s*,\\s*${num}$`),
+  ];
+  for (const re of pats) {
+    const m = t.match(re);
+    if (m) {
+      const g = { lat: Number(m[1]), lng: Number(m[2]) };
+      if (validGeo(g)) return { lat: Math.round(g.lat * 1e6) / 1e6, lng: Math.round(g.lng * 1e6) / 1e6 };
+    }
+  }
+  return null;
 }
 
 export function validateTravelText(c: { tagline: string; description: string; videoUrl?: string }): TravelError[] {

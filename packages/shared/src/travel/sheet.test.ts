@@ -57,4 +57,19 @@ describe('seyahat excel', () => {
     expect(eski.errors).toEqual([]);
     expect(eski.places[0]!.data).not.toHaveProperty('bring');
   });
+
+  it('Gezimi planla sütunları: konum, kalış, saatler', () => {
+    const { yer } = TRAVEL_SHEETS;
+    const base = { il: 'Bursa', ad: 'Ulu Cami', tur: 'Cami', kategori: 'tarih', ozet: 'Yirmi kubbeli cami.', hakkinda: 'Yıldırım Bayezid döneminde yapıldı.', kaynak: 'x' };
+    const parse = (v: Record<string, string>) => parseTravelWorkbook([{ sheet: yer.sheet, data: [[...yer.columns], row(yer.columns, { ...base, ...v })] }], ctx);
+    expect(parse({ konum: '40.1838, 29.0617', kalis_dk: '45', acilis: 'Her zaman', namaz: 'Evet' }).places[0]!.data).toMatchObject({
+      location: { lat: 40.1838, lng: 29.0617 },
+      durationMinutes: 45,
+      hours: { allDay: true, closedDays: [], prayer: true },
+    });
+    expect(parse({ acilis: '9:00', kapanis: '0.75', kapali_gunler: 'Pazartesi | Salı' }).places[0]!.data.hours).toEqual({ allDay: false, open: '09:00', close: '18:00', closedDays: [1, 2], prayer: false });
+    expect(parse({ konum: 'Bursa' }).errors).toHaveLength(1);
+    expect(parse({ acilis: '18:00', kapanis: '09:00' }).errors).toHaveLength(1);
+    expect(parse({ kapali_gunler: 'Bayram' }).errors).toHaveLength(1);
+  });
 });

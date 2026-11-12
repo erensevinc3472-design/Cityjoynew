@@ -1360,7 +1360,32 @@
       "lists": "Kısa alanlar en çok 200 karakter, listeler en çok 10 satır olmalı. Rotada 2-12 durak ve süre (saat) olmalı.",
       "website": "Web sitesi https ile başlamalı.",
       "video": "Video bağlantısı https ile başlamalı.",
-      "tour": "İçini gez: her sahnenin adı olmalı; her noktanın başlığı ve en az bir açıklaması olmalı."
+      "tour": "İçini gez: her sahnenin adı olmalı; her noktanın başlığı ve en az bir açıklaması olmalı.",
+      "location": "Konum okunamadı. Google Haritalar'daki koordinatı (ör. 40.1826, 29.0619) yapıştırın.",
+      "hours": "Açılış saati kapanıştan önce olmalı (ör. 09:00 – 18:00).",
+      "duration": "Kalış süresi 10-720 dakika arasında olmalı."
+    },
+    "plan": {
+      "title": "Gezimi planla ve Yakınımda için",
+      "intro": "Uygulama bu bilgilerle kişiye özel gezi programı kurar ve yakındaki yerleri gösterir. Konumu olmayan yer programa ve Yakınımda'ya girmez.",
+      "location": "Konum",
+      "locationHint": "Google Haritalar'da yere uzun basın (bilgisayarda sağ tıklayın), çıkan koordinatı kopyalayıp buraya yapıştırın. Uzun Google Haritalar bağlantısı da olur; kısa bağlantı (maps.app.goo.gl) okunamaz.",
+      "locationOk": "Konum: {{lat}}, {{lng}}",
+      "locationBad": "Okunamadı. Koordinatı ör. 40.1826, 29.0619 biçiminde yapıştırın.",
+      "openMap": "Haritada kontrol et",
+      "clear": "Konumu kaldır",
+      "duration": "Önerilen kalış (dakika)",
+      "durationHint": "Planlayıcı bu kadar süre ayırır. Boş bırakılırsa kategoriye göre tahmin edilir.",
+      "hours": "Açılış saatleri (hesap için)",
+      "hoursNone": "Girilmedi",
+      "hoursAllDay": "Her zaman açık",
+      "hoursSet": "Belirli saatlerde",
+      "open": "Açılış",
+      "close": "Kapanış",
+      "closedDays": "Kapalı günler",
+      "prayer": "Namaz vakitlerinde ziyaret kısıtlı (cami)",
+      "hoursHint": "Yukarıdaki \"Ziyaret saatleri\" yazısı kullanıcıya aynen gösterilir; bu kutular yalnızca program hesabı içindir.",
+      "days": "Pazar|Pazartesi|Salı|Çarşamba|Perşembe|Cuma|Cumartesi"
     },
     "cityNotPublished": "{{city}} şehir tanıtımı yayında değil. Bu yerler uygulamada görünmez: Şehirler sekmesinden {{city}} için \"Yayına al\"a basın.",
     "routeThemes": {

@@ -3362,14 +3362,33 @@ service cloud.firestore {
       allow create, update: if _k136(request.resource.data);
       allow delete: if isAdmin();
     }
+    // Gezimi planla ve Yakınımda (Karar, Eren, 12 Kasım 2026): konum ve hesaplanabilir açılış saatleri.
+    function placeGeoOk(d) {
+      return !('location' in d) || (d.location is map && d.location.keys().hasOnly(['lat', 'lng'])
+        && d.location.lat is number && d.location.lng is number
+        && d.location.lat >= -90 && d.location.lat <= 90 && d.location.lng >= -180 && d.location.lng <= 180);
+    }
+    function placeHoursOk(d) {
+      return !('hours' in d) || (d.hours is map && d.hours.keys().hasOnly(['allDay', 'open', 'close', 'closedDays', 'prayer'])
+        && d.hours.allDay is bool && d.hours.prayer is bool
+        && d.hours.closedDays is list && d.hours.closedDays.size() <= 6
+        && (d.hours.allDay
+          ? !('open' in d.hours) && !('close' in d.hours)
+          : (d.hours.open is string && d.hours.open.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+            && d.hours.close is string && d.hours.close.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+            && d.hours.open < d.hours.close)));
+    }
     match /travelPlaces/{id} {
       allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
       function _k137(nw) {
         return isAdmin() && validTravelStatus(nw)
         && nw.keys().hasOnly(['cityId', 'districtId', 'name', 'kind', 'category', 'summary', 'about', 'history',
              'architecture', 'visitingHours', 'entranceFee', 'suggestedDuration', 'address', 'howToGet', 'nearby', 'tips',
-             'bring', 'rules', 'ageInfo', 'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'tour', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
+             'bring', 'rules', 'ageInfo', 'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'tour', 'mustSee', 'source', 'order', 'status', 'updatedAt',
+             'durationMinutes', 'hours', 'location'])
         && mediaKeptOrOwn(nw, 'cover', 'seyahat') && (!('tour' in nw) || (nw.tour is list && nw.tour.size() <= 6))
+        && placeGeoOk(nw) && placeHoursOk(nw)
+        && (!('durationMinutes' in nw) || (nw.durationMinutes is int && nw.durationMinutes >= 10 && nw.durationMinutes <= 720))
         && nw.cityId is string && nw.cityId.matches('^[0-8][0-9]$')
         && nw.name is string && nw.name.size() >= 2 && nw.name.size() <= 80
         && nw.category in ['tarih', 'doga', 'deniz', 'lezzet', 'kultur', 'alisveris']
