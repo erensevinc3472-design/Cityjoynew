@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router';
 import { canSeeModule, type Module } from '@cityjoy/shared';
 
 import { ScopeLabel } from './scope-label';
+import { PanelSearch } from './panel-search';
 import { hasProfileAccess } from '../pages/profile-page';
 import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
@@ -218,6 +219,8 @@ export function Shell() {
             </select>
           </label>
         ) : null}
+
+        <PanelSearch user={user} />
 
         <nav aria-label={t('menu.label')}>
           {MENU_GROUPS.map((g) => {

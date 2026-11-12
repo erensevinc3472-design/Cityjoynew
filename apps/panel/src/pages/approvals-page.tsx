@@ -22,6 +22,7 @@ import { locationRepository } from '../lib/locations';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { EmptyState } from '../components/empty-state';
 import { Intro } from '../components/intro';
 
 type View = 'bekleyen' | ApprovalStatus | 'sonuclanan';
@@ -375,7 +376,7 @@ function TrustedApprovers(props: {
       ) : null}
 
       {active.length === 0 ? (
-        <div className="state">{t('approvals.trusted.empty')}</div>
+        <EmptyState text={t('approvals.trusted.empty')} {...(props.live && !draft ? { actionLabel: t('approvals.trusted.add'), onAction: () => setDraft(empty) } : {})} />
       ) : (
         <div className="table-wrap">
           <table>

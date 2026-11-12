@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router';
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import {
   isGrantActive,
@@ -24,6 +25,7 @@ import { accountAuth, firebaseAuth, firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { EmptyState } from '../components/empty-state';
 import { Intro } from '../components/intro';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
@@ -55,7 +57,8 @@ function OrgList({ user, isAdmin, ownAdminOrgs, provinceViews }: { user: PanelUs
   const [creating, setCreating] = useState(false);
   const [openId, setOpenId] = useState<string | null>(ownAdminOrgs.length === 1 && !isAdmin ? ownAdminOrgs[0]!.id : null);
   const [message, setMessage] = useState<Msg>();
-  const [filter, setFilter] = useState({ provinceCode: '', query: '' });
+  const [params] = useSearchParams();
+  const [filter, setFilter] = useState(() => ({ provinceCode: '', query: params.get('q') ?? '' }));
 
   const load = useCallback(async () => {
     setLoadError(false);
@@ -151,7 +154,7 @@ function OrgList({ user, isAdmin, ownAdminOrgs, provinceViews }: { user: PanelUs
       ) : orgs === null ? (
         <div className="state" aria-live="polite">{t('orgs.loading')}</div>
       ) : visible.length === 0 ? (
-        <div className="state">{t('orgs.empty')}</div>
+        <EmptyState text={t('orgs.empty')} {...(isAdmin && !creating && !user.isDemo ? { actionLabel: t('orgs.new'), onAction: () => setCreating(true) } : {})} />
       ) : (
         <div className="table-wrap">
           <table>
@@ -525,7 +528,10 @@ function OrgDetail({
           ) : members === null ? (
             <div className="state" aria-live="polite">{t('orgs.loading')}</div>
           ) : members.length === 0 ? (
-            <div className="state">{t('orgs.noMembers')}</div>
+            <EmptyState
+              text={t('orgs.noMembers')}
+              {...(!draft && !user.isDemo ? { actionLabel: t('orgs.addMember'), onAction: () => setDraft({ isNew: true, email: '', displayName: '', isOrgAdmin: false, assignments: {}, expiresOn: '' }) } : {})}
+            />
           ) : (
             <div className="table-wrap">
               <table>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { POST_CATEGORIES } from '@cityjoy/shared';
-import { createFirebaseStats } from '@cityjoy/shared/firebase';
+import { canSeeModule, CITY_GUIDE_SECTIONS, POST_CATEGORIES, type CityGuideMeta } from '@cityjoy/shared';
+import { createCityGuideAdmin, createFirebaseStats } from '@cityjoy/shared/firebase';
 
 import { BarList, Change, ColumnChart, daysAgo, lastWeeks, show, StatTile, type Datum } from '../components/charts';
 import { canSeeStats, MENU_GROUPS, visibleItems } from '../components/shell';
@@ -84,6 +84,8 @@ export function TodayPage() {
         </div>
       </header>
 
+      {isAdminUser(user) || canSeeModule(user.grants, 'sehir-rehberi') ? <ContentStatus provinceCode={provinceCode} /> : null}
+
       {stats ? (
         <>
           <div className="stat-grid">
@@ -124,6 +126,81 @@ export function TodayPage() {
         <QuickLinks />
       )}
     </section>
+  );
+}
+
+const PROVINCE_SECTIONS = CITY_GUIDE_SECTIONS.filter((s) => s.id !== 'nasil-yapilir');
+
+/**
+ * İl içerik durumu (panel yenileme, Eren 12 Kasım 2026): seçili ilde Benim Şehrim bölümlerinden kaçının dolu olduğu
+ * ve boş olanlar. İlin tek özet belgesi okunur (1 okuma). İl seçili değilse 81 il durumuna yönlendirir.
+ */
+function ContentStatus({ provinceCode }: { provinceCode: string }) {
+  const { user } = useSession();
+  const [meta, setMeta] = useState<CityGuideMeta | null | undefined>(undefined);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setMeta(undefined);
+    setError(false);
+    if (!provinceCode || !user || user.isDemo) return;
+    let live = true;
+    createCityGuideAdmin(firestore, user.uid)
+      .meta(provinceCode)
+      .then((m) => live && setMeta(m))
+      .catch(() => live && setError(true));
+    return () => {
+      live = false;
+    };
+  }, [provinceCode, user]);
+
+  if (!provinceCode) {
+    return (
+      <div className="card content-status">
+        <h2 className="card-title">{t('today.content.title')}</h2>
+        <p className="meta">{t('today.content.pickProvince')}</p>
+        <Link className="btn secondary" to="/sehir-rehberi">{t('today.content.open')}</Link>
+      </div>
+    );
+  }
+
+  const count = (id: (typeof PROVINCE_SECTIONS)[number]['id']) => meta?.sections[id]?.count ?? 0;
+  const filled = PROVINCE_SECTIONS.filter((s) => count(s.id) > 0);
+  const missing = PROVINCE_SECTIONS.filter((s) => count(s.id) === 0);
+  const total = PROVINCE_SECTIONS.reduce((n, s) => n + count(s.id), 0);
+  const pct = Math.round((filled.length / PROVINCE_SECTIONS.length) * 100);
+  const place = locationRepository.getProvince(provinceCode)?.name ?? '';
+
+  return (
+    <div className="card content-status">
+      <h2 className="card-title">{t('today.content.titleFor', { place })}</h2>
+      {error ? (
+        <p className="meta" role="alert">{t('today.content.error')}</p>
+      ) : meta === undefined && !user?.isDemo ? (
+        <p className="meta" aria-live="polite">{t('today.content.loading')}</p>
+      ) : (
+        <>
+          <p className="content-status-line">
+            <b>{t('today.content.filled', { filled: filled.length, all: PROVINCE_SECTIONS.length })}</b>
+            <span className="meta"> · {t('today.content.records', { count: total })}</span>
+          </p>
+          <div className="progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label={t('today.content.filledLabel')}>
+            <span style={{ width: pct + '%' }} />
+          </div>
+          {missing.length ? (
+            <>
+              <p className="meta">{t('today.content.missing')}</p>
+              <ul className="pill-list">
+                {missing.map((s) => <li key={s.id} className="pill">{s.names.tr}</li>)}
+              </ul>
+            </>
+          ) : (
+            <p className="meta">{t('today.content.complete')}</p>
+          )}
+        </>
+      )}
+      <Link className="btn secondary" to="/sehir-rehberi">{t('today.content.open')}</Link>
+    </div>
   );
 }
 

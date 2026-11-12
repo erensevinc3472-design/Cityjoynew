@@ -1,5 +1,5 @@
-import { useState, type FormEvent } from 'react';
-import { Link, Navigate } from 'react-router';
+import { useEffect, useState, type FormEvent } from 'react';
+import { Link, Navigate, useSearchParams } from 'react-router';
 import { searchWords, SEARCH_LIMITS, type PublicProfile } from '@cityjoy/shared';
 import { createFirestoreSocialRepository } from '@cityjoy/shared/firebase';
 
@@ -19,12 +19,22 @@ interface Row extends PublicProfile {
  */
 export function ProfilesPage() {
   const { user } = useSession();
-  const [q, setQ] = useState('');
+  // Genel aramadan gelince (?q=) ad kutusu dolu açılır ve arama hemen yapılır.
+  const [params] = useSearchParams();
+  const [q, setQ] = useState(() => params.get('q') ?? '');
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [refresh, setRefresh] = useState(0);
   const [lastKey, setLastKey] = useState('');
+  useEffect(() => {
+    const key = searchWords(params.get('q') ?? '')[0]?.slice(0, SEARCH_LIMITS.keyLength) ?? '';
+    if (key.length < SEARCH_LIMITS.minName || !user || !isAdminUser(user)) return;
+    setLastKey(key);
+    find(key);
+    // Yalnızca sayfa açılışında.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   if (!user || !isAdminUser(user)) return <Navigate to="/" replace />;
 
   const search = async (e: FormEvent) => {

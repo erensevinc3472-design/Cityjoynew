@@ -24,6 +24,7 @@ import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 import { limitText } from '../lib/limits';
+import { EmptyState } from '../components/empty-state';
 import { Intro } from '../components/intro';
 
 // `retry`: sınır dolunca "Onaya gönder" düğmesi.
@@ -266,7 +267,7 @@ function Announcements({ user }: { user: PanelUser }) {
             <>
               <h2>{publisher.author.type === 'kurum' ? t('announcements.orgTitle') : t('announcements.mineTitle')}</h2>
               {mine.length === 0 ? (
-                <div className="state">{t('announcements.empty')}</div>
+                <EmptyState text={t('announcements.empty')} {...(live && !draft ? { actionLabel: t('announcements.new'), onAction: () => setDraft({ input: newDraft() }) } : {})} />
               ) : (
                 table(
                   mine.map((a) =>

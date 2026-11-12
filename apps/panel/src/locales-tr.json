@@ -1808,7 +1808,13 @@
     "open": "Menüyü aç",
     "themeLight": "Gündüz görünümüne geç",
     "themeDark": "Gece görünümüne geç",
-    "waiting": "{{count}} bekleyen"
+    "waiting": "{{count}} bekleyen",
+    "search": "Panelde ara",
+    "searchPlaceholder": "Ara: sayfa, kişi, kurum…",
+    "searchPage": "sayfa",
+    "searchProfiles": "“{{q}}” profillerde ara",
+    "searchOrgs": "“{{q}}” kurumlarda ara",
+    "searchNone": "Eşleşen sayfa yok"
   },
   "today": {
     "morning": "Günaydın",
@@ -1829,7 +1835,20 @@
     "reports": "İncelenmemiş şikâyetler",
     "allDone": "Bekleyen iş yok.",
     "moreStats": "Tüm istatistikler",
-    "categories": "Keşfet’te ne paylaşılıyor (son 30 gün)"
+    "categories": "Keşfet’te ne paylaşılıyor (son 30 gün)",
+    "content": {
+      "title": "İl içerik durumu",
+      "titleFor": "{{place}} içerik durumu",
+      "pickProvince": "Üstten bir il seçince o ilin Benim Şehrim bölümlerinden hangilerinin dolu, hangilerinin boş olduğu burada görünür.",
+      "loading": "Yükleniyor…",
+      "error": "İçerik durumu okunamadı. Sayfayı yenileyip tekrar deneyin.",
+      "filled": "{{all}} bölümden {{filled}} tanesi dolu",
+      "filledLabel": "Dolu bölüm oranı",
+      "records": "{{count}} kayıt",
+      "missing": "Boş bölümler (uygulamada bu bölümler boş görünür):",
+      "complete": "Bütün bölümlerde kayıt var.",
+      "open": "Şehir rehberine git"
+    }
   },
   "stats": {
     "title": "İstatistikler",

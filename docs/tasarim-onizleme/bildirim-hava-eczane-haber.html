@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CityJoy önizleme</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL@24,500,1&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0B2328; --s:#123238; --s2:#163C43; --line:rgba(234,241,241,.10); --t:#EAF1F1; --m:#A3B9BB; --soft:#7F9799; --g:#E2B277; --gs:rgba(226,178,119,.14); --red:#E5484D; --ok:#3FB37F; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#E9ECE6; font-family:Inter, sans-serif; color:var(--t); padding:20px 12px; }
+  h1 { font-family:'Plus Jakarta Sans'; color:#14262B; font-size:20px; margin:0 0 4px 6px; }
+  .sub { color:#56696D; font-size:13px; margin:0 0 16px 6px; }
+  .grid { display:flex; flex-wrap:wrap; gap:18px; justify-content:center; }
+  .cap { color:#14262B; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; text-align:center; margin:8px 0 0; }
+  .ic { font-family:'Material Symbols Rounded'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; }
+  .phone { width:300px; height:630px; border-radius:42px; background:var(--bg); overflow:hidden; position:relative; box-shadow:0 0 0 7px #10181a, 0 10px 30px rgba(0,0,0,.25); }
+  .status { height:40px; display:flex; justify-content:space-between; align-items:center; padding:0 26px; font-weight:600; font-size:13px; }
+  .scr { padding:0 14px; }
+  .hdr { display:flex; align-items:center; gap:10px; margin:6px 0 12px; }
+  .back { width:34px; height:34px; border-radius:50%; background:var(--s); display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ttl { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:19px; }
+  .loc { color:var(--m); font-size:12px; display:flex; align-items:center; gap:3px; }
+  .card { background:var(--s); border:1px solid var(--line); border-radius:16px; padding:12px; }
+  .muted { color:var(--m); } .soft { color:var(--soft); }
+
+  /* kilit ekranı */
+  .lock { background:linear-gradient(180deg,#0f3d44 0%, #0B2328 55%, #132a2e 100%); }
+  .lock .date { text-align:center; color:#EAF1F1; font-size:15px; font-weight:500; margin-top:18px; opacity:.9; }
+  .lock .time { text-align:center; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:78px; letter-spacing:-2px; line-height:1; margin:2px 0 26px; }
+  .noti { display:flex; gap:10px; align-items:flex-start; background:rgba(40,60,64,.62); backdrop-filter:blur(14px); border-radius:20px; padding:11px 12px; margin:0 10px 8px; }
+  .noti .app { width:34px; height:34px; border-radius:9px; flex:none; }
+  .noti .nt { flex:1; min-width:0; }
+  .noti .row { display:flex; justify-content:space-between; gap:6px; }
+  .noti b { font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .noti small { color:rgba(234,241,241,.6); font-size:11.5px; flex:none; }
+  .noti p { margin:1px 0 0; font-size:13px; line-height:1.3; color:rgba(234,241,241,.92); }
+  .stack { margin:0 22px; height:10px; border-radius:0 0 16px 16px; background:rgba(40,60,64,.4); margin-top:-8px; }
+
+  /* ana sayfa + şerit bildirim */
+  .banner { position:absolute; top:46px; left:10px; right:10px; z-index:3; background:rgba(28,50,54,.96); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+  .homehead { margin-top:96px; }
+  .hello { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:21px; margin:2px 0 10px; }
+  .wx { display:flex; align-items:center; gap:12px; background:linear-gradient(135deg,#1A4D55,#123238); }
+  .wx .big { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:40px; }
+  .wx .sun { font-size:42px; color:var(--g); }
+  .tiles { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+  .tile { height:96px; border-radius:16px; padding:10px; display:flex; align-items:flex-end; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; }
+
+  /* hava ayrıntı */
+  .now { text-align:center; padding:6px 0 12px; }
+  .now .deg { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:64px; line-height:1; }
+  .now .ic { font-size:56px; color:var(--g); }
+  .hours { display:flex; gap:6px; overflow:hidden; }
+  .h { flex:1; text-align:center; font-size:12px; padding:8px 0; border-radius:12px; }
+  .h.on { background:var(--gs); outline:1px solid rgba(226,178,119,.4); }
+  .h .ic { font-size:22px; color:var(--g); margin:4px 0; }
+  .days .d { display:grid; grid-template-columns:72px 28px 1fr; align-items:center; gap:8px; font-size:13px; padding:6px 0; border-top:1px solid var(--line); }
+  .days .d:first-child { border-top:0; }
+  .bar { height:6px; border-radius:3px; background:var(--s2); position:relative; }
+  .bar i { position:absolute; top:0; bottom:0; border-radius:3px; background:linear-gradient(90deg,#7FC6D9,var(--g)); }
+  .facts { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .fact { font-size:12px; color:var(--m); } .fact b { display:block; color:var(--t); font-size:15px; font-weight:600; margin-top:2px; }
+
+  /* eczane */
+  .seg { display:flex; gap:6px; background:var(--s); border-radius:999px; padding:4px; margin-bottom:10px; }
+  .seg > span { flex:1; text-align:center; font-size:13px; font-weight:600; padding:7px 0; border-radius:999px; color:var(--m); display:flex; align-items:center; justify-content:center; gap:5px; }
+  .seg > span.on { background:var(--gs); color:var(--g); outline:1px solid rgba(226,178,119,.45); }
+  .map { height:178px; border-radius:16px; position:relative; overflow:hidden; background:#10343a; }
+  .pin { position:absolute; width:26px; height:26px; border-radius:50% 50% 50% 0; transform:rotate(-45deg); background:var(--red); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.4); }
+  .pin b { transform:rotate(45deg); color:#fff; font-size:12px; font-weight:800; }
+  .pin.me { background:var(--g); }
+  .ph { display:flex; gap:10px; align-items:flex-start; margin-top:8px; }
+  .eb { width:38px; height:38px; border-radius:9px; background:#fff; color:var(--red); font-family:'Plus Jakarta Sans'; font-weight:800; font-size:24px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .ph .nm { font-weight:600; font-size:14px; }
+  .ph .ad { font-size:11.5px; color:var(--m); margin-top:1px; }
+  .chip { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; background:rgba(63,179,127,.16); color:#6FD3A3; margin-top:5px; }
+  .acts { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex:none; font-size:12px; color:var(--m); }
+  .rb { width:32px; height:32px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--g); }
+  .note { font-size:11px; color:var(--soft); margin-top:8px; display:flex; gap:6px; }
+
+  /* haber */
+  .cats { display:flex; gap:6px; overflow:hidden; margin-bottom:10px; }
+  .cats span { font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:999px; background:var(--s); color:var(--m); white-space:nowrap; }
+  .cats span.on { background:var(--g); color:var(--bg); }
+  .srcs { display:flex; gap:10px; margin-bottom:12px; }
+  .src { width:44px; text-align:center; font-size:10px; color:var(--m); }
+  .src i { display:flex; width:40px; height:40px; border-radius:50%; margin:0 auto 3px; align-items:center; justify-content:center; font-style:normal; font-weight:800; font-size:13px; color:#fff; border:2px solid var(--g); }
+  .lead { border-radius:16px; overflow:hidden; background:var(--s); }
+  .lead .img { height:120px; background:linear-gradient(135deg,#2c6a73 0%,#1a3f45 50%,#E2B277 140%); position:relative; }
+  .lead .img .ic { position:absolute; right:12px; bottom:10px; font-size:40px; color:rgba(255,255,255,.35); }
+  .lead .tx { padding:10px 12px; }
+  .meta { font-size:11px; color:var(--m); display:flex; align-items:center; gap:6px; }
+  .meta i { width:16px; height:16px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-style:normal; font-size:8px; font-weight:800; color:#fff; }
+  .hl { font-weight:600; font-size:14px; line-height:1.3; margin-top:4px; }
+  .nrow { display:flex; gap:10px; padding:10px 0; border-top:1px solid var(--line); }
+  .nrow .th { width:64px; height:64px; border-radius:12px; flex:none; }
+  .tag { font-size:10px; font-weight:700; color:var(--bg); background:var(--g); border-radius:4px; padding:1px 5px; }
+</style>
+</head>
+<body>
+<h1>CityJoy: bildirim, hava, eczane, haber</h1>
+<p class="sub">Telefonda nasıl görüneceğinin önizlemesi. Adlar ve sayılar örnek; gerçek içerik kullanıcının iline göre gelir.</p>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3D7A8"/><stop offset=".5" stop-color="#E2B277"/><stop offset="1" stop-color="#B9874A"/></linearGradient>
+    <linearGradient id="bgi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#145F68"/><stop offset="1" stop-color="#0B2328"/></linearGradient>
+    <symbol id="appicon" viewBox="0 0 512 512">
+      <rect width="512" height="512" rx="114" fill="url(#bgi)"/>
+      <path d="M256 462 C 214 400 84 326 84 220 A172 172 0 0 1 428 220 C 428 326 298 400 256 462 Z" fill="url(#gold)"/>
+      <circle cx="256" cy="220" r="146" fill="#0E3439"/>
+      <path d="M256 100 L268 150 L256 160 L244 150 Z" fill="#E2B277"/>
+      <text x="256" y="262" text-anchor="middle" font-family="Plus Jakarta Sans" font-weight="800" font-size="118" letter-spacing="-6" fill="url(#gold)">CJ</text>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="grid">
+
+<!-- 1. Kilit ekranı -->
+<div>
+<div class="phone lock">
+  <div class="status"><span></span><span>80%</span></div>
+  <div class="date">Perşembe 12 Kasım</div>
+  <div class="time">09:41</div>
+  <div class="noti">
+    <svg class="app"><use href="#appicon"/></svg>
+    <div class="nt"><div class="row"><b>Acil duyuru · Osmangazi Belediyesi</b><small>şimdi</small></div>
+    <p>Yarın 09:00–17:00 arası Çekirge Mahallesi'nde planlı su kesintisi olacak.</p></div>
+  </div>
+  <div class="noti">
+    <svg class="app"><use href="#appicon"/></svg>
+    <div class="nt"><div class="row"><b>Ayşe Yılmaz</b><small>5 dk önce</small></div>
+    <p>Yeni mesaj</p></div>
+  </div>
+  <div class="stack"></div>
+  <div style="height:8px"></div>
+  <div class="noti">
+    <svg class="app"><use href="#appicon"/></svg>
+    <div class="nt"><div class="row"><b>Yeni takipçi</b><small>1 sa önce</small></div>
+    <p>Mehmet K. seni takip etmeye başladı.</p></div>
+  </div>
+</div>
+<p class="cap">1. Kilit ekranında bildirim</p>
+</div>
+
+<!-- 2. Uygulama açıkken şerit + ana sayfa hava -->
+<div>
+<div class="phone">
+  <div class="status"><span>09:42</span><span>80%</span></div>
+  <div class="noti banner">
+    <svg class="app"><use href="#appicon"/></svg>
+    <div class="nt"><div class="row"><b>Duyuru · Nilüfer Belediyesi</b><small>şimdi</small></div>
+    <p>Cumartesi Odunluk Parkı'nda ücretsiz çocuk şenliği var.</p></div>
+  </div>
+  <div class="scr homehead">
+    <div class="muted" style="font-size:12px">Perşembe, 12 Kasım</div>
+    <div class="hello">Günaydın, Eren</div>
+    <div class="card wx">
+      <span class="ic sun">partly_cloudy_day</span>
+      <div style="flex:1">
+        <div class="loc"><span class="ic" style="font-size:14px">location_on</span>Osmangazi, Bursa</div>
+        <div style="font-size:13px;margin-top:2px">Parçalı bulutlu</div>
+        <div class="soft" style="font-size:12px">En yüksek 17° · En düşük 9°</div>
+      </div>
+      <div class="big">14°</div>
+    </div>
+    <div class="tiles">
+      <div class="tile" style="background:linear-gradient(160deg,#2d6f78,#173f45)">Benim Şehrim</div>
+      <div class="tile" style="background:linear-gradient(160deg,#6b4d2c,#2a2117)">Seyahat</div>
+      <div class="tile" style="background:linear-gradient(160deg,#4a3d6e,#1d1a2c)">Sosyal Harmoni</div>
+      <div class="tile" style="background:linear-gradient(160deg,#7a2e33,#2c1416)">Acil İhtiyaçlar</div>
+    </div>
+  </div>
+</div>
+<p class="cap">2. Uygulama açıkken şerit · ana sayfada hava</p>
+</div>
+
+<!-- 3. Hava ayrıntı -->
+<div>
+<div class="phone">
+  <div class="status"><span>09:42</span><span>80%</span></div>
+  <div class="scr">
+    <div class="hdr"><span class="back ic">arrow_back</span><div><div class="ttl">Hava durumu</div><div class="loc"><span class="ic" style="font-size:14px">location_on</span>Osmangazi, Bursa</div></div></div>
+    <div class="now"><span class="ic">partly_cloudy_day</span><div class="deg">14°</div><div class="muted" style="font-size:13px">Parçalı bulutlu · Hissedilen 12°</div></div>
+    <div class="card" style="padding:8px">
+      <div class="hours">
+        <div class="h on">Şimdi<br><span class="ic">partly_cloudy_day</span><br>14°</div>
+        <div class="h">11<br><span class="ic">sunny</span><br>16°</div>
+        <div class="h">13<br><span class="ic">sunny</span><br>17°</div>
+        <div class="h">15<br><span class="ic">cloud</span><br>16°</div>
+        <div class="h">17<br><span class="ic">rainy</span><br>13°</div>
+        <div class="h">19<br><span class="ic">rainy</span><br>11°</div>
+      </div>
+    </div>
+    <div class="card days" style="margin-top:10px;padding:6px 12px">
+      <div class="d"><span>Bugün</span><span class="ic" style="color:var(--g)">partly_cloudy_day</span><span style="display:flex;gap:6px;align-items:center"><span class="soft">9°</span><span class="bar" style="flex:1"><i style="left:20%;right:30%"></i></span><span>17°</span></span></div>
+      <div class="d"><span>Cuma</span><span class="ic" style="color:var(--g)">rainy</span><span style="display:flex;gap:6px;align-items:center"><span class="soft">8°</span><span class="bar" style="flex:1"><i style="left:15%;right:45%"></i></span><span>13°</span></span></div>
+      <div class="d"><span>Cumartesi</span><span class="ic" style="color:var(--g)">sunny</span><span style="display:flex;gap:6px;align-items:center"><span class="soft">7°</span><span class="bar" style="flex:1"><i style="left:10%;right:20%"></i></span><span>18°</span></span></div>
+      <div class="d"><span>Pazar</span><span class="ic" style="color:var(--g)">cloud</span><span style="display:flex;gap:6px;align-items:center"><span class="soft">9°</span><span class="bar" style="flex:1"><i style="left:22%;right:35%"></i></span><span>15°</span></span></div>
+    </div>
+    <div class="card facts">
+      <div class="fact">Yağmur ihtimali<b>%40 (17:00)</b></div>
+      <div class="fact">Rüzgâr<b>12 km/sa KD</b></div>
+      <div class="fact">Gün doğumu<b>07:12</b></div>
+      <div class="fact">Gün batımı<b>17:08</b></div>
+    </div>
+    <div class="note"><span class="ic" style="font-size:14px">info</span>Veri: MET Norway · 3 saatte bir güncellenir</div>
+  </div>
+</div>
+<p class="cap">3. Hava durumu ayrıntısı</p>
+</div>
+
+<!-- 4. Nöbetçi eczane -->
+<div>
+<div class="phone">
+  <div class="status"><span>09:42</span><span>80%</span></div>
+  <div class="scr">
+    <div class="hdr"><span class="back ic">arrow_back</span><div style="flex:1"><div class="ttl">Nöbetçi Eczane</div><div class="loc"><span class="ic" style="font-size:14px">location_on</span>Osmangazi, Bursa <span class="ic" style="font-size:16px">expand_more</span></div></div></div>
+    <div class="seg"><span class="on"><span class="ic" style="font-size:16px">map</span>Harita</span><span><span class="ic" style="font-size:16px">list</span>Liste</span></div>
+    <div class="map">
+      <svg width="100%" height="100%" viewBox="0 0 272 178" preserveAspectRatio="none" style="position:absolute;inset:0">
+        <g stroke="#1d4a51" stroke-width="7" fill="none" stroke-linecap="round"><path d="M-10 60 Q120 40 290 80"/><path d="M60 -10 L90 190"/><path d="M-10 140 Q140 120 290 150"/><path d="M190 -10 Q170 90 210 190"/></g>
+        <g stroke="#17404a" stroke-width="3" fill="none"><path d="M0 100 H272"/><path d="M130 0 V178"/><path d="M20 20 L250 170"/></g>
+        <rect x="20" y="96" width="34" height="24" rx="4" fill="#1d4a3a"/>
+        <path d="M200 30 Q230 90 262 120" stroke="#b9874a" stroke-width="3" fill="none" opacity=".6"/>
+      </svg>
+      <div class="pin" style="left:40px;top:28px"><b>E</b></div>
+      <div class="pin" style="left:178px;top:40px"><b>E</b></div>
+      <div class="pin me" style="left:118px;top:76px;width:30px;height:30px"><b style="color:#0B2328">E</b></div>
+      <div class="pin" style="left:34px;top:120px"><b>E</b></div>
+      <div class="pin" style="left:196px;top:124px"><b>E</b></div>
+      <span class="rb ic" style="position:absolute;right:8px;top:8px;background:rgba(11,35,40,.8)">my_location</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 2px">
+      <b style="font-family:'Plus Jakarta Sans';font-size:15px">Bugün nöbetçi (5)</b>
+      <span class="soft" style="font-size:11px">Güncellendi 08:16</span>
+    </div>
+    <div class="card ph">
+      <span class="eb">E</span>
+      <div style="flex:1;min-width:0"><div class="nm">Adalet Eczanesi</div><div class="ad">Adalet Mah., Haşim İşcan Cad. No:12</div><span class="chip">Şu an açık · yarın 08:30'a kadar</span></div>
+      <div class="acts"><span>850 m</span><span class="rb ic">call</span></div>
+    </div>
+    <div class="card ph">
+      <span class="eb">E</span>
+      <div style="flex:1;min-width:0"><div class="nm">Merkez Eczanesi</div><div class="ad">Kırcaali Mah., Gazcılar Cad. No:45</div><span class="chip">Şu an açık · yarın 08:30'a kadar</span></div>
+      <div class="acts"><span>1,4 km</span><span class="rb ic">call</span></div>
+    </div>
+    <div class="note"><span class="ic" style="font-size:14px">info</span>Nöbet listesi eczacı odalarının yayımladığı bilgiye dayanır; gitmeden aramanı öneririz.</div>
+  </div>
+</div>
+<p class="cap">4. Nöbetçi eczane (senin tasarımın)</p>
+</div>
+
+<!-- 5. Haber akışı -->
+<div>
+<div class="phone">
+  <div class="status"><span>09:42</span><span>80%</span></div>
+  <div class="scr">
+    <div class="hdr"><span class="back ic">arrow_back</span><div style="flex:1"><div class="ttl">Haberler</div><div class="loc"><span class="ic" style="font-size:14px">location_on</span>Bursa</div></div><span class="back ic">tune</span></div>
+    <div class="cats"><span class="on">Sana özel</span><span>Bursa</span><span>Gündem</span><span>Spor</span><span>Ekonomi</span></div>
+    <div class="srcs">
+      <div class="src"><i style="background:#2b6cb0">BH</i>Bursa Haber</div>
+      <div class="src"><i style="background:#c53030">OL</i>Olay</div>
+      <div class="src"><i style="background:#2f855a">BB</i>Belediye</div>
+      <div class="src"><i style="background:#6b46c1">ŞG</i>Şehir Gündem</div>
+      <div class="src"><i style="background:#4a5568;border-color:transparent">+</i>Kaynak</div>
+    </div>
+    <div class="lead">
+      <div class="img"><span class="ic">directions_bus</span></div>
+      <div class="tx"><div class="meta"><i style="background:#2b6cb0">BH</i>Bursa Haber · 25 dk <span class="tag">Bursa</span></div>
+      <div class="hl">Yeni metro hattı için ilk durakların yeri belli oldu</div></div>
+    </div>
+    <div class="nrow">
+      <div class="th" style="background:linear-gradient(135deg,#7a2e33,#2c1416)"></div>
+      <div><div class="meta"><i style="background:#c53030">OL</i>Olay · 1 sa</div><div class="hl" style="font-size:13px">Bursaspor sahasında 3 puanı aldı, taraftar coştu</div></div>
+    </div>
+    <div class="nrow">
+      <div class="th" style="background:linear-gradient(135deg,#2f855a,#173f2a)"></div>
+      <div><div class="meta"><i style="background:#2f855a">BB</i>Belediye · 2 sa</div><div class="hl" style="font-size:13px">Uludağ yolunda kış lastiği zorunluluğu başlıyor</div></div>
+    </div>
+    <div class="note"><span class="ic" style="font-size:14px">info</span>Başlık ve kısa özet; dokununca haberin tamamı kaynağın sitesinde açılır. Yalnızca izin veren yayıncılar.</div>
+  </div>
+</div>
+<p class="cap">5. Haber akışı (Bundle tarzı)</p>
+</div>
+
+</div>
+</body>
+</html>
