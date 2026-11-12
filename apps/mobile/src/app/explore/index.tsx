@@ -425,6 +425,11 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
         ListFooterComponent={loadingMore ? <ActivityIndicator /> : !hasMore && all?.length ? <AppText variant="caption" muted style={styles.center}>{t('explore.end')}</AppText> : undefined}
         onEndReached={hasMore ? loadMore : undefined}
         onEndReachedThreshold={0.5}
+        // Akıcılık: ilk açılışta az kart çizilir, ekrandan uzak kartlar bellekten çıkar.
+        initialNumToRender={4}
+        maxToRenderPerBatch={4}
+        windowSize={7}
+        removeClippedSubviews={Platform.OS === 'android'}
         refreshControl={<RefreshControl refreshing={false} onRefresh={reload} progressViewOffset={topInset} />}
       />
       <VideoViewer
@@ -437,6 +442,9 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
         onSave={(p) => save(p.id)}
         followOf={followFor}
         onFollow={followTap}
+        hasMore={hasMore}
+        loadingMore={loadingMore}
+        onLoadMore={loadMore}
         onAuthor={(p) => {
           setViewer(null);
           router.push(authorHref(p));

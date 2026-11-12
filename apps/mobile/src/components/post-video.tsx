@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { useVideoPlayer, VideoView, type VideoPlayer } from 'expo-video';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,40 @@ import { AppText } from '@/components/app-text';
 export const ratioOf = (v: Pick<PostVideo, 'width' | 'height'>) => (v.width > 0 && v.height > 0 ? Math.min(16 / 9, Math.max(0.8, v.width / v.height)) : 0.8);
 
 export const formatDuration = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.round(sec) % 60).padStart(2, '0')}`;
+
+// Kaldığı yer (Eren, 12 Kasım 2026: "tam ekrana geçince baştan başlamasın"): akış ile tam ekran arasında video aynı
+// saniyeden sürer. Uygulama açıkken bellekte tutulur.
+const resumeAt = new Map<string, number>();
+
+/**
+ * Kaldığı yerden süren oynatıcı. Telefon videoyu önbelleğe alır (useCaching): akıştan tam ekrana geçerken ya da geri
+ * dönerken yeniden indirilmez; hem açılış hızlanır hem veri maliyeti düşer.
+ */
+export function useResumingPlayer(url: string, setup: (p: VideoPlayer) => void): VideoPlayer {
+  const start = resumeAt.get(url) ?? 0;
+  const player = useVideoPlayer({ uri: url, useCaching: true }, (p) => {
+    p.timeUpdateEventInterval = 0.25;
+    setup(p);
+    if (start > 0.3) p.currentTime = start;
+  });
+  useEffect(() => {
+    // Bazı telefonlarda video hazır olmadan verilen konum yok sayılır: hazır olunca bir kez daha.
+    let seek = start > 0.3;
+    const ready = player.addListener('statusChange', ({ status }) => {
+      if (!seek || status !== 'readyToPlay') return;
+      seek = false;
+      if (player.currentTime < start - 0.5) player.currentTime = start;
+    });
+    const time = player.addListener('timeUpdate', (e) => {
+      resumeAt.set(url, e.currentTime);
+    });
+    return () => {
+      ready.remove();
+      time.remove();
+    };
+  }, [player]); // eslint-disable-line react-hooks/exhaustive-deps
+  return player;
+}
 
 // Akıştaki ses tercihi bütün videolarda ortak: biri sesi açınca sonrakiler de sesli oynar (uygulama açıkken).
 let feedMuted = true;
@@ -97,7 +131,7 @@ export function PostVideoView({ video, maxWidth, active, onOpen }: Props) {
 function AutoPlayer({ url, width, height }: { url: string; width: number; height: number }) {
   const { t } = useTranslation();
   const [muted, toggleMuted] = useFeedMuted();
-  const player = useVideoPlayer(url, (p) => {
+  const player = useResumingPlayer(url, (p) => {
     p.loop = true;
     p.muted = feedMuted;
   });

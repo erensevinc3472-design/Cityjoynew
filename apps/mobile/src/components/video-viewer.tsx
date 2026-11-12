@@ -1,8 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useVideoPlayer, VideoView } from 'expo-video';
+import { VideoView } from 'expo-video';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
-import { Animated, FlatList, I18nManager, Modal, Pressable, Share, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Animated, FlatList, I18nManager, Modal, PanResponder, Pressable, Share, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import type { Post } from '@cityjoy/shared';
@@ -10,6 +10,7 @@ import type { Post } from '@cityjoy/shared';
 import { AppText } from '@/components/app-text';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { PostSheet } from '@/components/post-sheet';
+import { useResumingPlayer } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { useAuthor, useBusinessInfo } from '@/lib/profile-photos';
 import { fonts, radius, spacing } from '@/theme/tokens';
@@ -30,7 +31,15 @@ interface Props {
   followOf(p: Post): Follow;
   onFollow(p: Post): void;
   onAuthor(p: Post): void;
+  /** Akışta daha fazla gönderi var mı (sona gelince yenileri istenir). */
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?(): void;
 }
+
+type Page = { kind: 'post'; post: Post } | { kind: 'loading' } | { kind: 'end' };
+// Sona gelince en çok bu kadar sayfa (20'şer gönderi) üst üste video aranır; bulunmazsa "başka video yok" (okuma maliyeti).
+const MAX_EMPTY_LOADS = 3;
 
 const DOUBLE_TAP_MS = 260;
 const WHITE = '#FFFFFF';
@@ -38,40 +47,101 @@ const SHADE = [0.04, 0.1, 0.18, 0.28, 0.4, 0.52];
 
 /**
  * Tam ekran video (Eren, 12 Kasım 2026, Instagram örneği): akışta videoya bir kez dokununca açılır. Siyah zeminde video
- * sesli ve döngüde oynar; yukarı kaydırınca akıştaki sonraki video. Bir dokunuş durdurur/oynatır, iki dokunuş beğenir.
+ * sesli ve döngüde, akışta kaldığı yerden oynar; yukarı kaydırınca sonraki video (sona gelince akıştan yenileri yüklenir),
+ * soldan sağa kaydırınca kapanır. Bir dokunuş durdurur/oynatır, iki dokunuş beğenir.
  * Sol üstte geri; sağda beğen, yorum, paylaş, kaydet; altta paylaşan, Takip et, açıklama, ilerleme çizgisi ve
  * "Yorum ekle..." (yorumlar penceresi açılır). Yalnızca açık sayfanın oynatıcısı vardır (veri maliyeti).
  */
-export function VideoViewer({ posts, startId, onClose, ...rest }: Props) {
+export function VideoViewer({ posts, startId, onClose, hasMore, loadingMore, onLoadMore, ...rest }: Props) {
+  const { t } = useTranslation();
   const { height, width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const start = Math.max(0, posts.findIndex((p) => p.id === startId));
   const [index, setIndex] = useState(start);
   useEffect(() => {
     if (startId) setIndex(start);
   }, [startId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Instagram gibi: son videoya yaklaşınca akıştan yeni gönderiler istenir; yeni sayfada video yoksa birkaç sayfa daha.
+  const emptyLoads = useRef(0);
+  const lastCount = useRef(posts.length);
+  if (posts.length !== lastCount.current) {
+    lastCount.current = posts.length;
+    emptyLoads.current = 0;
+  }
+  const searching = !!hasMore && emptyLoads.current < MAX_EMPTY_LOADS;
+  useEffect(() => {
+    if (!startId || !searching || loadingMore || index < posts.length - 2) return;
+    emptyLoads.current += 1;
+    onLoadMore?.();
+  }, [startId, searching, loadingMore, index, posts.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pages: Page[] = [...posts.map((post) => ({ kind: 'post' as const, post })), searching ? { kind: 'loading' } : { kind: 'end' }];
+
+  // Soldan sağa kaydırınca (Arapçada sağdan sola) tam ekran kapanır, arkada akış görünür.
+  const dir = I18nManager.isRTL ? -1 : 1;
+  const dx = useRef(new Animated.Value(0)).current;
+  const close = useRef(onClose);
+  close.current = onClose;
+  useEffect(() => {
+    if (startId) dx.setValue(0);
+  }, [startId, dx]);
+  const swipe = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (_, g) => dir * g.dx > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 2,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderMove: (_, g) => dx.setValue(Math.max(0, dir * g.dx) * dir),
+      onPanResponderRelease: (_, g) => {
+        if (dir * g.dx > width * 0.3 || dir * g.vx > 0.6) {
+          Animated.timing(dx, { toValue: dir * width, duration: 180, useNativeDriver: true }).start(() => close.current());
+        } else {
+          Animated.spring(dx, { toValue: 0, useNativeDriver: true, friction: 8 }).start();
+        }
+      },
+      onPanResponderTerminate: () => Animated.spring(dx, { toValue: 0, useNativeDriver: true }).start(),
+    }),
+  ).current;
+
   return (
-    <Modal visible={!!startId} animationType="fade" onRequestClose={onClose} statusBarTranslucent supportedOrientations={['portrait']}>
+    <Modal visible={!!startId} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent supportedOrientations={['portrait']}>
       <StatusBar style="light" />
-      <View style={styles.root}>
+      <Animated.View
+        {...swipe.panHandlers}
+        accessibilityHint={t('explore.video.swipeClose')}
+        style={[styles.root, { transform: [{ translateX: dx }], opacity: dx.interpolate({ inputRange: [-width, 0, width], outputRange: [0.6, 1, 0.6] }) }]}>
         {startId ? (
           <FlatList
-            data={posts}
-            keyExtractor={(p) => p.id}
+            data={pages}
+            keyExtractor={(p) => (p.kind === 'post' ? p.post.id : p.kind)}
             pagingEnabled
             showsVerticalScrollIndicator={false}
             initialScrollIndex={start}
             getItemLayout={(_, i) => ({ length: height, offset: height * i, index: i })}
-            onMomentumScrollEnd={(e) => setIndex(Math.max(0, Math.min(posts.length - 1, Math.round(e.nativeEvent.contentOffset.y / height))))}
+            onMomentumScrollEnd={(e) => setIndex(Math.max(0, Math.min(pages.length - 1, Math.round(e.nativeEvent.contentOffset.y / height))))}
+            initialNumToRender={1}
+            maxToRenderPerBatch={2}
             windowSize={3}
             renderItem={({ item, index: i }) => (
               <View style={{ width, height }}>
-                <Reel post={item} active={i === index} onClose={onClose} {...rest} />
+                {item.kind === 'post' ? (
+                  <Reel post={item.post} active={i === index} onClose={onClose} {...rest} />
+                ) : item.kind === 'loading' ? (
+                  <View style={styles.center}>
+                    <ActivityIndicator color={WHITE} accessibilityLabel={t('common.loading')} />
+                  </View>
+                ) : (
+                  <View style={[styles.center, styles.endPage, { paddingBottom: insets.bottom }]}>
+                    <MaterialIcons name="video-library" size={44} color="rgba(255,255,255,0.7)" />
+                    <AppText style={styles.endText}>{t('explore.video.end')}</AppText>
+                    <Pressable accessibilityRole="button" onPress={onClose} style={({ pressed }) => [styles.endBtn, { opacity: pressed ? 0.7 : 1 }]}>
+                      <AppText style={styles.followText}>{t('explore.video.backToFeed')}</AppText>
+                    </Pressable>
+                  </View>
+                )}
               </View>
             )}
           />
         ) : null}
-      </View>
+      </Animated.View>
     </Modal>
   );
 }
@@ -216,12 +286,11 @@ function Reel({ post: given, active, onClose, isLiked, onLike, isSaved, onSave, 
   );
 }
 
-/** Açık sayfanın oynatıcısı: sesli, döngüde; ilerlemeyi ekranı yeniden çizmeden çizgiye yazar. */
+/** Açık sayfanın oynatıcısı: sesli, döngüde, akışta kaldığı saniyeden sürer; ilerlemeyi ekranı yeniden çizmeden çizgiye yazar. */
 function ReelVideo({ url, paused, progress }: { url: string; paused: boolean; progress: Animated.Value }) {
-  const player = useVideoPlayer(url, (p) => {
+  const player = useResumingPlayer(url, (p) => {
     p.loop = true;
     p.muted = false;
-    p.timeUpdateEventInterval = 0.25;
   });
   useEffect(() => {
     progress.setValue(0);
@@ -264,4 +333,7 @@ const styles = StyleSheet.create({
   fill: { height: 2, backgroundColor: WHITE, width: '100%', transformOrigin: I18nManager.isRTL ? 'right' : 'left' },
   addComment: { minHeight: 42, marginEnd: -56, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', paddingHorizontal: spacing.md, justifyContent: 'center' },
   addCommentText: { color: 'rgba(255,255,255,0.75)', fontSize: 14 },
+  endPage: { gap: spacing.md, paddingHorizontal: spacing.xl },
+  endText: { color: WHITE, fontFamily: fonts.bodySemi, fontSize: 16, textAlign: 'center' },
+  endBtn: { minHeight: 44, paddingHorizontal: spacing.lg, borderRadius: 22, borderWidth: 1, borderColor: 'rgba(255,255,255,0.8)', justifyContent: 'center' },
 });

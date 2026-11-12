@@ -1362,7 +1362,10 @@
       "pause": "Pause",
       "resume": "Abspielen",
       "viewer": "Videoansicht",
-      "progress": "Videofortschritt"
+      "progress": "Videofortschritt",
+      "end": "Im Moment keine weiteren Videos",
+      "backToFeed": "Zurück zum Feed",
+      "swipeClose": "Zum Schließen nach rechts wischen"
     },
     "verifiedBusiness": "Verifiziertes Unternehmen",
     "seeComments": "Alle {{count}} Kommentare ansehen",

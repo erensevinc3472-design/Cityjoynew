@@ -1362,7 +1362,10 @@
       "pause": "Durdur",
       "resume": "Oynat",
       "viewer": "Video izleyici",
-      "progress": "Video ilerlemesi"
+      "progress": "Video ilerlemesi",
+      "end": "Şimdilik başka video yok",
+      "backToFeed": "Akışa dön",
+      "swipeClose": "Kapatmak için sağa kaydır"
     },
     "verifiedBusiness": "Doğrulanmış işletme",
     "seeComments": "{{count}} yorumun tümünü gör",

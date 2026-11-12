@@ -1362,7 +1362,10 @@
       "pause": "Pause",
       "resume": "Play",
       "viewer": "Video viewer",
-      "progress": "Video progress"
+      "progress": "Video progress",
+      "end": "No more videos for now",
+      "backToFeed": "Back to feed",
+      "swipeClose": "Swipe right to close"
     },
     "verifiedBusiness": "Verified business",
     "seeComments": "View all {{count}} comments",
