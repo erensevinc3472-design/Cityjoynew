@@ -60,6 +60,8 @@ const FRIDAY_PRAYER: [number, number] = [12 * 60, 14 * 60];
 const LUNCH_FROM = 11 * 60 + 45;
 
 const round5 = (n: number) => Math.max(5, Math.round(n / 5) * 5);
+/** Saatler 5 dakikaya yuvarlanır (09:03 yerine 09:05). */
+const up5 = (n: number) => Math.ceil(n / 5) * 5;
 
 /** Haftanın günü (0 = pazar); saat dilimi kaymasın diye öğlen UTC. */
 export const weekdayOf = (date: string) => new Date(`${date}T12:00:00Z`).getUTCDay();
@@ -133,13 +135,13 @@ export function timeDay(placeIds: string[], date: string, prefs: PlanPrefs, plac
     if (!p) continue;
     const stay = stayOf(p, prefs.pace);
     const move = pos && p.location ? moveBetween(pos, p.location) : undefined;
-    let arrive = cursor + (move?.minutes ?? 0);
+    let arrive = up5(cursor + (move?.minutes ?? 0));
     if (!lunch && (arrive >= LUNCH_FROM || arrive + stay > 14 * 60)) {
       const at = Math.max(cursor, 12 * 60);
       if (at < 15 * 60) {
         items.push({ kind: 'meal', meal: 'ogle', start: at, end: at + P.lunch, ...(food(0) ? { foodId: food(0) } : {}) });
         cursor = at + P.lunch;
-        arrive = cursor + (move?.minutes ?? 0);
+        arrive = up5(cursor + (move?.minutes ?? 0));
       }
       lunch = true;
     }
@@ -181,7 +183,7 @@ export function buildPlan(cityId: string, places: TravelPlace[], prefs: PlanPref
         if (used.has(p.id)) continue;
         const stay = stayOf(p, prefs.pace);
         const move = pos ? moveBetween(pos, p.location!) : undefined;
-        let arrive = cursor + (move?.minutes ?? 0);
+        let arrive = up5(cursor + (move?.minutes ?? 0));
         const w = openWindow(p, date);
         if (w && arrive < w[0] && w[0] - arrive <= 90) arrive = w[0];
         if (arrive + stay > P.end || !fitsAt(p, date, arrive, stay)) continue;

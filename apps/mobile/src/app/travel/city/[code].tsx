@@ -22,7 +22,7 @@ type Filter = 'all' | TravelCategory;
 
 /**
  * Şehir sayfası (tasarım: bursa.html): alçak kapak, kısa tanıtım (uzunsa "Devamını oku"), iki sütunlu dört kutu
- * (Kareler, Başkanlarla Keşif, Yöresel, Hazır Rotalar), kategoriye göre gezilecek yerler. UNESCO / en yüksek nokta gibi
+ * (Kareler, Başkanlarla Keşif, Yöresel), Gezimi planla ve Yakınımda kartları, kategoriye göre gezilecek yerler. UNESCO / en yüksek nokta gibi
  * bilgi kutuları sayfada gösterilmez (Eren, 11 Kasım 2026); panelde girilen bilgiler veride durur.
  * Puan, nüfus gibi kaynaksız sayılar yok; yapay zekâ rehberi bilgi tabanı dolunca gelecek.
  */
@@ -125,20 +125,31 @@ export default function TravelCityScreen() {
               ))}
             </View>
 
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`${t('travel.routes')}. ${t('travel.routesHint')}`}
-              onPress={() => router.push({ pathname: '/travel/routes/[code]', params: { code } })}
-              style={({ pressed }) => [styles.routes, { opacity: pressed ? 0.9 : 1 }]}>
-              <View style={styles.routesIcon}>
-                <MaterialIcons name="route" size={24} color={navy} />
-              </View>
-              <View style={styles.flex}>
-                <AppText style={styles.routesTitle}>{t('travel.routes')}</AppText>
-                <AppText style={styles.routesHint}>{t('travel.routesHint')}</AppText>
-              </View>
-              <MaterialIcons name={I18nManager.isRTL ? 'arrow-back' : 'arrow-forward'} size={22} color={navy} />
-            </Pressable>
+            {/* Gezimi planla ve Yakınımda (Karar, Eren, 12 Kasım 2026): Hazır Rotalar'ın yerine. */}
+            <View style={styles.duo}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${t('travel.planTitle')}. ${t('travel.planHint')}`}
+                onPress={() => router.push({ pathname: '/travel/plan/[code]', params: { code } })}
+                style={({ pressed }) => [styles.routes, { opacity: pressed ? 0.9 : 1 }]}>
+                <View style={styles.routesIcon}>
+                  <MaterialIcons name="event-note" size={22} color={navy} />
+                </View>
+                <AppText style={styles.routesTitle} numberOfLines={2}>{t('travel.planTitle')}</AppText>
+                <AppText style={styles.routesHint} numberOfLines={2}>{t('travel.planHint')}</AppText>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${t('travel.nearbyTitle')}. ${t('travel.nearbyHint')}`}
+                onPress={() => router.push({ pathname: '/travel/nearby/[code]', params: { code } })}
+                style={({ pressed }) => [styles.routes, { backgroundColor: c.surface, borderWidth: 1, borderColor: c.border, opacity: pressed ? 0.9 : 1 }]}>
+                <View style={[styles.routesIcon, { backgroundColor: c.accentSoft }]}>
+                  <MaterialIcons name="near-me" size={22} color={c.accent} />
+                </View>
+                <AppText style={[styles.routesTitle, { color: c.textStrong }]} numberOfLines={2}>{t('travel.nearbyTitle')}</AppText>
+                <AppText style={[styles.routesHint, { color: c.textMuted }]} numberOfLines={2}>{t('travel.nearbyHint')}</AppText>
+              </Pressable>
+            </View>
           </View>
         ) : null}
 
@@ -233,8 +244,9 @@ const styles = StyleSheet.create({
   boxIcon: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   boxTitle: { fontFamily: fonts.bodySemi, fontSize: 12, lineHeight: 16 },
   boxHint: { fontSize: 10, lineHeight: 13 },
-  routes: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, padding: spacing.md, borderRadius: radius.lg, backgroundColor: '#E0B07A', minHeight: MIN_TOUCH + 20 },
-  routesIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
+  duo: { flexDirection: 'row', gap: spacing.sm },
+  routes: { flex: 1, gap: 6, padding: spacing.md, borderRadius: radius.lg, backgroundColor: '#E0B07A', minHeight: MIN_TOUCH + 70 },
+  routesIcon: { width: 40, height: 40, borderRadius: 20, marginBottom: 2, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
   routesTitle: { color: navy, fontFamily: fonts.heading, fontSize: 15, lineHeight: 20 },
   routesHint: { color: 'rgba(8,31,36,0.75)', fontSize: 12, lineHeight: 16 },
   filters: { paddingHorizontal: GUTTER, paddingTop: spacing.lg, gap: spacing.sm },
