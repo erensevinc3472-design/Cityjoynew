@@ -437,6 +437,8 @@ service cloud.firestore {
              ['ownerUid', 'status', 'verification', 'membership', 'rating', 'createdAt', 'updatedAt']))
         && validBusinessContent(nw)
         && nw.ownerUid == request.auth.uid
+        // Askıdaki işletmenin sahibi askı süresince yeni işletme açamaz.
+        && !exists(/databases/$(database)/documents/businessBans/$(request.auth.uid))
         && nw.status == 'yayinda'
         && nw.verification == {'status': 'dogrulanmadi'}
         && nw.membership == {'tier': 'ucretsiz'}
@@ -1188,6 +1190,16 @@ service cloud.firestore {
       allow update: if _k49(request.resource.data, resource.data);
     }
 
+    // İşletme askıları: admin ve işletmenin sahibi okur (sebep ve bitiş tarihini görür); yazma yalnızca sunucu işlevi.
+    match /businessSuspensions/{bid} {
+      allow read: if isAdmin() || (resource != null && isSelf(resource.data.ownerUid));
+      allow write: if false;
+    }
+    // Yeni işletme açma yasağı (askıdaki işletmenin sahibi): admin ve kişinin kendisi okur.
+    match /businessBans/{uid} {
+      allow read: if isAdmin() || isSelf(uid);
+      allow write: if false;
+    }
     // Hesap askıları (Eren, 12 Kasım 2026): yalnızca sunucu işlevi yazar; admin hepsini, kişi kendi kaydını okur.
     match /suspensions/{uid} {
       allow read: if isAdmin() || isSelf(uid);

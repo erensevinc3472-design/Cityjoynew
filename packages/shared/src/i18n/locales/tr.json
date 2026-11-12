@@ -301,7 +301,7 @@
     "deleteYes": "Evet, sil",
     "statusLive": "Yayında",
     "statusHidden": "Gizli",
-    "statusRemoved": "Yönetim tarafından kaldırıldı",
+    "statusRemoved": "Askıya alındı",
     "verifiedOn": "Belgeleri doğrulandı ({{date}})",
     "verified": "Belgeleri doğrulandı",
     "unverified": "Doğrulanmadı",
@@ -327,7 +327,7 @@
     "addressLabel": "Adres",
     "noProvince": "İşletmeleri görmek için konumunuzu seçin.",
     "chooseLocation": "Konum seç",
-    "removedNote": "Bu işletme yönetim tarafından yayından kaldırıldı. Bilgi için CityJoy ile iletişime geçin.",
+    "removedNote": "Bu işletme yönetim tarafından askıya alındı; uygulamada görünmüyor. Bilgi için CityJoy ile iletişime geç.",
     "priceListTitle": "Fiyat listesi",
     "removeService": "Kaldır",
     "duplicatePhone": "Bu telefon numarasıyla kayıtlı bir işletme zaten var. İşletme sizinse CityJoy ile iletişime geçin.",
@@ -459,7 +459,11 @@
     "categoryNotFound": "Bu kelimeyle hizmet bulunamadı. Başka bir kelime dene ya da aşağıdan bize yaz.",
     "categoryNotListed": "İşin listede yok mu? Grubunun \"Diğer\" seçeneğini işaretle ve bize yaz, ekleyelim.",
     "categorySuggest": "Eksik hizmeti bildir",
-    "categorySelectedCount": "{{count}} seçili"
+    "categorySelectedCount": "{{count}} seçili",
+    "suspendedReason": "Sebep: {{reason}}.",
+    "suspendedUntil": "{{date}} tarihinde kendiliğinden açılır.",
+    "bannedNew": "Hesabına bağlı bir işletme askıda olduğu için şu an yeni işletme açamazsın.",
+    "bannedUntil": "{{date}} tarihinden sonra açabilirsin."
   },
   "reviews": {
     "title": "Değerlendirmeler",
@@ -2634,5 +2638,15 @@
     "signIn": "Çeviri için giriş yap",
     "error": "Şu an çevrilemedi, biraz sonra tekrar dene",
     "a11y": "Bu metni çevir ({{lang}})"
+  },
+  "suspension": {
+    "reasons": {
+      "uygunsuz-icerik": "Uygunsuz içerik",
+      "taciz": "Taciz ya da zorbalık",
+      "spam": "Spam ya da reklam",
+      "sahte-hesap": "Sahte ya da taklit hesap",
+      "yasa-disi": "Yasa dışı içerik",
+      "diger": "Kurallara aykırı kullanım"
+    }
   }
 }

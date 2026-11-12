@@ -12,6 +12,7 @@ import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePost
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
 import { handleLift, handleSuspend, liftExpiredSuspensions } from '../src/suspensions';
+import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensions } from '../src/business-suspensions';
 import { handleThumb, type ThumbStore } from '../src/thumbs';
 import sharp from 'sharp';
 import { deleteOldTranslations, handleTranslate, translationId, type Translator } from '../src/translate';
@@ -661,5 +662,44 @@ describe('hesap askıya alma', () => {
     expect(off.has('U')).toBe(false);
     expect(off.has('V')).toBe(true);
     expect(await liftExpiredSuspensions(db, accounts, new Date(NOW.getTime() + 3 * 86_400_000))).toBe(0);
+  });
+});
+
+describe('işletme askıya alma', () => {
+  beforeEach(async () => {
+    await db.doc('admins/A').set({ at: Timestamp.now() });
+    await db.doc('businesses/b1').set({ name: 'Ali Tesisat', ownerUid: 'U', status: 'gizli', location: { provinceCode: '16', districtId: '16-nilufer' } });
+  });
+
+  it('admin askıya alır: işletme kaldırılır, sahibine yasak konur; kaldırınca eski durumuna döner, yasak kalkar', async () => {
+    await handleBusinessSuspend(db, 'A', { businessId: 'b1', reason: 'spam', days: 30, banOwner: true, note: 'sahte yorumlar' }, NOW);
+    expect((await db.doc('businesses/b1').get()).get('status')).toBe('kaldirildi');
+    const s = await db.doc('businessSuspensions/b1').get();
+    expect(s.get('ownerUid')).toBe('U');
+    expect(s.get('prevStatus')).toBe('gizli');
+    expect((await db.doc('businessBans/U').get()).exists).toBe(true);
+    await handleBusinessLift(db, 'A', 'b1', NOW);
+    expect((await db.doc('businesses/b1').get()).get('status')).toBe('gizli');
+    expect((await db.doc('businessBans/U').get()).exists).toBe(false);
+    expect((await db.doc('businessSuspensions/b1').get()).get('active')).toBe(false);
+    expect((await db.collection('auditLog').where('targetId', '==', 'b1').get()).size).toBe(2);
+  });
+
+  it('yasak istenmezse sahibi yeni işletme açabilir; admin olmayan askıya alamaz', async () => {
+    await expect(handleBusinessSuspend(db, 'U', { businessId: 'b1', reason: 'spam', days: 7, banOwner: true }, NOW)).rejects.toThrow('yetki');
+    await expect(handleBusinessSuspend(db, 'A', { businessId: 'b1', reason: 'spam', days: 7 }, NOW)).rejects.toThrow('gecersiz');
+    await expect(handleBusinessSuspend(db, 'A', { businessId: 'yok', reason: 'spam', days: 7, banOwner: false }, NOW)).rejects.toThrow('yok');
+    await handleBusinessSuspend(db, 'A', { businessId: 'b1', reason: 'spam', days: 7, banOwner: false }, NOW);
+    expect((await db.doc('businessBans/U').get()).exists).toBe(false);
+  });
+
+  it('süresi dolunca kendiliğinden açılır; eski yolla kaldırılmış işletme de açılabilir', async () => {
+    await handleBusinessSuspend(db, 'A', { businessId: 'b1', reason: 'spam', days: 1, banOwner: true }, NOW);
+    expect(await liftExpiredBusinessSuspensions(db, new Date(NOW.getTime() + 3_600_000))).toBe(0);
+    expect(await liftExpiredBusinessSuspensions(db, new Date(NOW.getTime() + 2 * 86_400_000))).toBe(1);
+    expect((await db.doc('businesses/b1').get()).get('status')).toBe('gizli');
+    await db.doc('businesses/b2').set({ name: 'Eski', ownerUid: 'V', status: 'kaldirildi', location: { provinceCode: '16', districtId: 'x' } });
+    await handleBusinessLift(db, 'A', 'b2', NOW);
+    expect((await db.doc('businesses/b2').get()).get('status')).toBe('yayinda');
   });
 });

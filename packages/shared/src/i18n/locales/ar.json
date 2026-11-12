@@ -301,7 +301,7 @@
     "deleteYes": "نعم، احذف",
     "statusLive": "منشور",
     "statusHidden": "مخفي",
-    "statusRemoved": "أزالته CityJoy",
+    "statusRemoved": "معلّق",
     "verifiedOn": "تم التحقق من الوثائق ({{date}})",
     "verified": "تم التحقق من الوثائق",
     "unverified": "غير موثّق",
@@ -327,7 +327,7 @@
     "addressLabel": "العنوان",
     "noProvince": "اختر موقعك لرؤية الأعمال.",
     "chooseLocation": "اختر الموقع",
-    "removedNote": "أزالت CityJoy هذا العمل. تواصل مع CityJoy لمزيد من المعلومات.",
+    "removedNote": "تم تعليق هذا النشاط التجاري من قبل CityJoy ولا يظهر في التطبيق. تواصل مع CityJoy لمعرفة التفاصيل.",
     "priceListTitle": "قائمة الأسعار",
     "removeService": "إزالة",
     "duplicatePhone": "يوجد عمل مسجل بهذا الرقم بالفعل. إذا كان عملك، تواصل مع CityJoy.",
@@ -459,7 +459,11 @@
     "categoryNotFound": "لا توجد خدمة بهذه الكلمة. جرّب كلمة أخرى أو راسلنا.",
     "categoryNotListed": "عملك غير موجود؟ اختر «أخرى» في مجموعتك وراسلنا لنضيفه.",
     "categorySuggest": "أبلغ عن خدمة ناقصة",
-    "categorySelectedCount": "{{count}} محدد"
+    "categorySelectedCount": "{{count}} محدد",
+    "suspendedReason": "السبب: {{reason}}.",
+    "suspendedUntil": "سيُعاد فتحه تلقائيًا في {{date}}.",
+    "bannedNew": "لا يمكنك فتح نشاط تجاري جديد حاليًا لأن نشاطًا مرتبطًا بحسابك معلّق.",
+    "bannedUntil": "يمكنك ذلك بعد {{date}}."
   },
   "reviews": {
     "title": "التقييمات",
@@ -2658,5 +2662,15 @@
     "signIn": "سجّل الدخول للترجمة",
     "error": "تعذّرت الترجمة الآن، حاول مرة أخرى لاحقًا",
     "a11y": "ترجمة هذا النص إلى {{lang}}"
+  },
+  "suspension": {
+    "reasons": {
+      "uygunsuz-icerik": "محتوى غير لائق",
+      "taciz": "تحرش أو تنمر",
+      "spam": "رسائل مزعجة أو إعلانات",
+      "sahte-hesap": "حساب مزيف أو منتحل",
+      "yasa-disi": "محتوى غير قانوني",
+      "diger": "مخالفة القواعد"
+    }
   }
 }

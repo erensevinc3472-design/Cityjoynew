@@ -224,6 +224,13 @@ describe('occupations, admins, auditLog', () => {
       b.set(doc(f, 'businessPhones/05321234567'), { businessId: id, ownerUid: uid });
       return b.commit();
     };
+    // Askıdaki işletmenin sahibi (yasak kaydı varsa) yeni işletme açamaz.
+    await seed('businessBans/ali', { uid: 'ali', businessId: 'eski' });
+    await assertFails(create('ali', 'b1'));
+    await assertSucceeds(getDoc(doc(db('ali'), 'businessBans/ali')));
+    await assertFails(getDoc(doc(db('veli'), 'businessBans/ali')));
+    await assertFails(deleteDoc(doc(db('ali'), 'businessBans/ali')));
+    await env.withSecurityRulesDisabled((c) => deleteDoc(doc(c.firestore(), 'businessBans/ali')));
     await assertSucceeds(create('ali', 'b1'));
     await assertFails(create('veli', 'b2'));
 
@@ -442,6 +449,15 @@ describe('hesap askıları', () => {
     await assertFails(getDoc(doc(db('veli'), 'suspensions/ali')));
     await assertFails(setDoc(doc(db('eren'), 'suspensions/veli'), { uid: 'veli', active: true }));
     await assertFails(setDoc(doc(db('ali'), 'suspensions/ali'), { uid: 'ali', active: false }));
+  });
+
+  it('işletme askı kaydını admin ve işletmenin sahibi okur, başkası okuyamaz, kimse yazamaz', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    await seed('businessSuspensions/b9', { businessId: 'b9', ownerUid: 'ali', active: true, reason: 'spam' });
+    await assertSucceeds(getDoc(doc(db('eren'), 'businessSuspensions/b9')));
+    await assertSucceeds(getDoc(doc(db('ali'), 'businessSuspensions/b9')));
+    await assertFails(getDoc(doc(db('veli'), 'businessSuspensions/b9')));
+    await assertFails(setDoc(doc(db('ali'), 'businessSuspensions/b9'), { businessId: 'b9', ownerUid: 'ali', active: false }));
   });
 
   it('kişi profiline askı işareti koyamaz ya da silemez; askıdaki profili düzenleyemez', async () => {

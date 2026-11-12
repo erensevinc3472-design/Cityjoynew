@@ -23,7 +23,7 @@ import {
   type BusinessType,
   type DayHours,
 } from '@cityjoy/shared';
-import { vitrinLimit } from '@cityjoy/shared/firebase';
+import { createOwnerSuspensionReader, vitrinLimit } from '@cityjoy/shared/firebase';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
@@ -104,6 +104,26 @@ export default function EditBusinessScreen() {
       .catch(() => setExisting(null));
   }, [id]);
 
+  // Askıdaki işletmede sebep ve bitiş tarihi (yalnızca sahibi okur); yeni işletmede sahibine yasak var mı.
+  const [suspendedText, setSuspendedText] = useState<string>();
+  const [banned, setBanned] = useState<{ until?: string } | null>(null);
+  const removedNow = existing?.status === 'kaldirildi';
+  useEffect(() => {
+    if (!removedNow || !existing) return setSuspendedText(undefined);
+    createOwnerSuspensionReader(firestore)
+      .business(existing.id)
+      .then((s) => {
+        if (!s) return setSuspendedText(undefined);
+        const parts = [t('business.suspendedReason', { reason: t(`suspension.reasons.${s.reason}`) })];
+        if (s.until) parts.push(t('business.suspendedUntil', { date: new Date(s.until).toLocaleDateString() }));
+        setSuspendedText(parts.join(' '));
+      }, () => setSuspendedText(undefined));
+  }, [removedNow, existing, t]);
+  useEffect(() => {
+    if (id || !user) return;
+    createOwnerSuspensionReader(firestore).banned(user.uid).then(setBanned, () => setBanned(null));
+  }, [id, user]);
+
   if (!user) {
     return (
       <FormScreen title={t('business.newTitle')}>
@@ -115,6 +135,16 @@ export default function EditBusinessScreen() {
     return (
       <FormScreen title={t('business.editTitle')}>
         <StateMessage kind="loading" />
+      </FormScreen>
+    );
+  }
+  if (!id && banned) {
+    return (
+      <FormScreen title={t('business.newTitle')}>
+        <FormMessage
+          kind="error"
+          text={`${t('business.bannedNew')}${banned.until ? ` ${t('business.bannedUntil', { date: new Date(banned.until).toLocaleDateString() })}` : ''}`}
+        />
       </FormScreen>
     );
   }
@@ -205,7 +235,7 @@ export default function EditBusinessScreen() {
 
   return (
     <FormScreen title={existing ? t('business.editTitle') : t('business.newTitle')}>
-      {removed ? <FormMessage kind="error" text={t('business.removedNote')} /> : null}
+      {removed ? <FormMessage kind="error" text={suspendedText ? `${t('business.removedNote')} ${suspendedText}` : t('business.removedNote')} /> : null}
       {existing && !isOwner ? <FormMessage kind="info" text={t('business.managers.editingAs', { name: existing.name })} /> : null}
       {message ? <FormMessage kind={message.kind} text={message.text} /> : null}
 

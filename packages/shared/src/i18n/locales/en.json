@@ -301,7 +301,7 @@
     "deleteYes": "Yes, delete",
     "statusLive": "Published",
     "statusHidden": "Hidden",
-    "statusRemoved": "Removed by CityJoy",
+    "statusRemoved": "Suspended",
     "verifiedOn": "Documents verified ({{date}})",
     "verified": "Documents verified",
     "unverified": "Not verified",
@@ -327,7 +327,7 @@
     "addressLabel": "Address",
     "noProvince": "Choose your location to see businesses.",
     "chooseLocation": "Choose location",
-    "removedNote": "This business was removed by CityJoy. Contact CityJoy for details.",
+    "removedNote": "This business has been suspended by CityJoy and is not visible in the app. Contact CityJoy for details.",
     "priceListTitle": "Price list",
     "removeService": "Remove",
     "duplicatePhone": "A business with this phone number is already registered. If it's yours, contact CityJoy.",
@@ -459,7 +459,11 @@
     "categoryNotFound": "No service matches this word. Try another word or tell us below.",
     "categoryNotListed": "Your work isn't listed? Tick \"Other\" in your group and tell us, we'll add it.",
     "categorySuggest": "Report a missing service",
-    "categorySelectedCount": "{{count}} selected"
+    "categorySelectedCount": "{{count}} selected",
+    "suspendedReason": "Reason: {{reason}}.",
+    "suspendedUntil": "It reopens automatically on {{date}}.",
+    "bannedNew": "You can't open a new business right now because a business linked to your account is suspended.",
+    "bannedUntil": "You can open one after {{date}}."
   },
   "reviews": {
     "title": "Reviews",
@@ -2634,5 +2638,15 @@
     "signIn": "Sign in to translate",
     "error": "Couldn’t translate right now, please try again later",
     "a11y": "Translate this text into {{lang}}"
+  },
+  "suspension": {
+    "reasons": {
+      "uygunsuz-icerik": "Inappropriate content",
+      "taciz": "Harassment or bullying",
+      "spam": "Spam or advertising",
+      "sahte-hesap": "Fake or impersonating account",
+      "yasa-disi": "Illegal content",
+      "diger": "Breaking the rules"
+    }
   }
 }

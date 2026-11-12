@@ -44,3 +44,41 @@ export function validSuspendRequest(r: unknown): r is SuspendRequest {
     (x.note === undefined || (typeof x.note === 'string' && x.note.length <= SUSPENSION_NOTE_MAX))
   );
 }
+
+/**
+ * İşletme askıya alma (Eren, 12 Kasım 2026: "işletme hesabını askıya alabilir miyim; hangi hesaba bağlıysa o hesap
+ * işletme açamasın"). Yalnızca admin, sunucu işleviyle: işletme herkesten gizlenir, sahibi ve yetkilileri açamaz,
+ * düzenleyemez, işletme adına paylaşamaz. İstenirse (varsayılan) sahibi askı süresince yeni işletme açamaz. Aynı
+ * telefonla ikinci işletme zaten açılamaz (telefon kaydı askıdaki işletmede kalır).
+ */
+export interface BusinessSuspendRequest {
+  businessId: string;
+  reason: SuspensionReason;
+  days: SuspensionDays;
+  note?: string;
+  /** Sahibi askı süresince yeni işletme açamasın. */
+  banOwner: boolean;
+}
+
+export interface BusinessSuspension {
+  businessId: string;
+  name: string;
+  ownerUid: string;
+  reason: SuspensionReason;
+  note: string;
+  banOwner: boolean;
+  active: boolean;
+  until?: string;
+  at: string;
+  by: string;
+}
+
+export function validBusinessSuspendRequest(r: unknown): r is BusinessSuspendRequest {
+  if (!r || typeof r !== 'object') return false;
+  const x = r as Record<string, unknown>;
+  return (
+    typeof x.businessId === 'string' && x.businessId.length > 0 && x.businessId.length <= 128 &&
+    typeof x.banOwner === 'boolean' &&
+    validSuspendRequest({ uid: x.businessId, reason: x.reason, days: x.days, note: x.note })
+  );
+}

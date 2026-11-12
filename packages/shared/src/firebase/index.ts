@@ -63,7 +63,7 @@ export { createFirestoreMessageRepository, createMessageModeration, type Message
 export { createFirestoreListingRepository, createListingModeration, type ListingFilter, type ListingPage, type ListingReport } from './listings';
 export { createNotificationSettings, createNotificationTriggers } from './notifications';
 export { createBillingAdmin } from './billing';
-export { createSuspensionAdmin } from './suspensions';
+export { createOwnerSuspensionReader, createSuspensionAdmin } from './suspensions';
 export { countUsage, createLimitsAdmin, deleteUsageOf, vitrinLimit } from './limits';
 export { createFirestoreTravelRepository, createMunicipalTravel, createTravelAdmin, type TravelAdminKind } from './travel';
 export { createRoadsidePackAdmin, createRoadsidePackRepository, type RoadsidePackSummary } from './roadside';

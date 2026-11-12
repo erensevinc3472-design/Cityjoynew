@@ -301,7 +301,7 @@
     "deleteYes": "Ja, löschen",
     "statusLive": "Veröffentlicht",
     "statusHidden": "Ausgeblendet",
-    "statusRemoved": "Von CityJoy entfernt",
+    "statusRemoved": "Gesperrt",
     "verifiedOn": "Dokumente geprüft ({{date}})",
     "verified": "Dokumente geprüft",
     "unverified": "Nicht geprüft",
@@ -327,7 +327,7 @@
     "addressLabel": "Adresse",
     "noProvince": "Wählen Sie Ihren Standort, um Betriebe zu sehen.",
     "chooseLocation": "Standort wählen",
-    "removedNote": "Dieser Betrieb wurde von CityJoy entfernt. Wenden Sie sich für Details an CityJoy.",
+    "removedNote": "Dieses Unternehmen wurde von CityJoy gesperrt und ist in der App nicht sichtbar. Wende dich für Details an CityJoy.",
     "priceListTitle": "Preisliste",
     "removeService": "Entfernen",
     "duplicatePhone": "Mit dieser Telefonnummer ist bereits ein Betrieb eingetragen. Wenn es Ihrer ist, wenden Sie sich an CityJoy.",
@@ -459,7 +459,11 @@
     "categoryNotFound": "Keine Leistung gefunden. Versuchen Sie ein anderes Wort oder schreiben Sie uns.",
     "categoryNotListed": "Nicht dabei? Wählen Sie „Sonstiges\" in Ihrer Gruppe und schreiben Sie uns.",
     "categorySuggest": "Fehlende Leistung melden",
-    "categorySelectedCount": "{{count}} ausgewählt"
+    "categorySelectedCount": "{{count}} ausgewählt",
+    "suspendedReason": "Grund: {{reason}}.",
+    "suspendedUntil": "Es wird am {{date}} automatisch wieder freigegeben.",
+    "bannedNew": "Du kannst derzeit kein neues Unternehmen eröffnen, weil ein mit deinem Konto verbundenes Unternehmen gesperrt ist.",
+    "bannedUntil": "Ab dem {{date}} ist es wieder möglich."
   },
   "reviews": {
     "title": "Bewertungen",
@@ -2634,5 +2638,15 @@
     "signIn": "Zum Übersetzen anmelden",
     "error": "Übersetzung gerade nicht möglich, versuche es später erneut",
     "a11y": "Diesen Text auf {{lang}} übersetzen"
+  },
+  "suspension": {
+    "reasons": {
+      "uygunsuz-icerik": "Unangemessene Inhalte",
+      "taciz": "Belästigung oder Mobbing",
+      "spam": "Spam oder Werbung",
+      "sahte-hesap": "Gefälschtes Konto",
+      "yasa-disi": "Illegale Inhalte",
+      "diger": "Regelverstoß"
+    }
   }
 }

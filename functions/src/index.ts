@@ -23,6 +23,7 @@ import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePost
 import { expoSender } from './push';
 import { handleFollowWrite, handleMessageCreate } from './social';
 import { handleLift, handleSuspend, liftExpiredSuspensions, SuspensionError, type AccountSwitch } from './suspensions';
+import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensions } from './business-suspensions';
 import { handleThumb } from './thumbs';
 import { deleteOldTranslations, googleTranslator, handleTranslate, TranslateError } from './translate';
 
@@ -163,6 +164,15 @@ export const liftSuspension = onCall({ maxInstances: 2 }, async (req) => {
 // Süreli askılar saatte bir denetlenir (askı yoksa tek okuma).
 export const suspensionExpiry = onSchedule({ schedule: 'every 1 hours', maxInstances: 1 }, async () => {
   await liftExpiredSuspensions(db, accounts, new Date());
+  await liftExpiredBusinessSuspensions(db, new Date());
+});
+export const suspendBusiness = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return suspensionCall(() => handleBusinessSuspend(db, req.auth!.uid, req.data, new Date()));
+});
+export const liftBusinessSuspension = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return suspensionCall(() => handleBusinessLift(db, req.auth!.uid, (req.data as { businessId?: unknown } | null)?.businessId, new Date()));
 });
 
 // "Çevir" düğmesi: yalnızca giriş yapmış kişi; sınır ve önbellek translate.ts'de.

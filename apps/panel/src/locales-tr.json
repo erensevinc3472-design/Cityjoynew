@@ -289,7 +289,7 @@
     "statuses": {
       "yayinda": "Yayında",
       "gizli": "Sahibi gizledi",
-      "kaldirildi": "Kaldırıldı"
+      "kaldirildi": "Askıda"
     },
     "remove": "Yayından kaldır",
     "restore": "Yeniden yayına al",
@@ -2282,6 +2282,13 @@
       "d7": "7 gün",
       "d30": "30 gün",
       "forever": "Süresiz"
-    }
+    },
+    "liftBusinessConfirm": "{{name}} işletmesinin askısı kaldırılsın mı? İşletme eski durumuna döner.",
+    "banOwner": "Sahibi askı süresince yeni işletme açamasın",
+    "businessEffect": "İşletme uygulamada görünmez; sahibi ve yetkilileri açamaz, düzenleyemez, işletme adına paylaşamaz. Aynı telefonla yeni işletme zaten açılamaz.",
+    "businessPill": "Askıda",
+    "businessInfo": "{{reason}} · {{until}}",
+    "bannedOwner": "Sahibi yeni işletme açamaz",
+    "businessListTitle": "Askıdaki işletmeler"
   }
 }
