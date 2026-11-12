@@ -5,6 +5,7 @@ import { createBillingAdmin } from '@cityjoy/shared/firebase';
 import { firestore, functions } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 const tl = (n: number) => `${n.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} TL`;
 const when = (s?: string) => (s ? new Date(s).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }) : '');
@@ -77,7 +78,7 @@ export function BillingPage() {
       <header className="page-head">
         <div>
           <h1>{t('billing.title')}</h1>
-          <p className="meta">{t('billing.intro')}</p>
+          <Intro text={t('billing.intro')} />
         </div>
       </header>
       {!canEdit ? (

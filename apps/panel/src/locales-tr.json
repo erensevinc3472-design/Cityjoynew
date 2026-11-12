@@ -257,7 +257,12 @@
     "keywords": "Arama kelimeleri",
     "keywordsHint": "Virgülle ayırın (ör. kuaför için \"saç, fön, boya\"). İnsanlar bu kelimelerle aradığında da bu hizmet çıkar. Yalnızca Türkçe.",
     "missingDefaults": "CityJoy'un hazır listesinde veritabanınızda olmayan {{count}} kategori var (yeni gruplar ve \"Diğer\" seçenekleri). Var olan kategorileriniz değişmez.",
-    "addMissing": "Eksik kategorileri ekle"
+    "addMissing": "Eksik kategorileri ekle",
+    "childCount": "{{count}} hizmet",
+    "searchPlaceholder": "Kategori ya da arama kelimesi ara",
+    "noMatch": "Bu aramayla kategori bulunamadı.",
+    "expandAll": "Hepsini aç",
+    "collapseAll": "Hepsini kapat"
   },
   "businesses": {
     "title": "İşletmeler",
@@ -562,6 +567,16 @@
         "spam": "Reklam ya da tekrar",
         "diger": "Diğer"
       }
+    },
+    "tabs": {
+      "degerlendirmeler": "Değerlendirmeler",
+      "gonderiler": "Gönderiler",
+      "yorumlar": "Yorumlar",
+      "aktiviteler": "Aktiviteler",
+      "ilanlar": "İlanlar",
+      "profiller": "Profiller",
+      "mesajlar": "Mesajlar",
+      "ayarlar": "Ayarlar"
     }
   },
   "notifications": {
@@ -2227,5 +2242,8 @@
       "places": "En az bir sayfa seç.",
       "dates": "Bitiş günü başlangıçtan önce olamaz (en çok 400 gün)."
     }
+  },
+  "common": {
+    "howItWorks": "Nasıl çalışır?"
   }
 }

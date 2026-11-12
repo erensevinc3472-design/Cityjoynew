@@ -24,6 +24,7 @@ import { accountAuth, firebaseAuth, firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
 const KINDS: ('belediye' | Exclude<OrganizationKind, 'buyuksehir-belediyesi' | 'il-belediyesi' | 'ilce-belediyesi'>)[] = ['belediye', 'kurum', 'kulup', 'yayinci'];
@@ -102,7 +103,7 @@ function OrgList({ user, isAdmin, ownAdminOrgs, provinceViews }: { user: PanelUs
       <header className="page-head">
         <div>
           <h1>{t('orgs.title')}</h1>
-          <p className="meta">{isAdmin ? t('orgs.introAdmin') : t('orgs.introOther')}</p>
+          <Intro text={isAdmin ? t('orgs.introAdmin') : t('orgs.introOther')} />
         </div>
         {isAdmin && !creating && !user.isDemo ? (
           <div className="actions">

@@ -22,6 +22,7 @@ import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 const PERIODS = [7, 30, 90] as const;
 type View = { kind: 'genel' } | { kind: 'il-ici' } | { kind: 'ilce'; id: string } | { kind: 'il-disi' } | { kind: 'yas' } | { kind: 'gunluk' };
@@ -107,7 +108,7 @@ function Audience({ user }: { user: PanelUser }) {
             {t('audience.title')}
             {user.isDemo ? <span className="sample-tag">{t('audience.sample')}</span> : null}
           </h1>
-          <p className="meta">{t('audience.intro')}</p>
+          <Intro text={t('audience.intro')} />
         </div>
         <div className="seg" role="group" aria-label={t('stats.period')}>
           {PERIODS.map((d) => (

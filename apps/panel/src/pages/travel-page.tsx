@@ -33,6 +33,7 @@ import { TourEditor } from '../components/tour-editor';
 import { PlacePlanFields } from '../components/place-plan-fields';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
 import { FramesTab, LocalTab, MunicipalTab, MunicipalTravelPage, RoutesTab, StatusPill } from './travel-extra';
+import { Intro } from '../components/intro';
 
 type Tab = TravelAdminKind | 'kareler';
 type Data = Awaited<ReturnType<ReturnType<typeof createTravelAdmin>['listAll']>>;
@@ -278,7 +279,7 @@ function AdminTravelPage() {
       <header className="page-head">
         <div>
           <h1>{t('travel.title')}</h1>
-          <p className="meta">{t('travel.intro')}</p>
+          <Intro text={t('travel.intro')} />
         </div>
         {canEdit || isAdminUser(user) ? (
           <div className="actions">

@@ -6,6 +6,7 @@ import { createFirestoreSocialRepository } from '@cityjoy/shared/firebase';
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 interface Row extends PublicProfile {
   followers: number | null;
@@ -43,7 +44,7 @@ export function ProfilesPage() {
       <header className="page-head">
         <div>
           <h1>{t('profiles.title')}</h1>
-          <p className="meta">{t('profiles.intro')}</p>
+          <Intro text={t('profiles.intro')} />
         </div>
       </header>
       <form className="toolbar" role="search" onSubmit={search}>

@@ -5,6 +5,7 @@ import { createLimitsAdmin } from '@cityjoy/shared/firebase';
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 /**
  * Günlük sınırlar (PROJE.md 15.3). Kişi, işletme, muhtar ve kurumun günde (duyuruda haftada da) kaç iş yapabileceği.
@@ -51,7 +52,7 @@ export function LimitsPage() {
       <header className="page-head">
         <div>
           <h1>{t('limits.title')}</h1>
-          <p className="meta">{t('limits.intro')}</p>
+          <Intro text={t('limits.intro')} />
         </div>
       </header>
       <p className="note">{t('limits.never')}</p>

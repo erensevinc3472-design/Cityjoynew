@@ -337,3 +337,21 @@ td.handle-cell { width: 40px; padding-inline: 4px; }
 .content form.card > button { justify-self: start; }
 .content form.card .check { margin: 0; min-height: 44px; }
 .page > .field { max-width: 320px; }
+.intro { display: flex; flex-direction: column; gap: 0.2rem; }
+.intro details summary { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 32px; font-size: 0.85rem; font-weight: 600; list-style: none; }
+.intro details summary::-webkit-details-marker { display: none; }
+.intro details[open] summary { margin-bottom: 0.2rem; }
+.intro details p { max-width: 75ch; }
+/* Sayfa içi sekmeler (Moderasyon): alt çizgili yazı sekmeleri, uygulamadaki Keşfet süzgeçleriyle aynı dil. */
+.page-tabs { display: flex; gap: 0.25rem; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+.page-tabs button { display: inline-flex; align-items: center; gap: 0.4rem; flex-shrink: 0; min-height: 44px; padding: 0 0.85rem; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; color: var(--muted); font: 500 0.92rem var(--font-body); cursor: pointer; }
+.page-tabs button:hover { color: var(--fg); }
+.page-tabs button[aria-selected='true'] { color: var(--fg); font-weight: 600; border-bottom-color: var(--primary); }
+.tab-panel, [role='tabpanel'] { display: flex; flex-direction: column; gap: 1rem; }
+[role='tabpanel'][hidden] { display: none; }
+.table-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+.table-tools input[type='search'] { flex: 1 1 260px; max-width: 420px; }
+.group-toggle { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 40px; padding: 0; border: 0; background: none; color: var(--fg); font: inherit; cursor: pointer; text-align: start; }
+.group-toggle:disabled { cursor: default; }
+.group-toggle > span:first-child { width: 1.1rem; color: var(--accent); font-size: 1.1rem; line-height: 1; }
+.group-toggle .meta { font-size: 0.8rem; }

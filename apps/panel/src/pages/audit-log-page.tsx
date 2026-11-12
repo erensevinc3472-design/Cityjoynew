@@ -5,6 +5,7 @@ import { listAuditLog } from '@cityjoy/shared/firebase';
 import { firestore } from '../lib/firebase';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 /**
  * İşlem kayıtları (PROJE.md 6.1, 6.4 madde 9): kim, hangi bölümde, ne yaptı. Kayıtlar silinemez ve
@@ -40,7 +41,7 @@ export function AuditLogPage() {
       <header className="page-head">
         <div>
           <h1>{t('audit.title')}</h1>
-          <p className="meta">{isAdmin ? t('audit.introAdmin') : t('audit.introOwn')}</p>
+          <Intro text={isAdmin ? t('audit.introAdmin') : t('audit.introOwn')} />
         </div>
       </header>
       {user?.isDemo ? <p className="note">{t('audit.demoReadOnly')}</p> : null}

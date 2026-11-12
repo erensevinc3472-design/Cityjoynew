@@ -5,6 +5,7 @@ import { createNeedsConfig, createServiceCategoryAdmin } from '@cityjoy/shared/f
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 /**
  * Panel > Diğer İhtiyaçlar (13. madde 35, yalnızca admin): uygulamadaki Acil İhtiyaçlar > Diğer ihtiyaçlar durum
@@ -71,7 +72,7 @@ export function NeedsPage() {
       <header className="page-head">
         <div>
           <h1>{t('needs.title')}</h1>
-          <p className="meta">{t('needs.intro')}</p>
+          <Intro text={t('needs.intro')} />
         </div>
         {canEdit && map ? <button className="btn" disabled={busy} onClick={save}>{t('needs.save')}</button> : null}
       </header>

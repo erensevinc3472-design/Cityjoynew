@@ -21,6 +21,7 @@ import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 import { limitText } from '../lib/limits';
+import { Intro } from '../components/intro';
 
 // `retry`: sınır dolunca "Onaya gönder" düğmesi.
 type Msg = { kind: 'ok' | 'error'; text: string; retry?: () => void } | undefined;
@@ -209,7 +210,7 @@ function Events({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h1>{t('events.title')}</h1>
-          <p className="meta">{t('events.intro')}</p>
+          <Intro text={t('events.intro')} />
         </div>
         {publisher && live && !draft ? <button className="btn" onClick={() => setDraft({ input: newDraft() })}>{t('events.new')}</button> : null}
       </header>

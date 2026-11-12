@@ -6,6 +6,7 @@ import { firestore } from '../lib/firebase';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
+import { Intro } from '../components/intro';
 
 const NAME_LABEL: Record<LanguageCode, string> = {
   tr: 'occupations.nameTr',
@@ -82,7 +83,7 @@ export function OccupationsPage() {
       <header className="page-head">
         <div>
           <h1>{t('occupations.title')}</h1>
-          <p className="meta">{t('occupations.intro')}</p>
+          <Intro text={t('occupations.intro')} />
         </div>
         {canEdit && !usingDefaults ? (
           <div className="actions">

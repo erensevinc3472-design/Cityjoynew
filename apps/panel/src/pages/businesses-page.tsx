@@ -17,6 +17,7 @@ import { locationRepository } from '../lib/locations';
 import { useCity } from '../lib/city';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 const TIERS = MEMBERSHIP_TIERS;
 const DAY = 86400000;
@@ -96,7 +97,7 @@ export function BusinessesPage() {
       <header className="page-head">
         <div>
           <h1>{t('businesses.title')}</h1>
-          <p className="meta">{t('businesses.intro')}</p>
+          <Intro text={t('businesses.intro')} />
         </div>
       </header>
       {user?.isDemo ? <p className="note">{t('businesses.demoReadOnly')}</p> : !canEdit ? <p className="note">{t('businesses.readOnly')}</p> : null}

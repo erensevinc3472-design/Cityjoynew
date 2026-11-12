@@ -5,6 +5,7 @@ import { createSosSettingsAdmin } from '@cityjoy/shared/firebase';
 import { firestore } from '../lib/firebase';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 /**
  * SOS ayarları (PROJE.md 5.4). Uygulamadaki SOS'un panel karşılığı yalnızca ayarlardır: kişilerin SOS
@@ -68,7 +69,7 @@ export function SosSettingsPage() {
       <header className="page-head">
         <div>
           <h1>{t('sosSettings.title')}</h1>
-          <p className="meta">{t('sosSettings.intro')}</p>
+          <Intro text={t('sosSettings.intro')} />
         </div>
       </header>
       <p className="note">{t('sosSettings.privacy')}</p>
