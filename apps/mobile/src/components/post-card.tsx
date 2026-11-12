@@ -13,6 +13,7 @@ import { PostVideoView } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { locationRepository as repo } from '@/lib/locations';
 import { useAuthor, useBusinessInfo } from '@/lib/profile-photos';
+import { useRelativeTime } from '@/lib/relative-time';
 import { useSettings } from '@/lib/settings';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -31,26 +32,16 @@ interface Props {
   /** Kaydet işareti; onSave yoksa görünmez. */
   saved?: boolean;
   onSave?(): void;
+  /** Akışta ekranda en çok görünen video: sessiz ve döngüde kendiliğinden oynar. */
+  videoActive?: boolean;
+  /** Videoya dokununca tam ekran (verilmezse video kartın içinde oynat düğmesiyle açılır). */
+  onOpenVideo?(): void;
 }
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 const DOUBLE_TAP_MS = 260;
 
-/** "şimdi", "5 dk", "3 sa", "2 g"; bir haftadan eskiyse tarih. */
-export function useRelativeTime() {
-  const { t } = useTranslation();
-  const { language } = useSettings();
-  return (iso: string) => {
-    if (!iso) return '';
-    const at = new Date(iso);
-    const min = Math.floor((Date.now() - at.getTime()) / 60000);
-    if (min < 1) return t('time.now');
-    if (min < 60) return t('time.minutes', { count: min });
-    if (min < 60 * 24) return t('time.hours', { count: Math.floor(min / 60) });
-    if (min < 60 * 24 * 7) return t('time.days', { count: Math.floor(min / 1440) });
-    return at.toLocaleDateString(language ?? 'tr', { day: 'numeric', month: 'short' });
-  };
-}
+export { useRelativeTime };
 
 /**
  * Keşfet gönderisi (Instagram hissi; Eren'in örnek ekranı, 13. madde 30): çerçevesiz, ekran genişliğinde. Üstte halkalı
@@ -58,7 +49,7 @@ export function useRelativeTime() {
  * en altta kategori etiketi. Fotoğraf varsa ekran genişliğinde üstte durur, yazı altında. Yazıya ya da fotoğrafa iki kez dokunmak beğenir (kalp belirir); bir kez dokunmak uzun yazıyı açar. Yorumlar ayrı sayfada
  * değil, alttan açılan panelde (Eren, 7 Kasım).
  */
-export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, onFollow, saved, onSave }: Props) {
+export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, onFollow, saved, onSave, videoActive, onOpenVideo }: Props) {
   // Yorum panelinde yapılan değişiklikler (yorum sayısı, yorumları kapatma) kartta hemen görünür.
   const [changed, setChanged] = useState<Post | null>(null);
   const item = changed && changed.id === given.id ? changed : given;
@@ -195,7 +186,7 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
           </View>
         ) : item.video ? (
           <View style={styles.photos}>
-            <PostVideoView video={item.video} maxWidth={640} />
+            <PostVideoView video={item.video} maxWidth={640} active={videoActive} onOpen={onOpenVideo} />
           </View>
         ) : null}
         {item.text ? (

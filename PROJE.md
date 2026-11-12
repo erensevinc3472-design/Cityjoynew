@@ -320,6 +320,8 @@ Gönderi türleri (örneklerden): Kurumsal (belediye), Duyuru (muhtar), Yeni/Ho�
 Doğrulanmış hesap işareti (mavi tik) ve profil sayfaları var (profil-belediye, profil-muhtar, profil-baskan vb.).
 - SORULACAK: Kim doğrulanmış hesap olur ve nasıl doğrulanır? Mahalle muhtarı hesapları nasıl açılır? (Mesajlaşma birebirdir, grup sohbeti ve Reels ilk sürümde yok: karar verildi.)
 
+**Akış sırası (Karar Eren, 12 Kasım 2026: A seçeneği).** Varsayılan "Senin için": herkes için aynı, uygulamada "Nasıl sıralanıyor?" altında açıkça yazılı kurallar (tazelik, beğeni ve yorum, takip ettiklerin, kendi mahallen, resmî duyuru, ilk saatte yeni paylaşıma şans, aynı kişi arka arkaya gelmez, şikâyet alan geri düşer). İzlenme süresi takibi, tartışmayı ödüllendirme ve gizli ücretli öne çıkarma yok. "En yeni" zaman sırasıdır. Seçim üst çubukta menünün yanındaki küçük düğmeyle yapılır (Eren: "çok göze batmasın"). Yorumlar alttan açılan pencerede, videolar akışta sessiz kendiliğinden oynar, bir dokunuşla tam ekran açılır (Eren'in Instagram örnekleri).
+
 ### 5.6 Profil: "İşletmem"
 - Kayıtlı her kullanıcı profilinden işletme ekleyebilir: dükkân sahibi, evden satış yapan biri (örn. yumurta), evden tesisat işi yapan biri veya sanal mağaza açmak isteyen herkes.
 - Eklenen işletme, kategorisine göre Acil İhtiyaçlar modülünde ve "Tüm Şehir Hizmetleri" listesinde otomatik görünür. İçerik kapasitesi sınırlı olacak, her şeyi satan bir mağaza platformu hedeflenmiyor.

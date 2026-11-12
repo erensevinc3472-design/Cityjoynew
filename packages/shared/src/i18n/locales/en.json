@@ -1219,7 +1219,13 @@
       "write": "Write a comment",
       "send": "Send",
       "turnOff": "Turn off comments",
-      "turnOn": "Turn on comments"
+      "turnOn": "Turn on comments",
+      "sheetTitle": "Comments",
+      "add": "Add a comment...",
+      "deleteShort": "Delete",
+      "moreActions": "More actions",
+      "backToComments": "Back to comments",
+      "emoji": "Add {{emoji}}"
     },
     "followHint": "You aren't following anyone yet. Tap a person's name on a post to follow them from their profile.",
     "profile": {
@@ -1342,13 +1348,30 @@
       "selected": "Selected video, {{duration}}",
       "note": "Up to {{max}} seconds and 40 MB. Add a video or photos, not both.",
       "tooLong": "Videos can be up to {{max}} seconds. Trim it and choose again.",
-      "tooLarge": "The video is too large (max 40 MB). Choose a shorter or lower-resolution video."
+      "tooLarge": "The video is too large (max 40 MB). Choose a shorter or lower-resolution video.",
+      "open": "Open video full screen",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "pause": "Pause",
+      "resume": "Play",
+      "viewer": "Video viewer",
+      "progress": "Video progress"
     },
     "verifiedBusiness": "Verified business",
     "seeComments": "View all {{count}} comments",
     "seen": "I saw it",
     "seenHint": "Write where you saw it in a comment",
-    "more": "more"
+    "more": "more",
+    "sort": {
+      "label": "Sort",
+      "choose": "Feed order",
+      "senin-icin": "For you",
+      "en-yeni": "Newest",
+      "seninDesc": "Fresh, liked and nearby posts first",
+      "yeniDesc": "By time only, newest on top",
+      "how": "How is it sorted?",
+      "rules": "The same open rules for everyone: new posts rise and fade over time. Likes and comments (comments count more) lift a post a little. People you follow, your own neighbourhood and official announcements come first. Posts from the same person never come back to back. Reported posts drop down. How long you look is not tracked, and there is no hidden paid boosting."
+    }
   },
   "news": {
     "title": "News",

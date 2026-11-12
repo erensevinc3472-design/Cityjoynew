@@ -1,27 +1,30 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef, useState, type ComponentProps } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 import { ActivityIndicator, Alert, Animated, FlatList, I18nManager, Platform, Pressable, RefreshControl, StyleSheet, View, useWindowDimensions, type FlatListProps } from 'react-native';
 // Sekme sayfaları hareket kütüphanesinin listesiyle: içindeki fotoğraf kaydırması önceliklidir (post-photos.tsx).
 import { FlatList as PagerList, ScrollView as ChipScroll } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { isUnread, POST_TARGETS, type Announcement, type Post, type PostCategory, type PostTarget } from '@cityjoy/shared';
+import { isUnread, POST_TARGETS, rankFeed, type Announcement, type Post, type PostCategory, type PostTarget } from '@cityjoy/shared';
 import type { FeedFilter } from '@cityjoy/shared/firebase';
 
 import { AnnouncementCard } from '@/components/announcement-card';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BottomNav } from '@/components/bottom-nav';
+import { FeedSortButton } from '@/components/feed-sort-button';
 import { FormMessage } from '@/components/form-message';
 import { GOLD } from '@/components/city-tiles';
 import { LineIcon } from '@/components/line-icon';
 import { RoundButton } from '@/components/hero-header';
 import { PostCard } from '@/components/post-card';
 import { SideMenu } from '@/components/side-menu';
+import { VideoViewer } from '@/components/video-viewer';
 import { StateMessage } from '@/components/state-message';
 import { useAnnouncements } from '@/lib/announcements';
+import { useFeedSort } from '@/lib/feed-sort';
 import { useNotificationFeed, useReadState } from '@/lib/notifications';
 import { authorHref, toggleLike, toggleSave, useFeed, useLiked, useSaved } from '@/lib/posts';
 import { useSession } from '@/lib/session';
@@ -127,7 +130,10 @@ export default function ExploreScreen() {
           { transform: [{ translateY: hidden.interpolate({ inputRange: [0, 1], outputRange: [0, -headerH] }) }] },
         ]}>
         <View style={styles.bar}>
-          <RoundButton icon="menu" label={t('menu.open')} onPress={() => setMenuOpen(true)} />
+          <View style={styles.row}>
+            <RoundButton icon="menu" label={t('menu.open')} onPress={() => setMenuOpen(true)} />
+            {user ? <FeedSortButton /> : null}
+          </View>
           <View style={styles.titleBox}>
             <AppText accessibilityRole="header" style={[styles.title, { color: c.heroText }]}>{t('explore.title').toLocaleUpperCase()}</AppText>
             <AppText style={[styles.subtitle, { color: c.heroAccent }]}>{t(`explore.targets.${tab}`)}</AppText>
@@ -226,6 +232,27 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
   const isSaved = useSaved(user?.uid);
   const [, rerender] = useState(0);
   const { list: announcements } = useAnnouncements(location, 'hepsi');
+  const sort = useFeedSort();
+  // Otomatik oynatma (Eren, 12 Kasım 2026): ekranda en az %60'ı görünen ilk videolu gönderi oynar; sekme açık değilse,
+  // başka ekrana geçildiyse ya da tam ekran açıksa hiçbiri oynamaz.
+  const [visibleVideo, setVisibleVideo] = useState<string | null>(null);
+  const [viewer, setViewer] = useState<string | null>(null);
+  const [focused, setFocused] = useState(true);
+  useFocusEffect(
+    useCallback(() => {
+      setFocused(true);
+      return () => setFocused(false);
+    }, []),
+  );
+  const playing = active && focused && !viewer;
+  const onViewable = useRef(({ viewableItems }: { viewableItems: { item: unknown; isViewable: boolean }[] }) => {
+    const hit = viewableItems.find((v) => {
+      const i = v.item as { kind: string; post?: Post };
+      return v.isViewable && i.kind === 'post' && !!i.post?.video;
+    });
+    setVisibleVideo(hit ? (hit.item as { post: Post }).post.id : null);
+  }).current;
+  const viewability = useRef({ itemVisiblePercentThreshold: 60, minimumViewTime: 150 }).current;
   const urgent = tab === 'genel' || tab === 'takip' ? [] : (announcements ?? []).filter((a) => a.kind === 'acil');
 
   // Resmî duyurular (muhtar, belediye, kurum) kullanıcı gönderileriyle zaman sırasına göre karışık akar (PROJE.md 5.5,
@@ -240,11 +267,39 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
         )
       : [];
   type Item = { kind: 'post'; post: Post; at: string } | { kind: 'ann'; ann: Announcement; at: string };
-  const items: Item[] | null = posts
+  const byTime: Item[] | null = posts
     ? [...posts.map((p) => ({ kind: 'post' as const, post: p, at: p.createdAt })), ...official.map((a) => ({ kind: 'ann' as const, ann: a, at: a.publishedAt ?? '' }))].sort(
         (a, b) => b.at.localeCompare(a.at),
       )
     : null;
+  // "Senin için" (Eren, 12 Kasım 2026, A seçeneği): okunan sayfa telefonda açık kurallarla sıralanır (@cityjoy/shared feed-rank).
+  // "En yeni" zaman sırası. Acil duyurular her iki durumda da en üstte (yukarıdaki `top`).
+  // Sıra yalnızca liste ya da seçim değişince hesaplanır: beğenince kart parmağın altından kaçmaz.
+  const keyOf = (i: Item) => (i.kind === 'post' ? i.post.id : `a-${i.ann.id}`);
+  const idsKey = byTime ? byTime.map(keyOf).join('|') : '';
+  const order = useMemo(
+    () =>
+      byTime && sort === 'senin-icin'
+        ? new Map(rankFeed(
+          byTime,
+          (i) =>
+            i.kind === 'ann'
+              ? { at: i.at, authorKey: `ann-${i.ann.id}`, official: true }
+              : {
+                  at: i.at,
+                  authorKey: i.post.business ? `b-${i.post.business.id}` : i.post.authorUid,
+                  likes: i.post.likeCount,
+                  comments: i.post.commentCount,
+                  reports: i.post.cleared ? 0 : i.post.reportCount,
+                  followed: i.post.business ? !!followingBusinesses?.includes(i.post.business.id) : !!following?.includes(i.post.authorUid),
+                  nearby: !!location?.neighbourhoodId && i.post.region.neighbourhoodId === location.neighbourhoodId,
+                },
+          Date.now(),
+        ).map((i, n) => [keyOf(i), n]))
+        : null,
+    [idsKey, sort], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const items: Item[] | null = byTime && order ? [...byTime].sort((a, b) => (order.get(keyOf(a)) ?? 0) - (order.get(keyOf(b)) ?? 0)) : byTime;
 
   const like = async (id: string) => {
     const p = posts?.find((x) => x.id === id);
@@ -320,48 +375,72 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
   }
 
   const listProps: Partial<FlatListProps<Item>> = active ? {} : { scrollsToTop: false };
+  const videoPosts = (items ?? []).flatMap((i) => (i.kind === 'post' && i.post.video ? [i.post] : []));
+  const followFor = (p: Post) => (p.authorUid === user.uid ? undefined : p.business ? (followingBusinesses?.includes(p.business.id) ? 'aktif' : null) : followOf(p.authorUid));
+  const followTap = (p: Post) => (p.business ? followBusiness(p.business.id) : follow(p.authorUid));
   return (
-    <FlatList
-      {...listProps}
-      data={items ?? []}
-      keyExtractor={(i) => (i.kind === 'post' ? i.post.id : `a-${i.ann.id}`)}
-      // Liste üst çubuğun altından başlar; iPhone'da yenileme göstergesi de çubuğun altında görünsün diye boşluk iç boşluk olarak verilir.
-      contentContainerStyle={[styles.page, Platform.OS === 'ios' ? null : { paddingTop: topInset }]}
-      contentInset={Platform.OS === 'ios' ? { top: topInset } : undefined}
-      contentOffset={Platform.OS === 'ios' ? { x: 0, y: -topInset } : undefined}
-      scrollIndicatorInsets={Platform.OS === 'ios' ? { top: topInset } : undefined}
-      onScroll={onScrollY ? (e) => onScrollY(e.nativeEvent.contentOffset.y + (Platform.OS === 'ios' ? topInset : 0)) : undefined}
-      scrollEventThrottle={16}
-      ListHeaderComponent={top}
-      renderItem={({ item: i }) =>
-        i.kind === 'ann' ? (
-          <View style={styles.ann}>
-            <AnnouncementCard item={i.ann} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: i.ann.id } })} />
-          </View>
-        ) : (
-          <PostCard
-            item={i.post}
-            liked={isLiked(i.post.id)}
-            saved={isSaved(i.post.id)}
-            onSave={() => save(i.post.id)}
-            // İşletme adına paylaşımda takip ve ad işletmeye gider.
-            follow={i.post.authorUid === user.uid ? undefined : i.post.business ? (followingBusinesses?.includes(i.post.business.id) ? 'aktif' : null) : followOf(i.post.authorUid)}
-            onFollow={() => (i.post.business ? followBusiness(i.post.business.id) : follow(i.post.authorUid))}
-            onLike={() => like(i.post.id)}
-            onAuthor={() => router.push(authorHref(i.post))}
-          />
-        )
-      }
-      ListEmptyComponent={
-        items === null ? <StateMessage kind="loading" />
-        : failed ? <StateMessage kind="error" message={t('explore.loadError')} onRetry={reload} />
-        : <StateMessage kind="empty" message={tag === 'all' ? t('explore.empty') : t('explore.tagEmpty')} />
-      }
-      ListFooterComponent={loadingMore ? <ActivityIndicator /> : !hasMore && all?.length ? <AppText variant="caption" muted style={styles.center}>{t('explore.end')}</AppText> : undefined}
-      onEndReached={hasMore ? loadMore : undefined}
-      onEndReachedThreshold={0.5}
-      refreshControl={<RefreshControl refreshing={false} onRefresh={reload} progressViewOffset={topInset} />}
-    />
+    <>
+      <FlatList
+        {...listProps}
+        onViewableItemsChanged={onViewable}
+        viewabilityConfig={viewability}
+        data={items ?? []}
+        keyExtractor={(i) => (i.kind === 'post' ? i.post.id : `a-${i.ann.id}`)}
+        // Liste üst çubuğun altından başlar; iPhone'da yenileme göstergesi de çubuğun altında görünsün diye boşluk iç boşluk olarak verilir.
+        contentContainerStyle={[styles.page, Platform.OS === 'ios' ? null : { paddingTop: topInset }]}
+        contentInset={Platform.OS === 'ios' ? { top: topInset } : undefined}
+        contentOffset={Platform.OS === 'ios' ? { x: 0, y: -topInset } : undefined}
+        scrollIndicatorInsets={Platform.OS === 'ios' ? { top: topInset } : undefined}
+        onScroll={onScrollY ? (e) => onScrollY(e.nativeEvent.contentOffset.y + (Platform.OS === 'ios' ? topInset : 0)) : undefined}
+        scrollEventThrottle={16}
+        ListHeaderComponent={top}
+        renderItem={({ item: i }) =>
+          i.kind === 'ann' ? (
+            <View style={styles.ann}>
+              <AnnouncementCard item={i.ann} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: i.ann.id } })} />
+            </View>
+          ) : (
+            <PostCard
+              item={i.post}
+              liked={isLiked(i.post.id)}
+              saved={isSaved(i.post.id)}
+              onSave={() => save(i.post.id)}
+              // İşletme adına paylaşımda takip ve ad işletmeye gider.
+              follow={followFor(i.post)}
+              onFollow={() => followTap(i.post)}
+              videoActive={playing && i.post.id === visibleVideo}
+              onOpenVideo={() => setViewer(i.post.id)}
+              onLike={() => like(i.post.id)}
+              onAuthor={() => router.push(authorHref(i.post))}
+            />
+          )
+        }
+        ListEmptyComponent={
+          items === null ? <StateMessage kind="loading" />
+          : failed ? <StateMessage kind="error" message={t('explore.loadError')} onRetry={reload} />
+          : <StateMessage kind="empty" message={tag === 'all' ? t('explore.empty') : t('explore.tagEmpty')} />
+        }
+        ListFooterComponent={loadingMore ? <ActivityIndicator /> : !hasMore && all?.length ? <AppText variant="caption" muted style={styles.center}>{t('explore.end')}</AppText> : undefined}
+        onEndReached={hasMore ? loadMore : undefined}
+        onEndReachedThreshold={0.5}
+        refreshControl={<RefreshControl refreshing={false} onRefresh={reload} progressViewOffset={topInset} />}
+      />
+      <VideoViewer
+        posts={videoPosts}
+        startId={viewer}
+        onClose={() => setViewer(null)}
+        isLiked={isLiked}
+        onLike={(p) => like(p.id)}
+        isSaved={isSaved}
+        onSave={(p) => save(p.id)}
+        followOf={followFor}
+        onFollow={followTap}
+        onAuthor={(p) => {
+          setViewer(null);
+          router.push(authorHref(p));
+        }}
+      />
+    </>
   );
 }
 

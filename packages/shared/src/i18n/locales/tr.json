@@ -1219,7 +1219,13 @@
       "write": "Yorum yaz",
       "send": "Gönder",
       "turnOff": "Yorumları kapat",
-      "turnOn": "Yorumları aç"
+      "turnOn": "Yorumları aç",
+      "sheetTitle": "Yorumlar",
+      "add": "Yorum ekle...",
+      "deleteShort": "Sil",
+      "moreActions": "Diğer işlemler",
+      "backToComments": "Yorumlara dön",
+      "emoji": "{{emoji}} ekle"
     },
     "followHint": "Henüz kimseyi takip etmiyorsun. Bir gönderide paylaşanın adına dokunup profilinden takip edebilirsin.",
     "profile": {
@@ -1342,13 +1348,30 @@
       "selected": "Seçilen video, {{duration}}",
       "note": "En çok {{max}} saniye ve 40 MB. Video ya da fotoğraf eklenir, ikisi birlikte olmaz.",
       "tooLong": "Video en çok {{max}} saniye olabilir. Kırpıp yeniden seç.",
-      "tooLarge": "Video çok büyük (en çok 40 MB). Daha kısa ya da düşük çözünürlüklü bir video seç."
+      "tooLarge": "Video çok büyük (en çok 40 MB). Daha kısa ya da düşük çözünürlüklü bir video seç.",
+      "open": "Videoyu tam ekran aç",
+      "mute": "Sesi kapat",
+      "unmute": "Sesi aç",
+      "pause": "Durdur",
+      "resume": "Oynat",
+      "viewer": "Video izleyici",
+      "progress": "Video ilerlemesi"
     },
     "verifiedBusiness": "Doğrulanmış işletme",
     "seeComments": "{{count}} yorumun tümünü gör",
     "seen": "Gördüm",
     "seenHint": "Nerede gördüğünü yorumla yaz",
-    "more": "devamı"
+    "more": "devamı",
+    "sort": {
+      "label": "Sıralama",
+      "choose": "Akış sırası",
+      "senin-icin": "Senin için",
+      "en-yeni": "En yeni",
+      "seninDesc": "Taze, beğenilen ve yakınındaki paylaşımlar önce",
+      "yeniDesc": "Yalnızca zamana göre, en yeni üstte",
+      "how": "Nasıl sıralanıyor?",
+      "rules": "Herkes için aynı açık kurallar: yeni paylaşımlar öne çıkar ve zamanla geriler. Beğeni ve yorum (yorum daha değerli) biraz öne alır. Takip ettiğin kişiler, kendi mahallen ve resmî duyurular öne gelir. Aynı kişinin paylaşımları arka arkaya gelmez. Şikâyet alan paylaşım geri düşer. Ne kadar baktığın izlenmez, parayla gizli öne çıkma yoktur."
+    }
   },
   "news": {
     "title": "Haberler",

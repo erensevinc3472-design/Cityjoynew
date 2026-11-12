@@ -1219,7 +1219,13 @@
       "write": "Kommentar schreiben",
       "send": "Senden",
       "turnOff": "Kommentare deaktivieren",
-      "turnOn": "Kommentare aktivieren"
+      "turnOn": "Kommentare aktivieren",
+      "sheetTitle": "Kommentare",
+      "add": "Kommentar hinzufügen...",
+      "deleteShort": "Löschen",
+      "moreActions": "Weitere Aktionen",
+      "backToComments": "Zurück zu den Kommentaren",
+      "emoji": "{{emoji}} hinzufügen"
     },
     "followHint": "Du folgst noch niemandem. Tippe bei einem Beitrag auf den Namen, um der Person über ihr Profil zu folgen.",
     "profile": {
@@ -1342,13 +1348,30 @@
       "selected": "Ausgewähltes Video, {{duration}}",
       "note": "Bis zu {{max}} Sekunden und 40 MB. Entweder ein Video oder Fotos, nicht beides.",
       "tooLong": "Videos dürfen höchstens {{max}} Sekunden lang sein. Kürze es und wähle es erneut.",
-      "tooLarge": "Das Video ist zu groß (max. 40 MB). Wähle ein kürzeres Video oder eine geringere Auflösung."
+      "tooLarge": "Das Video ist zu groß (max. 40 MB). Wähle ein kürzeres Video oder eine geringere Auflösung.",
+      "open": "Video im Vollbild öffnen",
+      "mute": "Ton aus",
+      "unmute": "Ton an",
+      "pause": "Pause",
+      "resume": "Abspielen",
+      "viewer": "Videoansicht",
+      "progress": "Videofortschritt"
     },
     "verifiedBusiness": "Verifiziertes Unternehmen",
     "seeComments": "Alle {{count}} Kommentare ansehen",
     "seen": "Gesehen",
     "seenHint": "Schreib in einem Kommentar, wo du es gesehen hast",
-    "more": "mehr"
+    "more": "mehr",
+    "sort": {
+      "label": "Sortierung",
+      "choose": "Reihenfolge",
+      "senin-icin": "Für dich",
+      "en-yeni": "Neueste",
+      "seninDesc": "Frische, beliebte und nahe Beiträge zuerst",
+      "yeniDesc": "Nur nach Zeit, neueste oben",
+      "how": "Wie wird sortiert?",
+      "rules": "Für alle die gleichen offenen Regeln: Neue Beiträge steigen auf und sinken mit der Zeit. Likes und Kommentare (Kommentare zählen mehr) heben einen Beitrag etwas an. Personen, denen du folgst, dein Viertel und offizielle Mitteilungen kommen zuerst. Beiträge derselben Person folgen nie direkt aufeinander. Gemeldete Beiträge rutschen nach unten. Wie lange du schaust, wird nicht erfasst, und es gibt keine versteckte bezahlte Hervorhebung."
+    }
   },
   "news": {
     "title": "Nachrichten",

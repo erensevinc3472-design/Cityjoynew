@@ -41,6 +41,7 @@ export * from './announcements/announcements';
 export * from './events/events';
 export * from './activities/activities';
 export * from './posts/posts';
+export * from './posts/feed-rank';
 export * from './posts/social';
 export * from './posts/word-filter';
 export * from './posts/default-banned-words';
