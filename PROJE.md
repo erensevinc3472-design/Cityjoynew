@@ -683,6 +683,8 @@ Tümü yayından önce avukat tarafından kontrol edilmelidir.
 - **Ziyaretçi Modu:** Kullanıcı farklı bir ilde algılandığında sorulur. Her modülde kendiliğinden açılmaz. Kendi adresine tek dokunuşla döner.
 - **Keşfet davranışı:** Sekmeler (Mahallem, Bölgesel, Genel, Takip) arasında hızlı geçiş, aşağı çekince yenileme, aşağı kaydırdıkça akışın otomatik dolması (sonsuz kaydırma), paylaşırken hedef bölüm seçimi.
 
+**Fotoğraf ve video deposu (Karar Eren, 12 Kasım 2026).** Yayından önce fotoğraf ve videolar Cloudflare R2'ye taşınır (izlenme/indirme ücreti yok; Keşfet videoları akışta kendiliğinden oynadığı için). Firebase giriş, veri ve bildirim için kalır. Yükleme izni ve silme sunucu işlevinden, veri Avrupa'da, anahtar gizli ayarda. Mağaza yayınına engel değil; gizlilik metninde Cloudflare da sayılır (avukat).
+
 ## 10. Önerilen yapım sırası (öneri)
 
 1. **Temel:** proje kurulumu, kayıt/giriş, dil seçimi (5 dil, RTL dahil), il-ilçe-mahalle seçimi, veritabanı ve konum yapısı
