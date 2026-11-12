@@ -1844,7 +1844,8 @@
     "planSwap": "Swap for another place",
     "planSwapHint": "Nearby places not in your plan:",
     "planTomorrow": "Move to tomorrow",
-    "planRemove": "Remove from plan"
+    "planRemove": "Remove from plan",
+    "localGov": "Local governments"
   },
   "food": {
     "kinds": {

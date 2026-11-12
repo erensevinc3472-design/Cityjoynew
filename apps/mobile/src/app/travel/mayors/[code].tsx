@@ -16,7 +16,7 @@ import { StateMessage } from '@/components/state-message';
 import { ThumbImage } from '@/components/thumb-image';
 import { VideoModal } from '@/components/video-modal';
 import { locationRepository as repo } from '@/lib/locations';
-import { cityMunicipalities, ROUTE_THEME_ICONS, useDurationText, useTravelCity, useTravelMunicipal, useTravelRoutes } from '@/lib/travel';
+import { cityMunicipalities, ROUTE_THEME_ICONS, useDurationText, useTravelMunicipal, useTravelRoutes } from '@/lib/travel';
 import { fonts, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -39,14 +39,12 @@ export default function TravelMayorsScreen() {
   const bottom = usePageBottom();
   const duration = useDurationText();
   const { code } = useLocalSearchParams<{ code: string }>();
-  const { value: city } = useTravelCity(code);
   const { value: intros, failed, retry } = useTravelMunicipal(code);
   const { value: routes } = useTravelRoutes(code);
   const [filter, setFilter] = useState<Filter>('all');
   const [open, setOpen] = useState<string | null>(null);
   const [playing, setPlaying] = useState<{ src: string; title: string } | null>(null);
   const name = repo.getProvince(code)?.name ?? '';
-  const cover = city?.cover ?? undefined;
   const back = () => (router.canGoBack() ? router.back() : router.replace({ pathname: '/travel/city/[code]', params: { code } }));
 
   const all: Item[] = cityMunicipalities(code).map((m) => {
@@ -110,7 +108,9 @@ export default function TravelMayorsScreen() {
     const intro = m.intro;
     const expanded = open === m.id;
     const mayor = mayorOf(m);
-    const label = [t('travel.provinceIntro'), name, m.name, mayor, intro?.slogan ?? t('travel.introPreparing')].filter(Boolean).join('. ');
+    // Eren (12 Kasım 2026): kartta belediye adı yerine "Yerel Yönetimler", "İl tanıtımı" etiketi yok.
+    const title = t('travel.localGov');
+    const label = [title, name, mayor, intro?.slogan ?? t('travel.introPreparing')].filter(Boolean).join('. ');
     const frame = [styles.featured, { borderColor: expanded ? c.accentBorder : 'rgba(226, 178, 119, 0.45)', backgroundColor: c.surface }];
     // Geniş afiş (ör. bütün başkanların yan yana olduğu fotoğraf, 12 Kasım 2026): kesilmesin diye tam genişlikte, yazı altında.
     const ratio = intro?.cover ? intro.cover.width / intro.cover.height : 0;
@@ -125,14 +125,10 @@ export default function TravelMayorsScreen() {
             style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}>
             <View style={[styles.banner, { aspectRatio: Math.min(ratio, 3.2), backgroundColor: c.surfaceStrong }]}>
               <ThumbImage photo={intro.cover} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityIgnoresInvertColors />
-              <View style={styles.badge}>
-                <MaterialIcons name="location-city" size={13} color="#081F24" />
-                <AppText style={styles.badgeText}>{t('travel.provinceIntro').toLocaleUpperCase(i18n.language)}</AppText>
-              </View>
             </View>
             <View style={styles.bannerFoot}>
               <View style={styles.flex}>
-                <AppText style={[styles.bannerTitle, { color: c.textStrong }]} numberOfLines={2}>{m.name}</AppText>
+                <AppText style={[styles.bannerTitle, { color: c.textStrong }]} numberOfLines={2}>{title}</AppText>
                 {mayor ? <AppText style={[styles.sub, { color: c.textMuted }]} numberOfLines={1}>{t('travel.mayorOf', { name: mayor })}</AppText> : null}
                 <AppText style={[styles.slogan, { color: c.text }]} numberOfLines={expanded ? undefined : 2}>{intro.slogan}</AppText>
               </View>
@@ -158,13 +154,10 @@ export default function TravelMayorsScreen() {
             <Image source={TOWNHALL_ART} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
           )}
           <BottomShade />
-          <View style={styles.badge}>
-            <MaterialIcons name="location-city" size={13} color="#081F24" />
-            <AppText style={styles.badgeText}>{t('travel.provinceIntro').toLocaleUpperCase(i18n.language)}</AppText>
-          </View>
+          <View />
           <View style={styles.featuredFoot}>
             <View style={styles.flex}>
-              <AppText style={styles.featuredTitle} numberOfLines={2}>{m.name}</AppText>
+              <AppText style={styles.featuredTitle} numberOfLines={2}>{title}</AppText>
               {mayor ? <AppText style={styles.featuredMeta} numberOfLines={1}>{t('travel.mayorOf', { name: mayor })}</AppText> : null}
               <AppText style={[styles.featuredSlogan, !intro && styles.dimText]} numberOfLines={expanded ? undefined : 2}>
                 {intro?.slogan ?? t('travel.introPreparing')}
@@ -188,14 +181,16 @@ export default function TravelMayorsScreen() {
     const expanded = open === m.id;
     const place = placeOf(m);
     const mayor = mayorOf(m);
-    const sub = [m.name, mayor ? t('travel.mayorOf', { name: mayor }) : undefined].filter(Boolean).join(' · ');
+    // Eren (12 Kasım 2026): üstte başkan adı, altta belediye adı. Başkan adı yoksa (seçim dönemi) üstte ilçe adı.
+    const top = mayor ?? place;
+    const sub = m.name;
     return (
       <View key={m.id} style={!first && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: c.border }}>
         <Pressable
           accessibilityRole="button"
           accessibilityState={intro ? { expanded } : { disabled: true }}
           disabled={!intro}
-          accessibilityLabel={[place, sub, intro?.slogan ?? t('travel.introPreparing'), t('travel.municipalTag')].filter(Boolean).join('. ')}
+          accessibilityLabel={[top, sub, intro?.slogan ?? t('travel.introPreparing'), t('travel.municipalTag')].filter(Boolean).join('. ')}
           onPress={() => setOpen(expanded ? null : m.id)}
           style={({ pressed }) => [styles.row, { opacity: pressed ? 0.75 : 1 }]}>
           {intro?.cover ? (
@@ -207,7 +202,7 @@ export default function TravelMayorsScreen() {
           )}
           <View style={styles.flex}>
             <View style={styles.titleRow}>
-              <AppText style={[styles.place, { color: c.textStrong }]} numberOfLines={1}>{place}</AppText>
+              <AppText style={[styles.place, { color: c.textStrong }]} numberOfLines={1}>{top}</AppText>
               {intro?.zone ? (
                 <View style={[styles.zone, { borderColor: c.border }]}>
                   <AppText style={[styles.zoneText, { color: c.textMuted }]}>{t(`travel.zones.${intro.zone}`)}</AppText>
@@ -238,9 +233,9 @@ export default function TravelMayorsScreen() {
   };
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
-        <PageHead cover={cover} extend={6} title={t('travel.mayorsTitle')} subtitle={name} onBack={back} />
+        <PageHead title={t('travel.mayorsTitle')} subtitle={name} onBack={back} />
         <AppText style={[styles.intro, { color: c.textMuted }]}>{t('travel.mayorsIntro', { count: districts.length })}</AppText>
 
         {failed && !intros ? <StateMessage kind="error" onRetry={retry} /> : intros === null ? <StateMessage kind="loading" /> : null}
@@ -278,8 +273,6 @@ const styles = StyleSheet.create({
   bannerFoot: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2 },
   bannerTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 25 },
   bannerBody: { paddingHorizontal: spacing.md - 2 },
-  badge: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: GOLD, paddingHorizontal: 9, paddingVertical: 3, borderRadius: radius.pill },
-  badgeText: { color: '#081F24', fontFamily: fonts.bodySemi, fontSize: 9.5, letterSpacing: 1 },
   featuredFoot: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm },
   featuredTitle: { color: white, fontFamily: fonts.display, fontSize: 21, lineHeight: 26 },
   featuredMeta: { color: 'rgba(255,255,255,0.75)', fontSize: 12, lineHeight: 16 },
