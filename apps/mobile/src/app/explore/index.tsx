@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import { ActivityIndicator, Alert, Animated, FlatList, I18nManager, Platform, Pressable, RefreshControl, StyleSheet, View, useWindowDimensions, type FlatListProps } from 'react-native';
 // Sekme sayfaları hareket kütüphanesinin listesiyle: içindeki fotoğraf kaydırması önceliklidir (post-photos.tsx).
-import { FlatList as PagerList } from 'react-native-gesture-handler';
+import { FlatList as PagerList, ScrollView as ChipScroll } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { isUnread, POST_TARGETS, type Announcement, type Post, type PostCategory, type PostTarget } from '@cityjoy/shared';
@@ -34,7 +34,7 @@ import { limitText } from '@/lib/limits';
 type Tag = PostCategory | 'all';
 /**
  * Her bölümün kendi süzgeçleri (Eren, 12 Kasım 2026: "her bölüm için gerekli olanlar"). Mahallem komşuluk (yardım,
- * kayıp, taziye), Bölgesel şehir hayatı (etkinlik, fırsat, duyuru), Genel ülke geneli gündem (haber, ekonomi, spor, teknoloji, kültür-sanat, sağlık, yardım; iki satır), Takip'te süzgeç yok.
+ * kayıp, taziye), Bölgesel şehir hayatı (etkinlik, fırsat, duyuru), Genel ülke geneli gündem (haber, ekonomi, spor, teknoloji, kültür-sanat, sağlık, yardım; sağa sola kayar), Takip'te süzgeç yok.
  * Paylaşırken bütün türler (POST_CATEGORIES) seçilebilir; bu yalnızca okurken süzmek içindir.
  */
 const TAB_TAGS: Record<PostTarget, Tag[]> = {
@@ -269,8 +269,10 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
     <View style={styles.top}>
       {/* Bölümün kendi süzgeçleri, tek satırda eşit genişlikte (yana kaymaz, sayfa kaydırmasına takılmaz). */}
       {tags.length ? (
-        <View style={[styles.tags, tags.length > 4 && styles.tagsWrap]} accessibilityRole="tablist" accessibilityLabel={t('explore.tagsLabel')}>
-          {tags.map((x) => {
+        (() => {
+          // Az süzgeçli bölümde eşit genişlikte tek satır; Genel gibi çok süzgeçlide sağa sola kayan tek satır (Eren, 12 Kasım 2026).
+          const slide = tags.length > 4;
+          const chips = tags.map((x) => {
             const on = x === tag;
             return (
               <Pressable
@@ -278,12 +280,21 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
                 accessibilityRole="tab"
                 accessibilityState={{ selected: on }}
                 onPress={() => setTag(x)}
-                style={({ pressed }) => [styles.chip, tags.length > 4 && styles.chipWrap, on ? { backgroundColor: c.primary, borderColor: c.primary } : { backgroundColor: c.surface, borderColor: c.border }, { opacity: pressed ? 0.85 : 1 }]}>
-                <AppText numberOfLines={1} adjustsFontSizeToFit style={[styles.chipText, { color: on ? c.onPrimary : c.textStrong }]}>{t(`explore.tags.${x}`)}</AppText>
+                style={({ pressed }) => [styles.chip, slide && styles.chipSlide, on ? { backgroundColor: c.primary, borderColor: c.primary } : { backgroundColor: c.surface, borderColor: c.border }, { opacity: pressed ? 0.85 : 1 }]}>
+                <AppText numberOfLines={1} adjustsFontSizeToFit={!slide} style={[styles.chipText, { color: on ? c.onPrimary : c.textStrong }]}>{t(`explore.tags.${x}`)}</AppText>
               </Pressable>
             );
-          })}
-        </View>
+          });
+          return slide ? (
+            <ChipScroll horizontal showsHorizontalScrollIndicator={false} style={styles.slideScroll} contentContainerStyle={styles.slideRow} accessibilityRole="tablist" accessibilityLabel={t('explore.tagsLabel')}>
+              {chips}
+            </ChipScroll>
+          ) : (
+            <View style={styles.tags} accessibilityRole="tablist" accessibilityLabel={t('explore.tagsLabel')}>
+              {chips}
+            </View>
+          );
+        })()
       ) : null}
       {urgent.map((a) => (
         <AnnouncementCard key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />
@@ -370,9 +381,9 @@ const styles = StyleSheet.create({
   page: { paddingHorizontal: GUTTER, paddingBottom: spacing.xl },
   top: { gap: spacing.sm, paddingTop: spacing.sm },
   tags: { flexDirection: 'row', gap: 6 },
-  // Çok süzgeçli bölümde (Genel) düğmeler alt satıra iner; yine yana kaymaz.
-  tagsWrap: { flexWrap: 'wrap' },
-  chipWrap: { flexGrow: 1, flexShrink: 0, flexBasis: 'auto', paddingHorizontal: 14 },
+  slideScroll: { marginHorizontal: -GUTTER, flexGrow: 0 },
+  slideRow: { paddingHorizontal: GUTTER, gap: 6 },
+  chipSlide: { flexGrow: 0, flexShrink: 0, flexBasis: 'auto', paddingHorizontal: 16 },
   chip: { flex: 1, minHeight: 36, paddingHorizontal: 8, borderRadius: radius.pill, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   chipText: { fontFamily: fonts.bodyMedium, fontSize: 13 },
   ann: { paddingVertical: spacing.sm },
