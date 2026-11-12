@@ -87,7 +87,7 @@ export default function MunicipalitiesScreen() {
           found.length ? pairs(found.map(row)) : <AppText muted style={styles.empty}>{t('common.noResults')}</AppText>
         ) : (
           <>
-            {/* Benim Şehrim kartları gibi: ilçe belediyesi altın, büyükşehir yanında. */}
+            {/* Benim Şehrim kartları gibi: ilçe belediyesi ve büyükşehir yan yana (altın renk yok, Eren 12 Kasım 2026). */}
             {own.length ? (
               <View style={styles.pair}>
                 {own.map((m) => {
@@ -97,7 +97,6 @@ export default function MunicipalitiesScreen() {
                       key={m.id}
                       scene='townhall'
                       image={mine ? TOWNHALL_ART : KURUMLAR_ART}
-                      gold={mine}
                       height={112}
                       icon={mine ? 'location-city' : 'account-balance'}
                       title={m.name}

@@ -50,7 +50,7 @@ const TILES: Tile[] = [
 
 /**
  * Benim Şehrim (PROJE.md 5.1; Eren'in 7 Kasım 2026 taslağı): üstte ilin fotoğraflı kapağı (Seyahat bölümünde panelden
- * yüklenen il kapağı; yoksa çizim), "Şehrinde keşfet" altında altın Belediye kartı ve Önemli Kurumlar, sonra iki
+ * yüklenen il kapağı; yoksa çizim), "Şehrinde keşfet" altında Belediye kartı ve Önemli Kurumlar (altın renk kalktı, Eren 12 Kasım 2026), sonra iki
  * sütunlu cam satırlar, en altta Mahalle Meydanı ve il Vitrini. Bilgisi olmayan bölüm soluk "Yakında" görünür.
  */
 export default function MyCityScreen() {
@@ -154,14 +154,15 @@ export default function MyCityScreen() {
         <View style={styles.pair}>
           <PhotoCard
             flex={1.2}
+            height={84}
             scene="townhall"
             image={TOWNHALL_ART}
-            gold
             icon="account-balance"
             title={townhall.label}
             onPress={() => router.push('/city/belediyeler')}
           />
           <PhotoCard
+            height={84}
             scene="townhall"
             image={KURUMLAR_ART}
             icon={KURUMLAR.icon}
@@ -188,7 +189,6 @@ export default function MyCityScreen() {
           <PhotoCard
             scene="showcase"
             image={VITRIN_ART}
-            gold
             icon="auto-awesome"
             title={province ? t('city.hub.showcaseOf', { city: province }) : t('city.showcase')}
             sub={t('showcase.weekly')}

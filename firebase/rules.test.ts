@@ -118,6 +118,15 @@ describe('users', () => {
     });
     await assertSucceeds(updateDoc(ref, { location: second, locationChangedAt: serverTimestamp(), updatedAt: serverTimestamp() }));
   });
+
+  it('CityJoy yöneticisi deneme için mahallesini bekleme olmadan değiştirir', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    const ref = doc(db('eren'), 'users/eren');
+    await assertSucceeds(setDoc(ref, profile('eren')));
+    const first = { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-ataevler' };
+    await assertSucceeds(updateDoc(ref, { location: first, locationChangedAt: serverTimestamp(), updatedAt: serverTimestamp() }));
+    await assertSucceeds(updateDoc(ref, { location: { ...first, neighbourhoodId: '16-nilufer-beşevler' }, locationChangedAt: serverTimestamp(), updatedAt: serverTimestamp() }));
+  });
 });
 
 describe('occupations, admins, auditLog', () => {

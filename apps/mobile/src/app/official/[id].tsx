@@ -8,6 +8,7 @@ import { ThumbImage } from '@/components/thumb-image';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { HeroHeader } from '@/components/hero-header';
+import { MunicipalityProfile } from '@/components/municipality-profile';
 import { OfficialProfileCard } from '@/components/official-profile-card';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
@@ -43,6 +44,11 @@ export default function OfficialProfileScreen() {
   const muhtarlik = isMuhtar && neighbourhood ? t('announcements.muhtarOf', { place: neighbourhood }) : label;
   const title = isMuhtar ? (profile?.name || muhtarlik || '') : (profile?.name || label || '');
   const subtitle = [isMuhtar && profile?.name ? muhtarlik : null, isMayor ? t('official.mayor') : null, place].filter(Boolean).join(' · ');
+
+  // Belediyenin kendi tasarımlı sayfası (Eren, 12 Kasım 2026).
+  if (id && isMunicipalityId(id)) {
+    return <MunicipalityProfile id={id} name={profile?.name || label || ''} profile={profile} loading={loading} mayor={mayor} mayorId={mayorId} />;
+  }
 
   const header = (
     <HeroHeader title={isMayor ? t('official.mayorTitle') : t('official.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/home'))} />

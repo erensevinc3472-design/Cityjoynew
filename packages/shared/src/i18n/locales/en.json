@@ -945,7 +945,30 @@
     "followHint": "When you follow, this account only sees your saved neighbourhood and age range as an anonymous total; your name is never shown.",
     "followError": "Could not complete, please try again.",
     "mayor": "Mayor",
-    "mayorTitle": "Mayor"
+    "mayorTitle": "Mayor",
+    "muni": {
+      "call": "Call",
+      "web": "Website",
+      "mail": "Email",
+      "map": "Directions",
+      "services": "e-Municipality services",
+      "servicesNote": "Services open on the municipality’s official website.",
+      "servicesNoSite": "The municipality has not added its website yet; services open a web search.",
+      "mayorActing": "Acting Mayor",
+      "discover": "Discover with Mayors page",
+      "discoverSub": "Photos, videos and routes of the district",
+      "about": "About the municipality",
+      "service": {
+        "pay": "Tax and payments",
+        "request": "Requests and complaints",
+        "zoning": "Zoning and permits",
+        "marriage": "Marriage services",
+        "social": "Social assistance",
+        "culture": "Culture and events",
+        "tenders": "Tenders",
+        "council": "Council decisions"
+      }
+    }
   },
   "neighbourhood": {
     "title": "Neighbourhood Square",
@@ -1644,7 +1667,8 @@
       "efficiency": "Journey mode",
       "efficiencyTitle": "Plan and\nNavigate",
       "efficiencyText": "Reach your destination the easiest and most efficient way.",
-      "start": "Start your journey"
+      "start": "Start your journey",
+      "myCityA11y": "Open the {{city}} page"
     },
     "directions": "Directions",
     "call": "Call",

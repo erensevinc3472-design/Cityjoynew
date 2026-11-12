@@ -10,6 +10,8 @@ import { AppText } from '@/components/app-text';
 import { RoundButton } from '@/components/hero-header';
 import { sceneSky } from '@/components/scene-art';
 import { TRAVEL_ART } from '@/lib/app-art';
+import { locationRepository as repo } from '@/lib/locations';
+import { useUserLocation } from '@/lib/user-location';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -26,6 +28,9 @@ export default function TravelIntroScreen() {
   const c = useThemeColors();
   const insets = useSafeAreaInsets();
   const { width: W, height: H } = useWindowDimensions();
+  const { location } = useUserLocation();
+  const cityCode = location?.provinceCode;
+  const cityName = cityCode ? repo.getProvince(cityCode)?.name : undefined;
   const diag = Math.sqrt(W * W + H * H);
   const angle = Math.atan2(H, W);
   const S = diag * 2;
@@ -78,6 +83,17 @@ export default function TravelIntroScreen() {
         <Pressable accessibilityRole="button" onPress={() => router.push('/travel/explore')} style={({ pressed }) => [styles.primary, { opacity: pressed ? 0.85 : 1 }]}>
           <AppText style={styles.primaryText}>{t('travel.intro.explore')}</AppText>
         </Pressable>
+        {/* Bulunduğu şehir: doğrudan o ilin sayfası, Yoldayım rengiyle (Eren, 12 Kasım 2026). */}
+        {cityCode && cityName ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('travel.intro.myCityA11y', { city: cityName })}
+            onPress={() => router.push({ pathname: '/travel/city/[code]', params: { code: cityCode } })}
+            style={({ pressed }) => [styles.road, styles.city, { opacity: pressed ? 0.85 : 1 }]}>
+            <MaterialIcons name="location-on" size={18} color="#1A1408" />
+            <AppText style={styles.roadText} numberOfLines={1}>{cityName}</AppText>
+          </Pressable>
+        ) : null}
       </View>
 
       {/* Sağ alt: Planla ve Navigasyon (yakında). */}
@@ -91,9 +107,9 @@ export default function TravelIntroScreen() {
           <MaterialIcons name="directions-car" size={18} color="#1A1408" />
           <AppText style={styles.roadText}>{t('trip.title')}</AppText>
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={() => router.push('/travel/planla')} style={({ pressed }) => [styles.secondary, { opacity: pressed ? 0.8 : 1 }]}>
-          <MaterialIcons name="map" size={18} color="#FFFFFF" />
-          <AppText style={styles.secondaryText}>{t('plan.title')}</AppText>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/travel/planla')} style={({ pressed }) => [styles.plan, { opacity: pressed ? 0.85 : 1 }]}>
+          <MaterialIcons name="map" size={18} color="#0B2E34" />
+          <AppText style={styles.primaryText}>{t('plan.title')}</AppText>
         </Pressable>
       </View>
     </View>
@@ -116,6 +132,8 @@ const styles = StyleSheet.create({
   primaryText: { color: '#0B2E34', fontFamily: fonts.heading, fontSize: 15 },
   road: { marginTop: spacing.xs, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: GOLD, paddingVertical: 12, paddingHorizontal: 32, borderRadius: radius.pill, minHeight: 44 },
   roadText: { color: '#1A1408', fontFamily: fonts.heading, fontSize: 15 },
+  city: { marginTop: 0, maxWidth: 220 },
+  plan: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: TEAL, paddingVertical: 12, paddingHorizontal: 24, borderRadius: radius.pill, minHeight: 44 },
   secondary: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: 10, paddingHorizontal: 22, borderRadius: radius.pill, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.05)', minHeight: 44 },
   secondaryText: { color: 'rgba(255,255,255,0.7)', fontFamily: fonts.bodySemi, fontSize: 14 },
   soon: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.pill },

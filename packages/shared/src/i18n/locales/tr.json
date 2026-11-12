@@ -945,7 +945,30 @@
     "followHint": "Takip ettiğinde bu hesaba yalnızca kayıtlı mahallen ve yaş aralığın isimsiz, toplu sayı olarak yansır; adın görünmez.",
     "followError": "İşlem yapılamadı, tekrar dene.",
     "mayor": "Belediye Başkanı",
-    "mayorTitle": "Belediye başkanı"
+    "mayorTitle": "Belediye başkanı",
+    "muni": {
+      "call": "Ara",
+      "web": "İnternet sitesi",
+      "mail": "E-posta",
+      "map": "Yol tarifi",
+      "services": "e-Belediye işlemleri",
+      "servicesNote": "İşlemler belediyenin resmî internet sitesinde açılır.",
+      "servicesNoSite": "Belediye internet sitesini henüz eklemedi; işlemler web aramasıyla açılır.",
+      "mayorActing": "Belediye Başkan Vekili",
+      "discover": "Başkanlarla Keşif tanıtımı",
+      "discoverSub": "İlçenin fotoğrafları, videoları ve rotaları",
+      "about": "Belediye hakkında",
+      "service": {
+        "pay": "Vergi ve borç ödeme",
+        "request": "İstek ve şikâyet",
+        "zoning": "İmar ve ruhsat",
+        "marriage": "Nikâh işlemleri",
+        "social": "Sosyal yardımlar",
+        "culture": "Kültür ve etkinlik",
+        "tenders": "İhaleler",
+        "council": "Meclis kararları"
+      }
+    }
   },
   "neighbourhood": {
     "title": "Mahalle Meydanı",
@@ -1644,7 +1667,8 @@
       "efficiency": "Yolculuk modu",
       "efficiencyTitle": "Planla ve\nNavigasyon",
       "efficiencyText": "Gideceğin yere en rahat ve en verimli yoldan ulaş.",
-      "start": "Yolculuğa başla"
+      "start": "Yolculuğa başla",
+      "myCityA11y": "{{city}} sayfasını aç"
     },
     "directions": "Yol tarifi",
     "call": "Ara",

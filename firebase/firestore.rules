@@ -114,7 +114,8 @@ service cloud.firestore {
         : after.locationChangedAt == request.time
           && (neighbourhoodOf(before) == null
               || before.get('locationChangedAt', null) == null
-              || request.time > before.locationChangedAt + duration.value(30, 'd'));
+              || request.time > before.locationChangedAt + duration.value(30, 'd')
+              || isAdmin());
     }
 
     // Konum rozeti: kişinin kaydındaki doğrulama ile herkese açık profildeki rozet aynı yazımda birlikte değişir.

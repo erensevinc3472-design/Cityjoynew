@@ -945,7 +945,30 @@
     "followHint": "Wenn du folgst, sieht dieses Konto nur dein gespeichertes Viertel und deine Altersgruppe als anonyme Gesamtzahl; dein Name wird nie angezeigt.",
     "followError": "Das hat nicht geklappt, bitte erneut versuchen.",
     "mayor": "Bürgermeister/in",
-    "mayorTitle": "Bürgermeister/in"
+    "mayorTitle": "Bürgermeister/in",
+    "muni": {
+      "call": "Anrufen",
+      "web": "Website",
+      "mail": "E-Mail",
+      "map": "Route",
+      "services": "E-Gemeinde-Dienste",
+      "servicesNote": "Die Dienste öffnen sich auf der offiziellen Website der Gemeinde.",
+      "servicesNoSite": "Die Gemeinde hat noch keine Website eingetragen; die Dienste öffnen eine Websuche.",
+      "mayorActing": "Amtierender Bürgermeister",
+      "discover": "Seite „Mit Bürgermeistern entdecken“",
+      "discoverSub": "Fotos, Videos und Routen des Bezirks",
+      "about": "Über die Gemeinde",
+      "service": {
+        "pay": "Steuern und Zahlungen",
+        "request": "Anliegen und Beschwerden",
+        "zoning": "Bau und Genehmigungen",
+        "marriage": "Trauung",
+        "social": "Sozialhilfe",
+        "culture": "Kultur und Events",
+        "tenders": "Ausschreibungen",
+        "council": "Ratsbeschlüsse"
+      }
+    }
   },
   "neighbourhood": {
     "title": "Viertelplatz",
@@ -1644,7 +1667,8 @@
       "efficiency": "Reise-Modus",
       "efficiencyTitle": "Planen und\nNavigieren",
       "efficiencyText": "Erreiche dein Ziel auf dem bequemsten und effizientesten Weg.",
-      "start": "Reise beginnen"
+      "start": "Reise beginnen",
+      "myCityA11y": "Seite von {{city}} öffnen"
     },
     "directions": "Route",
     "call": "Anrufen",
