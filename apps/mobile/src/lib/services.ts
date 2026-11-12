@@ -13,6 +13,7 @@ import {
   createHolidayRepository,
   createSponsorRepository,
   createOwnerPayments,
+  createPostVisibility,
   createFirestoreTravelRepository,
   createFirestorePostRepository,
   createFirestoreSocialRepository,
@@ -36,7 +37,7 @@ import { Platform } from 'react-native';
 
 export { DuplicateBusinessError, SosSendTimeoutError } from '@cityjoy/shared/firebase';
 
-import { firebaseAuth, firestore } from './firebase';
+import { firebaseAuth, firestore, functions } from './firebase';
 import i18n from './i18n';
 import { deviceStorage } from './storage';
 
@@ -86,6 +87,7 @@ export const communityRepository = createFirestoreCommunityRepository(firestore)
 export const holidayRepository = createHolidayRepository(firestore);
 export const sponsorRepository = createSponsorRepository(firestore);
 export const ownerPayments = createOwnerPayments(firestore);
+export const postVisibility = createPostVisibility(functions);
 export const pushTokenRepository = createFirestorePushTokenRepository(firestore);
 /** Benim Şehrim sabit bilgileri: il başına özet tek okuma, bölüm yalnızca değişince indirilir. */
 export const cityGuide = createCityGuideStore(createFirestoreCityGuideRepository(firestore), deviceStorage);

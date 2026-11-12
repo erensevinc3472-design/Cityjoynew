@@ -23,12 +23,17 @@ function load(): Promise<Sdk> {
   return sdk;
 }
 
+export type TrialUnit = 'DAY' | 'WEEK' | 'MONTH' | 'YEAR';
+const UNITS: readonly string[] = ['DAY', 'WEEK', 'MONTH', 'YEAR'];
+
 export interface PlanOffer {
   plan: ProPlan;
   /** Mağazanın yazdığı fiyat, örn. "349,99 ₺". */
   price: string;
   /** Yıllıkta aylık karşılığı, örn. "29,17 ₺". */
   perMonth?: string;
+  /** Mağazada tanımlı ücretsiz deneme (Karar Eren, 12 Kasım 2026: açılışta ilk ay ücretsiz). */
+  trial?: { count: number; unit: TrialUnit };
   pkg: unknown;
 }
 
@@ -42,7 +47,9 @@ export async function loadOffers(businessId: string): Promise<PlanOffer[]> {
   return PRO_PLANS.flatMap((plan) => {
     const pkg = pkgs.find((x) => x.product.identifier === PRO_PRODUCTS[plan] || x.product.identifier.startsWith(`${PRO_PRODUCTS[plan]}:`));
     if (!pkg) return [];
-    return [{ plan, price: pkg.product.priceString, perMonth: plan === 'yillik' ? (pkg.product.pricePerMonthString ?? undefined) : undefined, pkg }];
+    const intro = pkg.product.introPrice;
+    const trial = intro && intro.price === 0 && UNITS.includes(intro.periodUnit) ? { count: Math.max(1, intro.periodNumberOfUnits * intro.cycles), unit: intro.periodUnit as TrialUnit } : undefined;
+    return [{ plan, price: pkg.product.priceString, perMonth: plan === 'yillik' ? (pkg.product.pricePerMonthString ?? undefined) : undefined, ...(trial ? { trial } : {}), pkg }];
   });
 }
 

@@ -16,15 +16,17 @@ export async function handleBusinessPostWrite(db: Firestore, before: DocumentDat
   const b = businessOf(before);
   const a = businessOf(after);
   // Durum ya da işletme değişmediyse (beğeni, yorum sayacı) yeniden sayma.
-  if (before && after && b === a && before.status === after.status) return;
+  if (before && after && b === a && before.status === after.status && (before.tierHidden === true) === (after.tierHidden === true)) return;
   if (b) ids.add(b);
   if (a) ids.add(a);
   for (const id of ids) {
     const ref = db.doc(`businesses/${id}`);
     const snap = await ref.get();
     if (!snap.exists) continue;
-    const agg = await db.collection('posts').where('business.id', '==', id).where('status', '==', 'aktif').count().get();
-    const postCount = agg.data().count;
+    // Pro bitince gizlenenler (tierHidden) sayılmaz: sınır görünen gönderiler içindir.
+    const active = db.collection('posts').where('business.id', '==', id).where('status', '==', 'aktif');
+    const [all, hidden] = await Promise.all([active.count().get(), active.where('tierHidden', '==', true).count().get()]);
+    const postCount = all.data().count - hidden.data().count;
     if (snap.get('postCount') !== postCount) await ref.update({ postCount });
   }
 }

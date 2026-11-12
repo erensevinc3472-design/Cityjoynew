@@ -543,7 +543,28 @@
       "restoreLate": "Deine früheren Käufe wurden geprüft. Es wurde kein aktives Pro-Abo gefunden.",
       "soon": "Das Pro-Abo ist hier bald erhältlich.",
       "noOffers": "Die Pro-Tarife konnten gerade nicht geladen werden. Versuche es gleich noch einmal.",
-      "back": "Zurück zu meinem Unternehmen"
+      "back": "Zurück zu meinem Unternehmen",
+      "trial": {
+        "DAY_one": "{{count}} Tag kostenlos",
+        "DAY_other": "{{count}} Tage kostenlos",
+        "WEEK_one": "{{count}} Woche kostenlos",
+        "WEEK_other": "{{count}} Wochen kostenlos",
+        "MONTH_one": "{{count}} Monat kostenlos",
+        "MONTH_other": "{{count}} Monate kostenlos",
+        "YEAR_one": "{{count}} Jahr kostenlos",
+        "YEAR_other": "{{count}} Jahre kostenlos"
+      },
+      "buyTrial": "Kostenlos testen",
+      "termsTrial": "Nach dem kostenlosen Testzeitraum ({{trial}}) beginnt das Abo automatisch zu {{price}} / {{period}}; kündigst du mindestens 24 Stunden vor Ende des Testzeitraums, wird nichts berechnet."
+    },
+    "hidden": {
+      "title": "Ausgeblendete Beiträge ({{count}})",
+      "body": "Diese Beiträge wurden ausgeblendet, weil Pro abgelaufen ist. Sie wurden nicht gelöscht. Im kostenlosen Tarif werden deine neuesten {{count}} Beiträge gezeigt. Tippe auf „Zeigen“, um einen mit deinem ältesten sichtbaren Beitrag zu tauschen. Mit Pro kommen alle zurück.",
+      "show": "Zeigen",
+      "renew": "Pro verlängern",
+      "error": "Konnte nicht geändert werden. Versuche es gleich noch einmal.",
+      "gallery": "{{count}} Galeriefotos sind ausgeblendet (Pro abgelaufen). Sie wurden nicht gelöscht; mit Pro kommen sie zurück.",
+      "galleryEdit": "Im kostenlosen Tarif werden nur die ersten {{count}} Fotos gezeigt; die anderen bleiben gespeichert und kommen mit Pro zurück. Ändere die Reihenfolge, um zu wählen, welches gezeigt wird."
     }
   },
   "reviews": {
@@ -1657,7 +1678,9 @@
       "muhtar": "Ortsvorsteher",
       "cityjoy": "CityJoy",
       "channel": "Allgemeine Benachrichtigungen",
-      "quietChannel": "Stille Benachrichtigungen"
+      "quietChannel": "Stille Benachrichtigungen",
+      "proEndingTitle": "{{title}}: Pro endet in drei Tagen",
+      "proEndingBody": "Wenn du nicht verlängerst, werden Beiträge und Fotos über dem kostenlosen Limit ausgeblendet (nicht gelöscht). Mit Pro kommen alle zurück."
     },
     "categories": {
       "acil": "Dringende Meldungen",
@@ -2386,7 +2409,9 @@
     "reached": "Dein Tageslimit ist erreicht. Ab {{when}} kannst du es wieder tun."
   },
   "media": {
-    "count": "{{count}}/{{max}} Fotos"
+    "count": "{{count}}/{{max}} Fotos",
+    "locked": "Pro abgelaufen, ausgeblendet (nicht gelöscht)",
+    "makeFirst": "An den Anfang"
   },
   "locationBadge": {
     "title": "Standortabzeichen",

@@ -15,6 +15,7 @@ import { handleLift, handleSuspend, liftExpiredSuspensions } from '../src/suspen
 import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensions } from '../src/business-suspensions';
 import { handleThumb, type ThumbStore } from '../src/thumbs';
 import { expireMemberships, handleStoreEvent, type ProState } from '../src/memberships';
+import { applyTierVisibility, handleBusinessTierChange, handleTierVisibilityChoice, remindProEnding } from '../src/tier-visibility';
 import sharp from 'sharp';
 import { deleteOldTranslations, handleTranslate, translationId, type Translator } from '../src/translate';
 
@@ -755,5 +756,66 @@ describe('Pro abonelik', () => {
     expect(await expireMemberships(db, NOW)).toBe(1);
     expect((await db.doc('businesses/eski').get()).get('membership.tier')).toBe('ucretsiz');
     expect((await db.doc('businesses/yeni').get()).get('membership.tier')).toBe('pro');
+  });
+});
+
+describe('Pro bitince fazla gönderiler', () => {
+  const free = { name: 'Usta Fırın', ownerUid: 'sahip', managers: { yrd: { edit: true } }, verification: { status: 'dogrulandi' }, membership: { tier: 'ucretsiz' } };
+  const proBiz = { ...free, membership: { tier: 'pro' } };
+  async function seed(n: number) {
+    await db.doc('businesses/b1').set(proBiz);
+    for (let i = 0; i < n; i++) {
+      await db.doc(`posts/p${String(i).padStart(2, '0')}`).set({ business: { id: 'b1', name: 'Usta Fırın' }, status: 'aktif', createdAt: Timestamp.fromMillis(NOW.getTime() - (n - i) * 60_000) });
+    }
+  }
+  const hiddenIds = async () => (await db.collection('posts').where('tierHidden', '==', true).get()).docs.map((d) => d.id).sort();
+
+  it('Pro kapanınca en yeni 9 görünür, gerisi gizlenir (silinmez); Pro açılınca hepsi geri gelir', async () => {
+    await seed(12);
+    expect(await handleBusinessTierChange(db, 'b1', proBiz, free)).toBe(3);
+    expect(await hiddenIds()).toEqual(['p00', 'p01', 'p02']);
+    expect((await db.collection('posts').get()).size).toBe(12);
+    // Sayaç yalnızca görünenleri sayar (yeni gönderi sınırı).
+    await handleBusinessPostWrite(db, { business: { id: 'b1' }, status: 'aktif' }, { business: { id: 'b1' }, status: 'aktif', tierHidden: true });
+    expect((await db.doc('businesses/b1').get()).get('postCount')).toBe(9);
+    // Kademe değişmeden yapılan düzenleme dokunmaz; Pro dönünce hepsi açılır.
+    expect(await handleBusinessTierChange(db, 'b1', free, { ...free, name: 'Yeni ad' })).toBe(0);
+    expect(await handleBusinessTierChange(db, 'b1', free, proBiz)).toBe(3);
+    expect(await hiddenIds()).toEqual([]);
+  });
+
+  it('panelden sınır değişince ona göre; doğrulama kalkınca da Pro sayılmaz', async () => {
+    await seed(5);
+    await db.doc('config/limits').set({ isletmeGonderiToplam: 2 });
+    await handleBusinessTierChange(db, 'b1', proBiz, { ...proBiz, verification: { status: 'dogrulanmadi' } });
+    expect(await hiddenIds()).toEqual(['p00', 'p01', 'p02']);
+  });
+
+  it('sahibi gizli gönderiyi gösterince en eski görünen gizlenir; yabancı ve Pro işletme seçemez', async () => {
+    await seed(11);
+    await db.doc('businesses/b1').set(free);
+    await applyTierVisibility(db, 'b1', false);
+    expect(await hiddenIds()).toEqual(['p00', 'p01']);
+    await handleTierVisibilityChoice(db, 'sahip', { postId: 'p00', visible: true });
+    expect(await hiddenIds()).toEqual(['p01', 'p02']);
+    await handleTierVisibilityChoice(db, 'yrd', { postId: 'p05', visible: false });
+    await handleTierVisibilityChoice(db, 'yrd', { postId: 'p01', visible: true });
+    expect(await hiddenIds()).toEqual(['p02', 'p05']);
+    await expect(handleTierVisibilityChoice(db, 'yabanci', { postId: 'p02', visible: true })).rejects.toThrow('yetki');
+    await expect(handleTierVisibilityChoice(db, 'sahip', { postId: '../x', visible: true })).rejects.toThrow('gecersiz');
+    await db.doc('businesses/b1').set(proBiz);
+    await expect(handleTierVisibilityChoice(db, 'sahip', { postId: 'p02', visible: true })).rejects.toThrow('pro');
+  });
+
+  it('yenilenmeyecek Pro bitmeden 3 gün önce sahibine bildirim; kendiliğinden yenilenene gitmez', async () => {
+    const ends = (days: number) => Timestamp.fromMillis(NOW.getTime() + days * 86_400_000);
+    await db.doc('businesses/b1').set({ ...free, membership: { tier: 'pro', endsAt: ends(2.5), autoRenew: false } });
+    await db.doc('businesses/b2').set({ ...free, ownerUid: 'sahip2', membership: { tier: 'pro', endsAt: ends(2.5), autoRenew: true } });
+    await db.doc('businesses/b3').set({ ...free, ownerUid: 'sahip3', membership: { tier: 'pro', endsAt: ends(10), source: 'manuel' } });
+    for (const uid of ['sahip', 'sahip2', 'sahip3']) await db.doc(`pushTokens/${uid}`).set({ tokens: [`T-${uid}`], language: 'tr', updatedAt: Timestamp.now() });
+    const { sent, deps } = fakeSender();
+    expect(await remindProEnding(db, deps)).toBe(1);
+    expect(sent[0]).toMatchObject({ to: 'T-sahip', title: 'Usta Fırın: Pro üç gün içinde bitiyor' });
+    expect(sent[0].data.href).toEqual({ pathname: '/business/membership', params: { id: 'b1' } });
   });
 });

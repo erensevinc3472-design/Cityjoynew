@@ -28,6 +28,7 @@ import { handleFollowWrite, handleMessageCreate } from './social';
 import { handleLift, handleSuspend, liftExpiredSuspensions, SuspensionError, type AccountSwitch } from './suspensions';
 import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensions } from './business-suspensions';
 import { handleThumb } from './thumbs';
+import { handleBusinessTierChange, handleTierVisibilityChoice, remindProEnding, TierVisibilityError } from './tier-visibility';
 import { deleteOldTranslations, googleTranslator, handleTranslate, TranslateError } from './translate';
 
 initializeApp();
@@ -102,6 +103,20 @@ export const profilePhotoChanged = onDocumentWritten('publicProfiles/{uid}', asy
 });
 export const businessMediaChanged = onDocumentWritten('businesses/{id}', async (e) => {
   await handleMediaChange(MEDIA_FIELDS.businesses, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+  // Pro açılınca ya da kapanınca fazla gönderiler gizlenir / geri gelir (hiçbiri silinmez).
+  await handleBusinessTierChange(db, e.params.id, e.data?.before.data(), e.data?.after.data());
+});
+
+// Ücretsiz kademede hangi gönderinin görüneceğini işletme sahibi seçer.
+export const choosePostVisibility = onCall({ maxInstances: 3 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  try {
+    await handleTierVisibilityChoice(db, req.auth.uid, req.data);
+    return { ok: true };
+  } catch (e) {
+    if (!(e instanceof TierVisibilityError)) throw new HttpsError('internal', 'yapilamadi');
+    throw new HttpsError(e.code === 'yetki' ? 'permission-denied' : e.code === 'yok' ? 'not-found' : e.code === 'pro' ? 'failed-precondition' : 'invalid-argument', e.code);
+  }
 });
 
 // Çarşı ilanından çıkan ya da ilan kaldırılınca fotoğraf dosyaları silinir.
@@ -135,6 +150,7 @@ export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 
   await deleteExpiredPushLog(db, now);
   await deleteOldTranslations(db, now);
   await expireMemberships(db, now);
+  await remindProEnding(db, { send: expoSender, now });
 });
 
 // Hesap askıya alma (yalnızca admin, panelden): giriş kapanır, açık oturumlar düşer.

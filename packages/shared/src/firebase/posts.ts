@@ -85,6 +85,7 @@ function fromDoc(id: string, d: DocumentData): Post {
     ...(d.frames === true ? { frames: true } : {}),
     ...(d.framesFeatured === true ? { framesFeatured: true } : {}),
     ...(d.authorSuspended === true ? { authorSuspended: true } : {}),
+    ...(d.tierHidden === true ? { tierHidden: true } : {}),
     createdAt: iso(d.createdAt) ?? '',
   };
 }

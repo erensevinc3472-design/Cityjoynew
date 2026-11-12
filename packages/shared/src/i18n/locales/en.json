@@ -543,7 +543,28 @@
       "restoreLate": "Your previous purchases were checked. No active Pro subscription was found.",
       "soon": "The Pro subscription will be available here very soon.",
       "noOffers": "Pro plans could not be loaded right now. Try again in a moment.",
-      "back": "Back to my business"
+      "back": "Back to my business",
+      "trial": {
+        "DAY_one": "{{count}}-day free trial",
+        "DAY_other": "{{count}}-day free trial",
+        "WEEK_one": "{{count}}-week free trial",
+        "WEEK_other": "{{count}}-week free trial",
+        "MONTH_one": "{{count}}-month free trial",
+        "MONTH_other": "{{count}}-month free trial",
+        "YEAR_one": "{{count}}-year free trial",
+        "YEAR_other": "{{count}}-year free trial"
+      },
+      "buyTrial": "Start free trial",
+      "termsTrial": "When the free trial ({{trial}}) ends, the subscription starts automatically at {{price}} / {{period}}; cancel at least 24 hours before the trial ends and you will not be charged."
+    },
+    "hidden": {
+      "title": "Hidden posts ({{count}})",
+      "body": "These posts were hidden because Pro ended. They were not deleted. On the free plan your newest {{count}} posts are shown. Tap \"Show\" to swap one with your oldest visible post. Renew Pro and they all come back.",
+      "show": "Show",
+      "renew": "Renew Pro",
+      "error": "Could not change it. Try again in a moment.",
+      "gallery": "{{count}} gallery photos are hidden (Pro ended). They were not deleted; renew Pro to bring them back.",
+      "galleryEdit": "On the free plan only the first {{count}} photos are shown; the others are kept and come back with Pro. Reorder them to choose which one is shown."
     }
   },
   "reviews": {
@@ -1657,7 +1678,9 @@
       "muhtar": "Neighbourhood office",
       "cityjoy": "CityJoy",
       "channel": "General notifications",
-      "quietChannel": "Silent notifications"
+      "quietChannel": "Silent notifications",
+      "proEndingTitle": "{{title}}: Pro ends in three days",
+      "proEndingBody": "If you do not renew, posts and photos over the free limit will be hidden (not deleted). They all come back when Pro returns."
     },
     "categories": {
       "acil": "Urgent announcements",
@@ -2386,7 +2409,9 @@
     "reached": "You have reached today’s limit. You can do this again from {{when}}."
   },
   "media": {
-    "count": "{{count}}/{{max}} photos"
+    "count": "{{count}}/{{max}} photos",
+    "locked": "Pro ended, hidden (not deleted)",
+    "makeFirst": "Move to first"
   },
   "locationBadge": {
     "title": "Location badge",

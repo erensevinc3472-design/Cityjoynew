@@ -299,7 +299,7 @@ export default function EditBusinessScreen() {
       <TextField label={t('business.description')} value={form.description ?? ''} onChangeText={(description) => set({ description })} maxLength={BUSINESS_LIMITS.description} multiline error={err('description')} />
       <MediaPicker label={t('business.logo')} hint={t('business.logoHint')} kind="isletme-logo" uid={user.uid} photos={form.logo ? [form.logo] : []} max={1} onChange={(p) => set({ logo: p[0] })} disabled={busy || removed} round />
       {vitrinMax > 0 || form.gallery?.length ? (
-        <MediaPicker label={t('business.gallery')} hint={t('business.galleryHint')} kind="isletme-vitrin" uid={user.uid} photos={form.gallery ?? []} max={Math.max(vitrinMax, form.gallery?.length ?? 0)} onChange={(gallery) => set({ gallery })} disabled={busy || removed} />
+        <MediaPicker label={t('business.gallery')} hint={tier !== 'pro' && (form.gallery?.length ?? 0) > vitrinMax ? t('business.hidden.galleryEdit', { count: vitrinMax }) : t('business.galleryHint')} kind="isletme-vitrin" uid={user.uid} photos={form.gallery ?? []} max={Math.max(vitrinMax, form.gallery?.length ?? 0)} visibleCount={tier !== 'pro' && (form.gallery?.length ?? 0) > vitrinMax ? vitrinMax : undefined} onChange={(gallery) => set({ gallery })} disabled={busy || removed} />
       ) : null}
 
       <AppText variant="label" accessibilityRole="header">{t('business.page.payment')}</AppText>

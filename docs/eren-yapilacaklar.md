@@ -7,7 +7,7 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
 
 Uygulama ve panel hazır; satın almanın gerçekten çalışması için bu hesap işleri gerekiyor. Sırası geldiğinde Claude her adımı tek tek anlatır.
 
-- [ ] **Pro fiyatı:** aylık ve yıllık kaç TL olsun? (Mağaza payı %15 düşülür.) Fiyatı mağaza panelinde sen girersin, sonra istediğin zaman oradan değiştirirsin.
+- [x] **Pro fiyatı (karar verildi, 12 Kasım):** aylık 999,99 TL, yıllık 9.999,99 TL, ilk ay ücretsiz deneme. Ürünleri açarken mağaza panelinde bu fiyatları ve 1 aylık ücretsiz denemeyi sen girersin; sonra istediğin zaman oradan değiştirirsin.
 - [ ] **Ücretli uygulama sözleşmesi:** Apple Developer (App Store Connect > İş) ve Google Play Console (Ödemeler profili). Şirket/vergi ve banka bilgisi gerekir; mali müşavire danış.
 - [ ] **İki mağazada abonelik ürünü:** `cityjoy_pro_aylik` ve `cityjoy_pro_yillik` (Claude ekran ekran anlatır).
 - [ ] **RevenueCat hesabı** (revenuecat.com, ücretsiz başlangıç) ve iki mağazanın bağlanması. Anahtarları sohbete yazma; Claude nereye gireceğini söyler.

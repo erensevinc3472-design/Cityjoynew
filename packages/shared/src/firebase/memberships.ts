@@ -1,3 +1,4 @@
+import { httpsCallable, type Functions } from 'firebase/functions';
 import { collection, getDocs, limit, orderBy, query, Timestamp, where, type DocumentData, type Firestore } from 'firebase/firestore';
 
 import { PAYMENT_KINDS, type BusinessMembership, type Payment, type PaymentKind } from '../models/membership';
@@ -60,6 +61,16 @@ export function createOwnerPayments(db: Firestore) {
         query(collection(db, 'payments'), where('businessId', '==', businessId), where('ownerUid', '==', ownerUid), orderBy('at', 'desc'), limit(max)),
       );
       return snap.docs.map((d) => paymentFrom(d.id, d.data()));
+    },
+  };
+}
+
+/** Ücretsiz kademede işletme sahibi hangi gönderinin görüneceğini seçer (Pro bitince gizlenenler). */
+export function createPostVisibility(functions: Functions) {
+  const call = httpsCallable<{ postId: string; visible: boolean }, { ok: boolean }>(functions, 'choosePostVisibility');
+  return {
+    async set(postId: string, visible: boolean): Promise<void> {
+      await call({ postId, visible });
     },
   };
 }

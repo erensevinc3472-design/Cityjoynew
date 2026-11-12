@@ -57,6 +57,11 @@ describe('işletme sayfası', () => {
     const b = (await biz('x').get(id))!;
     expect(b.gallery).toHaveLength(4);
     expect(b.logo).toBeUndefined();
+    // Sınır düşünce (Pro bitti) fazla fotoğraflar silinmez: çıkarma ve sıra değiştirme olur, yeni fotoğraf eklenemez.
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'config/limits'), { vitrinUcretsiz: 1 }));
+    await biz('cengiz').update(id, { ...input, gallery: [vitrin(4)[3], vitrin(4)[1], vitrin(4)[0]] });
+    expect((await biz('x').get(id))!.gallery?.map((p) => p.path.slice(-7))).toEqual(['003.jpg', '001.jpg', '000.jpg']);
+    await expect(biz('cengiz').update(id, { ...input, gallery: [vitrin(4)[3], media('cengiz', 'isletme-vitrin', 'yeniFoto0000001')] })).rejects.toThrow();
     // Sınır ne olursa olsun en çok 30.
     await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'config/limits'), { vitrinUcretsiz: 100 }));
     await expect(biz('cengiz').update(id, { ...input, gallery: vitrin(31) })).rejects.toThrow();

@@ -71,4 +71,4 @@ export { createTravelPrices } from './travel-prices';
 export { createFirebaseStats, type FirebaseStats, type StatsRange } from './stats';
 export { createTranslationClient } from './translate';
 export { createSponsorAdmin, createSponsorRepository } from './sponsors';
-export { createMembershipAdmin, createOwnerPayments, type ProBusinessRow } from './memberships';
+export { createMembershipAdmin, createOwnerPayments, createPostVisibility, type ProBusinessRow } from './memberships';

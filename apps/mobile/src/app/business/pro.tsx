@@ -113,6 +113,7 @@ export default function ProScreen() {
     );
   }
   const offer = proOffer(biz, new Date());
+  const chosen = offers?.find((o) => o.plan === plan);
 
   return (
     <FormScreen title={t('business.proPlan.title')} subtitle={biz.name}>
@@ -165,6 +166,7 @@ export default function ProScreen() {
                   <MaterialIcons name={on ? 'radio-button-checked' : 'radio-button-unchecked'} size={22} color={on ? c.primary : c.textSoft} />
                   <View style={styles.planText}>
                     <AppText style={[styles.planName, { color: c.textStrong }]}>{t(`business.proPlan.plans.${o.plan}`)}</AppText>
+                    {o.trial ? <AppText variant="caption" style={{ color: c.primary }}>{t(`business.proPlan.trial.${o.trial.unit}`, { count: o.trial.count })}</AppText> : null}
                     {o.perMonth ? <AppText variant="caption" muted>{t('business.proPlan.perMonth', { price: o.perMonth })}</AppText> : null}
                   </View>
                   <AppText style={[styles.price, { color: c.textStrong }]}>{o.price}</AppText>
@@ -173,9 +175,10 @@ export default function ProScreen() {
             })}
           </View>
           {error === 'odeme' ? <FormMessage kind="error" text={t('business.proPlan.buyError')} /> : null}
-          <AppButton title={t('business.proPlan.buy')} onPress={purchase} loading={stage === 'odeme'} disabled={stage !== 'hazir'} />
+          <AppButton title={chosen?.trial ? t('business.proPlan.buyTrial') : t('business.proPlan.buy')} onPress={purchase} loading={stage === 'odeme'} disabled={stage !== 'hazir'} />
           <AppText variant="caption" muted style={styles.small}>
-            {t('business.proPlan.terms', { price: offers.find((o) => o.plan === plan)?.price ?? '', period: t(`business.proPlan.periods.${plan}`) })}
+            {chosen?.trial ? `${t('business.proPlan.termsTrial', { trial: t(`business.proPlan.trial.${chosen.trial.unit}`, { count: chosen.trial.count }), price: chosen.price, period: t(`business.proPlan.periods.${plan}`) })} ` : ''}
+            {t('business.proPlan.terms', { price: chosen?.price ?? '', period: t(`business.proPlan.periods.${plan}`) })}
           </AppText>
         </>
       )}

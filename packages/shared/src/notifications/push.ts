@@ -28,7 +28,9 @@ export type PushNoticeKind =
   | 'messageRequest'
   | 'follower'
   | 'followRequest'
-  | 'followAccepted';
+  | 'followAccepted'
+  /** İşletme sahibine: Pro 3 gün içinde bitiyor (yenileme kapalı). */
+  | 'proEnding';
 
 export interface PushNotice {
   kind: PushNoticeKind;

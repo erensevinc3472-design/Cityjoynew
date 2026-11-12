@@ -543,7 +543,28 @@
       "restoreLate": "Önceki satın almaların kontrol edildi. Etkin bir Pro aboneliği bulunmadı.",
       "soon": "Pro aboneliği çok yakında burada satın alınabilecek.",
       "noOffers": "Pro planları şu an yüklenemedi. Biraz sonra tekrar dene.",
-      "back": "İşletmeme dön"
+      "back": "İşletmeme dön",
+      "trial": {
+        "DAY_one": "{{count}} gün ücretsiz",
+        "DAY_other": "{{count}} gün ücretsiz",
+        "WEEK_one": "{{count}} hafta ücretsiz",
+        "WEEK_other": "{{count}} hafta ücretsiz",
+        "MONTH_one": "{{count}} ay ücretsiz",
+        "MONTH_other": "{{count}} ay ücretsiz",
+        "YEAR_one": "{{count}} yıl ücretsiz",
+        "YEAR_other": "{{count}} yıl ücretsiz"
+      },
+      "buyTrial": "Ücretsiz denemeyi başlat",
+      "termsTrial": "Ücretsiz deneme ({{trial}}) bitince abonelik {{price}} / {{period}} ücretle kendiliğinden başlar; deneme bitmeden en az 24 saat önce iptal edersen ücret alınmaz."
+    },
+    "hidden": {
+      "title": "Gizlenen gönderiler ({{count}})",
+      "body": "Pro bittiği için bu gönderiler gizlendi, silinmedi. Ücretsizde en yeni {{count}} gönderi görünür. \"Göster\"e dokunursan en eski görünen gönderinle yer değiştirir. Pro'yu yenilersen hepsi geri gelir.",
+      "show": "Göster",
+      "renew": "Pro'yu yenile",
+      "error": "Değiştirilemedi. Biraz sonra tekrar dene.",
+      "gallery": "{{count}} vitrin fotoğrafı gizli (Pro bitti). Silinmedi; Pro'yu yenilersen geri gelir.",
+      "galleryEdit": "Ücretsizde yalnızca ilk {{count}} fotoğraf görünür, diğerleri saklı kalır ve Pro'da geri gelir. Sırayı değiştirerek hangisinin görüneceğini seçebilirsin."
     }
   },
   "reviews": {
@@ -1657,7 +1678,9 @@
       "muhtar": "Muhtarlık",
       "cityjoy": "CityJoy",
       "channel": "Genel bildirimler",
-      "quietChannel": "Sessiz bildirimler"
+      "quietChannel": "Sessiz bildirimler",
+      "proEndingTitle": "{{title}}: Pro üç gün içinde bitiyor",
+      "proEndingBody": "Yenilemezsen ücretsiz sınırdan fazla gönderilerin ve fotoğrafların gizlenir (silinmez). Pro dönünce hepsi geri gelir."
     },
     "categories": {
       "acil": "Acil duyurular",
@@ -2386,7 +2409,9 @@
     "reached": "Bugünlük hakkın doldu. {{when}} itibarıyla yeniden yapabilirsin."
   },
   "media": {
-    "count": "{{count}}/{{max}} fotoğraf"
+    "count": "{{count}}/{{max}} fotoğraf",
+    "locked": "Pro bitti, gizli (silinmedi)",
+    "makeFirst": "Başa al"
   },
   "locationBadge": {
     "title": "Konum rozeti",

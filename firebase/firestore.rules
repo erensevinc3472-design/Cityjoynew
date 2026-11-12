@@ -2298,6 +2298,8 @@ service cloud.firestore {
       let pro = d.get('membership', {}).get('tier', '') in ['pro', 'premium'];
       return l is list && (l.size() == 0
         || (resource != null && resource.data.get('gallery', []) == l)
+        // Pro bitince fazla fotoğraflar silinmez: eskilerden çıkarma ya da sıra değiştirme (yeni fotoğraf yok) her kademede olur.
+        || (resource != null && resource.data.get('gallery', []).hasAll(l))
         || (l.size() <= 30 && l.size() <= limitOf(pro ? 'vitrinPro' : 'vitrinUcretsiz', pro ? 10 : 1)));
     }
     // Gönderi fotoğrafları (en çok 10, albüm): dosya paylaşanın klasöründe, bu gönderinin kimliğiyle ve sırayla

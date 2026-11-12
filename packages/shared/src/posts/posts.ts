@@ -91,6 +91,8 @@ export interface Post extends PostInput {
   framesFeatured?: boolean;
   /** Yazarın hesabı askıda (yalnızca sunucu koyar): gönderi akışlarda görünmez. */
   authorSuspended?: boolean;
+  /** İşletmenin Pro'su bitti, Ücretsiz sınırdan fazla (yalnızca sunucu koyar): silinmez, akışlarda görünmez; Pro dönünce açılır. */
+  tierHidden?: boolean;
   createdAt: string;
 }
 
@@ -144,8 +146,8 @@ export function validatePost(p: PostInput): PostError[] {
 }
 
 /** Akışta görünür mü: kaldırılmamış ve şikâyetle düşmemiş. */
-export function isPostListed(p: Pick<Post, 'status' | 'reportCount' | 'cleared' | 'authorSuspended'>): boolean {
-  return p.status === 'aktif' && !p.authorSuspended && (p.cleared || p.reportCount < POST_LIMITS.reportThreshold);
+export function isPostListed(p: Pick<Post, 'status' | 'reportCount' | 'cleared' | 'authorSuspended' | 'tierHidden'>): boolean {
+  return p.status === 'aktif' && !p.authorSuspended && !p.tierHidden && (p.cleared || p.reportCount < POST_LIMITS.reportThreshold);
 }
 
 /**
