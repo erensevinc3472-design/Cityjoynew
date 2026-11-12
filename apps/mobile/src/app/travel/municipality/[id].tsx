@@ -4,7 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { videoEmbedUrl } from '@cityjoy/shared';
+import { municipalVideos, videoEmbedUrl } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { BottomShade } from '@/components/city-tiles';
@@ -49,9 +49,12 @@ export default function MunicipalityScreen() {
 
   const share = () =>
     Share.share({ message: [`${m?.name ?? place} · ${t('travel.mayorsTitle')}`, intro?.slogan, mayor, 'CityJoy · TravelJoy'].filter(Boolean).join('\n') }).catch(() => {});
-  const play = (url: string) => {
+  const videos = intro ? municipalVideos(intro) : [];
+  const videoName = (i: number) => videos[i]?.title || (videos.length > 1 ? t('travel.videoN', { n: i + 1 }) : t('travel.video'));
+  const host = (url: string) => (/youtu\.?be/.test(url) ? 'YouTube' : /vimeo\./.test(url) ? 'Vimeo' : url.replace(/^https:\/\/(www\.)?/, '').split('/')[0]);
+  const play = (url: string, title: string) => {
     const embed = videoEmbedUrl(url);
-    if (embed) setPlaying({ src: embed, title: `${place} · ${t('travel.video')}` });
+    if (embed) setPlaying({ src: embed, title: `${place} · ${title}` });
     else WebBrowser.openBrowserAsync(url).catch(() => {});
   };
 
@@ -103,12 +106,32 @@ export default function MunicipalityScreen() {
 
             {intro.description ? <AppText style={[styles.text, { color: c.text }]}>{intro.description}</AppText> : null}
 
-            {intro.videoUrl ? (
-              <Pressable accessibilityRole="button" onPress={() => play(intro.videoUrl!)} style={({ pressed }) => [styles.video, { opacity: pressed ? 0.85 : 1 }]}>
+            {/* Tek video: altın düğme; birden fazla: "Videolar" listesi (Eren, 12 Kasım 2026). */}
+            {videos.length === 1 ? (
+              <Pressable accessibilityRole="button" onPress={() => play(videos[0].url, videoName(0))} style={({ pressed }) => [styles.video, { opacity: pressed ? 0.85 : 1 }]}>
                 <MaterialIcons name="play-circle-filled" size={22} color={NAVY} />
-                <AppText style={styles.videoText}>{t('travel.video')}</AppText>
+                <AppText style={styles.videoText} numberOfLines={1}>{videoName(0)}</AppText>
               </Pressable>
             ) : null}
+            {videos.length > 1 ? <AppText accessibilityRole="header" style={[styles.h2, { color: c.textStrong }]}>{t('travel.videos')}</AppText> : null}
+            {videos.length > 1
+              ? videos.map((v, i) => (
+                  <Pressable
+                    key={`${i}-${v.url}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${videoName(i)}, ${host(v.url)}`}
+                    onPress={() => play(v.url, videoName(i))}
+                    style={({ pressed }) => [styles.route, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.85 : 1 }]}>
+                    <View style={[styles.routeIcon, { backgroundColor: GOLD }]}>
+                      <MaterialIcons name="play-arrow" size={24} color={NAVY} />
+                    </View>
+                    <View style={styles.flex}>
+                      <AppText style={[styles.routeTitle, { color: c.textStrong }]} numberOfLines={2}>{videoName(i)}</AppText>
+                      <AppText style={[styles.sub, { color: c.textMuted }]} numberOfLines={1}>{host(v.url)}</AppText>
+                    </View>
+                  </Pressable>
+                ))
+              : null}
 
             {own.length ? <AppText accessibilityRole="header" style={[styles.h2, { color: c.textStrong }]}>{t('travel.municipalRoutes')}</AppText> : null}
             {own.map((r) => (

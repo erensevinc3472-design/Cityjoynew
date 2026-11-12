@@ -1847,7 +1847,9 @@
     "planRemove": "Remove from plan",
     "localGov": "Local governments",
     "mayorTitle": "Mayor of {{name}}",
-    "mayorActingTitle": "Acting Mayor of {{name}}"
+    "mayorActingTitle": "Acting Mayor of {{name}}",
+    "videos": "Videos",
+    "videoN": "Promo video {{n}}"
   },
   "food": {
     "kinds": {

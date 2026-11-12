@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { byPopulation, DISTRICT_ZONES, type DistrictZone, type Municipality, type TravelMunicipal, type TravelRoute } from '@cityjoy/shared';
+import { byPopulation, DISTRICT_ZONES, municipalVideos, type DistrictZone, type Municipality, type TravelMunicipal, type TravelRoute } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { BottomShade, TOWNHALL_ART } from '@/components/city-tiles';
@@ -164,7 +164,7 @@ export default function TravelMayorsScreen() {
                 <AppText style={[styles.countText, { color: c.accent }]}>{m.routes.length}</AppText>
               </View>
             ) : null}
-            {intro.videoUrl ? <MaterialIcons name="play-circle-outline" size={18} color={c.accent} /> : null}
+            {municipalVideos(intro).length ? <MaterialIcons name="play-circle-outline" size={18} color={c.accent} /> : null}
             <MaterialIcons name={chevron} size={22} color={c.textSoft} />
           </View>
         ) : null}

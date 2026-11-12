@@ -3,6 +3,8 @@ import {
   DISTRICT_ZONES,
   listMunicipalities,
   LOCAL_KINDS,
+  MUNICIPAL_VIDEO_LIMITS,
+  municipalVideos,
   ROUTE_LENGTHS,
   ROUTE_THEMES,
   TRAVEL_MODES,
@@ -11,6 +13,7 @@ import {
   validateTravelRoute,
   type DistrictZone,
   type LocalKind,
+  type MunicipalVideo,
   type Organization,
   type RouteLength,
   type RouteTheme,
@@ -498,6 +501,35 @@ export function LocalTab({
 
 // ---- Admin: Başkanlarla Keşif (belediye tanıtımları) ----
 
+/** Tanıtım videoları: en çok 5, her biri bağlantı ve isteğe bağlı başlık (Eren, 12 Kasım 2026). */
+function VideoList({ prefix, value, onChange, disabled }: { prefix: string; value: MunicipalVideo[]; onChange(v: MunicipalVideo[]): void; disabled?: boolean }) {
+  const setAt = (i: number, patch: Partial<MunicipalVideo>) => onChange(value.map((v, j) => (j === i ? { ...v, ...patch } : v)));
+  return (
+    <fieldset className="form-section">
+      <legend>{t('travel.videosLegend')}</legend>
+      <p className="meta">{t('travel.videosHint', { n: MUNICIPAL_VIDEO_LIMITS.count })}</p>
+      {value.map((v, i) => (
+        <div key={i} className="stop-row">
+          <div className="stop-head">
+            <strong>{t('travel.videoN', { n: i + 1 })}</strong>
+          </div>
+          <Field id={`${prefix}-url-${i}`} label={t('travel.videoUrl')} value={v.url} onChange={(url) => setAt(i, { url })} hint={i === 0 ? t('travel.videoHint') : undefined} />
+          <Field id={`${prefix}-title-${i}`} label={t('travel.videoTitle')} value={v.title ?? ''} onChange={(title) => setAt(i, { title })} max={MUNICIPAL_VIDEO_LIMITS.title} />
+          <div className="actions">
+            <button type="button" className="link" disabled={disabled} onClick={() => onChange(value.filter((_, j) => j !== i))}>{t('travel.removeVideo')}</button>
+          </div>
+        </div>
+      ))}
+      {value.length < MUNICIPAL_VIDEO_LIMITS.count ? (
+        <button type="button" className="btn secondary" disabled={disabled} onClick={() => onChange([...value, { url: '' }])}>{t('travel.addVideo')}</button>
+      ) : null}
+    </fieldset>
+  );
+}
+
+/** Formdan gelen liste: boş satırlar atılır (eski tek alan artık yazılmaz). */
+const filledVideos = (v: MunicipalVideo[] | undefined) => (v ?? []).filter((x) => x.url.trim() || x.title?.trim());
+
 type MunicipalDraft = Omit<TravelMunicipal, 'updatedAt' | 'population'> & { population: string; label: string };
 
 export function MunicipalTab({
@@ -532,7 +564,7 @@ export function MunicipalTab({
       ...(districtId ? { districtId } : {}),
       slogan: m?.slogan ?? '',
       description: m?.description ?? '',
-      videoUrl: m?.videoUrl ?? '',
+      videos: m ? municipalVideos(m) : [],
       mayorName: m?.mayorName ?? '',
       cover: m?.cover,
       mayorPhoto: m?.mayorPhoto,
@@ -548,7 +580,8 @@ export function MunicipalTab({
 
   const save = (e: FormEvent) => {
     e.preventDefault();
-    const { label, population, ...rest } = draft!;
+    const { label, population, ...all } = draft!;
+    const rest = { ...all, videoUrl: undefined, videos: filledVideos(all.videos) };
     const err = validationError(validateTravelMunicipal(rest));
     if (err) return onError(err);
     const pop = Number(population.replace(/\D/g, ''));
@@ -566,7 +599,7 @@ export function MunicipalTab({
           <h2 className="form-section">{D.label}</h2>
           <Field id="m-slogan" label={t('travel.slogan')} value={D.slogan} onChange={(v) => set({ slogan: v })} max={60} />
           <Field id="m-desc" label={t('travel.description')} value={D.description} onChange={(v) => set({ description: v })} multiline max={600} />
-          <Field id="m-video" label={t('travel.videoUrl')} value={D.videoUrl ?? ''} onChange={(v) => set({ videoUrl: v })} hint={t('travel.videoHint')} />
+          <VideoList prefix="m-video" value={D.videos ?? []} onChange={(videos) => set({ videos })} disabled={busy} />
           {user ? <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={D.cover} onChange={(cover) => set({ cover })} disabled={busy} /> : null}
           <Field id="m-mayor" label={t('travel.mayorName')} value={D.mayorName ?? ''} onChange={(v) => set({ mayorName: v })} max={80} hint={t('travel.mayorOnlyHint')} />
           {user ? <ImageField label={t('travel.mayorPhoto')} hint={t('travel.mayorPhotoHint')} kind="seyahat" uid={user.uid} value={D.mayorPhoto} onChange={(mayorPhoto) => set({ mayorPhoto })} disabled={busy} /> : null}
@@ -679,7 +712,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
   const canDelete = !demo && actions.includes('sil');
   const api = createMunicipalTravel(firestore, user.uid, { id: org.id, name: org.name, cityId, ...(districtId ? { districtId } : {}) });
   const [intro, setIntro] = useState<TravelMunicipal | null>(null);
-  const [text, setText] = useState<{ slogan: string; description: string; videoUrl: string; mayorName: string; cover?: Photo; mayorPhoto?: Photo; mayorActing?: boolean }>({ slogan: '', description: '', videoUrl: '', mayorName: '' });
+  const [text, setText] = useState<{ slogan: string; description: string; videos: MunicipalVideo[]; mayorName: string; cover?: Photo; mayorPhoto?: Photo; mayorActing?: boolean }>({ slogan: '', description: '', videos: [], mayorName: '' });
   const [routes, setRoutes] = useState<TravelRoute[]>([]);
   const [places, setPlaces] = useState<TravelPlace[]>([]);
   const [draft, setDraft] = useState<RouteDraft | null>(null);
@@ -693,7 +726,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
       const places = createFirestoreTravelRepository(firestore).listPlaces(cityId).catch(() => []);
       const [m, r, p] = demo ? [null, [], await places] : await Promise.all([api.get(), api.listRoutes(), places]);
       setIntro(m);
-      setText({ slogan: m?.slogan ?? '', description: m?.description ?? '', videoUrl: m?.videoUrl ?? '', mayorName: m?.mayorName ?? '', cover: m?.cover, mayorPhoto: m?.mayorPhoto, mayorActing: m?.mayorActing });
+      setText({ slogan: m?.slogan ?? '', description: m?.description ?? '', videos: m ? municipalVideos(m) : [], mayorName: m?.mayorName ?? '', cover: m?.cover, mayorPhoto: m?.mayorPhoto, mayorActing: m?.mayorActing });
       setRoutes(r);
       setPlaces(p);
     } catch {
@@ -720,9 +753,10 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
   };
 
   const saveIntro = (submit: boolean) => {
-    const err = validationError(validateTravelMunicipal(text));
+    const out = { ...text, videos: filledVideos(text.videos) };
+    const err = validationError(validateTravelMunicipal(out));
     if (err) return setMessage({ kind: 'error', text: err });
-    act(async () => (await api.saveText(text, submit), t(submit ? 'travel.submitted' : 'travel.saved')));
+    act(async () => (await api.saveText(out, submit), t(submit ? 'travel.submitted' : 'travel.saved')));
   };
   const saveRoute = (submit: boolean) => {
     const input = routeInputOf(draft!);
@@ -755,7 +789,7 @@ function MunicipalEditor({ user, org }: { user: PanelUser; org: Organization }) 
         </h2>
         <Field id="mi-slogan" label={t('travel.slogan')} value={text.slogan} onChange={(v) => setText({ ...text, slogan: v })} max={60} hint={t('travel.sloganHint')} />
         <Field id="mi-desc" label={t('travel.description')} value={text.description} onChange={(v) => setText({ ...text, description: v })} multiline max={600} />
-        <Field id="mi-video" label={t('travel.videoUrl')} value={text.videoUrl} onChange={(v) => setText({ ...text, videoUrl: v })} hint={t('travel.videoHint')} />
+        <VideoList prefix="mi-video" value={text.videos} onChange={(videos) => setText({ ...text, videos })} disabled={busy || demo || !canWrite} />
         <ImageField label={t('travel.cover')} hint={t('travel.coverHint')} kind="seyahat" uid={user.uid} value={text.cover} onChange={(cover) => setText({ ...text, cover })} disabled={busy || demo || !canWrite} />
         <Field id="mi-mayor" label={t('travel.mayorName')} value={text.mayorName} onChange={(v) => setText({ ...text, mayorName: v })} max={80} hint={t('travel.mayorNameHint')} />
         <ImageField label={t('travel.mayorPhoto')} hint={t('travel.mayorPhotoHint')} kind="seyahat" uid={user.uid} value={text.mayorPhoto} onChange={(mayorPhoto) => setText({ ...text, mayorPhoto })} disabled={busy || demo || !canWrite} />

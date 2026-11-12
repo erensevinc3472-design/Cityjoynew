@@ -419,7 +419,10 @@ export interface TravelMunicipal {
   districtId?: string;
   slogan: string;
   description: string;
+  /** Eski tek video alanı (okunur; yeni kayıtlar `videos` yazar). */
   videoUrl?: string;
+  /** Tanıtım videoları (Eren, 12 Kasım 2026: başkan birden fazla video yükleyebilsin), en çok MUNICIPAL_VIDEO_LIMITS.count. */
+  videos?: MunicipalVideo[];
   /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
   cover?: Photo;
   mayorName?: string;
@@ -437,8 +440,21 @@ export interface TravelMunicipal {
   updatedAt: string;
 }
 
+export interface MunicipalVideo {
+  url: string;
+  /** İsteğe bağlı kısa başlık ("Tarihi çarşımız", "Festival 2026"). */
+  title?: string;
+}
+export const MUNICIPAL_VIDEO_LIMITS = { count: 5, title: 60 } as const;
+
+/** Tanıtımın videoları: yeni liste, yoksa eski tek video. Bozuk adresler atlanır. */
+export function municipalVideos(m: Pick<TravelMunicipal, 'videos' | 'videoUrl'>): MunicipalVideo[] {
+  const list = m.videos?.length ? m.videos : m.videoUrl ? [{ url: m.videoUrl }] : [];
+  return list.filter((v) => typeof v?.url === 'string' && /^https:\/\/\S+$/.test(v.url)).slice(0, MUNICIPAL_VIDEO_LIMITS.count);
+}
+
 /** Belediyenin değiştirebildiği alanlar. */
-export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'mayorName' | 'cover' | 'mayorPhoto' | 'mayorActing'>;
+export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'videos' | 'mayorName' | 'cover' | 'mayorPhoto' | 'mayorActing'>;
 
 export const ROUTE_LIMITS = { title: 60, summary: 300, stops: 12, note: 300, tips: 6 } as const;
 
@@ -475,6 +491,8 @@ export function validateTravelMunicipal(m: TravelMunicipalText): TravelError[] {
   if (!onlyMayor && (len(m.description) < 10 || len(m.description) > TRAVEL_LIMITS.description)) e.push('description');
   if (len(m.mayorName) > TRAVEL_LIMITS.name) e.push('name');
   if (!httpsOk(m.videoUrl)) e.push('video');
+  const v = m.videos ?? [];
+  if (v.length > MUNICIPAL_VIDEO_LIMITS.count || v.some((x) => !len(x.url) || !httpsOk(x.url) || len(x.title) > MUNICIPAL_VIDEO_LIMITS.title)) e.push('video');
   return e;
 }
 

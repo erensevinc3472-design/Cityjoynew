@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { SEED_LOCAL, SEED_ROUTES } from '@cityjoy/shared';
+import { SEED_LOCAL, SEED_ROUTES, validateTravelMunicipal } from '@cityjoy/shared';
 import { createFirestoreTravelRepository, createMunicipalTravel, createTravelAdmin } from '@cityjoy/shared/firebase';
 import { collection, doc, getDocs, serverTimestamp, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -167,6 +167,20 @@ describe('seyahat 2. aşama', () => {
     // Vekillik yalnızca doğru / yanlış; tek harfli slogan olmaz.
     await assertFails(updateDoc(doc(fs('basin'), 'travelMunicipal', nilufer.id), { mayorActing: 'evet', updatedAt: serverTimestamp() }));
     await assertFails(updateDoc(doc(fs('basin'), 'travelMunicipal', nilufer.id), { slogan: 'A', updatedAt: serverTimestamp() }));
+  });
+
+  it('birden fazla video: belediye listeyi girer, eski tek video listeye taşınır, en çok 5', async () => {
+    const bld = createMunicipalTravel(fs('basin'), 'basin', nilufer);
+    const text = { slogan: 'Modern Bursa', description: 'Göller, köyler ve kültür merkezleriyle Nilüfer.', mayorName: 'Başkan' };
+    await bld.saveText({ ...text, videoUrl: 'https://youtu.be/eski' }, false);
+    expect((await bld.get())?.videos).toEqual([{ url: 'https://youtu.be/eski' }]);
+    await bld.saveText({ ...text, videos: [{ url: ' https://youtu.be/a ', title: ' Çarşımız ' }, { url: '' }, { url: 'https://youtu.be/b' }] }, true);
+    const m = await bld.get();
+    expect([m?.videos, m?.videoUrl]).toEqual([[{ url: 'https://youtu.be/a', title: 'Çarşımız' }, { url: 'https://youtu.be/b' }], undefined]);
+    const six = Array.from({ length: 6 }, (_, i) => ({ url: `https://youtu.be/${i}` }));
+    await assertFails(updateDoc(doc(fs('basin'), 'travelMunicipal', nilufer.id), { videos: six, updatedAt: serverTimestamp() }));
+    expect(validateTravelMunicipal({ ...text, videos: six })).toContain('video');
+    expect(validateTravelMunicipal({ ...text, videos: [{ url: 'http://x.com' }] })).toContain('video');
   });
 
   it('seyahat bölümü yalnızca belediyeye verilebilir', async () => {

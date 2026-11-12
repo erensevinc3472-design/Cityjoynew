@@ -1851,7 +1851,9 @@
     "planRemove": "Убрать из программы",
     "localGov": "Местные органы власти",
     "mayorTitle": "Мэр: {{name}}",
-    "mayorActingTitle": "Исполняющий обязанности мэра: {{name}}"
+    "mayorActingTitle": "Исполняющий обязанности мэра: {{name}}",
+    "videos": "Видео",
+    "videoN": "Видеоролик {{n}}"
   },
   "food": {
     "kinds": {

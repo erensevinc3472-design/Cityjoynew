@@ -1513,7 +1513,13 @@
     "mayorPhoto": "Başkanın fotoğrafı",
     "mayorPhotoHint": "Dikey (portre), yüzün üst kısımda olduğu bir fotoğraf en iyi görünür. Uygulamada belediyenin Başkanlarla Keşif tanıtım sayfasının en üstünde çıkar. Belediyenin resmî fotoğrafını kullanın; parti işareti olmasın.",
     "mayorActing": "Başkan vekili (kartta \"Başkan Vekili\" yazar)",
-    "mayorOnlyHint": "Tanıtım yazısı hazır değilse slogan ve tanıtımı boş bırakıp yalnızca başkan bilgisini kaydedebilirsiniz."
+    "mayorOnlyHint": "Tanıtım yazısı hazır değilse slogan ve tanıtımı boş bırakıp yalnızca başkan bilgisini kaydedebilirsiniz.",
+    "videosLegend": "Tanıtım videoları",
+    "videosHint": "En çok {{n}} video eklenebilir. Uygulamada sırayla listelenir; başlık isteğe bağlıdır.",
+    "videoN": "{{n}}. video",
+    "videoTitle": "Video başlığı (isteğe bağlı)",
+    "addVideo": "Video ekle",
+    "removeVideo": "Videoyu kaldır"
   },
   "sort": {
     "column": "Sırala",

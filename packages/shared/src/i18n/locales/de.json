@@ -1847,7 +1847,9 @@
     "planRemove": "Aus dem Plan entfernen",
     "localGov": "Kommunalverwaltungen",
     "mayorTitle": "Bürgermeister von {{name}}",
-    "mayorActingTitle": "Amtierender Bürgermeister von {{name}}"
+    "mayorActingTitle": "Amtierender Bürgermeister von {{name}}",
+    "videos": "Videos",
+    "videoN": "Vorstellungsvideo {{n}}"
   },
   "food": {
     "kinds": {

@@ -15,6 +15,7 @@ import {
 
 import { SEED_CITIES, SEED_LOCAL, SEED_PLACES, SEED_REGIONS, SEED_ROUTES } from '../travel/seed';
 import { travelPlaceId, type TravelImport } from '../travel/sheet';
+import { municipalVideos, type MunicipalVideo } from '../travel/travel';
 import type {
   TravelCityContent,
   TravelLocalInput,
@@ -41,6 +42,10 @@ const LOCAL = 'travelLocal';
 const MUNICIPAL = 'travelMunicipal';
 
 /** Boş isteğe bağlı alanlar belgeye yazılmaz (güncellemede silinir). Kapak yalnızca dört alanıyla yazılır. */
+/** Yazılacak video listesi: boş satırlar atılır, yazılar kırpılır; liste boşsa alan silinir. */
+const cleanVideos = (m: { videos?: MunicipalVideo[]; videoUrl?: string }) =>
+  (m.videos?.length ? m.videos : m.videoUrl ? [{ url: m.videoUrl }] : []).map((x) => ({ url: x.url.trim(), ...(x.title?.trim() ? { title: x.title.trim() } : {}) })).filter((x) => x.url);
+
 const clean = <T extends Record<string, unknown>>(o: T) =>
   Object.fromEntries(
     Object.entries(o)
@@ -159,6 +164,7 @@ const municipalOf = (id: string, d: DocumentData): TravelMunicipal => {
   id,
   ...coverOf(d),
   ...(mayorPhoto ? { mayorPhoto } : {}),
+  videos: municipalVideos(d),
   showMayor: d.showMayor !== false,
   updatedAt: iso(d.updatedAt) ?? '',
   };
@@ -290,7 +296,13 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
       const batch = writeBatch(db);
       const { id, ...rest } = m;
       // Slogan ve tanıtım boş olabilir (yalnızca başkan bilgisi); boş metin de yazılır.
-      batch.set(doc(db, MUNICIPAL, id), { ...clean(rest as unknown as Record<string, unknown>), slogan: rest.slogan.trim(), description: rest.description.trim(), updatedAt: serverTimestamp() });
+      batch.set(doc(db, MUNICIPAL, id), {
+        ...clean({ ...rest, videoUrl: undefined, videos: undefined } as unknown as Record<string, unknown>),
+        ...(cleanVideos(rest).length ? { videos: cleanVideos(rest) } : {}),
+        slogan: rest.slogan.trim(),
+        description: rest.description.trim(),
+        updatedAt: serverTimestamp(),
+      });
       audit(batch, id, 'duzenle', `Belediye tanıtımı: ${label}`);
       await batch.commit();
     },
@@ -423,7 +435,9 @@ export function createMunicipalTravel(db: Firestore, actorUid: string, org: { id
           ...(org.districtId ? { districtId: org.districtId } : {}),
           slogan: text.slogan.trim(),
           description: text.description.trim(),
-          videoUrl: text.videoUrl?.trim() ? text.videoUrl.trim() : deleteField(),
+          // Eski tek video alanı listeye taşınır.
+          videoUrl: deleteField(),
+          videos: cleanVideos(text).length ? cleanVideos(text) : deleteField(),
           mayorName: text.mayorName?.trim() ? text.mayorName.trim() : deleteField(),
           cover: text.cover ? cleanPhoto(text.cover) : deleteField(),
           mayorPhoto: text.mayorPhoto ? cleanPhoto(text.mayorPhoto) : deleteField(),

@@ -1847,7 +1847,9 @@
     "planRemove": "Programdan çıkar",
     "localGov": "Yerel Yönetimler",
     "mayorTitle": "{{name}} Belediye Başkanı",
-    "mayorActingTitle": "{{name}} Belediye Başkan Vekili"
+    "mayorActingTitle": "{{name}} Belediye Başkan Vekili",
+    "videos": "Videolar",
+    "videoN": "{{n}}. tanıtım videosu"
   },
   "food": {
     "kinds": {

@@ -1851,7 +1851,9 @@
     "planRemove": "احذفه من البرنامج",
     "localGov": "الإدارات المحلية",
     "mayorTitle": "رئيس بلدية {{name}}",
-    "mayorActingTitle": "القائم بأعمال رئيس بلدية {{name}}"
+    "mayorActingTitle": "القائم بأعمال رئيس بلدية {{name}}",
+    "videos": "مقاطع الفيديو",
+    "videoN": "الفيديو التعريفي {{n}}"
   },
   "food": {
     "kinds": {

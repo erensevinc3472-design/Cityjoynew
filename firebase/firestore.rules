@@ -3464,7 +3464,7 @@ service cloud.firestore {
     function validMunicipal(id, d) {
       return id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
         && d.keys().hasOnly(['cityId', 'districtId', 'slogan', 'description', 'videoUrl', 'mayorName', 'cover', 'showMayor', 'zone',
-             'population', 'populationYear', 'status', 'updatedAt', 'mayorPhoto', 'mayorActing'])
+             'population', 'populationYear', 'status', 'updatedAt', 'mayorPhoto', 'mayorActing', 'videos'])
         && mediaKeptOrOwn(d, 'cover', 'seyahat')
         && mediaKeptOrOwn(d, 'mayorPhoto', 'seyahat')
         && (!('mayorActing' in d) || d.mayorActing is bool)
@@ -3477,6 +3477,7 @@ service cloud.firestore {
         && (!('population' in d) || (d.population is int && d.population >= 0))
         && (!('populationYear' in d) || (d.populationYear is string && d.populationYear.size() <= 10))
         && travelUrlOk(d, 'videoUrl')
+        && (!('videos' in d) || (d.videos is list && d.videos.size() <= 5))
         && d.status in ['taslak', 'onay-bekliyor', 'yayinda']
         && d.updatedAt == request.time;
     }
