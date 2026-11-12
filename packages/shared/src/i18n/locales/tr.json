@@ -161,7 +161,14 @@
     "appearance": "Görünüm",
     "appearanceSystem": "Telefonun ayarına göre",
     "appearanceLight": "Açık",
-    "appearanceDark": "Koyu"
+    "appearanceDark": "Koyu",
+    "autoplay": {
+      "title": "Videoları otomatik oynat",
+      "wifi": "Yalnızca Wi-Fi'de",
+      "her-zaman": "Her zaman",
+      "kapali": "Kapalı",
+      "hint": "Mobil verin harcanmaz"
+    }
   },
   "legal": {
     "draftNotice": "Bu metin hazırlanıyor. Yayından önce avukat tarafından kontrol edilecek."

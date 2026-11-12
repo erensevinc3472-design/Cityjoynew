@@ -161,7 +161,14 @@
     "appearance": "Appearance",
     "appearanceSystem": "Match phone setting",
     "appearanceLight": "Light",
-    "appearanceDark": "Dark"
+    "appearanceDark": "Dark",
+    "autoplay": {
+      "title": "Autoplay videos",
+      "wifi": "Wi-Fi only",
+      "her-zaman": "Always",
+      "kapali": "Off",
+      "hint": "Saves your mobile data"
+    }
   },
   "legal": {
     "draftNotice": "This text is being prepared and will be reviewed by a lawyer before launch."

@@ -15,7 +15,7 @@ import { errorKey } from '@/lib/auth-errors';
 import { firestore } from '@/lib/firebase';
 import { activityRepository, authService, businessRepository, eventRepository, familyRepository, listingRepository, messageRepository, officialFollowRepository, postRepository, profileRepository, reviewRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
-import { useSettings, type ThemeMode } from '@/lib/settings';
+import { useSettings, type AutoplayMode, type ThemeMode } from '@/lib/settings';
 import { useSignOut } from '@/lib/sign-out';
 import { restartFlow } from '@/lib/navigation';
 import { notificationSettings } from '@/lib/notifications';
@@ -28,13 +28,15 @@ const APPEARANCE: { mode: ThemeMode; key: string }[] = [
   { mode: 'dark', key: 'account.appearanceDark' },
 ];
 
+const AUTOPLAY: AutoplayMode[] = ['wifi', 'her-zaman', 'kapali'];
+
 /** Ayarlar (Profil > ☰; Instagram düzeni): hesap, dil, konum, görünüm, bildirimler, Ailem (SOS), işletme, yasal metinler, çıkış ve hesap silme. */
 export default function AccountScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
   const { user, profile, adopt } = useSession();
-  const { language, themeMode, setThemeMode } = useSettings();
+  const { language, themeMode, setThemeMode, autoplay, setAutoplay } = useSettings();
   const [confirming, setConfirming] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string>();
@@ -93,6 +95,13 @@ export default function AccountScreen() {
       <View style={{ gap: spacing.sm }} accessibilityRole="radiogroup" accessibilityLabel={t('account.appearance')}>
         {APPEARANCE.map((a) => (
           <OptionRow key={a.mode} title={t(a.key)} selected={themeMode === a.mode} onPress={() => setThemeMode(a.mode)} />
+        ))}
+      </View>
+
+      <AppText variant="label">{t('account.autoplay.title')}</AppText>
+      <View style={{ gap: spacing.sm }} accessibilityRole="radiogroup" accessibilityLabel={t('account.autoplay.title')}>
+        {AUTOPLAY.map((m) => (
+          <OptionRow key={m} title={t('account.autoplay.' + m)} subtitle={m === 'wifi' ? t('account.autoplay.hint') : undefined} selected={autoplay === m} onPress={() => setAutoplay(m)} />
         ))}
       </View>
 

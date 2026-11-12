@@ -161,7 +161,14 @@
     "appearance": "Darstellung",
     "appearanceSystem": "Wie am Telefon",
     "appearanceLight": "Hell",
-    "appearanceDark": "Dunkel"
+    "appearanceDark": "Dunkel",
+    "autoplay": {
+      "title": "Videos automatisch abspielen",
+      "wifi": "Nur im WLAN",
+      "her-zaman": "Immer",
+      "kapali": "Aus",
+      "hint": "Spart mobile Daten"
+    }
   },
   "legal": {
     "draftNotice": "Dieser Text wird vorbereitet und vor dem Start von einem Anwalt geprüft."

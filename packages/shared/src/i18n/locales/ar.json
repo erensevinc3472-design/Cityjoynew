@@ -161,7 +161,14 @@
     "appearance": "المظهر",
     "appearanceSystem": "حسب إعداد الهاتف",
     "appearanceLight": "فاتح",
-    "appearanceDark": "داكن"
+    "appearanceDark": "داكن",
+    "autoplay": {
+      "title": "تشغيل الفيديو تلقائياً",
+      "wifi": "عبر Wi-Fi فقط",
+      "her-zaman": "دائماً",
+      "kapali": "إيقاف",
+      "hint": "يوفّر بيانات الجوال"
+    }
   },
   "legal": {
     "draftNotice": "هذا النص قيد الإعداد وسيراجعه محامٍ قبل الإطلاق."

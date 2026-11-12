@@ -24,6 +24,7 @@ import { SideMenu } from '@/components/side-menu';
 import { VideoViewer } from '@/components/video-viewer';
 import { StateMessage } from '@/components/state-message';
 import { useAnnouncements } from '@/lib/announcements';
+import { useAutoplayAllowed } from '@/lib/autoplay';
 import { useFeedSort } from '@/lib/feed-sort';
 import { useNotificationFeed, useReadState } from '@/lib/notifications';
 import { authorHref, toggleLike, toggleSave, useFeed, useLiked, useSaved } from '@/lib/posts';
@@ -244,7 +245,8 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
       return () => setFocused(false);
     }, []),
   );
-  const playing = active && focused && !viewer;
+  const autoplayOk = useAutoplayAllowed();
+  const playing = active && focused && !viewer && autoplayOk;
   const onViewable = useRef(({ viewableItems }: { viewableItems: { item: unknown; isViewable: boolean }[] }) => {
     const hit = viewableItems.find((v) => {
       const i = v.item as { kind: string; post?: Post };

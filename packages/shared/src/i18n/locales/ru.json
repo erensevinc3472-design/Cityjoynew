@@ -161,7 +161,14 @@
     "appearance": "Оформление",
     "appearanceSystem": "Как на телефоне",
     "appearanceLight": "Светлое",
-    "appearanceDark": "Тёмное"
+    "appearanceDark": "Тёмное",
+    "autoplay": {
+      "title": "Автовоспроизведение видео",
+      "wifi": "Только по Wi-Fi",
+      "her-zaman": "Всегда",
+      "kapali": "Выкл.",
+      "hint": "Экономит мобильный трафик"
+    }
   },
   "legal": {
     "draftNotice": "Этот текст готовится и перед запуском будет проверен юристом."
