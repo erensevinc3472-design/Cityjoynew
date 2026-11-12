@@ -110,13 +110,46 @@ export default function TravelMayorsScreen() {
     const intro = m.intro;
     const expanded = open === m.id;
     const mayor = mayorOf(m);
+    const label = [t('travel.provinceIntro'), name, m.name, mayor, intro?.slogan ?? t('travel.introPreparing')].filter(Boolean).join('. ');
+    const frame = [styles.featured, { borderColor: expanded ? c.accentBorder : 'rgba(226, 178, 119, 0.45)', backgroundColor: c.surface }];
+    // Geniş afiş (ör. bütün başkanların yan yana olduğu fotoğraf, 12 Kasım 2026): kesilmesin diye tam genişlikte, yazı altında.
+    const ratio = intro?.cover ? intro.cover.width / intro.cover.height : 0;
+    if (intro?.cover && ratio >= 2.2) {
+      return (
+        <View style={frame}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded }}
+            accessibilityLabel={label}
+            onPress={() => setOpen(expanded ? null : m.id)}
+            style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}>
+            <View style={[styles.banner, { aspectRatio: Math.min(ratio, 3.2), backgroundColor: c.surfaceStrong }]}>
+              <ThumbImage photo={intro.cover} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityIgnoresInvertColors />
+              <View style={styles.badge}>
+                <MaterialIcons name="location-city" size={13} color="#081F24" />
+                <AppText style={styles.badgeText}>{t('travel.provinceIntro').toLocaleUpperCase(i18n.language)}</AppText>
+              </View>
+            </View>
+            <View style={styles.bannerFoot}>
+              <View style={styles.flex}>
+                <AppText style={[styles.bannerTitle, { color: c.textStrong }]} numberOfLines={2}>{m.name}</AppText>
+                {mayor ? <AppText style={[styles.sub, { color: c.textMuted }]} numberOfLines={1}>{t('travel.mayorOf', { name: mayor })}</AppText> : null}
+                <AppText style={[styles.slogan, { color: c.text }]} numberOfLines={expanded ? undefined : 2}>{intro.slogan}</AppText>
+              </View>
+              <MaterialIcons name={expanded ? 'expand-less' : 'expand-more'} size={24} color={c.textSoft} />
+            </View>
+          </Pressable>
+          {expanded ? <View style={styles.bannerBody}>{details(m, name, false)}</View> : null}
+        </View>
+      );
+    }
     return (
-      <View style={[styles.featured, { borderColor: expanded ? c.accentBorder : 'rgba(226, 178, 119, 0.45)', backgroundColor: c.surface }]}>
+      <View style={frame}>
         <Pressable
           accessibilityRole="button"
           accessibilityState={intro ? { expanded } : { disabled: true }}
           disabled={!intro}
-          accessibilityLabel={[t('travel.provinceIntro'), name, m.name, mayor, intro?.slogan ?? t('travel.introPreparing')].filter(Boolean).join('. ')}
+          accessibilityLabel={label}
           onPress={() => setOpen(expanded ? null : m.id)}
           style={({ pressed }) => [styles.featuredArt, { opacity: pressed ? 0.92 : 1 }]}>
           {intro?.cover ? (
@@ -241,6 +274,10 @@ const styles = StyleSheet.create({
   filters: { gap: spacing.xs + 2 },
   featured: { borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
   featuredArt: { height: 188, justifyContent: 'space-between', padding: spacing.md, overflow: 'hidden' },
+  banner: { width: '100%', padding: spacing.sm + 2, overflow: 'hidden' },
+  bannerFoot: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2 },
+  bannerTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 25 },
+  bannerBody: { paddingHorizontal: spacing.md - 2 },
   badge: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: GOLD, paddingHorizontal: 9, paddingVertical: 3, borderRadius: radius.pill },
   badgeText: { color: '#081F24', fontFamily: fonts.bodySemi, fontSize: 9.5, letterSpacing: 1 },
   featuredFoot: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm },
