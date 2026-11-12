@@ -24,6 +24,16 @@ interface SessionValue {
 
 const SessionContext = createContext<SessionValue | null>(null);
 
+// Açılış sayfası (Eren, 12 Kasım 2026): kayıt ya da girişten hemen sonra ana sayfa açılır; uygulama sonraki açılışlarda
+// (oturum telefonda zaten açıkken) Keşfet'le başlar. null: ilk oturum bilgisi henüz gelmedi.
+let restoredStart: boolean | null = null;
+/** Uygulama açık bir oturumla başladıysa ve açılış yönlendirmesi henüz yapılmadıysa true. */
+export const startsWithRestoredSession = () => restoredStart === true;
+/** Açılış yönlendirmesi yapıldı; aynı çalışmada sonraki yönlendirmeler ana sayfaya gider. */
+export const consumeRestoredStart = () => {
+  restoredStart = false;
+};
+
 export function SessionProvider({ children }: PropsWithChildren) {
   const [ready, setReady] = useState(!isFirebaseConfigured);
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -57,6 +67,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!isFirebaseConfigured) return;
     return authService.onChange(async (u) => {
+      if (restoredStart === null) restoredStart = !!u;
+      else if (!u) restoredStart = false;
       await adopt(u);
       setReady(true);
     });

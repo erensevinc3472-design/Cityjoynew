@@ -15,6 +15,7 @@ import '@/lib/i18n';
 import { IncomingSosBanner, IncomingSosProvider, PushRegistrar } from '@/lib/incoming-sos';
 // SOS arka plan konum görevi, uygulama kapalıyken de çalışabilmesi için en başta tanımlanır.
 import '@/lib/sos-background';
+import { ReturnToExplore } from '@/lib/return-to-explore';
 import { SessionProvider, useSession } from '@/lib/session';
 import { SettingsProvider, useSettings } from '@/lib/settings';
 import { useThemeColors } from '@/theme/use-theme';
@@ -53,6 +54,7 @@ function RootNavigator() {
           <IncomingSosBanner />
           <OfflineBanner />
           <PushRegistrar />
+          <ReturnToExplore />
         </IncomingSosProvider>
       </View>
     </LocaleProvider>
