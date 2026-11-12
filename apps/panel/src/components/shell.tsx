@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from 'react';
-import { NavLink, Outlet } from 'react-router';
+import { useEffect, useState, type ReactNode } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router';
 import { canSeeModule, type Module } from '@cityjoy/shared';
 
 import { ScopeLabel } from './scope-label';
@@ -8,6 +8,9 @@ import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { useTheme } from '../lib/theme';
+import { firestore } from '../lib/firebase';
+import { createFirebaseStats } from '@cityjoy/shared/firebase';
 
 /** Menü öğesi: ya bir bölüm yetkisine (module) ya da özel bir koşula (show) bağlı. Yolu olmayan "yakında" gösterilir. */
 interface MenuItem {
@@ -16,71 +19,72 @@ interface MenuItem {
   module?: Module;
   show?: (user: PanelUser) => boolean;
   icon: keyof typeof ICONS;
+  /** Yanında bekleyen iş sayısı gösterilir. */
+  badge?: 'approvals' | 'reports';
 }
 
 const admin = (u: PanelUser) => isAdminUser(u);
 
 /**
- * Menü uygulamanın bölümleriyle aynı gruplanır (Karar, Eren, 3 Kasım 2026): Benim Şehrim, Seyahat, Sosyal, Acil,
- * İşletmeler ve profiller, Yönetim. Her kişi yalnızca yetkili olduğu öğeleri görür; boş grup gizlenir.
+ * Menü işe göre gruplanır (Karar, Eren, 12 Kasım 2026; 3 Kasım'daki uygulama bölümleri düzeninin yerine):
+ * Günlük işler (bekleyen sayılarıyla), İçerik, İşletme ve sosyal, Raporlar, Ayarlar (başta kapalı).
+ * Her kişi yalnızca yetkili olduğu öğeleri görür; boş grup gizlenir. Henüz yapılmamış öğe menüde gösterilmez.
  */
 export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
   {
-    key: 'sehrim',
+    key: 'gunluk',
     items: [
-      { key: 'konumlar', module: 'konumlar', path: '/konumlar', icon: 'pin' },
+      { key: 'today', path: '/', icon: 'home', show: () => true },
+      { key: 'onaylar', module: 'onaylar', path: '/onaylar', icon: 'check', badge: 'approvals' },
+      { key: 'moderasyon', module: 'moderasyon', path: '/moderasyon', icon: 'shield', badge: 'reports' },
+    ],
+  },
+  {
+    key: 'icerik',
+    items: [
+      { key: 'vitrin', show: (u) => isAdminUser(u) || canSeeModule(u.grants, 'sehir-rehberi'), path: '/sehir-vitrini', icon: 'screen' },
       { key: 'sehir-rehberi', module: 'sehir-rehberi', path: '/sehir-rehberi', icon: 'book' },
       { key: 'gonderiler', module: 'gonderiler', path: '/duyurular', icon: 'megaphone' },
       { key: 'etkinlikler', module: 'etkinlikler', path: '/etkinlikler', icon: 'calendar' },
-      { key: 'hizmetler', module: 'hizmetler', icon: 'tool' },
-    ],
-  },
-  {
-    key: 'seyahat',
-    items: [
       { key: 'seyahat', module: 'seyahat', path: '/seyahat', icon: 'globe' },
       { key: 'yol-ustu', show: admin, path: '/yol-ustu-verisi', icon: 'road' },
       { key: 'tatil-fikirleri', show: admin, path: '/tatil-fikirleri', icon: 'sun' },
+      { key: 'acil-numaralar', module: 'acil-numaralar', path: '/acil-numaralar', icon: 'phone' },
+      { key: 'konumlar', module: 'konumlar', path: '/konumlar', icon: 'pin' },
     ],
   },
   {
-    key: 'sosyal',
+    key: 'isletme-sosyal',
     items: [
-      { key: 'moderasyon', module: 'moderasyon', path: '/moderasyon', icon: 'shield' },
+      { key: 'isletme-dogrulama', module: 'isletme-dogrulama', path: '/isletmeler', icon: 'store' },
+      { key: 'firsatlar', module: 'moderasyon', path: '/firsatlar', icon: 'ticket' },
+      { key: 'profiller', show: admin, path: '/profiller', icon: 'users' },
       { key: 'bildirimler', module: 'bildirimler', path: '/bildirimler', icon: 'bell' },
       { key: 'anketler', show: admin, path: '/anketler', icon: 'check' },
       { key: 'yarismalar', show: admin, path: '/yarismalar', icon: 'badge' },
       { key: 'sponsorlar', show: admin, path: '/sponsorlar', icon: 'megaphone' },
-    ],
-  },
-  {
-    key: 'acil',
-    items: [
-      { key: 'acil-numaralar', module: 'acil-numaralar', path: '/acil-numaralar', icon: 'phone' },
-      { key: 'sos', module: 'sos', path: '/sos-ayarlari', icon: 'alert' },
-    ],
-  },
-  {
-    key: 'isletmeler',
-    items: [
-      { key: 'isletme-dogrulama', module: 'isletme-dogrulama', path: '/isletmeler', icon: 'store' },
-      { key: 'onaylar', module: 'onaylar', path: '/onaylar', icon: 'check' },
-      { key: 'firsatlar', module: 'moderasyon', path: '/firsatlar', icon: 'ticket' },
-      { key: 'profiller', show: admin, path: '/profiller', icon: 'users' },
       { key: 'hizmet-kategorileri', module: 'hizmet-kategorileri', path: '/hizmet-kategorileri', icon: 'grid' },
       { key: 'diger-ihtiyaclar', show: admin, path: '/diger-ihtiyaclar', icon: 'grid' },
       { key: 'meslekler', module: 'meslekler', path: '/meslekler', icon: 'briefcase' },
     ],
   },
   {
-    key: 'yonetim',
+    key: 'raporlar',
+    items: [
+      { key: 'istatistikler', show: (u) => canSeeStats(u), path: '/istatistikler', icon: 'chart' },
+      { key: 'kitle', show: (u) => canSeeAudience(u, isAdminUser(u)), path: '/takipciler', icon: 'users' },
+      { key: 'harcama', show: admin, path: '/harcama', icon: 'gauge' },
+      { key: 'islem-kayitlari', module: 'islem-kayitlari', path: '/islem-kayitlari', icon: 'file' },
+    ],
+  },
+  {
+    key: 'ayarlar',
     items: [
       { key: 'profile', show: hasProfileAccess, path: '/profil', icon: 'badge' },
       { key: 'kurumlar', module: 'kurumlar', path: '/kurumlar', icon: 'building' },
       { key: 'yetkiler', module: 'yetkiler', path: '/yetkiler', icon: 'key' },
-      { key: 'islem-kayitlari', module: 'islem-kayitlari', path: '/islem-kayitlari', icon: 'file' },
+      { key: 'sos', module: 'sos', path: '/sos-ayarlari', icon: 'alert' },
       { key: 'sinirlar', show: admin, path: '/sinirlar', icon: 'gauge' },
-      { key: 'harcama', show: admin, path: '/harcama', icon: 'gauge' },
     ],
   },
 ];
@@ -94,21 +98,63 @@ export function canSeeStats(user: PanelUser): boolean {
   return canSeeModule(user.grants, 'moderasyon') || canSeeModule(user.grants, 'isletme-dogrulama');
 }
 
-const COLLAPSED_KEY = 'cityjoy-panel-kapali-gruplar';
+// Yeni menü düzeniyle anahtar değişti; Ayarlar başta kapalı.
+const COLLAPSED_KEY = 'cityjoy-panel-kapali-gruplar-2';
 
 function readCollapsed(): string[] {
   try {
-    return JSON.parse(localStorage.getItem(COLLAPSED_KEY) ?? '[]');
+    return JSON.parse(localStorage.getItem(COLLAPSED_KEY) ?? '["ayarlar"]');
   } catch {
-    return [];
+    return ['ayarlar'];
   }
 }
+
+type Badges = Partial<Record<NonNullable<MenuItem['badge']>, number | null>>;
 
 export function Shell() {
   const { user, signOut } = useSession();
   const city = useCity();
   const [collapsed, setCollapsed] = useState<string[]>(readCollapsed);
+  const [theme, toggleTheme] = useTheme();
+  // Telefonda menü soldan açılan çekmecedir; sayfa değişince ya da Esc ile kapanır.
+  const [drawer, setDrawer] = useState(false);
+  const location = useLocation();
+  useEffect(() => setDrawer(false), [location.pathname]);
+  useEffect(() => {
+    if (!drawer) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDrawer(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [drawer]);
+  // Bekleyen onay ve şikâyet sayıları (sayım sorgusu, belge okumaz): il değişince ve en çok dakikada bir yenilenir.
+  const [badges, setBadges] = useState<Badges>({});
+  const [badgeTick, setBadgeTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setBadgeTick((n) => n + 1), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  useEffect(() => {
+    if (!user || user.isDemo) return;
+    let live = true;
+    const s = createFirebaseStats(firestore);
+    Promise.all([
+      canSeeModule(user.grants, 'onaylar') ? s.pendingApprovals(city.provinceCode) : Promise.resolve(null),
+      canSeeModule(user.grants, 'moderasyon') ? s.openReports(city.provinceCode) : Promise.resolve(null),
+    ]).then(([approvals, reports]) => live && setBadges({ approvals, reports }));
+    return () => {
+      live = false;
+    };
+  }, [user, city.provinceCode, badgeTick]);
   if (!user) return null;
+
+  const themeLabel = t(theme === 'dark' ? 'menu.themeLight' : 'menu.themeDark');
+  const themeButton = (
+    <button type="button" className="theme-toggle" onClick={toggleTheme} aria-label={themeLabel} title={themeLabel}>
+      <span aria-hidden="true">◐</span>
+    </button>
+  );
 
   const toggle = (key: string) => {
     const next = collapsed.includes(key) ? collapsed.filter((k) => k !== key) : [...collapsed, key];
@@ -124,7 +170,10 @@ export function Shell() {
     item.path ? (
       <NavLink key={item.key} to={item.path} end={item.path === '/'}>
         <Icon name={item.icon} />
-        <span>{label}</span>
+        <span className="grow">{label}</span>
+        {item.badge && badges[item.badge] ? (
+          <b className="nav-badge" aria-label={t('menu.waiting', { count: badges[item.badge]! })}>{badges[item.badge]! > 99 ? '99+' : badges[item.badge]}</b>
+        ) : null}
       </NavLink>
     ) : (
       <span key={item.key} className="nav-disabled" aria-disabled="true">
@@ -134,17 +183,27 @@ export function Shell() {
     );
 
   const showCity = city.national || city.provinces.length > 1;
-  const showcase = isAdminUser(user) || canSeeModule(user.grants, 'sehir-rehberi');
 
   return (
-    <div className="shell">
-      <aside className="sidebar">
+    <div className={drawer ? 'shell drawer-open' : 'shell'}>
+      <header className="topbar">
+        <button type="button" className="menu-button" aria-expanded={drawer} aria-controls="panel-menu" onClick={() => setDrawer(!drawer)}>
+          <span aria-hidden="true">☰</span>
+          <span className="sr-only">{t('menu.open')}</span>
+        </button>
+        <span className="brand-mark" aria-hidden="true">C</span>
+        <p className="brand grow">CityJoy</p>
+        {themeButton}
+      </header>
+      {drawer ? <div className="drawer-backdrop" onClick={() => setDrawer(false)} aria-hidden="true" /> : null}
+      <aside className="sidebar" id="panel-menu">
         <div className="brand-row">
           <span className="brand-mark" aria-hidden="true">C</span>
-          <div>
+          <div className="grow">
             <p className="brand">CityJoy</p>
             <span className="brand-sub">{t('menu.panel')}</span>
           </div>
+          {themeButton}
         </div>
 
         {showCity ? (
@@ -160,11 +219,6 @@ export function Shell() {
         ) : null}
 
         <nav aria-label={t('menu.label')}>
-          {link({ key: 'today', path: '/', icon: 'home' }, t('menu.today'))}
-          {canSeeStats(user) ? link({ key: 'stats', path: '/istatistikler', icon: 'chart' }, t('menu.stats')) : null}
-          {canSeeAudience(user, isAdminUser(user)) ? link({ key: 'kitle', path: '/takipciler', icon: 'users' }, t('menu.audience')) : null}
-          {showcase ? link({ key: 'vitrin', path: '/sehir-vitrini', icon: 'screen' }, t('menu.showcase')) : null}
-
           {MENU_GROUPS.map((g) => {
             const items = visibleItems(user, g.items);
             if (!items.length) return null;

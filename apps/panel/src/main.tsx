@@ -36,7 +36,10 @@ import { StatsPage } from './pages/stats-page';
 import { ProfilesPage } from './pages/profiles-page';
 import { AudiencePage } from './pages/audience-page';
 import { CityProvider } from './lib/city';
+import { applyStoredTheme } from './lib/theme';
 import './styles.css';
+
+applyStoredTheme();
 
 function RequireUser({ children }: { children: React.ReactNode }) {
   const { ready, user } = useSession();

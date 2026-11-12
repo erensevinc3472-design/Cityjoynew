@@ -130,7 +130,7 @@ export function TodayPage() {
 /** İstatistik yetkisi olmayanlar (örn. kurum personeli) için bölümlerine kısayollar. */
 function QuickLinks() {
   const { user } = useSession();
-  const items = MENU_GROUPS.flatMap((g) => visibleItems(user!, g.items)).filter((m) => m.path);
+  const items = MENU_GROUPS.flatMap((g) => visibleItems(user!, g.items)).filter((m) => m.path && m.path !== '/');
   return (
     <div className="card-grid three">
       {items.map((m) => (

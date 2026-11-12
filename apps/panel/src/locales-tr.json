@@ -1738,6 +1738,11 @@
     "stats": "İstatistikler",
     "showcase": "Şehir Vitrini",
     "groups": {
+      "gunluk": "Günlük işler",
+      "icerik": "İçerik",
+      "isletme-sosyal": "İşletme ve sosyal",
+      "raporlar": "Raporlar",
+      "ayarlar": "Ayarlar",
       "sehrim": "Benim Şehrim",
       "seyahat": "Seyahat",
       "sosyal": "Sosyal",
@@ -1754,7 +1759,7 @@
       "seyahat": "Keşfet ve Öğren",
       "yol-ustu": "Yol üstü verisi",
       "yolculuk-fiyatlari": "Yolculuk fiyatları",
-      "moderasyon": "Moderasyon",
+      "moderasyon": "Şikâyetler ve denetim",
       "bildirimler": "Bildirimler",
       "acil-numaralar": "Acil numaralar",
       "sos": "SOS ayarları",
@@ -1774,9 +1779,17 @@
       "yarismalar": "Yarışmalar",
       "tatil-fikirleri": "Tatil fikirleri",
       "harcama": "Harcama",
-      "sponsorlar": "Sponsorlar"
+      "sponsorlar": "Sponsorlar",
+      "today": "Bugün",
+      "vitrin": "Şehir Vitrini",
+      "istatistikler": "İstatistikler",
+      "kitle": "Takipçiler"
     },
-    "audience": "Takipçiler"
+    "audience": "Takipçiler",
+    "open": "Menüyü aç",
+    "themeLight": "Gündüz görünümüne geç",
+    "themeDark": "Gece görünümüne geç",
+    "waiting": "{{count}} bekleyen"
   },
   "today": {
     "morning": "Günaydın",
