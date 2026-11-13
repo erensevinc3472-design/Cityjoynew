@@ -30,6 +30,7 @@ import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensio
 import { handleThumb } from './thumbs';
 import { handleBusinessTierChange, handleTierVisibilityChoice, remindProEnding, TierVisibilityError } from './tier-visibility';
 import { deleteOldTranslations, googleTranslator, handleTranslate, TranslateError } from './translate';
+import { metFetchJson, refreshWeather, saveWeatherStatus } from './weather';
 
 initializeApp();
 const db = getFirestore();
@@ -151,6 +152,20 @@ export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 
   await deleteOldTranslations(db, now);
   await expireMemberships(db, now);
   await remindProEnding(db, { send: expoSender, now });
+});
+
+// Hava durumu (Eren, 13 Kasım 2026): 3 saatte bir 81 il merkezi MET Norway'den bir kez çekilir, il başına küçük
+// dosya yazılır; telefon yalnızca dosyayı okur (kullanıcı sayısı dış isteği artırmaz). Dosya 30 dakika önbellekte kalır.
+export const weatherRefresh = onSchedule({ schedule: 'every 3 hours', timeZone: 'Europe/Istanbul', maxInstances: 1, timeoutSeconds: 300 }, async () => {
+  const now = new Date();
+  const bucket = getStorage().bucket();
+  const run = await refreshWeather({
+    now,
+    fetchJson: metFetchJson,
+    write: (path, file) =>
+      bucket.file(path).save(JSON.stringify(file), { resumable: false, contentType: 'application/json', metadata: { cacheControl: 'public, max-age=1800' } }),
+  });
+  await saveWeatherStatus(db, run, now);
 });
 
 // Hesap askıya alma (yalnızca admin, panelden): giriş kapanır, açık oturumlar düşer.

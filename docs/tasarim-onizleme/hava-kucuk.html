@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Küçük hava önizleme</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL@24,500,1&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0B2328; --s:#123238; --s2:#163C43; --line:rgba(234,241,241,.10); --t:#EAF1F1; --m:#A3B9BB; --soft:#7F9799; --g:#E2B277; --gs:rgba(226,178,119,.14); --chip:rgba(234,241,241,.10); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#E9ECE6; font-family:Inter, sans-serif; color:var(--t); padding:20px 12px; }
+  h1 { font-family:'Plus Jakarta Sans'; color:#14262B; font-size:20px; margin:0 0 4px 6px; }
+  .sub { color:#56696D; font-size:13px; margin:0 0 16px 6px; max-width:960px; }
+  .grid { display:flex; flex-wrap:wrap; gap:18px; justify-content:center; }
+  .cap { color:#14262B; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; text-align:center; margin:10px 0 0; }
+  .capsub { color:#56696D; font-size:12px; text-align:center; margin:2px 0 0; max-width:300px; }
+  .ic { font-family:'Material Symbols Rounded'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; }
+  .phone { width:300px; height:600px; border-radius:42px; background:var(--bg); overflow:hidden; position:relative; box-shadow:0 0 0 7px #10181a, 0 10px 30px rgba(0,0,0,.25); }
+  .status { height:40px; display:flex; justify-content:space-between; align-items:center; padding:0 26px; font-weight:600; font-size:13px; }
+  .hero { background:linear-gradient(180deg,#15535B 0%, #0E3439 100%); padding:4px 14px 16px; border-radius:0 0 26px 26px; }
+  .top { display:flex; align-items:center; gap:8px; height:40px; }
+  .round { width:36px; height:36px; border-radius:50%; background:var(--chip); display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .title { flex:1; text-align:center; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; }
+  .date { color:#B7CDCF; font-size:13px; margin-top:8px; display:flex; align-items:center; gap:6px; }
+  .hello { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:23px; margin:2px 0 12px; }
+  .row { display:flex; gap:8px; align-items:center; }
+  .chip { display:inline-flex; align-items:center; gap:4px; height:32px; padding:0 11px; border-radius:999px; background:var(--chip); font-size:12.5px; font-weight:600; max-width:100%; }
+  .chip .ic { font-size:17px; }
+  .loc { flex:1; min-width:0; } .loc span.tx { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .wxchip { flex:none; gap:5px; outline:1px solid rgba(226,178,119,.35); }
+  .wxchip .ic { color:var(--g); font-size:19px; }
+  .wxinline { display:inline-flex; align-items:center; gap:3px; color:var(--t); font-weight:600; }
+  .wxinline .ic { color:var(--g); font-size:17px; }
+  .tiles { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:14px; }
+  .tile { height:104px; border-radius:16px; padding:10px; display:flex; align-items:flex-end; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; }
+  .hl { position:absolute; border:2px dashed #E2B277; border-radius:12px; pointer-events:none; }
+  /* ayrıntı */
+  .scr { padding:0 14px; }
+  .hdr { display:flex; align-items:center; gap:10px; margin:6px 0 10px; }
+  .back { width:34px; height:34px; border-radius:50%; background:var(--s); display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .ttl { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:19px; }
+  .sm { color:var(--m); font-size:12px; }
+  .card { background:var(--s); border:1px solid var(--line); border-radius:16px; padding:12px; }
+  .now { text-align:center; padding:2px 0 10px; }
+  .now .deg { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:60px; line-height:1; }
+  .now .ic { font-size:52px; color:var(--g); }
+  .hours { display:flex; gap:6px; overflow:hidden; }
+  .h { flex:1; text-align:center; font-size:12px; padding:8px 0; border-radius:12px; }
+  .h.on { background:var(--gs); outline:1px solid rgba(226,178,119,.4); }
+  .h .ic { font-size:22px; color:var(--g); margin:4px 0; }
+  .d { display:grid; grid-template-columns:70px 26px 1fr; align-items:center; gap:8px; font-size:13px; padding:6px 0; border-top:1px solid var(--line); }
+  .d:first-child { border-top:0; }
+  .bar { height:6px; border-radius:3px; background:var(--s2); position:relative; }
+  .bar i { position:absolute; top:0; bottom:0; border-radius:3px; background:linear-gradient(90deg,#7FC6D9,var(--g)); }
+  .facts { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .fact { font-size:12px; color:var(--m); } .fact b { display:block; color:var(--t); font-size:15px; font-weight:600; margin-top:2px; }
+  .src { font-size:11px; color:var(--soft); text-align:center; margin-top:10px; }
+</style>
+</head>
+<body>
+<h1>Ana sayfada küçük hava durumu</h1>
+<p class="sub">Büyük hava kartı yok. Hava, ana sayfanın üst kısmında yer kaplamadan durur; dokununca ayrıntı ekranı açılır. İki seçenek: A) konum düğmesinin yanında küçük bir düğme, B) tarihin yanında yazı. Her ikisinde de ana sayfa bugünkü yüksekliğinde kalır.</p>
+
+<div class="grid">
+
+<div>
+<div class="phone">
+  <div class="status"><span>09:42</span><span>80%</span></div>
+  <div class="hero">
+    <div class="top"><span class="round ic">menu</span><span class="title">CityJoy</span><span class="round ic">notifications</span></div>
+    <div class="date">Cuma, 13 Kasım</div>
+    <div class="hello">Günaydın, Eren</div>
+    <div class="row">
+      <span class="chip loc"><span class="ic" style="color:var(--g)">place</span><span class="tx">Ataevler, Nilüfer, Bursa</span><span class="ic">expand_more</span></span>
+      <span class="chip wxchip"><span class="ic">partly_cloudy_day</span>14°</span>
+    </div>
+  </div>
+  <div class="tiles">
+    <div class="tile" style="background:linear-gradient(160deg,#2d6f78,#173f45)">Benim Şehrim</div>
+    <div class="tile" style="background:linear-gradient(160deg,#6b4d2c,#2a2117)">Seyahat</div>
+    <div class="tile" style="background:linear-gradient(160deg,#4a3d6e,#1d1a2c)">Sosyal Harmoni</div>
+    <div class="tile" style="background:linear-gradient(160deg,#7a2e33,#2c1416)">Acil İhtiyaçlar</div>
+  </div>
+</div>
+<p class="cap">A) Konumun yanında küçük düğme</p>
+<p class="capsub">Önerim. Dokunulacak yer belli, gözden kaçmaz.</p>
+</div>
+
+<div>
+<div class="phone">
+  <div class="status"><span>09:42</span><span>80%</span></div>
+  <div class="hero">
+    <div class="top"><span class="round ic">menu</span><span class="title">CityJoy</span><span class="round ic">notifications</span></div>
+    <div class="date">Cuma, 13 Kasım · <span class="wxinline"><span class="ic">partly_cloudy_day</span>14° Parçalı bulutlu</span></div>
+    <div class="hello">Günaydın, Eren</div>
+    <div class="row">
+      <span class="chip loc"><span class="ic" style="color:var(--g)">place</span><span class="tx">Ataevler, Nilüfer, Bursa</span><span class="ic">expand_more</span></span>
+    </div>
+  </div>
+  <div class="tiles">
+    <div class="tile" style="background:linear-gradient(160deg,#2d6f78,#173f45)">Benim Şehrim</div>
+    <div class="tile" style="background:linear-gradient(160deg,#6b4d2c,#2a2117)">Seyahat</div>
+    <div class="tile" style="background:linear-gradient(160deg,#4a3d6e,#1d1a2c)">Sosyal Harmoni</div>
+    <div class="tile" style="background:linear-gradient(160deg,#7a2e33,#2c1416)">Acil İhtiyaçlar</div>
+  </div>
+</div>
+<p class="cap">B) Tarihin yanında yazı</p>
+<p class="capsub">En sade hâli; hava durumunun adı da yazar.</p>
+</div>
+
+<div>
+<div class="phone">
+  <div class="status"><span>09:42</span><span>80%</span></div>
+  <div class="scr">
+    <div class="hdr"><span class="back ic">arrow_back</span><div><div class="ttl">Hava durumu</div><div class="sm">Bursa · 08:00'de güncellendi</div></div></div>
+    <div class="now"><span class="ic">partly_cloudy_day</span><div class="deg">14°</div><div class="sm" style="font-size:13px;margin-top:4px">Parçalı bulutlu · En yüksek 17° · En düşük 9°</div></div>
+    <div class="card">
+      <div class="hours">
+        <div class="h on">Şimdi<br><span class="ic">partly_cloudy_day</span><br>14°</div>
+        <div class="h">10<br><span class="ic">sunny</span><br>15°</div>
+        <div class="h">11<br><span class="ic">sunny</span><br>16°</div>
+        <div class="h">12<br><span class="ic">cloud</span><br>17°</div>
+        <div class="h">13<br><span class="ic">rainy</span><br>16°</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <div class="d"><span>Bugün</span><span class="ic" style="color:var(--g)">partly_cloudy_day</span><span style="display:flex;gap:6px;align-items:center">9°<span class="bar" style="flex:1"><i style="left:20%;right:30%"></i></span>17°</span></div>
+      <div class="d"><span>Cumartesi</span><span class="ic" style="color:var(--g)">rainy</span><span style="display:flex;gap:6px;align-items:center">8°<span class="bar" style="flex:1"><i style="left:15%;right:40%"></i></span>14°</span></div>
+      <div class="d"><span>Pazar</span><span class="ic" style="color:var(--g)">cloud</span><span style="display:flex;gap:6px;align-items:center">7°<span class="bar" style="flex:1"><i style="left:10%;right:35%"></i></span>15°</span></div>
+      <div class="d"><span>Pazartesi</span><span class="ic" style="color:var(--g)">sunny</span><span style="display:flex;gap:6px;align-items:center">9°<span class="bar" style="flex:1"><i style="left:20%;right:15%"></i></span>19°</span></div>
+    </div>
+    <div class="facts">
+      <div class="card fact">Rüzgâr<b>12 km/sa</b></div>
+      <div class="card fact">Nem<b>%71</b></div>
+      <div class="card fact">Gün doğumu<b>07:47</b></div>
+      <div class="card fact">Gün batımı<b>17:50</b></div>
+    </div>
+    <div class="src">Veri: MET Norway</div>
+  </div>
+</div>
+<p class="cap">Dokununca: hava ayrıntısı</p>
+<p class="capsub">Saatlik, 4 günlük, rüzgâr, nem, gün doğumu ve batımı.</p>
+</div>
+
+</div>
+</body>
+</html>

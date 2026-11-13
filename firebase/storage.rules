@@ -36,6 +36,13 @@ service firebase.storage {
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
 
+    // Hava durumu ve nöbetçi eczane gibi herkese açık veri dosyaları (Eren, 13 Kasım 2026): yalnızca sunucu yazar,
+    // herkes okur (giriş yapmadan da; karşılama ekranında da gösterilebilir).
+    match /public/{kind}/{file} {
+      allow read: if kind in ['weather', 'pharmacy'] && file.matches('[0-9]{2}[.]json');
+      allow write: if false;
+    }
+
     // Listelerde gösterilen küçük kopyalar (640 piksel): thumbs/{asıl yol}. Yalnızca sunucu yazar ve siler.
     match /thumbs/{allPaths=**} {
       allow read: if request.auth != null;

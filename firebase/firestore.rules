@@ -1200,6 +1200,11 @@ service cloud.firestore {
       allow read: if isAdmin() || isSelf(uid);
       allow write: if false;
     }
+    // Dış veri kaynaklarının son çekim özeti (hava durumu, nöbetçi eczane): yalnızca sunucu yazar, admin okur.
+    match /dataSources/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
     // Hesap askıları (Eren, 12 Kasım 2026): yalnızca sunucu işlevi yazar; admin hepsini, kişi kendi kaydını okur.
     match /suspensions/{uid} {
       allow read: if isAdmin() || isSelf(uid);
