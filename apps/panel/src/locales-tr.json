@@ -1803,7 +1803,8 @@
       "istatistikler": "İstatistikler",
       "kitle": "Takipçiler",
       "uyelikler": "Üyelikler ve Gelir",
-      "rozetler": "Rozetler"
+      "rozetler": "Rozetler",
+      "veri-kaynaklari": "Veri kaynakları"
     },
     "audience": "Takipçiler",
     "open": "Menüyü aç",
@@ -2427,5 +2428,25 @@
       "workspace-premium": "Madalya"
     },
     "publisherHint": "Haberler’e paylaşabilir"
+  },
+  "dataSources": {
+    "title": "Veri kaynakları",
+    "intro": "Sunucunun dış kaynaklardan zamanlanmış olarak çektiği verilerin son durumu. Telefonlar dış kaynağa gitmez, sunucunun yazdığı dosyayı okur; böylece kullanıcı sayısı arttıkça maliyet artmaz. Bir il okunamazsa burada görünür, bir sonraki çekimde yeniden denenir.",
+    "refresh": "Yenile",
+    "loading": "Yükleniyor…",
+    "loadError": "Veri kaynakları okunamadı.",
+    "weather": "Hava durumu",
+    "pharmacy": "Nöbetçi eczane",
+    "everyHours": "{{count}} saatte bir",
+    "daily": "Günde bir (hesap açılınca)",
+    "colName": "Kaynak",
+    "colStatus": "Durum",
+    "colLastRun": "Son çalışma",
+    "colLastSuccess": "Son başarılı",
+    "colFailed": "Okunamayan iller",
+    "never": "Henüz çalışmadı",
+    "stale": "Güncel değil",
+    "partial": "{{count}} il eksik",
+    "ok": "Çalışıyor"
   }
 }

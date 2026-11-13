@@ -2781,5 +2781,33 @@
       "yasa-disi": "Illegal content",
       "diger": "Breaking the rules"
     }
+  },
+  "weather": {
+    "title": "Weather",
+    "updated": "{{place}} · updated {{time}}",
+    "noLocation": "Choose your location to see the weather.",
+    "offline": "No internet; showing the last saved forecast.",
+    "now": "Now",
+    "today": "Today",
+    "high": "High {{v}}°",
+    "low": "Low {{v}}°",
+    "wind": "Wind",
+    "windValue": "{{v}} km/h",
+    "humidity": "Humidity",
+    "sunrise": "Sunrise",
+    "sunset": "Sunset",
+    "source": "Data: {{source}}",
+    "open": "Weather details",
+    "kinds": {
+      "clear": "Clear",
+      "partly": "Partly cloudy",
+      "cloudy": "Cloudy",
+      "fog": "Fog",
+      "rain": "Rain",
+      "showers": "Showers",
+      "sleet": "Sleet",
+      "snow": "Snow",
+      "thunder": "Thunderstorm"
+    }
   }
 }

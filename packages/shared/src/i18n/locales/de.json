@@ -2781,5 +2781,33 @@
       "yasa-disi": "Illegale Inhalte",
       "diger": "Regelverstoß"
     }
+  },
+  "weather": {
+    "title": "Wetter",
+    "updated": "{{place}} · aktualisiert {{time}}",
+    "noLocation": "Wähle deinen Standort, um das Wetter zu sehen.",
+    "offline": "Kein Internet; die zuletzt gespeicherte Vorhersage wird gezeigt.",
+    "now": "Jetzt",
+    "today": "Heute",
+    "high": "Höchstwert {{v}}°",
+    "low": "Tiefstwert {{v}}°",
+    "wind": "Wind",
+    "windValue": "{{v}} km/h",
+    "humidity": "Luftfeuchte",
+    "sunrise": "Sonnenaufgang",
+    "sunset": "Sonnenuntergang",
+    "source": "Daten: {{source}}",
+    "open": "Wetterdetails",
+    "kinds": {
+      "clear": "Klar",
+      "partly": "Teilweise bewölkt",
+      "cloudy": "Bewölkt",
+      "fog": "Nebel",
+      "rain": "Regen",
+      "showers": "Schauer",
+      "sleet": "Schneeregen",
+      "snow": "Schnee",
+      "thunder": "Gewitter"
+    }
   }
 }

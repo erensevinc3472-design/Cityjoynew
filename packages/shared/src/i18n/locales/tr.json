@@ -2781,5 +2781,33 @@
       "yasa-disi": "Yasa dışı içerik",
       "diger": "Kurallara aykırı kullanım"
     }
+  },
+  "weather": {
+    "title": "Hava durumu",
+    "updated": "{{place}} · güncelleme {{time}}",
+    "noLocation": "Hava durumunu görmek için konumunu seç.",
+    "offline": "İnternet yok; son kaydedilen tahmin gösteriliyor.",
+    "now": "Şimdi",
+    "today": "Bugün",
+    "high": "En yüksek {{v}}°",
+    "low": "En düşük {{v}}°",
+    "wind": "Rüzgâr",
+    "windValue": "{{v}} km/sa",
+    "humidity": "Nem",
+    "sunrise": "Gün doğumu",
+    "sunset": "Gün batımı",
+    "source": "Veri: {{source}}",
+    "open": "Hava durumu ayrıntısı",
+    "kinds": {
+      "clear": "Açık",
+      "partly": "Parçalı bulutlu",
+      "cloudy": "Bulutlu",
+      "fog": "Sisli",
+      "rain": "Yağmurlu",
+      "showers": "Sağanak",
+      "sleet": "Karla karışık yağmur",
+      "snow": "Karlı",
+      "thunder": "Gök gürültülü"
+    }
   }
 }
