@@ -12,7 +12,7 @@ import {
   type DocumentData,
   type Firestore,
   type WriteBatch,
-} from 'firebase/firestore';
+} from './metered';
 
 import { grantDocId, normalizeEmail, normalizeModules, ROLE_CAPS, type GrantRecord, type PersonRole } from '../permissions/grants';
 import type { Action, AuditLogEntry, Module, RegionRef, RegionScope } from '../permissions/types';

@@ -34,8 +34,8 @@ export const PROFILE_LIMITS = {
   bio: 160,
   /** Takip akışında en çok bu kadar hesabın gönderisi okunur (hesap başına bir sorgu). */
   feedAuthors: 30,
-  /** Takip akışında hesap başına okunan gönderi. */
-  perAuthor: 10,
+  /** Takip akışında hesap başına okunan gönderi (maliyet: 13 Kasım 2026'da 10'dan 5'e; akış zaten en yenileri gösterir). */
+  perAuthor: 5,
   /** Ara > Kişiler: tek sorguda en çok. */
   searchResults: 30,
 } as const;

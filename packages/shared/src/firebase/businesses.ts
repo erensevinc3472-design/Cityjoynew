@@ -17,7 +17,7 @@ import {
   type DocumentData,
   type Firestore,
   type QueryConstraint,
-} from 'firebase/firestore';
+} from './metered';
 
 import {
   cleanBusinessInput,

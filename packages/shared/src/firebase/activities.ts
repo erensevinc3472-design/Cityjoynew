@@ -14,7 +14,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { ACTIVITY_LIMITS, type Activity, type ActivityInput, type ActivityReportReason } from '../activities/activities';
 import { cleanPhoto, photoFrom } from '../media/photo';

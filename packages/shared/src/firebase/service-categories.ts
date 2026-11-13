@@ -11,7 +11,7 @@ import {
   where,
   writeBatch,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import {
   DEFAULT_SERVICE_CATEGORIES,

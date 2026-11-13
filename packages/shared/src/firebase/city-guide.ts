@@ -1,4 +1,4 @@
-import { doc, getDoc, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, writeBatch, type Firestore } from './metered';
 
 import {
   mergeCityItems,

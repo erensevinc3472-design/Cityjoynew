@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import type { PostInput } from '@cityjoy/shared';
-import { countUsage, createFirestorePostRepository, createFirestoreSocialRepository, createFramesAdmin, createPostModeration } from '@cityjoy/shared/firebase';
+import { countUsage, takeFirestoreUsage, createFirestorePostRepository, createFirestoreSocialRepository, createFramesAdmin, createPostModeration } from '@cityjoy/shared/firebase';
 import { deleteField, doc, getDoc, increment, serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
@@ -388,5 +388,17 @@ describe('Keşfet gönderileri', () => {
     await assertFails(setDoc(doc(fs('ali'), 'users/ali/settings/privacy'), { tagPolicy: 'kimse', other: 1, updatedAt: serverTimestamp() }));
     await assertFails(setDoc(doc(fs('ayse'), 'users/ali/settings/privacy'), { tagPolicy: 'kimse', updatedAt: serverTimestamp() }));
     await assertFails(getDoc(doc(fs('ayse'), 'users/ali/settings/privacy')));
+  });
+
+  it('harcama ölçümü: depolardaki okuma ve yazmalar koleksiyona göre sayılır', async () => {
+    takeFirestoreUsage();
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
+    await repo('ali').get(id);
+    await repo('ali').byAuthor('ayse', false);
+    const u = takeFirestoreUsage();
+    expect(u.writes.posts).toBe(1);
+    expect(u.writes.usage).toBe(1);
+    expect(u.reads.posts).toBeGreaterThanOrEqual(2);
+    expect(takeFirestoreUsage()).toEqual({ reads: {}, writes: {} });
   });
 });

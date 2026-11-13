@@ -15,7 +15,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
 import { TAG_POLICIES, type TagPolicy } from '../posts/posts';
@@ -192,9 +192,12 @@ export function createFirestoreSocialRepository(db: Firestore) {
      * Ortak takip (profilde "Ahmet K., Ayşe Y. ve 3 kişi daha takip ediyor"): benim takip ettiklerimden bu kişiyi takip
      * edenler. Takip listem en çok MUTUAL_SCAN kişi okunur, 30'luk parçalarla sorulur (yalnızca eşleşenler okunur).
      */
-    async mutualFollowers(me: string, other: string): Promise<string[]> {
-      const mine = await getDocs(query(collection(db, FOLLOWS), where('followerUid', '==', me), where('status', '==', 'aktif'), limit(MUTUAL_SCAN)));
-      const uids = mine.docs.map((d) => d.get('followeeUid') as string).filter((u) => u !== other);
+    /**
+     * Ortak takipçiler: takip ettiklerimden kimler bu kişiyi takip ediyor. Takip listem oturumda zaten okunduğu için
+     * buraya verilir (her profil açılışında yeniden okunmaz); en çok MUTUAL_SCAN kişi, 30'arlı sorgularla.
+     */
+    async mutualFollowers(myFollowing: readonly string[], other: string): Promise<string[]> {
+      const uids = myFollowing.filter((u) => u !== other).slice(0, MUTUAL_SCAN);
       const parts: string[][] = [];
       for (let i = 0; i < uids.length; i += 30) parts.push(uids.slice(i, i + 30));
       const found = await Promise.all(

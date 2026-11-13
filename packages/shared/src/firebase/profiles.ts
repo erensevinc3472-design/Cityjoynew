@@ -11,7 +11,7 @@ import {
   updateDoc,
   writeBatch,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { ageGroup, type UserProfile } from '../models/user';
 import { DEFAULT_OCCUPATIONS } from '../services/occupations';

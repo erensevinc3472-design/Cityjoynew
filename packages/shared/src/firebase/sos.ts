@@ -16,7 +16,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import type { LanguageCode } from '../i18n/languages';
 import type { Module } from '../permissions/types';

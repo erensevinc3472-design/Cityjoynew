@@ -1,4 +1,4 @@
-import type { Firestore } from 'firebase/firestore';
+import type { Firestore } from './metered';
 
 import { createFirestoreActivityRepository } from './activities';
 import { createFirestoreBusinessRepository } from './businesses';

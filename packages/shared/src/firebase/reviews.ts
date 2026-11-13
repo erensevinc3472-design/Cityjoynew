@@ -14,7 +14,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { nextRating, type ReportReason, type Review, type ReviewRepository } from '../business/reviews';
 import type { Module } from '../permissions/types';

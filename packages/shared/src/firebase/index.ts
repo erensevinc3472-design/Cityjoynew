@@ -76,3 +76,4 @@ export { createFirebaseStats, type FirebaseStats, type StatsRange } from './stat
 export { createTranslationClient } from './translate';
 export { createSponsorAdmin, createSponsorRepository } from './sponsors';
 export { createMembershipAdmin, createOwnerPayments, createPostVisibility, type ProBusinessRow } from './memberships';
+export { takeFirestoreUsage } from './metered';

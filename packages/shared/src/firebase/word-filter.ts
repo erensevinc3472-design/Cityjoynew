@@ -1,4 +1,4 @@
-import { doc, getDoc, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, writeBatch, type Firestore } from './metered';
 
 import { DEFAULT_BANNED_WORDS } from '../posts/default-banned-words';
 import { cleanBannedWords } from '../posts/word-filter';

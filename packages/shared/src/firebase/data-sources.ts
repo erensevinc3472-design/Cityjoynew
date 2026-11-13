@@ -1,4 +1,4 @@
-import { doc, getDoc, Timestamp, type Firestore } from 'firebase/firestore';
+import { doc, getDoc, Timestamp, type Firestore } from './metered';
 
 /** Dış veri kaynağının son çekim özeti (sunucu yazar, admin okur): Panel > Veri kaynakları. */
 export interface DataSourceStatus {

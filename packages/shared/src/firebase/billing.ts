@@ -1,7 +1,8 @@
-import { doc, getDoc, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
+import { collection, doc, documentId, getDoc, getDocs, query, serverTimestamp, where, writeBatch, type Firestore } from './metered';
 import { httpsCallable, type Functions } from 'firebase/functions';
 
 import { validCap, type BillingStatus } from '../billing/billing';
+import { costDayKey, type CostDay } from '../billing/cost';
 import { addAudit, iso } from './grants';
 
 /** Panel > Harcama (yalnızca admin): durum, sigorta tutarı, "Şimdi durdur". */
@@ -35,6 +36,12 @@ export function createBillingAdmin(db: Firestore, functions: Functions) {
       await batch.commit();
     },
     /** Ödeme bağlantısını hemen koparır (sunucu admin olduğunu denetler, işlem kaydına yazar). */
+    /** Özelliklere göre harcama: son `days` günün kayıtları (gün başına bir okuma). */
+    async costDays(days: number, now = new Date()): Promise<CostDay[]> {
+      const from = costDayKey(new Date(now.getTime() - days * 86400_000));
+      const snap = await getDocs(query(collection(db, 'billing'), where(documentId(), '>=', `cost-${from}`), where(documentId(), '<', 'cost-~')));
+      return snap.docs.map((d) => ({ ...(d.data() as CostDay), day: d.id.slice(5) }));
+    },
     async stopNow(): Promise<boolean> {
       const stop = httpsCallable<Record<string, never>, { stopped: boolean }>(functions, 'billingStop');
       return (await stop({})).data.stopped;

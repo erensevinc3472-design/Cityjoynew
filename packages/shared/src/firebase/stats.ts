@@ -6,7 +6,7 @@ import {
   where,
   type Firestore,
   type QueryConstraint,
-} from 'firebase/firestore';
+} from './metered';
 
 import { PENDING_STATUSES } from '../approvals/approvals';
 

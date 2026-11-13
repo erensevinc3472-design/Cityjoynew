@@ -9,6 +9,8 @@ import { handleBroadcastEstimate, handleBroadcastReview, handleBroadcastSend } f
 import { handleBudgetNotice, handleManualStop } from '../src/budget';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteExpiredViewLog, deleteUserLeftovers } from '../src/cleanup';
+import { handleCostReport, handleReportUsage, UsageError, type MonitoringFetch } from '../src/cost-report';
+import { isCostSampled } from '@cityjoy/shared';
 import { handlePostTags, handleRecordViews, removeTagsOf, ViewError, VIEW_LIMITS } from '../src/post-tags';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
@@ -957,5 +959,49 @@ describe('gönderide etiket ve izlenme', () => {
     // Günlük temizlik: süresi geçen kayıtlar.
     expect(await deleteExpiredViewLog(db, new Date(NOW.getTime() + 2.5 * 86_400_000))).toBe(2);
     expect(await deleteExpiredViewLog(db, new Date(NOW.getTime() + 4 * 86_400_000))).toBe(1);
+  });
+});
+
+describe('özelliklere göre harcama', () => {
+  const sampled = Array.from({ length: 500 }, (_, i) => `u${i}`).find((u) => isCostSampled(u))!;
+  const outside = Array.from({ length: 500 }, (_, i) => `u${i}`).find((u) => !isCostSampled(u))!;
+
+  it('örneklemdeki uygulamanın sayımı o günün kaydına eklenir; örneklem dışı ve bozuk rapor reddedilir', async () => {
+    await handleReportUsage(db, sampled, { reads: { posts: 10, follows: 3 }, writes: { posts: 1 } }, NOW);
+    await handleReportUsage(db, sampled, { reads: { posts: 5 } }, NOW);
+    const d = (await db.doc('billing/cost-20261101').get()).data();
+    expect(d?.client).toEqual({ reporters: 2, samplePct: 5, reads: { posts: 15, follows: 3 }, writes: { posts: 1 } });
+    await expect(handleReportUsage(db, outside, { reads: { posts: 1 } }, NOW)).rejects.toBeInstanceOf(UsageError);
+    await expect(handleReportUsage(db, sampled, { reads: { posts: -4 } }, NOW)).rejects.toBeInstanceOf(UsageError);
+  });
+
+  it('gece raporu: dünün sunucu kullanımı yazılır; Google okunamazsa hata not edilir, uygulama sayımı kalır', async () => {
+    const seen: string[] = [];
+    const monitor: MonitoringFetch = async (filter, _a, _g, start, end) => {
+      seen.push(`${start.toISOString()}|${end.toISOString()}`);
+      if (filter.includes('run.googleapis.com/request_count')) return [{ labels: { service_name: 'recordviews' }, value: 40 }];
+      if (filter.includes('billable_instance_time')) return [{ labels: { service_name: 'recordviews' }, value: 12.5 }];
+      if (filter.includes('execution_count')) return [{ labels: { function_name: 'userDeleted' }, value: 2 }];
+      if (filter.includes('read_ops')) return [{ labels: {}, value: 1000 }, { labels: {}, value: 500 }];
+      if (filter.includes('write_ops')) return [{ labels: {}, value: 80 }];
+      if (filter.includes('sent_bytes')) return [{ labels: {}, value: 2048 }];
+      if (filter.includes('total_bytes')) return [{ labels: {}, value: 4096 }];
+      return [];
+    };
+    // NOW = 1 Kasım 12.00 (Türkiye): dün = 31 Ekim.
+    await db.doc('billing/cost-20261031').set({ day: '20261031', client: { reporters: 1, samplePct: 5, reads: { posts: 1 }, writes: {} } });
+    expect(await handleCostReport(db, monitor, NOW)).toBe('20261031');
+    expect(seen[0]).toBe('2026-10-30T21:00:00.000Z|2026-10-31T21:00:00.000Z');
+    const d = (await db.doc('billing/cost-20261031').get()).data();
+    expect(d?.server).toEqual({
+      functions: { recordviews: { calls: 40, seconds: 12.5 }, userDeleted: { calls: 2, seconds: 2 } },
+      firestore: { reads: 1500, writes: 80, deletes: 0 },
+      storage: { egressBytes: 2048, storedBytes: 4096 },
+    });
+    expect(d?.client.reads.posts).toBe(1);
+    await handleCostReport(db, async () => { throw new Error('monitoring 403: izin yok'); }, NOW);
+    const e = (await db.doc('billing/cost-20261031').get()).data();
+    expect(e?.serverError).toContain('403');
+    expect(e?.server).toBeDefined();
   });
 });

@@ -6,6 +6,7 @@ import { firestore, functions } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { Intro } from '../components/intro';
+import { CostBreakdown } from '../components/cost-breakdown';
 
 const tl = (n: number) => `${n.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} TL`;
 const when = (s?: string) => (s ? new Date(s).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }) : '');
@@ -119,6 +120,8 @@ export function BillingPage() {
                   </div>
                 </div>
               )}
+
+              <CostBreakdown />
 
               <form className="form panel-form" onSubmit={saveCap}>
                 <fieldset className="form-section">

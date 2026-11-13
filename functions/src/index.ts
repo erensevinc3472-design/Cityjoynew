@@ -17,6 +17,7 @@ import { onObjectFinalized } from 'firebase-functions/v2/storage';
 import { handleAnnouncementWrite } from './announcements';
 import { BroadcastError, handleBroadcastEstimate, handleBroadcastReview, handleBroadcastSend, type Actor } from './broadcasts';
 import { handleBusinessPostWrite } from './business-posts';
+import { cloudMonitoring, handleCostReport, handleReportUsage, UsageError } from './cost-report';
 import { cloudBillingDisabler, handleBudgetNotice, handleManualStop, type BudgetNotice } from './budget';
 import { handleActivityChange, handleEventChange } from './cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteExpiredViewLog, deleteUserLeftovers } from './cleanup';
@@ -302,3 +303,20 @@ export const userDeleted = functionsV1
 // bilgiler (REVENUECAT_WEBHOOK_AUTH, REVENUECAT_API_KEY) Secret Manager'a girilince aşağıdaki satır açılır. Kapalıyken
 // Firebase yükleme sırasında bu gizli bilgileri istemez.
 // export { storeEvents } from './store-webhook';
+
+// Özelliklere göre harcama (Panel > Harcama; cost-report.ts): örneklemdeki uygulamalar sayım yollar, her gece sunucu
+// kullanımı Google Cloud Monitoring'den okunur.
+export const reportUsage = onCall({ maxInstances: 3 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  try {
+    await handleReportUsage(db, req.auth.uid, req.data, new Date());
+    return { ok: true };
+  } catch (e) {
+    if (e instanceof UsageError) throw new HttpsError('invalid-argument', e.code);
+    throw new HttpsError('internal', 'yapilamadi');
+  }
+});
+
+export const costReport = onSchedule({ schedule: 'every day 03:30', timeZone: 'Europe/Istanbul', maxInstances: 1, timeoutSeconds: 120 }, async () => {
+  await handleCostReport(db, cloudMonitoring(PROJECT), new Date());
+});

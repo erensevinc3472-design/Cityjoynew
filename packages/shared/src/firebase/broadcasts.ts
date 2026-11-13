@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, where, type DocumentData, type Firestore } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, where, type DocumentData, type Firestore } from './metered';
 import { httpsCallable, type Functions } from 'firebase/functions';
 
 import type { AnnouncementRegion } from '../announcements/announcements';

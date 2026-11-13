@@ -1,5 +1,5 @@
 import { httpsCallable, type Functions } from 'firebase/functions';
-import { collection, getDocs, limit, orderBy, query, Timestamp, where, type DocumentData, type Firestore } from 'firebase/firestore';
+import { collection, getDocs, limit, orderBy, query, Timestamp, where, type DocumentData, type Firestore } from './metered';
 
 import { PAYMENT_KINDS, type BusinessMembership, type Payment, type PaymentKind } from '../models/membership';
 import { membershipFrom } from './businesses';

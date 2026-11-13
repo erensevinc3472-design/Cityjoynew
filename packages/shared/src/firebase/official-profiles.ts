@@ -5,7 +5,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { cleanPhoto, photoFrom } from '../media/photo';
 import type { OfficialProfile, OfficialProfileInput, ProfileTarget } from '../organizations/profiles';

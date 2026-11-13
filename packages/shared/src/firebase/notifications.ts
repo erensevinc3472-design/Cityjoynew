@@ -1,4 +1,4 @@
-import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, writeBatch, type Firestore } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, writeBatch, type Firestore } from './metered';
 
 import {
   normalizeNotificationSettings,

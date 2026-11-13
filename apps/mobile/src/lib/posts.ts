@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { isPostListed, type Post } from '@cityjoy/shared';
 import type { FeedFilter } from '@cityjoy/shared/firebase';
@@ -105,12 +106,37 @@ export function forgetFeeds() {
 }
 
 /**
- * Kişinin beğendikleri ve kaydettikleri: oturum başına tek sorgu, sonra yerelde güncellenir. Her değişiklikte yeni nesne
+ * Kişinin beğendikleri ve kaydettikleri: telefonda saklanır, veritabanından günde en çok bir kez okunur (maliyet ilkesi,
+ * 13 Kasım 2026: önceden her açılışta 500'e kadar okuma), sonra yerelde güncellenir. Her değişiklikte yeni nesne
  * yazılır ve ekranlar useSyncExternalStore ile haber alır (React Compiler modül değişkenindeki değişikliği kendiliğinden
  * görmez; yoksa sayfa yenilenince kalpler boş kalabiliyordu). Açılışta okuma reddedilirse kısa süre sonra bir kez daha denenir.
  */
-function idStore(read: (uid: string) => Promise<Set<string>>) {
+const STORE_DAY_MS = 86_400_000;
+
+function idStore(name: string, readRemote: (uid: string) => Promise<Set<string>>) {
   let state: { uid: string; ids: Set<string> } | null = null;
+  const keyOf = (uid: string) => `cityjoy.${name}.${uid}`;
+  const persist = (uid: string, ids: Set<string>, at?: number) =>
+    AsyncStorage.getItem(keyOf(uid))
+      .then((raw) => {
+        const prev = raw ? (JSON.parse(raw) as { at?: number }) : {};
+        return AsyncStorage.setItem(keyOf(uid), JSON.stringify({ at: at ?? prev.at ?? 0, ids: [...ids] }));
+      })
+      .catch(() => {});
+  const read = async (uid: string): Promise<Set<string>> => {
+    const raw = await AsyncStorage.getItem(keyOf(uid)).catch(() => null);
+    if (raw) {
+      try {
+        const saved = JSON.parse(raw) as { at: number; ids: string[] };
+        if (Date.now() - saved.at < STORE_DAY_MS && Array.isArray(saved.ids)) return new Set(saved.ids);
+      } catch {
+        // Bozuk kayıt: veritabanından okunur.
+      }
+    }
+    const ids = await readRemote(uid);
+    persist(uid, ids, Date.now());
+    return ids;
+  };
   const loading = new Set<string>();
   const listeners = new Set<() => void>();
   const subscribe = (l: () => void) => {
@@ -159,12 +185,13 @@ function idStore(read: (uid: string) => Promise<Set<string>>) {
       if (on) next.add(id);
       else next.delete(id);
       publish({ uid, ids: next });
+      persist(uid, next);
     },
   };
 }
 
-const likedStore = idStore((uid) => postRepository.likedIds(uid));
-const savedStore = idStore((uid) => postRepository.savedIds(uid));
+const likedStore = idStore('liked', (uid) => postRepository.likedIds(uid));
+const savedStore = idStore('saved', (uid) => postRepository.savedIds(uid));
 
 export function useLiked(uid: string | undefined) {
   return likedStore.use(uid);

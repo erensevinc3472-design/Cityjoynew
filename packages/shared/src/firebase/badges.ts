@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, limit, query, serverTimestamp, where, writeBatch, type Firestore } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, query, serverTimestamp, where, writeBatch, type Firestore } from './metered';
 
 import { BADGE_LIMITS, cleanBadgeDefinitions, DEFAULT_BADGES, type BadgeDefinition } from '../posts/badges';
 import type { PublicProfile } from '../posts/social';

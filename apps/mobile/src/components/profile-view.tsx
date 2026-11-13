@@ -44,6 +44,7 @@ import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { rememberProfile, rememberProfilePhoto } from '@/lib/profile-photos';
 import { refreshFollowing, setBlocked, setMyProfile, useSocial } from '@/lib/social';
+import { loadMutual } from '@/lib/mutual';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { errorText } from '@/lib/limits';
@@ -81,7 +82,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const { language } = useSettings();
   const lang = language ?? 'tr';
   const { user } = useSession();
-  const { blocked } = useSocial();
+  const { blocked, following } = useSocial();
   const own = !!user && user.uid === uid;
   const [profile, setProfile] = useState<PublicProfile | null | undefined>(undefined);
   const [counts, setCounts] = useState<{ followers: number; following: number } | null>(null);
@@ -137,16 +138,20 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     setFollow(f);
     setBlockedMe(b);
     socialRepository.hasReportedProfile(uid, user.uid).then(setReported);
-    if (!b) {
-      socialRepository
-        .mutualFollowers(user.uid, uid)
-        .then(async (uids) => setMutual(uids.length ? { uids, top: await socialRepository.profilesOf(uids.slice(0, 3)) } : null))
-        .catch(() => setMutual(null));
-    }
     if (b || (p.isPrivate && f !== 'aktif')) return setPosts([]);
     postRepository.byAuthor(uid, f === 'aktif').then((l) => setPosts(l.filter((x) => isPostListed(x) && !x.business)), () => setPosts([]));
     postRepository.pinnedByAuthor(uid, f === 'aktif').then((l) => setPinned(l.filter((x) => isPostListed(x) && !x.business)), () => setPinned([]));
   }, [uid, user, own]);
+
+  // Ortak takipçiler: oturumdaki takip listemle, sonuç telefonda bir gün saklanır (lib/mutual).
+  useEffect(() => {
+    if (own || !user || !following || blockedMe) return;
+    let alive = true;
+    loadMutual(user.uid, uid, following).then((m) => alive && setMutual(m), () => alive && setMutual(null));
+    return () => {
+      alive = false;
+    };
+  }, [uid, user, own, following, blockedMe]);
 
   useEffect(() => {
     load();
