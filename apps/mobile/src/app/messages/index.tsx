@@ -70,10 +70,10 @@ export default function MessagesScreen() {
     <View style={[styles.root, { backgroundColor: c.background }]}>
       <TopBar
         title={title}
-        left={<RoundButton icon="arrow-back" label={t('common.back')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/me'))} />}
-        right={user ? <RoundButton icon="edit-square" label={t('messages.newMessage')} onPress={() => router.push('/messages/new')} /> : undefined} />
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]} keyboardShouldPersistTaps="handled">
-        <SearchField value={find} onChangeText={setFind} placeholder={t('messages.searchChats')} />
+        left={<RoundButton square icon="arrow-back" label={t('common.back')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/me'))} />}
+        right={user ? <RoundButton square icon="edit-square" label={t('messages.newMessage')} onPress={() => router.push('/messages/new')} /> : undefined} />
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xl }]} keyboardShouldPersistTaps="handled">
+        <SearchField square value={find} onChangeText={setFind} placeholder={t('messages.searchChats')} />
         <Chips<InboxSection>
           label={t('messages.title')}
           value={tab}

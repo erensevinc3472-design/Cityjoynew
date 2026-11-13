@@ -2573,6 +2573,7 @@
   },
   "needs": {
     "title": "Diğer ihtiyaçlar",
+    "subtitle": "Durumuna göre hazır listeler: yeni taşındım, hastayım, tatildeyim…",
     "empty": "Bu durum için henüz hizmet seçilmedi.",
     "note": "Listeler bu durumda en çok aranan hizmetlerden oluşur. Aradığını bulamazsan Acil İhtiyaçlar'daki aramayı kullan.",
     "items": {

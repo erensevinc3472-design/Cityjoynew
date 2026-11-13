@@ -81,7 +81,7 @@ export default function PostScreen() {
 
   return (
     <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         <PostCard item={item} liked={isLiked(item.id)} full onLike={busy ? undefined : like} onAuthor={() => router.push(authorHref(item))} />
         {error ? <FormMessage kind="error" text={error} /> : null}
         <View style={styles.row}>

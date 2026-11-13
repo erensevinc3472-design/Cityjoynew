@@ -115,7 +115,7 @@ export default function InstitutionsScreen() {
 
   return (
     <Screen bleed>
-      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {head}
         {error ? <StateMessage kind="error" message={t('city.loadError')} onRetry={retry} /> : null}
         <View style={styles.grid}>

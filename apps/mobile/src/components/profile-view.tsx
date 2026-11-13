@@ -315,7 +315,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   return (
     <View style={[styles.root, { backgroundColor: c.background }]}>
       {top(profile.displayName, right)}
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.scroll}>
         <View style={styles.pad}>
           {/* Profil başı: halkalı harf, yanında gönderi / takipçi / takip sayıları. */}
           <View style={styles.head}>

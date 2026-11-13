@@ -77,7 +77,7 @@ export default function MunicipalitiesScreen() {
 
   return (
     <Screen bleed>
-      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false}>
         {header}
         <SearchField value={query} onChangeText={setQuery} placeholder={t('city.townhallSearch')} />
 

@@ -113,7 +113,7 @@ export default function ServiceCategoryScreen() {
 
   return (
     <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         {category?.urgent || profile ? (
           <View style={[styles.warning, category?.urgent ? { backgroundColor: c.dangerSoft, borderColor: c.danger } : { backgroundColor: c.accentSoft, borderColor: c.accentBorder }]}>
             <MaterialIcons name={(category?.urgent ? 'warning-amber' : 'info-outline') as IconName} size={22} color={category?.urgent ? c.danger : c.primary} />

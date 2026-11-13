@@ -13,6 +13,7 @@ export function SearchField({
   onSubmitEditing,
   compact,
   glass,
+  square,
 }: {
   value: string;
   onChangeText(v: string): void;
@@ -23,13 +24,15 @@ export function SearchField({
   compact?: boolean;
   /** Fotoğrafın üstünde duran cam kutu (koyu modda yarı saydam, ince açık çerçeve). */
   glass?: boolean;
+  /** Köşeleri yumuşak kare (Mesajlar; sayfadaki kartlarla aynı). */
+  square?: boolean;
 }) {
   const c = useThemeColors();
   const { rtl } = useSettings();
   const dark = useResolvedScheme() === 'dark';
   const bg = glass && dark ? { backgroundColor: 'rgba(8, 32, 36, 0.55)', borderColor: 'rgba(235, 248, 245, 0.22)' } : { backgroundColor: c.surfaceStrong, borderColor: c.border };
   return (
-    <View style={[styles.box, compact && styles.compact, glass && styles.glass, bg]}>
+    <View style={[styles.box, compact && styles.compact, glass && styles.glass, square && styles.square, bg]}>
       <MaterialIcons name="search" size={compact || glass ? 19 : 22} color={c.textMuted} />
       <TextInput
         value={value}
@@ -59,6 +62,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
   },
+  square: { borderRadius: radius.md },
   glass: { minHeight: MIN_TOUCH, paddingHorizontal: 14 },
   compact: { minHeight: MIN_TOUCH, paddingHorizontal: 14 },
   compactInput: { fontSize: 14, paddingVertical: 10 },

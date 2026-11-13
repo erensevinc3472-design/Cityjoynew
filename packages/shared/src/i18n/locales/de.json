@@ -2573,6 +2573,7 @@
   },
   "needs": {
     "title": "Weitere Anliegen",
+    "subtitle": "Fertige Listen für deine Lage: neu umgezogen, krank, im Urlaub…",
     "empty": "Für diese Situation sind noch keine Dienste ausgewählt.",
     "note": "Die Listen zeigen die in dieser Lage meistgesuchten Dienste. Findest du nichts, nutze die Suche unter Dringende Anliegen.",
     "items": {

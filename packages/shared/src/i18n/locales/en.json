@@ -2573,6 +2573,7 @@
   },
   "needs": {
     "title": "Other needs",
+    "subtitle": "Ready-made lists for your situation: just moved, ill, on holiday…",
     "empty": "No services chosen for this situation yet.",
     "note": "These lists show the services most searched for in this situation. If you can't find yours, use the search in Urgent Needs.",
     "items": {

@@ -141,7 +141,7 @@ export default function CarsiScreen() {
 
   return (
     <Screen bleed>
-      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
         {header}
         <SearchField value={query} onChangeText={(v) => (setQuery(v), v.trim() ? null : setSearched(''))} placeholder={t('carsi.searchPlaceholder')} onSubmitEditing={() => setSearched(query.trim())} />
         <Chips<KindFilter>

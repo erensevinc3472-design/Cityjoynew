@@ -16,6 +16,8 @@ export interface HeaderAction {
   onPress(): void;
   /** Okunmamış bir şey varsa küçük nokta (ör. bildirim zili). */
   badge?: boolean;
+  /** Yuvarlak yerine köşeleri yumuşak kare (Mesajlar; sayfadaki sohbet kartlarıyla aynı). */
+  square?: boolean;
 }
 
 interface Props {
@@ -107,10 +109,10 @@ export function HeroHeader({ title, subtitle, onBack, left, right, compact, seri
   );
 }
 
-export function RoundButton({ icon, label, onPress, badge }: HeaderAction) {
+export function RoundButton({ icon, label, onPress, badge, square }: HeaderAction) {
   const c = useThemeColors();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={4} style={({ pressed }) => [styles.round, { backgroundColor: c.heroChip, opacity: pressed ? 0.7 : 1 }]}>
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={4} style={({ pressed }) => [styles.round, square && { borderRadius: radius.md }, { backgroundColor: c.heroChip, opacity: pressed ? 0.7 : 1 }]}>
       <MaterialIcons name={icon} size={21} color={c.heroText} />
       {badge ? <View style={[styles.badge, { backgroundColor: c.heroAccent, borderColor: c.heroChip }]} /> : null}
     </Pressable>

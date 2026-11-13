@@ -51,25 +51,65 @@ export default function WelcomeScreen() {
     Animated.parallel(fades.map((v, i) => Animated.timing(v, { toValue: i === slide ? 1 : 0, duration: 1200, useNativeDriver: true }))).start();
   }, [slide, fades]);
 
+  // Boşta tutamaç hafifçe ileri kayıp döner: "kaydır" diye davet eder (hareketi azalt açıksa durur).
+  const hint = useRef(new Animated.Value(0)).current;
+  const press = useRef(new Animated.Value(1)).current;
+  const hintLoop = useRef<Animated.CompositeAnimation | null>(null);
+  useEffect(() => {
+    if (reduce) return;
+    hintLoop.current = Animated.loop(
+      Animated.sequence([
+        Animated.delay(1400),
+        Animated.timing(hint, { toValue: 14, duration: 380, useNativeDriver: true }),
+        Animated.spring(hint, { toValue: 0, friction: 4, tension: 90, useNativeDriver: true }),
+      ]),
+    );
+    hintLoop.current.start();
+    return () => hintLoop.current?.stop();
+  }, [reduce, hint]);
+
   // Sıra (13. madde 35): karşılama > dil seçimi > kayıt.
+  const startRef = useRef(() => {});
   const start = () => router.push({ pathname: '/language', params: { next: 'sign-up' } });
+  startRef.current = start;
+  // Tutamaç dokunuşu kendisi alır (eskiden üstteki düğme dokunuşu önce kaptığı için sürükleme çoğu zaman başlamıyordu).
   const pan = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 4,
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: () => {
+        hintLoop.current?.stop();
+        hint.setValue(0);
+        Animated.spring(press, { toValue: 0.92, useNativeDriver: true }).start();
+      },
       onPanResponderMove: (_, g) => drag.setValue(Math.max(0, Math.min(maxRef.current, rtl ? -g.dx : g.dx))),
       onPanResponderRelease: (_, g) => {
+        Animated.spring(press, { toValue: 1, useNativeDriver: true }).start();
         const d = rtl ? -g.dx : g.dx;
+        // Sürüklemeden dokunmak da başlatır.
+        if (Math.abs(g.dx) < 6 && Math.abs(g.dy) < 6) {
+          startRef.current();
+          return;
+        }
         if (d > maxRef.current * 0.7) {
           Animated.timing(drag, { toValue: maxRef.current, duration: 120, useNativeDriver: true }).start(() => {
-            start();
+            startRef.current();
             drag.setValue(0);
+            hintLoop.current?.start();
           });
         } else {
-          Animated.spring(drag, { toValue: 0, useNativeDriver: true }).start();
+          Animated.spring(drag, { toValue: 0, useNativeDriver: true }).start(() => hintLoop.current?.start());
         }
+      },
+      onPanResponderTerminate: () => {
+        Animated.spring(press, { toValue: 1, useNativeDriver: true }).start();
+        Animated.spring(drag, { toValue: 0, useNativeDriver: true }).start();
       },
     }),
   ).current;
+  const moved = Animated.add(drag, hint);
+  const dir = rtl ? -1 : 1;
 
   // Giriş yapmış kullanıcı karşılama ekranında kalmaz.
   if (user) return <Redirect href="/" />;
@@ -100,20 +140,29 @@ export default function WelcomeScreen() {
               <View key={i} style={[styles.bar, { backgroundColor: i === slide ? c.heroAccent : 'rgba(255, 255, 255, 0.25)', flex: i === slide ? 2 : 1 }]} />
             ))}
           </View>
-          <Pressable
+          <View
+            accessible
             accessibilityRole="button"
             accessibilityLabel={t('auth.slideToStart')}
             accessibilityHint={t('auth.slideToStartHint')}
-            onPress={start}
+            accessibilityActions={[{ name: 'activate' }]}
+            onAccessibilityAction={start}
             onLayout={(e) => setTrackW(e.nativeEvent.layout.width)}
             style={styles.track}>
+            {/* Tutamacın arkasında kalan altın iz (tasarımdaki gibi), tutamaçla birlikte uzar. */}
+            {trackW ? (
+              <Animated.View
+                pointerEvents="none"
+                style={[styles.trail, { width: trackW, backgroundColor: c.heroAccent, [rtl ? 'right' : 'left']: HANDLE + 4 - trackW, transform: [{ translateX: Animated.multiply(moved, dir) }] }]}
+              />
+            ) : null}
             <AppText style={styles.trackText}>{t('auth.slideToStart')}</AppText>
             <Animated.View
               {...pan.panHandlers}
-              style={[styles.handle, { backgroundColor: c.heroAccent, [rtl ? 'right' : 'left']: 4, transform: [{ translateX: rtl ? Animated.multiply(drag, -1) : drag }] }]}>
+              style={[styles.handle, { backgroundColor: c.heroAccent, [rtl ? 'right' : 'left']: 4, transform: [{ translateX: Animated.multiply(moved, dir) }, { scale: press }] }]}>
               <MaterialIcons name={rtl ? 'arrow-back' : 'arrow-forward'} size={24} color="#1A1408" />
             </Animated.View>
-          </Pressable>
+          </View>
           <Pressable accessibilityRole="button" onPress={() => router.push('/sign-in')} hitSlop={8} style={styles.signIn}>
             <AppText style={[styles.signInText, { color: c.heroAccent }]}>{t('auth.haveAccount')}</AppText>
           </Pressable>
@@ -137,8 +186,9 @@ const styles = StyleSheet.create({
   bottom: { gap: spacing.md },
   bars: { flexDirection: 'row', gap: 6 },
   bar: { height: 4, borderRadius: 2 },
-  track: { height: HANDLE + 8, borderRadius: radius.pill, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.18)', justifyContent: 'center' },
+  track: { height: HANDLE + 8, overflow: 'hidden', borderRadius: radius.pill, backgroundColor: 'rgba(255, 255, 255, 0.1)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.18)', justifyContent: 'center' },
   trackText: { textAlign: 'center', fontFamily: fonts.bodySemi, fontSize: 15, color: white, letterSpacing: 0.3 },
+  trail: { position: 'absolute', top: 0, bottom: 0, opacity: 0.28, borderRadius: radius.pill },
   handle: { position: 'absolute', top: 4, width: HANDLE, height: HANDLE, borderRadius: HANDLE / 2, alignItems: 'center', justifyContent: 'center' },
   signIn: { alignSelf: 'center', minHeight: 44, justifyContent: 'center' },
   signInText: { fontFamily: fonts.bodySemi, fontSize: 14, textAlign: 'center' },

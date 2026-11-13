@@ -169,7 +169,7 @@ export default function LocationScreen() {
 
       <SearchField value={query} onChangeText={setQuery} placeholder={t(`location.${searchKey[step]}`)} />
 
-      <FlatList
+      <FlatList automaticallyAdjustKeyboardInsets
         data={visible ?? []}
         keyExtractor={(r) => r.id}
         keyboardShouldPersistTaps="handled"

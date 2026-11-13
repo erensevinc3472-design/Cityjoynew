@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import type { PropsWithChildren, ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 
 import { spacing } from '@/theme/tokens';
 import { AppText } from './app-text';
@@ -13,12 +13,12 @@ export function FormScreen({ title, subtitle, showBack = true, footer, children 
   const canBack = showBack && router.canGoBack();
   return (
     <Screen header={<HeroHeader title={title} onBack={canBack ? () => router.back() : undefined} />} footer={footer}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          {subtitle ? <AppText muted>{subtitle}</AppText> : null}
-          {children}
-        </ScrollView>
-      </KeyboardAvoidingView>
+      {/* iPhone: klavye açılınca kaydırma alanı klavyenin gerçek yerine göre boşluk bırakır, odaktaki kutu görünür kalır
+          (KeyboardAvoidingView üstteki başlığı hesaba katmadığı için kutular klavyenin altında kalabiliyordu). */}
+      <ScrollView style={styles.flex} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} automaticallyAdjustKeyboardInsets>
+        {subtitle ? <AppText muted>{subtitle}</AppText> : null}
+        {children}
+      </ScrollView>
     </Screen>
   );
 }

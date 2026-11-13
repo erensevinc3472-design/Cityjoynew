@@ -36,7 +36,7 @@ export function OccupationPicker({ visible, options, selectedId, onSelect, onClo
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <Screen header={<HeroHeader title={t('profile.selectOccupation')} onBack={onClose} />}>
         <SearchField value={query} onChangeText={setQuery} placeholder={t('profile.searchOccupation')} />
-        <FlatList
+        <FlatList automaticallyAdjustKeyboardInsets
           data={rows ?? []}
           keyExtractor={(o) => o.id}
           keyboardShouldPersistTaps="handled"

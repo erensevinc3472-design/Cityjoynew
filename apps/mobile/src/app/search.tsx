@@ -437,7 +437,7 @@ export default function SearchScreen() {
         </View>
 
         {open ? (
-      <ScrollView style={[styles.sheet, { backgroundColor: c.background }]} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView automaticallyAdjustKeyboardInsets style={[styles.sheet, { backgroundColor: c.background }]} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {!query ? (
           <>
             {recent.list.length ? (

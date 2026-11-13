@@ -11,8 +11,9 @@ import { useThemeColors } from '@/theme/use-theme';
 import { AppText } from './app-text';
 
 /**
- * Keşfet üst çubuğunda menünün yanındaki küçük "Senin için ⌄" düğmesi (Eren, 12 Kasım 2026: "çok göze batmasın, ufak
- * bir buton olsun, basınca seçim yapılsın"). Alttan açılan küçük pencerede iki seçenek ve "Nasıl sıralanıyor?".
+ * Keşfet üst çubuğunda menünün yanındaki yuvarlak sıralama düğmesi: yazı yok, yalnızca simge (✦ Senin için, saat En
+ * yeni). Eren, 12 Kasım 2026: "çok göze batmasın, ufak bir buton olsun, basınca seçim yapılsın"; 13 Kasım: "yazmasın
+ * sadece simge olsun". Alttan açılan küçük pencerede iki seçenek ve "Nasıl sıralanıyor?".
  */
 export function FeedSortButton() {
   const { t } = useTranslation();
@@ -34,8 +35,7 @@ export function FeedSortButton() {
         onPress={() => setOpen(true)}
         hitSlop={6}
         style={({ pressed }) => [styles.pill, { backgroundColor: c.heroChip, opacity: pressed ? 0.7 : 1 }]}>
-        <AppText numberOfLines={1} style={[styles.pillText, { color: c.heroText }]}>{t(`explore.sort.${sort}`)}</AppText>
-        <MaterialIcons name="expand-more" size={16} color={c.heroMuted} />
+        <MaterialIcons name={sort === 'senin-icin' ? 'auto-awesome' : 'schedule'} size={20} color={c.heroText} />
       </Pressable>
       <Modal visible={open} transparent animationType="fade" onRequestClose={close} statusBarTranslucent>
         <View style={styles.root}>
@@ -79,8 +79,7 @@ export function FeedSortButton() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  pill: { flexDirection: 'row', alignItems: 'center', gap: 2, height: 32, paddingStart: 10, paddingEnd: 6, borderRadius: radius.pill, maxWidth: 120 },
-  pillText: { flexShrink: 1, fontFamily: fonts.bodySemi, fontSize: 12.5 },
+  pill: { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   root: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
   sheet: { borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: GUTTER, paddingTop: spacing.sm, gap: spacing.sm },

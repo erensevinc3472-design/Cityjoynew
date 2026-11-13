@@ -57,6 +57,9 @@ const SHOW_AFTER = 60;
  * Mahallem / Bölgesel / Genel / Takip: dört simgeli cam düğme, parmakla sağa sola kaydırınca sekme değişir. Etiketlerle
  * (#Soru, #Kayıp...) süzülür. Acil duyurular akışın en üstünde. Engellediklerimin gönderileri hiçbir sekmede görünmez.
  */
+/** Uygulama açık kaldıkça son seçilen Keşfet sekmesi. */
+let lastTab = 0;
+
 export default function ExploreScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -64,11 +67,16 @@ export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const { user } = useSession();
-  const [index, setIndex] = useState(0);
+  // Son açık sekme hatırlanır: başka sayfaya gidip dönünce aynı sekmeden devam eder (Eren, 13 Kasım 2026).
+  const [index, setIndexState] = useState(lastTab);
+  const setIndex = (i: number) => {
+    lastTab = i;
+    setIndexState(i);
+  };
   // Açık sekme ve yanındakiler hazır tutulur: kaydırırken boş sayfa görünmez.
-  const [visited, setVisited] = useState<Set<number>>(() => new Set([0, 1]));
+  const [visited, setVisited] = useState<Set<number>>(() => new Set([lastTab - 1, lastTab, lastTab + 1].filter((i) => i >= 0 && i < POST_TARGETS.length)));
   // Sekme çubuğundaki altın gösterge parmağı izler (sayfa kaydıkça kayar).
-  const scrollX = useRef(new Animated.Value(0)).current;
+  const scrollX = useRef(new Animated.Value(lastTab * width)).current;
   const [tabsW, setTabsW] = useState(0);
   const rtl = I18nManager.isRTL;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -191,6 +199,7 @@ export default function ExploreScreen() {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
+        initialScrollIndex={index}
         onScroll={(e) => scrollX.setValue(e.nativeEvent.contentOffset.x)}
         scrollEventThrottle={16}
         decelerationRate="fast"

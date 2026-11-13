@@ -52,7 +52,7 @@ export default function ServicesScreen() {
 
   return (
     <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <SearchField value={query} onChangeText={setQuery} placeholder={t('services.search')} />
         {stale ? <AppText variant="caption" muted>{t('services.cachedNote')}</AppText> : null}
         {shown.length === 0 ? <StateMessage kind="empty" message={t('services.noMatch')} /> : null}
