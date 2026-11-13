@@ -180,7 +180,7 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
       <View style={styles.body}>
         {photos.length ? (
           <View style={styles.photos}>
-            <PostPhotos photos={photos} maxWidth={640} onTap={tapBody} />
+            <PostPhotos photos={photos} maxWidth={640} onTap={tapBody} edits={item.edits} />
             {/* Kategori etiketi fotoğrafın üstünde (13. madde 35, Keşfet önizlemesi). */}
             <View pointerEvents="none" style={styles.photoTag}>
               <AppText style={styles.photoTagText}>{t(`explore.categories.${item.category}`)}</AppText>
@@ -188,7 +188,7 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
           </View>
         ) : item.video ? (
           <View style={styles.photos}>
-            <PostVideoView video={item.video} maxWidth={640} active={videoActive} onOpen={onOpenVideo} />
+            <PostVideoView video={item.video} maxWidth={640} active={videoActive} onOpen={onOpenVideo} edit={item.edits?.[0]} />
           </View>
         ) : null}
         {item.text ? (

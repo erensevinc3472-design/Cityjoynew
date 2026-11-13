@@ -166,6 +166,24 @@ describe('Keşfet gönderileri', () => {
     x = r.newId();
     const photo = { path: `posts/ayse/${x}/0.jpg`, url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${x}%2F0.jpg?alt=media&token=t`, width: 10, height: 10 };
     await assertFails(raw(x, { video: video(x), photos: [photo] }));
+    // Paylaşım düzenleyicisi: kapak karesi ve düzenlemeler (en çok 10) yazılır; uygulama kapağı yalnızca aynı klasördeyse gösterir.
+    const ed = r.newId();
+    const poster = `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${ed}%2Fcover.jpg?alt=media&token=t`;
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', video: { ...video(ed), poster }, edits: [{ items: [{ kind: 'yazi', x: 0.5, y: 0.4, scale: 1, rotation: 0, text: 'Akşam', font: 'modern', color: '#FFFFFF', bg: 'yok', bgColor: '#111111', align: 'center', size: 0.08 }], muted: true, trimStart: 2, trimEnd: 20 }] }), undefined, ed));
+    const got = await r.get(ed);
+    expect(got?.video?.poster).toBe(poster);
+    expect(got?.edits?.[0]).toMatchObject({ muted: true, trimStart: 2, trimEnd: 20 });
+    x = r.newId();
+    await assertFails(raw(x, { video: { ...video(x), poster: 5 } }));
+    x = r.newId();
+    await assertFails(raw(x, { video: video(x), edits: Array.from({ length: 11 }, () => null) }));
+    x = r.newId();
+    await assertFails(raw(x, { video: video(x), edits: 'x' }));
+    await assertSucceeds(r.remove(ed));
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const d = (await getDoc(doc(ctx.firestore(), 'posts', ed))).data() ?? {};
+      expect('edits' in d || 'video' in d).toBe(false);
+    });
     await assertSucceeds(r.remove(ok));
     await env.withSecurityRulesDisabled(async (ctx) => {
       expect('video' in ((await getDoc(doc(ctx.firestore(), 'posts', ok))).data() ?? {})).toBe(false);

@@ -1463,7 +1463,8 @@
       "progress": "Video ilerlemesi",
       "end": "Şimdilik başka video yok",
       "backToFeed": "Akışa dön",
-      "swipeClose": "Kapatmak için sağa kaydır"
+      "swipeClose": "Kapatmak için sağa kaydır",
+      "silent": "Sessiz video"
     },
     "verifiedBusiness": "Doğrulanmış işletme",
     "seeComments": "{{count}} yorumun tümünü gör",
@@ -2846,5 +2847,87 @@
     "title": "Bildirim",
     "muhtar": "Muhtarlık",
     "note": "Bu bildirim seçtiğin bölgeye gönderildi. Hangi bildirimleri alacağını Hesabım > Bildirimler'den seçebilirsin."
+  },
+  "editor": {
+    "done": "Bitti",
+    "next": "İleri",
+    "edit": "Düzenle",
+    "close": "Kapat",
+    "cancel": "Vazgeç",
+    "back": "Geri",
+    "add": "Ekle",
+    "undo": "Geri al",
+    "discard": "Yaptığın düzenlemeler silinsin mi?",
+    "discardYes": "Sil",
+    "duration": "Süre {{time}}",
+    "text": "Yazı",
+    "textPlaceholder": "Bir şey yaz…",
+    "size": "Yazı boyutu",
+    "colors": "Renkler",
+    "align": "Hizalama",
+    "textColor": "Yazı rengi",
+    "background": "Alt zemin",
+    "backgroundColor": "Zemin rengi",
+    "bg": {
+      "yok": "Yok",
+      "dolu": "Dolu",
+      "yari": "Yarı saydam"
+    },
+    "fonts": {
+      "modern": "Modern",
+      "klasik": "Klasik",
+      "el": "El yazısı",
+      "kalin": "KALIN",
+      "daktilo": "Daktilo"
+    },
+    "tools": {
+      "text": "Yazı",
+      "sticker": "Çıkartma",
+      "draw": "Çizim",
+      "trim": "Kırp",
+      "crop": "Kırp / Döndür",
+      "soundOn": "Ses açık",
+      "soundOff": "Ses kapalı",
+      "cover": "Kapak"
+    },
+    "stickers": {
+      "search": "Çıkartma ara…",
+      "emoji": "Emoji",
+      "konum": "Konum",
+      "bahset": "Bahset",
+      "saat": "Saat",
+      "hava": "Hava",
+      "tarih": "Tarih",
+      "etiket": "Etiket",
+      "tagPlaceholder": "etiket",
+      "mentionPlaceholder": "Kişi ara"
+    },
+    "drawArea": "Çizim alanı",
+    "draw": {
+      "kalem": "Kalem",
+      "fosforlu": "Fosforlu kalem",
+      "silgi": "Silgi",
+      "width": "Kalınlık {{n}}"
+    },
+    "video": {
+      "trimTitle": "Kırp · {{from}} – {{to}} ({{n}} sn)",
+      "start": "Başlangıç",
+      "end": "Bitiş",
+      "sound": "Videonun sesi",
+      "cover": "Kapak karesi",
+      "choose": "Seç",
+      "coverTitle": "Kapak karesi",
+      "coverAt": "Kare {{time}}",
+      "coverNote": "Akışta video oynamadan önce bu kare görünür."
+    },
+    "crop": {
+      "title": "Kırp / Döndür",
+      "move": "Kırpma alanını kaydır",
+      "orijinal": "Orijinal",
+      "kare": "Kare",
+      "dikey": "4:5",
+      "yatay": "Yatay",
+      "rotate": "Döndür"
+    }
   }
 }

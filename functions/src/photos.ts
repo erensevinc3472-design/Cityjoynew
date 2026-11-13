@@ -5,7 +5,7 @@ export type DeleteFiles = (prefix: string) => Promise<void>;
 
 /**
  * Gönderi kaldırılınca (sahibi ya da moderatör) fotoğraf ve video dosyaları silinir; moderatör kaldırdıysa kayıttaki
- * fotoğraf ve video alanları da boşaltılır. Dosyası olmayan ya da zaten temizlenmiş gönderide bir şey yapmaz.
+ * fotoğraf, video ve düzenleyici (yazı/çıkartma) alanları da boşaltılır. Dosyası olmayan ya da zaten temizlenmiş gönderide bir şey yapmaz.
  */
 export async function handlePostPhotos(db: Firestore, id: string, before: DocumentData | undefined, after: DocumentData | undefined, deleteFiles: DeleteFiles): Promise<boolean> {
   const hadFiles = !!before && ((Array.isArray(before.photos) && before.photos.length > 0) || !!before.video);
@@ -13,7 +13,7 @@ export async function handlePostPhotos(db: Firestore, id: string, before: Docume
   const removed = !after || after.status === 'kaldirildi' || (!Array.isArray(after.photos) && !after.video);
   if (!removed) return false;
   await deleteFiles(`posts/${before!.authorUid}/${id}/`);
-  if (after && ('photos' in after || 'video' in after)) await db.doc(`posts/${id}`).update({ photos: FieldValue.delete(), video: FieldValue.delete() });
+  if (after && ('photos' in after || 'video' in after || 'edits' in after)) await db.doc(`posts/${id}`).update({ photos: FieldValue.delete(), video: FieldValue.delete(), edits: FieldValue.delete() });
   return true;
 }
 

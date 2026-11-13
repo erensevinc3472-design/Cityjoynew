@@ -1,11 +1,13 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView, type VideoPlayer } from 'expo-video';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import type { PostVideo } from '@cityjoy/shared';
+import { playRange, type MediaEdit, type PostVideo } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
+import { MediaOverlay } from '@/components/media-overlay';
 
 /** Videonun oranı fotoğraflardaki gibi sınırlanır: en uzun 4:5 dik, en geniş 16:9 yatay. */
 export const ratioOf = (v: Pick<PostVideo, 'width' | 'height'>) => (v.width > 0 && v.height > 0 ? Math.min(16 / 9, Math.max(0.8, v.width / v.height)) : 0.8);
@@ -53,6 +55,39 @@ export function useResumingPlayer(url: string, setup: (p: VideoPlayer) => void):
   return player;
 }
 
+/**
+ * Düzenleyicide kırpılan video yalnızca seçilen aralıkta döner; sessiz paylaşılan video hep sessizdir (dosyaya işlenmez,
+ * oynatırken uygulanır). Dönen aralığı verir.
+ */
+export function useEditPlayback(player: VideoPlayer, edit: MediaEdit | null | undefined, durationSec: number) {
+  const range = playRange(edit, durationSec);
+  const trimmed = edit?.trimStart !== undefined;
+  const muted = edit?.muted === true;
+  useEffect(() => {
+    if (!trimmed) return;
+    if (player.currentTime < range.start || player.currentTime > range.end) player.currentTime = range.start;
+    const sub = player.addListener('timeUpdate', (e) => {
+      if (e.currentTime >= range.end - 0.1 || e.currentTime < range.start - 0.5) player.currentTime = range.start;
+    });
+    return () => sub.remove();
+  }, [player, trimmed, range.start, range.end]);
+  useEffect(() => {
+    if (!muted) return;
+    player.muted = true;
+    const sub = player.addListener('mutedChange', () => {
+      if (!player.muted) player.muted = true;
+    });
+    return () => sub.remove();
+  }, [player, muted]);
+  return range;
+}
+
+/** Görünen süre: kırpıldıysa seçilen kısmın uzunluğu. */
+export const editedDuration = (video: PostVideo, edit: MediaEdit | null | undefined) => {
+  const r = playRange(edit, video.durationSec);
+  return Math.max(1, Math.round(r.end - r.start));
+};
+
 // Akıştaki ses tercihi bütün videolarda ortak: biri sesi açınca sonrakiler de sesli oynar (uygulama açıkken).
 let feedMuted = true;
 const muteListeners = new Set<(m: boolean) => void>();
@@ -83,62 +118,71 @@ interface Props {
    */
   active?: boolean;
   onOpen?(): void;
+  /** Düzenleyici: yazı, çıkartma, kırpma, ses. */
+  edit?: MediaEdit | null;
 }
 
 /**
  * Gönderi videosu. Akışta (onOpen verilmişse) yukarıdaki gibi; gönderi sayfasında önce süreyle birlikte oynat düğmesi
  * görünür, dokununca oynatıcı açılır (ses, durdurma, tam ekran oynatıcının kendi düğmeleriyle).
  */
-export function PostVideoView({ video, maxWidth, active, onOpen }: Props) {
+export function PostVideoView({ video, maxWidth, active, onOpen, edit }: Props) {
   const { t } = useTranslation();
   const { width: screen } = useWindowDimensions();
   const width = Math.min(screen, maxWidth);
   const height = Math.round(width / ratioOf(video));
   const [started, setStarted] = useState(false);
+  const duration = editedDuration(video, edit);
+  const overlay = <MediaOverlay edit={edit} frameW={width} frameH={height} mediaW={video.width} mediaH={video.height} fit="cover" />;
+  const poster = video.poster ? <Image source={{ uri: video.poster }} style={StyleSheet.absoluteFill} contentFit="cover" recyclingKey={video.poster} accessible={false} /> : null;
 
   if (onOpen) {
     return (
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${t('explore.video.open')}, ${formatDuration(video.durationSec)}`}
+        accessibilityLabel={`${t('explore.video.open')}, ${formatDuration(duration)}`}
         onPress={() => {
           if (active) handOffVideo(video.url);
           onOpen();
         }}
         style={[styles.poster, { width, height }]}>
-        {active ? <AutoPlayer url={video.url} width={width} height={height} /> : (
+        {poster}
+        {active ? <AutoPlayer url={video.url} width={width} height={height} edit={edit} durationSec={video.durationSec} /> : (
           <View style={styles.play}>
             <MaterialIcons name="play-arrow" size={44} color="#FFFFFF" />
           </View>
         )}
+        {overlay}
         <View pointerEvents="none" style={styles.badge}>
           <MaterialIcons name="videocam" size={14} color="#FFFFFF" />
-          <AppText style={styles.badgeText}>{formatDuration(video.durationSec)}</AppText>
+          <AppText style={styles.badgeText}>{formatDuration(duration)}</AppText>
         </View>
       </Pressable>
     );
   }
 
-  if (started) return <Player url={video.url} width={width} height={height} />;
+  if (started) return <Player url={video.url} width={width} height={height} edit={edit} video={video} />;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={t('explore.video.play', { duration: formatDuration(video.durationSec) })}
+      accessibilityLabel={t('explore.video.play', { duration: formatDuration(duration) })}
       onPress={() => setStarted(true)}
       style={[styles.poster, { width, height }]}>
+      {poster}
+      {overlay}
       <View style={styles.play}>
         <MaterialIcons name="play-arrow" size={44} color="#FFFFFF" />
       </View>
       <View style={styles.badge}>
         <MaterialIcons name="videocam" size={14} color="#FFFFFF" />
-        <AppText style={styles.badgeText}>{formatDuration(video.durationSec)}</AppText>
+        <AppText style={styles.badgeText}>{formatDuration(duration)}</AppText>
       </View>
     </Pressable>
   );
 }
 
 /** Akışta kendiliğinden oynayan video: döngüde, ses tercihi ortak, köşede ses düğmesi. */
-function AutoPlayer({ url, width, height }: { url: string; width: number; height: number }) {
+function AutoPlayer({ url, width, height, edit, durationSec }: { url: string; width: number; height: number; edit?: MediaEdit | null; durationSec: number }) {
   const { t } = useTranslation();
   const [muted, toggleMuted] = useFeedMuted();
   const player = useResumingPlayer(url, (p) => {
@@ -148,12 +192,19 @@ function AutoPlayer({ url, width, height }: { url: string; width: number; height
   useEffect(() => {
     player.play();
   }, [player]);
+  const silent = edit?.muted === true;
+  useEditPlayback(player, edit, durationSec);
   useEffect(() => {
-    player.muted = muted;
-  }, [player, muted]);
+    player.muted = silent || muted;
+  }, [player, muted, silent]);
   return (
     <>
       <VideoView player={player} style={[StyleSheet.absoluteFill, { width, height }]} nativeControls={false} contentFit="cover" pointerEvents="none" />
+      {silent ? (
+        <View accessible accessibilityLabel={t('explore.video.silent')} style={styles.mute}>
+          <MaterialIcons name="volume-off" size={16} color="#FFFFFF" />
+        </View>
+      ) : (
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={muted ? t('explore.video.unmute') : t('explore.video.mute')}
@@ -162,11 +213,13 @@ function AutoPlayer({ url, width, height }: { url: string; width: number; height
         style={styles.mute}>
         <MaterialIcons name={muted ? 'volume-off' : 'volume-up'} size={16} color="#FFFFFF" />
       </Pressable>
+      )}
     </>
   );
 }
 
-function Player({ url, width, height }: { url: string; width: number; height: number }) {
+function Player({ url, width, height, edit, video }: { url: string; width: number; height: number; edit?: MediaEdit | null; video: PostVideo }) {
+  const { t } = useTranslation();
   const player = useVideoPlayer(url, (p) => {
     p.loop = false;
   });
@@ -174,7 +227,36 @@ function Player({ url, width, height }: { url: string; width: number; height: nu
   useEffect(() => {
     player.play();
   }, [player]);
-  return <VideoView player={player} style={{ width, height, backgroundColor: '#000000' }} nativeControls contentFit="contain" />;
+  useEditPlayback(player, edit, video.durationSec);
+  // Düzenlenmiş videoda (kırpma ya da yazı) yerel düğmeler yerine kendi dokunuşumuz: yerel çubuk kırpılan kısma atlatır ve
+  // yazıların üstünü kapatır. Dokununca durur ya da sürer; döngüde oynar.
+  const plain = edit?.trimStart === undefined && !edit?.items?.length && !edit?.strokes?.length;
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    player.loop = !plain;
+  }, [player, plain]);
+  if (plain) return <VideoView player={player} style={{ width, height, backgroundColor: '#000000' }} nativeControls contentFit="contain" />;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={paused ? t('explore.video.resume') : t('explore.video.pause')}
+      onPress={() => {
+        if (paused) player.play();
+        else player.pause();
+        setPaused(!paused);
+      }}
+      style={{ width, height, backgroundColor: '#000000' }}>
+      <VideoView player={player} style={{ width, height }} nativeControls={false} contentFit="contain" pointerEvents="none" />
+      <MediaOverlay edit={edit} frameW={width} frameH={height} mediaW={video.width} mediaH={video.height} fit="contain" />
+      {paused ? (
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+          <View style={styles.play}>
+            <MaterialIcons name="play-arrow" size={44} color="#FFFFFF" />
+          </View>
+        </View>
+      ) : null}
+    </Pressable>
+  );
 }
 
 const styles = StyleSheet.create({

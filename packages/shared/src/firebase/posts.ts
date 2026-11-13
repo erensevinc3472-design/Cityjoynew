@@ -35,6 +35,7 @@ import {
   FRAMES_LIMITS,
   type PostVideo,
 } from '../posts/posts';
+import { sanitizeMediaEdits, type MediaEdit } from '../posts/media-edit';
 import { PROFILE_LIMITS } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { isStoredPhoto, photoFrom } from '../media/photo';
@@ -54,14 +55,35 @@ function postVideoOf(d: DocumentData): { video?: PostVideo } {
   const v = d.video as Partial<PostVideo> | undefined;
   return v && typeof v.path === 'string' && typeof v.url === 'string' && isStoredPhoto({ path: v.path, url: v.url })
     && typeof v.durationSec === 'number' && v.durationSec > 0 && v.durationSec <= POST_LIMITS.videoSeconds
-    ? { video: { path: v.path, url: v.url, width: Math.round(v.width ?? 0), height: Math.round(v.height ?? 0), durationSec: Math.round(v.durationSec) } }
+    ? { video: { path: v.path, url: v.url, width: Math.round(v.width ?? 0), height: Math.round(v.height ?? 0), durationSec: Math.round(v.durationSec), ...posterOf(v) } }
     : {};
+}
+
+/** Kapak karesi yalnızca videonun klasöründeki `cover.jpg` ise. */
+function posterOf(v: Partial<PostVideo>): { poster?: string } {
+  const path = v.path!.replace(/video[.](mp4|mov)$/, 'cover.jpg');
+  return typeof v.poster === 'string' && path !== v.path && isStoredPhoto({ path, url: v.poster }) ? { poster: v.poster } : {};
 }
 
 /** Yalnızca kendi depomuzdaki, bu gönderinin klasöründeki geçerli fotoğraflar gösterilir (kurallar yolu denetler). */
 function postPhotosOf(d: DocumentData): { photos?: PostPhoto[] } {
   const photos = Array.isArray(d.photos) ? (d.photos as unknown[]).map(photoFrom).filter((p): p is PostPhoto => !!p) : [];
   return photos.length ? { photos } : {};
+}
+
+/** Yazılacak düzenleyici bilgisi (Firestore null'u liste içinde kabul eder). */
+function editsField(input: PostInput): { edits?: (MediaEdit | null)[] } {
+  const count = input.photos?.length ?? (input.video ? 1 : 0);
+  const edits = sanitizeMediaEdits(input.edits, count, input.photos?.length ? undefined : input.video?.durationSec);
+  return edits ? { edits } : {};
+}
+
+/** Düzenleyici bilgisi: temizlenmiş, medya sayısına göre (bozuksa yok sayılır). */
+function postEditsOf(d: DocumentData): { edits?: (MediaEdit | null)[] } {
+  const { photos } = postPhotosOf(d);
+  const { video } = postVideoOf(d);
+  const edits = sanitizeMediaEdits(d.edits, photos?.length ?? (video ? 1 : 0), photos?.length ? undefined : video?.durationSec);
+  return edits ? { edits } : {};
 }
 
 function fromDoc(id: string, d: DocumentData): Post {
@@ -83,6 +105,7 @@ function fromDoc(id: string, d: DocumentData): Post {
     cleared: d.cleared === true,
     ...postPhotosOf(d),
     ...postVideoOf(d),
+    ...postEditsOf(d),
     ...(d.frames === true ? { frames: true } : {}),
     ...(d.framesFeatured === true ? { framesFeatured: true } : {}),
     ...(d.authorSuspended === true ? { authorSuspended: true } : {}),
@@ -314,10 +337,11 @@ export function createFirestorePostRepository(db: Firestore) {
           ? { photos: input.photos.map((p) => ({ path: p.path, url: p.url, width: Math.round(p.width), height: Math.round(p.height) })) }
           : {}),
         ...(input.video && !input.photos?.length
-          ? { video: { path: input.video.path, url: input.video.url, width: Math.round(input.video.width), height: Math.round(input.video.height), durationSec: Math.round(input.video.durationSec) } }
+          ? { video: { path: input.video.path, url: input.video.url, width: Math.round(input.video.width), height: Math.round(input.video.height), durationSec: Math.round(input.video.durationSec), ...(input.video.poster ? { poster: input.video.poster } : {}) } }
           : {}),
         searchKeys: searchKeys(input.text, SEARCH_LIMITS.postKeys, SEARCH_LIMITS.minPost),
         ...(input.frames && canShowInFrames(input) ? { frames: true } : {}),
+        ...editsField(input),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -331,7 +355,7 @@ export function createFirestorePostRepository(db: Firestore) {
      */
     async remove(id: string): Promise<void> {
       const batch = writeBatch(db);
-      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), updatedAt: serverTimestamp() });
+      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), edits: deleteField(), updatedAt: serverTimestamp() });
       await batch.commit();
     },
 
@@ -520,7 +544,7 @@ export function createFirestorePostRepository(db: Firestore) {
       for (const d of mine.docs) {
         if (d.get('status') === 'kaldirildi' && !d.get('text') && !d.get('photos') && !d.get('video')) continue;
         const batch = writeBatch(db);
-        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), updatedAt: serverTimestamp() });
+        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), edits: deleteField(), updatedAt: serverTimestamp() });
         await batch.commit();
       }
       const likes = await getDocs(query(collectionGroup(db, 'likes'), where('uid', '==', uid), limit(500)));

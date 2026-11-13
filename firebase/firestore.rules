@@ -2290,8 +2290,10 @@ service cloud.firestore {
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
              'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'video', 'frames',
-             'framesFeatured', 'createdAt', 'updatedAt'])
+             'framesFeatured', 'edits', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
+        // Düzenleyici (yazı/çıkartma/çizim; içeriği uygulama temizler): medya başına bir öğe.
+        && (!('edits' in d) || (d.edits is list && d.edits.size() <= 10))
         // Kareler: yalnızca fotoğraflı ve Genel'e açık gönderi (Seyahat > "{Şehir} kareleri").
         && (!('frames' in d) || (d.frames is bool && (d.frames == false || ('photos' in d && d.targets.genel == true))))
         && (!('framesFeatured' in d) || d.framesFeatured is bool)
@@ -2369,7 +2371,8 @@ service cloud.firestore {
       let v = d.get('video', null);
       let b = 'posts/' + d.authorUid + '/' + id + '/video.';
       return !('video' in d)
-        || (!('photos' in d) && v is map && v.keys().hasOnly(['path', 'url', 'width', 'height', 'durationSec'])
+        || (!('photos' in d) && v is map && v.keys().hasOnly(['path', 'url', 'width', 'height', 'durationSec', 'poster'])
+            && (!('poster' in v) || (v.poster is string && v.poster.size() <= 600))
             && (v.path == b + 'mp4' || v.path == b + 'mov')
             && v.url is string && v.url.size() <= 600
             && v.width is int && v.height is int
@@ -2476,8 +2479,8 @@ service cloud.firestore {
             || ('business' in od && isBusinessOwner(od.business.id)))
         && nw.updatedAt == request.time
         && nw.status == 'kaldirildi' && nw.text == '' && nw.authorName == ''
-        && !('searchKeys' in nw) && !('photos' in nw) && !('video' in nw)
-        && nw.diff(od).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'video', 'updatedAt']);
+        && !('searchKeys' in nw) && !('photos' in nw) && !('video' in nw) && !('edits' in nw)
+        && nw.diff(od).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'video', 'edits', 'updatedAt']);
       }
       allow update: if _k88(request.resource.data, resource.data);
       // Sahibi yorumları kapatır ya da açar.

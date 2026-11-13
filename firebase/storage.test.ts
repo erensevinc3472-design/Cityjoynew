@@ -39,6 +39,10 @@ describe('Dosya deposu: gönderi fotoğrafları', () => {
     await assertFails(put(st('ayse'), 'posts/ayse/p4/video.mp4', jpeg(5000), 'image/jpeg'));
     await assertFails(put(st('ayse'), 'posts/ayse/p4/klip.mp4', jpeg(5000), 'video/mp4'));
     await assertFails(put(st('ali'), 'posts/ayse/p4/video.mp4', jpeg(5000), 'video/mp4'));
+    // Videonun kapak karesi: cover.jpg, küçük JPEG.
+    await assertSucceeds(put(st('ayse'), 'posts/ayse/p2/cover.jpg', jpeg(5000)));
+    await assertFails(put(st('ayse'), 'posts/ayse/p2/cover.jpg', jpeg(500_000)));
+    await assertFails(put(st('ayse'), 'posts/ayse/p5/cover.png', jpeg(5000)));
     await assertFails(put(st('ayse'), 'posts/ayse/p1/0.png'));
     // Üzerine yazma kapalıdır (allow update: false). Emülatör var olan dosyaya yüklemeyi de "create" saydığı için bu
     // denetim burada sınanamaz; gerçek Firebase'de geçerlidir.

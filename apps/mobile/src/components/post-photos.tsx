@@ -5,9 +5,10 @@ import { Pressable, StyleSheet, View, useWindowDimensions, type NativeScrollEven
 // sekme değil (iç içe yatay kaydırmada içteki önceliklidir).
 import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
-import type { PostPhoto } from '@cityjoy/shared';
+import type { MediaEdit, PostPhoto } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
+import { MediaOverlay } from '@/components/media-overlay';
 import { useThemeColors } from '@/theme/use-theme';
 
 /** Fotoğrafın oranı Instagram'daki gibi sınırlanır: en uzun 4:5 dik, en geniş 1.91:1 yatay. */
@@ -17,7 +18,7 @@ const ratioOf = (p: PostPhoto) => Math.min(1.91, Math.max(0.8, p.width / p.heigh
  * Gönderi fotoğrafları, ekran genişliğinde. Birden çoksa yana kaydırılır; sağ üstte "2/3" ve altta noktalar. Yükseklik
  * ilk fotoğrafın oranından gelir, diğerleri bu çerçeveye sığdırılır.
  */
-export function PostPhotos({ photos, maxWidth, onTap }: { photos: readonly PostPhoto[]; maxWidth: number; /** Dokunma (iki kez: beğeni). */ onTap?(): void }) {
+export function PostPhotos({ photos, maxWidth, onTap, edits }: { photos: readonly PostPhoto[]; maxWidth: number; /** Dokunma (iki kez: beğeni). */ onTap?(): void; /** Düzenleyicinin yazı ve çıkartmaları (fotoğraf sırasına göre). */ edits?: readonly (MediaEdit | null)[] }) {
   const { t } = useTranslation();
   const c = useThemeColors();
   const { width: screen } = useWindowDimensions();
@@ -40,6 +41,7 @@ export function PostPhotos({ photos, maxWidth, onTap }: { photos: readonly PostP
       accessibilityRole="image"
       accessibilityLabel={t('explore.photos.label', { n: i + 1, total: photos.length })}
     />
+    <MediaOverlay edit={edits?.[i]} frameW={width} frameH={height} mediaW={p.width} mediaH={p.height} fit="cover" />
     </Pressable>
   );
 

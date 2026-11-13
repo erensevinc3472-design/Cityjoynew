@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -42,9 +43,11 @@ export function PostGrid({ list, empty, onLongPress, longPressHint }: { list: Po
             </>
           ) : p.video ? (
             <>
-              <View style={styles.videoTile}>
-                <MaterialIcons name="play-circle-outline" size={36} color="#FFFFFF" />
-              </View>
+              {p.video.poster ? <Image source={{ uri: p.video.poster }} style={StyleSheet.absoluteFill} contentFit="cover" recyclingKey={p.video.poster} /> : (
+                <View style={styles.videoTile}>
+                  <MaterialIcons name="play-circle-outline" size={36} color="#FFFFFF" />
+                </View>
+              )}
               <MaterialIcons name="videocam" size={16} color="#FFFFFF" style={styles.multi} />
             </>
           ) : (

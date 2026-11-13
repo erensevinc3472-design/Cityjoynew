@@ -12,11 +12,13 @@ import {
   ltr,
   POST_CATEGORIES,
   isPostTopic,
+  mediaEditTexts,
   POST_LIMITS,
   POST_TARGETS,
   postModeFor,
   validatePost,
   type Business,
+  type MediaEdit,
   type PostCategory,
   type PostError,
   type PostTarget,
@@ -26,6 +28,8 @@ import { deletePhotos, PhotoTooLargeError, uploadPostPhotos, uploadPostVideo, Vi
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { CheckboxRow } from '@/components/checkbox-row';
+import { MediaEditor, type EditorMedia, type EditorResult } from '@/components/editor/media-editor';
+import { MediaOverlay } from '@/components/media-overlay';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
@@ -61,6 +65,10 @@ export default function NewPostScreen() {
   const [photos, setPhotos] = useState<PreparedPhoto[]>([]);
   const [photoNote, setPhotoNote] = useState<string | false>(false);
   const [video, setVideo] = useState<PreparedVideo | null>(null);
+  // Paylaşım düzenleyicisi (Karar Eren, 13 Kasım 2026): seçilen medya önce düzenleyicide açılır; yazı, çıkartma ve çizimler
+  // medya sırasına göre burada durur ve gönderiyle kaydedilir.
+  const [edits, setEdits] = useState<(MediaEdit | null)[]>([]);
+  const [editor, setEditor] = useState<{ media: EditorMedia; edits: (MediaEdit | null)[] } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState<PostCategory>('genel');
   // Keşfet'te hangi sekmedeyken + düğmesine basıldıysa o hedef seçili gelir; kişi istediği yerleri işaretler.
@@ -95,6 +103,8 @@ export default function NewPostScreen() {
   const biz = author === 'me' ? null : businesses.find((b) => b.id === author) ?? null;
   const provinceCode = biz ? biz.location.provinceCode : location?.provinceCode;
   const provinceName = (provinceCode && locationRepository.getProvince(provinceCode)?.name) || '';
+  const districtId = biz ? biz.location.districtId : location?.districtId;
+  const place = [districtId ? locationRepository.getDistrict(districtId)?.name : '', provinceName].filter(Boolean).join(', ');
   if (author !== 'me' && !biz) {
     return (
       <FormScreen title={t('explore.newPost')}>
@@ -130,11 +140,12 @@ export default function NewPostScreen() {
     const region = biz
       ? { provinceCode: biz.location.provinceCode, districtId: biz.location.districtId, neighbourhoodId: biz.location.neighbourhoodId! }
       : { provinceCode: location!.provinceCode, districtId: location!.districtId!, neighbourhoodId: location!.neighbourhoodId! };
-    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), frames: frames && !!photos.length && targets.includes('genel'), ...(toNews ? { news: true } : {}) };
+    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), ...(edits.some(Boolean) ? { edits } : {}), frames: frames && !!photos.length && targets.includes('genel'), ...(toNews ? { news: true } : {}) };
     const errs: (PostError | 'relative' | 'banned')[] = [
       ...validatePost(input),
       ...(category === 'taziye' && !relative ? ['relative' as const] : []),
-      ...(hasBanned(text) ? ['banned' as const] : []),
+      // Medyanın üstündeki yazılar ve etiketler de yasaklı kelime süzgecinden geçer.
+      ...(hasBanned(text) || mediaEditTexts(edits).some((x) => hasBanned(x)) ? ['banned' as const] : []),
     ];
     setErrors(errs);
     setFailed(false);
@@ -189,7 +200,11 @@ export default function NewPostScreen() {
     setPhotoNote(false);
     try {
       const more = await pickPhotos(POST_LIMITS.photos - photos.length);
-      setPhotos((cur) => [...cur, ...more].slice(0, POST_LIMITS.photos));
+      // Seçilenler hemen eklenmez: önce düzenleyici açılır, "İleri" deyince forma gelir.
+      if (more.length) {
+        const all = [...photos, ...more].slice(0, POST_LIMITS.photos);
+        setEditor({ media: { kind: 'photo', photos: all }, edits: all.map((_, i) => edits[i] ?? null) });
+      }
     } catch (e) {
       setPhotoNote(e instanceof PhotoPermissionError ? t('explore.photos.permission') : t('explore.photos.uploadError'));
     }
@@ -199,7 +214,7 @@ export default function NewPostScreen() {
     setPhotoNote(false);
     try {
       const v = await pickVideo();
-      if (v) setVideo(v);
+      if (v) setEditor({ media: { kind: 'video', video: v }, edits: [] });
     } catch (e) {
       setPhotoNote(
         e instanceof PhotoPermissionError
@@ -212,6 +227,19 @@ export default function NewPostScreen() {
       );
     }
   };
+
+  const editorDone = (r: EditorResult) => {
+    setEditor(null);
+    if (r.media.kind === 'video') {
+      setPhotos([]);
+      setVideo(r.media.video);
+    } else {
+      setVideo(null);
+      setPhotos(r.media.photos);
+    }
+    setEdits(r.edits);
+  };
+  const openEditor = () => setEditor(video ? { media: { kind: 'video', video }, edits } : { media: { kind: 'photo', photos }, edits: photos.map((_, i) => edits[i] ?? null) });
 
   const err = (k: PostError | 'relative') => (errors.includes(k) ? t(`explore.errors.${k}`) : undefined);
 
@@ -228,9 +256,9 @@ export default function NewPostScreen() {
       {mode === 'onayla' ? <FormMessage kind="info" text={t('explore.business.pendingNote', { name: biz!.name })} /> : null}
       <TextField label={t('explore.fields.text')} value={text} onChangeText={setText} maxLength={POST_LIMITS.text[1]} multiline error={err('text')} hint={t('explore.fields.textHint')} />
       {video ? (
-        <VideoPicked video={video} onRemove={() => setVideo(null)} disabled={busy} />
+        <VideoPicked video={video} edit={edits[0]} onEdit={openEditor} onRemove={() => (setVideo(null), setEdits([]))} disabled={busy} />
       ) : (
-        <PhotoPicker photos={photos} onAdd={addPhotos} onAddVideo={photos.length ? undefined : addVideo} onRemove={(i) => setPhotos((cur) => cur.filter((_, k) => k !== i))} disabled={busy} />
+        <PhotoPicker photos={photos} edits={edits} onEdit={openEditor} onAdd={addPhotos} onAddVideo={photos.length ? undefined : addVideo} onRemove={(i) => (setPhotos((cur) => cur.filter((_, k) => k !== i)), setEdits((cur) => cur.filter((_, k) => k !== i)))} disabled={busy} />
       )}
       {err('video') ? <FormMessage kind="error" text={err('video')!} /> : null}
       {photoNote ? <FormMessage kind="error" text={photoNote} /> : null}
@@ -268,6 +296,7 @@ export default function NewPostScreen() {
       {failed ? <FormMessage kind="error" text={failed} /> : null}
       {uploading ? <AppText variant="caption" muted>{t('explore.photos.uploading')}</AppText> : null}
       <AppButton title={mode === 'onayla' ? t('explore.business.sendForApproval') : t('explore.publish')} onPress={submit} loading={busy} disabled={busy || bizNoHood} />
+      {editor ? <MediaEditor media={editor.media} edits={editor.edits} place={place} provinceCode={provinceCode} onDone={editorDone} onCancel={() => setEditor(null)} /> : null}
     </FormScreen>
   );
 }
@@ -284,19 +313,21 @@ function AuthorPicker({ businesses, value, onChange }: { businesses: Business[];
 }
 
 /** Seçilen video: süresi ve kaldır düğmesi (fotoğrafla birlikte olmaz). */
-function VideoPicked({ video, onRemove, disabled }: { video: PreparedVideo; onRemove(): void; disabled: boolean }) {
+function VideoPicked({ video, edit, onEdit, onRemove, disabled }: { video: PreparedVideo; edit?: MediaEdit | null; onEdit(): void; onRemove(): void; disabled: boolean }) {
   const { t } = useTranslation();
   const c = useThemeColors();
   return (
     <View style={styles.block}>
       <View style={styles.thumbs}>
         <View style={[styles.thumb, styles.videoThumb]} accessible accessibilityLabel={t('explore.video.selected', { duration: formatDuration(video.durationSec) })}>
-          <MaterialIcons name="videocam" size={26} color="#FFFFFF" />
-          <AppText style={styles.videoTime}>{formatDuration(video.durationSec)}</AppText>
+          {video.coverUri ? <Image source={{ uri: video.coverUri }} style={StyleSheet.absoluteFill} contentFit="cover" /> : <MaterialIcons name="videocam" size={26} color="#FFFFFF" />}
+          <MediaOverlay edit={edit} frameW={76} frameH={76} mediaW={video.width} mediaH={video.height} fit="cover" />
+          <AppText style={styles.videoTime}>{formatDuration(edit?.trimStart !== undefined ? (edit.trimEnd ?? video.durationSec) - edit.trimStart : video.durationSec)}</AppText>
           <Pressable accessibilityRole="button" accessibilityLabel={t('explore.video.remove')} disabled={disabled} onPress={onRemove} hitSlop={10} style={styles.remove}>
             <MaterialIcons name="close" size={16} color="#FFFFFF" />
           </Pressable>
         </View>
+        <EditButton onPress={onEdit} disabled={disabled} />
       </View>
       <AppText variant="caption" style={{ color: c.textMuted }}>{t('explore.video.note', { max: POST_LIMITS.videoSeconds })}</AppText>
     </View>
@@ -304,7 +335,7 @@ function VideoPicked({ video, onRemove, disabled }: { video: PreparedVideo; onRe
 }
 
 /** Seçilen fotoğrafların küçük önizlemeleri (her birinde kaldır düğmesi), "Fotoğraf ekle" ve fotoğraf yokken "Video ekle". */
-function PhotoPicker({ photos, onAdd, onAddVideo, onRemove, disabled }: { photos: PreparedPhoto[]; onAdd(): void; onAddVideo?(): void; onRemove(i: number): void; disabled: boolean }) {
+function PhotoPicker({ photos, edits, onEdit, onAdd, onAddVideo, onRemove, disabled }: { photos: PreparedPhoto[]; edits: readonly (MediaEdit | null)[]; onEdit(): void; onAdd(): void; onAddVideo?(): void; onRemove(i: number): void; disabled: boolean }) {
   const { t } = useTranslation();
   const c = useThemeColors();
   return (
@@ -313,6 +344,7 @@ function PhotoPicker({ photos, onAdd, onAddVideo, onRemove, disabled }: { photos
         {photos.map((p, i) => (
           <View key={p.uri} style={[styles.thumb, { backgroundColor: c.surfaceStrong }]}>
             <Image source={{ uri: p.uri }} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityLabel={t('explore.photos.label', { n: i + 1, total: photos.length })} />
+            <MediaOverlay edit={edits[i]} frameW={76} frameH={76} mediaW={p.width} mediaH={p.height} fit="cover" />
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={`${t('explore.photos.remove')} (${i + 1})`}
@@ -324,6 +356,7 @@ function PhotoPicker({ photos, onAdd, onAddVideo, onRemove, disabled }: { photos
             </Pressable>
           </View>
         ))}
+        {photos.length ? <EditButton onPress={onEdit} disabled={disabled} /> : null}
         {photos.length < POST_LIMITS.photos ? (
           <Pressable
             accessibilityRole="button"
@@ -352,6 +385,23 @@ function PhotoPicker({ photos, onAdd, onAddVideo, onRemove, disabled }: { photos
         {t('explore.photos.note')}
       </AppText>
     </View>
+  );
+}
+
+/** Düzenleyiciyi yeniden açar (yazı, çıkartma, çizim, kırpma). */
+function EditButton({ onPress, disabled }: { onPress(): void; disabled: boolean }) {
+  const { t } = useTranslation();
+  const c = useThemeColors();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t('editor.edit')}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [styles.thumb, styles.add, { borderColor: c.accent, borderStyle: 'solid', opacity: pressed ? 0.7 : 1 }]}>
+      <MaterialIcons name="auto-fix-high" size={24} color={c.accent} />
+      <AppText style={[styles.addText, { color: c.accent }]}>{t('editor.edit')}</AppText>
+    </Pressable>
   );
 }
 

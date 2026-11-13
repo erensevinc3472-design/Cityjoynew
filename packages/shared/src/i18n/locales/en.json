@@ -1463,7 +1463,8 @@
       "progress": "Video progress",
       "end": "No more videos for now",
       "backToFeed": "Back to feed",
-      "swipeClose": "Swipe right to close"
+      "swipeClose": "Swipe right to close",
+      "silent": "Silent video"
     },
     "verifiedBusiness": "Verified business",
     "seeComments": "View all {{count}} comments",
@@ -2846,5 +2847,87 @@
     "title": "Notification",
     "muhtar": "Neighbourhood office",
     "note": "This notification was sent to your chosen area. You can choose which notifications you get in My account > Notifications."
+  },
+  "editor": {
+    "done": "Done",
+    "next": "Next",
+    "edit": "Edit",
+    "close": "Close",
+    "cancel": "Cancel",
+    "back": "Back",
+    "add": "Add",
+    "undo": "Undo",
+    "discard": "Discard your edits?",
+    "discardYes": "Discard",
+    "duration": "Duration {{time}}",
+    "text": "Text",
+    "textPlaceholder": "Type something…",
+    "size": "Text size",
+    "colors": "Colours",
+    "align": "Alignment",
+    "textColor": "Text colour",
+    "background": "Background",
+    "backgroundColor": "Background colour",
+    "bg": {
+      "yok": "None",
+      "dolu": "Solid",
+      "yari": "Translucent"
+    },
+    "fonts": {
+      "modern": "Modern",
+      "klasik": "Classic",
+      "el": "Handwriting",
+      "kalin": "BOLD",
+      "daktilo": "Typewriter"
+    },
+    "tools": {
+      "text": "Text",
+      "sticker": "Sticker",
+      "draw": "Draw",
+      "trim": "Trim",
+      "crop": "Crop / Rotate",
+      "soundOn": "Sound on",
+      "soundOff": "Sound off",
+      "cover": "Cover"
+    },
+    "stickers": {
+      "search": "Search stickers…",
+      "emoji": "Emoji",
+      "konum": "Location",
+      "bahset": "Mention",
+      "saat": "Time",
+      "hava": "Weather",
+      "tarih": "Date",
+      "etiket": "Hashtag",
+      "tagPlaceholder": "hashtag",
+      "mentionPlaceholder": "Search people"
+    },
+    "drawArea": "Drawing area",
+    "draw": {
+      "kalem": "Pen",
+      "fosforlu": "Highlighter",
+      "silgi": "Eraser",
+      "width": "Width {{n}}"
+    },
+    "video": {
+      "trimTitle": "Trim · {{from}} – {{to}} ({{n}} s)",
+      "start": "Start",
+      "end": "End",
+      "sound": "Video sound",
+      "cover": "Cover frame",
+      "choose": "Choose",
+      "coverTitle": "Cover frame",
+      "coverAt": "Frame {{time}}",
+      "coverNote": "This frame shows in the feed before the video plays."
+    },
+    "crop": {
+      "title": "Crop / Rotate",
+      "move": "Move crop area",
+      "orijinal": "Original",
+      "kare": "Square",
+      "dikey": "4:5",
+      "yatay": "Landscape",
+      "rotate": "Rotate"
+    }
   }
 }

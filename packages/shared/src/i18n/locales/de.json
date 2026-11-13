@@ -1463,7 +1463,8 @@
       "progress": "Videofortschritt",
       "end": "Im Moment keine weiteren Videos",
       "backToFeed": "Zurück zum Feed",
-      "swipeClose": "Zum Schließen nach rechts wischen"
+      "swipeClose": "Zum Schließen nach rechts wischen",
+      "silent": "Video ohne Ton"
     },
     "verifiedBusiness": "Verifiziertes Unternehmen",
     "seeComments": "Alle {{count}} Kommentare ansehen",
@@ -2846,5 +2847,87 @@
     "title": "Benachrichtigung",
     "muhtar": "Ortsvorsteher",
     "note": "Diese Benachrichtigung wurde an deine gewählte Region gesendet. Welche Benachrichtigungen du erhältst, wählst du unter Mein Konto > Benachrichtigungen."
+  },
+  "editor": {
+    "done": "Fertig",
+    "next": "Weiter",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "back": "Zurück",
+    "add": "Hinzufügen",
+    "undo": "Rückgängig",
+    "discard": "Änderungen verwerfen?",
+    "discardYes": "Verwerfen",
+    "duration": "Dauer {{time}}",
+    "text": "Text",
+    "textPlaceholder": "Schreib etwas…",
+    "size": "Textgröße",
+    "colors": "Farben",
+    "align": "Ausrichtung",
+    "textColor": "Textfarbe",
+    "background": "Hintergrund",
+    "backgroundColor": "Hintergrundfarbe",
+    "bg": {
+      "yok": "Keiner",
+      "dolu": "Voll",
+      "yari": "Halbtransparent"
+    },
+    "fonts": {
+      "modern": "Modern",
+      "klasik": "Klassisch",
+      "el": "Handschrift",
+      "kalin": "FETT",
+      "daktilo": "Schreibmaschine"
+    },
+    "tools": {
+      "text": "Text",
+      "sticker": "Sticker",
+      "draw": "Zeichnen",
+      "trim": "Kürzen",
+      "crop": "Zuschneiden / Drehen",
+      "soundOn": "Ton an",
+      "soundOff": "Ton aus",
+      "cover": "Titelbild"
+    },
+    "stickers": {
+      "search": "Sticker suchen…",
+      "emoji": "Emoji",
+      "konum": "Ort",
+      "bahset": "Erwähnen",
+      "saat": "Uhrzeit",
+      "hava": "Wetter",
+      "tarih": "Datum",
+      "etiket": "Hashtag",
+      "tagPlaceholder": "hashtag",
+      "mentionPlaceholder": "Personen suchen"
+    },
+    "drawArea": "Zeichenfläche",
+    "draw": {
+      "kalem": "Stift",
+      "fosforlu": "Textmarker",
+      "silgi": "Radierer",
+      "width": "Stärke {{n}}"
+    },
+    "video": {
+      "trimTitle": "Kürzen · {{from}} – {{to}} ({{n}} s)",
+      "start": "Anfang",
+      "end": "Ende",
+      "sound": "Videoton",
+      "cover": "Titelbild",
+      "choose": "Wählen",
+      "coverTitle": "Titelbild",
+      "coverAt": "Bild {{time}}",
+      "coverNote": "Dieses Bild erscheint im Feed, bevor das Video startet."
+    },
+    "crop": {
+      "title": "Zuschneiden / Drehen",
+      "move": "Ausschnitt verschieben",
+      "orijinal": "Original",
+      "kare": "Quadrat",
+      "dikey": "4:5",
+      "yatay": "Quer",
+      "rotate": "Drehen"
+    }
   }
 }

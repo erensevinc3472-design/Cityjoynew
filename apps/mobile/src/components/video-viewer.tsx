@@ -1,16 +1,18 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { VideoView } from 'expo-video';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState, type ComponentProps, type ComponentRef, type MutableRefObject } from 'react';
 import { ActivityIndicator, Animated, FlatList, I18nManager, Modal, PanResponder, Pressable, Share, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import type { Post } from '@cityjoy/shared';
+import type { MediaEdit, Post } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { PostSheet } from '@/components/post-sheet';
-import { handOffVideo, useResumingPlayer } from '@/components/post-video';
+import { MediaOverlay } from '@/components/media-overlay';
+import { handOffVideo, useEditPlayback, useResumingPlayer } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { useAuthor, useBusinessInfo } from '@/lib/profile-photos';
 import { fonts, radius, spacing } from '@/theme/tokens';
@@ -187,6 +189,8 @@ function Reel({
   const [sheet, setSheet] = useState<'list' | 'input' | null>(null);
   const [paused, setPaused] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [box, setBox] = useState({ w: 0, h: 0 });
+  const edit = post.edits?.[0];
   const heart = useRef(new Animated.Value(0)).current;
   const progress = useRef(new Animated.Value(0)).current;
   const seeker = useRef<Seeker | null>(null);
@@ -236,15 +240,26 @@ function Reel({
   );
 
   return (
-    <View style={styles.reel}>
+    <View style={styles.reel} onLayout={(e) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
+      {post.video?.poster && !active ? <Image source={{ uri: post.video.poster }} style={StyleSheet.absoluteFill} contentFit="contain" accessible={false} /> : null}
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={paused ? t('explore.video.resume') : t('explore.video.pause')}
         accessibilityHint={t('explore.doubleTapHint')}
         onPress={tap}
         style={StyleSheet.absoluteFill}>
-        {active ? <ReelVideo url={post.video!.url} paused={paused} progress={progress} seeker={seeker} /> : null}
+        {active ? <ReelVideo url={post.video!.url} paused={paused} progress={progress} seeker={seeker} edit={edit} durationSec={post.video!.durationSec} /> : null}
       </Pressable>
+      {/* Paylaşım düzenleyicisinin yazı ve çıkartmaları; Bahset çıkartmasına dokununca kişinin profili açılır. */}
+      <MediaOverlay
+        edit={edit}
+        frameW={box.w}
+        frameH={box.h}
+        mediaW={post.video?.width ?? 0}
+        mediaH={post.video?.height ?? 0}
+        fit="contain"
+        onMention={(uid) => onAuthor({ ...post, authorUid: uid, business: undefined })}
+      />
       {paused ? (
         <View pointerEvents="none" style={styles.center}>
           <View style={styles.bigPlay}>
@@ -380,7 +395,7 @@ function Scrubber({ progress, seeker, onScrub }: { progress: Animated.Value; see
 }
 
 /** Açık sayfanın oynatıcısı: sesli, döngüde, akışta kaldığı saniyeden sürer; ilerlemeyi ekranı yeniden çizmeden çizgiye yazar. */
-function ReelVideo({ url, paused, progress, seeker }: { url: string; paused: boolean; progress: Animated.Value; seeker: MutableRefObject<Seeker | null> }) {
+function ReelVideo({ url, paused, progress, seeker, edit, durationSec }: { url: string; paused: boolean; progress: Animated.Value; seeker: MutableRefObject<Seeker | null>; edit?: MediaEdit | null; durationSec: number }) {
   const holding = useRef(false);
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
@@ -388,17 +403,20 @@ function ReelVideo({ url, paused, progress, seeker }: { url: string; paused: boo
     p.loop = true;
     p.muted = false;
   });
+  // Kırpılmış videoda çubuk ve atlama yalnızca seçilen aralıkta.
+  const range = useEditPlayback(player, edit, durationSec);
+  const span = Math.max(0.5, range.end - range.start);
   useEffect(() => {
     progress.setValue(0);
     const sub = player.addListener('timeUpdate', (e) => {
-      if (!holding.current) progress.setValue(player.duration > 0 ? Math.min(1, e.currentTime / player.duration) : 0);
+      if (!holding.current) progress.setValue(Math.min(1, Math.max(0, (e.currentTime - range.start) / span)));
     });
     seeker.current = {
       seek: (r) => {
-        if (player.duration > 0) player.currentTime = r * player.duration;
+        player.currentTime = range.start + r * span;
       },
       step: (sec) => {
-        if (player.duration > 0) player.currentTime = Math.min(player.duration, Math.max(0, player.currentTime + sec));
+        player.currentTime = Math.min(range.end - 0.2, Math.max(range.start, player.currentTime + sec));
       },
       hold: (on) => {
         holding.current = on;
@@ -410,7 +428,7 @@ function ReelVideo({ url, paused, progress, seeker }: { url: string; paused: boo
       sub.remove();
       seeker.current = null;
     };
-  }, [player, progress, seeker]);
+  }, [player, progress, seeker, range.start, span]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (paused) player.pause();
     else player.play();

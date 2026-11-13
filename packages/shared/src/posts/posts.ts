@@ -5,6 +5,7 @@
  * verilemez (madde 9). Üç şikâyette gönderi moderatör inceleyene kadar akıştan düşer (madde 8).
  */
 
+import type { MediaEdit } from './media-edit';
 import type { Photo } from '../media/photo';
 
 /** Takip: yalnızca takipçiler görür (gizli hesapta takip isteği onaylananlar). */
@@ -49,11 +50,14 @@ export interface PostVideo {
   height: number;
   /** Saniye (1-60). */
   durationSec: number;
+  /** Kapak karesi (düzenleyicide seçilir; aynı klasörde `cover.jpg`): akışta ve ızgarada video oynamadan görünür. */
+  poster?: string;
 }
 
 export const POST_VIDEO_TYPES = { mp4: 'video/mp4', mov: 'video/quicktime' } as const;
 export type PostVideoExt = keyof typeof POST_VIDEO_TYPES;
 export const postVideoPath = (uid: string, postId: string, ext: PostVideoExt) => `posts/${uid}/${postId}/video.${ext}`;
+export const postPosterPath = (uid: string, postId: string) => `posts/${uid}/${postId}/cover.jpg`;
 
 export interface PostInput {
   /** Fotoğraf varsa boş olabilir. */
@@ -65,6 +69,11 @@ export interface PostInput {
   photos?: PostPhoto[];
   /** Fotoğrafın yerine tek video (ikisi birlikte olmaz). */
   video?: PostVideo;
+  /**
+   * Paylaşım düzenleyicisi (media-edit.ts): fotoğraf sırasına göre (videoda tek) yazı, çıkartma, çizim; videoda kırpma,
+   * ses ve kapak. Düzenlenmeyen medyada null.
+   */
+  edits?: (MediaEdit | null)[];
   /**
    * "{Şehir} kareleri"nde de görünsün (Seyahat; PROJE.md 13. madde 34): yalnızca fotoğraflı ve Genel'e paylaşılan
    * gönderide. Ek yükleme ya da kopya yok; aynı gönderi iki yerde görünür.

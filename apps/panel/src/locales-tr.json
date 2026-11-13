@@ -372,6 +372,11 @@
     }
   },
   "moderation": {
+    "edits": {
+      "texts": "Medyanın üstündeki yazılar",
+      "trimmed": "Kırpıldı: {{from}} – {{to}} arası oynar",
+      "muted": "Sessiz paylaşıldı"
+    },
     "title": "Moderasyon",
     "intro": "Kullanıcıların \"Şikâyet et\" düğmesiyle bildirdiği işletme değerlendirmeleri (son 100). Gizlenen değerlendirme uygulamada görünmez ve işletme puanından düşer.",
     "readOnly": "Bu sayfada değişikliği şimdilik yalnızca admin yapabilir.",

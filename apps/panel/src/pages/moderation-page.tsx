@@ -26,6 +26,7 @@ import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 import { Intro } from '../components/intro';
+import { MediaEdits } from '../components/media-edits';
 import { SuspendControl } from '../components/suspend-control';
 
 /** Sekmeler (Eren, 12 Kasım 2026 panel yenileme): alt alta uzun liste yerine türlere göre, yeni şikâyet sayısıyla. */
@@ -233,7 +234,8 @@ function PostContext({ post }: { post: CommentReport['post'] }) {
           ))}
         </div>
       ) : null}
-      {post.video ? <video className="mod-video" src={post.video.url} controls preload="metadata" aria-label={t('moderation.posts.video', { seconds: post.video.durationSec })} /> : null}
+      {post.video && !post.edits?.[0] ? <video className="mod-video" src={post.video.url} controls preload="metadata" aria-label={t('moderation.posts.video', { seconds: post.video.durationSec })} /> : null}
+      <MediaEdits post={post} />
       {post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : null}
     </div>
   );
@@ -590,7 +592,7 @@ function PostReports({ user, onCount }: { user: PanelUser; onCount?: (n: number)
                 <tr key={r.id}>
                   <td className="num">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
                   <td>
-                    {r.post && (r.post.text || r.post.photos?.length) ? (
+                    {r.post && (r.post.text || r.post.photos?.length || r.post.video) ? (
                       <>
                         <strong>{r.post.authorName}</strong> <span className="meta">· {t(`moderation.posts.categories.${r.post.category}`)}</span>
                         <div className="meta">{regionLabel(r.post.region)} · {r.post.targets.map((x) => t(`moderation.posts.targets.${x}`)).join(', ')}</div>
@@ -608,9 +610,10 @@ function PostReports({ user, onCount }: { user: PanelUser; onCount?: (n: number)
                             ))}
                           </div>
                         ) : null}
-                        {r.post.video ? (
+                        {r.post.video && !r.post.edits?.[0] ? (
                           <video className="mod-video" src={r.post.video.url} controls preload="metadata" aria-label={t('moderation.posts.video', { seconds: r.post.video.durationSec })} />
                         ) : null}
+                        <MediaEdits post={r.post} />
                         {r.post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : r.post.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
                       </>
                     ) : (
