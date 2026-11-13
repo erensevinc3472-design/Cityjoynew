@@ -1480,7 +1480,33 @@
       "how": "Nasıl sıralanıyor?",
       "rules": "Herkes için aynı açık kurallar: yeni paylaşımlar öne çıkar ve zamanla geriler. Beğeni ve yorum (yorum daha değerli) biraz öne alır. Takip ettiğin kişiler, kendi mahallen ve resmî duyurular öne gelir. Aynı kişinin paylaşımları arka arkaya gelmez. Şikâyet alan paylaşım geri düşer. Ne kadar baktığın izlenmez, parayla gizli öne çıkma yoktur."
     },
-    "badge": "Rozet: {{name}}"
+    "badge": "Rozet: {{name}}",
+    "folders": {
+      "all": "Tümü",
+      "add": "Yeni klasör",
+      "title": "Klasöre ekle",
+      "none": "Klasörsüz",
+      "newName": "Yeni klasör adı",
+      "create": "Oluştur",
+      "edit": "Düzenle",
+      "name": "Klasör adı",
+      "save": "Kaydet",
+      "delete": "Klasörü sil",
+      "deleteConfirm": "Klasör silinsin mi? İçindeki gönderiler Kaydettiklerim'de kalır.",
+      "cancel": "Vazgeç",
+      "limit": "En çok {{count}} klasör açabilirsin.",
+      "error": "Klasör işlemi yapılamadı. Tekrar dene.",
+      "empty": "Bu klasörde gönderi yok. Bir gönderiye uzun basıp bu klasörü seç.",
+      "hint": "Klasöre koymak için gönderiye uzun bas.",
+      "in": "Klasör: {{name}}"
+    },
+    "recent": {
+      "tab": "Son gördüklerin",
+      "info": "Son baktığın {{count}} gönderi. Yalnızca bu telefonda tutulur.",
+      "reset": "Sıfırla",
+      "resetConfirm": "Son gördüklerin listesi silinsin mi?",
+      "empty": "Henüz bir gönderiye bakmadın. Keşfet'te baktığın gönderiler burada görünür."
+    }
   },
   "news": {
     "title": "Haberler",

@@ -1480,7 +1480,33 @@
       "how": "Wie wird sortiert?",
       "rules": "Für alle die gleichen offenen Regeln: Neue Beiträge steigen auf und sinken mit der Zeit. Likes und Kommentare (Kommentare zählen mehr) heben einen Beitrag etwas an. Personen, denen du folgst, dein Viertel und offizielle Mitteilungen kommen zuerst. Beiträge derselben Person folgen nie direkt aufeinander. Gemeldete Beiträge rutschen nach unten. Wie lange du schaust, wird nicht erfasst, und es gibt keine versteckte bezahlte Hervorhebung."
     },
-    "badge": "Abzeichen: {{name}}"
+    "badge": "Abzeichen: {{name}}",
+    "folders": {
+      "all": "Alle",
+      "add": "Neuer Ordner",
+      "title": "Zu Ordner hinzufügen",
+      "none": "Kein Ordner",
+      "newName": "Name des neuen Ordners",
+      "create": "Erstellen",
+      "edit": "Bearbeiten",
+      "name": "Ordnername",
+      "save": "Speichern",
+      "delete": "Ordner löschen",
+      "deleteConfirm": "Ordner löschen? Die Beiträge bleiben in deinen gespeicherten Beiträgen.",
+      "cancel": "Abbrechen",
+      "limit": "Du kannst bis zu {{count}} Ordner anlegen.",
+      "error": "Ordner konnte nicht geändert werden. Bitte erneut versuchen.",
+      "empty": "Keine Beiträge in diesem Ordner. Halte einen Beitrag gedrückt und wähle diesen Ordner.",
+      "hint": "Halte einen Beitrag gedrückt, um ihn in einen Ordner zu legen.",
+      "in": "Ordner: {{name}}"
+    },
+    "recent": {
+      "tab": "Zuletzt angesehen",
+      "info": "Die letzten {{count}} Beiträge, die du angesehen hast. Nur auf diesem Telefon gespeichert.",
+      "reset": "Zurücksetzen",
+      "resetConfirm": "Liste der zuletzt angesehenen Beiträge löschen?",
+      "empty": "Du hast noch keine Beiträge angesehen. Beiträge, die du in Entdecken ansiehst, erscheinen hier."
+    }
   },
   "news": {
     "title": "Nachrichten",

@@ -169,11 +169,21 @@ service cloud.firestore {
       // Keşfet'te kaydedilen gönderiler: yalnızca kişinin kendisi.
       match /savedPosts/{postId} {
         allow read, delete: if isSelf(uid);
-        function _k3(nw) {
-          return isSelf(uid) && nw.keys().hasOnly(['createdAt'])
-          && nw.createdAt == request.time;
+        // folder: kişinin klasörü (saveFolders), yoksa "Tümü"; güncellemede yalnız klasör değişir.
+        function _k3(nw, t) {
+          return isSelf(uid) && nw.keys().hasOnly(['createdAt', 'folder'])
+          && nw.createdAt == t && (!('folder' in nw) || (nw.folder is string && nw.folder.size() <= 40));
         }
-        allow create: if _k3(request.resource.data);
+        allow create: if _k3(request.resource.data, request.time);
+        allow update: if _k3(request.resource.data, resource.data.createdAt);
+      }
+      match /saveFolders/{f} {
+        allow read, delete: if isSelf(uid);
+        function _kf(nw) {
+          return isSelf(uid) && nw.keys().hasOnly(['name', 'createdAt']) && nw.name is string
+          && nw.name.size() > 0 && nw.name.size() <= 40 && nw.createdAt is timestamp;
+        }
+        allow create, update: if _kf(request.resource.data);
       }
 
       // Çarşı favorileri: yalnızca kişinin kendisi.

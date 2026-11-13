@@ -10,10 +10,13 @@ import { HeroHeader } from '@/components/hero-header';
 import { PostActions } from '@/components/post-actions';
 import { PostCard } from '@/components/post-card';
 import { PostComments } from '@/components/post-comments';
+import { SaveFolderModal } from '@/components/save-folder-modal';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { authorHref, cachedPost, toggleLike, useLiked } from '@/lib/posts';
 import { postRepository } from '@/lib/services';
+import { markSeen } from '@/lib/recent-posts';
+import { useSaveFolders } from '@/lib/save-folders';
 import { useSession } from '@/lib/session';
 import { spacing } from '@/theme/tokens';
 import { errorText } from '@/lib/limits';
@@ -31,6 +34,10 @@ export default function PostScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
   const [saved, setSaved] = useState<boolean>();
+  // Kaydedildiyse klasörü (null: klasörsüz).
+  const [folder, setFolder] = useState<string | null>(null);
+  const [folderOpen, setFolderOpen] = useState(false);
+  const { folders } = useSaveFolders(user?.uid);
   const isLiked = useLiked(user?.uid);
   const mine = !!item && !!user && item.authorUid === user.uid;
   const back = () => (router.canGoBack() ? router.back() : router.replace('/explore'));
@@ -39,8 +46,21 @@ export default function PostScreen() {
     if (!user) return;
     // Göremediği gönderide (başka mahalle, kaldırılmış) kurallar okutmaz: "artık yok" gösterilir.
     postRepository.get(id).then(setItem, () => setItem(null));
-    postRepository.isSaved(user.uid, id).then(setSaved);
+    postRepository.savedFolder(user.uid, id).then(
+      (f) => {
+        setSaved(f !== undefined);
+        setFolder(f ?? null);
+      },
+      () => setSaved(false),
+    );
   }, [id, user]);
+
+  // Son gördüklerin: açılan gönderi listeye girer (yalnız telefonda).
+  const seenId = item && user && isPostListed(item) ? item.id : null;
+  useEffect(() => {
+    if (seenId && item && user) markSeen(user.uid, item).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seenId]);
 
   const header = <HeroHeader compact title={t('explore.post')} onBack={back} />;
 
@@ -77,6 +97,7 @@ export default function PostScreen() {
       if (saved) await postRepository.unsave(user.uid, item.id);
       else await postRepository.save(user.uid, item.id);
       setSaved(!saved);
+      setFolder(null);
     }, 'explore.saveError');
 
   return (
@@ -86,7 +107,25 @@ export default function PostScreen() {
         {error ? <FormMessage kind="error" text={error} /> : null}
         <View style={styles.row}>
           <AppButton variant="secondary" title={saved ? t('explore.unsave') : t('explore.save')} disabled={busy || saved === undefined} onPress={toggleSave} />
+          {saved ? (
+            <AppButton
+              variant="secondary"
+              title={folder ? t('explore.folders.in', { name: folders?.find((f) => f.id === folder)?.name ?? '…' }) : t('explore.folders.add')}
+              disabled={busy}
+              onPress={() => setFolderOpen(true)}
+            />
+          ) : null}
         </View>
+        <SaveFolderModal
+          uid={user.uid}
+          visible={folderOpen}
+          current={folder}
+          onPick={async (f) => {
+            await postRepository.setSavedFolder(user.uid, item.id, f);
+            setFolder(f);
+          }}
+          onClose={() => setFolderOpen(false)}
+        />
         <PostComments post={item} uid={user.uid} displayName={profile?.displayName} onCount={(n) => setItem((p) => (p ? { ...p, commentCount: n } : p))} />
         <PostActions item={item} uid={user.uid} onChange={setItem} onRemoved={back} />
       </ScrollView>

@@ -281,6 +281,31 @@ describe('Keşfet gönderileri', () => {
     expect(await repo('ali').listSaved('ali')).toEqual([]);
   });
 
+  it('kaydedilenler klasörleri: yalnızca kişinin kendisi, silinince gönderiler kalır', async () => {
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
+    const f = await repo('ali').createFolder('ali', '  Gidilecek yerler  ');
+    expect(f.name).toBe('Gidilecek yerler');
+    await assertFails(repo('veli').createFolder('ali', 'Benim'));
+    await assertFails(repo('veli').listFolders('ali'));
+    await assertSucceeds(repo('ali').save('ali', id, f.id));
+    expect(await repo('ali').savedFolder('ali', id)).toBe(f.id);
+    expect((await repo('ali').listSavedEntries('ali')).map((e) => e.folder)).toEqual([f.id]);
+    await assertSucceeds(repo('ali').setSavedFolder('ali', id, null));
+    expect(await repo('ali').savedFolder('ali', id)).toBeNull();
+    await assertSucceeds(repo('ali').setSavedFolder('ali', id, f.id));
+    await assertFails(repo('veli').setSavedFolder('ali', id, null));
+    // Kayıt tarihi ya da başka alan değiştirilemez; çok uzun ad olmaz.
+    await assertFails(updateDoc(doc(fs('ali'), 'users', 'ali', 'savedPosts', id), { createdAt: Timestamp.fromDate(new Date('2020-01-01')) }));
+    await assertFails(updateDoc(doc(fs('ali'), 'users', 'ali', 'savedPosts', id), { note: 'x' }));
+    await assertFails(setDoc(doc(fs('ali'), 'users', 'ali', 'saveFolders', 'uzun'), { name: 'x'.repeat(41), createdAt: Timestamp.now() }));
+    await assertSucceeds(repo('ali').renameFolder('ali', f.id, 'Hafta sonu'));
+    expect((await repo('ali').listFolders('ali')).map((x) => x.name)).toEqual(['Hafta sonu']);
+    await assertSucceeds(repo('ali').deleteFolder('ali', f.id));
+    expect(await repo('ali').listFolders('ali')).toEqual([]);
+    expect(await repo('ali').savedFolder('ali', id)).toBeNull();
+    expect(await repo('ali').isSaved('ali', id)).toBe(true);
+  });
+
   it('hesap silme: gönderiler boşaltılır, beğeniler geri alınır', async () => {
     const mine = await repo('ali').create('ali', 'Ali', input({ targets: ['genel'] }));
     const other = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));

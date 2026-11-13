@@ -11,6 +11,7 @@ import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
+import { clearRecent } from '@/lib/recent-posts';
 import { errorKey } from '@/lib/auth-errors';
 import { firestore } from '@/lib/firebase';
 import { authService } from '@/lib/services';
@@ -48,7 +49,10 @@ export default function AccountScreen() {
     setBusy(true);
     try {
       // Kişinin bütün verisi (KVKK; ayrıntı: deleteAllUserData), sonra profil, en son hesap. Web'deki hesap silme sayfası da aynısını yapar.
-      await authService.deleteAccountAndData(password || undefined, (uid) => deleteAllUserData(firestore, uid));
+      await authService.deleteAccountAndData(password || undefined, async (uid) => {
+        await deleteAllUserData(firestore, uid);
+        await clearRecent(uid);
+      });
       await adopt(null);
       restartFlow(router);
     } catch (e) {

@@ -14,7 +14,7 @@ const TILE_COLORS = ['#1F5C63', '#7A5A1E', '#5B3F6E', '#2F5D3A', '#7A3B3B', '#34
 const tileColor = (p: Post) => TILE_COLORS[Math.max(0, POST_CATEGORIES.indexOf(p.category)) % TILE_COLORS.length];
 
 /** Profil ve işletme sayfasındaki üçlü gönderi ızgarası (Instagram düzeni); kareye dokununca gönderi açılır. */
-export function PostGrid({ list, empty }: { list: Post[] | null; empty: string }) {
+export function PostGrid({ list, empty, onLongPress, longPressHint }: { list: Post[] | null; empty: string; /** Uzun basınca (ör. Kaydettiklerim: klasöre taşı). */ onLongPress?(p: Post): void; longPressHint?: string }) {
   const { t } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -29,7 +29,11 @@ export function PostGrid({ list, empty }: { list: Post[] | null; empty: string }
           key={p.id}
           accessibilityRole="button"
           accessibilityLabel={[t(`explore.categories.${p.category}`), p.photos?.length ? t('explore.photos.count', { count: p.photos.length }) : p.video ? t('explore.video.label') : '', p.text.slice(0, 100)].filter(Boolean).join('. ')}
+          accessibilityHint={onLongPress ? longPressHint : undefined}
+          accessibilityActions={onLongPress ? [{ name: 'longpress', label: longPressHint }] : undefined}
+          onAccessibilityAction={onLongPress ? () => onLongPress(p) : undefined}
           onPress={() => router.push({ pathname: '/explore/[id]', params: { id: p.id } })}
+          onLongPress={onLongPress ? () => onLongPress(p) : undefined}
           style={({ pressed }) => [styles.tile, { width: size, height: size, backgroundColor: tileColor(p), opacity: pressed ? 0.85 : 1 }]}>
           {p.photos?.length ? (
             <>

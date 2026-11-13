@@ -51,7 +51,7 @@ export { createFirestoreOfficialProfileRepository, createOfficialProfileAdmin } 
 export { createFirestoreOfficialFollowRepository, getOfficialStats, type OfficialFollowRepository } from './official-follows';
 export { createActivityModeration, createFirestoreActivityRepository, type ActivityReport } from './activities';
 export { deletePhotos, PhotoTooLargeError, uploadMedia, uploadPostPhotos, uploadPostVideo, VideoTooLargeError, type PreparedPhoto, type PreparedVideo } from './photos';
-export { createFirestorePostRepository, createFramesAdmin, createPostModeration, type CommentReport, type FeedFilter, type FeedPage, type PostReport } from './posts';
+export { createFirestorePostRepository, createFramesAdmin, createPostModeration, type CommentReport, type FeedFilter, type FeedPage, type PostReport, SAVE_FOLDER_LIMITS, type SaveFolder, type SavedEntry } from './posts';
 export { createFirestoreSocialRepository, createProfileModeration, type ProfileReport } from './social';
 export { createBannedWords } from './word-filter';
 export { createBadgeAdmin, createBadgeReader } from './badges';

@@ -28,6 +28,7 @@ import { useAutoplayAllowed } from '@/lib/autoplay';
 import { useFeedSort } from '@/lib/feed-sort';
 import { useNotificationFeed, useReadState } from '@/lib/notifications';
 import { authorHref, toggleLike, toggleSave, useFeed, useLiked, useSaved } from '@/lib/posts';
+import { markSeen } from '@/lib/recent-posts';
 import { useSession } from '@/lib/session';
 import { toggleFollowAuthor, toggleFollowBusiness, useSocial } from '@/lib/social';
 import { useUserLocation } from '@/lib/user-location';
@@ -266,12 +267,38 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
   );
   const autoplayOk = useAutoplayAllowed();
   const playing = active && focused && !viewer && autoplayOk;
+  // Son gördüklerin: akışta en az 2,5 saniye ekranda (%60) kalan gönderi listeye girer (yalnız telefonda tutulur).
+  const uidRef = useRef(user?.uid);
+  uidRef.current = user?.uid;
+  const dwell = useRef(new Map<string, ReturnType<typeof setTimeout>>()).current;
+  useEffect(() => () => dwell.forEach(clearTimeout), [dwell]);
   const onViewable = useRef(({ viewableItems }: { viewableItems: { item: unknown; isViewable: boolean }[] }) => {
     const hit = viewableItems.find((v) => {
       const i = v.item as { kind: string; post?: Post };
       return v.isViewable && i.kind === 'post' && !!i.post?.video;
     });
     setVisibleVideo(hit ? (hit.item as { post: Post }).post.id : null);
+    const now = new Map<string, Post>();
+    viewableItems.forEach((v) => {
+      const i = v.item as { kind: string; post?: Post };
+      if (v.isViewable && i.kind === 'post' && i.post) now.set(i.post.id, i.post);
+    });
+    dwell.forEach((timer, id) => {
+      if (!now.has(id)) {
+        clearTimeout(timer);
+        dwell.delete(id);
+      }
+    });
+    now.forEach((p, id) => {
+      if (dwell.has(id)) return;
+      dwell.set(
+        id,
+        setTimeout(() => {
+          const uid = uidRef.current;
+          if (uid) markSeen(uid, p).catch(() => {});
+        }, 2500),
+      );
+    });
   }).current;
   const viewability = useRef({ itemVisiblePercentThreshold: 60, minimumViewTime: 150 }).current;
   const urgent = tab === 'genel' || tab === 'takip' ? [] : (announcements ?? []).filter((a) => a.kind === 'acil');
@@ -430,7 +457,10 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
               follow={followFor(i.post)}
               onFollow={() => followTap(i.post)}
               videoActive={playing && i.post.id === visibleVideo}
-              onOpenVideo={() => setViewer(i.post.id)}
+              onOpenVideo={() => {
+                setViewer(i.post.id);
+                markSeen(user.uid, i.post).catch(() => {});
+              }}
               onLike={() => like(i.post.id)}
               onAuthor={() => router.push(authorHref(i.post))}
             />

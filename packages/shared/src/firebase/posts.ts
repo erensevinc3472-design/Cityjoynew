@@ -111,6 +111,20 @@ function commentFromDoc(postId: string, id: string, d: DocumentData): PostCommen
 }
 
 /** Akış süzgeci: Mahallem kendi mahallesi, Bölgesel kendi ili (istenirse bir ilçesi), Genel herkes. */
+/** Kaydettiklerim klasörü (users/{uid}/saveFolders). */
+export interface SaveFolder {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+/** Klasör adı en çok 40 harf, kişi başına en çok 20 klasör (sınır uygulamada). */
+export const SAVE_FOLDER_LIMITS = { name: 40, count: 20 } as const;
+/** Kaydedilen gönderi ve (varsa) klasörü. */
+export interface SavedEntry {
+  post: Post;
+  folder?: string;
+}
+
 export type FeedFilter =
   | { target: 'mahallem'; neighbourhoodId: string }
   | { target: 'bolgesel'; provinceCode: string; districtId?: string }
@@ -129,6 +143,20 @@ export interface FeedPage {
  * Mahallem gönderisini yalnızca o mahalledekine, Bölgesel'i yalnızca o ildekine okutur.
  */
 export function createFirestorePostRepository(db: Firestore) {
+  /** Kaydedilenler klasörleriyle (Kaydettiklerim ekranı; yeniden eskiye, en çok 100). */
+  async function listSavedEntries(uid: string): Promise<SavedEntry[]> {
+    const snap = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), orderBy('createdAt', 'desc'), limit(100)));
+    const rows = await Promise.all(
+      snap.docs.map((d) =>
+        getDoc(postRef(db, d.id)).then(
+          (p): SavedEntry | null => (p.exists() ? { post: fromDoc(p.id, p.data()), ...(d.get('folder') ? { folder: d.get('folder') as string } : {}) } : null),
+          () => null,
+        ),
+      ),
+    );
+    return rows.filter((r): r is SavedEntry => !!r && r.post.status === 'aktif');
+  }
+
   return {
     /**
      * "{Şehir} kareleri": ildeki fotoğraflı, Genel'e açık ve Karelere işaretli gönderiler, yeniden eskiye, 30'ar.
@@ -403,9 +431,48 @@ export function createFirestorePostRepository(db: Firestore) {
       return getDoc(savedRef(db, uid, postId)).then((s) => s.exists(), () => false);
     },
 
-    async save(uid: string, postId: string): Promise<void> {
+    async save(uid: string, postId: string, folder?: string): Promise<void> {
       const batch = writeBatch(db);
-      batch.set(savedRef(db, uid, postId), { createdAt: serverTimestamp() });
+      batch.set(savedRef(db, uid, postId), folder ? { createdAt: serverTimestamp(), folder } : { createdAt: serverTimestamp() });
+      await batch.commit();
+    },
+
+    /** Kaydedilen gönderiyi klasöre taşır; null: klasörden çıkarır ("Tümü"de kalır). */
+    async setSavedFolder(uid: string, postId: string, folder: string | null): Promise<void> {
+      await updateDoc(savedRef(db, uid, postId), { folder: folder ?? deleteField() });
+    },
+
+    /** Gönderinin klasörü (kaydedilmemişse undefined, klasörsüzse null). */
+    async savedFolder(uid: string, postId: string): Promise<string | null | undefined> {
+      const s = await getDoc(savedRef(db, uid, postId));
+      return s.exists() ? (s.get('folder') ?? null) : undefined;
+    },
+
+    async listFolders(uid: string): Promise<SaveFolder[]> {
+      const snap = await getDocs(query(collection(db, 'users', uid, 'saveFolders'), orderBy('createdAt', 'asc'), limit(SAVE_FOLDER_LIMITS.count)));
+      return snap.docs.map((d) => ({ id: d.id, name: d.get('name') ?? '', createdAt: iso(d.get('createdAt')) ?? '' }));
+    },
+
+    async createFolder(uid: string, name: string): Promise<SaveFolder> {
+      const ref = doc(collection(db, 'users', uid, 'saveFolders'));
+      const at = Timestamp.now();
+      const clean = name.trim().slice(0, SAVE_FOLDER_LIMITS.name);
+      const batch = writeBatch(db);
+      batch.set(ref, { name: clean, createdAt: at });
+      await batch.commit();
+      return { id: ref.id, name: clean, createdAt: at.toDate().toISOString() };
+    },
+
+    async renameFolder(uid: string, id: string, name: string): Promise<void> {
+      await updateDoc(doc(db, 'users', uid, 'saveFolders', id), { name: name.trim().slice(0, SAVE_FOLDER_LIMITS.name) });
+    },
+
+    /** Klasörü siler; içindeki gönderiler kaydedilmiş kalır ("Tümü"ye döner). */
+    async deleteFolder(uid: string, id: string): Promise<void> {
+      const inside = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), where('folder', '==', id), limit(400)));
+      const batch = writeBatch(db);
+      inside.docs.forEach((d) => batch.update(d.ref, { folder: deleteField() }));
+      batch.delete(doc(db, 'users', uid, 'saveFolders', id));
       await batch.commit();
     },
 
@@ -423,10 +490,10 @@ export function createFirestorePostRepository(db: Firestore) {
 
     /** Kaydedilenler (yeniden eskiye, en çok 50). Kaldırılan ya da artık görülemeyen gönderi listede yer almaz. */
     async listSaved(uid: string): Promise<Post[]> {
-      const snap = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), orderBy('createdAt', 'desc'), limit(50)));
-      const posts = await Promise.all(snap.docs.map((d) => getDoc(postRef(db, d.id)).then((p) => (p.exists() ? fromDoc(p.id, p.data()) : null), () => null)));
-      return posts.filter((p): p is Post => !!p && p.status === 'aktif');
+      return (await listSavedEntries(uid)).map((e) => e.post);
     },
+
+    listSavedEntries,
 
     /** Hesap silmede (KVKK): kişinin gönderileri boşaltılır, beğenileri ve yorumları geri alınır, kaydettikleri silinir. */
     async deleteAllOf(uid: string): Promise<void> {
@@ -441,6 +508,12 @@ export function createFirestorePostRepository(db: Firestore) {
       for (const s of saved.docs) {
         const batch = writeBatch(db);
         batch.delete(s.ref);
+        await batch.commit();
+      }
+      const folders = await getDocs(query(collection(db, 'users', uid, 'saveFolders'), limit(100)));
+      for (const f of folders.docs) {
+        const batch = writeBatch(db);
+        batch.delete(f.ref);
         await batch.commit();
       }
       const mine = await getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), limit(500)));

@@ -1480,7 +1480,33 @@
       "how": "How is it sorted?",
       "rules": "The same open rules for everyone: new posts rise and fade over time. Likes and comments (comments count more) lift a post a little. People you follow, your own neighbourhood and official announcements come first. Posts from the same person never come back to back. Reported posts drop down. How long you look is not tracked, and there is no hidden paid boosting."
     },
-    "badge": "Badge: {{name}}"
+    "badge": "Badge: {{name}}",
+    "folders": {
+      "all": "All",
+      "add": "New folder",
+      "title": "Add to folder",
+      "none": "No folder",
+      "newName": "New folder name",
+      "create": "Create",
+      "edit": "Edit",
+      "name": "Folder name",
+      "save": "Save",
+      "delete": "Delete folder",
+      "deleteConfirm": "Delete this folder? Its posts stay in your saved posts.",
+      "cancel": "Cancel",
+      "limit": "You can create up to {{count}} folders.",
+      "error": "Couldn't update the folder. Try again.",
+      "empty": "No posts in this folder. Long-press a post and pick this folder.",
+      "hint": "Long-press a post to put it in a folder.",
+      "in": "Folder: {{name}}"
+    },
+    "recent": {
+      "tab": "Recently viewed",
+      "info": "The last {{count}} posts you looked at. Kept only on this phone.",
+      "reset": "Reset",
+      "resetConfirm": "Clear your recently viewed list?",
+      "empty": "You haven't looked at any posts yet. Posts you view in Explore appear here."
+    }
   },
   "news": {
     "title": "News",
