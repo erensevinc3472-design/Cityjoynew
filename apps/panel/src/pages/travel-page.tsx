@@ -294,6 +294,10 @@ function AdminTravelPage() {
             {canEdit ? <button className="btn secondary" disabled={busy} onClick={() => window.confirm(t('travel.seedConfirm')) && act(async () => t('travel.seeded', { count: await admin!.importSeed() }))}>
               {t('travel.seed')}
             </button> : null}
+            {/* Ara > Yerler (Türkiye geneli, 13 Kasım 2026): eski yerlere arama anahtarı; yeni kayıtlarda kendiliğinden. */}
+            {canEdit ? <button className="btn secondary" disabled={busy} onClick={() => act(async () => t('travel.searchIndexed', { count: await admin!.reindexPlaceSearch() }))}>
+              {t('travel.searchIndex')}
+            </button> : null}
             {import.meta.env.DEV && import.meta.env.VITE_FIREBASE_EMULATOR !== '1' && isAdminUser(user) && !user!.isDemo ? (
               <button className="btn" disabled={busy} onClick={importTours}>Gezileri ve pratik bilgileri yayına aktar (Bursa)</button>
             ) : null}

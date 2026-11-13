@@ -1584,13 +1584,13 @@
   "search": {
     "title": "Search",
     "ask": "What are you looking for?",
-    "placeholder": "People, businesses, places, events or posts",
+    "placeholder": "People, businesses, services, places or posts",
     "tabs": {
       "tumu": "All",
       "kisiler": "People",
       "isletmeler": "Businesses",
+      "hizmetler": "Services",
       "yerler": "Places",
-      "etkinlikler": "Events",
       "gonderiler": "Posts"
     },
     "recent": "Recent searches",
@@ -1623,11 +1623,16 @@
     "privateAccount": "Private account",
     "heroLine1": "What are you",
     "heroLine2": "looking for?",
-    "heroSub": "People, businesses, places, events and posts in one place.",
+    "heroSub": "People, businesses, services, places and posts in one place.",
     "clear": "Clear search",
     "masters": "Tradespeople near you",
     "upcoming": "Upcoming events",
-    "seeAllShort": "See all"
+    "seeAllShort": "See all",
+    "scopeAll": "All of Türkiye",
+    "scoped": "{{title}} · {{place}}",
+    "otherProvince": "Province to search services in",
+    "noService": "No service called “{{q}}” was found. Looking for a business name? Try the Businesses tab.",
+    "cityPlaces": "Places in your city · {{place}}"
   },
   "messages": {
     "title": "Messages",

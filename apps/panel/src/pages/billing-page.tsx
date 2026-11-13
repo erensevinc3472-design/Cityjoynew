@@ -106,7 +106,7 @@ export function BillingPage() {
                     {!status.enabled && status.stoppedAt ? <span className="meta">{when(status.stoppedAt)}</span> : null}
                   </div>
                   <div className="card stat">
-                    <span className="stat-label">{t('billing.cost')}</span>
+                    <span className="stat-label">{t('billing.costMonth')}</span>
                     <strong className="stat-value">{tl(status.costAmount)}</strong>
                     {status.updatedAt ? <span className="meta">{t('billing.updated', { at: when(status.updatedAt) })}</span> : null}
                   </div>

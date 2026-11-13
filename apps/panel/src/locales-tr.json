@@ -254,8 +254,8 @@
     "sortGroup": "Sıralanacak liste",
     "sortMains": "Ana kategoriler",
     "sortChildrenOf": "{{name}} alt kategorileri",
-    "keywords": "Arama kelimeleri",
-    "keywordsHint": "Virgülle ayırın (ör. kuaför için \"saç, fön, boya\"). İnsanlar bu kelimelerle aradığında da bu hizmet çıkar. Yalnızca Türkçe.",
+    "keywords": "Arama kelimeleri (eş anlamlılar)",
+    "keywordsHint": "Eş anlamlılar ve farklı yazılışlar, virgülle (ör. kuaför için \"berber, saç, fön\"; hırdavat için \"hırdavatçı, nalbur\"). Ara > Hizmetler bu kelimelerle de bulur ve kişinin bölgesindeki işletmeleri gösterir. Yalnızca Türkçe.",
     "missingDefaults": "CityJoy'un hazır listesinde veritabanınızda olmayan {{count}} kategori var (yeni gruplar ve \"Diğer\" seçenekleri). Var olan kategorileriniz değişmez.",
     "addMissing": "Eksik kategorileri ekle",
     "childCount": "{{count}} hizmet",
@@ -1554,7 +1554,9 @@
     "videoN": "{{n}}. video",
     "videoTitle": "Video başlığı (isteğe bağlı)",
     "addVideo": "Video ekle",
-    "removeVideo": "Videoyu kaldır"
+    "removeVideo": "Videoyu kaldır",
+    "searchIndex": "Yerleri aramaya ekle",
+    "searchIndexed": "{{count}} yer aramaya eklendi ya da güncellendi. Diğerleri zaten aramada."
   },
   "sort": {
     "column": "Sırala",
@@ -2202,7 +2204,7 @@
     "on": "Açık (servisler çalışıyor)",
     "offCap": "Durdu: sigorta attı",
     "offPanel": "Durdu: panelden durduruldu",
-    "cost": "Bu ayki harcama",
+    "costMonth": "Bu ayki harcama",
     "updated": "Son bilgi: {{at}}",
     "budget": "Aylık bütçe",
     "cap": "Sigorta tutarı",

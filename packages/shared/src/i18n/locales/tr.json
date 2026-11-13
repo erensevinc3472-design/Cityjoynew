@@ -1584,13 +1584,13 @@
   "search": {
     "title": "Ara",
     "ask": "Ne arıyorsun?",
-    "placeholder": "Kişi, işletme, yer, etkinlik ya da gönderi",
+    "placeholder": "Kişi, işletme, hizmet, yer ya da gönderi",
     "tabs": {
       "tumu": "Tümü",
       "kisiler": "Kişiler",
       "isletmeler": "İşletmeler",
+      "hizmetler": "Hizmetler",
       "yerler": "Yerler",
-      "etkinlikler": "Etkinlikler",
       "gonderiler": "Gönderiler"
     },
     "recent": "Son aramalar",
@@ -1623,11 +1623,16 @@
     "privateAccount": "Gizli hesap",
     "heroLine1": "Ne aramak",
     "heroLine2": "istersin?",
-    "heroSub": "Kişiler, işletmeler, yerler, etkinlikler ve gönderiler tek yerde.",
+    "heroSub": "Kişiler, işletmeler, hizmetler, yerler ve gönderiler tek yerde.",
     "clear": "Aramayı temizle",
     "masters": "Bölgendeki ustalar",
     "upcoming": "Yaklaşan etkinlikler",
-    "seeAllShort": "Tümünü gör"
+    "seeAllShort": "Tümünü gör",
+    "scopeAll": "Türkiye geneli",
+    "scoped": "{{title}} · {{place}}",
+    "otherProvince": "Hizmet aranan il",
+    "noService": "“{{q}}” adında bir hizmet bulunamadı. İşletme adı arıyorsan İşletmeler sekmesine bak.",
+    "cityPlaces": "Şehrindeki yerler · {{place}}"
   },
   "messages": {
     "title": "Mesajlar",

@@ -13,6 +13,7 @@ import {
   type Firestore,
 } from './metered';
 
+import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { SEED_CITIES, SEED_LOCAL, SEED_PLACES, SEED_REGIONS, SEED_ROUTES } from '../travel/seed';
 import { travelPlaceId, type TravelImport } from '../travel/sheet';
 import { municipalVideos, type MunicipalVideo } from '../travel/travel';
@@ -169,6 +170,9 @@ const municipalOf = (id: string, d: DocumentData): TravelMunicipal => {
   updatedAt: iso(d.updatedAt) ?? '',
   };
 };
+/** Ara > Yerler (Türkiye geneli): gezilecek yerin adından arama anahtarları. */
+export const placeSearchKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.placeKeys);
+
 const ordered = <T extends { order: number; title: string }>(a: T, b: T) => a.order - b.order || a.title.localeCompare(b.title, 'tr');
 
 /** Durakların boş isteğe bağlı alanları yazılmaz. */
@@ -193,6 +197,11 @@ export function createFirestoreTravelRepository(db: Firestore) {
     },
     async listPlaces(cityId: string): Promise<TravelPlace[]> {
       return (await published(PLACES, where('cityId', '==', cityId))).docs.map((d) => placeOf(d.id, d.data())).sort(byOrder);
+    },
+    /** Ara > Yerler: Türkiye genelinde, adının bir kelimesi anahtarla başlayan yayındaki yerler (en çok 30). */
+    async searchPlaces(key: string): Promise<TravelPlace[]> {
+      const snap = await getDocs(query(collection(db, PLACES), where('status', '==', 'yayinda'), where('searchKeys', 'array-contains', key), limit(30)));
+      return snap.docs.map((d) => placeOf(d.id, d.data()));
     },
     async getPlace(id: string): Promise<TravelPlace | null> {
       const s = await getDoc(doc(db, PLACES, id));
@@ -267,7 +276,7 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
     async savePlace(id: string | null, p: TravelPlaceInput): Promise<string> {
       const ref = id ? doc(db, PLACES, id) : doc(collection(db, PLACES));
       const batch = writeBatch(db);
-      batch.set(ref, { ...clean({ ...p, tour: cleanTour(p.tour), hours: cleanHours(p.hours) } as unknown as Record<string, unknown>), updatedAt: serverTimestamp() });
+      batch.set(ref, { ...clean({ ...p, tour: cleanTour(p.tour), hours: cleanHours(p.hours) } as unknown as Record<string, unknown>), searchKeys: placeSearchKeys(p.name), updatedAt: serverTimestamp() });
       audit(batch, ref.id, id ? 'duzenle' : 'ekle', `Gezilecek yer: ${p.name}`);
       await batch.commit();
       return ref.id;
@@ -366,7 +375,7 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
           byCity.set(p.data.cityId, names);
         }
         const existing = names.get(p.id);
-        const data = { ...p.data, hours: cleanHours(p.data.hours) };
+        const data = { ...p.data, hours: cleanHours(p.data.hours), searchKeys: placeSearchKeys(p.data.name) };
         writes.push({ col: PLACES, id: existing ?? p.id, data: data as unknown as Record<string, unknown>, isNew: !existing && !(await exists(PLACES, p.id)) });
       }
       for (let i = 0; i < writes.length; i += 400) {
@@ -385,6 +394,26 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
       return { added, updated };
     },
 
+    /**
+     * Ara > Yerler için eski yerlere arama anahtarı yazar (13 Kasım 2026 öncesi kaydedilenler; yeni kayıtlarda kendiliğinden).
+     * Yalnızca anahtarı eksik ya da adı değişmiş yerler yazılır. Döner: güncellenen sayısı.
+     */
+    async reindexPlaceSearch(): Promise<number> {
+      const snap = await getDocs(query(collection(db, PLACES), limit(5000)));
+      const todo = snap.docs.filter((d) => {
+        const want = placeSearchKeys(String(d.data().name ?? ''));
+        const have = (d.data().searchKeys ?? []) as string[];
+        return want.length !== have.length || want.some((k, i) => k !== have[i]);
+      });
+      for (let i = 0; i < todo.length; i += 400) {
+        const batch = writeBatch(db);
+        for (const d of todo.slice(i, i + 400)) batch.update(d.ref, { searchKeys: placeSearchKeys(String(d.data().name ?? '')), updatedAt: serverTimestamp() });
+        audit(batch, `seyahat-arama-${i / 400 + 1}`, 'duzenle', `Gezilecek yerler aramaya eklendi (${Math.min(400, todo.length - i)} yer)`);
+        await batch.commit();
+      }
+      return todo.length;
+    },
+
     /** Başlangıç içeriği (Marmara, Bursa): yalnızca olmayanlar taslak olarak eklenir. Döner: eklenen sayısı. */
     async importSeed(): Promise<number> {
       const batch = writeBatch(db);
@@ -399,7 +428,7 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
         const { id, ...rest } = c;
         await add(CITIES, id, rest);
       }
-      for (const p of SEED_PLACES) await add(PLACES, p.id, p.data as unknown as Record<string, unknown>);
+      for (const p of SEED_PLACES) await add(PLACES, p.id, { ...p.data, searchKeys: placeSearchKeys(p.data.name) } as unknown as Record<string, unknown>);
       for (const r of SEED_ROUTES) await add(ROUTES, r.id, cleanRoute({ ...r.data, status: 'taslak' }));
       for (const x of SEED_LOCAL) await add(LOCAL, x.id, x.data as unknown as Record<string, unknown>);
       if (n) audit(batch, 'seyahat-baslangic', 'ekle', `Seyahat başlangıç içeriği taslak olarak yüklendi (${n} kayıt)`);

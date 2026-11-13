@@ -3493,7 +3493,7 @@ service cloud.firestore {
         && nw.keys().hasOnly(['cityId', 'districtId', 'name', 'kind', 'category', 'summary', 'about', 'history',
              'architecture', 'visitingHours', 'entranceFee', 'suggestedDuration', 'address', 'howToGet', 'nearby', 'tips',
              'bring', 'rules', 'ageInfo', 'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'tour', 'mustSee', 'source', 'order', 'status', 'updatedAt',
-             'durationMinutes', 'hours', 'location'])
+             'durationMinutes', 'hours', 'location', 'searchKeys'])
         && mediaKeptOrOwn(nw, 'cover', 'seyahat') && (!('tour' in nw) || (nw.tour is list && nw.tour.size() <= 6))
         && placeGeoOk(nw) && placeHoursOk(nw)
         && (!('durationMinutes' in nw) || (nw.durationMinutes is int && nw.durationMinutes >= 10 && nw.durationMinutes <= 720))
@@ -3503,7 +3503,7 @@ service cloud.firestore {
         && nw.about is string && nw.about.size() <= 2000
         && nw.get('howToGet', []).size() <= 10 && nw.get('nearby', []).size() <= 10
         && nw.get('tips', []).size() <= 10
-        && travelUrlOk(nw, 'website') && travelUrlOk(nw, 'videoUrl');
+        && travelUrlOk(nw, 'website') && travelUrlOk(nw, 'videoUrl') && validSearchKeys(nw, 40);
       }
       allow create, update: if _k137(request.resource.data);
       allow delete: if isAdmin();

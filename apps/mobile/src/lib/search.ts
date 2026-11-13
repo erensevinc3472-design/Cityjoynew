@@ -11,12 +11,14 @@ import {
   type Post,
   type PublicProfile,
   type SearchSuggestions,
+  type TravelPlace,
+  uniqueById,
 } from '@cityjoy/shared';
 import { createSearchSuggestions } from '@cityjoy/shared/firebase';
 
 import { isFirebaseConfigured } from './firebase-config';
 import { firestore } from './firebase';
-import { businessRepository, cityGuide, postRepository, socialRepository } from './services';
+import { businessRepository, cityGuide, postRepository, socialRepository, travelRepository } from './services';
 import { deviceStorage } from './storage';
 
 // ---- Son aramalar (telefonda, kişi silebilir) ----
@@ -107,8 +109,35 @@ async function lookup<T>(cacheKey: string, query: string, min: number, fetch: (k
 export const searchPeople = (query: string) =>
   lookup<PublicProfile>('kisi', query, SEARCH_LIMITS.minName, (k) => socialRepository.searchPeople(k).then((l) => l.filter((p) => !p.suspended)), (p) => p.displayName);
 
-export const searchBusinesses = (query: string, provinceCode: string) =>
-  lookup<Business>(`isletme|${provinceCode}`, query, SEARCH_LIMITS.minName, (k) => businessRepository.searchByName(provinceCode, k), (b) => b.name);
+/**
+ * İşletme adı Türkiye genelinde aranır (Eren, 13 Kasım 2026). Genel sorgu en çok 30 getirdiği için kişinin ilindeki
+ * eşleşmeler ayrıca sorulur; böylece aynı adlı çok işletme olsa da yakındakiler kaybolmaz. Sıralama ekranda (nearFirst).
+ */
+export const searchBusinesses = (query: string, provinceCode: string | undefined) =>
+  lookup<Business>(
+    `isletme|${provinceCode ?? ''}`,
+    query,
+    SEARCH_LIMITS.minName,
+    async (k) => {
+      const [near, all] = await Promise.all([provinceCode ? businessRepository.searchByName(provinceCode, k) : [], businessRepository.searchByNameAll(k)]);
+      return uniqueById([...near, ...all]);
+    },
+    (b) => b.name,
+  );
+
+/** Gezilecek yerler (Ulu Cami, Alanya Kalesi) Türkiye genelinde. */
+export const searchTravelPlaces = (query: string) =>
+  lookup<TravelPlace>('yer', query, SEARCH_LIMITS.minName, (k) => travelRepository.searchPlaces(k), (p) => p.name);
+
+/** Ara > Hizmetler: seçilen ildeki bir meslekteki işletmeler (en çok 100; 5 dakika tekrar okunmaz). */
+export async function serviceBusinesses(provinceCode: string, categoryId: string): Promise<Business[]> {
+  const key = `hizmet|${provinceCode}|${categoryId}`;
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < TTL) return hit.list as Business[];
+  const list = await businessRepository.listByCategory(provinceCode, categoryId);
+  cache.set(key, { at: Date.now(), list });
+  return list;
+}
 
 export const searchPosts = (query: string, at: { provinceCode?: string; neighbourhoodId?: string }) =>
   lookup<Post>(`gonderi|${at.provinceCode}|${at.neighbourhoodId}`, query, SEARCH_LIMITS.minPost, (k) => postRepository.search(k, at), (p) => p.text);

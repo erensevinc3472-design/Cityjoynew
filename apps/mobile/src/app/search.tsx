@@ -8,10 +8,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   buildCategoryTree,
+  categorySearchText,
   cityChoiceLabel,
   citySection,
   filterBySearch,
+  isServiceQuery,
   localized,
+  nearFirst,
   rankBusinesses,
   SEARCH_LIMITS,
   SEARCH_TABS,
@@ -22,6 +25,7 @@ import {
   type PublicProfile,
   type SearchTab,
   type ServiceCategory,
+  type TravelPlace,
 } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
@@ -31,6 +35,7 @@ import { EventCard } from '@/components/event-card';
 import { BottomNav } from '@/components/bottom-nav';
 import { RoundButton } from '@/components/hero-header';
 import { OptionRow } from '@/components/option-row';
+import { ProvincePicker } from '@/components/pickers';
 import { PostCard } from '@/components/post-card';
 import type { TreeEvent } from '@/components/search-tree/tree-html';
 import { TreeScene } from '@/components/search-tree/tree-scene';
@@ -38,7 +43,7 @@ import { StateMessage } from '@/components/state-message';
 import { useEvents } from '@/lib/events';
 import { locationRepository as repo } from '@/lib/locations';
 import { authorHref, toggleLike, useLiked } from '@/lib/posts';
-import { searchBusinesses, searchPeople, searchPosts, useCityPlaces, useRecentSearches, useSearchSuggestions } from '@/lib/search';
+import { searchBusinesses, searchPeople, searchPosts, searchTravelPlaces, serviceBusinesses, useCityPlaces, useRecentSearches, useSearchSuggestions } from '@/lib/search';
 import { useServiceCategories } from '@/lib/service-categories';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
@@ -75,8 +80,9 @@ function useRemote<T>(query: string, enabled: boolean, run: (q: string) => Promi
 }
 
 /**
- * Ara (PROJE.md 5.10): kişiler, işletmeler (ve hizmet kategorileri), yerler (Benim Şehrim), etkinlikler ve Keşfet
- * gönderileri. Sonuçlar kişinin iline göre süzülür, doğrulanmış işletmeler önce gelir, engellenenler görünmez.
+ * Ara (PROJE.md 5.10): kişiler, işletmeler, hizmetler, yerler ve Keşfet gönderileri. Kapsam (Karar Eren, 13 Kasım 2026):
+ * kişiler, işletme adları ve gezilecek yerler Türkiye geneli (önce ilçe, sonra il); hizmetler (meslek) bölgesel, istenirse
+ * başka il; gönderiler Genel + il + mahalle. Doğrulanmış işletmeler önce gelir, engellenenler görünmez.
  * Türkçe karakter ve bir harflik yazım hatası tolere edilir. Boşken son aramalar, önerilen aramalar ve hızlı erişim.
  */
 export default function SearchScreen() {
@@ -98,6 +104,8 @@ export default function SearchScreen() {
   const [query, setQuery] = useState(params.q?.trim() ?? '');
   const tabParam = (SEARCH_TABS as readonly string[]).includes(params.tab ?? '') ? (params.tab as SearchTab) : undefined;
   const [tab, setTab] = useState<SearchTab>(tabParam ?? 'tumu');
+  // Hizmetler sekmesinde "Başka ilde ara" ile seçilen il; boşsa kişinin ili.
+  const [serviceProvince, setServiceProvince] = useState<string | undefined>();
   // Profil > Kişi bul: ekran açıkken de sekme Kişiler'e geçsin.
   useEffect(() => {
     if (tabParam) setTab(tabParam);
@@ -195,7 +203,8 @@ export default function SearchScreen() {
   const wants = (x: SearchTab) => active && (tab === 'tumu' || tab === x);
 
   const people = useRemote<PublicProfile>(query, wants('kisiler') && !!user, searchPeople, []);
-  const businesses = useRemote<Business>(query, wants('isletmeler') && !!province, (q) => searchBusinesses(q, province!), [province]);
+  const businesses = useRemote<Business>(query, wants('isletmeler'), (q) => searchBusinesses(q, province), [province]);
+  const travel = useRemote<TravelPlace>(query, wants('yerler'), searchTravelPlaces, []);
   const postsOk = longest >= SEARCH_LIMITS.minPost;
   const posts = useRemote<Post>(
     query,
@@ -206,16 +215,32 @@ export default function SearchScreen() {
   const places = useCityPlaces(province, wants('yerler'));
   // Boşken "Yaklaşan etkinlikler" de buradan; oturumda önbellekte.
   const { list: events } = useEvents(province);
+  const here = { provinceCode: province, districtId: location?.districtId };
 
   const subcategories = useMemo(() => buildCategoryTree(categories).flatMap((n) => n.children), [categories]);
-  const categoryText = (x: ServiceCategory) => `${localized(x.names, lang)} ${x.names.tr}`;
-  const categoryHits = active ? filterBySearch(subcategories, query, categoryText).slice(0, 8) : [];
+  // Hizmetler: meslek adı ve paneldeki eş anlamlılar; işletmeler kişinin ilinde (ya da seçtiği ilde), önce ilçesi.
+  const categoryHits = active && (tab === 'tumu' || tab === 'hizmetler') ? filterBySearch(subcategories, query, categorySearchText).slice(0, 8) : [];
+  const serviceFirst = active && isServiceQuery(subcategories, query);
+  const svcProvince = serviceProvince ?? province;
+  const svcPlace = svcProvince === province && district ? [district, provinceName].join(', ') : svcProvince ? repo.getProvince(svcProvince)?.name : undefined;
+  const topCategory = categoryHits[0]?.id;
+  const svc = useRemote<Business>(
+    query,
+    wants('hizmetler') && !!svcProvince && !!topCategory,
+    () =>
+      serviceBusinesses(svcProvince!, topCategory!).then((l) => {
+        const r = rankBusinesses(l, { districtId: svcProvince === province ? location?.districtId : undefined });
+        return nearFirst([...r.featured, ...r.others], svcProvince === province ? here : {}, (b) => b.location);
+      }),
+    [svcProvince, topCategory],
+  );
+  const svcHits = topCategory ? svc.list : [];
   const placeText = (i: CityGuideItem) =>
     [i.name, i.category && cityChoiceLabel(i.category, lang), i.districtId && repo.getDistrict(i.districtId)?.name].filter(Boolean).join(' ');
   const placeHits = active && places ? filterBySearch(places, query, placeText) : null;
-  const eventHits = active && events ? filterBySearch(events, query, (e) => `${e.title} ${e.venueName} ${e.description}`) : null;
+  const travelHits = travel.list ? nearFirst(travel.list, here, (x) => ({ provinceCode: x.cityId, districtId: x.districtId })) : null;
   const peopleHits = people.list?.filter((p) => !blocked.has(p.uid) && p.uid !== user?.uid) ?? null;
-  const businessHits = businesses.list ? (({ featured, others }) => [...featured, ...others])(rankBusinesses(businesses.list, { districtId: location?.districtId })) : null;
+  const businessHits = businesses.list ? nearFirst((({ featured, others }) => [...featured, ...others])(rankBusinesses(businesses.list, { districtId: location?.districtId })), here, (b) => b.location) : null;
   const postHits = posts.list?.filter((p) => !blocked.has(p.authorUid)).map((p) => (p.id in likes ? { ...p, likeCount: likes[p.id] } : p)) ?? null;
 
   // Bir sonuca (ya da başka ekrana) geçilince arama son aramalara eklenir.
@@ -261,12 +286,47 @@ export default function SearchScreen() {
   };
 
   const needLocation = province ? undefined : t('search.needLocation');
+  const everywhere = t('search.scopeAll');
+  const scoped = (key: SearchTab, place?: string) => (place ? t('search.scoped', { title: t(`search.tabs.${key}`), place }) : t(`search.tabs.${key}`));
+  const goCategory = (id: string) =>
+    router.push({ pathname: '/services/[id]', params: svcProvince && svcProvince !== province ? { id, province: svcProvince } : { id } });
+
+  // Hizmetler (bölgesel): eşleşen meslekler ve ilk meslekteki işletmeler; kendi sekmesinde başka il seçilebilir.
+  const services = (() => {
+    if (tab !== 'tumu' && tab !== 'hizmetler') return null;
+    const own = tab === 'hizmetler';
+    if (!categoryHits.length) return own ? <StateMessage key="hizmetler" kind="empty" message={t('search.noService', { q: query })} /> : null;
+    const shown = svcHits ? (own ? svcHits : svcHits.slice(0, PREVIEW)) : [];
+    return (
+      <View key="hizmetler" style={styles.group}>
+        <AppText variant="label" accessibilityRole="header">{scoped('hizmetler', svcPlace)}</AppText>
+        {own ? (
+          <ProvincePicker label={t('search.otherProvince')} value={svcProvince} onChange={(code) => setServiceProvince(code === province ? undefined : code)} />
+        ) : null}
+        {(own ? categoryHits : categoryHits.slice(0, 2)).map((x) => (
+          <OptionRow key={`k-${x.id}`} title={localized(x.names, lang) ?? x.names.tr} subtitle={t('search.serviceCategory')} showChevron onPress={() => goCategory(x.id)} />
+        ))}
+        {!svcProvince ? (
+          <StateMessage kind="empty" message={t('search.needLocation')} />
+        ) : svcHits === null ? (
+          own ? <StateMessage kind="loading" /> : null
+        ) : svc.failed && !svcHits.length ? (
+          own ? <StateMessage kind="error" message={t('search.loadError')} /> : null
+        ) : (
+          shown.map((b) => <BusinessCard key={`h-${b.id}`} business={b} />)
+        )}
+        {svcHits && svcHits.length > shown.length ? (
+          <Pressable accessibilityRole="button" onPress={() => (own && topCategory ? goCategory(topCategory) : setTab('hizmetler'))} style={styles.more}>
+            <AppText variant="label" style={{ color: c.accent }}>{t('search.seeAll', { count: svcHits.length })}</AppText>
+          </Pressable>
+        ) : null}
+      </View>
+    );
+  })();
+
   const results = [
-    // Hizmet kategorileri ("berber" > Berberler listesi): yalnızca eşleşme varsa görünür.
-    section<ServiceCategory>('isletmeler', categoryHits, (x) => (
-      <OptionRow key={`k-${x.id}`} title={localized(x.names, lang) ?? x.names.tr} subtitle={t('search.serviceCategory')} showChevron onPress={() => router.push({ pathname: '/services/[id]', params: { id: x.id } })} />
-    ), { id: 'kategoriler', quiet: true, title: t('search.services') }),
-    section('isletmeler', businessHits, (b) => <BusinessCard key={b.id} business={b} />, { failed: businesses.failed, note: needLocation }),
+    serviceFirst ? services : null,
+    section('isletmeler', businessHits, (b) => <BusinessCard key={b.id} business={b} showProvince />, { failed: businesses.failed, title: scoped('isletmeler', everywhere) }),
     section('kisiler', peopleHits, (p) => (
       <OptionRow
         key={p.uid}
@@ -282,19 +342,29 @@ export default function SearchScreen() {
         showChevron
         onPress={() => router.push({ pathname: '/u/[uid]', params: { uid: p.uid } })}
       />
-    ), { failed: people.failed }),
-    section('yerler', placeHits, (i) => (
+    ), { failed: people.failed, title: scoped('kisiler', everywhere) }),
+    serviceFirst ? null : services,
+    // Yerler: gezilecek yerler Türkiye geneli; kişinin ilindeki Benim Şehrim kayıtları (park, otopark...) ayrıca.
+    section('yerler', travelHits, (x) => (
       <OptionRow
-        key={i.id}
-        title={i.name}
-        subtitle={[citySection(i.section)?.names[lang], i.districtId && repo.getDistrict(i.districtId)?.name].filter(Boolean).join(' · ')}
+        key={`g-${x.id}`}
+        title={x.name}
+        subtitle={[x.kind, [x.districtId && repo.getDistrict(x.districtId)?.name, repo.getProvince(x.cityId)?.name].filter(Boolean).join(', ')].filter(Boolean).join(' · ')}
         showChevron
-        onPress={() => router.push({ pathname: '/city/item', params: { section: i.section, id: i.id } })}
+        onPress={() => router.push({ pathname: '/travel/place/[id]', params: { id: x.id } })}
       />
-    ), { note: needLocation }),
-    section('etkinlikler', eventHits, (e) => (
-      <EventCard key={e.id} item={e} onPress={() => router.push({ pathname: '/events/[id]', params: { id: e.id } })} />
-    ), { note: needLocation }),
+    ), { failed: travel.failed, title: scoped('yerler', everywhere), quiet: !!placeHits?.length }),
+    province
+      ? section('yerler', placeHits, (i) => (
+          <OptionRow
+            key={i.id}
+            title={i.name}
+            subtitle={[citySection(i.section)?.names[lang], i.districtId && repo.getDistrict(i.districtId)?.name].filter(Boolean).join(' · ')}
+            showChevron
+            onPress={() => router.push({ pathname: '/city/item', params: { section: i.section, id: i.id } })}
+          />
+        ), { id: 'sehir-yerleri', quiet: true, title: t('search.cityPlaces', { place: provinceName }) })
+      : null,
     section('gonderiler', postHits, (p) => (
       <PostCard
         key={p.id}
@@ -307,7 +377,7 @@ export default function SearchScreen() {
   ];
 
   // Tümü sekmesinde her şey bittiyse ve hiç sonuç yoksa tek bir "sonuç yok" yazısı.
-  const allLists = [categoryHits, businessHits, peopleHits, placeHits, eventHits, postsOk ? postHits : []];
+  const allLists = [categoryHits, topCategory ? svcHits : [], businessHits, peopleHits, travelHits, placeHits, postsOk ? postHits : []];
   const allDone = allLists.every((l) => l !== null);
   const nothing = tab === 'tumu' && allDone && allLists.every((l) => !l || l.length === 0);
   const loadingAll = tab === 'tumu' && !allDone && allLists.every((l) => !l || l.length === 0);

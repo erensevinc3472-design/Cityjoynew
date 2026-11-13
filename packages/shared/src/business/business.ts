@@ -447,6 +447,8 @@ export interface BusinessRepository {
   listInProvince(provinceCode: string): Promise<Business[]>;
   /** Ara > İşletmeler: ildeki yayındaki işletmelerden adının bir kelimesi anahtarla başlayanlar (en çok 30). */
   searchByName(provinceCode: string, key: string): Promise<Business[]>;
+  /** Ara > İşletmeler (Türkiye geneli, Eren 13 Kasım 2026): adının bir kelimesi anahtarla başlayan yayındaki işletmeler (en çok 30). */
+  searchByNameAll(key: string): Promise<Business[]>;
   get(id: string): Promise<Business | null>;
   listMine(uid: string): Promise<Business[]>;
   /** Kişinin yetkili olduğu (sahibi olmadığı) işletmeler. */

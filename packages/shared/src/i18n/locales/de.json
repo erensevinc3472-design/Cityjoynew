@@ -1584,13 +1584,13 @@
   "search": {
     "title": "Suche",
     "ask": "Wonach suchst du?",
-    "placeholder": "Personen, Betriebe, Orte, Events oder Beiträge",
+    "placeholder": "Personen, Betriebe, Dienste, Orte oder Beiträge",
     "tabs": {
       "tumu": "Alle",
       "kisiler": "Personen",
       "isletmeler": "Betriebe",
+      "hizmetler": "Dienste",
       "yerler": "Orte",
-      "etkinlikler": "Veranstaltungen",
       "gonderiler": "Beiträge"
     },
     "recent": "Letzte Suchen",
@@ -1623,11 +1623,16 @@
     "privateAccount": "Privates Konto",
     "heroLine1": "Wonach",
     "heroLine2": "suchst du?",
-    "heroSub": "Personen, Betriebe, Orte, Veranstaltungen und Beiträge an einem Ort.",
+    "heroSub": "Personen, Betriebe, Dienste, Orte und Beiträge an einem Ort.",
     "clear": "Suche löschen",
     "masters": "Handwerker in deiner Nähe",
     "upcoming": "Kommende Veranstaltungen",
-    "seeAllShort": "Alle ansehen"
+    "seeAllShort": "Alle ansehen",
+    "scopeAll": "Ganze Türkei",
+    "scoped": "{{title}} · {{place}}",
+    "otherProvince": "Provinz für die Dienstsuche",
+    "noService": "Kein Dienst namens „{{q}}“ gefunden. Suchst du einen Betriebsnamen? Sieh im Tab Betriebe nach.",
+    "cityPlaces": "Orte in deiner Stadt · {{place}}"
   },
   "messages": {
     "title": "Nachrichten",

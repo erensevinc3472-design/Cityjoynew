@@ -103,6 +103,8 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
     searchByName: (provinceCode, key) =>
       list(where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode), where('searchKeys', 'array-contains', key), limit(30)),
 
+    searchByNameAll: (key) => list(where('status', '==', 'yayinda'), where('searchKeys', 'array-contains', key), limit(30)),
+
     async get(id) {
       const snap = await getDoc(doc(db, COLLECTION, id));
       return snap.exists() ? fromDoc(snap.id, snap.data()) : null;

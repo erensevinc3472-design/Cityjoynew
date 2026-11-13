@@ -91,11 +91,14 @@ describe('Ara', () => {
     const ayse = createFirestoreBusinessRepository(fs('ayse'));
     expect((await ayse.searchByName('16', 'berb')).map((b) => b.id)).toEqual([id]);
     expect((await ayse.searchByName('16', 'sukru')).map((b) => b.id)).toEqual([id]);
+    // Türkiye geneli (Eren, 13 Kasım 2026): iki ildeki berber de adla bulunur.
+    expect((await ayse.searchByNameAll('berb')).map((b) => b.name).sort()).toEqual(['Moda Berber', 'Şükrü Berber']);
     await repo.update(id, business('Ali Kuaför'));
     expect(await ayse.searchByName('16', 'sukru')).toEqual([]);
     expect((await ayse.searchByName('16', 'kuaf')).map((b) => b.id)).toEqual([id]);
     await repo.setHidden(id, true);
     expect(await ayse.searchByName('16', 'kuaf')).toEqual([]);
+    expect(await ayse.searchByNameAll('kuaf')).toEqual([]);
   });
 
   it('önerilen aramalar: herkes okur, yalnızca admin yazar ve kayda geçer', async () => {
