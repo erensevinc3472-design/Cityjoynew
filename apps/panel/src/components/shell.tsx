@@ -5,6 +5,7 @@ import { canSeeModule, type Module } from '@cityjoy/shared';
 import { ScopeLabel } from './scope-label';
 import { PanelSearch } from './panel-search';
 import { hasProfileAccess } from '../pages/profile-page';
+import { canBroadcast } from '../pages/broadcast-page';
 import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
@@ -46,6 +47,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
       { key: 'vitrin', show: (u) => isAdminUser(u) || canSeeModule(u.grants, 'sehir-rehberi'), path: '/sehir-vitrini', icon: 'screen' },
       { key: 'sehir-rehberi', module: 'sehir-rehberi', path: '/sehir-rehberi', icon: 'book' },
       { key: 'gonderiler', module: 'gonderiler', path: '/duyurular', icon: 'megaphone' },
+      { key: 'toplu-bildirim', show: canBroadcast, path: '/toplu-bildirim', icon: 'bell' },
       { key: 'etkinlikler', module: 'etkinlikler', path: '/etkinlikler', icon: 'calendar' },
       { key: 'seyahat', module: 'seyahat', path: '/seyahat', icon: 'globe' },
       { key: 'yol-ustu', show: admin, path: '/yol-ustu-verisi', icon: 'road' },

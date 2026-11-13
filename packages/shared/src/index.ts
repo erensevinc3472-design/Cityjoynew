@@ -55,6 +55,7 @@ export * from './listings/listings';
 export * from './locations/location-badge';
 export * from './notifications/notifications';
 export * from './notifications/push';
+export * from './notifications/broadcast';
 export * from './billing/billing';
 export * from './limits/limits';
 export * from './travel/travel';

@@ -2814,5 +2814,10 @@
       "snow": "Snow",
       "thunder": "Thunderstorm"
     }
+  },
+  "broadcast": {
+    "title": "Notification",
+    "muhtar": "Neighbourhood office",
+    "note": "This notification was sent to your chosen area. You can choose which notifications you get in My account > Notifications."
   }
 }

@@ -392,3 +392,11 @@ section[aria-labelledby="suspended-title"] { margin-top: 28px; }
 .badge-row strong { margin-inline-end: 0.5rem; }
 .badge-row .meta { margin: 0.2rem 0 0; }
 .badge-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-size: 1.1rem; flex: none; }
+
+/* Toplu bildirim önizlemesi: telefonun kilit ekranındaki bildirim kartı. */
+.phone-notice { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 0.7rem 0.9rem; margin: 0 0 0.6rem; box-shadow: 0 6px 18px rgb(0 0 0 / 0.12); max-width: 380px; }
+.phone-notice-head { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; margin-bottom: 0.3rem; }
+.phone-notice-head i { width: 18px; height: 18px; border-radius: 5px; background: var(--accent); display: inline-block; }
+.phone-notice-head .meta { margin-inline-start: auto; }
+.phone-notice strong { display: block; font-size: 0.92rem; }
+.phone-notice p { margin: 0.15rem 0 0; font-size: 0.88rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }

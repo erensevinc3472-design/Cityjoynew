@@ -2814,5 +2814,10 @@
       "snow": "Schnee",
       "thunder": "Gewitter"
     }
+  },
+  "broadcast": {
+    "title": "Benachrichtigung",
+    "muhtar": "Ortsvorsteher",
+    "note": "Diese Benachrichtigung wurde an deine gewählte Region gesendet. Welche Benachrichtigungen du erhältst, wählst du unter Mein Konto > Benachrichtigungen."
   }
 }

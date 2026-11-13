@@ -5,6 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { handleAnnouncementWrite } from '../src/announcements';
 import { handleBusinessPostWrite } from '../src/business-posts';
+import { handleBroadcastEstimate, handleBroadcastReview, handleBroadcastSend } from '../src/broadcasts';
 import { handleBudgetNotice, handleManualStop } from '../src/budget';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
 import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
@@ -817,5 +818,83 @@ describe('Pro bitince fazla gönderiler', () => {
     expect(await remindProEnding(db, deps)).toBe(1);
     expect(sent[0]).toMatchObject({ to: 'T-sahip', title: 'Usta Fırın: Pro üç gün içinde bitiyor' });
     expect(sent[0].data.href).toEqual({ pathname: '/business/membership', params: { id: 'b1' } });
+  });
+});
+
+describe('bölgeye toplu bildirim', () => {
+  const kurum = { uid: 'k1', email: 'personel@nilufer.bel.tr', emailVerified: true };
+  const muhtar = { uid: 'mu1', email: 'muhtar@ornek.com', emailVerified: true };
+  const il = { uid: 'iy1', email: 'il@ornek.com', emailVerified: true };
+  const msg = (over: Record<string, unknown> = {}) => ({
+    publisherKey: 'bld-16-nilufer', kind: 'duyuru', title: 'Su kesintisi', body: 'Yarın 09.00-17.00 arası su kesilecek.',
+    region: { provinceCode: '16', districtId: '16-nilufer' }, ...over,
+  });
+
+  beforeEach(async () => {
+    const live = (uid: string, location: Record<string, string>) =>
+      Promise.all([db.doc(`users/${uid}`).set({ uid, location }), phone(uid)]);
+    await live('n1', { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-m1' });
+    await live('n2', { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-m2' });
+    await live('o1', { provinceCode: '16', districtId: '16-osmangazi' });
+    await live('i1', { provinceCode: '34', districtId: '34-kadikoy' });
+    await db.doc('organizations/bld-16-nilufer').set({ name: 'Nilüfer Belediyesi', status: 'aktif', modules: ['gonderiler', 'bildirimler'], scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' } });
+    await db.doc('orgMembers/bld-16-nilufer__personel@nilufer.bel.tr').set({ assignments: { bildirimler: ['goruntule', 'bildirim-gonder'] } });
+    await db.doc('grants/muhtar@ornek.com__mahalle-16-nilufer-m1').set({ role: 'muhtar', scope: { level: 'mahalle', provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-m1' }, modules: { bildirimler: ['goruntule', 'bildirim-gonder'] } });
+    await db.doc('grants/il@ornek.com__il-16').set({ role: 'il-yoneticisi', scope: { level: 'il', provinceCode: '16' }, modules: { bildirimler: ['goruntule', 'bildirim-gonder'] } });
+    await db.doc('admins/adm').set({ at: Timestamp.now() });
+  });
+
+  it('kurum kendi ilçesine gönderir: yalnızca ilçedekilere gider, kayıt ve işlem kaydı yazılır', async () => {
+    const { sent, deps } = fakeSender();
+    const res = await handleBroadcastSend(db, kurum, msg(), deps);
+    expect(res.status).toBe('gonderildi');
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-n1', 'T-n2']);
+    expect(sent[0]).toMatchObject({ title: 'Duyuru · Nilüfer Belediyesi', body: 'Su kesintisi: Yarın 09.00-17.00 arası su kesilecek.' });
+    expect(sent[0].data.href).toEqual({ pathname: '/broadcast/[id]', params: { id: res.id } });
+    const rec = (await db.doc(`broadcasts/${res.id}`).get()).data()!;
+    expect(rec).toMatchObject({ status: 'gonderildi', sentCount: 2, author: { type: 'kurum', orgId: 'bld-16-nilufer' }, preparedBy: 'k1' });
+    expect((await db.collection('auditLog').where('targetId', '==', res.id).get()).size).toBe(1);
+  });
+
+  it('bölge dışına, görevi olmayana, doğrulanmamış e-postaya izin yok', async () => {
+    const { sent, deps } = fakeSender();
+    await expect(handleBroadcastSend(db, kurum, msg({ region: { provinceCode: '16', districtId: '16-osmangazi' } }), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, { ...kurum, emailVerified: false }, msg(), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, { uid: 'x', email: 'baska@ornek.com', emailVerified: true }, msg(), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, muhtar, msg({ publisherKey: 'mahalle-16-nilufer-m1' }), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, kurum, msg({ publisherKey: 'cityjoy' }), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, kurum, msg({ title: 'x' }), deps)).rejects.toThrow('gecersiz');
+    expect(sent).toEqual([]);
+  });
+
+  it('muhtar yalnızca mahallesine; günlük sınır 3', async () => {
+    const { sent, deps } = fakeSender();
+    const m = msg({ publisherKey: 'mahalle-16-nilufer-m1', region: { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-m1' } });
+    for (let i = 0; i < 3; i++) await handleBroadcastSend(db, muhtar, m, deps);
+    expect(sent.map((x) => x.to)).toEqual(['T-n1', 'T-n1', 'T-n1']);
+    expect(sent[0].title).toBe('Duyuru · Muhtarlık');
+    await expect(handleBroadcastSend(db, muhtar, m, deps)).rejects.toThrow('sinir');
+  });
+
+  it('il geneli il yöneticisinden onaya düşer; admin onaylayınca ildekilere gider, ret gerekçe ister', async () => {
+    const { sent, deps } = fakeSender();
+    const est = await handleBroadcastEstimate(db, il, { publisherKey: 'il-16', region: { provinceCode: '16' } }, NOW);
+    expect(est).toEqual({ reach: null, needsApproval: true });
+    const res = await handleBroadcastSend(db, il, msg({ publisherKey: 'il-16', kind: 'acil', region: { provinceCode: '16' } }), deps);
+    expect(res.status).toBe('onay-bekliyor');
+    expect(sent).toEqual([]);
+    await expect(handleBroadcastReview(db, 'iy1', { id: res.id, approve: true }, deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastReview(db, 'adm', { id: res.id, approve: false, note: 'x' }, deps)).rejects.toThrow('gecersiz');
+    await handleBroadcastReview(db, 'adm', { id: res.id, approve: true }, deps);
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-n1', 'T-n2', 'T-o1']);
+    expect(sent[0].priority).toBe('high');
+    await expect(handleBroadcastReview(db, 'adm', { id: res.id, approve: true }, deps)).rejects.toThrow('yok');
+  });
+
+  it('admin (CityJoy) her yere doğrudan gönderir, sınırsız', async () => {
+    const { sent, deps } = fakeSender();
+    const res = await handleBroadcastSend(db, { uid: 'adm' }, msg({ publisherKey: 'cityjoy', region: { provinceCode: '34' } }), deps);
+    expect(res.status).toBe('gonderildi');
+    expect(sent.map((m) => [m.to, m.title])).toEqual([['T-i1', 'Duyuru · CityJoy']]);
   });
 });

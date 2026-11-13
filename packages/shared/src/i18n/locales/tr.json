@@ -2814,5 +2814,10 @@
       "snow": "Karlı",
       "thunder": "Gök gürültülü"
     }
+  },
+  "broadcast": {
+    "title": "Bildirim",
+    "muhtar": "Muhtarlık",
+    "note": "Bu bildirim seçtiğin bölgeye gönderildi. Hangi bildirimleri alacağını Hesabım > Bildirimler'den seçebilirsin."
   }
 }

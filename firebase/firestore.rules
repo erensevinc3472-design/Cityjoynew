@@ -1876,6 +1876,15 @@ service cloud.firestore {
     }
     // Hazırlayanın seçebileceği durum: taslak, onaya gönder ya da (yetkisi varsa) doğrudan yayınla.
 
+    // Bölgeye toplu bildirim (PROJE.md 7): yalnızca sunucu işlevi yazar (yetki, günlük sınır, il geneli onayı orada).
+    // Gönderilen bildirimin tam metni uygulamada açılır; onay bekleyeni / reddedileni hazırlayan ve admin görür.
+    match /broadcasts/{id} {
+      allow read: if (signedIn() && resource.data.status == 'gonderildi')
+        || (signedIn() && resource.data.preparedBy == request.auth.uid)
+        || isAdmin();
+      allow write: if false;
+    }
+
     match /announcements/{id} {
       allow read: if resource.data.status == 'yayinda'
         || (signedIn() && resource.data.preparedBy == request.auth.uid)

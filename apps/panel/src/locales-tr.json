@@ -585,7 +585,7 @@
   "notifications": {
     "title": "Bildirimler",
     "intro": "Kullanıcının uygulamadaki bildirim merkezine hangi olayların düşeceği. Kullanıcı kendi türlerini ayrıca açıp kapatabilir.",
-    "sendingSoon": "Gruba bildirim gönderme (il, ilçe, mahalle ve ilgi alanına göre; onaylı kampanyalar) telefona bildirim altyapısıyla birlikte gelecek.",
+    "sendingSoon": "Bölgeye bildirim göndermek için menüde İçerik > Toplu bildirim sayfasını kullanın. Yaş, cinsiyet ve ilgi alanına göre hedefleme ile kampanya bildirimleri sonra gelecek.",
     "triggers": "Bildirim üreten olaylar",
     "categories": {
       "acil": "Acil duyuru",
@@ -1804,7 +1804,8 @@
       "kitle": "Takipçiler",
       "uyelikler": "Üyelikler ve Gelir",
       "rozetler": "Rozetler",
-      "veri-kaynaklari": "Veri kaynakları"
+      "veri-kaynaklari": "Veri kaynakları",
+      "toplu-bildirim": "Toplu bildirim"
     },
     "audience": "Takipçiler",
     "open": "Menüyü aç",
@@ -2448,5 +2449,75 @@
     "stale": "Güncel değil",
     "partial": "{{count}} il eksik",
     "ok": "Çalışıyor"
+  },
+  "broadcast": {
+    "title": "Toplu bildirim",
+    "intro": "Seçtiğiniz il, ilçe ya da mahallede oturanların telefonuna bildirim gönderir. Önce \"Önizle\"ye basın: bildirimin telefonda nasıl görüneceğini ve yaklaşık kaç kişiye ulaşacağını görürsünüz. Kişilerin kim olduğu gösterilmez; {{min}} kişiden azsa sayı da gösterilmez. Her hesap günde en çok {{count}} toplu bildirim gönderebilir. İl genelinde bildirim önce admin onayına gider. Kişilerin kapattığı bildirim türleri ve sessiz saatleri gözetilir; acil bildirim her zaman çalar. Her gönderim işlem kaydına yazılır.",
+    "demoReadOnly": "Deneme hesabıyla bildirim gönderilemez.",
+    "noAccount": "Toplu bildirim göndermek için Bildirimler bölümünde \"Bildirim gönder\" yetkiniz olmalı. Yetkiyi kurum yöneticiniz ya da il yöneticisi verir.",
+    "account": "Hangi hesapla",
+    "sendingAs": "Gönderen: {{name}}",
+    "cityjoy": "CityJoy",
+    "muhtar": "Muhtarlık",
+    "kind": "Tür",
+    "kinds": {
+      "duyuru": "Duyuru",
+      "acil": "Acil"
+    },
+    "kindHints": {
+      "duyuru": "kişinin bildirim ayarlarına göre gider",
+      "acil": "su kesintisi, afet gibi durumlar; her zaman çalar"
+    },
+    "province": "İl",
+    "titleField": "Başlık",
+    "body": "Metin",
+    "bodyHint": "Telefonda ilk birkaç satır görünür, dokununca tamamı açılır.",
+    "provinceApproval": "İl genelinde bildirim önce admin onayına gider. Hemen göndermek için ilçe ya da mahalle seçin.",
+    "preview": "Önizle",
+    "send": "Gönder",
+    "sendForApproval": "Onaya gönder",
+    "previewTitle": "Telefonda böyle görünür",
+    "previewHint": "Bildirim kişinin uygulama dilinden bağımsız olarak yazdığınız dilde gider.",
+    "now": "şimdi",
+    "pushTitle": {
+      "duyuru": "Duyuru · {{name}}",
+      "acil": "Acil duyuru · {{name}}"
+    },
+    "reach": "Yaklaşık {{count}} kişiye ulaşır.",
+    "reachFew": "{{min}} kişiden az kişiye ulaşır.",
+    "reachHint": "Bölgede oturan kayıtlı kişiler. Telefonunda bildirimi kapatanlara gitmez.",
+    "reachUnknown": "Kaç kişiye ulaşacağını görmek için \"Önizle\"ye basın.",
+    "fillAll": "Bölgeyi seçin; başlık en az {{title}}, metin en az {{body}} karakter olsun.",
+    "confirmSend": "Bildirim şimdi {{place}} bölgesindekilere gönderilecek. Gönderilen bildirim geri alınamaz. Gönderilsin mi?",
+    "confirmApproval": "Bildirim admin onayına gönderilecek. Onaylanınca gider. Devam edilsin mi?",
+    "confirmApprove": "Bildirim şimdi bölgedekilere gönderilecek ve geri alınamaz. Onaylıyor musunuz?",
+    "sent": "Bildirim gönderildi.",
+    "sentForApproval": "Bildirim admin onayına gönderildi.",
+    "approved": "Onaylandı, bildirim gönderildi.",
+    "rejected": "Reddedildi; gerekçe hazırlayana görünür.",
+    "limitReached": "Bu hesap bugün {{count}} toplu bildirim gönderdi. Yarın yeniden gönderebilirsiniz.",
+    "noPermission": "Bu bölgeye bu hesapla bildirim gönderme yetkiniz yok.",
+    "error": "Bir sorun oldu. Yeniden deneyin.",
+    "pendingTitle": "Onay bekleyen il geneli bildirimler ({{count}})",
+    "approve": "Onayla ve gönder",
+    "reject": "Reddet",
+    "rejectNote": "Ret gerekçesi (hazırlayan görür)",
+    "cancel": "Vazgeç",
+    "historyTitle": "Gönderilenler",
+    "empty": "Henüz toplu bildirim gönderilmedi.",
+    "loading": "Yükleniyor…",
+    "loadError": "Liste yüklenemedi.",
+    "retry": "Yeniden dene",
+    "message": "Bildirim",
+    "target": "Gönderen ve bölge",
+    "status": "Durum",
+    "actions": "İşlemler",
+    "statuses": {
+      "gonderildi": "Gönderildi",
+      "onay-bekliyor": "Onay bekliyor",
+      "reddedildi": "Reddedildi"
+    },
+    "sentCount": "{{count}} kişinin telefonuna gitti",
+    "noteShown": "Gerekçe: {{note}}"
   }
 }

@@ -650,6 +650,7 @@ Paneller şu filtrelerle bildirim gönderebilecek: **il, ilçe, mahalle, yaş, c
 - Kayıtta/profilde istenecekler: doğum yılı (yaş için), cinsiyet (isteğe bağlı), ilgi alanları, bildirim izni. Hedefleme için gereken bilgilere **ayrı açık rıza** alınır. 18 yaş altı kullanıcılara kampanya türü bildirim gönderilmez (öneri).
 - Modüller bildirimi otomatik tetikleyebilir: yeni etkinlik (mahalleye), muhtar duyurusu (su kesintisi gibi), yeni belediye hizmeti, takip edilen hesabın gönderisi. Her tetikleyici panelde açılıp kapatılabilir.
 - Her bildirim için gönderen, hedef, saat, ulaşan ve açan sayısı kayıt altına alınır.
+- **Yapıldı (13 Kasım 2026): bölgeye toplu bildirim (ilk sürüm).** Panel > Toplu bildirim: il/ilçe/mahalle hedefi (yetki bölgesi içinde), duyuru ve acil türü, önizleme + yaklaşık kişi sayısı (50 altı sayı gösterilmez), il geneli admin dışında admin onayına (6.5), hesap başına günde 3, gönderen/hedef/saat/ulaşan sayısı kayıtlı, işlem kaydı. Yaş, cinsiyet, ilgi alanı hedeflemesi (açık rıza), kampanya türü, zamanlama ve açılma sayısı sonraki adım.
 - **Siyasi içerik riski:** Belediye ve başkan hesaplarının bildirimleri seçim dönemlerinde propaganda sınırlarına takılabilir. Bu konuda kurallar ve panel uyarıları hukuk incelemesinde netleştirilecek.
 
 ## 8. Hukuk ve mağaza gereklilikleri (Claude hazırlar)

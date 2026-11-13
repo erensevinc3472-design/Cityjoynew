@@ -17,6 +17,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { onObjectFinalized } from 'firebase-functions/v2/storage';
 
 import { handleAnnouncementWrite } from './announcements';
+import { BroadcastError, handleBroadcastEstimate, handleBroadcastReview, handleBroadcastSend, type Actor } from './broadcasts';
 import { handleBusinessPostWrite } from './business-posts';
 import { cloudBillingDisabler, handleBudgetNotice, handleManualStop, type BudgetNotice } from './budget';
 import { handleActivityChange, handleEventChange } from './cancellations';
@@ -195,6 +196,36 @@ export const suspendAccount = onCall({ maxInstances: 2 }, async (req) => {
 export const liftSuspension = onCall({ maxInstances: 2 }, async (req) => {
   if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
   return suspensionCall(() => handleLift(db, accounts, req.auth!.uid, (req.data as { uid?: unknown } | null)?.uid, new Date()));
+});
+// Bölgeye toplu bildirim (panel): ulaşılacak kişi sayısı, gönderme, il geneli için admin onayı.
+const broadcastCall = async <T>(fn: () => Promise<T>) => {
+  try {
+    return await fn();
+  } catch (e) {
+    if (!(e instanceof BroadcastError)) throw new HttpsError('internal', 'yapilamadi');
+    const code = e.code === 'yetki' ? 'permission-denied' : e.code === 'yok' ? 'not-found' : e.code === 'sinir' ? 'resource-exhausted' : 'invalid-argument';
+    throw new HttpsError(code, e.code);
+  }
+};
+const actorOf = (auth: { uid: string; token: { email?: string; email_verified?: boolean } }): Actor => ({
+  uid: auth.uid,
+  email: auth.token.email,
+  emailVerified: auth.token.email_verified === true,
+});
+export const broadcastEstimate = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return broadcastCall(() => handleBroadcastEstimate(db, actorOf(req.auth!), req.data, new Date()));
+});
+export const broadcastSend = onCall({ maxInstances: 2, timeoutSeconds: 300 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return broadcastCall(() => handleBroadcastSend(db, actorOf(req.auth!), req.data, deps()));
+});
+export const broadcastReview = onCall({ maxInstances: 2, timeoutSeconds: 300 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return broadcastCall(async () => {
+    await handleBroadcastReview(db, req.auth!.uid, req.data, deps());
+    return { ok: true };
+  });
 });
 // Süreli askılar saatte bir denetlenir (askı yoksa tek okuma).
 export const suspensionExpiry = onSchedule({ schedule: 'every 1 hours', maxInstances: 1 }, async () => {
