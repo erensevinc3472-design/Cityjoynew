@@ -171,7 +171,8 @@
     }
   },
   "legal": {
-    "draftNotice": "This text is being prepared and will be reviewed by a lawyer before launch."
+    "draftNotice": "This text is being prepared and will be reviewed by a lawyer before launch.",
+    "openFull": "Read the full text"
   },
   "urgent": {
     "title": "Urgent Needs",

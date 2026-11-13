@@ -83,6 +83,8 @@ Uygulama ve panel hazır; satın almanın gerçekten çalışması için bu hesa
 
 ## 3. Hukuk ve metinler
 
+- [ ] **Yasal sayfalardaki boşluklar (13 Kasım 2026):** taslak sayfalar hazır (gizlilik, kullanım şartları, hesap silme; panel yüklenince https://cityjoynew.web.app/gizlilik.html, /kullanim-sartlari.html, /hesap-silme.html). Doldurulacak 3 şey: veri sorumlusunun adı/unvanı ve adresi (şahıs mı şirket mi kararına bağlı), bir iletişim e-postası (ör. destek@cityjoy.com.tr; alan adında e-posta açılabilir, Claude anlatır), avukatın netleştireceği yerler (yurt dışı aktarım dayanağı, sorumluluk sınırı, yetkili mahkeme). Bu adresleri mağaza kayıtlarına yazacağız.
+
 - [ ] **Avukat:** gizlilik politikası, kullanım şartları, KVKK aydınlatma metni, açık rıza metinleri, topluluk kuralları.
   Uygulamada konum (SOS ve arka plan konumu), aile listesi, yorumlar, mesajlaşma, arama kaydı ve yaş sınırı (13) var;
   avukata bunları söyle. İstersen Claude avukat için soru listesi ve uygulamanın veri dökümünü hazırlar.

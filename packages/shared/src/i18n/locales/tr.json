@@ -171,7 +171,8 @@
     }
   },
   "legal": {
-    "draftNotice": "Bu metin hazırlanıyor. Yayından önce avukat tarafından kontrol edilecek."
+    "draftNotice": "Bu metin hazırlanıyor. Yayından önce avukat tarafından kontrol edilecek.",
+    "openFull": "Tam metni oku"
   },
   "urgent": {
     "title": "Acil İhtiyaçlar",

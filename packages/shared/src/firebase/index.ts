@@ -56,6 +56,7 @@ export { createFirestoreSocialRepository, createProfileModeration, type ProfileR
 export { createBannedWords } from './word-filter';
 export { createBadgeAdmin, createBadgeReader } from './badges';
 export { createDataSourceReader, DATA_SOURCE_IDS, type DataSourceStatus } from './data-sources';
+export { deleteAllUserData } from './account-deletion';
 export { createSearchSuggestions } from './search';
 export { cleanVideoUrl, createIntroVideo, INTRO_VIDEO_URL_MAX } from './intro';
 export { createNeedsConfig } from './needs';

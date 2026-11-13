@@ -171,7 +171,8 @@
     }
   },
   "legal": {
-    "draftNotice": "Dieser Text wird vorbereitet und vor dem Start von einem Anwalt geprüft."
+    "draftNotice": "Dieser Text wird vorbereitet und vor dem Start von einem Anwalt geprüft.",
+    "openFull": "Vollständigen Text lesen"
   },
   "urgent": {
     "title": "Notfälle",

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '@cityjoy/shared';
-import { deleteServiceSuggestionsOf, deleteUsageOf } from '@cityjoy/shared/firebase';
+import { deleteAllUserData } from '@cityjoy/shared/firebase';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
@@ -13,12 +13,11 @@ import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
 import { firestore } from '@/lib/firebase';
-import { activityRepository, authService, businessRepository, eventRepository, familyRepository, listingRepository, messageRepository, officialFollowRepository, postRepository, profileRepository, reviewRepository, socialRepository } from '@/lib/services';
+import { authService } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings, type AutoplayMode, type ThemeMode } from '@/lib/settings';
 import { useSignOut } from '@/lib/sign-out';
 import { restartFlow } from '@/lib/navigation';
-import { notificationSettings } from '@/lib/notifications';
 import { radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
@@ -48,26 +47,8 @@ export default function AccountScreen() {
     setError(undefined);
     setBusy(true);
     try {
-      // Kullanıcının aile bağları, SOS kayıtları, değerlendirmeleri, etkinlik ve aktivite katılımları, açtığı aktiviteler, Keşfet gönderileri, Çarşı ilanları, beğenileri, takipleri (resmî hesaplar dahil) ve profili, mesajları, işletmeleri, hizmet önerileri ve sınır sayaçları da silinir (KVKK);
-      // sonra profil, en son hesap.
-      await authService.deleteAccountAndData(password || undefined, async (uid) => {
-        await familyRepository.deleteAllOf(uid);
-        // Etkinlik ve aktivite katılımları aynı adla tutulur, leaveAll ikisini de siler.
-        await eventRepository.leaveAll(uid);
-        await activityRepository.deleteAllOf(uid);
-        await messageRepository.deleteAllOf(uid);
-        await notificationSettings.delete(uid);
-        await postRepository.deleteAllOf(uid);
-        await listingRepository.deleteAllOf(uid);
-        await socialRepository.deleteAllOf(uid);
-        await reviewRepository.deleteAllBy(uid);
-        await businessRepository.leaveAllOf(uid);
-        await officialFollowRepository.leaveAllOf(uid);
-        await businessRepository.deleteAllOf(uid);
-        await deleteServiceSuggestionsOf(firestore, uid);
-        await deleteUsageOf(firestore, uid);
-        await profileRepository.delete(uid);
-      });
+      // Kişinin bütün verisi (KVKK; ayrıntı: deleteAllUserData), sonra profil, en son hesap. Web'deki hesap silme sayfası da aynısını yapar.
+      await authService.deleteAccountAndData(password || undefined, (uid) => deleteAllUserData(firestore, uid));
       await adopt(null);
       restartFlow(router);
     } catch (e) {

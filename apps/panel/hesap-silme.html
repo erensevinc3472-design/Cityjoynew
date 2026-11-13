@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CityJoy Hesap Silme</title>
+<meta name="description" content="CityJoy hesabınızı ve verilerinizi uygulamadan ya da bu sayfadan kalıcı olarak silin." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/src/site/legal.css" />
+</head>
+<body>
+<main class="wrap">
+  <a class="brand" href="./gizlilik.html"><i aria-hidden="true"></i>CityJoy</a>
+  <nav class="links" aria-label="Yasal sayfalar">
+    <a href="./gizlilik.html">Gizlilik ve KVKK</a>
+    <a href="./kullanim-sartlari.html">Kullanım şartları</a>
+    <a href="./hesap-silme.html" aria-current="page">Hesap silme</a>
+  </nav>
+
+  <h1>CityJoy hesabını silme</h1>
+  <p class="meta">Delete your CityJoy account: sign in below and confirm. Your profile and data are deleted permanently.</p>
+
+  <h2>Uygulamadan</h2>
+  <ol>
+    <li>CityJoy'u aç, <strong>Hesabım</strong>'a dokun.</li>
+    <li><strong>Ayarlar</strong> &gt; <strong>Hesabı sil</strong>'i seç.</li>
+    <li>Şifreni girip (Google ile girdiysen Google hesabını seçip) onayla.</li>
+  </ol>
+
+  <h2>Bu sayfadan</h2>
+  <p>Uygulama telefonunda yoksa hesabına burada giriş yapıp silebilirsin. Kimliğini doğrulamak için giriş gerekir; böylece kimse senin hesabını senin yerine silemez.</p>
+
+  <section class="card" id="signin" aria-labelledby="signin-title">
+    <h3 id="signin-title">1. Giriş yap</h3>
+    <form id="email-form" novalidate>
+      <label for="email">E-posta</label>
+      <input id="email" type="email" autocomplete="email" required maxlength="254" />
+      <label for="password">Şifre</label>
+      <input id="password" type="password" autocomplete="current-password" required />
+      <button type="submit" id="email-btn">Giriş yap</button>
+      <button type="button" class="secondary" id="reset-btn">Şifremi unuttum</button>
+    </form>
+    <p class="or">ya da</p>
+    <button type="button" class="secondary" id="google-btn">Google ile giriş yap</button>
+    <p class="msg" id="signin-msg" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card" id="confirm" hidden aria-labelledby="confirm-title">
+    <h3 id="confirm-title">2. Silmeyi onayla</h3>
+    <p>Giriş yapılan hesap: <strong id="who"></strong></p>
+    <p>Silinenler: profilin ve fotoğrafın, gönderilerin, yorumların, mesajların, ilanların, aktivitelerin, takiplerin, kaydettiklerin, Ailem (SOS) bağlantıların ve yüklediğin dosyalar. Bu işlem <strong>geri alınamaz</strong>.</p>
+    <p>Yasal olarak saklanması gereken bazı kayıtlar (örneğin yönetici işlem kayıtları) yasal süre boyunca saklanır, sonra silinir. Bir işletmenin sahibiysen işletmeyi önce uygulamadan silmen ya da devretmen gerekir.</p>
+    <label class="check"><input type="checkbox" id="agree" /> Hesabımın ve verilerimin kalıcı olarak silineceğini anlıyorum.</label>
+    <button type="button" class="danger" id="delete-btn" disabled>Hesabımı kalıcı olarak sil</button>
+    <button type="button" class="secondary" id="signout-btn">Vazgeç, çıkış yap</button>
+    <p class="msg" id="confirm-msg" role="status" aria-live="polite"></p>
+  </section>
+
+  <section class="card" id="done" hidden>
+    <h3>Hesabın silindi</h3>
+    <p class="msg ok">CityJoy hesabın ve verilerin silindi. Kalan dosyalar birkaç dakika içinde temizlenir.</p>
+  </section>
+
+  <p>Giriş yapamıyorsan <strong>[iletişim e-postası]</strong> adresine, hesabının e-posta adresinden yaz; kimliğini doğruladıktan sonra hesabını en geç 30 gün içinde sileriz.</p>
+
+  <footer>CityJoy · <a href="./gizlilik.html">Gizlilik ve KVKK</a> · <a href="./kullanim-sartlari.html">Kullanım şartları</a></footer>
+</main>
+<script type="module" src="/src/site/delete-account.ts"></script>
+</body>
+</html>
