@@ -1232,7 +1232,7 @@ Dikkat: arka plandaki işlemi `pkill -f "...emulators..."` ile durdurma; komut s
   sahiplik doğrulaması (SMS, Blaze), belge yükleme ve ücretli doğrulama, aynı işletmenin ikinci kaydını engelleme, kategoriye
   özel alanlar (konaklama, yeme-içme...), mobil ustalar için hizmet verdiği ilçeler, "bilgileriniz hâlâ doğru mu?" hatırlatması,
   işletme başına günlük ekleme sınırı. (İl yöneticisi kendi ilinin işletmelerini panelde görür, doğrulama admin'de.)
-- SORULACAK (öneri hazır, Eren'in onayı bekleniyor): Nöbetçi eczane veri kaynağı ve günlük çekimin yeri.
+- Karar (Eren, 13 Kasım 2026): Nöbetçi eczane veri kaynağı NosyAPI (5.000 kredilik paket, ~6 $/ay), günde bir sunucu çekimi, il dosyası public/pharmacy/{il}.json (hava ile aynı altyapı). Ama şimdi değil, sonra yapılacak; Eren o zaman hesap açıp anahtarı alacak (gizli ayar, koda konmaz).
   Öneri `docs/oneri-nobetci-eczane.md`: NosyAPI (yedek CollectAPI) + GitHub Actions, sabah 08:15 ve 10:00 (yalnızca
   başarısız iller). Eren'den gerekenler: onay, NosyAPI anahtarı, GitHub Actions seçilirse Firebase hizmet hesabı anahtarı.
 - **Panel 2. aşama (Eren istedi, 3 Kasım):** belediye panelinde gönderi istatistikleri (görüntülenme, beğeni, yorum,
