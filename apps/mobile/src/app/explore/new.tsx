@@ -38,7 +38,7 @@ import { formatDuration } from '@/components/post-video';
 import { locationRepository } from '@/lib/locations';
 import { forgetFeeds } from '@/lib/posts';
 import { forgetSearches } from '@/lib/search';
-import { businessRepository, postRepository } from '@/lib/services';
+import { businessRepository, postRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useUserLocation } from '@/lib/user-location';
 import { radius, spacing } from '@/theme/tokens';
@@ -77,6 +77,13 @@ export default function NewPostScreen() {
       setAuthor((a) => (a === 'me' || list.some((b) => b.id === a) ? a : 'me'));
     });
   }, [user]);
+  // Yayıncı rozeti olan kişi kendi adına paylaşırken Haberler'i de seçebilir (Eren, 13 Kasım 2026; asıl denetim kurallarda).
+  const [publisher, setPublisher] = useState(false);
+  const [news, setNews] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    socialRepository.getProfile(user.uid).then((p) => setPublisher(p?.publisher === true)).catch(() => {});
+  }, [user]);
   const [targets, setTargets] = useState<PostTarget[]>([POST_TARGETS.includes(target as PostTarget) ? (target as PostTarget) : 'mahallem']);
   const [relative, setRelative] = useState(false);
   const [frames, setFrames] = useState(false);
@@ -112,7 +119,8 @@ export default function NewPostScreen() {
 
   const toggle = (x: PostTarget) => setTargets((cur) => (cur.includes(x) ? cur.filter((y) => y !== x) : [...cur, x]));
   // Gündem konuları (haber, ekonomi, spor...) yalnızca Genel seçiliyken; Genel kalkınca tür "Genel"e döner.
-  const withTopics = targets.includes('genel');
+  const toNews = news && publisher && !biz;
+  const withTopics = targets.includes('genel') || toNews;
   useEffect(() => {
     if (!withTopics && isPostTopic(category)) setCategory('genel');
   }, [withTopics, category]);
@@ -122,7 +130,7 @@ export default function NewPostScreen() {
     const region = biz
       ? { provinceCode: biz.location.provinceCode, districtId: biz.location.districtId, neighbourhoodId: biz.location.neighbourhoodId! }
       : { provinceCode: location!.provinceCode, districtId: location!.districtId!, neighbourhoodId: location!.neighbourhoodId! };
-    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), frames: frames && !!photos.length && targets.includes('genel') };
+    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), frames: frames && !!photos.length && targets.includes('genel'), ...(toNews ? { news: true } : {}) };
     const errs: (PostError | 'relative' | 'banned')[] = [
       ...validatePost(input),
       ...(category === 'taziye' && !relative ? ['relative' as const] : []),
@@ -244,6 +252,9 @@ export default function NewPostScreen() {
         {POST_TARGETS.map((x) => (
           <CheckboxRow key={x} checked={targets.includes(x)} onToggle={() => toggle(x)} label={`${t(`explore.targets.${x}`)}: ${t(`explore.tabHints.${x}`)}`} />
         ))}
+        {publisher && !biz ? (
+          <CheckboxRow checked={news} onToggle={() => setNews((x) => !x)} label={`${t('explore.targets.haberler')}: ${t('explore.tabHints.haberler', { place: provinceName })}`} />
+        ) : null}
         {err('targets') ? <FormMessage kind="error" text={err('targets')!} /> : null}
         {targets.includes('mahallem') ? <AppText variant="caption" muted>{t('explore.fields.mahallemNote')}</AppText> : null}
       </View>

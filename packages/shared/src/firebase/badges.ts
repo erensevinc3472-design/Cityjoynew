@@ -53,7 +53,9 @@ export function createBadgeAdmin(db: Firestore, actorUid: string) {
       const clean = [...new Set(ids)].filter((id) => defs.some((d) => d.id === id)).slice(0, BADGE_LIMITS.perProfile);
       const names = clean.map((id) => defs.find((d) => d.id === id)!.name.tr);
       const batch = writeBatch(db);
-      batch.update(doc(db, 'publicProfiles', profile.uid), { badges: clean, updatedAt: serverTimestamp() });
+      // Yayıncı rozeti Haberler'e paylaşma hakkı verir; kurallar bu işarete bakar (kişi kendisi yazamaz).
+      const publisher = clean.some((id) => defs.find((d) => d.id === id)?.publisher === true);
+      batch.update(doc(db, 'publicProfiles', profile.uid), { badges: clean, publisher, updatedAt: serverTimestamp() });
       addAudit(db, batch, {
         actorUid,
         module: 'moderasyon',

@@ -1254,13 +1254,15 @@
       "mahallem": "Mahallem",
       "bolgesel": "Bölgesel",
       "genel": "Genel",
-      "takip": "Takip"
+      "takip": "Takip",
+      "haberler": "Haberler"
     },
     "tabHints": {
       "mahallem": "yalnızca mahallendekiler görür",
       "bolgesel": "ilindeki herkes görür",
       "genel": "uygulamadaki herkes görür",
-      "takip": "yalnızca takipçilerin görür"
+      "takip": "yalnızca takipçilerin görür",
+      "haberler": "{{place}} Haberler sayfasında görünür (yayıncı)"
     },
     "categories": {
       "genel": "Genel",
@@ -1512,7 +1514,9 @@
     "official": "Kurum haberi",
     "sourceNote": "Her haberde kaynağın adı yazar. Yayıncı haberlerinde yalnızca başlık ve kısa özet olur, tamamı kaynağın sitesindedir. \"Son dakika\" etiketini uygulama kendisi koymaz.",
     "publisherTitle": "Yerel haber siten mi var?",
-    "publisherText": "Yayıncı olarak başvur, haberlerin burada çıksın."
+    "publisherText": "Yayıncı olarak başvur, haberlerin burada çıksın.",
+    "localTitle": "Yerel yayıncılar",
+    "localHint": "CityJoy’un yayıncı rozeti verdiği yerel haber hesapları. Paylaşımlar hesabın kendisine aittir."
   },
   "search": {
     "title": "Ara",

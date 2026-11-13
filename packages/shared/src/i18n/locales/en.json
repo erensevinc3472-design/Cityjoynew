@@ -1254,13 +1254,15 @@
       "mahallem": "My Neighbourhood",
       "bolgesel": "Regional",
       "genel": "General",
-      "takip": "Following"
+      "takip": "Following",
+      "haberler": "News"
     },
     "tabHints": {
       "mahallem": "only people in your neighbourhood see it",
       "bolgesel": "everyone in your province sees it",
       "genel": "everyone on the app sees it",
-      "takip": "only your followers see it"
+      "takip": "only your followers see it",
+      "haberler": "shown on the {{place}} News page (publisher)"
     },
     "categories": {
       "genel": "General",
@@ -1512,7 +1514,9 @@
     "official": "Official news",
     "sourceNote": "Every story shows its source. Publisher stories show only a headline and short summary; the full text is on the source's site. The app never adds a \"breaking\" label itself.",
     "publisherTitle": "Run a local news site?",
-    "publisherText": "Apply as a publisher and your stories will appear here."
+    "publisherText": "Apply as a publisher and your stories will appear here.",
+    "localTitle": "Local publishers",
+    "localHint": "Local news accounts verified with a CityJoy publisher badge. Posts belong to the account itself."
   },
   "search": {
     "title": "Search",

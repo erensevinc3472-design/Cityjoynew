@@ -1254,13 +1254,15 @@
       "mahallem": "Mein Viertel",
       "bolgesel": "Regional",
       "genel": "Allgemein",
-      "takip": "Gefolgt"
+      "takip": "Gefolgt",
+      "haberler": "Nachrichten"
     },
     "tabHints": {
       "mahallem": "nur Menschen in deinem Viertel sehen es",
       "bolgesel": "alle in deiner Provinz sehen es",
       "genel": "alle in der App sehen es",
-      "takip": "nur deine Follower sehen es"
+      "takip": "nur deine Follower sehen es",
+      "haberler": "erscheint auf der Nachrichtenseite von {{place}} (Herausgeber)"
     },
     "categories": {
       "genel": "Allgemein",
@@ -1512,7 +1514,9 @@
     "official": "Behördenmeldung",
     "sourceNote": "Jede Meldung nennt ihre Quelle. Bei Verlagsmeldungen gibt es nur Titel und Kurztext, der Rest steht auf der Seite der Quelle. Das Label \"Eilmeldung\" setzt die App nie selbst.",
     "publisherTitle": "Betreibst du eine lokale Nachrichtenseite?",
-    "publisherText": "Bewirb dich als Verlag, dann erscheinen deine Meldungen hier."
+    "publisherText": "Bewirb dich als Verlag, dann erscheinen deine Meldungen hier.",
+    "localTitle": "Lokale Herausgeber",
+    "localHint": "Lokale Nachrichtenkonten mit CityJoy-Herausgeberabzeichen. Beiträge gehören dem jeweiligen Konto."
   },
   "search": {
     "title": "Suche",

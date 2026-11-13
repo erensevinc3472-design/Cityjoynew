@@ -26,6 +26,8 @@ export interface PublicProfile {
   suspended?: boolean;
   /** Admin'in verdiği rozetlerin kimlikleri (posts/badges.ts); kişi kendisi değiştiremez. */
   badges?: string[];
+  /** Yayıncı rozeti var: Haberler'e paylaşabilir (yalnızca admin rozet verirken yazılır). */
+  publisher?: boolean;
 }
 
 export const PROFILE_LIMITS = {

@@ -70,6 +70,7 @@ function fromDoc(id: string, d: DocumentData): Post {
     text: d.text,
     category: d.category,
     targets: targetsFromMap(d.targets),
+    ...(d.targets?.haberler === true ? { news: true } : {}),
     region: d.region,
     status: d.status,
     authorUid: d.authorUid,
@@ -184,6 +185,14 @@ export function createFirestorePostRepository(db: Firestore) {
       return { posts, cursor: posts.length === POST_LIMITS.pageSize ? posts[posts.length - 1].createdAt : null };
     },
 
+    /** Haberler > Bölgesel: ildeki yayıncıların Haberler'e paylaştıkları (en yeni 20). */
+    async news(provinceCode: string): Promise<Post[]> {
+      const snap = await getDocs(
+        query(collection(db, COLLECTION), where('targets.haberler', '==', true), where('status', '==', 'aktif'), where('region.provinceCode', '==', provinceCode), orderBy('createdAt', 'desc'), limit(POST_LIMITS.pageSize)),
+      );
+      return snap.docs.map((d) => fromDoc(d.id, d.data())).filter((p) => !p.authorSuspended && !p.tierHidden);
+    },
+
     /**
      * Ara > Gönderiler: kişinin görebileceği akışlarda (Genel, ilindeki Bölgesel, mahallesindeki Mahallem) anahtarı
      * taşıyan son gönderiler. Her akış ayrı sorgudur; kurallar her birini ayrı doğrular.
@@ -263,7 +272,8 @@ export function createFirestorePostRepository(db: Firestore) {
       batch.set(ref, {
         text: input.text.trim(),
         category: input.category,
-        targets: targetsToMap(input.targets),
+        // Haberler yalnızca kişisel paylaşımda (yayıncı rozeti; işletme adına olmaz).
+        targets: { ...targetsToMap(input.targets), ...(input.news && !as ? { haberler: true } : {}) },
         region: { provinceCode: r.provinceCode, districtId: r.districtId, neighbourhoodId: r.neighbourhoodId },
         status: as?.pending ? 'onay-bekliyor' : 'aktif',
         authorUid: uid,

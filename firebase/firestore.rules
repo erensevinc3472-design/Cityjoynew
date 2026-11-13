@@ -2267,11 +2267,11 @@ service cloud.firestore {
         && (!('framesFeatured' in d) || d.framesFeatured is bool)
         && validSearchKeys(d, 300)
         && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye', 'haber', 'ekonomi', 'spor', 'teknoloji', 'kultur-sanat', 'saglik']
-        && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip'])
+        && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip', 'haberler'])
         && d.targets.keys().hasAll(['mahallem', 'bolgesel', 'genel'])
         && d.targets.mahallem is bool && d.targets.bolgesel is bool && d.targets.genel is bool
-        && d.targets.get('takip', false) is bool
-        && (d.targets.mahallem || d.targets.bolgesel || d.targets.genel || d.targets.get('takip', false))
+        && d.targets.get('takip', false) is bool && d.targets.get('haberler', false) is bool
+        && (d.targets.mahallem || d.targets.bolgesel || d.targets.genel || d.targets.get('takip', false) || d.targets.get('haberler', false))
         && validLocation(d.region) && 'neighbourhoodId' in d.region
         && d.authorName is string && d.authorName.size() <= 40
         && d.likeCount is int && d.reportCount is int
@@ -2349,6 +2349,8 @@ service cloud.firestore {
       // Hedefler sabit anahtarlı bir haritada durur ({mahallem, bolgesel, genel}: true/false): akış sorguları bunlarla
       // süzülür ve kurallar sorguyu doğrulayabilir.
       return d.targets.get('genel', false) == true
+        // Haberler (yayıncı paylaşımı): giriş yapan herkes okur; liste ile süzülür.
+        || d.targets.get('haberler', false) == true
         || (d.targets.get('bolgesel', false) == true && myLocation().get('provinceCode', '') == d.region.provinceCode)
         || (d.targets.get('mahallem', false) == true && myLocation().get('neighbourhoodId', '') == d.region.neighbourhoodId)
         || (d.targets.get('takip', false) == true
@@ -2405,6 +2407,10 @@ service cloud.firestore {
         && (nw.text.size() >= 1 || 'photos' in nw || 'video' in nw)
         && validPostPhotos(nw, id)
         && validPostVideo(nw, id)
+        // Haberler'e yalnızca yayıncı rozetli kişi, kendi adına paylaşır (Eren, 13 Kasım 2026).
+        && (nw.targets.get('haberler', false) == false
+            || (!('business' in nw)
+                && get(/databases/$(database)/documents/publicProfiles/$(request.auth.uid)).data.get('publisher', false) == true))
         && ('business' in nw
             ? (validBusinessPost(nw)
                 && usageOk('b-' + nw.business.id, 'isletme-gonderi', limitOf('isletmeGonderi', 5)))
@@ -3056,7 +3062,7 @@ service cloud.firestore {
       // fotoğrafı kaldırıldıysa yenisini koyamaz. Fotoğraf kendi yüklediği dosya olmalı.
       function _k122(nw, od) {
         return isSelf(uid)
-        && nw.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'badges', 'searchKeys', 'updatedAt'])
+        && nw.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'badges', 'publisher', 'searchKeys', 'updatedAt'])
         && nw.diff(od).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'locationVerified', 'searchKeys', 'updatedAt'])
         // Konum rozeti yalnızca kişinin kaydındaki doğrulamayla aynı yazımda ve aynı düzeyde.
         && (!nw.diff(od).affectedKeys().hasAny(['locationVerified'])
@@ -3092,8 +3098,9 @@ service cloud.firestore {
       // Rozet (Eren, 13 Kasım 2026): yalnızca admin verir ya da geri alır; kişi isteyemez, kendisi değiştiremez.
       function _k125(nw) {
         return isAdmin()
-        && nw.diff(resource.data).affectedKeys().hasOnly(['badges', 'updatedAt'])
+        && nw.diff(resource.data).affectedKeys().hasOnly(['badges', 'publisher', 'updatedAt'])
         && nw.badges is list && nw.badges.size() <= 3
+        && nw.get('publisher', false) is bool
         && nw.updatedAt == request.time;
       }
       allow update: if _k125(request.resource.data);

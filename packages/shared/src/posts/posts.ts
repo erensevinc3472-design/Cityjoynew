@@ -70,6 +70,11 @@ export interface PostInput {
    * gönderide. Ek yükleme ya da kopya yok; aynı gönderi iki yerde görünür.
    */
   frames?: boolean;
+  /**
+   * Haberler'de de görünsün (Eren, 13 Kasım 2026): yalnızca yayıncı rozetli kişi seçebilir (kurallar denetler), kendi
+   * ilinin Haberler > Bölgesel listesinde çıkar. Veritabanında `targets.haberler`. Tek başına da seçilebilir.
+   */
+  news?: boolean;
 }
 
 export interface Post extends PostInput {
@@ -137,8 +142,8 @@ export function validatePost(p: PostInput): PostError[] {
   if (photos > POST_LIMITS.photos) errors.push('photos');
   if (p.video && (photos || !(p.video.durationSec >= 1 && p.video.durationSec <= POST_LIMITS.videoSeconds))) errors.push('video');
   // Gündem konusu seçilen gönderi Genel'de de yayınlanmalı.
-  if (!POST_CATEGORIES.includes(p.category) || (isPostTopic(p.category) && !p.targets.includes('genel'))) errors.push('category');
-  if (!p.targets.length || new Set(p.targets).size !== p.targets.length || p.targets.some((x) => !POST_TARGETS.includes(x))) errors.push('targets');
+  if (!POST_CATEGORIES.includes(p.category) || (isPostTopic(p.category) && !p.targets.includes('genel') && !p.news)) errors.push('category');
+  if ((!p.targets.length && !p.news) || new Set(p.targets).size !== p.targets.length || p.targets.some((x) => !POST_TARGETS.includes(x))) errors.push('targets');
   const r = p.region;
   if (!/^[0-8][0-9]$/.test(r.provinceCode) || !r.districtId.startsWith(`${r.provinceCode}-`) || !r.neighbourhoodId.startsWith(`${r.districtId}-`)) errors.push('region');
   if (looksLikeRealEstate(p.text)) errors.push('realEstate');
