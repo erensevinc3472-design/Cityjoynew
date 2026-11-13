@@ -11,6 +11,7 @@ import { UrgentStrip } from '@/components/announcement-card';
 import { AppText } from '@/components/app-text';
 import { BottomNav } from '@/components/bottom-nav';
 import { HeroHeader, LocationChip } from '@/components/hero-header';
+import { WeatherChip } from '@/components/weather-chip';
 import { sceneRim, type SceneKind } from '@/components/scene-art';
 import { Screen } from '@/components/screen';
 import { SideMenu } from '@/components/side-menu';
@@ -98,7 +99,12 @@ export default function HomeScreen() {
           {firstName ? t(greetingKey(), { name: firstName }) : t('home.slogan')}
         </AppText>
       </View>
-      <LocationChip label={locationText} onPress={() => router.push('/location?edit=1')} />
+      <View style={styles.chips}>
+        <View style={styles.locWrap}>
+          <LocationChip label={locationText} onPress={() => router.push('/location?edit=1')} />
+        </View>
+        <WeatherChip provinceCode={location?.provinceCode} />
+      </View>
     </HeroHeader>
   );
 
@@ -162,6 +168,8 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  chips: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  locWrap: { flexShrink: 1, minWidth: 0 },
   // Kaydırma alanı kenardan kenara (silüet kırpılmasın); içerik yine kenar boşluklu.
   scroll: { marginHorizontal: -GUTTER },
   content: { gap: spacing.md, paddingBottom: spacing.xl, paddingHorizontal: GUTTER },
