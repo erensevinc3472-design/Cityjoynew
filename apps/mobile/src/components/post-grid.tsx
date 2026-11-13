@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { POST_CATEGORIES, type Post } from '@cityjoy/shared';
+import { compactCount, POST_CATEGORIES, type Post } from '@cityjoy/shared';
 
 import { ThumbImage } from '@/components/thumb-image';
 import { fonts, spacing } from '@/theme/tokens';
@@ -14,9 +14,12 @@ import { StateMessage } from './state-message';
 const TILE_COLORS = ['#1F5C63', '#7A5A1E', '#5B3F6E', '#2F5D3A', '#7A3B3B', '#34506B', '#5E5A2A', '#3E4A57'];
 const tileColor = (p: Post) => TILE_COLORS[Math.max(0, POST_CATEGORIES.indexOf(p.category)) % TILE_COLORS.length];
 
-/** Profil ve işletme sayfasındaki üçlü gönderi ızgarası (Instagram düzeni); kareye dokununca gönderi açılır. */
-export function PostGrid({ list, empty, onLongPress, longPressHint }: { list: Post[] | null; empty: string; /** Uzun basınca (ör. Kaydettiklerim: klasöre taşı). */ onLongPress?(p: Post): void; longPressHint?: string }) {
-  const { t } = useTranslation();
+/**
+ * Profil ve işletme sayfasındaki üçlü gönderi ızgarası (Instagram düzeni); kareye dokununca gönderi açılır.
+ * `views`: Profil > Videolar; beğeni yerine izlenme sayısı ve dikey (9:16) kareler. Sabitlenen gönderide raptiye.
+ */
+export function PostGrid({ list, empty, onLongPress, longPressHint, views }: { list: Post[] | null; empty: string; /** Uzun basınca (ör. Kaydettiklerim: klasöre taşı). */ onLongPress?(p: Post): void; longPressHint?: string; views?: boolean }) {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const size = Math.floor((Math.min(width, 640) - 4) / 3);
@@ -29,13 +32,13 @@ export function PostGrid({ list, empty, onLongPress, longPressHint }: { list: Po
         <Pressable
           key={p.id}
           accessibilityRole="button"
-          accessibilityLabel={[t(`explore.categories.${p.category}`), p.photos?.length ? t('explore.photos.count', { count: p.photos.length }) : p.video ? t('explore.video.label') : '', p.text.slice(0, 100)].filter(Boolean).join('. ')}
+          accessibilityLabel={[p.pinned ? t('explore.pin.pinned') : '', t(`explore.categories.${p.category}`), p.photos?.length ? t('explore.photos.count', { count: p.photos.length }) : p.video ? t('explore.video.label') : '', views ? t('explore.views', { n: compactCount(p.viewCount ?? 0, i18n.language) }) : '', p.text.slice(0, 100)].filter(Boolean).join('. ')}
           accessibilityHint={onLongPress ? longPressHint : undefined}
           accessibilityActions={onLongPress ? [{ name: 'longpress', label: longPressHint }] : undefined}
           onAccessibilityAction={onLongPress ? () => onLongPress(p) : undefined}
           onPress={() => router.push({ pathname: '/explore/[id]', params: { id: p.id } })}
           onLongPress={onLongPress ? () => onLongPress(p) : undefined}
-          style={({ pressed }) => [styles.tile, { width: size, height: size, backgroundColor: tileColor(p), opacity: pressed ? 0.85 : 1 }]}>
+          style={({ pressed }) => [styles.tile, { width: size, height: views ? Math.round(size * 1.6) : size, backgroundColor: tileColor(p), opacity: pressed ? 0.85 : 1 }]}>
           {p.photos?.length ? (
             <>
               <ThumbImage photo={p.photos[0]} style={StyleSheet.absoluteFill} contentFit="cover" />
@@ -53,9 +56,19 @@ export function PostGrid({ list, empty, onLongPress, longPressHint }: { list: Po
           ) : (
             <AppText numberOfLines={5} style={styles.text}>{p.text}</AppText>
           )}
+          {p.pinned ? <MaterialIcons name="push-pin" size={15} color="#FFFFFF" style={styles.pin} /> : null}
           <View style={styles.foot}>
-            <MaterialIcons name="favorite" size={12} color="rgba(255,255,255,0.85)" />
-            <AppText style={styles.count}>{p.likeCount}</AppText>
+            {views ? (
+              <>
+                <MaterialIcons name="visibility" size={14} color="#FFFFFF" />
+                <AppText style={[styles.count, styles.views]}>{compactCount(p.viewCount ?? 0, i18n.language)}</AppText>
+              </>
+            ) : (
+              <>
+                <MaterialIcons name="favorite" size={12} color="rgba(255,255,255,0.85)" />
+                <AppText style={styles.count}>{p.likeCount}</AppText>
+              </>
+            )}
           </View>
         </Pressable>
       ))}
@@ -70,6 +83,8 @@ const styles = StyleSheet.create({
   text: { color: '#FFFFFF', fontFamily: fonts.bodyMedium, fontSize: 12, lineHeight: 16 },
   foot: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   count: { color: 'rgba(255,255,255,0.85)', fontSize: 11, lineHeight: 14, textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 3 },
+  views: { color: '#FFFFFF', fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 16 },
+  pin: { position: 'absolute', top: 8, start: 8, transform: [{ rotate: '45deg' }], textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 3 },
   multi: { alignSelf: 'flex-end', textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 3 },
   empty: { textAlign: 'center', padding: spacing.xl },
 });

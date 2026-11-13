@@ -1,4 +1,5 @@
 import {
+  arrayRemove,
   collection,
   collectionGroup,
   deleteField,
@@ -33,6 +34,8 @@ import {
   type PostTarget,
   canShowInFrames,
   FRAMES_LIMITS,
+  PIN_LIMIT,
+  postTagRequest,
   type PostVideo,
 } from '../posts/posts';
 import { sanitizeMediaEdits, type MediaEdit } from '../posts/media-edit';
@@ -110,8 +113,19 @@ function fromDoc(id: string, d: DocumentData): Post {
     ...(d.framesFeatured === true ? { framesFeatured: true } : {}),
     ...(d.authorSuspended === true ? { authorSuspended: true } : {}),
     ...(d.tierHidden === true ? { tierHidden: true } : {}),
+    ...tagsOf(d),
+    ...(d.pinned === true ? { pinned: true } : {}),
+    ...(typeof d.viewCount === 'number' && d.viewCount > 0 ? { viewCount: Math.floor(d.viewCount) } : {}),
     createdAt: iso(d.createdAt) ?? '',
   };
+}
+
+/** Sunucunun onayladığı etiketler ve adları (adı olmayan kimlik "?" görünür). */
+function tagsOf(d: DocumentData): { tags?: string[]; tagNames?: Record<string, string> } {
+  const tags = Array.isArray(d.tags) ? (d.tags as unknown[]).filter((x): x is string => typeof x === 'string').slice(0, POST_LIMITS.tags) : [];
+  if (!tags.length) return {};
+  const names = (d.tagNames ?? {}) as Record<string, unknown>;
+  return { tags, tagNames: Object.fromEntries(tags.map((u) => [u, typeof names[u] === 'string' ? (names[u] as string) : '?'])) };
 }
 
 const postRef = (db: Firestore, id: string) => doc(db, COLLECTION, id);
@@ -166,6 +180,15 @@ export interface FeedPage {
  * Mahallem gönderisini yalnızca o mahalledekine, Bölgesel'i yalnızca o ildekine okutur.
  */
 export function createFirestorePostRepository(db: Firestore) {
+  /** Kişinin profil gönderileri: Genel olanlar, takip ediyorsam Takip olanlar da (en yeni önce). */
+  async function authorPosts(uid: string, following: boolean, extra: QueryConstraint[], max: number): Promise<Post[]> {
+    const q = (target: 'genel' | 'takip') =>
+      getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where(`targets.${target}`, '==', true), ...extra, where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(max)))
+        .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())));
+    const lists = await Promise.all([q('genel'), following ? q('takip').catch(() => [] as Post[]) : Promise.resolve([] as Post[])]);
+    const seen = new Set<string>();
+    return lists.flat().filter((p) => !seen.has(p.id) && !!seen.add(p.id)).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, max);
+  }
   /** Kaydedilenler klasörleriyle (Kaydettiklerim ekranı; yeniden eskiye, en çok 100). */
   async function listSavedEntries(uid: string): Promise<SavedEntry[]> {
     const snap = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), orderBy('createdAt', 'desc'), limit(100)));
@@ -263,12 +286,42 @@ export function createFirestorePostRepository(db: Firestore) {
 
     /** Profil sayfası: kişinin Genel gönderileri, takip ediyorsam Takip gönderileri de (son 20). */
     async byAuthor(uid: string, following: boolean): Promise<Post[]> {
-      const q = (target: 'genel' | 'takip') =>
-        getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where(`targets.${target}`, '==', true), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(20)))
-          .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())));
-      const lists = await Promise.all([q('genel'), following ? q('takip').catch(() => [] as Post[]) : Promise.resolve([] as Post[])]);
-      const seen = new Set<string>();
-      return lists.flat().filter((p) => !seen.has(p.id) && !!seen.add(p.id)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      return authorPosts(uid, following, [], 20);
+    },
+
+    /** Profil > Videolar: kişinin videolu gönderileri (izlenme sayısıyla). */
+    async videosByAuthor(uid: string, following: boolean): Promise<Post[]> {
+      return authorPosts(uid, following, [where('hasVideo', '==', true)], 30);
+    },
+
+    /** Profilin en üstüne sabitlenenler (en çok PIN_LIMIT). */
+    async pinnedByAuthor(uid: string, following: boolean): Promise<Post[]> {
+      return authorPosts(uid, following, [where('pinned', '==', true)], PIN_LIMIT);
+    },
+
+    /** Kendi sabitlediğim gönderi sayısı (sınır denetimi; en çok PIN_LIMIT + 1 okunur). */
+    async myPinnedCount(uid: string): Promise<number> {
+      const snap = await getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where('pinned', '==', true), limit(PIN_LIMIT + 1)));
+      return snap.docs.filter((d) => d.get('status') === 'aktif').length;
+    },
+
+    /** Sahibi sabitler ya da sabitlemeyi kaldırır (sınırı uygulama denetler). */
+    async setPinned(id: string, pinned: boolean): Promise<void> {
+      await updateDoc(postRef(db, id), { pinned: pinned ? true : deleteField(), updatedAt: serverTimestamp() });
+    },
+
+    /**
+     * Profil > Etiketlendiklerim: kişinin etiketlendiği herkese açık (Genel) gönderiler. Takipçilere özel gönderiler
+     * burada listelenmez (her paylaşanın takipçisi olup olmadığı tek sorguda denetlenemez).
+     */
+    async taggedIn(uid: string): Promise<Post[]> {
+      const snap = await getDocs(query(collection(db, COLLECTION), where('tags', 'array-contains', uid), where('targets.genel', '==', true), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(30)));
+      return snap.docs.map((d) => fromDoc(d.id, d.data()));
+    },
+
+    /** Etiketlenen kişi kendini gönderiden çıkarır (profilinde de görünmez olur). */
+    async removeMyTag(id: string, uid: string): Promise<void> {
+      await updateDoc(postRef(db, id), { tags: arrayRemove(uid), [`tagNames.${uid}`]: deleteField() });
     },
 
     /**
@@ -318,6 +371,7 @@ export function createFirestorePostRepository(db: Firestore) {
     async create(uid: string, authorName: string, input: PostInput, as?: { business: PostBusiness; pending: boolean }, id?: string): Promise<string> {
       const ref = id ? postRef(db, id) : doc(collection(db, COLLECTION));
       const r = input.region;
+      const tagReq = postTagRequest(uid, input.tagRequest, input.edits);
       const batch = writeBatch(db);
       await countUsage(db, batch, as ? { type: 'b', id: as.business.id } : { type: 'u', id: uid }, as ? 'isletme-gonderi' : 'gonderi', uid);
       batch.set(ref, {
@@ -342,6 +396,8 @@ export function createFirestorePostRepository(db: Firestore) {
         searchKeys: searchKeys(input.text, SEARCH_LIMITS.postKeys, SEARCH_LIMITS.minPost),
         ...(input.frames && canShowInFrames(input) ? { frames: true } : {}),
         ...editsField(input),
+        ...(input.video && !input.photos?.length ? { hasVideo: true } : {}),
+        ...(tagReq.length ? { tagReq } : {}),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });

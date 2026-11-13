@@ -1389,7 +1389,9 @@
       "tabs": {
         "gonderiler": "Gönderiler",
         "kaydedilenler": "Kaydedilenler",
-        "katildiklarim": "Katıldıklarım"
+        "katildiklarim": "Katıldıklarım",
+        "videolar": "Videolar",
+        "etiketlendiklerim": "Etiketlendiklerim"
       },
       "noPostsOwn": "Henüz paylaşımın yok. Keşfet'teki + düğmesiyle ilk gönderini paylaşabilirsin.",
       "noSaved": "Kaydettiğin gönderiler burada görünür. Yalnızca sen görürsün.",
@@ -1402,7 +1404,22 @@
       "photoRemoved": "Profil fotoğrafın şikâyet üzerine kaldırıldı; yeni fotoğraf koyamazsın.",
       "photoZoom": "Profil fotoğrafını büyüt",
       "suspended": "Bu profil askıya alındı.",
-      "suspendedNote": "Profili ve gönderileri şu an görünmüyor."
+      "suspendedNote": "Profili ve gönderileri şu an görünmüyor.",
+      "noVideos": "Henüz video yok.",
+      "noVideosOwn": "Paylaştığın videolar izlenme sayılarıyla burada görünür.",
+      "noTagged": "Henüz etiketlendiği gönderi yok.",
+      "noTaggedOwn": "Başkalarının seni etiketlediği gönderiler burada görünür.",
+      "taggedNote": "Yalnızca herkese açık (Genel) gönderiler listelenir.",
+      "mutual1": "{{a}} takip ediyor",
+      "mutual2": "{{a}} ve {{b}} takip ediyor",
+      "mutualMore": "{{a}}, {{b}} ve {{n}} kişi daha takip ediyor",
+      "mutualTitle": "Takip ettiğin kişilerden takip edenler",
+      "tagPolicy": "Beni kim etiketleyebilir",
+      "tagPolicies": {
+        "herkes": "Herkes",
+        "takip": "Yalnızca takip ettiğim kişiler",
+        "kimse": "Kimse"
+      }
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
     "share": "Paylaş",
@@ -1507,7 +1524,26 @@
       "reset": "Sıfırla",
       "resetConfirm": "Son gördüklerin listesi silinsin mi?",
       "empty": "Henüz bir gönderiye bakmadın. Keşfet'te baktığın gönderiler burada görünür."
-    }
+    },
+    "people": {
+      "add": "Kişileri etiketle",
+      "title": "Etiketlenenler",
+      "limit": "En çok {{n}} kişi etiketleyebilirsin.",
+      "remove": "{{name}} etiketini kaldır",
+      "hint": "Etiketlediğin kişiler bildirim alır. Kişinin ayarı izin vermiyorsa etiket eklenmez.",
+      "with": "{{name}} ile",
+      "withMore": "{{name}} ve {{n}} kişi ile",
+      "removeMe": "Profilimden kaldır",
+      "removeMeConfirm": "Bu gönderideki etiketin kaldırılsın mı? Gönderi profilinde görünmez olur.",
+      "removed": "Etiketin kaldırıldı."
+    },
+    "pin": {
+      "pin": "Profilde sabitle",
+      "unpin": "Sabitlemeyi kaldır",
+      "limit": "En çok {{n}} gönderi sabitleyebilirsin. Önce birini kaldır.",
+      "pinned": "Sabitlendi"
+    },
+    "views": "{{n}} izlenme"
   },
   "news": {
     "title": "Haberler",
@@ -1713,7 +1749,9 @@
       "channel": "Genel bildirimler",
       "quietChannel": "Sessiz bildirimler",
       "proEndingTitle": "{{title}}: Pro üç gün içinde bitiyor",
-      "proEndingBody": "Yenilemezsen ücretsiz sınırdan fazla gönderilerin ve fotoğrafların gizlenir (silinmez). Pro dönünce hepsi geri gelir."
+      "proEndingBody": "Yenilemezsen ücretsiz sınırdan fazla gönderilerin ve fotoğrafların gizlenir (silinmez). Pro dönünce hepsi geri gelir.",
+      "taggedTitle": "{{title}} seni etiketledi",
+      "taggedBody": "Gönderiyi görmek için dokun."
     },
     "categories": {
       "acil": "Acil duyurular",

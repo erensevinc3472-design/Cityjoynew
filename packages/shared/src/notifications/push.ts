@@ -29,6 +29,8 @@ export type PushNoticeKind =
   | 'follower'
   | 'followRequest'
   | 'followAccepted'
+  /** Biri seni gönderisinde etiketledi (başlıkta paylaşanın adı). */
+  | 'tagged'
   /** İşletme sahibine: Pro 3 gün içinde bitiyor (yenileme kapalı). */
   | 'proEnding';
 

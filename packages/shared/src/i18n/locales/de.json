@@ -1389,7 +1389,9 @@
       "tabs": {
         "gonderiler": "Beiträge",
         "kaydedilenler": "Gespeichert",
-        "katildiklarim": "Teilgenommen"
+        "katildiklarim": "Teilgenommen",
+        "videolar": "Videos",
+        "etiketlendiklerim": "Markiert"
       },
       "noPostsOwn": "Noch keine Beiträge. Mit der +-Taste in Entdecken teilst du deinen ersten Beitrag.",
       "noSaved": "Gespeicherte Beiträge erscheinen hier. Nur du siehst sie.",
@@ -1402,7 +1404,22 @@
       "photoRemoved": "Dein Profilfoto wurde nach einer Meldung entfernt; du kannst kein neues hinzufügen.",
       "photoZoom": "Profilbild vergrößern",
       "suspended": "Dieses Profil wurde gesperrt.",
-      "suspendedNote": "Profil und Beiträge sind derzeit nicht sichtbar."
+      "suspendedNote": "Profil und Beiträge sind derzeit nicht sichtbar.",
+      "noVideos": "Noch keine Videos.",
+      "noVideosOwn": "Deine geteilten Videos erscheinen hier mit Aufrufzahlen.",
+      "noTagged": "Noch keine Beiträge mit Markierung.",
+      "noTaggedOwn": "Beiträge, in denen dich andere markieren, erscheinen hier.",
+      "taggedNote": "Nur öffentliche (Allgemein) Beiträge werden angezeigt.",
+      "mutual1": "Gefolgt von {{a}}",
+      "mutual2": "Gefolgt von {{a}} und {{b}}",
+      "mutualMore": "Gefolgt von {{a}}, {{b}} und {{n}} weiteren",
+      "mutualTitle": "Personen, denen du folgst und die hier folgen",
+      "tagPolicy": "Wer mich markieren darf",
+      "tagPolicies": {
+        "herkes": "Alle",
+        "takip": "Nur Personen, denen ich folge",
+        "kimse": "Niemand"
+      }
     },
     "takipFeedHint": "Beiträge von Personen, denen du folgst, nur für Follower",
     "share": "Teilen",
@@ -1507,7 +1524,26 @@
       "reset": "Zurücksetzen",
       "resetConfirm": "Liste der zuletzt angesehenen Beiträge löschen?",
       "empty": "Du hast noch keine Beiträge angesehen. Beiträge, die du in Entdecken ansiehst, erscheinen hier."
-    }
+    },
+    "people": {
+      "add": "Personen markieren",
+      "title": "Markierte Personen",
+      "limit": "Du kannst bis zu {{n}} Personen markieren.",
+      "remove": "Markierung {{name}} entfernen",
+      "hint": "Markierte Personen werden benachrichtigt. Erlauben ihre Einstellungen es nicht, wird die Markierung nicht hinzugefügt.",
+      "with": "mit {{name}}",
+      "withMore": "mit {{name}} und {{n}} weiteren",
+      "removeMe": "Aus meinem Profil entfernen",
+      "removeMeConfirm": "Deine Markierung aus diesem Beitrag entfernen? Er erscheint dann nicht mehr in deinem Profil.",
+      "removed": "Deine Markierung wurde entfernt."
+    },
+    "pin": {
+      "pin": "Im Profil anheften",
+      "unpin": "Lösen",
+      "limit": "Du kannst bis zu {{n}} Beiträge anheften. Löse zuerst einen.",
+      "pinned": "Angeheftet"
+    },
+    "views": "{{n}} Aufrufe"
   },
   "news": {
     "title": "Nachrichten",
@@ -1713,7 +1749,9 @@
       "channel": "Allgemeine Benachrichtigungen",
       "quietChannel": "Stille Benachrichtigungen",
       "proEndingTitle": "{{title}}: Pro endet in drei Tagen",
-      "proEndingBody": "Wenn du nicht verlängerst, werden Beiträge und Fotos über dem kostenlosen Limit ausgeblendet (nicht gelöscht). Mit Pro kommen alle zurück."
+      "proEndingBody": "Wenn du nicht verlängerst, werden Beiträge und Fotos über dem kostenlosen Limit ausgeblendet (nicht gelöscht). Mit Pro kommen alle zurück.",
+      "taggedTitle": "{{title}} hat dich markiert",
+      "taggedBody": "Tippe, um den Beitrag zu sehen."
     },
     "categories": {
       "acil": "Dringende Meldungen",

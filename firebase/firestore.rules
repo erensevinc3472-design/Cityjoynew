@@ -211,6 +211,11 @@ service cloud.firestore {
           && nw.updatedAt == request.time;
         }
         allow create, update: if _k5(request.resource.data);
+        // "Beni kim etiketleyebilir" (sunucu etiketlerken okur).
+        allow create, update: if isSelf(uid) && id == 'privacy'
+          && request.resource.data.keys().hasOnly(['tagPolicy', 'updatedAt'])
+          && request.resource.data.tagPolicy in ['herkes', 'takip', 'kimse']
+          && request.resource.data.updatedAt == request.time;
       }
     }
 
@@ -2290,7 +2295,7 @@ service cloud.firestore {
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
              'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'video', 'frames',
-             'framesFeatured', 'edits', 'createdAt', 'updatedAt'])
+             'framesFeatured', 'edits', 'tagReq', 'hasVideo', 'tags', 'tagNames', 'pinned', 'viewCount', 'createdAt', 'updatedAt'])
         && d.text is string && d.text.size() <= 2000
         // Düzenleyici (yazı/çıkartma/çizim; içeriği uygulama temizler): medya başına bir öğe.
         && (!('edits' in d) || (d.edits is list && d.edits.size() <= 10))
@@ -2435,6 +2440,9 @@ service cloud.firestore {
         && !('cleared' in nw) && !('moderatedBy' in nw)
         && !('commentsOff' in nw) && !('lastComment' in nw)
         && !('framesFeatured' in nw)
+        && !('tags' in nw) && !('tagNames' in nw) && !('pinned' in nw) && !('viewCount' in nw)
+        && (!('tagReq' in nw) || (nw.tagReq is list && nw.tagReq.size() <= 20 && !(me() in nw.tagReq)))
+        && (!('hasVideo' in nw) || (nw.hasVideo == true && 'video' in nw))
         && nw.createdAt == request.time
         && validPost(nw)
         && (nw.text.size() >= 1 || 'photos' in nw || 'video' in nw)
@@ -2491,6 +2499,17 @@ service cloud.firestore {
         && nw.diff(od).affectedKeys().hasOnly(['commentsOff', 'updatedAt']);
       }
       allow update: if _k89(request.resource.data, resource.data);
+      // Sahibi profilinde sabitler / kaldırır (en çok 3'ü uygulama denetler).
+      allow update: if resource.data.authorUid == me()
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.get('pinned', true) == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pinned', 'updatedAt']);
+      // Etiketlenen kişi yalnızca kendini çıkarır (etiketleri sunucu yazar).
+      allow update: if signedIn() && me() in resource.data.get('tags', [])
+        && request.resource.data.tags == resource.data.tags.removeAll([me()])
+        && !(me() in request.resource.data.get('tagNames', {}))
+        && request.resource.data.get('tagNames', {}).diff(resource.data.get('tagNames', {})).affectedKeys().hasOnly([me()])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tags', 'tagNames']);
       // Yorum sayacı: yalnızca adı geçen yorum (lastComment) aynı yazımda eklenirken tam bir artar, silinirken azalır.
       // Kimin silebileceğini yorum kuralı denetler.
       function _k90(nw, od) {

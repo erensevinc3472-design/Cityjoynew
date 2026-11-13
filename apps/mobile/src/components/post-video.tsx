@@ -4,10 +4,11 @@ import { useVideoPlayer, VideoView, type VideoPlayer } from 'expo-video';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { playRange, type MediaEdit, type PostVideo } from '@cityjoy/shared';
+import { playRange, VIEW_MIN_SECONDS, type MediaEdit, type PostVideo } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { MediaOverlay } from '@/components/media-overlay';
+import { markViewed } from '@/lib/views';
 
 /** Videonun oranı fotoğraflardaki gibi sınırlanır: en uzun 4:5 dik, en geniş 16:9 yatay. */
 export const ratioOf = (v: Pick<PostVideo, 'width' | 'height'>) => (v.width > 0 && v.height > 0 ? Math.min(16 / 9, Math.max(0.8, v.width / v.height)) : 0.8);
@@ -82,6 +83,28 @@ export function useEditPlayback(player: VideoPlayer, edit: MediaEdit | null | un
   return range;
 }
 
+/**
+ * İzlenme: video gerçekten en az VIEW_MIN_SECONDS oynayınca bir kez işaretlenir (lib/views toplu gönderir). Atlamalar
+ * (kırpma başına dönme, ileri sarma) sayılmaz; yalnızca akan oynatma süresi toplanır.
+ */
+export function useViewCount(player: VideoPlayer, viewId: string | undefined) {
+  useEffect(() => {
+    if (!viewId) return;
+    let last = -1;
+    let played = 0;
+    const sub = player.addListener('timeUpdate', (e) => {
+      const d = e.currentTime - last;
+      last = e.currentTime;
+      if (d > 0 && d < 1.5) played += d;
+      if (played >= VIEW_MIN_SECONDS) {
+        markViewed(viewId);
+        sub.remove();
+      }
+    });
+    return () => sub.remove();
+  }, [player, viewId]);
+}
+
 /** Görünen süre: kırpıldıysa seçilen kısmın uzunluğu. */
 export const editedDuration = (video: PostVideo, edit: MediaEdit | null | undefined) => {
   const r = playRange(edit, video.durationSec);
@@ -120,13 +143,15 @@ interface Props {
   onOpen?(): void;
   /** Düzenleyici: yazı, çıkartma, kırpma, ses. */
   edit?: MediaEdit | null;
+  /** İzlenme sayılacak gönderi. */
+  viewId?: string;
 }
 
 /**
  * Gönderi videosu. Akışta (onOpen verilmişse) yukarıdaki gibi; gönderi sayfasında önce süreyle birlikte oynat düğmesi
  * görünür, dokununca oynatıcı açılır (ses, durdurma, tam ekran oynatıcının kendi düğmeleriyle).
  */
-export function PostVideoView({ video, maxWidth, active, onOpen, edit }: Props) {
+export function PostVideoView({ video, maxWidth, active, onOpen, edit, viewId }: Props) {
   const { t } = useTranslation();
   const { width: screen } = useWindowDimensions();
   const width = Math.min(screen, maxWidth);
@@ -147,7 +172,7 @@ export function PostVideoView({ video, maxWidth, active, onOpen, edit }: Props) 
         }}
         style={[styles.poster, { width, height }]}>
         {poster}
-        {active ? <AutoPlayer url={video.url} width={width} height={height} edit={edit} durationSec={video.durationSec} /> : (
+        {active ? <AutoPlayer url={video.url} width={width} height={height} edit={edit} durationSec={video.durationSec} viewId={viewId} /> : (
           <View style={styles.play}>
             <MaterialIcons name="play-arrow" size={44} color="#FFFFFF" />
           </View>
@@ -161,7 +186,7 @@ export function PostVideoView({ video, maxWidth, active, onOpen, edit }: Props) 
     );
   }
 
-  if (started) return <Player url={video.url} width={width} height={height} edit={edit} video={video} />;
+  if (started) return <Player url={video.url} width={width} height={height} edit={edit} video={video} viewId={viewId} />;
   return (
     <Pressable
       accessibilityRole="button"
@@ -182,7 +207,7 @@ export function PostVideoView({ video, maxWidth, active, onOpen, edit }: Props) 
 }
 
 /** Akışta kendiliğinden oynayan video: döngüde, ses tercihi ortak, köşede ses düğmesi. */
-function AutoPlayer({ url, width, height, edit, durationSec }: { url: string; width: number; height: number; edit?: MediaEdit | null; durationSec: number }) {
+function AutoPlayer({ url, width, height, edit, durationSec, viewId }: { url: string; width: number; height: number; edit?: MediaEdit | null; durationSec: number; viewId?: string }) {
   const { t } = useTranslation();
   const [muted, toggleMuted] = useFeedMuted();
   const player = useResumingPlayer(url, (p) => {
@@ -194,6 +219,7 @@ function AutoPlayer({ url, width, height, edit, durationSec }: { url: string; wi
   }, [player]);
   const silent = edit?.muted === true;
   useEditPlayback(player, edit, durationSec);
+  useViewCount(player, viewId);
   useEffect(() => {
     player.muted = silent || muted;
   }, [player, muted, silent]);
@@ -218,7 +244,7 @@ function AutoPlayer({ url, width, height, edit, durationSec }: { url: string; wi
   );
 }
 
-function Player({ url, width, height, edit, video }: { url: string; width: number; height: number; edit?: MediaEdit | null; video: PostVideo }) {
+function Player({ url, width, height, edit, video, viewId }: { url: string; width: number; height: number; edit?: MediaEdit | null; video: PostVideo; viewId?: string }) {
   const { t } = useTranslation();
   const player = useVideoPlayer(url, (p) => {
     p.loop = false;
@@ -228,6 +254,7 @@ function Player({ url, width, height, edit, video }: { url: string; width: numbe
     player.play();
   }, [player]);
   useEditPlayback(player, edit, video.durationSec);
+  useViewCount(player, viewId);
   // Düzenlenmiş videoda (kırpma ya da yazı) yerel düğmeler yerine kendi dokunuşumuz: yerel çubuk kırpılan kısma atlatır ve
   // yazıların üstünü kapatır. Dokununca durur ya da sürer; döngüde oynar.
   const plain = edit?.trimStart === undefined && !edit?.items?.length && !edit?.strokes?.length;

@@ -84,6 +84,12 @@ export interface PostInput {
    * ilinin Haberler > Bölgesel listesinde çıkar. Veritabanında `targets.haberler`. Tek başına da seçilebilir.
    */
   news?: boolean;
+  /**
+   * Etiketlenmek istenen kişiler (Eren, 13 Kasım 2026): "Kişileri etiketle" ve düzenleyicideki "Bahset" çıkartmaları.
+   * Veritabanında `tagReq`; sunucu her kişinin "Beni kim etiketleyebilir" ayarını ve engellemeyi denetleyip uygun
+   * olanları `tags` alanına yazar ve bildirim gönderir (istemci `tags` yazamaz).
+   */
+  tagRequest?: string[];
 }
 
 export interface Post extends PostInput {
@@ -107,7 +113,44 @@ export interface Post extends PostInput {
   authorSuspended?: boolean;
   /** İşletmenin Pro'su bitti, Ücretsiz sınırdan fazla (yalnızca sunucu koyar): silinmez, akışlarda görünmez; Pro dönünce açılır. */
   tierHidden?: boolean;
+  /** Sunucunun onayladığı etiketler (kişi kimlikleri); kişi kendini çıkarabilir. Profilde "Etiketlendiklerim". */
+  tags?: string[];
+  /** Etiketlenenlerin adları ("Ayşe K."), etiket satırında okuma yapmadan göstermek için. */
+  tagNames?: Record<string, string>;
+  /** Sahibi profilinin en üstüne sabitledi (en çok PIN_LIMIT). */
+  pinned?: boolean;
+  /** Video izlenme sayısı (yalnızca sunucu artırır; kişi başına günde bir, en az 3 sn izlenince). */
+  viewCount?: number;
   createdAt: string;
+}
+
+/** Profilde en üste sabitlenebilen gönderi. */
+export const PIN_LIMIT = 3;
+
+/** "Beni kim etiketleyebilir" (users/{uid}/settings/privacy). Varsayılan herkes. */
+export const TAG_POLICIES = ['herkes', 'takip', 'kimse'] as const;
+export type TagPolicy = (typeof TAG_POLICIES)[number];
+
+/** Video en az bu kadar oynayınca izlenmiş sayılır. */
+export const VIEW_MIN_SECONDS = 3;
+
+/**
+ * Etiket isteği: seçilen kişiler ve düzenleyicideki "Bahset" çıkartmaları birleşir; paylaşan kendisi ve tekrarlar
+ * atılır, en çok POST_LIMITS.tags.
+ */
+export function postTagRequest(authorUid: string, chosen: readonly string[] | undefined, edits: PostInput['edits']): string[] {
+  const fromStickers = (edits ?? []).flatMap((e) => (e?.items ?? []).flatMap((it) => (it.kind === 'cikartma' && it.type === 'bahset' && it.uid ? [it.uid] : [])));
+  return [...new Set([...(chosen ?? []), ...fromStickers])].filter((u) => u && u !== authorUid && /^[A-Za-z0-9_-]{1,128}$/.test(u)).slice(0, POST_LIMITS.tags);
+}
+
+/** İzlenme sayısının kısa yazımı: 950, 4.579, 10,4B, 1,2Mn (Türkçe); diğer dillerde tarayıcının kısa biçimi. */
+export function compactCount(n: number, locale: string): string {
+  if (n < 10_000) return n.toLocaleString(locale);
+  try {
+    return new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+  } catch {
+    return n.toLocaleString(locale);
+  }
 }
 
 /** Kareler: sayfa başına küçük önizleme ve en üstteki öne çıkanlar. */
@@ -127,6 +170,8 @@ export const POST_LIMITS = {
   reportThreshold: 3,
   /** Akışta bir seferde okunan gönderi (sayfalama, maliyet ilkesi). */
   pageSize: 20,
+  /** Gönderi başına en çok etiketlenen kişi. */
+  tags: 20,
 } as const;
 
 export const POST_REPORT_REASONS = ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger'] as const;

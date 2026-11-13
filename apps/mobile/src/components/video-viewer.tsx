@@ -12,7 +12,7 @@ import { AppText } from '@/components/app-text';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { PostSheet } from '@/components/post-sheet';
 import { MediaOverlay } from '@/components/media-overlay';
-import { handOffVideo, useEditPlayback, useResumingPlayer } from '@/components/post-video';
+import { handOffVideo, useEditPlayback, useResumingPlayer, useViewCount } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { useAuthor, useBusinessInfo } from '@/lib/profile-photos';
 import { fonts, radius, spacing } from '@/theme/tokens';
@@ -248,7 +248,7 @@ function Reel({
         accessibilityHint={t('explore.doubleTapHint')}
         onPress={tap}
         style={StyleSheet.absoluteFill}>
-        {active ? <ReelVideo url={post.video!.url} paused={paused} progress={progress} seeker={seeker} edit={edit} durationSec={post.video!.durationSec} /> : null}
+        {active ? <ReelVideo url={post.video!.url} paused={paused} progress={progress} seeker={seeker} edit={edit} durationSec={post.video!.durationSec} viewId={post.id} /> : null}
       </Pressable>
       {/* Paylaşım düzenleyicisinin yazı ve çıkartmaları; Bahset çıkartmasına dokununca kişinin profili açılır. */}
       <MediaOverlay
@@ -395,7 +395,7 @@ function Scrubber({ progress, seeker, onScrub }: { progress: Animated.Value; see
 }
 
 /** Açık sayfanın oynatıcısı: sesli, döngüde, akışta kaldığı saniyeden sürer; ilerlemeyi ekranı yeniden çizmeden çizgiye yazar. */
-function ReelVideo({ url, paused, progress, seeker, edit, durationSec }: { url: string; paused: boolean; progress: Animated.Value; seeker: MutableRefObject<Seeker | null>; edit?: MediaEdit | null; durationSec: number }) {
+function ReelVideo({ url, paused, progress, seeker, edit, durationSec, viewId }: { url: string; paused: boolean; progress: Animated.Value; seeker: MutableRefObject<Seeker | null>; edit?: MediaEdit | null; durationSec: number; viewId?: string }) {
   const holding = useRef(false);
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
@@ -405,6 +405,7 @@ function ReelVideo({ url, paused, progress, seeker, edit, durationSec }: { url: 
   });
   // Kırpılmış videoda çubuk ve atlama yalnızca seçilen aralıkta.
   const range = useEditPlayback(player, edit, durationSec);
+  useViewCount(player, viewId);
   const span = Math.max(0.5, range.end - range.start);
   useEffect(() => {
     progress.setValue(0);

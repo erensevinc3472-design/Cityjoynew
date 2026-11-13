@@ -597,6 +597,8 @@ function PostReports({ user, onCount }: { user: PanelUser; onCount?: (n: number)
                         <strong>{r.post.authorName}</strong> <span className="meta">· {t(`moderation.posts.categories.${r.post.category}`)}</span>
                         <div className="meta">{regionLabel(r.post.region)} · {r.post.targets.map((x) => t(`moderation.posts.targets.${x}`)).join(', ')}</div>
                         <div className="meta">{t('moderation.posts.counts', { reports: r.post.reportCount, likes: r.post.likeCount })}</div>
+                        {r.post.viewCount ? <div className="meta">{t('moderation.posts.views', { n: r.post.viewCount.toLocaleString('tr-TR') })}</div> : null}
+                        {r.post.tags?.length ? <div className="meta">{t('moderation.posts.tags', { names: r.post.tags.map((u) => r.post?.tagNames?.[u] ?? '?').join(', ') })}</div> : null}
                         <details>
                           <summary>{t('announcements.showBody')}</summary>
                           <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.post.text}</p>

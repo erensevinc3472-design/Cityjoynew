@@ -7,7 +7,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   isPostListed,
+  PIN_LIMIT,
   PROFILE_LIMITS,
+  TAG_POLICIES,
+  type TagPolicy,
   PROFILE_REPORT_REASONS,
   validateBio,
   type FollowStatus,
@@ -46,8 +49,22 @@ import { useThemeColors } from '@/theme/use-theme';
 import { errorText } from '@/lib/limits';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
-type Tab = 'gonderiler' | 'kaydedilenler' | 'katildiklarim';
-const TAB_ICONS: Record<Tab, IconName> = { gonderiler: 'grid-on', kaydedilenler: 'bookmark-border', katildiklarim: 'event-available' };
+type Tab = 'gonderiler' | 'videolar' | 'etiketlendiklerim' | 'kaydedilenler' | 'katildiklarim';
+const TAB_ICONS: Record<Tab, IconName> = {
+  gonderiler: 'grid-on',
+  videolar: 'smart-display',
+  etiketlendiklerim: 'assignment-ind',
+  kaydedilenler: 'bookmark-border',
+  katildiklarim: 'event-available',
+};
+
+/** Sabitlenenler başta (en çok PIN_LIMIT), sonra kalanlar en yeni önce. */
+function withPinned(list: Post[] | null, pinned: Post[] | null): Post[] | null {
+  if (!list) return list;
+  const top = (pinned ?? list.filter((p) => p.pinned)).slice(0, PIN_LIMIT);
+  const ids = new Set(top.map((p) => p.id));
+  return [...top, ...list.filter((p) => !ids.has(p.id))];
+}
 
 /**
  * Profil (Instagram düzeni; 13. madde 31). Paylaşım yalnızca Keşfet'ten yapılır, profil paylaşılanları gösterir.
@@ -73,6 +90,15 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [saved, setSaved] = useState<Post[] | null>(null);
   const [joined, setJoined] = useState<JoinedItem[] | null>(null);
+  const [videos, setVideos] = useState<Post[] | null>(null);
+  const [tagged, setTagged] = useState<Post[] | null>(null);
+  // Başkasının profilinde sabitlenenler ayrı okunur (kendi profilimde bütün gönderilerimden süzülür).
+  const [pinned, setPinned] = useState<Post[] | null>(null);
+  // Ortak takip: takip ettiklerimden bu kişiyi takip edenler (ilk üçünün adı ve fotoğrafı).
+  const [mutual, setMutual] = useState<{ uids: string[]; top: PublicProfile[] } | null>(null);
+  const [mutualOpen, setMutualOpen] = useState(false);
+  const [mutualList, setMutualList] = useState<PublicProfile[] | null>(null);
+  const [tagPolicy, setTagPolicy] = useState<TagPolicy>('herkes');
   const [requests, setRequests] = useState<{ uid: string; displayName: string }[]>([]);
   const [tab, setTab] = useState<Tab>('gonderiler');
   const [editing, setEditing] = useState(false);
@@ -111,23 +137,42 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     setFollow(f);
     setBlockedMe(b);
     socialRepository.hasReportedProfile(uid, user.uid).then(setReported);
+    if (!b) {
+      socialRepository
+        .mutualFollowers(user.uid, uid)
+        .then(async (uids) => setMutual(uids.length ? { uids, top: await socialRepository.profilesOf(uids.slice(0, 3)) } : null))
+        .catch(() => setMutual(null));
+    }
     if (b || (p.isPrivate && f !== 'aktif')) return setPosts([]);
     postRepository.byAuthor(uid, f === 'aktif').then((l) => setPosts(l.filter((x) => isPostListed(x) && !x.business)), () => setPosts([]));
+    postRepository.pinnedByAuthor(uid, f === 'aktif').then((l) => setPinned(l.filter((x) => isPostListed(x) && !x.business)), () => setPinned([]));
   }, [uid, user, own]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  // Kaydedilenler ve Katıldıklarım yalnızca sekme açılınca okunur.
+  // Videolar, Etiketlendiklerim, Kaydedilenler ve Katıldıklarım yalnızca sekme açılınca okunur.
   useEffect(() => {
-    if (!own || !user) return;
+    if (!user || !profile) return;
+    if (tab === 'videolar' && videos === null) {
+      if (own) setVideos(posts ? posts.filter((x) => !!x.video) : null);
+      else postRepository.videosByAuthor(uid, follow === 'aktif').then((l) => setVideos(l.filter((x) => isPostListed(x) && !x.business)), () => setVideos([]));
+    }
+    if (tab === 'etiketlendiklerim' && tagged === null) postRepository.taggedIn(uid).then((l) => setTagged(l.filter(isPostListed)), () => setTagged([]));
+    if (!own) return;
     if (tab === 'kaydedilenler' && saved === null) postRepository.listSaved(user.uid).then((l) => setSaved(l.filter(isPostListed)), () => setSaved([]));
     if (tab === 'katildiklarim' && joined === null) eventRepository.listJoined(user.uid).then(setJoined, () => setJoined([]));
-  }, [tab, own, user, saved, joined]);
+  }, [tab, own, user, profile, uid, follow, posts, videos, tagged, saved, joined]);
+
+  const openMutual = () => {
+    setMutualOpen(true);
+    if (mutual && mutualList === null) socialRepository.profilesOf(mutual.uids).then(setMutualList, () => setMutualList([]));
+  };
 
   const back = () => (asTab ? router.dismissTo('/home') : router.canGoBack() ? router.back() : router.replace('/explore'));
-  const footer = asTab ? <BottomNav active="profile" /> : null;
+  // Alt menü başkasının profilinde de durur (Eren, 13 Kasım 2026).
+  const footer = <BottomNav active={asTab ? 'profile' : undefined} />;
   const top = (title: string, right?: ReactNode) => (
     <TopBar centered title={title} left={<RoundButton icon="arrow-back" label={t('common.back')} onPress={back} />} right={right} />
   );
@@ -240,10 +285,24 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     setDraft({ displayName: profile.displayName, bio: profile.bio, isPrivate: profile.isPrivate });
     setPhotoDraft(undefined);
     setEditing(true);
+    socialRepository.tagPolicy(uid).then(setTagPolicy, () => {});
+  };
+  const changeTagPolicy = (v: TagPolicy) => {
+    const before = tagPolicy;
+    setTagPolicy(v);
+    socialRepository.setTagPolicy(uid, v).catch(() => (setTagPolicy(before), setError(t('explore.saveError'))));
   };
 
+  const mutualText = mutual
+    ? mutual.uids.length === 1
+      ? t('explore.profile.mutual1', { a: mutual.top[0]?.displayName ?? '?' })
+      : mutual.uids.length === 2
+        ? t('explore.profile.mutual2', { a: mutual.top[0]?.displayName ?? '?', b: mutual.top[1]?.displayName ?? '?' })
+        : t('explore.profile.mutualMore', { a: mutual.top[0]?.displayName ?? '?', b: mutual.top[1]?.displayName ?? '?', n: mutual.uids.length - 2 })
+    : '';
+
   const hidden = !own && (blockedMe || iBlocked || (profile.isPrivate && follow !== 'aktif'));
-  const tabs: Tab[] = own ? ['gonderiler', 'kaydedilenler', 'katildiklarim'] : ['gonderiler'];
+  const tabs: Tab[] = own ? ['gonderiler', 'videolar', 'etiketlendiklerim', 'kaydedilenler', 'katildiklarim'] : ['gonderiler', 'videolar', 'etiketlendiklerim'];
 
   const pill = (label: string, onPress: () => void, opts: { primary?: boolean; disabled?: boolean } = {}) => (
     <Pressable
@@ -372,6 +431,19 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
             ) : null}
             <BadgeChips ids={profile.badges} />
             {profile.bio ? <AppText selectable style={styles.bioText}>{profile.bio}</AppText> : null}
+            {!own && mutual ? (
+              <Pressable accessibilityRole="button" accessibilityHint={t('explore.profile.mutualTitle')} onPress={openMutual} style={({ pressed }) => [styles.mutual, { opacity: pressed ? 0.7 : 1 }]}>
+                <View style={styles.mutualFaces}>
+                  {mutual.top.slice(0, 3).map((m, i) => (
+                    <View key={m.uid} style={[styles.mutualFace, { backgroundColor: c.surfaceStrong, borderColor: c.background, marginStart: i ? -8 : 0 }]}>
+                      <AppText style={[styles.mutualInitial, { color: c.accent }]}>{(m.displayName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                      <AvatarPhoto photo={m.photo} size={22} />
+                    </View>
+                  ))}
+                </View>
+                <AppText variant="caption" numberOfLines={2} style={[styles.grow, { color: c.textMuted }]}>{mutualText}</AppText>
+              </Pressable>
+            ) : null}
           </View>
           {error ? <FormMessage kind="error" text={error} /> : null}
 
@@ -404,6 +476,8 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                   <TextField label={t('explore.profile.bio')} hint={t('explore.profile.bioHint')} value={draft.bio} onChangeText={(v) => setDraft((d) => ({ ...d, bio: v }))} maxLength={PROFILE_LIMITS.bio} multiline />
                 )}
                 <CheckboxRow checked={draft.isPrivate} onToggle={() => setDraft((d) => ({ ...d, isPrivate: !d.isPrivate }))} label={t('explore.profile.privateToggle')} />
+                {/* Etiket izni hemen kaydedilir (Kaydet'i beklemez). */}
+                <Chips<TagPolicy> label={t('explore.profile.tagPolicy')} value={tagPolicy} onChange={changeTagPolicy} options={TAG_POLICIES.map((v) => ({ value: v, label: t(`explore.profile.tagPolicies.${v}`) }))} />
                 <AppButton title={t('explore.profile.save')} loading={busy} disabled={busy} onPress={saveProfile} />
                 <AppButton variant="ghost" title={t('account.cancel')} onPress={cancelEdit} />
               </View>
@@ -464,23 +538,57 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
           })}
         </View>
 
-        {tab === 'gonderiler' ? (
-          hidden ? (
-            <View style={styles.lockBox}>
-              <MaterialIcons name="lock-outline" size={36} color={c.textSoft} />
-              <AppText muted style={styles.center}>{iBlocked ? t('explore.profile.youBlocked') : blockedMe ? '' : t('explore.profile.privateNote')}</AppText>
-            </View>
-          ) : (
-            <PostGrid list={posts} empty={own ? t('explore.profile.noPostsOwn') : t('explore.profile.noPosts')} />
-          )
+        {hidden && (tab === 'gonderiler' || tab === 'videolar' || tab === 'etiketlendiklerim') ? (
+          <View style={styles.lockBox}>
+            <MaterialIcons name="lock-outline" size={36} color={c.textSoft} />
+            <AppText muted style={styles.center}>{iBlocked ? t('explore.profile.youBlocked') : blockedMe ? '' : t('explore.profile.privateNote')}</AppText>
+          </View>
+        ) : tab === 'gonderiler' ? (
+          <PostGrid list={withPinned(posts, own ? null : pinned)} empty={own ? t('explore.profile.noPostsOwn') : t('explore.profile.noPosts')} />
+        ) : tab === 'videolar' ? (
+          <PostGrid list={videos} views empty={own ? t('explore.profile.noVideosOwn') : t('explore.profile.noVideos')} />
+        ) : tab === 'etiketlendiklerim' ? (
+          <>
+            <PostGrid list={tagged} empty={own ? t('explore.profile.noTaggedOwn') : t('explore.profile.noTagged')} />
+            {tagged?.length ? <AppText variant="caption" muted style={styles.center}>{t('explore.profile.taggedNote')}</AppText> : null}
+          </>
         ) : tab === 'kaydedilenler' ? (
           <PostGrid list={saved} empty={t('explore.profile.noSaved')} />
         ) : (
           joinedList()
         )}
-        <View style={{ height: asTab ? spacing.lg : insets.bottom + spacing.lg }} />
+        <View style={{ height: spacing.lg }} />
       </ScrollView>
       {footer}
+
+      {/* Ortak takip listesi. */}
+      <Modal visible={mutualOpen} transparent animationType="fade" onRequestClose={() => setMutualOpen(false)}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={styles.backdrop} onPress={() => setMutualOpen(false)} />
+        <View style={[styles.sheet, { backgroundColor: c.background, paddingBottom: insets.bottom + spacing.md }]}>
+          <View style={[styles.handle, { backgroundColor: c.border }]} />
+          <AppText variant="label" accessibilityRole="header">{t('explore.profile.mutualTitle')}</AppText>
+          {mutualList === null ? (
+            <StateMessage kind="loading" />
+          ) : (
+            <ScrollView style={styles.mutualScroll}>
+              {mutualList.map((m) => (
+                <Pressable
+                  key={m.uid}
+                  accessibilityRole="button"
+                  onPress={() => (setMutualOpen(false), router.push({ pathname: '/u/[uid]', params: { uid: m.uid } }))}
+                  style={({ pressed }) => [styles.mutualRow, { opacity: pressed ? 0.7 : 1 }]}>
+                  <View style={[styles.mutualFace, styles.mutualFaceBig, { backgroundColor: c.surfaceStrong, borderColor: c.background }]}>
+                    <AppText style={[styles.mutualInitial, { color: c.accent }]}>{(m.displayName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                    <AvatarPhoto photo={m.photo} size={36} />
+                  </View>
+                  <AppText style={styles.grow}>{m.displayName}</AppText>
+                  <MaterialIcons name="chevron-right" size={20} color={c.textSoft} />
+                </Pressable>
+              ))}
+            </ScrollView>
+          )}
+        </View>
+      </Modal>
 
       {/* Başkasının profili: engelle ve şikâyet et. */}
       <Modal visible={menu} transparent animationType="fade" onRequestClose={() => setMenu(false)}>
@@ -550,6 +658,13 @@ const styles = StyleSheet.create({
   shortcutTitle: { fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 17 },
   shortcutHint: { fontSize: 11, lineHeight: 15 },
   grow: { flex: 1 },
+  mutual: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: MIN_TOUCH, marginTop: 4 },
+  mutualFaces: { flexDirection: 'row' },
+  mutualFace: { width: 24, height: 24, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  mutualFaceBig: { width: 38, height: 38, borderRadius: 19 },
+  mutualInitial: { fontFamily: fonts.bodySemi, fontSize: 11, lineHeight: 14 },
+  mutualRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: MIN_TOUCH, paddingVertical: 4 },
+  mutualScroll: { maxHeight: 360 },
   block: { gap: spacing.sm },
   requests: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   request: { flexDirection: 'row', alignItems: 'center', gap: 6 },

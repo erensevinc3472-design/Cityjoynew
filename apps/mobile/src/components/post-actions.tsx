@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { POST_REPORT_REASONS, type Post, type PostReportReason } from '@cityjoy/shared';
+import { PIN_LIMIT, POST_REPORT_REASONS, type Post, type PostReportReason } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
@@ -31,6 +31,9 @@ export function PostActions({ item, uid, onChange, onRemoved }: Props) {
   const [reporting, setReporting] = useState<PostReportReason | null>(null);
   const [reported, setReported] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
+  const [confirmUntag, setConfirmUntag] = useState(false);
+  const [info, setInfo] = useState<string>();
+  const tagged = !mine && !!item.tags?.includes(uid);
 
   useEffect(() => {
     if (!mine) postRepository.hasReported(item.id, uid).then(setReported, () => {});
@@ -62,6 +65,33 @@ export function PostActions({ item, uid, onChange, onRemoved }: Props) {
       setReporting(null);
     }, 'explore.reportError');
 
+  // Profilde sabitle (en çok PIN_LIMIT; işletme adına paylaşım kişinin profilinde görünmez).
+  const togglePin = () =>
+    run(async () => {
+      if (!item.pinned && (await postRepository.myPinnedCount(uid)) >= PIN_LIMIT) {
+        setError(t('explore.pin.limit', { n: PIN_LIMIT }));
+        return;
+      }
+      await postRepository.setPinned(item.id, !item.pinned);
+      const next = { ...item, pinned: !item.pinned || undefined };
+      patchCachedPost(item.id, { pinned: next.pinned });
+      onChange(next);
+      setInfo(next.pinned ? t('explore.pin.pinned') : undefined);
+    }, 'explore.saveError');
+
+  // Etiketlenen kişi kendini çıkarır.
+  const untag = () =>
+    run(async () => {
+      await postRepository.removeMyTag(item.id, uid);
+      const tags = (item.tags ?? []).filter((x) => x !== uid);
+      const tagNames = { ...item.tagNames };
+      delete tagNames[uid];
+      patchCachedPost(item.id, { tags, tagNames });
+      onChange({ ...item, tags, tagNames });
+      setConfirmUntag(false);
+      setInfo(t('explore.people.removed'));
+    }, 'explore.saveError');
+
   const toggleComments = () =>
     run(async () => {
       await postRepository.setCommentsOff(item.id, !item.commentsOff);
@@ -73,8 +103,23 @@ export function PostActions({ item, uid, onChange, onRemoved }: Props) {
     <View style={styles.block}>
       {mine && item.reportCount >= 3 && !item.cleared ? <FormMessage kind="info" text={t('explore.hiddenForReview')} /> : null}
       {error ? <FormMessage kind="error" text={error} /> : null}
+      {info ? <FormMessage kind="info" text={info} /> : null}
+      {tagged ? (
+        confirmUntag ? (
+          <View style={styles.block}>
+            <AppText>{t('explore.people.removeMeConfirm')}</AppText>
+            <AppButton title={t('explore.people.removeMe')} loading={busy} disabled={busy} onPress={untag} />
+            <AppButton variant="ghost" title={t('account.cancel')} onPress={() => setConfirmUntag(false)} />
+          </View>
+        ) : (
+          <AppButton variant="secondary" title={t('explore.people.removeMe')} disabled={busy} onPress={() => setConfirmUntag(true)} />
+        )
+      ) : null}
       {mine ? (
         <>
+          {!item.business && item.status === 'aktif' ? (
+            <AppButton variant="secondary" title={item.pinned ? t('explore.pin.unpin') : t('explore.pin.pin')} disabled={busy} onPress={togglePin} />
+          ) : null}
           <AppButton variant="secondary" title={item.commentsOff ? t('explore.comments.turnOn') : t('explore.comments.turnOff')} disabled={busy} onPress={toggleComments} />
           {confirmRemove ? (
             <View style={styles.block}>

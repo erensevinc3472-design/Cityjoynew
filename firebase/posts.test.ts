@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import type { PostInput } from '@cityjoy/shared';
-import { createFirestorePostRepository, createFramesAdmin, createPostModeration } from '@cityjoy/shared/firebase';
-import { doc, getDoc, increment, serverTimestamp, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
+import { countUsage, createFirestorePostRepository, createFirestoreSocialRepository, createFramesAdmin, createPostModeration } from '@cityjoy/shared/firebase';
+import { deleteField, doc, getDoc, increment, serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -334,5 +334,59 @@ describe('Keşfet gönderileri', () => {
     expect(await repo('ali').get(mine)).toMatchObject({ status: 'kaldirildi', text: '' });
     expect(await repo('ayse').get(other)).toMatchObject({ likeCount: 0, commentCount: 0 });
     expect(await repo('ali').listSaved('ali')).toEqual([]);
+  });
+
+  it('etiket, sabitleme, izlenme: istemci etiketi yalnızca istek olarak yazar, sabitlemeyi sahibi yapar, etiketlenen kendini çıkarır', async () => {
+    const r = repo('ayse');
+    // İstek: en çok 20 kişi, kendisi olmaz; etiket, sabit ve izlenme alanlarını istemci yazamaz.
+    const id = await r.create('ayse', 'Ayşe K.', input({ targets: ['genel'], tagRequest: ['ali', 'veli'] }));
+    expect((await getDoc(doc(fs('ayse'), 'posts', id))).get('tagReq')).toEqual(['ali', 'veli']);
+    // Uygulamanın yazdığı gibi (kullanım sayacıyla birlikte) doğrudan yazım.
+    const raw = async (extra: Record<string, unknown>) => {
+      const db = fs('ayse');
+      const b = writeBatch(db);
+      await countUsage(db, b, { type: 'u', id: 'ayse' }, 'gonderi', 'ayse');
+      b.set(doc(db, 'posts', r.newId()), {
+        text: 'Yazı', category: 'genel', targets: { mahallem: false, bolgesel: false, genel: true }, region: ataevler, status: 'aktif', authorUid: 'ayse',
+        authorName: 'Ayşe K.', likeCount: 0, commentCount: 0, reportCount: 0, searchKeys: [], createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...extra,
+      });
+      return b.commit();
+    };
+    await assertSucceeds(raw({ tagReq: ['ali'] }));
+    await assertFails(raw({ tagReq: ['ayse'] }));
+    await assertFails(raw({ tagReq: Array.from({ length: 21 }, (_, i) => `u${i}`) }));
+    await assertFails(raw({ tags: ['ali'] }));
+    await assertFails(raw({ pinned: true }));
+    await assertFails(raw({ viewCount: 5 }));
+    await assertFails(raw({ hasVideo: true }));
+
+    // Sahibi sabitler ve kaldırır; başkası sabitleyemez; sabitlerken başka alan değişmez.
+    await assertFails(repo('ali').setPinned(id, true));
+    await assertSucceeds(r.setPinned(id, true));
+    expect(await r.myPinnedCount('ayse')).toBe(1);
+    expect((await repo('ali').pinnedByAuthor('ayse', false)).map((p) => p.id)).toEqual([id]);
+    await assertFails(updateDoc(doc(fs('ayse'), 'posts', id), { pinned: true, viewCount: 99, updatedAt: serverTimestamp() }));
+    await assertSucceeds(r.setPinned(id, false));
+    expect(await r.myPinnedCount('ayse')).toBe(0);
+
+    // Sunucunun yazdığı etiket: etiketlenen yalnızca kendini çıkarır, başkasını çıkaramaz; yabancı hiç dokunamaz.
+    await env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), 'posts', id), { tags: ['ali', 'veli'], tagNames: { ali: 'Ali', veli: 'Veli' }, tagReq: deleteField() }));
+    expect((await repo('veli').taggedIn('ali')).map((p) => p.id)).toEqual([id]);
+    await assertFails(updateDoc(doc(fs('ali'), 'posts', id), { tags: ['ali'], ['tagNames.veli']: deleteField() }));
+    await assertFails(updateDoc(doc(fs('istanbul'), 'posts', id), { tags: ['ali'], ['tagNames.veli']: deleteField() }));
+    await assertSucceeds(repo('ali').removeMyTag(id, 'ali'));
+    expect(await r.get(id)).toMatchObject({ tags: ['veli'], tagNames: { veli: 'Veli' } });
+    expect(await repo('ali').taggedIn('ali')).toEqual([]);
+  });
+
+  it('"Beni kim etiketleyebilir" ayarı yalnızca kişinin kendisine, yalnızca geçerli değerle', async () => {
+    const social = (uid: string) => createFirestoreSocialRepository(fs(uid));
+    expect(await social('ali').tagPolicy('ali')).toBe('herkes');
+    await assertSucceeds(social('ali').setTagPolicy('ali', 'takip'));
+    expect(await social('ali').tagPolicy('ali')).toBe('takip');
+    await assertFails(setDoc(doc(fs('ali'), 'users/ali/settings/privacy'), { tagPolicy: 'herkesler', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(fs('ali'), 'users/ali/settings/privacy'), { tagPolicy: 'kimse', other: 1, updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(fs('ayse'), 'users/ali/settings/privacy'), { tagPolicy: 'kimse', updatedAt: serverTimestamp() }));
+    await assertFails(getDoc(doc(fs('ayse'), 'users/ali/settings/privacy')));
   });
 });

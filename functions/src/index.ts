@@ -19,9 +19,10 @@ import { BroadcastError, handleBroadcastEstimate, handleBroadcastReview, handleB
 import { handleBusinessPostWrite } from './business-posts';
 import { cloudBillingDisabler, handleBudgetNotice, handleManualStop, type BudgetNotice } from './budget';
 import { handleActivityChange, handleEventChange } from './cancellations';
-import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
+import { deleteExpiredPushLog, deleteExpiredSos, deleteExpiredViewLog, deleteUserLeftovers } from './cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
 import { expoSender } from './push';
+import { handlePostTags, handleRecordViews, removeTagsOf, ViewError } from './post-tags';
 import { expireMemberships } from './memberships';
 import { handleFollowWrite, handleMessageCreate } from './social';
 import { handleLift, handleSuspend, liftExpiredSuspensions, SuspensionError, type AccountSwitch } from './suspensions';
@@ -63,6 +64,22 @@ export const messageSent = onDocumentCreated('chats/{chatId}/messages/{mid}', as
 
 export const followChanged = onDocumentWritten('follows/{fid}', async (e) => {
   await handleFollowWrite(db, e.params.fid, e.data?.before.data(), e.data?.after.data(), deps());
+});
+
+// Etiket isteği denetlenir, uygunlar yazılır ve bildirim gider (post-tags.ts).
+export const postTagged = onDocumentCreated('posts/{id}', async (e) => {
+  await handlePostTags(db, e.params.id, e.data?.data(), deps());
+});
+
+// Video izlenmeleri: telefon toplu gönderir, kişi başına günde bir sayılır.
+export const recordViews = onCall({ maxInstances: 5 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  try {
+    return { counted: await handleRecordViews(db, req.auth.uid, req.data, new Date()) };
+  } catch (e) {
+    if (e instanceof ViewError) throw new HttpsError('invalid-argument', e.code);
+    throw new HttpsError('internal', 'yapilamadi');
+  }
 });
 
 // İşletme adına yayındaki gönderi sayısı (Ücretsiz kademede toplam sınır).
@@ -148,6 +165,7 @@ export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 
   const now = new Date();
   await deleteExpiredSos(db, now);
   await deleteExpiredPushLog(db, now);
+  await deleteExpiredViewLog(db, now);
   await deleteOldTranslations(db, now);
   await expireMemberships(db, now);
   await remindProEnding(db, { send: expoSender, now });
@@ -275,7 +293,10 @@ export const billingStop = onCall({ maxInstances: 1 }, async (req) => {
 export const userDeleted = functionsV1
   .region(REGION)
   .auth.user()
-  .onDelete((user) => deleteUserLeftovers(db, user.uid, deleteFiles));
+  .onDelete(async (user) => {
+    await deleteUserLeftovers(db, user.uid, deleteFiles);
+    await removeTagsOf(db, user.uid);
+  });
 
 // Pro abonelik mağaza bildirimi (RevenueCat): store-webhook.ts. Ödeme ilk sürümde yok (PROJE.md 15.2); gizli
 // bilgiler (REVENUECAT_WEBHOOK_AUTH, REVENUECAT_API_KEY) Secret Manager'a girilince aşağıdaki satır açılır. Kapalıyken

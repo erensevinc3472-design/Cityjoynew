@@ -15,6 +15,11 @@ export async function deleteExpiredPushLog(db: Firestore, now: Date): Promise<nu
   return deleteExpired(db, 'pushLog', now);
 }
 
+/** Günlük video izlenme kayıtları (aynı kişinin aynı videoyu günde bir sayılması; iki gün sonra silinir). */
+export async function deleteExpiredViewLog(db: Firestore, now: Date): Promise<number> {
+  return deleteExpired(db, 'viewLog', now);
+}
+
 async function deleteExpired(db: Firestore, collection: string, now: Date): Promise<number> {
   let total = 0;
   for (;;) {

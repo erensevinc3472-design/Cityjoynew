@@ -28,6 +28,7 @@ import { deletePhotos, PhotoTooLargeError, uploadPostPhotos, uploadPostVideo, Vi
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { CheckboxRow } from '@/components/checkbox-row';
+import { TagPeople, type TaggedPerson } from '@/components/tag-people';
 import { MediaEditor, type EditorMedia, type EditorResult } from '@/components/editor/media-editor';
 import { MediaOverlay } from '@/components/media-overlay';
 import { Chips } from '@/components/chips';
@@ -70,6 +71,8 @@ export default function NewPostScreen() {
   const [edits, setEdits] = useState<(MediaEdit | null)[]>([]);
   const [editor, setEditor] = useState<{ media: EditorMedia; edits: (MediaEdit | null)[] } | null>(null);
   const [uploading, setUploading] = useState(false);
+  // Etiketlenecek kişiler (düzenleyicideki "Bahset" çıkartmaları da gönderide etiket olur).
+  const [people, setPeople] = useState<TaggedPerson[]>([]);
   const [category, setCategory] = useState<PostCategory>('genel');
   // Keşfet'te hangi sekmedeyken + düğmesine basıldıysa o hedef seçili gelir; kişi istediği yerleri işaretler.
   const { target, as } = useLocalSearchParams<{ target?: string; as?: string }>();
@@ -140,7 +143,7 @@ export default function NewPostScreen() {
     const region = biz
       ? { provinceCode: biz.location.provinceCode, districtId: biz.location.districtId, neighbourhoodId: biz.location.neighbourhoodId! }
       : { provinceCode: location!.provinceCode, districtId: location!.districtId!, neighbourhoodId: location!.neighbourhoodId! };
-    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), ...(edits.some(Boolean) ? { edits } : {}), frames: frames && !!photos.length && targets.includes('genel'), ...(toNews ? { news: true } : {}) };
+    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), ...(edits.some(Boolean) ? { edits } : {}), frames: frames && !!photos.length && targets.includes('genel'), ...(toNews ? { news: true } : {}), ...(people.length ? { tagRequest: people.map((x) => x.uid) } : {}) };
     const errs: (PostError | 'relative' | 'banned')[] = [
       ...validatePost(input),
       ...(category === 'taziye' && !relative ? ['relative' as const] : []),
@@ -261,6 +264,7 @@ export default function NewPostScreen() {
         <PhotoPicker photos={photos} edits={edits} onEdit={openEditor} onAdd={addPhotos} onAddVideo={photos.length ? undefined : addVideo} onRemove={(i) => (setPhotos((cur) => cur.filter((_, k) => k !== i)), setEdits((cur) => cur.filter((_, k) => k !== i)))} disabled={busy} />
       )}
       {err('video') ? <FormMessage kind="error" text={err('video')!} /> : null}
+      {biz ? null : <TagPeople value={people} onChange={setPeople} disabled={busy} />}
       {photoNote ? <FormMessage kind="error" text={photoNote} /> : null}
       {errors.includes('photos') ? <FormMessage kind="error" text={t('explore.errors.photos')} /> : null}
       {errors.includes('realEstate') ? <FormMessage kind="error" text={t('explore.errors.realEstate')} /> : null}

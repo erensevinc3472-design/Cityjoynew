@@ -436,6 +436,8 @@
       "intro": "Keşfet gönderilerinin şikâyetleri. 3 şikâyet alan gönderi siz karar verene kadar uygulamada akıştan düşer.",
       "post": "Gönderi",
       "counts": "{{reports}} şikâyet · {{likes}} beğeni",
+      "views": "{{n}} izlenme",
+      "tags": "Etiketlenenler: {{names}}",
       "removed": "Kaldırıldı",
       "kept": "Yerinde kaldı",
       "missing": "(gönderi sahibi tarafından silinmiş)",

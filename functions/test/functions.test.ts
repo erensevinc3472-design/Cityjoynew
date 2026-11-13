@@ -8,7 +8,8 @@ import { handleBusinessPostWrite } from '../src/business-posts';
 import { handleBroadcastEstimate, handleBroadcastReview, handleBroadcastSend } from '../src/broadcasts';
 import { handleBudgetNotice, handleManualStop } from '../src/budget';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
-import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
+import { deleteExpiredPushLog, deleteExpiredSos, deleteExpiredViewLog, deleteUserLeftovers } from '../src/cleanup';
+import { handlePostTags, handleRecordViews, removeTagsOf, ViewError, VIEW_LIMITS } from '../src/post-tags';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
@@ -896,5 +897,65 @@ describe('bölgeye toplu bildirim', () => {
     const res = await handleBroadcastSend(db, { uid: 'adm' }, msg({ publisherKey: 'cityjoy', region: { provinceCode: '34' } }), deps);
     expect(res.status).toBe('gonderildi');
     expect(sent.map((m) => [m.to, m.title])).toEqual([['T-i1', 'Duyuru · CityJoy']]);
+  });
+});
+
+describe('gönderide etiket ve izlenme', () => {
+  const person = async (uid: string, extra: Record<string, unknown> = {}) => {
+    await db.doc(`publicProfiles/${uid}`).set({ uid, displayName: uid.toUpperCase(), ...extra });
+    await db.doc(`pushTokens/${uid}`).set({ tokens: [`T-${uid}`], language: 'tr', updatedAt: Timestamp.now() });
+  };
+
+  it('ayara, engele ve askıya göre süzer; uygunları yazar, isteği siler, yalnızca onlara bildirim gider', async () => {
+    for (const u of ['acik', 'takipci', 'takipsiz', 'kapali', 'engelli', 'askida']) await person(u, u === 'askida' ? { suspended: true } : {});
+    await db.doc('users/takipci/settings/privacy').set({ tagPolicy: 'takip' });
+    await db.doc('users/takipsiz/settings/privacy').set({ tagPolicy: 'takip' });
+    await db.doc('users/kapali/settings/privacy').set({ tagPolicy: 'kimse' });
+    await db.doc('follows/takipci_ayse').set({ status: 'aktif' });
+    await db.doc('blocks/engelli_ayse').set({ at: Timestamp.now() });
+    const post = { authorUid: 'ayse', authorName: 'Ayşe K.', status: 'aktif', tagReq: ['acik', 'takipci', 'takipsiz', 'kapali', 'engelli', 'askida', 'yok', 'ayse'] };
+    await db.doc('posts/p1').set(post);
+    const { sent, deps } = fakeSender();
+    expect(await handlePostTags(db, 'p1', post, deps)).toBe(2);
+    const after = (await db.doc('posts/p1').get()).data();
+    expect(after?.tags).toEqual(['acik', 'takipci']);
+    expect(after?.tagNames).toEqual({ acik: 'ACIK', takipci: 'TAKIPCI' });
+    expect(after?.tagReq).toBeUndefined();
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-acik', 'T-takipci']);
+    expect(sent[0].data.href).toEqual({ pathname: '/explore/[id]', params: { id: 'p1' } });
+
+    // Onay bekleyen (işletme) gönderide etiket yazılır ama bildirim gitmez; hesap silinince etiketten çıkar.
+    const pending = { ...post, status: 'onay-bekliyor', tagReq: ['acik'] };
+    await db.doc('posts/p2').set(pending);
+    const quiet = fakeSender();
+    expect(await handlePostTags(db, 'p2', pending, quiet.deps)).toBe(1);
+    expect(quiet.sent).toEqual([]);
+    expect(await removeTagsOf(db, 'acik')).toBe(2);
+    expect((await db.doc('posts/p1').get()).data()).toMatchObject({ tags: ['takipci'], tagNames: { takipci: 'TAKIPCI' } });
+    // İsteği olmayan gönderiye dokunulmaz.
+    expect(await handlePostTags(db, 'p3', { authorUid: 'ayse' }, fakeSender().deps)).toBe(0);
+  });
+
+  it('izlenme: kişi başına günde bir; kendi, kaldırılmış ve videosuz gönderi sayılmaz; kayıt iki gün sonra silinir', async () => {
+    const video = { path: 'v', url: 'https://x', width: 1, height: 1, durationSec: 10 };
+    await db.doc('posts/v1').set({ authorUid: 'ayse', status: 'aktif', video });
+    await db.doc('posts/v2').set({ authorUid: 'ali', status: 'aktif', video });
+    await db.doc('posts/v3').set({ authorUid: 'ayse', status: 'kaldirildi', video });
+    await db.doc('posts/f1').set({ authorUid: 'ayse', status: 'aktif' });
+    expect(await handleRecordViews(db, 'ali', { ids: ['v1', 'v2', 'v3', 'f1', 'yok', 'v1'] }, NOW)).toBe(1);
+    expect((await db.doc('posts/v1').get()).get('viewCount')).toBe(1);
+    expect((await db.doc('posts/v2').get()).get('viewCount')).toBeUndefined();
+    // Aynı gün tekrar sayılmaz; ertesi gün sayılır; başka kişi ayrıca sayılır.
+    expect(await handleRecordViews(db, 'ali', { ids: ['v1'] }, NOW)).toBe(0);
+    expect(await handleRecordViews(db, 'veli', { ids: ['v1'] }, NOW)).toBe(1);
+    const tomorrow = new Date(NOW.getTime() + 86_400_000);
+    expect(await handleRecordViews(db, 'ali', { ids: ['v1'] }, tomorrow)).toBe(1);
+    expect((await db.doc('posts/v1').get()).get('viewCount')).toBe(3);
+    // Geçersiz istek.
+    await expect(handleRecordViews(db, 'ali', { ids: Array.from({ length: VIEW_LIMITS.perCall + 1 }, (_, i) => `p${i}`) }, NOW)).rejects.toBeInstanceOf(ViewError);
+    await expect(handleRecordViews(db, 'ali', null, NOW)).rejects.toBeInstanceOf(ViewError);
+    // Günlük temizlik: süresi geçen kayıtlar.
+    expect(await deleteExpiredViewLog(db, new Date(NOW.getTime() + 2.5 * 86_400_000))).toBe(2);
+    expect(await deleteExpiredViewLog(db, new Date(NOW.getTime() + 4 * 86_400_000))).toBe(1);
   });
 });

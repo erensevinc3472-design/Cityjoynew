@@ -1389,7 +1389,9 @@
       "tabs": {
         "gonderiler": "Posts",
         "kaydedilenler": "Saved",
-        "katildiklarim": "Joined"
+        "katildiklarim": "Joined",
+        "videolar": "Videos",
+        "etiketlendiklerim": "Tagged"
       },
       "noPostsOwn": "No posts yet. Use the + button in Explore to share your first post.",
       "noSaved": "Posts you save appear here. Only you can see them.",
@@ -1402,7 +1404,22 @@
       "photoRemoved": "Your profile photo was removed after a report; you cannot add a new one.",
       "photoZoom": "Enlarge profile photo",
       "suspended": "This profile has been suspended.",
-      "suspendedNote": "Its profile and posts are not visible right now."
+      "suspendedNote": "Its profile and posts are not visible right now.",
+      "noVideos": "No videos yet.",
+      "noVideosOwn": "Videos you share appear here with their view counts.",
+      "noTagged": "No tagged posts yet.",
+      "noTaggedOwn": "Posts where others tag you appear here.",
+      "taggedNote": "Only public (General) posts are listed.",
+      "mutual1": "Followed by {{a}}",
+      "mutual2": "Followed by {{a}} and {{b}}",
+      "mutualMore": "Followed by {{a}}, {{b}} and {{n}} others",
+      "mutualTitle": "People you follow who follow them",
+      "tagPolicy": "Who can tag me",
+      "tagPolicies": {
+        "herkes": "Everyone",
+        "takip": "Only people I follow",
+        "kimse": "No one"
+      }
     },
     "takipFeedHint": "posts shared only with followers by people you follow",
     "share": "Share",
@@ -1507,7 +1524,26 @@
       "reset": "Reset",
       "resetConfirm": "Clear your recently viewed list?",
       "empty": "You haven't looked at any posts yet. Posts you view in Explore appear here."
-    }
+    },
+    "people": {
+      "add": "Tag people",
+      "title": "Tagged people",
+      "limit": "You can tag up to {{n}} people.",
+      "remove": "Remove tag {{name}}",
+      "hint": "People you tag get a notification. If their settings don’t allow it, the tag is not added.",
+      "with": "with {{name}}",
+      "withMore": "with {{name}} and {{n}} others",
+      "removeMe": "Remove from my profile",
+      "removeMeConfirm": "Remove your tag from this post? It will no longer appear on your profile.",
+      "removed": "Your tag was removed."
+    },
+    "pin": {
+      "pin": "Pin to profile",
+      "unpin": "Unpin",
+      "limit": "You can pin up to {{n}} posts. Unpin one first.",
+      "pinned": "Pinned"
+    },
+    "views": "{{n}} views"
   },
   "news": {
     "title": "News",
@@ -1713,7 +1749,9 @@
       "channel": "General notifications",
       "quietChannel": "Silent notifications",
       "proEndingTitle": "{{title}}: Pro ends in three days",
-      "proEndingBody": "If you do not renew, posts and photos over the free limit will be hidden (not deleted). They all come back when Pro returns."
+      "proEndingBody": "If you do not renew, posts and photos over the free limit will be hidden (not deleted). They all come back when Pro returns.",
+      "taggedTitle": "{{title}} tagged you",
+      "taggedBody": "Tap to see the post."
     },
     "categories": {
       "acil": "Urgent announcements",

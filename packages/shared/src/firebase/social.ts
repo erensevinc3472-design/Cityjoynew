@@ -9,6 +9,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
   writeBatch,
@@ -17,6 +18,7 @@ import {
 } from 'firebase/firestore';
 
 import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
+import { TAG_POLICIES, type TagPolicy } from '../posts/posts';
 import { blockId, followId, PROFILE_LIMITS, type FollowStatus, type ProfileReportReason, type PublicProfile } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
@@ -26,6 +28,9 @@ const PROFILES = 'publicProfiles';
 const FOLLOWS = 'follows';
 const BLOCKS = 'blocks';
 const REPORTS = 'profileReports';
+
+/** Ortak takip için okunan en çok takip (maliyet sınırı; 7 küçük sorgu). */
+const MUTUAL_SCAN = 200;
 
 const nameKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.profileKeys);
 
@@ -181,6 +186,41 @@ export function createFirestoreSocialRepository(db: Firestore) {
         query(collection(db, FOLLOWS), where('followerUid', '==', me), where('status', '==', 'aktif'), limit(PROFILE_LIMITS.feedAuthors)),
       );
       return snap.docs.map((d) => d.get('followeeUid') as string);
+    },
+
+    /**
+     * Ortak takip (profilde "Ahmet K., Ayşe Y. ve 3 kişi daha takip ediyor"): benim takip ettiklerimden bu kişiyi takip
+     * edenler. Takip listem en çok MUTUAL_SCAN kişi okunur, 30'luk parçalarla sorulur (yalnızca eşleşenler okunur).
+     */
+    async mutualFollowers(me: string, other: string): Promise<string[]> {
+      const mine = await getDocs(query(collection(db, FOLLOWS), where('followerUid', '==', me), where('status', '==', 'aktif'), limit(MUTUAL_SCAN)));
+      const uids = mine.docs.map((d) => d.get('followeeUid') as string).filter((u) => u !== other);
+      const parts: string[][] = [];
+      for (let i = 0; i < uids.length; i += 30) parts.push(uids.slice(i, i + 30));
+      const found = await Promise.all(
+        parts.map((part) =>
+          getDocs(query(collection(db, FOLLOWS), where('followeeUid', '==', other), where('status', '==', 'aktif'), where('followerUid', 'in', part)))
+            .then((snap) => snap.docs.map((d) => d.get('followerUid') as string))
+            .catch(() => [] as string[]),
+        ),
+      );
+      return found.flat();
+    },
+
+    /** Profiller (ortak takip satırı ve listesi için; en çok 30). */
+    async profilesOf(uids: readonly string[]): Promise<PublicProfile[]> {
+      const snaps = await Promise.all(uids.slice(0, 30).map((u) => getDoc(profileRef(u)).catch(() => null)));
+      return snaps.flatMap((x) => (x?.exists() && x.get('suspended') !== true ? [profileFromDoc(x.id, x.data())] : []));
+    },
+
+    /** "Beni kim etiketleyebilir" (kişinin kendi ayarı; varsayılan herkes). */
+    async tagPolicy(me: string): Promise<TagPolicy> {
+      const v = (await getDoc(doc(db, 'users', me, 'settings', 'privacy')).catch(() => null))?.get('tagPolicy');
+      return (TAG_POLICIES as readonly string[]).includes(v) ? (v as TagPolicy) : 'herkes';
+    },
+
+    async setTagPolicy(me: string, policy: TagPolicy): Promise<void> {
+      await setDoc(doc(db, 'users', me, 'settings', 'privacy'), { tagPolicy: policy, updatedAt: serverTimestamp() });
     },
 
     /** Engelle: iki yöndeki takip de biter. */

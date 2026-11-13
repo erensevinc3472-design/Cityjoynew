@@ -1,6 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
-import { Animated, Pressable, Share, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Animated, Modal, Pressable, Share, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import type { Post } from '@cityjoy/shared';
 
@@ -57,6 +59,9 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
   const [sheet, setSheet] = useState(false);
   const [removed, setRemoved] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(false);
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
   // Ad ve rozet güncel profilden (oturumda kişi başına bir okuma): ad değişikliği eski gönderilerde de görünür.
   const author = useAuthor(item.business ? undefined : item.authorUid);
   const biz = useBusinessInfo(item.business?.id);
@@ -188,7 +193,7 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
           </View>
         ) : item.video ? (
           <View style={styles.photos}>
-            <PostVideoView video={item.video} maxWidth={640} active={videoActive} onOpen={onOpenVideo} edit={item.edits?.[0]} />
+            <PostVideoView video={item.video} maxWidth={640} active={videoActive} onOpen={onOpenVideo} edit={item.edits?.[0]} viewId={item.id} />
           </View>
         ) : null}
         {item.text ? (
@@ -204,6 +209,40 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
           <MaterialIcons name="favorite" size={76} color={c.danger} />
         </Animated.View>
       </View>
+
+      {item.tags?.length ? (
+        // Etiketlenenler: "Ayşe K. ile" / "Ayşe K. ve 2 kişi ile"; dokununca liste, kişiye dokununca profili.
+        <Pressable accessibilityRole="button" accessibilityHint={t('explore.people.title')} onPress={() => setTagsOpen(true)} hitSlop={4} style={({ pressed }) => [styles.tagged, { opacity: pressed ? 0.7 : 1 }]}>
+          <MaterialIcons name="person-outline" size={16} color={c.textMuted} />
+          <AppText numberOfLines={1} style={[styles.taggedText, { color: c.textMuted }]}>
+            {item.tags.length === 1
+              ? t('explore.people.with', { name: item.tagNames?.[item.tags[0]] ?? '?' })
+              : t('explore.people.withMore', { name: item.tagNames?.[item.tags[0]] ?? '?', n: item.tags.length - 1 })}
+          </AppText>
+        </Pressable>
+      ) : null}
+      {item.tags?.length ? (
+        <Modal visible={tagsOpen} transparent animationType="fade" onRequestClose={() => setTagsOpen(false)}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={styles.backdrop} onPress={() => setTagsOpen(false)} />
+          <View style={[styles.sheet, { backgroundColor: c.background, paddingBottom: insets.bottom + spacing.md }]}>
+            <AppText variant="label" accessibilityRole="header">{t('explore.people.title')}</AppText>
+            {item.tags.map((u) => (
+              <Pressable
+                key={u}
+                accessibilityRole="link"
+                onPress={() => (setTagsOpen(false), router.push({ pathname: '/u/[uid]', params: { uid: u } }))}
+                style={({ pressed }) => [styles.tagRow, { opacity: pressed ? 0.7 : 1 }]}>
+                <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
+                  <AppText style={[styles.initial, { color: c.accent }]}>{(item.tagNames?.[u] || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                  <AvatarPhoto uid={u} size={36} />
+                </View>
+                <AppText style={styles.flex} numberOfLines={1}>{item.tagNames?.[u] ?? '?'}</AppText>
+                <MaterialIcons name="chevron-right" size={20} color={c.textSoft} />
+              </Pressable>
+            ))}
+          </View>
+        </Modal>
+      ) : null}
 
       <View style={styles.actions}>
         <Animated.View style={{ transform: [{ scale: bump }] }}>
@@ -285,6 +324,11 @@ const styles = StyleSheet.create({
   lostText: { fontFamily: fonts.bodySemi, fontSize: 14 },
   seeComments: { fontSize: 13, paddingBottom: 4 },
   foot: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  tagged: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 32, alignSelf: 'flex-start' },
+  taggedText: { fontFamily: fonts.bodyMedium, fontSize: 13 },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
+  sheet: { paddingHorizontal: GUTTER, paddingTop: spacing.md, gap: spacing.xs, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, maxHeight: '70%' },
+  tagRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 48 },
   tag: { fontFamily: fonts.bodySemi, fontSize: 12 },
   targets: { flex: 1, fontSize: 11 },
 });
