@@ -9,7 +9,7 @@ import type { Post } from '@cityjoy/shared';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
 import { TranslatableText } from '@/components/translatable-text';
-import { BadgeIcons } from '@/components/user-badges';
+import { BadgeIcons, OfficialSeal } from '@/components/user-badges';
 import { PostPhotos } from '@/components/post-photos';
 import { PostSheet } from '@/components/post-sheet';
 import { PostVideoView } from '@/components/post-video';
@@ -72,7 +72,15 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
   const lang = language ?? 'tr';
   const reduce = useReduceMotion();
   const ago = useRelativeTime();
-  const district = repo.getDistrict(item.region.districtId)?.name;
+  // Resmî hesabın seçtiği yer: "Tüm Türkiye", il, "ilçe, il"; diğerlerinde ilçe.
+  const district =
+    item.reach === 'turkiye'
+      ? t('explore.official.reach.turkiye')
+      : item.reach === 'il'
+        ? repo.getProvince(item.region.provinceCode)?.name
+        : item.reach === 'ilce'
+          ? [repo.getDistrict(item.region.districtId)?.name, repo.getProvince(item.region.provinceCode)?.name].filter(Boolean).join(', ')
+          : repo.getDistrict(item.region.districtId)?.name;
   const heart = useRef(new Animated.Value(0)).current;
   const bump = useRef(new Animated.Value(1)).current;
   const lastTap = useRef(0);
@@ -152,6 +160,7 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
               {!item.business && author.locationVerified ? (
                 <MaterialIcons name="where-to-vote" size={14} color={c.accent} accessibilityLabel={t(`locationBadge.badge.${author.locationVerified}`)} />
               ) : null}
+              {!item.business && author.official ? <OfficialSeal /> : null}
               {!item.business ? <BadgeIcons ids={author.badges} /> : null}
               {item.business && biz.verified ? (
                 <MaterialIcons name="verified" size={15} color={c.accent} accessibilityLabel={t('explore.verifiedBusiness')} />

@@ -2515,7 +2515,19 @@
       "volunteer-activism": "El ve kalp (gönüllü)",
       "workspace-premium": "Madalya"
     },
-    "publisherHint": "Haberler’e paylaşabilir"
+    "publisherHint": "Haberler’e paylaşabilir",
+    "official": {
+      "title": "Resmî CityJoy hesabı",
+      "how": "Uygulamada normal bir hesap aç, sonra Profiller'de o hesabı bulup \"Resmî hesap yap\"a bas. Resmî hesabın adının yanında altın onay rozeti çıkar; tüm Türkiye'ye, bir ile, ilçeye ya da mahalleye fotoğraflı ve videolu gönderi paylaşır, Haberler'e de paylaşabilir. En çok 10 resmî hesap olur.",
+      "none": "Henüz resmî hesap yok.",
+      "pill": "Resmî CityJoy hesabı",
+      "make": "Resmî hesap yap",
+      "undo": "Resmî hesabı geri al",
+      "makeConfirm": "\"{{name}}\" resmî CityJoy hesabı olsun mu? Adının yanında altın rozet çıkar ve istediği yere paylaşabilir.",
+      "undoConfirm": "\"{{name}}\" resmî hesap olmaktan çıkarılsın mı? Altın rozet kalkar, yalnızca kendi mahallesine paylaşabilir.",
+      "made": "\"{{name}}\" artık resmî CityJoy hesabı.",
+      "undone": "\"{{name}}\" resmî hesap olmaktan çıkarıldı."
+    }
   },
   "dataSources": {
     "title": "Veri kaynakları",

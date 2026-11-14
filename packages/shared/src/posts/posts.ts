@@ -12,6 +12,30 @@ import type { Photo } from '../media/photo';
 export const POST_TARGETS = ['mahallem', 'bolgesel', 'genel', 'takip'] as const;
 export type PostTarget = (typeof POST_TARGETS)[number];
 
+/**
+ * Resmî CityJoy hesabının "Nerede görünsün?" seçimi (Eren, 14 Kasım 2026). Yalnızca resmî hesap kullanır (kurallar):
+ * Tüm Türkiye = Genel; il ve ilçe = Bölgesel (o ilin akışı); mahalle = Mahallem. Hepsi takipçilerin akışına da düşer.
+ */
+export const POST_REACHES = ['turkiye', 'il', 'ilce', 'mahalle'] as const;
+export type PostReach = (typeof POST_REACHES)[number];
+
+/** Seçilen yer için hedefler ve gönderinin konum alanı (il ve ilçe düzeyinde alt kademe "tum" ile doldurulur). */
+export function reachPlan(
+  reach: PostReach,
+  place: { provinceCode?: string; districtId?: string; neighbourhoodId?: string },
+  own: PostRegion,
+): { targets: PostTarget[]; region: PostRegion } | null {
+  if (reach === 'turkiye') return { targets: ['genel', 'takip'], region: own };
+  const p = place.provinceCode;
+  if (!p) return null;
+  if (reach === 'il') return { targets: ['bolgesel', 'takip'], region: { provinceCode: p, districtId: `${p}-tum`, neighbourhoodId: `${p}-tum-tum` } };
+  const d = place.districtId;
+  if (!d) return null;
+  if (reach === 'ilce') return { targets: ['bolgesel', 'takip'], region: { provinceCode: p, districtId: d, neighbourhoodId: `${d}-tum` } };
+  const n = place.neighbourhoodId;
+  return n ? { targets: ['mahallem', 'takip'], region: { provinceCode: p, districtId: d, neighbourhoodId: n } } : null;
+}
+
 /** Keşfet kuralları madde 6. Taziyeyi yalnızca yakını paylaşır (kullanıcı beyan eder) ya da muhtar. */
 /** Gündem konuları: yalnızca Genel (ülke geneli) akışında (Eren, 12 Kasım 2026: "ekonomi, haber, spor gibi şeyler"). */
 export const POST_TOPICS = ['haber', 'ekonomi', 'spor', 'teknoloji', 'kultur-sanat', 'saglik'] as const;
@@ -90,6 +114,8 @@ export interface PostInput {
    * olanları `tags` alanına yazar ve bildirim gönderir (istemci `tags` yazamaz).
    */
   tagRequest?: string[];
+  /** Yalnızca resmî CityJoy hesabı: seçtiği yer (gönderide "Tüm Türkiye", "Bursa" gibi görünür). */
+  reach?: PostReach;
 }
 
 export interface Post extends PostInput {

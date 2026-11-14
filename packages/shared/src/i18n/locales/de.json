@@ -1543,7 +1543,24 @@
       "limit": "Du kannst bis zu {{n}} Beiträge anheften. Löse zuerst einen.",
       "pinned": "Angeheftet"
     },
-    "views": "{{n}} Aufrufe"
+    "views": "{{n}} Aufrufe",
+    "official": {
+      "seal": "Offizielles CityJoy-Konto",
+      "where": "Wo soll es erscheinen?",
+      "reach": {
+        "turkiye": "Ganze Türkei",
+        "il": "Eine Provinz",
+        "ilce": "Ein Bezirk",
+        "mahalle": "Ein Viertel"
+      },
+      "needPlace": "Wähle zuerst den Ort.",
+      "note": {
+        "turkiye": "Alle sehen es im allgemeinen Feed; es erreicht auch deine Follower.",
+        "il": "Alle in der gewählten Provinz sehen es im regionalen Feed.",
+        "ilce": "Erscheint im regionalen Feed der Provinz des gewählten Bezirks.",
+        "mahalle": "Erscheint nur im gewählten Viertel, im Feed „Mein Viertel\"."
+      }
+    }
   },
   "news": {
     "title": "Nachrichten",

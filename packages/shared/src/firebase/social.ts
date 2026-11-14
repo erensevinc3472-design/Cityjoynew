@@ -49,6 +49,7 @@ export function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
     ...(d.locationVerified === 'mahalle' || d.locationVerified === 'ilce' ? { locationVerified: d.locationVerified } : {}),
     ...(d.suspended === true ? { suspended: true } : {}),
     ...(d.publisher === true ? { publisher: true } : {}),
+    ...(d.official === true ? { official: true } : {}),
     ...(Array.isArray(d.badges) && d.badges.length ? { badges: d.badges.filter((b: unknown): b is string => typeof b === 'string').slice(0, 3) } : {}),
   };
 }

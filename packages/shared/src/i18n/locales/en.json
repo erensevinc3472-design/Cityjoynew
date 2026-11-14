@@ -1543,7 +1543,24 @@
       "limit": "You can pin up to {{n}} posts. Unpin one first.",
       "pinned": "Pinned"
     },
-    "views": "{{n}} views"
+    "views": "{{n}} views",
+    "official": {
+      "seal": "Official CityJoy account",
+      "where": "Where should it appear?",
+      "reach": {
+        "turkiye": "All of Türkiye",
+        "il": "A province",
+        "ilce": "A district",
+        "mahalle": "A neighbourhood"
+      },
+      "needPlace": "Choose the place first.",
+      "note": {
+        "turkiye": "Everyone sees it in the General feed; it also reaches your followers.",
+        "il": "Everyone in the chosen province sees it in the Regional feed.",
+        "ilce": "Shown in the Regional feed of the chosen district's province.",
+        "mahalle": "Shown only in the chosen neighbourhood, in the My neighbourhood feed."
+      }
+    }
   },
   "news": {
     "title": "News",

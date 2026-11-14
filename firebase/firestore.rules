@@ -74,6 +74,12 @@ service cloud.firestore {
         && c.granted is bool && c.at is string && c.textVersion is string;
     }
 
+    // Resmî CityJoy hesabı (Eren, 14 Kasım 2026): işareti yalnızca admin koyar (publicProfiles.official).
+    function isOfficialAccount() {
+      return signedIn() && exists(dp('publicProfiles', me()))
+        && get(dp('publicProfiles', me())).data.get('official', false) == true;
+    }
+
     function validLocation(loc) {
       return loc is map
         && loc.keys().hasOnly(['provinceCode', 'districtId', 'neighbourhoodId'])
@@ -2325,7 +2331,8 @@ service cloud.firestore {
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
              'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'video', 'frames',
-             'framesFeatured', 'edits', 'tagReq', 'hasVideo', 'tags', 'tagNames', 'pinned', 'viewCount', 'createdAt', 'updatedAt'])
+             'framesFeatured', 'edits', 'tagReq', 'hasVideo', 'tags', 'tagNames', 'pinned', 'viewCount', 'reach', 'createdAt', 'updatedAt'])
+        && (!('reach' in d) || d.reach in ['turkiye', 'il', 'ilce', 'mahalle'])
         && d.text is string && d.text.size() <= 2000
         // Düzenleyici (yazı/çıkartma/çizim; içeriği uygulama temizler): medya başına bir öğe.
         && (!('edits' in d) || (d.edits is list && d.edits.size() <= 10))
@@ -2464,6 +2471,8 @@ service cloud.firestore {
             || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
       // Paylaşma: kendi adına kendi kayıtlı mahallesiyle, ya da işletme adına işletmenin konumuyla.
       function _k85(nw) {
+        // Resmî CityJoy hesabı mı (bir kez okunur; yalnızca kişisel gönderide).
+        let off = !('business' in nw) && isOfficialAccount();
         return signedIn() && nw.authorUid == me()
         && nw.likeCount == 0 && nw.reportCount == 0
         && nw.get('commentCount', 0) == 0
@@ -2478,19 +2487,24 @@ service cloud.firestore {
         && (nw.text.size() >= 1 || 'photos' in nw || 'video' in nw)
         && validPostPhotos(nw, id)
         && validPostVideo(nw, id)
-        // Haberler'e yalnızca yayıncı rozetli kişi, kendi adına paylaşır (Eren, 13 Kasım 2026).
+        // Haberler'e yalnızca yayıncı rozetli kişi ya da resmî CityJoy hesabı, kendi adına paylaşır (Eren, 13-14 Kasım 2026).
         && (nw.targets.get('haberler', false) == false
             || (!('business' in nw)
-                && get(dp('publicProfiles', me())).data.get('publisher', false) == true))
+                && (off || get(dp('publicProfiles', me())).data.get('publisher', false) == true)))
+        // Erişim seçimi (reach) yalnızca resmî hesapta.
+        && (!('reach' in nw) || off)
         && ('business' in nw
             ? (validBusinessPost(nw)
                 && usageOk('b-' + nw.business.id, 'isletme-gonderi', limitOf('isletmeGonderi', 5)))
             : (nw.status == 'aktif'
                 && exists(myUserPath())
-                && usageOk('u-' + me(), 'gonderi', userLimit('gonderi', 10, 3))
-                && myLocation().get('neighbourhoodId', '') == nw.region.neighbourhoodId
-                && myLocation().get('districtId', '') == nw.region.districtId
-                && myLocation().get('provinceCode', '') == nw.region.provinceCode));
+                // Resmî CityJoy hesabı istediği yere paylaşır (Eren, 14 Kasım 2026); günlük sınırı yüksek.
+                && (off
+                    ? usageOk('u-' + me(), 'gonderi', 100)
+                    : (usageOk('u-' + me(), 'gonderi', userLimit('gonderi', 10, 3))
+                        && myLocation().get('neighbourhoodId', '') == nw.region.neighbourhoodId
+                        && myLocation().get('districtId', '') == nw.region.districtId
+                        && myLocation().get('provinceCode', '') == nw.region.provinceCode))));
       }
       allow create: if _k85(request.resource.data);
       // Kareler (admin): öne çıkar / kaldır. Karelere girmeyi yalnızca paylaşan seçer; admin geri açamaz.
@@ -3144,7 +3158,7 @@ service cloud.firestore {
       // fotoğrafı kaldırıldıysa yenisini koyamaz. Fotoğraf kendi yüklediği dosya olmalı.
       function _k122(nw, od) {
         return isSelf(uid)
-        && nw.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'badges', 'publisher', 'searchKeys', 'updatedAt'])
+        && nw.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'badges', 'publisher', 'official', 'searchKeys', 'updatedAt'])
         && nw.diff(od).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'locationVerified', 'searchKeys', 'updatedAt'])
         // Konum rozeti yalnızca kişinin kaydındaki doğrulamayla aynı yazımda ve aynı düzeyde.
         && (!nw.diff(od).affectedKeys().hasAny(['locationVerified'])
@@ -3180,9 +3194,10 @@ service cloud.firestore {
       // Rozet (Eren, 13 Kasım 2026): yalnızca admin verir ya da geri alır; kişi isteyemez, kendisi değiştiremez.
       function _k125(nw) {
         return isAdmin()
-        && nw.diff(resource.data).affectedKeys().hasOnly(['badges', 'publisher', 'updatedAt'])
-        && nw.badges is list && nw.badges.size() <= 3
+        && nw.diff(resource.data).affectedKeys().hasOnly(['badges', 'publisher', 'official', 'updatedAt'])
+        && nw.get('badges', []) is list && nw.get('badges', []).size() <= 3
         && nw.get('publisher', false) is bool
+        && nw.get('official', false) is bool
         && nw.updatedAt == request.time;
       }
       allow update: if _k125(request.resource.data);

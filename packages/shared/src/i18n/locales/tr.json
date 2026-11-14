@@ -1543,7 +1543,24 @@
       "limit": "En çok {{n}} gönderi sabitleyebilirsin. Önce birini kaldır.",
       "pinned": "Sabitlendi"
     },
-    "views": "{{n}} izlenme"
+    "views": "{{n}} izlenme",
+    "official": {
+      "seal": "Resmî CityJoy hesabı",
+      "where": "Nerede görünsün?",
+      "reach": {
+        "turkiye": "Tüm Türkiye",
+        "il": "Bir il",
+        "ilce": "Bir ilçe",
+        "mahalle": "Bir mahalle"
+      },
+      "needPlace": "Önce yeri seç.",
+      "note": {
+        "turkiye": "Genel akışta herkes görür; takipçilerin akışına da düşer.",
+        "il": "Seçtiğin ildeki herkes Bölgesel akışta görür.",
+        "ilce": "Seçtiğin ilçenin ilindeki Bölgesel akışta görünür.",
+        "mahalle": "Yalnızca seçtiğin mahallede, Mahallem akışında görünür."
+      }
+    }
   },
   "news": {
     "title": "Haberler",

@@ -85,3 +85,37 @@ export function BadgeControl({
     </form>
   );
 }
+
+/**
+ * Resmî CityJoy hesabı yap / geri al (yalnızca admin; Eren, 14 Kasım 2026). Hesap adının yanında altın onay rozeti
+ * çıkar; istediği yere (tüm Türkiye, il, ilçe, mahalle) ve Haberler'e paylaşır. İşlem kaydına yazılır.
+ */
+export function OfficialControl({
+  actorUid,
+  profile,
+  onDone,
+}: {
+  actorUid: string;
+  profile: Pick<PublicProfile, 'uid' | 'displayName' | 'official'>;
+  onDone: (ok: boolean, official?: boolean) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const on = !!profile.official;
+  const toggle = async () => {
+    if (!window.confirm(t(on ? 'badges.official.undoConfirm' : 'badges.official.makeConfirm', { name: profile.displayName }))) return;
+    setBusy(true);
+    try {
+      await createBadgeAdmin(firestore, actorUid).setOfficial(profile, !on);
+      onDone(true, !on);
+    } catch {
+      onDone(false);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button className={on ? 'link danger' : 'link'} disabled={busy} onClick={toggle}>
+      {t(on ? 'badges.official.undo' : 'badges.official.make')}
+    </button>
+  );
+}

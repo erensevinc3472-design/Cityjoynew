@@ -36,7 +36,7 @@ import { RoundButton } from '@/components/hero-header';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { TopBar } from '@/components/top-bar';
-import { BadgeChips } from '@/components/user-badges';
+import { BadgeChips, OfficialChip, OfficialSeal } from '@/components/user-badges';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { storage } from '@/lib/firebase';
 import { useChats } from '@/lib/messages';
@@ -420,7 +420,11 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
             />
           </View>
           <View style={styles.bio}>
-            <AppText style={[styles.name, { color: c.textStrong }]}>{profile.displayName}</AppText>
+            <View style={styles.nameRow}>
+              <AppText style={[styles.name, styles.nameShrink, { color: c.textStrong }]}>{profile.displayName}</AppText>
+              {profile.official ? <OfficialSeal size={18} /> : null}
+            </View>
+            {profile.official ? <OfficialChip /> : null}
             {profile.isPrivate ? (
               <View style={styles.privateRow}>
                 <MaterialIcons name="lock-outline" size={13} color={c.textMuted} />
@@ -646,6 +650,8 @@ const styles = StyleSheet.create({
   initial: { fontFamily: fonts.heading, fontSize: 32 },
   bio: { gap: 2, marginTop: -spacing.xs },
   name: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  nameShrink: { flexShrink: 1 },
   privateRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   bioText: { fontSize: 14, lineHeight: 20 },
   buttons: { flexDirection: 'row', gap: 6 },

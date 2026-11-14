@@ -7,7 +7,7 @@ import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { Intro } from '../components/intro';
-import { BadgeControl, BadgePills } from '../components/badge-control';
+import { BadgeControl, BadgePills, OfficialControl } from '../components/badge-control';
 
 const OTHER_LANGS: Exclude<LanguageCode, 'tr'>[] = ['en', 'de', 'ar', 'ru'];
 
@@ -21,6 +21,7 @@ export function BadgesPage() {
   const [defs, setDefs] = useState<BadgeDefinition[] | null>(null);
   const [saved, setSaved] = useState(true);
   const [holders, setHolders] = useState<PublicProfile[] | null>(null);
+  const [officials, setOfficials] = useState<PublicProfile[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -33,7 +34,10 @@ export function BadgesPage() {
       const r = await admin.load();
       setDefs(r.items);
       setSaved(r.saved);
-      if (!user?.isDemo) setHolders(await admin.holders(r.items.map((b) => b.id)).catch(() => []));
+      if (!user?.isDemo) {
+        setHolders(await admin.holders(r.items.map((b) => b.id)).catch(() => []));
+        setOfficials(await admin.officials().catch(() => []));
+      }
     } catch {
       setLoadError(true);
     }
@@ -122,6 +126,42 @@ export function BadgesPage() {
             ),
           )}
         </ul>
+      ) : null}
+
+      {!user.isDemo ? (
+        <section aria-labelledby="officials-title">
+          <h2 id="officials-title">{t('badges.official.title')}</h2>
+          <p className="meta">
+            {t('badges.official.how')} <Link to="/profiller">{t('menu.items.profiller')}</Link>
+          </p>
+          {officials === null ? (
+            <p className="state" aria-live="polite">{t('badges.loading')}</p>
+          ) : officials.length === 0 ? (
+            <p className="state">{t('badges.official.none')}</p>
+          ) : (
+            <ul className="badge-list">
+              {officials.map((p) => (
+                <li key={p.uid} className="card badge-row">
+                  <span className="badge-icon official-seal" aria-hidden="true">✓</span>
+                  <div className="grow">
+                    <strong>{p.displayName}</strong>
+                    <p className="meta">{t('badges.official.pill')}</p>
+                  </div>
+                  <div className="row-actions">
+                    <OfficialControl
+                      actorUid={user.uid}
+                      profile={p}
+                      onDone={(ok) => {
+                        setMessage(ok ? { kind: 'ok', text: t('badges.official.undone', { name: p.displayName }) } : { kind: 'error', text: t('badges.saveError') });
+                        if (ok) setOfficials((os) => (os ?? []).filter((o) => o.uid !== p.uid));
+                      }}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       ) : null}
 
       {defs && !user.isDemo ? (

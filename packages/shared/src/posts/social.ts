@@ -28,6 +28,11 @@ export interface PublicProfile {
   badges?: string[];
   /** Yayıncı rozeti var: Haberler'e paylaşabilir (yalnızca admin rozet verirken yazılır). */
   publisher?: boolean;
+  /**
+   * Resmî CityJoy hesabı (Eren, 14 Kasım 2026): adın yanında altın onay rozeti; istediği yere (tüm Türkiye, il, ilçe,
+   * mahalle) paylaşır, Haberler'e de paylaşabilir. Yalnızca admin panelden verir; kişi kendisi yazamaz (kurallar).
+   */
+  official?: boolean;
 }
 
 export const PROFILE_LIMITS = {

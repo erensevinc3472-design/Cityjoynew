@@ -67,6 +67,20 @@ export function createBadgeAdmin(db: Firestore, actorUid: string) {
       return clean;
     },
 
+    /** Resmî CityJoy hesabı yapar ya da geri alır (Eren, 14 Kasım 2026); işlem kaydına geçer. */
+    async setOfficial(profile: Pick<PublicProfile, 'uid' | 'displayName'>, on: boolean): Promise<void> {
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'publicProfiles', profile.uid), { official: on, updatedAt: serverTimestamp() });
+      addAudit(db, batch, { actorUid, module: 'moderasyon', action: 'duzenle', targetId: profile.uid, summary: on ? `Resmî CityJoy hesabı yapıldı: ${profile.displayName}` : `Resmî hesap geri alındı: ${profile.displayName}` });
+      await batch.commit();
+    },
+
+    /** Resmî hesaplar (en çok 10). */
+    async officials(): Promise<PublicProfile[]> {
+      const snap = await getDocs(query(collection(db, 'publicProfiles'), where('official', '==', true), limit(10)));
+      return snap.docs.map((d) => profileFromDoc(d.id, d.data()));
+    },
+
     /** Rozeti olan kişiler (en çok 100). */
     async holders(ids: string[]): Promise<PublicProfile[]> {
       if (!ids.length) return [];

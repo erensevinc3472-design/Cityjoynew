@@ -14,13 +14,16 @@ import {
   isPostTopic,
   mediaEditTexts,
   POST_LIMITS,
+  POST_REACHES,
   POST_TARGETS,
   postModeFor,
+  reachPlan,
   validatePost,
   type Business,
   type MediaEdit,
   type PostCategory,
   type PostError,
+  type PostReach,
   type PostTarget,
 } from '@cityjoy/shared';
 import { deletePhotos, PhotoTooLargeError, uploadPostPhotos, uploadPostVideo, VideoTooLargeError, type PreparedPhoto, type PreparedVideo } from '@cityjoy/shared/firebase';
@@ -34,6 +37,7 @@ import { MediaOverlay } from '@/components/media-overlay';
 import { Chips } from '@/components/chips';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
+import { ProvincePicker, RegionPicker } from '@/components/pickers';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { useBannedWordCheck } from '@/lib/banned-words';
@@ -90,15 +94,22 @@ export default function NewPostScreen() {
   }, [user]);
   // Yayıncı rozeti olan kişi kendi adına paylaşırken Haberler'i de seçebilir (Eren, 13 Kasım 2026; asıl denetim kurallarda).
   const [publisher, setPublisher] = useState(false);
+  // Resmî CityJoy hesabı (Eren, 14 Kasım 2026): "Nerede görünsün?" ile tüm Türkiye, bir il, ilçe ya da mahalle seçer.
+  const [official, setOfficial] = useState(false);
+  const [reach, setReach] = useState<PostReach>('turkiye');
+  const [spot, setSpot] = useState<{ provinceCode?: string; districtId?: string; neighbourhoodId?: string }>({});
   const [news, setNews] = useState(false);
   useEffect(() => {
     if (!user) return;
-    socialRepository.getProfile(user.uid).then((p) => setPublisher(p?.publisher === true)).catch(() => {});
+    socialRepository
+      .getProfile(user.uid)
+      .then((p) => (setPublisher(p?.publisher === true), setOfficial(p?.official === true)))
+      .catch(() => {});
   }, [user]);
   const [targets, setTargets] = useState<PostTarget[]>([POST_TARGETS.includes(target as PostTarget) ? (target as PostTarget) : 'mahallem']);
   const [relative, setRelative] = useState(false);
   const [frames, setFrames] = useState(false);
-  const [errors, setErrors] = useState<(PostError | 'relative' | 'banned')[]>([]);
+  const [errors, setErrors] = useState<(PostError | 'relative' | 'banned' | 'place')[]>([]);
   const hasBanned = useBannedWordCheck();
   const [failed, setFailed] = useState<string | false>(false);
   const [busy, setBusy] = useState(false);
@@ -110,8 +121,12 @@ export default function NewPostScreen() {
   const place = [districtId ? locationRepository.getDistrict(districtId)?.name : '', provinceName].filter(Boolean).join(', ');
   // Kancalar (useEffect) erken dönüşlerden önce olmalı, yoksa ekran açılırken çöker.
   // Gündem konuları (haber, ekonomi, spor...) yalnızca Genel seçiliyken; Genel kalkınca tür "Genel"e döner.
-  const toNews = news && publisher && !biz;
-  const withTopics = targets.includes('genel') || toNews;
+  const asOfficial = official && !biz;
+  const ownRegion = location?.districtId && location.neighbourhoodId ? { provinceCode: location.provinceCode, districtId: location.districtId, neighbourhoodId: location.neighbourhoodId } : null;
+  const plan = asOfficial && ownRegion ? reachPlan(reach, spot, ownRegion) : null;
+  const shownTargets = asOfficial ? plan?.targets ?? [] : targets;
+  const toNews = news && (publisher || official) && !biz;
+  const withTopics = shownTargets.includes('genel') || toNews;
   useEffect(() => {
     if (!withTopics && isPostTopic(category)) setCategory('genel');
   }, [withTopics, category]);
@@ -141,11 +156,14 @@ export default function NewPostScreen() {
 
   const submit = async () => {
     if (bizNoHood || bizFull) return;
-    const region = biz
+    if (asOfficial && !plan) return setErrors(['place' as const]);
+    const region = plan
+      ? plan.region
+      : biz
       ? { provinceCode: biz.location.provinceCode, districtId: biz.location.districtId, neighbourhoodId: biz.location.neighbourhoodId! }
       : { provinceCode: location!.provinceCode, districtId: location!.districtId!, neighbourhoodId: location!.neighbourhoodId! };
-    const input = { text, category, targets, region, photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), ...(edits.some(Boolean) ? { edits } : {}), frames: frames && !!photos.length && targets.includes('genel'), ...(toNews ? { news: true } : {}), ...(people.length ? { tagRequest: people.map((x) => x.uid) } : {}) };
-    const errs: (PostError | 'relative' | 'banned')[] = [
+    const input = { text, category, targets: shownTargets, region, ...(plan ? { reach } : {}), photos: photos.map((p) => ({ path: '', url: '', width: p.width, height: p.height })), ...(video ? { video: { path: '', url: '', width: video.width, height: video.height, durationSec: video.durationSec } } : {}), ...(edits.some(Boolean) ? { edits } : {}), frames: frames && !!photos.length && shownTargets.includes('genel'), ...(toNews ? { news: true } : {}), ...(people.length ? { tagRequest: people.map((x) => x.uid) } : {}) };
+    const errs: (PostError | 'relative' | 'banned' | 'place')[] = [
       ...validatePost(input),
       ...(category === 'taziye' && !relative ? ['relative' as const] : []),
       // Medyanın üstündeki yazılar ve etiketler de yasaklı kelime süzgecinden geçer.
@@ -280,6 +298,17 @@ export default function NewPostScreen() {
           {err('relative') ? <FormMessage kind="error" text={err('relative')!} /> : null}
         </>
       ) : null}
+      {asOfficial ? (
+        <View style={styles.block}>
+          <AppText variant="label">{t('explore.official.where')}</AppText>
+          <Chips<PostReach> label={t('explore.official.where')} value={reach} onChange={(r) => (setReach(r), setErrors((e) => e.filter((x) => x !== 'place')))} options={POST_REACHES.map((r) => ({ value: r, label: t(`explore.official.reach.${r}`) }))} />
+          {reach === 'il' ? <ProvincePicker label={t('business.province')} value={spot.provinceCode} onChange={(p) => setSpot({ provinceCode: p })} /> : null}
+          {reach === 'ilce' || reach === 'mahalle' ? <RegionPicker provinceCode={spot.provinceCode} districtId={spot.districtId} neighbourhoodId={spot.neighbourhoodId} withNeighbourhood={reach === 'mahalle'} onChange={setSpot} /> : null}
+          {errors.includes('place') && !plan ? <FormMessage kind="error" text={t('explore.official.needPlace')} /> : null}
+          <CheckboxRow checked={news} onToggle={() => setNews((x) => !x)} label={`${t('explore.targets.haberler')}: ${t('explore.tabHints.haberler', { place: (plan && locationRepository.getProvince(plan.region.provinceCode)?.name) || provinceName })}`} />
+          <AppText variant="caption" muted>{t(`explore.official.note.${reach}`)}</AppText>
+        </View>
+      ) : (
       <View style={styles.block}>
         <AppText variant="label">{t('explore.fields.where')}</AppText>
         {POST_TARGETS.map((x) => (
@@ -291,7 +320,8 @@ export default function NewPostScreen() {
         {err('targets') ? <FormMessage kind="error" text={err('targets')!} /> : null}
         {targets.includes('mahallem') ? <AppText variant="caption" muted>{t('explore.fields.mahallemNote')}</AppText> : null}
       </View>
-      {photos.length && targets.includes('genel') ? (
+      )}
+      {photos.length && shownTargets.includes('genel') ? (
         <View style={styles.block}>
           <CheckboxRow checked={frames} onToggle={() => setFrames((x) => !x)} label={t('explore.fields.frames', { name: provinceName })} />
           <AppText variant="caption" muted>{t('explore.fields.framesHint')}</AppText>

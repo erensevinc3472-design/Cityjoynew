@@ -45,6 +45,37 @@ export function BadgeIcons({ ids, size = 14 }: { ids: string[] | undefined; size
   );
 }
 
+/**
+ * Resmî CityJoy hesabı (Eren, 14 Kasım 2026, seçenek A): adın yanında altın daire içinde onay işareti. Renkler her iki
+ * temada aynıdır (marka işareti); ekran okuyucu "Resmî CityJoy hesabı" okur.
+ */
+export function OfficialSeal({ size = 15 }: { size?: number }) {
+  const { t } = useTranslation();
+  return (
+    <View accessible accessibilityLabel={t('explore.official.seal')} style={[styles.seal, { width: size, height: size, borderRadius: size / 2 }]}>
+      <MaterialIcons name="check" size={Math.round(size * 0.72)} color={SEAL_INK} />
+    </View>
+  );
+}
+
+/** Profilde: "Resmî CityJoy hesabı" etiketi. */
+export function OfficialChip() {
+  const { t } = useTranslation();
+  return (
+    <View style={styles.row}>
+      <View style={[styles.chip, { backgroundColor: SEAL_SOFT }]}>
+        <OfficialSeal size={13} />
+        <AppText variant="caption" style={{ color: SEAL_TEXT }}>{t('explore.official.seal')}</AppText>
+      </View>
+    </View>
+  );
+}
+
+const SEAL = '#E2B277';
+const SEAL_INK = '#2A1C06';
+const SEAL_SOFT = 'rgba(226,178,119,0.18)';
+const SEAL_TEXT = '#A9773A';
+
 /** Profilde: rozetler adlarıyla, küçük etiketler hâlinde. */
 export function BadgeChips({ ids }: { ids: string[] | undefined }) {
   const defs = useBadgeDefs();
@@ -67,4 +98,5 @@ export function BadgeChips({ ids }: { ids: string[] | undefined }) {
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: spacing.sm, paddingVertical: 3, borderRadius: radius.pill },
+  seal: { backgroundColor: SEAL, alignItems: 'center', justifyContent: 'center' },
 });
