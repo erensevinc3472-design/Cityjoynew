@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel uygulama önizleme</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL@24,500,1&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#081f24; --s:#0d2c32; --s2:#11363d; --fg:#f3f6f6; --m:#a0b0b5; --b:rgb(255 255 255 / .09); --a:#e0b07a; --as:rgb(224 176 122 / .14); --ok:#6ee7b7; --okb:rgb(52 211 153 / .14); --warn:#fcd34d; --warnb:rgb(252 211 77 / .14); --f:rgb(4 18 21 / .45); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#E9ECE6; font-family:Inter, sans-serif; color:var(--fg); padding:20px 14px; }
+  h1.t { font-family:'Plus Jakarta Sans'; color:#14262B; font-size:20px; margin:0 0 4px 4px; }
+  .sub { color:#56696D; font-size:13px; margin:0 0 14px 4px; }
+  .cap { color:#14262B; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; margin:18px 0 8px 4px; }
+  .ic { font-family:'Material Symbols Rounded'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; vertical-align:middle; }
+  .win { width:1180px; height:750px; background:var(--bg); border-radius:14px; overflow:hidden; display:flex; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+  .side { width:210px; background:#0b2a30; padding:14px 10px; font-size:13px; flex:none; }
+  .side .brand { font-family:'Plus Jakarta Sans'; font-weight:800; color:var(--a); font-size:16px; margin:2px 8px 14px; }
+  .side .g { color:#7f959a; font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin:12px 8px 4px; }
+  .side .i { display:flex; gap:8px; align-items:center; padding:7px 8px; border-radius:9px; color:#d5dee0; }
+  .side .i.on { background:var(--as); color:var(--a); font-weight:600; }
+  .side .i .ic { font-size:18px; }
+  .main { flex:1; padding:18px 22px; overflow:hidden; }
+  .main h2 { font-family:'Plus Jakarta Sans'; font-size:21px; margin:0; }
+  .lead { color:var(--m); font-size:13px; margin:4px 0 14px; }
+  .status { display:flex; gap:10px; margin-bottom:14px; }
+  .st { flex:1; background:var(--s); border:1px solid var(--b); border-radius:12px; padding:10px 12px; font-size:12.5px; color:var(--m); }
+  .st b { display:block; color:var(--fg); font-size:14px; margin-top:2px; }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok); margin-right:6px; }
+  .dot.w { background:var(--warn); }
+  .tabs { display:flex; gap:4px; border-bottom:1px solid var(--b); margin-bottom:14px; }
+  .tab { padding:8px 12px; font-size:13px; color:var(--m); font-weight:600; }
+  .tab.on { color:var(--fg); box-shadow:inset 0 -2px 0 var(--a); }
+  .cols { display:flex; gap:16px; }
+  .card { background:var(--s); border:1px solid var(--b); border-radius:14px; padding:14px; }
+  .lbl { font-size:12.5px; color:var(--m); margin:10px 0 4px; }
+  .field { background:var(--f); border:1px solid var(--b); border-radius:10px; padding:8px 10px; font-size:13px; }
+  .row { display:flex; gap:8px; }
+  .seg { display:flex; background:rgb(6 20 24 / .6); border-radius:10px; padding:3px; font-size:12.5px; }
+  .seg span { flex:1; text-align:center; padding:6px; border-radius:8px; color:var(--m); }
+  .seg span.on { background:var(--s2); color:var(--fg); font-weight:600; }
+  .chip { display:inline-flex; gap:4px; align-items:center; background:var(--as); color:var(--a); border-radius:999px; padding:3px 9px; font-size:12px; margin:0 4px 4px 0; }
+  .btn { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 14px; border-radius:10px; background:var(--a); color:#1a1206; font-weight:600; font-size:13px; }
+  .btn.s { background:var(--as); color:var(--fg); }
+  .tog { width:34px; height:20px; border-radius:999px; background:var(--s2); position:relative; flex:none; }
+  .tog::after { content:''; position:absolute; top:3px; left:3px; width:14px; height:14px; border-radius:50%; background:#7f959a; }
+  .tog.on { background:var(--a); } .tog.on::after { left:17px; background:#1a1206; }
+  .mod { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--b); font-size:13px; }
+  .mod span.n { flex:1; }
+  .hist { font-size:12px; color:var(--m); line-height:1.7; }
+  /* telefon */
+  .phone { width:250px; height:510px; border-radius:36px; background:#0B2328; box-shadow:0 0 0 6px #050f11; overflow:hidden; position:relative; flex:none; }
+  .ps { height:30px; display:flex; justify-content:space-between; align-items:center; padding:0 20px; font-size:11px; font-weight:600; }
+  .band { margin:0 10px; background:var(--warnb); color:var(--warn); border-radius:10px; padding:7px 9px; font-size:11px; display:flex; gap:6px; }
+  .hero { background:linear-gradient(180deg,#15535B,#0E3439); margin:8px 0 0; padding:10px 12px 14px; border-radius:0 0 22px 22px; }
+  .hello { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:17px; margin:2px 0 8px; }
+  .pchip { display:inline-flex; gap:4px; align-items:center; background:rgba(234,241,241,.1); border-radius:999px; height:24px; padding:0 9px; font-size:10.5px; margin-right:4px; }
+  .tiles { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:10px; }
+  .tile { height:92px; border-radius:16px; background:linear-gradient(160deg,#1C4950,#0F2E33); padding:9px; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:12px; display:flex; align-items:flex-end; position:relative; }
+  .tile .ic { position:absolute; top:9px; left:9px; color:var(--a); font-size:20px; }
+  .nav { position:absolute; bottom:0; left:0; right:0; height:52px; border-top:1px solid var(--b); display:flex; justify-content:space-around; align-items:center; font-size:9.5px; color:var(--m); }
+  .nav div { text-align:center; } .nav .on { color:var(--a); }
+  .nav .ic { font-size:19px; display:block; margin:0 auto 1px; }
+  .ctx h3 { font-family:'Plus Jakarta Sans'; font-size:15px; margin:0 0 2px; }
+  .link { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:10px; background:var(--s2); font-size:13px; margin-bottom:6px; }
+  .link .ic { color:var(--a); font-size:18px; }
+  .link span.x { flex:1; }
+  .warnline { background:var(--warnb); color:var(--warn); border-radius:10px; padding:7px 10px; font-size:12px; margin:6px 0; display:flex; gap:6px; }
+  .okline { background:var(--okb); color:var(--ok); border-radius:10px; padding:7px 10px; font-size:12px; margin:6px 0; display:flex; gap:6px; }
+  .bar { display:flex; gap:8px; align-items:center; margin-bottom:12px; font-size:13px; }
+  .sel { background:var(--f); border:1px solid var(--b); border-radius:10px; padding:6px 10px; display:flex; gap:6px; align-items:center; }
+  .crumb { color:var(--m); font-size:12.5px; }
+</style>
+</head>
+<body>
+<h1 class="t">Panel: Uygulama ayarları ve Uygulama görünümü (öneri)</h1>
+<p class="sub">Panelin bugünkü renkleri ve menüsü korunuyor. Örnek veriler gösterilmiştir.</p>
+
+<!-- 1. UYGULAMA AYARLARI -->
+<p class="cap">1. Ayarlar &gt; Uygulama ayarları</p>
+<div class="win">
+  <div class="side">
+    <div class="brand">CityJoy Panel</div>
+    <div class="g">Günlük işler</div><div class="i"><span class="ic">home</span>Bugün</div>
+    <div class="g">İçerik</div><div class="i"><span class="ic">smartphone</span>Uygulama görünümü</div><div class="i"><span class="ic">book</span>Şehir rehberi</div><div class="i"><span class="ic">public</span>Keşfet ve Öğren</div>
+    <div class="g">Ayarlar</div><div class="i on"><span class="ic">tune</span>Uygulama ayarları</div><div class="i"><span class="ic">key</span>Yetkiler</div><div class="i"><span class="ic">speed</span>Günlük sınırlar</div>
+  </div>
+  <div class="main">
+    <h2>Uygulama ayarları</h2>
+    <p class="lead">Uygulamanın tamamını etkileyen ayarlar. Yalnızca admin görür ve değiştirir, her değişiklik kayda geçer.</p>
+    <div class="status">
+      <div class="st"><span class="dot"></span>Uygulama<b>Açık</b></div>
+      <div class="st"><span class="dot w"></span>Duyuru bandı<b>Cumartesi 02:00'de başlayacak</b></div>
+      <div class="st"><span class="dot"></span>En düşük sürüm<b>iPhone 1.0.3 · Android 1.0.3</b></div>
+      <div class="st"><span class="dot w"></span>Kapalı bölüm<b>1 (Çarşı)</b></div>
+    </div>
+    <div class="tabs"><div class="tab on">Duyuru ve bakım</div><div class="tab">Güncelleme</div><div class="tab">Bölümler</div><div class="tab">Görseller</div><div class="tab">İletişim</div><div class="tab">Yasal metinler</div><div class="tab">Geçmiş</div></div>
+    <div class="cols">
+      <div class="card" style="flex:1">
+        <div class="lbl" style="margin-top:0">Tür</div>
+        <div class="seg"><span class="on">Duyuru bandı</span><span>Bakım modu (uygulama kapanır)</span></div>
+        <div class="lbl">Hazır metin</div>
+        <div><span class="chip">Planlı bakım</span><span class="chip">Hizmette aksama</span><span class="chip">Yeni özellik</span></div>
+        <div class="lbl">Metin (5 dile çevrilir, istersen düzeltirsin)</div>
+        <div class="field">Bu gece 02:00 - 03:00 arası kısa bir bakım yapılacak. Bazı bölümler yavaş çalışabilir.</div>
+        <div class="row">
+          <div style="flex:1"><div class="lbl">Başlangıç</div><div class="field">Cumartesi 16 Kasım, 02:00</div></div>
+          <div style="flex:1"><div class="lbl">Bitiş</div><div class="field">Cumartesi 16 Kasım, 03:00</div></div>
+        </div>
+        <div class="lbl">Kimler görsün</div>
+        <div class="seg"><span>Türkiye geneli</span><span class="on">Seçili iller</span><span>Sadece bana</span></div>
+        <div style="margin-top:6px"><span class="chip">Bursa ✕</span><span class="chip">+ İl ekle</span></div>
+        <div class="row" style="margin-top:14px"><div class="btn"><span class="ic" style="font-size:17px">schedule</span>Zamanla</div><div class="btn s">Önce bana göster</div></div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px">
+        <div class="phone">
+          <div class="ps"><span>02:10</span><span class="ic" style="font-size:13px">signal_cellular_alt</span></div>
+          <div class="band"><span class="ic" style="font-size:14px">build</span>Bu gece 02:00 - 03:00 arası kısa bir bakım yapılacak.</div>
+          <div class="hero"><div style="font-size:10.5px;color:#B7CDCF">Cumartesi, 16 Kasım</div><div class="hello">Merhaba Eren</div><span class="pchip"><span class="ic" style="font-size:13px">place</span>Osmangazi</span><span class="pchip">☁ 12°</span></div>
+          <div class="tiles"><div class="tile"><span class="ic">location_city</span>Benim Şehrim</div><div class="tile"><span class="ic">flight</span>Seyahat</div><div class="tile"><span class="ic">groups</span>Sosyal Harmoni</div><div class="tile"><span class="ic">emergency</span>Acil İhtiyaçlar</div></div>
+          <div class="nav"><div class="on"><span class="ic">home</span>Ana Sayfa</div><div><span class="ic">explore</span>Keşfet</div><div><span class="ic">search</span>Ara</div><div><span class="ic">person</span>Profil</div></div>
+        </div>
+        <div style="color:#56696D;font-size:12px">Canlı önizleme</div>
+      </div>
+      <div class="card" style="width:230px">
+        <div style="font-family:'Plus Jakarta Sans';font-weight:700;font-size:14px">Son değişiklikler</div>
+        <div class="hist">
+          Bugün 10:12 · Eren · Çarşı kapatıldı <a style="color:var(--a)">Geri al</a><br>
+          Dün 18:40 · Eren · En düşük sürüm 1.0.3<br>
+          12 Kas · Eren · Destek e-postası değişti
+        </div>
+        <div class="warnline" style="margin-top:12px"><span class="ic" style="font-size:15px">warning</span>Bakım modu ve zorunlu güncelleme açılırken ikinci kez onay istenir.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. UYGULAMA GÖRÜNÜMÜ -->
+<p class="cap">2. İçerik &gt; Uygulama görünümü</p>
+<div class="win">
+  <div class="side">
+    <div class="brand">CityJoy Panel</div>
+    <div class="g">Günlük işler</div><div class="i"><span class="ic">home</span>Bugün</div>
+    <div class="g">İçerik</div><div class="i on"><span class="ic">smartphone</span>Uygulama görünümü</div><div class="i"><span class="ic">book</span>Şehir rehberi</div><div class="i"><span class="ic">public</span>Keşfet ve Öğren</div><div class="i"><span class="ic">campaign</span>Duyurular</div>
+    <div class="g">Ayarlar</div><div class="i"><span class="ic">tune</span>Uygulama ayarları</div>
+  </div>
+  <div class="main">
+    <h2>Uygulama görünümü</h2>
+    <p class="lead">Uygulamayı burada gez. Hangi ekrandaysan o ekranın panel bağlantıları ve durumu sağda çıkar.</p>
+    <div class="bar">
+      <span class="crumb">Şu il gibi göster:</span>
+      <div class="sel"><span class="ic" style="font-size:16px">place</span>Bursa · Nilüfer <span class="ic" style="font-size:16px">expand_more</span></div>
+      <div class="sel"><span class="ic" style="font-size:16px">dark_mode</span>Gece</div>
+      <div class="sel"><span class="ic" style="font-size:16px">translate</span>Türkçe</div>
+      <div class="sel"><span class="ic" style="font-size:16px">restart_alt</span>Ana sayfaya dön</div>
+    </div>
+    <div class="cols">
+      <div class="phone" style="height:560px;width:270px">
+        <div class="ps"><span>10:50</span><span class="ic" style="font-size:13px">signal_cellular_alt</span></div>
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 12px"><span class="ic" style="font-size:20px">arrow_back</span><div style="flex:1;text-align:center;font-family:'Plus Jakarta Sans';font-weight:700;font-size:14px">Cafe ve Restoran</div><span style="width:20px"></span></div>
+        <div style="padding:6px 12px;display:flex;gap:6px"><span class="pchip" style="background:var(--a);color:#1a1206">Tümü</span><span class="pchip">Kahvaltı</span><span class="pchip">Kebap</span><span class="pchip">Tatlı</span></div>
+        <div style="padding:4px 12px;display:flex;flex-direction:column;gap:8px">
+          <div style="background:#123238;border-radius:14px;padding:10px;display:flex;gap:10px"><div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#2E7A82,#E2B277)"></div><div><div style="font-weight:600;font-size:12.5px">Kahve Durağı</div><div style="color:var(--m);font-size:11px">Kafe · Nilüfer</div><div style="color:var(--ok);font-size:11px">Şu an açık</div></div></div>
+          <div style="background:#123238;border-radius:14px;padding:10px;display:flex;gap:10px"><div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#8A6A3E,#E2B277)"></div><div><div style="font-weight:600;font-size:12.5px">Cengiz Kebap</div><div style="color:var(--m);font-size:11px">Kebapçı · Osmangazi</div><div style="color:var(--m);font-size:11px">★ 4,6 · 120 yorum</div></div></div>
+          <div style="background:#123238;border-radius:14px;padding:10px;display:flex;gap:10px"><div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#4D5F8C,#E2B277)"></div><div><div style="font-weight:600;font-size:12.5px">Tophane Kahvaltı</div><div style="color:var(--m);font-size:11px">Kahvaltı · Osmangazi</div></div></div>
+        </div>
+        <div class="nav"><div><span class="ic">home</span>Ana Sayfa</div><div><span class="ic">explore</span>Keşfet</div><div><span class="ic">search</span>Ara</div><div><span class="ic">person</span>Profil</div></div>
+      </div>
+      <div class="card ctx" style="flex:1">
+        <div class="crumb">Ana sayfa › Benim Şehrim › Cafe ve Restoran</div>
+        <h3 style="margin-top:4px">Cafe ve Restoran</h3>
+        <div class="okline"><span class="ic" style="font-size:15px">check_circle</span>Bursa'da 84 yayında işletme, 12 fırsat. Son ekleme dün.</div>
+        <div class="warnline"><span class="ic" style="font-size:15px">warning</span>Nilüfer'de "Tatlı" türünde işletme yok. 3 işletmenin çalışma saati boş.</div>
+        <div class="lbl">Bu ekranla ilgili</div>
+        <div class="link"><span class="ic">store</span><span class="x">İşletmeler (Bursa, yeme-içme)</span><span class="ic" style="font-size:16px;color:var(--m)">open_in_new</span></div>
+        <div class="link"><span class="ic">sell</span><span class="x">Fırsatlar</span><span class="ic" style="font-size:16px;color:var(--m)">open_in_new</span></div>
+        <div class="link"><span class="ic">screenshot_monitor</span><span class="x">Şehir Vitrini (bu sayfanın üst kartı)</span><span class="ic" style="font-size:16px;color:var(--m)">open_in_new</span></div>
+        <div class="link"><span class="ic">grid_view</span><span class="x">Hizmet kategorileri (türler)</span><span class="ic" style="font-size:16px;color:var(--m)">open_in_new</span></div>
+        <div class="lbl">Hızlı ayarlar</div>
+        <div class="mod"><span class="n">Bu bölüm uygulamada açık</span><div class="tog on"></div></div>
+        <div class="mod"><span class="n">Bu bölüme duyuru bandı koy</span><span class="btn s" style="height:28px">Ekle</span></div>
+        <div class="lbl">Ekranda bir karta dokununca</div>
+        <div class="link" style="background:var(--as)"><span class="ic">edit</span><span class="x">"Kahve Durağı" işletmesini düzenle</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
