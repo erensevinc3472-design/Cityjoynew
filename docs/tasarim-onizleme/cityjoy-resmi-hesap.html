@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CityJoy resmî hesap</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL@24,500,1&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0B2328; --s:#10323a; --s2:#15404a; --fg:#F3F6F6; --m:#A0B0B5; --b:rgb(255 255 255 / .09); --a:#E2B277; --as:rgb(226 178 119 / .15); --teal:#4FC2A8; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#E9ECE6; font-family:Inter, sans-serif; color:var(--fg); padding:20px 14px; }
+  h1.t { font-family:'Plus Jakarta Sans'; color:#14262B; font-size:20px; margin:0 0 4px 4px; }
+  .sub { color:#56696D; font-size:13px; margin:0 0 14px 4px; max-width:1150px; }
+  .cap { color:#14262B; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; margin:0 0 8px 4px; }
+  .ic { font-family:'Material Symbols Rounded'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; vertical-align:middle; }
+  .phones { display:flex; gap:22px; flex-wrap:wrap; }
+  .phone { width:300px; height:620px; background:var(--bg); border-radius:36px; box-shadow:0 0 0 7px #050f11, 0 12px 30px rgba(0,0,0,.25); overflow:hidden; position:relative; }
+  .status { height:30px; padding:0 22px; display:flex; align-items:center; font-size:12px; font-weight:600; }
+  .top { display:flex; align-items:center; gap:10px; padding:4px 14px 8px; }
+  .top .ic { font-size:22px; color:var(--fg); }
+  .top b { font-family:'Plus Jakarta Sans'; font-size:16px; flex:1; }
+  .seal { display:inline-flex; align-items:center; justify-content:center; width:17px; height:17px; border-radius:50%; background:var(--a); color:#2A1C06; vertical-align:-3px; margin-inline-start:4px; }
+  .seal .ic { font-size:13px; font-weight:700; color:#2A1C06; }
+  .seal.lg { width:20px; height:20px; }
+  .seal.lg .ic { font-size:15px; }
+  .head { display:flex; gap:16px; align-items:center; padding:6px 16px; }
+  .ava { width:78px; height:78px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #1d5a63, #0a2c31); border:2px solid var(--a); display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:26px; color:var(--a); flex:none; }
+  .ava.sm { width:36px; height:36px; font-size:13px; border-width:1.5px; }
+  .stats { display:flex; flex:1; justify-content:space-around; text-align:center; }
+  .stats b { display:block; font-size:16px; font-family:'Plus Jakarta Sans'; }
+  .stats span { font-size:11px; color:var(--m); }
+  .bio { padding:8px 16px 0; }
+  .name { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px; }
+  .chip { display:inline-flex; gap:4px; align-items:center; background:var(--as); color:var(--a); font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:999px; margin-top:6px; }
+  .chip .ic { font-size:14px; }
+  .bio p { font-size:12.5px; line-height:1.45; color:#D6E0E1; margin:8px 0 0; }
+  .btns { display:flex; gap:8px; padding:12px 16px 10px; }
+  .btn { flex:1; text-align:center; padding:9px; border-radius:12px; font-weight:600; font-size:13px; background:var(--s2); }
+  .btn.p { background:var(--a); color:#2A1C06; }
+  .tabs { display:flex; border-bottom:1px solid var(--b); margin-top:2px; }
+  .tabs span { flex:1; text-align:center; padding:9px 0; font-size:12px; color:var(--m); font-weight:600; }
+  .tabs span.on { color:var(--fg); box-shadow:inset 0 -2px 0 var(--a); }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; padding-top:2px; }
+  .grid div { aspect-ratio:1; background-size:cover; background-position:center; position:relative; }
+  .grid .k { position:absolute; inset:auto 4px 4px auto; font-size:9.5px; background:rgba(0,0,0,.55); padding:2px 5px; border-radius:6px; }
+  .feed { padding:4px 12px; display:flex; flex-direction:column; gap:10px; }
+  .post { background:var(--s); border:1px solid var(--b); border-radius:16px; padding:11px; }
+  .ph { display:flex; gap:9px; align-items:center; }
+  .ph .who { flex:1; }
+  .ph .who b { font-size:13.5px; }
+  .ph .who small { display:block; color:var(--m); font-size:11px; margin-top:1px; }
+  .post p { font-size:12.5px; line-height:1.45; margin:9px 0; color:#DCE5E6; }
+  .post .img { height:150px; border-radius:12px; background-size:cover; background-position:center; }
+  .acts { display:flex; gap:16px; color:var(--m); font-size:12px; margin-top:9px; }
+  .acts .ic { font-size:17px; }
+  .ev { display:flex; gap:10px; align-items:center; }
+  .ev .d { width:46px; text-align:center; background:var(--as); color:var(--a); border-radius:10px; padding:5px 0; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:16px; line-height:1.1; }
+  .ev .d small { display:block; font-size:10px; font-weight:600; }
+  .ev .t { font-size:13px; font-weight:600; }
+  .ev .t small { display:block; color:var(--m); font-weight:400; font-size:11px; margin-top:2px; }
+  .form { padding:4px 16px; }
+  .lbl { font-size:12px; color:var(--m); margin:12px 0 6px; font-weight:600; }
+  .opts { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  .opt { background:var(--s); border:1px solid var(--b); border-radius:12px; padding:9px 10px; font-size:12.5px; display:flex; gap:7px; align-items:center; }
+  .opt.on { border-color:var(--a); background:var(--as); color:var(--a); font-weight:600; }
+  .opt .ic { font-size:17px; }
+  .field { background:rgb(4 18 21 / .45); border:1px solid var(--b); border-radius:11px; padding:9px 11px; font-size:12.5px; display:flex; justify-content:space-between; }
+  .field .ic { font-size:18px; color:var(--m); }
+  .area { height:74px; color:var(--m); }
+  .note { font-size:11px; color:var(--m); margin-top:8px; line-height:1.4; display:flex; gap:6px; }
+  .note .ic { font-size:15px; color:var(--a); }
+  .send { margin:14px 16px 0; background:var(--a); color:#2A1C06; border-radius:13px; text-align:center; padding:11px; font-weight:700; font-size:14px; }
+  .badges { display:flex; gap:14px; margin-top:22px; flex-wrap:wrap; }
+  .bopt { background:#fff; border-radius:14px; padding:12px 16px; color:#14262B; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,.08); display:flex; flex-direction:column; gap:8px; min-width:250px; }
+  .bopt .row { background:var(--bg); color:var(--fg); border-radius:10px; padding:9px 12px; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; }
+  .seal.teal { background:var(--teal); }
+  .seal.teal .ic { color:#06302A; }
+  .seal.white { background:#fff; }
+  .seal.white .ic { color:#0B2328; }
+</style>
+</head>
+<body>
+<h1 class="t">CityJoy resmî hesabı (örnek)</h1>
+<p class="sub">Sen uygulamadan normal bir hesap açarsın, panelden "Resmî hesap yap" dersin. O hesap adının yanında altın rozetle görünür, istediği yere paylaşır, etkinlik ve haber açar. Panelden de aynı hesap adına paylaşabilirsin. Profil resmi senin yükleyeceğin logo olur (burada geçici "CJ").</p>
+
+<div class="phones">
+  <div>
+    <p class="cap">1. Profil sayfası</p>
+    <div class="phone">
+      <div class="status">9:41</div>
+      <div class="top"><span class="ic">arrow_back</span><b>cityjoy</b><span class="ic">more_horiz</span></div>
+      <div class="head">
+        <div class="ava">CJ</div>
+        <div class="stats"><div><b>48</b><span>Gönderi</span></div><div><b>12,4 B</b><span>Takipçi</span></div><div><b>0</b><span>Takip</span></div></div>
+      </div>
+      <div class="bio">
+        <div class="name">CityJoy <span class="seal lg"><span class="ic">check</span></span></div>
+        <span class="chip"><span class="ic">verified</span>Resmî CityJoy hesabı</span>
+        <p>Şehrindeki her şey tek yerde. Etkinlikler, haberler ve duyurular burada. 🇹🇷</p>
+      </div>
+      <div class="btns"><div class="btn p">Takip et</div><div class="btn">Mesaj</div></div>
+      <div class="tabs"><span class="on">Gönderiler</span><span>Etkinlikler</span><span>Haberler</span><span>Aktiviteler</span></div>
+      <div class="grid">
+        <div style="background-image:url(../../apps/mobile/assets/social/etkinlikler.jpg)"><span class="k">Tüm Türkiye</span></div>
+        <div style="background-image:url(../../apps/mobile/assets/city/vitrin.jpg)"><span class="k">Bursa</span></div>
+        <div style="background-image:url(../../apps/mobile/assets/social/haberler.jpg)"></div>
+        <div style="background-image:url(../../apps/mobile/assets/travel/kesfet.jpg)"></div>
+        <div style="background-image:url(../../apps/mobile/assets/social/aktiviteler.jpg)"><span class="k">İzmir</span></div>
+        <div style="background-image:url(../../apps/mobile/assets/home/sehrim.jpg)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <p class="cap">2. Keşfet'te ve etkinliklerde görünüşü</p>
+    <div class="phone">
+      <div class="status">9:41</div>
+      <div class="top"><b>Keşfet</b><span class="ic">notifications</span></div>
+      <div class="feed">
+        <div class="post">
+          <div class="ph"><div class="ava sm">CJ</div><div class="who"><b>CityJoy</b><span class="seal"><span class="ic">check</span></span><small>Tüm Türkiye · 2 sa</small></div><span class="ic" style="color:var(--m)">more_horiz</span></div>
+          <p>Bu hafta sonu 12 ilde ücretsiz açık hava konserleri var. Şehrindekini Etkinlikler'de bul.</p>
+          <div class="img" style="background-image:url(../../apps/mobile/assets/social/eglence.jpg)"></div>
+          <div class="acts"><span><span class="ic">favorite</span> 1,2 B</span><span><span class="ic">chat_bubble</span> 86</span><span><span class="ic">send</span></span></div>
+        </div>
+        <div class="post">
+          <div class="ev"><div class="d">22<small>KAS</small></div><div class="t">Kitap Fuarı<small>Bursa · Merinos AKKM</small><small style="color:var(--a)">CityJoy <span class="seal" style="width:13px;height:13px"><span class="ic" style="font-size:10px">check</span></span> düzenledi</small></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <p class="cap">3. Paylaşırken yer seçimi (yalnızca bu hesapta)</p>
+    <div class="phone">
+      <div class="status">9:41</div>
+      <div class="top"><span class="ic">close</span><b>Yeni paylaşım</b></div>
+      <div class="form">
+        <div class="lbl">Ne paylaşıyorsun?</div>
+        <div class="opts">
+          <div class="opt on"><span class="ic">photo_library</span>Gönderi</div>
+          <div class="opt"><span class="ic">event</span>Etkinlik</div>
+          <div class="opt"><span class="ic">newspaper</span>Haber</div>
+          <div class="opt"><span class="ic">groups</span>Aktivite</div>
+        </div>
+        <div class="lbl">Nerede görünsün?</div>
+        <div class="opts">
+          <div class="opt on"><span class="ic">public</span>Tüm Türkiye</div>
+          <div class="opt"><span class="ic">location_city</span>Bir il</div>
+          <div class="opt"><span class="ic">holiday_village</span>Bir ilçe</div>
+          <div class="opt"><span class="ic">home_pin</span>Bir mahalle</div>
+        </div>
+        <div class="lbl">Yazı</div>
+        <div class="field area">Ne paylaşmak istersin?</div>
+        <div class="note"><span class="ic">verified</span>Resmî hesap: paylaşımın onay beklemeden yayına girer, takipçilerine bildirim gider.</div>
+      </div>
+      <div class="send">Paylaş</div>
+    </div>
+  </div>
+</div>
+
+<p class="cap" style="margin-top:24px">Rozet rengi seçenekleri</p>
+<div class="badges">
+  <div class="bopt"><strong>A. Altın (önerim)</strong><div class="row">CityJoy <span class="seal"><span class="ic">check</span></span></div><span>Markanın altın rengi; başka rozetlerle karışmaz.</span></div>
+  <div class="bopt"><strong>B. Turkuaz</strong><div class="row">CityJoy <span class="seal teal"><span class="ic">check</span></span></div><span>Uygulamadaki yeşil tonlarla aynı.</span></div>
+  <div class="bopt"><strong>C. Beyaz</strong><div class="row">CityJoy <span class="seal white"><span class="ic">check</span></span></div><span>Sade; açık temada koyu görünür.</span></div>
+</div>
+</body>
+</html>
