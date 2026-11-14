@@ -90,6 +90,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
       { key: 'kurumlar', module: 'kurumlar', path: '/kurumlar', icon: 'building' },
       { key: 'yetkiler', module: 'yetkiler', path: '/yetkiler', icon: 'key' },
       { key: 'sos', module: 'sos', path: '/sos-ayarlari', icon: 'alert' },
+      { key: 'uygulama-ayarlari', show: admin, path: '/uygulama-ayarlari', icon: 'settings' },
       { key: 'sinirlar', show: admin, path: '/sinirlar', icon: 'gauge' },
     ],
   },
@@ -290,6 +291,8 @@ const ICONS = {
   key: 'M14 10a4 4 0 1 0-1 2.7L20 20M17 17l2-2',
   file: 'M7 3h7l5 5v13H7ZM14 3v5h5M10 13h6M10 17h4',
   gauge: 'M4 16a8 8 0 1 1 16 0M12 16l4-5',
+  settings: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M14 4v4M8 10v4M16 16v4',
+  smartphone: 'M7 2h10a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1ZM11 18h2',
 } as const;
 
 function Icon({ name }: { name: keyof typeof ICONS }) {

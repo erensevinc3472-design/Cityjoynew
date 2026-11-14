@@ -5,6 +5,7 @@ import { isValidEmail, type AuthUser } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AuthLink, AuthScene, GlassCard, OrDivider, SocialButton } from '@/components/auth-scene';
+import { useAppImage } from '@/lib/app-config';
 import { FormMessage } from '@/components/form-message';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
@@ -15,6 +16,7 @@ import { restartFlow } from '@/lib/navigation';
 /** Giriş (G-Giris): sahne üstünde buzlu cam kart. Apple ile giriş geliştirme derlemesiyle eklenecek (Expo Go desteklemez). */
 export default function SignInScreen() {
   const { t } = useTranslation();
+  const signInImage = useAppImage('signIn');
   const router = useRouter();
   const { adopt } = useSession();
   const [email, setEmail] = useState('');
@@ -45,7 +47,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <AuthScene glass kind="cover">
+    <AuthScene glass kind="cover" remote={signInImage}>
       <GlassCard title={t('auth.signInTitle')} subtitle={t('auth.signInSubtitle')}>
         <TextField label={t('auth.email')} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email" textContentType="emailAddress" />
         <TextField label={t('auth.password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" textContentType="password" onSubmitEditing={submit} />

@@ -9,6 +9,7 @@ import { LANGUAGES, type LanguageCode } from '@cityjoy/shared';
 import { AppText } from '@/components/app-text';
 import { AuthScene } from '@/components/auth-scene';
 import { AUTH_ART, LANGUAGE_ART } from '@/lib/app-art';
+import { useAppImage } from '@/lib/app-config';
 import { profileRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
@@ -27,6 +28,7 @@ export default function LanguageScreen() {
   // Karşılamadan gelindiyse dil seçilince kayda geçilir.
   const { next } = useLocalSearchParams<{ next?: string }>();
   const { t, i18n } = useTranslation();
+  const languageImage = useAppImage('language');
   const router = useRouter();
   const { language, suggestedLanguage, setLanguage, rtl } = useSettings();
   const { user, profile, refreshProfile } = useSession();
@@ -63,7 +65,7 @@ export default function LanguageScreen() {
   };
 
   return (
-    <AuthScene kind="cover" image={AUTH_ART.languageBg} shade={false}>
+    <AuthScene kind="cover" image={AUTH_ART.languageBg} remote={languageImage} shade={false}>
       <View style={styles.head}>
         {router.canGoBack() ? (
           <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={() => router.back()} hitSlop={8} style={styles.back}>

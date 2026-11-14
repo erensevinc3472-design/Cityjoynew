@@ -1811,7 +1811,8 @@
       "uyelikler": "Üyelikler ve Gelir",
       "rozetler": "Rozetler",
       "veri-kaynaklari": "Veri kaynakları",
-      "toplu-bildirim": "Toplu bildirim"
+      "toplu-bildirim": "Toplu bildirim",
+      "uygulama-ayarlari": "Uygulama ayarları"
     },
     "audience": "Takipçiler",
     "open": "Menüyü aç",
@@ -2604,5 +2605,172 @@
     },
     "sentCount": "{{count}} kişinin telefonuna gitti",
     "noteShown": "Gerekçe: {{note}}"
+  },
+  "appSettings": {
+    "title": "Uygulama ayarları",
+    "intro": "Uygulamanın tamamını etkileyen ayarlar. Yalnızca admin görür ve değiştirir. Her kayıt işlem kayıtlarına ve Geçmiş sekmesine yazılır, istersen geri alırsın. Uygulama bu ayarları açılırken bir kez okur, bağlantı yoksa son bildiğini kullanır; değişiklik uygulamayı yeniden açan kişide görünür.",
+    "adminOnly": "Bu sayfayı yalnızca admin görür.",
+    "demoReadOnly": "Deneme hesabında yalnızca görüntülenir.",
+    "loading": "Yükleniyor…",
+    "loadError": "Ayarlar yüklenemedi.",
+    "retry": "Tekrar dene",
+    "save": "Kaydet",
+    "discard": "Vazgeç",
+    "cancel": "Vazgeç",
+    "saved": "Kaydedildi. Uygulamayı yeniden açan kişiler yeni ayarı görür.",
+    "error": "Kaydedilemedi. Değerleri kontrol edip tekrar dene.",
+    "unsaved": "Kaydedilmemiş değişiklik var.",
+    "allSaved": "Tüm değişiklikler kayıtlı.",
+    "tabs": {
+      "banner": "Duyuru ve bakım",
+      "update": "Güncelleme",
+      "closed": "Bölümler",
+      "images": "Görseller",
+      "contact": "İletişim",
+      "legal": "Yasal metinler",
+      "history": "Geçmiş"
+    },
+    "help": {
+      "banner": "Uygulamanın üstünde bant ya da bakım ekranı. Bakım modunda uygulama kapanır, yalnızca bakım ekranı görünür. Başlangıç ve bitiş saati verirsen kendiliğinden başlar ve biter. İl seçersen yalnızca o illerdeki kişiler görür. \"Önce bana göster\" ile önce kendi telefonunda dene, beğenince kitleyi seçip yeniden kaydet. Türkçe metin zorunlu, boş bıraktığın dilde Türkçe gösterilir.",
+      "update": "Uygulamanın eski sürümlerini yönetir. En düşük sürümün altındaki uygulama açılmaz, \"Güncelle\" ekranı çıkar (ör. eski sürümde ciddi bir hata varsa). Önerilen sürümün altındakilere kapatılabilir bir \"Yeni sürüm var\" notu çıkar. iPhone ve Android ayrı yazılır çünkü mağazalar farklı günlerde onaylayabilir. Mağaza bağlantısı, Güncelle düğmesinin açacağı sayfadır.",
+      "closed": "Bir bölümde sorun olursa geçici olarak kapatabilirsin. Kapalı bölüme girmeye çalışan kişi \"Bu bölüm geçici olarak kapalı\" yazısını görür. Acil İhtiyaçlar ve SOS güvenlik nedeniyle kapatılamaz.",
+      "images": "Karşılama, dil seçimi ve giriş ekranlarının resimleri. Resim yüklemezsen uygulamadaki hazır resim görünür. Yüklenen resim açılamazsa da hazır resme dönülür.",
+      "contact": "Uygulamada Hesap ekranındaki İletişim bölümünde görünür. Boş bıraktığın satır gösterilmez.",
+      "legal": "Kullanım şartları ve aydınlatma metni değişince sürüm adını değiştir. \"Yeniden onay iste\" açıksa, eski sürümü onaylamış kişiler uygulamayı açınca yeni metni okuyup onaylar.",
+      "history": "Son 20 değişiklik. \"Geri al\", o değişiklikten önceki hâle döner; geri alma da buraya yeni bir satır olarak yazılır."
+    },
+    "status": {
+      "app": "Uygulama",
+      "open": "Açık",
+      "maintenance": "Bakımda (kapalı)",
+      "banner": "Duyuru bandı",
+      "none": "Yok",
+      "live": "yayında",
+      "starts": "{{at}} başlayacak",
+      "onlyMe": "yalnızca sen",
+      "minVersion": "En düşük sürüm",
+      "closed": "Kapalı bölüm",
+      "noneClosed": "Yok"
+    },
+    "banner": {
+      "empty": "Şu an bant ya da bakım yok.",
+      "create": "Bant ya da bakım ekle",
+      "kind": "Tür",
+      "kinds": {
+        "duyuru": "Duyuru bandı",
+        "bakim": "Bakım modu (uygulama kapanır)"
+      },
+      "bakimHint": "Bakım modunda kimse uygulamayı kullanamaz. Acil durumda 112 aranabileceği bakım ekranında yazar.",
+      "templates": "Hazır metin",
+      "template": {
+        "planli-bakim": "Planlı bakım",
+        "aksama": "Hizmette aksama",
+        "yeni-ozellik": "Yeni özellik",
+        "bakim-modu": "Bakım modu"
+      },
+      "text": "Metin",
+      "textHint": "Türkçe zorunlu. Hazır metinler beş dilde gelir.",
+      "start": "Başlangıç",
+      "startHint": "Boşsa hemen başlar.",
+      "end": "Bitiş",
+      "endHint": "Boşsa sen kaldırana kadar sürer.",
+      "audience": "Kimler görsün",
+      "all": "Türkiye geneli",
+      "provinces": "Seçili iller",
+      "addProvince": "+ İl ekle",
+      "removeProvince": "{{name}} ilini çıkar",
+      "onlyMe": "Önce bana göster",
+      "onlyMeOn": "Şu an yalnızca sen görüyorsun. Herkese açmak için kitleyi seçip kaydet.",
+      "onlyMeDone": "Kaydedildi. Bant şu an yalnızca senin telefonunda görünüyor (uygulamayı yeniden aç).",
+      "remove": "Bandı kaldır"
+    },
+    "update": {
+      "ios": "iPhone",
+      "android": "Android",
+      "min": "En düşük sürüm (zorunlu güncelleme)",
+      "minHint": "Bunun altındaki uygulama açılmaz.",
+      "suggest": "Önerilen sürüm",
+      "suggestHint": "Bunun altındakilere kapatılabilir not çıkar.",
+      "store": "Mağaza bağlantısı",
+      "format": "Sürüm biçimi: 1.0.3 gibi. 0.0.0 kapalı demektir."
+    },
+    "sections": {
+      "myCity": "Benim Şehrim",
+      "travel": "Seyahat",
+      "social": "Sosyal Harmoni",
+      "urgent": "Acil İhtiyaçlar",
+      "explore": "Keşfet",
+      "carsi": "Çarşı",
+      "messages": "Mesajlar"
+    },
+    "closed": {
+      "on": "Açık",
+      "off": "Geçici olarak kapalı",
+      "never": "Acil İhtiyaçlar ve SOS her zaman açıktır."
+    },
+    "images": {
+      "welcome": "Karşılama ekranı",
+      "language": "Dil seçimi ekranı",
+      "signIn": "Giriş ekranı",
+      "default": "Uygulamadaki hazır resim kullanılıyor",
+      "choose": "Resim seç",
+      "reset": "Hazır resme dön",
+      "tooSmall": "Resim küçük ({{w}}×{{h}}). En az {{minW}}×{{minH}} piksel, dikey bir resim seç.",
+      "hint": "Dikey resim, en az {{minW}}×{{minH}} piksel. Resim yüklenince küçültülür ve konum bilgisi silinir."
+    },
+    "contact": {
+      "supportEmail": "Destek e-postası",
+      "supportEmailHint": "Kişiler sorun bildirirken bu adrese yazar.",
+      "kvkkAddress": "KVKK başvuru adresi",
+      "kvkkHint": "Posta ya da KEP adresi. Avukat kontrolünden sonra kesinleştir.",
+      "web": "Web sitesi",
+      "instagram": "Instagram",
+      "x": "X (Twitter)",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "tiktok": "TikTok",
+      "hint": "Bağlantılar https:// ile başlamalı."
+    },
+    "legal": {
+      "lawyer": "Yasal metinler avukat kontrolünden sonra kesinleşir. Metin değişmeden sürüm adını değiştirme.",
+      "version": "Yürürlükteki metin sürümü",
+      "versionHint": "Küçük harf, rakam ve tire. Ör. 2027-01.",
+      "reaccept": "Yeniden onay iste",
+      "reacceptHint": "Açıksa eski sürümü onaylamış kişiler uygulamayı açınca yeni metni onaylamadan devam edemez."
+    },
+    "parts": {
+      "banner": "Duyuru ve bakım",
+      "update": "Güncelleme",
+      "closed": "Bölümler",
+      "images": "Görseller",
+      "contact": "İletişim",
+      "legal": "Yasal metinler"
+    },
+    "history": {
+      "empty": "Henüz değişiklik yok.",
+      "undo": "Geri al",
+      "confirm": "Bu değişiklikten önceki hâle dönülsün mü?",
+      "done": "Geri alındı.",
+      "rolledBack": "Geri alma",
+      "you": "Sen"
+    },
+    "confirm": {
+      "title": "Bu değişiklik herkesi etkiler. Emin misin?",
+      "bakim": "Bakım modu: uygulama seçilen kişilere kapanacak.",
+      "zorunlu": "Zorunlu güncelleme: eski sürümü kullanan kişiler uygulamayı açamayacak.",
+      "bolum": "Bölüm kapatma: kapatılan bölüme kimse giremeyecek.",
+      "yasal": "Yeniden onay: herkes yeni yasal metni onaylamadan devam edemeyecek.",
+      "yes": "Evet, uygula"
+    },
+    "preview": {
+      "caption": "Telefonda yaklaşık görünüm",
+      "placeholder": "Metin burada görünecek",
+      "maintTitle": "Bakımdayız",
+      "hello": "Merhaba",
+      "closed": "Geçici olarak kapalı",
+      "home": "Ana Sayfa",
+      "search": "Ara",
+      "profile": "Profil"
+    }
   }
 }

@@ -2990,5 +2990,35 @@
     "noFollowing": "Folgt noch niemandem.",
     "noBusinesses": "Du folgst keinen Unternehmen.",
     "businessPrivate": "Nur Inhaber und Verwalter des Unternehmens sehen diese Liste."
+  },
+  "appConfig": {
+    "updateTitle": "Update erforderlich",
+    "updateBody": "Diese Version von CityJoy kann nicht mehr verwendet werden. Bitte aktualisiere die App, um fortzufahren.",
+    "update": "Aktualisieren",
+    "maintTitle": "Wartungsarbeiten",
+    "maintEmergency": "Im Notfall rufe die 112 an.",
+    "call112": "112 anrufen",
+    "reacceptTitle": "Unsere Rechtstexte wurden aktualisiert",
+    "reacceptBody": "Die Nutzungsbedingungen und die Datenschutzhinweise haben sich geändert. Bitte lies und akzeptiere sie, um fortzufahren.",
+    "accept": "Gelesen und akzeptiert",
+    "acceptError": "Speichern fehlgeschlagen. Prüfe deine Verbindung und versuche es erneut.",
+    "closedTitle": "Dieser Bereich ist vorübergehend geschlossen",
+    "closedBody": "Wir nehmen Verbesserungen vor. Er ist bald wieder da.",
+    "closedTile": "Vorübergehend geschlossen",
+    "goHome": "Zur Startseite",
+    "newVersion": "Neue Version verfügbar",
+    "newVersionBody": "Zum Aktualisieren tippen.",
+    "dismiss": "Schließen",
+    "contactTitle": "Kontakt",
+    "supportEmail": "Support-E-Mail",
+    "kvkk": "Datenschutzadresse (KVKK)",
+    "links": {
+      "web": "Webseite",
+      "instagram": "Instagram",
+      "x": "X",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "tiktok": "TikTok"
+    }
   }
 }

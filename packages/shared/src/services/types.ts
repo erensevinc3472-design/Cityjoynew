@@ -73,6 +73,8 @@ export interface ProfilePatch {
   isPrivate?: boolean;
   targeting?: ConsentRecord;
   commercialMessages?: ConsentRecord;
+  /** Yasal metinler yeniden onaylanınca: kullanım şartları ve aydınlatma metni birlikte yeni sürümle yazılır. */
+  legal?: ConsentRecord;
 }
 
 export interface ProfileRepository {

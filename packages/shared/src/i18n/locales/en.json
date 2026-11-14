@@ -2990,5 +2990,35 @@
     "noFollowing": "Not following anyone yet.",
     "noBusinesses": "You don’t follow any businesses.",
     "businessPrivate": "Only the business owner and managers can see this list."
+  },
+  "appConfig": {
+    "updateTitle": "Update required",
+    "updateBody": "This version of CityJoy can no longer be used. Please update the app to continue.",
+    "update": "Update",
+    "maintTitle": "Under maintenance",
+    "maintEmergency": "If this is an emergency, call 112.",
+    "call112": "Call 112",
+    "reacceptTitle": "Our legal texts have changed",
+    "reacceptBody": "The terms of use and privacy notice have changed. Please read and accept them to continue.",
+    "accept": "I have read and accept",
+    "acceptError": "Could not save. Check your connection and try again.",
+    "closedTitle": "This section is temporarily closed",
+    "closedBody": "We are making improvements. It will be back soon.",
+    "closedTile": "Temporarily closed",
+    "goHome": "Back to home",
+    "newVersion": "A new version is available",
+    "newVersionBody": "Tap to update.",
+    "dismiss": "Close",
+    "contactTitle": "Contact",
+    "supportEmail": "Support email",
+    "kvkk": "Data protection (KVKK) address",
+    "links": {
+      "web": "Website",
+      "instagram": "Instagram",
+      "x": "X",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "tiktok": "TikTok"
+    }
   }
 }

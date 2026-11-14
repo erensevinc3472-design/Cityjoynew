@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { isUnread, videoEmbedUrl } from '@cityjoy/shared';
 
 import { UrgentStrip } from '@/components/announcement-card';
+import { AppNotices } from '@/components/app-gate';
 import { AppText } from '@/components/app-text';
 import { BottomNav } from '@/components/bottom-nav';
 import { HeroHeader, LocationChip } from '@/components/hero-header';
@@ -20,6 +21,7 @@ import { VideoModal } from '@/components/video-modal';
 import { VerifyEmailBanner } from '@/components/verify-email-banner';
 import { useAnnouncements } from '@/lib/announcements';
 import { HOME_ART } from '@/lib/app-art';
+import { useAppConfig } from '@/lib/app-config';
 import { useIntroVideoUrl } from '@/lib/intro-video';
 import { locationRepository as repo } from '@/lib/locations';
 import { useNotificationFeed, useReadState } from '@/lib/notifications';
@@ -31,10 +33,11 @@ import { useThemeColors } from '@/theme/use-theme';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
-const MODULES: { key: keyof typeof HOME_ART; icon: IconName; scene: SceneKind; href?: Href }[] = [
-  { key: 'myCity', icon: 'location-city', scene: 'city', href: '/city' },
-  { key: 'travel', icon: 'explore', scene: 'travel', href: '/travel' as Href },
-  { key: 'social', icon: 'groups', scene: 'social', href: '/social' },
+// Acil İhtiyaçlar panelden kapatılamaz (section yok).
+const MODULES: { key: keyof typeof HOME_ART; icon: IconName; scene: SceneKind; href?: Href; section?: 'myCity' | 'travel' | 'social' }[] = [
+  { key: 'myCity', icon: 'location-city', scene: 'city', href: '/city', section: 'myCity' },
+  { key: 'travel', icon: 'explore', scene: 'travel', href: '/travel' as Href, section: 'travel' },
+  { key: 'social', icon: 'groups', scene: 'social', href: '/social', section: 'social' },
   { key: 'urgent', icon: 'emergency', scene: 'urgent', href: '/urgent' },
 ];
 
@@ -66,6 +69,7 @@ export default function HomeScreen() {
   const [read] = useReadState();
   const hasUnread = (feed ?? []).some((n) => isUnread(n, read));
   const videoUrl = useIntroVideoUrl();
+  const { closed } = useAppConfig();
 
   useEffect(() => {
     setNeighbourhoodName(undefined);
@@ -112,19 +116,25 @@ export default function HomeScreen() {
     <Screen header={header} footer={<BottomNav active="home" />}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <VerifyEmailBanner />
+        {/* Panel > Uygulama ayarları: duyuru bandı ve "yeni sürüm var" önerisi. */}
+        <AppNotices />
         {/* Acil duyurular en üstte (PROJE.md 5.5); yoksa bu alan hiç görünmez. */}
         {urgent.map((a) => (
           <UrgentStrip key={a.id} item={a} onPress={() => router.push({ pathname: '/announcements/[id]', params: { id: a.id } })} />
         ))}
         <View style={styles.grid}>
-          {MODULES.map((m) => (
+          {MODULES.map((m) => {
+            // Panelden geçici olarak kapatılan bölüm: kart soluk, dokunulmaz, altında "Geçici olarak kapalı".
+            const off = !!m.section && closed.includes(m.section);
+            const href = off ? undefined : m.href;
+            return (
             <Pressable
               key={m.key}
-              accessibilityRole={m.href ? 'button' : undefined}
-              disabled={!m.href}
-              accessibilityLabel={m.href ? `${t(`modules.${m.key}`)}. ${t(`modules.${m.key}Hint`)}` : `${t(`modules.${m.key}`)}. ${t('home.comingSoon')}`}
-              onPress={m.href ? () => router.push(m.href!) : undefined}
-              style={({ pressed }) => [styles.module, { borderColor: sceneRim(m.scene), opacity: pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+              accessibilityRole={href ? 'button' : undefined}
+              disabled={!href}
+              accessibilityLabel={href ? `${t(`modules.${m.key}`)}. ${t(`modules.${m.key}Hint`)}` : `${t(`modules.${m.key}`)}. ${off ? t('appConfig.closedTile') : t('home.comingSoon')}`}
+              onPress={href ? () => router.push(href) : undefined}
+              style={({ pressed }) => [styles.module, { borderColor: sceneRim(m.scene), opacity: off ? 0.5 : pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
               {/* Eren'in resimleri: Seyahat ve Acil'de konu sağ yarıda (8 Kasım); Şehrim ve Sosyal kare, ortalı (10 Kasım). */}
               <Image source={HOME_ART[m.key]} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition={m.key === 'travel' ? 'right' : 'center'} accessible={false} />
               <View style={styles.moduleIcon}>
@@ -132,10 +142,11 @@ export default function HomeScreen() {
               </View>
               <View style={styles.moduleFoot}>
                 <AppText style={styles.moduleTitle}>{t(`modules.${m.key}`)}</AppText>
-                <AppText numberOfLines={1} style={styles.moduleHint}>{m.href ? t(`modules.${m.key}Hint`) : t('menu.soon')}</AppText>
+                <AppText numberOfLines={1} style={styles.moduleHint}>{off ? t('appConfig.closedTile') : m.href ? t(`modules.${m.key}Hint`) : t('menu.soon')}</AppText>
               </View>
             </Pressable>
-          ))}
+            );
+          })}
         </View>
         {/* Tanıtım videosu (bağlantısı panelden girilir); bağlantı yoksa "yakında". */}
         <Pressable

@@ -12,6 +12,7 @@ import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppGate } from '@/components/app-gate';
 import { CrashScreen } from '@/components/crash-screen';
 import { OfflineBanner } from '@/components/offline-banner';
 import '@/lib/i18n';
@@ -59,6 +60,8 @@ function RootNavigator() {
       <View style={{ flex: 1, ...(Platform.OS === 'web' ? {} : { direction: rtl ? ('rtl' as const) : ('ltr' as const) }), backgroundColor: c.background }}>
         <IncomingSosProvider>
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }} />
+          {/* Panel > Uygulama ayarları: zorunlu güncelleme, bakım, yeniden onay, kapalı bölüm. */}
+          <AppGate />
           <IncomingSosBanner />
           <OfflineBanner />
           <PushRegistrar />

@@ -1362,6 +1362,31 @@ service cloud.firestore {
         && stamped(nw);
       }
       allow write: if isAdmin() && id == 'notificationTriggers' && _c_notificationTriggers(request.resource.data);
+      // Uygulama ayarları (Panel > Ayarlar > Uygulama ayarları, 14 Kasım 2026): admin yazar, uygulama açılışta okur.
+      // Acil İhtiyaçlar ve SOS kapatılamaz (closed listesinde yer alamaz).
+      function _c_app(d) {
+        return d.keys().hasOnly(['minVersion', 'suggestVersion', 'storeUrl', 'banner', 'closed', 'legal', 'contact', 'images', 'updatedBy', 'updatedAt'])
+        && d.minVersion is map && d.suggestVersion is map && d.storeUrl is map
+        && d.contact is map && d.images is map
+        && (d.banner == null || (d.banner is map && d.banner.kind in ['duyuru', 'bakim']
+            && d.banner.text is map && d.banner.text.tr is string
+            && d.banner.text.tr.size() > 0 && d.banner.text.tr.size() <= 300
+            && d.banner.provinces is list && d.banner.provinces.size() <= 81))
+        && d.closed is list && d.closed.hasOnly(['myCity', 'travel', 'social', 'explore', 'carsi', 'messages'])
+        && d.legal is map && d.legal.version is string && d.legal.version.size() <= 40 && d.legal.reaccept is bool
+        && stamped(d);
+      }
+      allow write: if isAdmin() && id == 'app' && _c_app(request.resource.data);
+    }
+    // Uygulama ayarı geçmişi: her değişiklikte önceki hâl yazılır ("Geri al"). Yalnızca admin; değiştirilemez, silinemez.
+    match /appConfigHistory/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['actorUid', 'at', 'parts', 'before', 'rollback'])
+        && request.resource.data.actorUid == me() && request.resource.data.at == request.time
+        && request.resource.data.parts is list && request.resource.data.before is map
+        && request.resource.data.rollback is bool;
+      allow update, delete: if false;
     }
 
     match /admins/{uid} {

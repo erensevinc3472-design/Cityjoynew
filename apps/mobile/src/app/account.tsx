@@ -1,8 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { LANGUAGES } from '@cityjoy/shared';
+import { CONTACT_LINKS, LANGUAGES } from '@cityjoy/shared';
 import { deleteAllUserData } from '@cityjoy/shared/firebase';
 
 import { AppButton } from '@/components/app-button';
@@ -12,6 +12,7 @@ import { FormScreen } from '@/components/form-screen';
 import { OptionRow } from '@/components/option-row';
 import { TextField } from '@/components/text-field';
 import { clearRecent } from '@/lib/recent-posts';
+import { useAppConfig } from '@/lib/app-config';
 import { errorKey } from '@/lib/auth-errors';
 import { firestore } from '@/lib/firebase';
 import { authService } from '@/lib/services';
@@ -33,6 +34,7 @@ const AUTOPLAY: AutoplayMode[] = ['wifi', 'her-zaman', 'kapali'];
 /** Ayarlar (Profil > ☰; Instagram düzeni): hesap, dil, konum, görünüm, bildirimler, Ailem (SOS), işletme, yasal metinler, çıkış ve hesap silme. */
 export default function AccountScreen() {
   const { t } = useTranslation();
+  const { contact } = useAppConfig();
   const router = useRouter();
   const c = useThemeColors();
   const { user, profile, adopt } = useSession();
@@ -93,6 +95,25 @@ export default function AccountScreen() {
       <AppText variant="label">{t('account.legal')}</AppText>
       <OptionRow title={t('account.terms')} showChevron onPress={() => router.push('/legal/terms')} />
       <OptionRow title={t('account.privacy')} showChevron onPress={() => router.push('/legal/privacy')} />
+
+      {/* İletişim (Panel > Uygulama ayarları > İletişim): boş satır gösterilmez. */}
+      {contact.supportEmail || contact.kvkkAddress || CONTACT_LINKS.some((k) => contact[k]) ? (
+        <>
+          <AppText variant="label">{t('appConfig.contactTitle')}</AppText>
+          {contact.supportEmail ? (
+            <OptionRow title={t('appConfig.supportEmail')} subtitle={contact.supportEmail} showChevron onPress={() => Linking.openURL(`mailto:${contact.supportEmail}`).catch(() => {})} />
+          ) : null}
+          {contact.kvkkAddress ? (
+            <View style={{ gap: 2 }} accessible>
+              <AppText>{t('appConfig.kvkk')}</AppText>
+              <AppText muted selectable>{contact.kvkkAddress}</AppText>
+            </View>
+          ) : null}
+          {CONTACT_LINKS.filter((k) => contact[k]).map((k) => (
+            <OptionRow key={k} title={t(`appConfig.links.${k}`)} showChevron onPress={() => Linking.openURL(contact[k]).catch(() => {})} />
+          ))}
+        </>
+      ) : null}
 
       <AppButton variant="secondary" title={t('account.signOut')} onPress={signOut} />
 

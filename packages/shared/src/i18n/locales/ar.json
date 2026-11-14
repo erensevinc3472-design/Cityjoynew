@@ -3014,5 +3014,35 @@
     "noFollowing": "لا يتابع أحدًا بعد.",
     "noBusinesses": "لا تتابع أي نشاط تجاري.",
     "businessPrivate": "لا يرى هذه القائمة إلا مالك النشاط التجاري ومديروه."
+  },
+  "appConfig": {
+    "updateTitle": "يلزم التحديث",
+    "updateBody": "لم يعد بالإمكان استخدام هذا الإصدار من CityJoy. يرجى تحديث التطبيق للمتابعة.",
+    "update": "تحديث",
+    "maintTitle": "التطبيق قيد الصيانة",
+    "maintEmergency": "إذا كانت حالة طارئة، اتصل بالرقم 112.",
+    "call112": "اتصل بـ 112",
+    "reacceptTitle": "تم تحديث النصوص القانونية",
+    "reacceptBody": "تغيّرت شروط الاستخدام وإشعار الخصوصية. يرجى قراءتها والموافقة عليها للمتابعة.",
+    "accept": "قرأت وأوافق",
+    "acceptError": "تعذّر الحفظ. تحقق من اتصالك وحاول مرة أخرى.",
+    "closedTitle": "هذا القسم مغلق مؤقتًا",
+    "closedBody": "نقوم ببعض التحسينات. سيعود قريبًا.",
+    "closedTile": "مغلق مؤقتًا",
+    "goHome": "العودة إلى الرئيسية",
+    "newVersion": "يتوفر إصدار جديد",
+    "newVersionBody": "اضغط للتحديث.",
+    "dismiss": "إغلاق",
+    "contactTitle": "التواصل",
+    "supportEmail": "بريد الدعم",
+    "kvkk": "عنوان حماية البيانات (KVKK)",
+    "links": {
+      "web": "الموقع الإلكتروني",
+      "instagram": "Instagram",
+      "x": "X",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "tiktok": "TikTok"
+    }
   }
 }

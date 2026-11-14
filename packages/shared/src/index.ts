@@ -69,3 +69,4 @@ export * from './travel/holiday';
 export * from './travel/sheet';
 export * from './translate/translate';
 export * from './sponsors/sponsors';
+export * from './app-config/app-config';

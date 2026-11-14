@@ -2990,5 +2990,35 @@
     "noFollowing": "Henüz kimse takip edilmiyor.",
     "noBusinesses": "Takip ettiğin işletme yok.",
     "businessPrivate": "Bu listeyi yalnızca işletmenin sahibi ve yetkilileri görür."
+  },
+  "appConfig": {
+    "updateTitle": "Güncelleme gerekiyor",
+    "updateBody": "CityJoy'un bu sürümü artık kullanılamıyor. Devam etmek için uygulamayı güncelle.",
+    "update": "Güncelle",
+    "maintTitle": "Bakımdayız",
+    "maintEmergency": "Acil bir durumdaysan 112'yi ara.",
+    "call112": "112'yi ara",
+    "reacceptTitle": "Yasal metinler güncellendi",
+    "reacceptBody": "Kullanım şartları ve aydınlatma metni değişti. Devam etmek için okuyup onaylaman gerekiyor.",
+    "accept": "Okudum, onaylıyorum",
+    "acceptError": "Kaydedilemedi. Bağlantını kontrol edip tekrar dene.",
+    "closedTitle": "Bu bölüm geçici olarak kapalı",
+    "closedBody": "Bir iyileştirme yapıyoruz. Kısa süre sonra tekrar açılacak.",
+    "closedTile": "Geçici olarak kapalı",
+    "goHome": "Ana sayfaya dön",
+    "newVersion": "Yeni sürüm var",
+    "newVersionBody": "Güncellemek için dokun.",
+    "dismiss": "Kapat",
+    "contactTitle": "İletişim",
+    "supportEmail": "Destek e-postası",
+    "kvkk": "KVKK başvuru adresi",
+    "links": {
+      "web": "Web sitesi",
+      "instagram": "Instagram",
+      "x": "X",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "tiktok": "TikTok"
+    }
   }
 }

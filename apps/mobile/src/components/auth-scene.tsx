@@ -1,6 +1,6 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import type { ComponentProps, PropsWithChildren, ReactNode } from 'react';
+import { useEffect, useState, type ComponentProps, type PropsWithChildren, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,23 +18,24 @@ const GOLD = '#E2B277';
  * Giriş akışının ortak zemini (13. madde 35, giriş akışı): arkada tam ekran sahne çizimi ve karartma, üstte CityJoy
  * yazısı, altta içerik. Renk şeması her zaman koyudur; resimler Panel > Uygulama görselleri'nden değişecek (Blaze ile).
  */
-export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, shade = true, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; image?: number | null; shade?: boolean; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
+export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, remote, shade = true, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; image?: number | null; remote?: string; shade?: boolean; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
   const insets = useSafeAreaInsets();
+  const source = useRemoteOr(remote, image);
   const { width } = useWindowDimensions();
   return (
     <SurfaceContext.Provider value={{ scheme: 'dark', glass }}>
       <View style={[styles.root, { backgroundColor: sceneSky(kind) }]}>
         <StatusBar style="light" />
-        {image ? (
+        {source ? (
           // Dikey resim (Eren, 8 Kasım 2026): üstü boş gökyüzü, konu altta; ekranı tam kaplar.
-          <Image source={image} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
+          <Image source={source.src} onError={source.onError} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
         ) : (
           <View pointerEvents="none" style={[styles.scene, { height: Math.round(width * 1.35) }]}>
             <SceneArt kind={kind} />
           </View>
         )}
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, image ? styles.dimPhoto : styles.dim]} />
-        {image && shade ? <BottomShade /> : null}
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, source ? styles.dimPhoto : styles.dim]} />
+        {source && shade ? <BottomShade /> : null}
         <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView
             contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + spacing.lg }]}
@@ -55,6 +56,14 @@ export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, shade = tr
       </View>
     </SurfaceContext.Provider>
   );
+}
+
+/** Panelden yüklenen resim (adres) varsa o; yüklenemezse ya da yoksa uygulamadaki hazır resim. */
+export function useRemoteOr(remote: string | undefined, fallback: number | null | undefined): { src: number | { uri: string }; onError?: () => void } | null {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [remote]);
+  if (remote && !failed) return { src: { uri: remote }, onError: () => setFailed(true) };
+  return fallback ? { src: fallback } : null;
 }
 
 /** Resmin alt yarısını koyulaştırır: yazılar resmin dolu kısmının üstüne gelince okunsun. */

@@ -77,6 +77,10 @@ export function createFirestoreProfileRepository(db: Firestore): ProfileReposito
       }
       if (patch.targeting) data['consents.targeting'] = patch.targeting;
       if (patch.commercialMessages) data['consents.commercialMessages'] = patch.commercialMessages;
+      if (patch.legal) {
+        data['consents.terms'] = patch.legal;
+        data['consents.privacyNotice'] = patch.legal;
+      }
       await updateDoc(ref(uid), data);
     },
 

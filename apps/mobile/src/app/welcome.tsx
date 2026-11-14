@@ -9,7 +9,9 @@ import { useTranslation } from 'react-i18next';
 import { AppText } from '@/components/app-text';
 import { Image } from 'expo-image';
 import { useReduceMotion } from '@/components/scene-art';
+import { useRemoteOr } from '@/components/auth-scene';
 import { AUTH_ART } from '@/lib/app-art';
+import { useAppImage } from '@/lib/app-config';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
@@ -34,6 +36,8 @@ export default function WelcomeScreen() {
   const reduce = useReduceMotion();
   const { user } = useSession();
   const [slide, setSlide] = useState(0);
+  // İlk görsel panelden değiştirilebilir (Uygulama ayarları > Görseller); açılamazsa hazır resim.
+  const first = useRemoteOr(useAppImage('welcome'), AUTH_ART.welcome)!;
   const fades = useRef(SLIDES.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
   const drag = useRef(new Animated.Value(0)).current;
   const [trackW, setTrackW] = useState(0);
@@ -119,7 +123,7 @@ export default function WelcomeScreen() {
       <StatusBar style="light" />
       {SLIDES.map((k, i) => (
         <Animated.View key={i} pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: fades[i], backgroundColor: '#0A2226' }]}>
-          <Image source={k} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
+          <Image source={i === 0 ? first.src : k} onError={i === 0 ? first.onError : undefined} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
         </Animated.View>
       ))}
       <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dim]} />
