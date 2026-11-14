@@ -16,7 +16,7 @@ import { StateMessage } from '@/components/state-message';
 import { locationRepository as repo } from '@/lib/locations';
 import { isAdminAccount } from '@cityjoy/shared/firebase';
 import { firestore } from '@/lib/firebase';
-import { profileRepository } from '@/lib/services';
+import { profileRepository, socialRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
@@ -87,8 +87,10 @@ export default function LocationScreen() {
       const neighbourhoodChanged = (next?.neighbourhoodId ?? null) !== (profile.location?.neighbourhoodId ?? null);
       const nextAllowed = nextNeighbourhoodChange(profile);
       // Mahalle ayda bir kez değişir; aynı kural veritabanında da denetlenir.
-      // CityJoy yöneticisi (deneme için konum değiştirir) bu sınıra takılmaz; kurallar da aynı (Eren, 12 Kasım 2026).
-      if (neighbourhoodChanged && nextAllowed && nextAllowed > new Date() && !(await isAdminAccount(firestore, user.uid).catch(() => false))) {
+      // CityJoy yöneticisi (deneme için konum değiştirir) ve resmî CityJoy hesabı (denetim için; Eren, 14 Kasım 2026) bu
+      // sınıra takılmaz; kurallar da aynı (Eren, 12 Kasım 2026).
+      const free = async () => (await isAdminAccount(firestore, user.uid).catch(() => false)) || (await socialRepository.getProfile(user.uid).catch(() => null))?.official === true;
+      if (neighbourhoodChanged && nextAllowed && nextAllowed > new Date() && !(await free())) {
         setSaveError(t('account.neighbourhoodLocked', { date: nextAllowed.toLocaleDateString(i18n.language) }));
         return;
       }

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { reachPlan, type PostInput } from '@cityjoy/shared';
 import { createBadgeAdmin, createFirestorePostRepository, createFirestoreSocialRepository } from '@cityjoy/shared/firebase';
-import { doc, serverTimestamp, setDoc, updateDoc, type Firestore } from 'firebase/firestore';
+import { doc, serverTimestamp, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 // Resmî CityJoy hesabı (Eren, 14 Kasım 2026). Ayrı proje adı: paneldeki emülatör verisine dokunmaz.
@@ -67,6 +67,22 @@ describe('Resmî CityJoy hesabı', () => {
     // Geri alınınca başka yere paylaşamaz.
     await createBadgeAdmin(fs('eren'), 'eren').setOfficial({ uid: 'cityjoy', displayName: 'CityJoy' }, false);
     await assertFails(cj.create('cityjoy', 'CityJoy', post('il', { provinceCode: '34' })));
+  }, 30000);
+
+  it('resmî hesap denetim için mahallesini istediği zaman değiştirir; sıradan kişi ayda bir', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      // Geçerli tam kullanıcı kaydı (kuralların istediği alanlar), mahalle az önce seçilmiş.
+      const consent = { granted: true, at: '2026-10-27T10:00:00Z', textVersion: 'taslak-1' };
+      for (const uid of ['cityjoy', 'ayse']) {
+        await setDoc(doc(ctx.firestore(), 'users', uid), { uid, displayName: uid, language: 'tr', birthYear: 1990, occupationId: 'ogretmen', phoneVerified: false, emailVerified: false, isPrivate: false, consents: { terms: consent, privacyNotice: consent }, location: ataevler, locationChangedAt: Timestamp.now(), createdAt: Timestamp.now(), updatedAt: Timestamp.now() });
+      }
+    });
+    const move = (uid: string, location: typeof moda) => updateDoc(doc(fs(uid), 'users', uid), { location, locationChangedAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    await assertFails(move('ayse', moda));
+    await assertFails(move('cityjoy', moda));
+    await createBadgeAdmin(fs('eren'), 'eren').setOfficial({ uid: 'cityjoy', displayName: 'CityJoy' }, true);
+    await assertSucceeds(move('cityjoy', moda));
+    await assertSucceeds(move('cityjoy', ataevler));
   }, 30000);
 
   it('reachPlan hedefleri doğru kurar', () => {

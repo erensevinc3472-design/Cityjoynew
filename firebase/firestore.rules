@@ -132,7 +132,9 @@ service cloud.firestore {
           && (neighbourhoodOf(before) == null
               || before.get('locationChangedAt', null) == null
               || request.time > before.locationChangedAt + duration.value(30, 'd')
-              || isAdmin());
+              || isAdmin()
+              // Resmî CityJoy hesabı denetim için istediği zaman konum değiştirir (Eren, 14 Kasım 2026).
+              || isOfficialAccount());
     }
 
     // Konum rozeti: kişinin kaydındaki doğrulama ile herkese açık profildeki rozet aynı yazımda birlikte değişir.

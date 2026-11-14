@@ -15,7 +15,8 @@ Son güncelleme: 14 Kasım 2026 (Resmî CityJoy hesabı 1. parça: altın rozet,
 > `-tum`), mahalle = Mahallem; hepsi takipçilere de düşer; Haberler kutusu da açık. Gönderide `reach` alanı; kartta
 > "Tüm Türkiye" / il / "ilçe, il" yazar. Kural (`_k85`, `isOfficialAccount`): resmî hesap konum denetimine takılmaz,
 > günlük 100 gönderi, `reach` yalnız resmî hesapta (test: `firebase/official-account.test.ts`; uzun test olduğu için 30 sn
-> süre verildi). Fotoğraf ve video her gönderide zaten var. **Bilinen sınır:** ilçe seçilince gönderi o ilin bütün
+> süre verildi). Fotoğraf ve video her gönderide zaten var. **Konum (Eren, 14 Kasım):** resmî hesap denetim için mahallesini istediği zaman değiştirir (aylık sınır yok; uygulama
+> `location.tsx` ve kural `neighbourhoodChangeAllowed`; bu kural canlıya ayrıca yüklenmeli). **Bilinen sınır:** ilçe seçilince gönderi o ilin bütün
 > Bölgesel akışında görünür. **2. parça (sırada, Eren istedi):** resmî hesaptan duyuru (fotoğraf ve videolu), etkinlik,
 > haber; **3. parça:** aktivite ve takipçilere bildirim.
 
