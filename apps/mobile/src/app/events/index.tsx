@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { EVENT_CATEGORIES, type CityEvent, type EventCategory } from '@cityjoy/shared';
 
@@ -9,6 +9,7 @@ import { AppText } from '@/components/app-text';
 import { PillButton } from '@/components/city-hub';
 import { EventCard, eventDateRange } from '@/components/event-card';
 import { FilterChip } from '@/components/inner';
+import { useReduceMotion } from '@/components/scene-art';
 import { BLEED_STRIP, BLEED_STRIP_CONTENT, PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
@@ -22,6 +23,8 @@ import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
 
 /** Tepedeki kayan öne çıkanlar: kapak görseli olan ilk etkinlikler. */
 const MAX_FEATURED = 5;
+/** Öne çıkanlar kendiliğinden kayar (Eren, 14 Kasım 2026); dokununca durur, "hareketi azalt" açıksa kaymaz. */
+const SLIDE_MS = 4500;
 const DAYS = 7;
 
 const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -55,6 +58,9 @@ export default function EventsScreen() {
   const [category, setCategory] = useState<EventCategory | null>(null);
   const [width, setWidth] = useState(0);
   const [slide, setSlide] = useState(0);
+  const strip = useRef<ScrollViewInstance>(null);
+  const touching = useRef(false);
+  const reduce = useReduceMotion();
   const district = location?.districtId ? repo.getDistrict(location.districtId) : undefined;
   const province = location ? repo.getProvince(location.provinceCode)?.name : undefined;
   const gold = dark ? c.heroAccent : c.primary;
@@ -71,6 +77,23 @@ export default function EventsScreen() {
   const categories = useMemo(() => EVENT_CATEGORIES.filter((k) => (dated ?? []).some((e) => e.category === k)), [dated]);
   const shown = dated && category ? dated.filter((e) => e.category === category) : dated;
   const featured = (regional ?? []).filter((e) => e.cover && e.status !== 'iptal').slice(0, MAX_FEATURED);
+
+  const featuredCount = featured.length;
+  const slideRef = useRef(0);
+  slideRef.current = slide;
+  // Ekran açıkken ve kullanıcı dokunmuyorken bir sonraki görsele geçer; sondan başa döner.
+  useFocusEffect(
+    useCallback(() => {
+      if (reduce || featuredCount < 2 || !width) return;
+      const id = setInterval(() => {
+        if (touching.current) return;
+        const next = (slideRef.current + 1) % featuredCount;
+        strip.current?.scrollTo({ x: next * width, animated: true });
+        setSlide(next);
+      }, SLIDE_MS);
+      return () => clearInterval(id);
+    }, [reduce, featuredCount, width]),
+  );
 
   const head = (
     <PageHead extend={featured.length ? 24 : 60} title={t('events.title')} subtitle={province} onBack={() => (router.canGoBack() ? router.back() : router.replace('/social'))} />
@@ -100,8 +123,11 @@ export default function EventsScreen() {
           <View onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))} style={styles.featured}>
             {width ? (
               <ScrollView
+                ref={strip}
                 horizontal
                 pagingEnabled
+                onScrollBeginDrag={() => (touching.current = true)}
+                onScrollEndDrag={() => (touching.current = false)}
                 showsHorizontalScrollIndicator={false}
                 onMomentumScrollEnd={(e) => setSlide(Math.round(e.nativeEvent.contentOffset.x / width))}
                 scrollEventThrottle={32}>
