@@ -225,7 +225,7 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
   const { location } = useUserLocation();
   const [tag, setTag] = useState<Tag>('all');
   const tags = TAB_TAGS[tab];
-  const { blocked, following, followingBusinesses } = useSocial();
+  const { blocked, following, followingBusinesses, teamBusinesses } = useSocial();
   const [pending, setPending] = useState<Record<string, 'istek' | undefined>>({});
 
   const filter: FeedFilter | null =
@@ -424,7 +424,7 @@ function FeedPage({ tab, active, topInset, onScrollY }: { tab: PostTarget; activ
 
   const listProps: Partial<FlatListProps<Item>> = active ? {} : { scrollsToTop: false };
   const videoPosts = (items ?? []).flatMap((i) => (i.kind === 'post' && i.post.video ? [i.post] : []));
-  const followFor = (p: Post) => (p.authorUid === user.uid ? undefined : p.business ? (followingBusinesses?.includes(p.business.id) ? 'aktif' : null) : followOf(p.authorUid));
+  const followFor = (p: Post) => (p.authorUid === user.uid || (p.business && teamBusinesses.includes(p.business.id)) ? undefined : p.business ? (followingBusinesses?.includes(p.business.id) ? 'aktif' : null) : followOf(p.authorUid));
   const followTap = (p: Post) => (p.business ? followBusiness(p.business.id) : follow(p.authorUid));
   return (
     <>
