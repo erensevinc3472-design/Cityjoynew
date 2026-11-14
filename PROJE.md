@@ -589,7 +589,7 @@ Eren'in onayıyla ilk sürüm seçimi Claude'a bırakıldı. Tam liste ve ilk s�
 
 | 3 | İl bazında modül/özellik açıp kapatma | Evet |
 | 4 | Çeviri dosyaları ve uygulama metinleri (5 dil) | Evet |
-| 5 | Zorunlu uygulama güncelleme uyarıları | Sonra |
+| 5 | Zorunlu uygulama güncelleme uyarıları | Evet (yapıldı 14 Kasım 2026, Uygulama ayarları) |
 | 6 | Ülke geneli ve afet bildirimleri, bildirim sınırları ve kuralları | Evet |
 | 7 | Platform geneli şikâyet merkezi, yasaklı kelime listesi, kullanıcı engelleme | Evet |
 | 8 | Mahkeme ve resmi kurum içerik kaldırma taleplerini yönetme | Sonra (hukuk süreci kurulunca) |
@@ -603,6 +603,10 @@ Eren'in onayıyla ilk sürüm seçimi Claude'a bırakıldı. Tam liste ve ilk s�
 | 16 | Anket siparişleri: talep alma, içerik/hukuk incelemesi, ücret tahsilatı, yayın, sonuç raporu | Evet |
 | 17 | Yarışma yönetimi: yarışma ve şartname oluşturma, aşamalar ve takvim, katılımcı onayı, oy denetimi, diskalifiye, sonuç ve ödül takibi, kurum taleplerini onaylama | Evet |
 | 18 | Etkinlik düzenleme yetkisi atama: hangi hesap/kurum/kişi hangi bölgede etkinlik açabilir (ver/geri al, süreli yetki, kayıt), yetki başvurularını onaylama | Evet (başvuru kısmı şimdilik yok, aşağıdaki not) |
+
+**Yapıldı (14 Kasım 2026, Eren onayladı), 5. madde ve uygulama ayarları:** Panel > Ayarlar > Uygulama ayarları (yalnızca admin): duyuru / bakım bandı (5 dil, zamanlı, il seçimli, şablonlu, "Önce bana göster"), zorunlu ve önerilen güncelleme (iOS/Android ayrı), bölümleri geçici kapatma (Acil İhtiyaçlar kapatılamaz), giriş ekranı görselleri, iletişim bilgileri, yasal metin sürümü ve yeniden onay, geçmiş ve geri alma; riskli değişiklikte ikinci onay, her kayıt işlem kaydında. Uygulamada açılışta bir kez okunur (maliyet ilkesi), SOS hiçbir zaman engellenmez.
+
+**Yapıldı (14 Kasım 2026, Eren onayladı): Panel > İçerik > Uygulama görünümü (yalnızca admin).** Uygulamanın web sürümü telefon çerçevesinde, ana sayfadan başlar; "Şu il gibi göster" (kimsenin konumunu değiştirmez), tema ve dil seçimi; açık ekrana göre yanda ilgili panel sayfaları, seçili ilin içerik sayıları ve boş bölüm uyarıları, kayıt ekranında o kaydın panel sayfası, hızlı ayarlar (bölüm aç/kapat, duyuru bandı). Panel kayıtlarından ters yönde "Uygulamada gör". Karar (Claude, güvenlik): önizleme yalnızca okur; kayıt, giriş/çıkış ve hesap işlemleri kapalı (panelin oturumunu paylaştığı için). Web'de bildirim, SOS gönderimi, kamera ve arka plan konumu çalışmaz; bunlar telefonda denenir.
 
 **Karar (Eren, 28 Ekim 2026):** STK ve kulüpler için ayrı başvuru akışı şimdilik yapılmaz. Etkinlik yetkisi Panel > Kurumlar (admin kurumu açar, "etkinlikler" bölümünü verir) ve Yetkiler sayfasıyla verilir.
 
