@@ -2972,5 +2972,23 @@
       "yatay": "Quer",
       "rotate": "Drehen"
     }
+  },
+  "follows": {
+    "title": "Folgen",
+    "tabs": {
+      "takipci": "Follower",
+      "takip": "Folgt",
+      "isletmeler": "Unternehmen"
+    },
+    "search": "Suchen",
+    "openHint": "Öffnet die Liste",
+    "remove": "Entfernen",
+    "removeTitle": "{{name}} aus deinen Followern entfernen?",
+    "removeBody": "Die Person wird nicht benachrichtigt und kann dir erneut folgen.",
+    "cancel": "Abbrechen",
+    "noFollowers": "Noch keine Follower.",
+    "noFollowing": "Folgt noch niemandem.",
+    "noBusinesses": "Du folgst keinen Unternehmen.",
+    "businessPrivate": "Nur Inhaber und Verwalter des Unternehmens sehen diese Liste."
   }
 }

@@ -25,6 +25,7 @@ import { deletePhotos, type JoinedItem } from '@cityjoy/shared/firebase';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { StatBox } from '@/components/stat-box';
 import { BottomNav } from '@/components/bottom-nav';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
@@ -307,6 +308,9 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     : '';
 
   const hidden = !own && (blockedMe || iBlocked || (profile.isPrivate && follow !== 'aktif'));
+  // Takipçi / Takip listesi: gizli hesabınkini yalnızca takipçileri açar; engel varsa kapalı (14 Kasım 2026).
+  const listsOpen = !hidden && !profile.suspended;
+  const openFollows = (side: 'takipci' | 'takip') => router.push({ pathname: '/follows', params: { uid, side, name: profile.displayName } });
   const tabs: Tab[] = own ? ['gonderiler', 'videolar', 'etiketlendiklerim', 'kaydedilenler', 'katildiklarim'] : ['gonderiler', 'videolar', 'etiketlendiklerim'];
 
   const pill = (label: string, onPress: () => void, opts: { primary?: boolean; disabled?: boolean } = {}) => (
@@ -407,18 +411,13 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                 </Pressable>
               </Modal>
             ) : null}
-            <View style={styles.stats}>
-              {[
-                { n: hidden || posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts') },
-                { n: counts ? String(counts.followers) : '–', label: t('explore.profile.statFollowers') },
-                { n: counts ? String(counts.following) : '–', label: t('explore.profile.statFollowing') },
-              ].map((x) => (
-                <View key={x.label} style={styles.stat} accessible accessibilityLabel={`${x.n} ${x.label}`}>
-                  <AppText style={[styles.statN, { color: c.textStrong }]}>{x.n}</AppText>
-                  <AppText style={[styles.statL, { color: c.textMuted }]}>{x.label}</AppText>
-                </View>
-              ))}
-            </View>
+            <StatBox
+              items={[
+                { n: hidden || posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts'), onPress: hidden ? undefined : () => setTab('gonderiler') },
+                { n: counts ? String(counts.followers) : '–', label: t('explore.profile.statFollowers'), onPress: listsOpen ? () => openFollows('takipci') : undefined, hint: t('follows.openHint') },
+                { n: counts ? String(counts.following) : '–', label: t('explore.profile.statFollowing'), onPress: listsOpen ? () => openFollows('takip') : undefined, hint: t('follows.openHint') },
+              ]}
+            />
           </View>
           <View style={styles.bio}>
             <AppText style={[styles.name, { color: c.textStrong }]}>{profile.displayName}</AppText>
@@ -645,10 +644,6 @@ const styles = StyleSheet.create({
   avatar: { width: 76, height: 76, borderRadius: 38, alignItems: 'center', justifyContent: 'center' },
   zoomBack: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.85)', alignItems: 'center', justifyContent: 'center' },
   initial: { fontFamily: fonts.heading, fontSize: 32 },
-  stats: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
-  stat: { alignItems: 'center' },
-  statN: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23 },
-  statL: { fontSize: 12, lineHeight: 16 },
   bio: { gap: 2, marginTop: -spacing.xs },
   name: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
   privateRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },

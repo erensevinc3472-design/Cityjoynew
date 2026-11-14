@@ -42,6 +42,20 @@ beforeEach(async () => {
 });
 
 describe('Keşfet profili ve takip', () => {
+  it('Takipçi / Takip listesi: onaylı takipler en yeni önce, sayfalı; istekler listede yok', async () => {
+    await social('ali').follow('ali', 'ayse', false);
+    await social('genc').follow('genc', 'ayse', false);
+    await social('ayse').follow('ayse', 'genc', true); // gizli hesaba istek: listede görünmez
+    const f = await social('veli').followPage('ayse', 'takipci');
+    expect(f.items.map((x) => x.uid).sort()).toEqual(['ali', 'genc']);
+    expect(f.next).toBeNull();
+    expect((await social('veli').followPage('ali', 'takip')).items.map((x) => x.uid)).toEqual(['ayse']);
+    expect((await social('veli').followPage('ayse', 'takip')).items).toEqual([]);
+    // Satırlardaki düğme için benim durumum: tek sorgu, istek de görünür.
+    const st = await social('ayse').followStatesOf('ayse', ['ali', 'genc', 'veli']);
+    expect([st.get('genc'), st.get('ali'), st.get('veli')]).toEqual(['istek', undefined, undefined]);
+  });
+
   it('profil: herkes okur, yalnızca sahibi yazar; başkasının adına profil açılamaz', async () => {
     expect((await social('ali').getProfile('ayse'))?.displayName).toBe('Ayşe K.');
     await assertSucceeds(social('ayse').updateProfile('ayse', { displayName: 'Ayşe K.', bio: 'Ataevler', isPrivate: false }));

@@ -2972,5 +2972,23 @@
       "yatay": "Landscape",
       "rotate": "Rotate"
     }
+  },
+  "follows": {
+    "title": "Follows",
+    "tabs": {
+      "takipci": "Followers",
+      "takip": "Following",
+      "isletmeler": "Businesses"
+    },
+    "search": "Search",
+    "openHint": "Opens the list",
+    "remove": "Remove",
+    "removeTitle": "Remove {{name}} from your followers?",
+    "removeBody": "They won’t be notified. They can follow you again if they want.",
+    "cancel": "Cancel",
+    "noFollowers": "No followers yet.",
+    "noFollowing": "Not following anyone yet.",
+    "noBusinesses": "You don’t follow any businesses.",
+    "businessPrivate": "Only the business owner and managers can see this list."
   }
 }

@@ -544,9 +544,14 @@ service cloud.firestore {
       allow delete: if isSelf(resource.data.ownerUid);
     }
 
-    // İşletme takibi (belge kimliği = işletme_kişi). Kişi yalnızca kendi takiplerini görür; sayaç aynı yazımda değişir.
+    // İşletme takibi (belge kimliği = işletme_kişi). Kişi kendi takiplerini görür; takipçi listesini yalnızca işletmenin
+    // sahibi ve yetkilileri görür (14 Kasım 2026; sayı herkese açık, kim takip ediyor değil). Sayaç aynı yazımda değişir.
+    function businessTeamOf(bid) {
+      let b = get(businessPath(bid)).data;
+      return b.ownerUid == me() || me() in b.get('managerUids', []);
+    }
     match /businessFollows/{fid} {
-      allow read: if signedIn() && (resource == null || resource.data.uid == me());
+      allow read: if signedIn() && (resource == null || resource.data.uid == me() || businessTeamOf(resource.data.businessId));
       function _k18(nw) {
         return signedIn()
         && nw.keys().hasOnly(['uid', 'businessId', 'createdAt'])

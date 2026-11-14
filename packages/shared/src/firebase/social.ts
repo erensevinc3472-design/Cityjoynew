@@ -10,6 +10,8 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  startAfter,
+  Timestamp,
   updateDoc,
   where,
   writeBatch,
@@ -19,7 +21,7 @@ import {
 
 import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
 import { TAG_POLICIES, type TagPolicy } from '../posts/posts';
-import { blockId, followId, PROFILE_LIMITS, type FollowStatus, type ProfileReportReason, type PublicProfile } from '../posts/social';
+import { blockId, followId, PROFILE_LIMITS, type FollowPage, type FollowStatus, type ProfileReportReason, type PublicProfile } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
 import { countUsage } from './limits';
@@ -178,6 +180,40 @@ export function createFirestoreSocialRepository(db: Firestore) {
         getCountFromServer(query(collection(db, FOLLOWS), where('followerUid', '==', uid), where('status', '==', 'aktif'))),
       ]);
       return { followers: a.data().count, following: b.data().count };
+    },
+
+    /**
+     * Takipçi / Takip listesi (14 Kasım 2026): onaylı takipler en yeni önce, 30'ar kişi. İmleç son takibin tarihidir.
+     * Gizli hesabın listesini uygulama yalnızca takipçilerine açar (sayılar herkese açık olduğu için kayıtlar da okunur).
+     */
+    async followPage(uid: string, side: 'takipci' | 'takip', cursor?: string | null): Promise<FollowPage<PublicProfile>> {
+      const field = side === 'takipci' ? 'followeeUid' : 'followerUid';
+      const other = side === 'takipci' ? 'followerUid' : 'followeeUid';
+      const snap = await getDocs(
+        query(
+          collection(db, FOLLOWS),
+          where(field, '==', uid),
+          where('status', '==', 'aktif'),
+          orderBy('createdAt', 'desc'),
+          ...(cursor ? [startAfter(Timestamp.fromDate(new Date(cursor)))] : []),
+          limit(PROFILE_LIMITS.followPage),
+        ),
+      );
+      const uids = snap.docs.map((d) => d.get(other) as string);
+      const found = new Map((await this.profilesOf(uids)).map((p) => [p.uid, p]));
+      const last = snap.docs[snap.docs.length - 1];
+      return {
+        items: uids.flatMap((u) => (found.has(u) ? [found.get(u)!] : [])),
+        next: snap.docs.length === PROFILE_LIMITS.followPage && last ? (iso(last.get('createdAt')) ?? null) : null,
+      };
+    },
+
+    /** Listedeki kişilerle benim takip durumum (tek sorgu, en çok 30 kişi): kimlik > aktif / istek. */
+    async followStatesOf(me: string, uids: readonly string[]): Promise<Map<string, FollowStatus>> {
+      const part = uids.filter((u) => u !== me).slice(0, 30);
+      if (!part.length) return new Map();
+      const snap = await getDocs(query(collection(db, FOLLOWS), where('followerUid', '==', me), where('followeeUid', 'in', part)));
+      return new Map(snap.docs.map((d) => [d.get('followeeUid') as string, d.get('status') as FollowStatus]));
     },
 
     /** Takip ettiklerim (Takip akışı için, en çok 30). */

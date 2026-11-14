@@ -10,6 +10,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  startAfter,
   Timestamp,
   updateDoc,
   where,
@@ -143,6 +144,19 @@ export function createFirestoreBusinessRepository(db: Firestore): BusinessReposi
     async followedIds(uid) {
       const snap = await getDocs(query(collection(db, FOLLOWS), where('uid', '==', uid), limit(200)));
       return snap.docs.map((d) => d.get('businessId') as string);
+    },
+
+    async followerPage(id, cursor) {
+      const size = 30;
+      const snap = await getDocs(
+        query(collection(db, FOLLOWS), where('businessId', '==', id), orderBy('createdAt', 'desc'), ...(cursor ? [startAfter(Timestamp.fromDate(new Date(cursor)))] : []), limit(size)),
+      );
+      const last = snap.docs[snap.docs.length - 1];
+      const at = last?.get('createdAt');
+      return {
+        uids: snap.docs.map((d) => d.get('uid') as string),
+        next: snap.docs.length === size && at && typeof at.toDate === 'function' ? (at.toDate() as Date).toISOString() : null,
+      };
     },
 
     async leaveAllOf(uid) {

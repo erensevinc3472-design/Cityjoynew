@@ -38,7 +38,15 @@ export const PROFILE_LIMITS = {
   perAuthor: 5,
   /** Ara > Kişiler: tek sorguda en çok. */
   searchResults: 30,
+  /** Takipçi / Takip listesi: sayfa başına kişi (aşağı kaydırdıkça devamı; 14 Kasım 2026). */
+  followPage: 30,
 } as const;
+
+/** Takipçi / Takip listesinde bir sayfa: kişiler ve devamı için imleç (null: bitti). */
+export interface FollowPage<T> {
+  items: T[];
+  next: string | null;
+}
 
 export type FollowStatus = 'aktif' | 'istek';
 

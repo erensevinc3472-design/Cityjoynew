@@ -461,6 +461,11 @@ export interface BusinessRepository {
   unfollow(id: string, uid: string): Promise<void>;
   /** Takip ettiğim işletmelerin kimlikleri (en çok 200). */
   followedIds(uid: string): Promise<string[]>;
+  /**
+   * İşletmenin takipçileri (yalnızca sahibi ve yetkilileri okur; kurallarda). Kişi kimlikleri en yeni önce, 30'ar;
+   * imleç son takibin tarihi (14 Kasım 2026).
+   */
+  followerPage(id: string, cursor?: string | null): Promise<{ uids: string[]; next: string | null }>;
   /** Hesap silinirken işletme takipleri ve yetkililikler bırakılır. */
   leaveAllOf(uid: string): Promise<void>;
   create(uid: string, input: BusinessInput): Promise<string>;

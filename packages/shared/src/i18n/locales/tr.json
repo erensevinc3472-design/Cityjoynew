@@ -2972,5 +2972,23 @@
       "yatay": "Yatay",
       "rotate": "Döndür"
     }
+  },
+  "follows": {
+    "title": "Takip",
+    "tabs": {
+      "takipci": "Takipçi",
+      "takip": "Takip",
+      "isletmeler": "İşletmeler"
+    },
+    "search": "Ara",
+    "openHint": "Listeyi açar",
+    "remove": "Çıkar",
+    "removeTitle": "{{name}} takipçilerinden çıkarılsın mı?",
+    "removeBody": "Kişiye bildirim gitmez. İstersen seni yeniden takip edebilir.",
+    "cancel": "Vazgeç",
+    "noFollowers": "Henüz takipçi yok.",
+    "noFollowing": "Henüz kimse takip edilmiyor.",
+    "noBusinesses": "Takip ettiğin işletme yok.",
+    "businessPrivate": "Bu listeyi yalnızca işletmenin sahibi ve yetkilileri görür."
   }
 }

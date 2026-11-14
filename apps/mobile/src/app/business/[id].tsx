@@ -27,6 +27,7 @@ import {
 
 import { ThumbImage } from '@/components/thumb-image';
 import { AppText } from '@/components/app-text';
+import { StatBox } from '@/components/stat-box';
 import { TranslatableText } from '@/components/translatable-text';
 import { BusinessCard, ProTag, verificationText } from '@/components/business-card';
 import { useToast } from '@/components/toast';
@@ -251,18 +252,14 @@ export default function BusinessScreen() {
                 )}
               </View>
             </View>
-            <View style={styles.stats}>
-              {[
-                { n: posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts') },
-                { n: String(b.followerCount), label: t('explore.profile.statFollowers') },
-                { n: b.rating.count ? `★ ${avg.toLocaleString(i18n.language)}` : '–', label: t('business.page.statRating', { count: b.rating.count }) },
-              ].map((x) => (
-                <View key={x.label} style={styles.stat} accessible accessibilityLabel={`${x.n} ${x.label}`}>
-                  <AppText style={[styles.statN, { color: c.textStrong }]}>{x.n}</AppText>
-                  <AppText style={[styles.statL, { color: c.textMuted }]} numberOfLines={1}>{x.label}</AppText>
-                </View>
-              ))}
-            </View>
+            <StatBox
+              items={[
+                { n: posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts'), onPress: () => setTab('gonderiler') },
+                // Takipçi listesini yalnızca sahibi ve yetkilileri açar (14 Kasım 2026; kurallarda da öyle).
+                { n: String(b.followerCount), label: t('explore.profile.statFollowers'), onPress: team ? () => router.push({ pathname: '/follows', params: { business: b.id, name: b.name } }) : undefined, hint: t('follows.openHint') },
+                { n: b.rating.count ? `★ ${avg.toLocaleString(i18n.language)}` : '–', label: t('business.page.statRating', { count: b.rating.count }), onPress: () => setTab('yorumlar') },
+              ]}
+            />
           </View>
 
           <View style={styles.bio}>
@@ -480,10 +477,6 @@ const styles = StyleSheet.create({
   gallery: { gap: spacing.sm },
   galleryItem: { height: 140, borderRadius: radius.md },
   initial: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 30 },
-  stats: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
-  stat: { alignItems: 'center', flexShrink: 1 },
-  statN: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23 },
-  statL: { fontSize: 12, lineHeight: 16 },
   bio: { gap: 2, marginTop: -spacing.xs },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   name: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20, flexShrink: 1 },

@@ -106,6 +106,19 @@ describe('işletme sayfası', () => {
     expect(log.docs.map((d) => d.data().summary)).toContain('Yetkili çıkarıldı (Ayşe K.): Cengiz Kebap');
   }, 30000);
 
+  it('takipçi listesi: yalnızca sahibi ve yetkilileri görür; takipçi kendi kaydını görür', async () => {
+    const id = await biz('cengiz').create('cengiz', input);
+    await verify(id);
+    await biz('cengiz').setManagers(id, [{ uid: 'ayse', name: 'Ayşe K.', post: 'kapali', edit: false, reply: false, messages: false }]);
+    await biz('ali').follow(id, 'ali');
+    await biz('veli').follow(id, 'veli');
+    expect((await biz('cengiz').followerPage(id)).uids.sort()).toEqual(['ali', 'veli']);
+    expect((await biz('ayse').followerPage(id)).uids.sort()).toEqual(['ali', 'veli']);
+    await expect(biz('ali').followerPage(id)).rejects.toThrow();
+    await expect(biz('yabanci').followerPage(id)).rejects.toThrow();
+    expect(await biz('ali').followedIds('ali')).toEqual([id]);
+  }, 30000);
+
   it('takip: sayaç tam bir değişir, iki kez takip edilemez; takip akışına işletmenin Takip gönderileri düşer', async () => {
     const id = await biz('cengiz').create('cengiz', input);
     await verify(id);
