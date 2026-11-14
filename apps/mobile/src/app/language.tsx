@@ -8,8 +8,7 @@ import { LANGUAGES, type LanguageCode } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
 import { AuthScene } from '@/components/auth-scene';
-import { AUTH_ART, LANGUAGE_ART } from '@/lib/app-art';
-import { useAppImage } from '@/lib/app-config';
+import { useArt } from '@/lib/app-art';
 import { profileRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
@@ -24,11 +23,15 @@ const FLAG: Record<LanguageCode, string> = { tr: '🇹🇷', en: '🇬🇧', de:
 const ROW_BG = '#023236';
 const GOLD = '#E2B277';
 
+/** Dil satırlarının resimleri (panelden değiştirilebilir). */
+const LANG_ART = { tr: 'langTr', en: 'langEn', de: 'langDe', ar: 'langAr', ru: 'langRu' } as const;
+
 export default function LanguageScreen() {
   // Karşılamadan gelindiyse dil seçilince kayda geçilir.
   const { next } = useLocalSearchParams<{ next?: string }>();
   const { t, i18n } = useTranslation();
-  const languageImage = useAppImage('language');
+  const art = useArt();
+  const langArt = (code: keyof typeof LANG_ART) => art(LANG_ART[code]);
   const router = useRouter();
   const { language, suggestedLanguage, setLanguage, rtl } = useSettings();
   const { user, profile, refreshProfile } = useSession();
@@ -65,7 +68,7 @@ export default function LanguageScreen() {
   };
 
   return (
-    <AuthScene kind="cover" image={AUTH_ART.languageBg} remote={languageImage} shade={false}>
+    <AuthScene kind="cover" art="language" shade={false}>
       <View style={styles.head}>
         {router.canGoBack() ? (
           <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} onPress={() => router.back()} hitSlop={8} style={styles.back}>
@@ -88,7 +91,8 @@ export default function LanguageScreen() {
               onPress={() => confirm(l.code)}
               style={({ pressed }) => [styles.row, { borderColor: on ? GOLD : 'rgba(79, 194, 168, 0.28)', transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
               <Image
-                source={LANGUAGE_ART[l.code]}
+                source={langArt(l.code)?.source}
+                onError={langArt(l.code)?.onError}
                 style={[styles.art, rtl && { transform: [{ scaleX: -1 }] }]}
                 contentFit="cover"
                 contentPosition="right"

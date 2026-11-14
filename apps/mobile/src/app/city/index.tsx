@@ -6,7 +6,7 @@ import { CITY_GUIDE_SECTIONS, type CityGuideSectionId } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
-import { GlassRow, GOLD, KURUMLAR_ART, MAHALLE_ART, PhotoCard, SectionHeading, Shade, TOWNHALL_ART, VITRIN_ART, type IconName } from '@/components/city-tiles';
+import { GlassRow, GOLD, PhotoCard, SectionHeading, Shade, type IconName } from '@/components/city-tiles';
 import { PageHead, PAGE_CONTENT } from '@/components/page-head';
 import { LineIcon } from '@/components/line-icon';
 import { CoverArt } from '@/components/scene-art';
@@ -20,6 +20,7 @@ import { useTravelCity } from '@/lib/travel';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
+import { useArt } from '@/lib/app-art';
 
 
 interface Tile {
@@ -55,6 +56,7 @@ const TILES: Tile[] = [
  */
 export default function MyCityScreen() {
   const { t } = useTranslation();
+  const art = useArt();
   const router = useRouter();
   const c = useThemeColors();
   const dark = useResolvedScheme() === 'dark';
@@ -156,7 +158,7 @@ export default function MyCityScreen() {
             flex={1.2}
             height={84}
             scene="townhall"
-            image={TOWNHALL_ART}
+            image={art('cityTownhall')}
             icon="account-balance"
             title={townhall.label}
             onPress={() => router.push('/city/belediyeler')}
@@ -164,7 +166,7 @@ export default function MyCityScreen() {
           <PhotoCard
             height={84}
             scene="townhall"
-            image={KURUMLAR_ART}
+            image={art('cityInstitutions')}
             icon={KURUMLAR.icon}
             title={kurumlar.label}
             onPress={() => open(KURUMLAR)}
@@ -180,7 +182,7 @@ export default function MyCityScreen() {
         <View style={[styles.pair, styles.bottom]}>
           <PhotoCard
             scene="neighbourhood"
-            image={MAHALLE_ART}
+            image={art('cityNeighbourhood')}
             icon="holiday-village"
             title={t('neighbourhood.title')}
             sub={neighbourhood ?? t('neighbourhood.hint')}
@@ -188,7 +190,7 @@ export default function MyCityScreen() {
           />
           <PhotoCard
             scene="showcase"
-            image={VITRIN_ART}
+            image={art('cityShowcase')}
             icon="auto-awesome"
             title={province ? t('city.hub.showcaseOf', { city: province }) : t('city.showcase')}
             sub={t('showcase.weekly')}

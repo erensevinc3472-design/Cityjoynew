@@ -8,9 +8,10 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { SurfaceContext } from '@/theme/use-theme';
-import { AUTH_ART } from '@/lib/app-art';
+import { useArt } from '@/lib/app-art';
 import { AppText } from './app-text';
 import { SceneArt, sceneSky, type SceneKind } from './scene-art';
+import type { AppImage } from '@cityjoy/shared';
 
 const GOLD = '#E2B277';
 
@@ -18,9 +19,9 @@ const GOLD = '#E2B277';
  * Giriş akışının ortak zemini (13. madde 35, giriş akışı): arkada tam ekran sahne çizimi ve karartma, üstte CityJoy
  * yazısı, altta içerik. Renk şeması her zaman koyudur; resimler Panel > Uygulama görselleri'nden değişecek (Blaze ile).
  */
-export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, remote, shade = true, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; image?: number | null; remote?: string; shade?: boolean; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
+export function AuthScene({ kind = 'cover', art = 'signIn', shade = true, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; art?: AppImage; shade?: boolean; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
   const insets = useSafeAreaInsets();
-  const source = useRemoteOr(remote, image);
+  const source = useArt()(art);
   const { width } = useWindowDimensions();
   return (
     <SurfaceContext.Provider value={{ scheme: 'dark', glass }}>
@@ -28,7 +29,7 @@ export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, remote, sh
         <StatusBar style="light" />
         {source ? (
           // Dikey resim (Eren, 8 Kasım 2026): üstü boş gökyüzü, konu altta; ekranı tam kaplar.
-          <Image source={source.src} onError={source.onError} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
+          <Image source={source.source} onError={source.onError} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
         ) : (
           <View pointerEvents="none" style={[styles.scene, { height: Math.round(width * 1.35) }]}>
             <SceneArt kind={kind} />
@@ -56,14 +57,6 @@ export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, remote, sh
       </View>
     </SurfaceContext.Provider>
   );
-}
-
-/** Panelden yüklenen resim (adres) varsa o; yüklenemezse ya da yoksa uygulamadaki hazır resim. */
-export function useRemoteOr(remote: string | undefined, fallback: number | null | undefined): { src: number | { uri: string }; onError?: () => void } | null {
-  const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [remote]);
-  if (remote && !failed) return { src: { uri: remote }, onError: () => setFailed(true) };
-  return fallback ? { src: fallback } : null;
 }
 
 /** Resmin alt yarısını koyulaştırır: yazılar resmin dolu kısmının üstüne gelince okunsun. */

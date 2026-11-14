@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
-import { DEFAULT_APP_CONFIG, normalizeAppConfig, type AppConfig, type AppImage } from '@cityjoy/shared';
+import { DEFAULT_APP_CONFIG, normalizeAppConfig, type AppConfig } from '@cityjoy/shared';
 import { getAppConfig } from '@cityjoy/shared/firebase';
 
 import { isFirebaseConfigured } from './firebase-config';
@@ -58,7 +58,3 @@ export function useAppConfig(): AppConfig {
 export const appPlatform: 'ios' | 'android' | null = Platform.OS === 'ios' || Platform.OS === 'android' ? Platform.OS : null;
 export const appVersion: string = Constants.expoConfig?.version ?? '0.0.0';
 
-/** Panelden yüklenen giriş resmi; yoksa uygulamadaki hazır resim. */
-export function useAppImage(key: AppImage): string {
-  return useAppConfig().images[key];
-}

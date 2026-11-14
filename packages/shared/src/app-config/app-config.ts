@@ -52,11 +52,65 @@ export interface AppContact {
 }
 export const CONTACT_LINKS = ['web', 'instagram', 'x', 'facebook', 'youtube', 'tiktok'] as const;
 
-/** Paneldan değiştirilebilen giriş resimleri; boşsa uygulamadaki gömülü resim kullanılır. */
-export const APP_IMAGES = ['welcome', 'language', 'signIn'] as const;
-export type AppImage = (typeof APP_IMAGES)[number];
-/** Giriş resimleri dikey telefon ekranını doldurur: en az bu boyutta olmalı. */
-export const APP_IMAGE_MIN = { width: 900, height: 1400 } as const;
+/** Panel > Uygulama ayarları > Görseller'deki resim grupları (uygulamadaki yerlerine göre). */
+export const APP_IMAGE_GROUPS = ['entry', 'language', 'home', 'travel', 'city', 'social', 'deals'] as const;
+export type AppImageGroup = (typeof APP_IMAGE_GROUPS)[number];
+
+interface ImageSpec {
+  group: AppImageGroup;
+  /** Önerilen boyut (uygulamadaki hazır resmin boyutu). */
+  w: number;
+  h: number;
+  /** En küçük kabul edilen boyut: daha küçüğü telefonda bulanık görünür. */
+  minW: number;
+  minH: number;
+}
+const spec = (group: AppImageGroup, w: number, h: number, minW: number, minH: number): ImageSpec => ({ group, w, h, minW, minH });
+const ENTRY = (): ImageSpec => spec('entry', 941, 1672, 900, 1400);
+
+/**
+ * Uygulamadaki bütün resimler (Eren, 14 Kasım 2026: "Bütün resimler, görseller. Ben istediğim zaman değiştirebileyim").
+ * Her biri panelden değiştirilebilir; adres boşsa uygulamadaki hazır resim (ya da çizim) kullanılır. Anahtarları
+ * değiştirme: kayıtlı ayarlar bu adlarla okunur. Uygulama simgesi, açılış ekranı ve arama ağacı burada yok (mağaza
+ * güncellemesi gerekir / ağacın ışıkları resme göre yerleşik).
+ */
+export const APP_IMAGE_SPECS = {
+  welcome: ENTRY(),
+  welcomeLanguage: ENTRY(),
+  permission: ENTRY(),
+  language: ENTRY(),
+  signIn: ENTRY(),
+  langTr: spec('language', 900, 500, 720, 400),
+  langEn: spec('language', 900, 500, 720, 400),
+  langDe: spec('language', 900, 500, 720, 400),
+  langAr: spec('language', 900, 500, 720, 400),
+  langRu: spec('language', 900, 500, 720, 400),
+  homeMyCity: spec('home', 600, 572, 500, 480),
+  homeTravel: spec('home', 900, 600, 720, 480),
+  homeSocial: spec('home', 900, 600, 720, 480),
+  homeUrgent: spec('home', 900, 600, 720, 480),
+  travelJourney: spec('travel', 860, 1528, 720, 1280),
+  travelExplore: spec('travel', 860, 1528, 720, 1280),
+  cityTownhall: spec('city', 960, 640, 720, 480),
+  cityInstitutions: spec('city', 960, 640, 720, 480),
+  cityNeighbourhood: spec('city', 960, 640, 720, 480),
+  cityShowcase: spec('city', 1152, 941, 900, 735),
+  citySkyline: spec('city', 1200, 262, 1000, 220),
+  socialEvents: spec('social', 720, 1008, 600, 840),
+  socialActivities: spec('social', 720, 1008, 600, 840),
+  socialNews: spec('social', 720, 1008, 600, 840),
+  socialContests: spec('social', 720, 1008, 600, 840),
+  socialPolls: spec('social', 720, 1008, 600, 840),
+  dealFood: spec('deals', 720, 1008, 600, 840),
+  dealMarket: spec('deals', 720, 1008, 600, 840),
+  dealSport: spec('deals', 720, 1008, 600, 840),
+  dealFun: spec('deals', 720, 1008, 600, 840),
+  dealCraft: spec('deals', 720, 1008, 600, 840),
+  dealHealth: spec('deals', 720, 1008, 600, 840),
+  dealEducation: spec('deals', 720, 1008, 600, 840),
+} satisfies Record<string, ImageSpec>;
+export type AppImage = keyof typeof APP_IMAGE_SPECS;
+export const APP_IMAGES = Object.keys(APP_IMAGE_SPECS) as AppImage[];
 
 export interface AppConfig {
   /** Bu sürümün altındaki uygulama açılmaz, güncelleme ister. */
@@ -85,7 +139,7 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   closed: [],
   legal: { version: LEGAL_TEXT_VERSION, reaccept: false },
   contact: { supportEmail: '', kvkkAddress: '', web: '', instagram: '', x: '', facebook: '', youtube: '', tiktok: '' },
-  images: { welcome: '', language: '', signIn: '' },
+  images: Object.fromEntries(APP_IMAGES.map((k) => [k, ''])) as Record<AppImage, string>,
 };
 
 const str = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '');

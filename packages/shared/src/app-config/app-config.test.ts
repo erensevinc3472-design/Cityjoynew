@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   activeBanner,
+  APP_IMAGE_GROUPS,
+  APP_IMAGE_SPECS,
+  APP_IMAGES,
   changedParts,
   closedSectionOf,
   compareVersions,
@@ -36,6 +39,19 @@ describe('uygulama ayarları', () => {
     const mine = cfg({ banner: { ...c.banner!, provinces: [], onlyUid: 'adminUid1' } });
     expect(activeBanner(mine, { now, uid: 'adminUid1' })).not.toBeNull();
     expect(activeBanner(mine, { now, uid: 'baskasi99' })).toBeNull();
+  });
+
+  it('resimler: bütün anahtarlar var, yalnızca https adresi kalır, bilinmeyen anahtar atılır', () => {
+    const c = normalizeAppConfig({ images: { homeTravel: 'https://x.test/a.jpg', welcome: 'http://x.test/b.jpg', eskiResim: 'https://x.test/c.jpg' } });
+    expect(Object.keys(c.images).sort()).toEqual([...APP_IMAGES].sort());
+    expect(c.images.homeTravel).toBe('https://x.test/a.jpg');
+    expect(c.images.welcome).toBe('');
+    expect('eskiResim' in c.images).toBe(false);
+    for (const k of APP_IMAGES) {
+      const sp = APP_IMAGE_SPECS[k];
+      expect(APP_IMAGE_GROUPS).toContain(sp.group);
+      expect(sp.minW <= sp.w && sp.minH <= sp.h).toBe(true);
+    }
   });
 
   it('temizleme: geçersiz alanlar varsayılana döner, Türkçesiz bant yok sayılır', () => {

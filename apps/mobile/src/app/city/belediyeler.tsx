@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { listMunicipalities, municipalityIdsFor, normalizeName, type Municipality } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
-import { GlassRow, KURUMLAR_ART, PhotoCard, SectionHeading, TOWNHALL_ART } from '@/components/city-tiles';
+import { GlassRow, PhotoCard, SectionHeading } from '@/components/city-tiles';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { SearchField } from '@/components/search-field';
@@ -14,6 +14,7 @@ import { locationRepository as repo } from '@/lib/locations';
 import { useOfficialProfiles } from '@/lib/official-profiles';
 import { useUserLocation } from '@/lib/user-location';
 import { spacing } from '@/theme/tokens';
+import { useArt } from '@/lib/app-art';
 
 /**
  * Belediye Hizmetleri (13. madde 35): üstte kullanıcının ilçe belediyesi ve büyükşehir / il belediyesi aynı büyüklükte
@@ -29,6 +30,7 @@ const FREQUENT = [
 
 export default function MunicipalitiesScreen() {
   const { t } = useTranslation();
+  const art = useArt();
   const bottom = usePageBottom();
   const router = useRouter();
   const { location } = useUserLocation();
@@ -94,7 +96,7 @@ export default function MunicipalitiesScreen() {
                     <PhotoCard
                       key={m.id}
                       scene='townhall'
-                      image={mine ? TOWNHALL_ART : KURUMLAR_ART}
+                      image={art(mine ? 'cityTownhall' : 'cityInstitutions')}
                       height={112}
                       icon={mine ? 'location-city' : 'account-balance'}
                       title={m.name}

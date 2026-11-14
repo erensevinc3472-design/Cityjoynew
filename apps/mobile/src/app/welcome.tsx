@@ -9,16 +9,14 @@ import { useTranslation } from 'react-i18next';
 import { AppText } from '@/components/app-text';
 import { Image } from 'expo-image';
 import { useReduceMotion } from '@/components/scene-art';
-import { useRemoteOr } from '@/components/auth-scene';
-import { AUTH_ART } from '@/lib/app-art';
-import { useAppImage } from '@/lib/app-config';
+import { useArt } from '@/lib/app-art';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 
-/** Sırayla değişen görseller (13. madde 27): Eren'in üç dikey resmi (8 Kasım 2026). Panelden değiştirme Blaze ile. */
-const SLIDES = [AUTH_ART.welcome, AUTH_ART.language, AUTH_ART.permission];
+/** Sırayla değişen görseller (13. madde 27): Eren'in üç dikey resmi (8 Kasım 2026); hepsi panelden değiştirilebilir. */
+const SLIDES = ['welcome', 'welcomeLanguage', 'permission'] as const;
 const SLIDE_MS = 4500;
 const HANDLE = 52;
 
@@ -36,8 +34,8 @@ export default function WelcomeScreen() {
   const reduce = useReduceMotion();
   const { user } = useSession();
   const [slide, setSlide] = useState(0);
-  // İlk görsel panelden değiştirilebilir (Uygulama ayarları > Görseller); açılamazsa hazır resim.
-  const first = useRemoteOr(useAppImage('welcome'), AUTH_ART.welcome)!;
+  // Panelden değiştirilebilir (Uygulama ayarları > Görseller); açılamazsa hazır resim.
+  const art = useArt();
   const fades = useRef(SLIDES.map((_, i) => new Animated.Value(i === 0 ? 1 : 0))).current;
   const drag = useRef(new Animated.Value(0)).current;
   const [trackW, setTrackW] = useState(0);
@@ -123,7 +121,7 @@ export default function WelcomeScreen() {
       <StatusBar style="light" />
       {SLIDES.map((k, i) => (
         <Animated.View key={i} pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: fades[i], backgroundColor: '#0A2226' }]}>
-          <Image source={i === 0 ? first.src : k} onError={i === 0 ? first.onError : undefined} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
+          <Image source={art(k)?.source} onError={art(k)?.onError} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
         </Animated.View>
       ))}
       <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.dim]} />

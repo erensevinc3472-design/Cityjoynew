@@ -12,6 +12,7 @@ import { LineIcon } from '@/components/line-icon';
 import { SceneArt, type SceneKind } from '@/components/scene-art';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useResolvedScheme, useThemeColors } from '@/theme/use-theme';
+import type { ArtSource } from '@/lib/app-art';
 
 /**
  * Benim Şehrim'in kutuları (Eren'in 7 Kasım 2026 taslağı): fotoğraflı büyük kart, cam satır, altın simgeli başlık.
@@ -22,10 +23,6 @@ export type IconName = ComponentProps<typeof MaterialIcons>['name'];
 export const GOLD = '#E2B277';
 export const TEAL = '#4FC2A8';
 // Eren'in ChatGPT ile hazırladığı resimler (8 Kasım 2026), her ilde aynı. Kaynakları masaüstündeki CityJoy-gorseller klasöründe.
-export const TOWNHALL_ART = require('../../assets/city/belediye.jpg') as number;
-export const KURUMLAR_ART = require('../../assets/city/kurumlar.jpg') as number;
-export const MAHALLE_ART = require('../../assets/city/mahalle.jpg') as number;
-export const VITRIN_ART = require('../../assets/city/vitrin.jpg') as number;
 
 /** Kartın soldan sağa koyulaşan örtüsü (fotoğraf üstündeki yazı okunsun). */
 export function Shade({ from, opacity, mid = 0.55, to = 0.15 }: { from: string; opacity: number; mid?: number; to?: number }) {
@@ -78,7 +75,7 @@ export function Chevron({ gold, plain, open }: { gold?: boolean; plain?: boolean
 }
 
 /** Fotoğraflı (yoksa çizimli) büyük kart. `gold`: altın tonlu örtü. */
-export function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, height = 100, onPress }: { scene: SceneKind; image?: number; gold?: boolean; icon: IconName; title: string; sub?: string; flex?: number; height?: number; onPress(): void }): ReactNode {
+export function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, height = 100, onPress }: { scene: SceneKind; image?: ArtSource | null; gold?: boolean; icon: IconName; title: string; sub?: string; flex?: number; height?: number; onPress(): void }): ReactNode {
   return (
     <Pressable
       accessibilityRole="button"
@@ -87,7 +84,7 @@ export function PhotoCard({ scene, image, gold, icon, title, sub, flex = 1, heig
       style={({ pressed }) => [styles.tall, { flex, height, borderColor: gold ? 'rgba(226, 178, 119, 0.55)' : 'rgba(220, 240, 236, 0.18)', transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
       {image ? (
         <View style={styles.cardArt}>
-          <Image source={image} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
+          <Image source={image.source} onError={image.onError} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
         </View>
       ) : (
         <SceneArt kind={scene} still />

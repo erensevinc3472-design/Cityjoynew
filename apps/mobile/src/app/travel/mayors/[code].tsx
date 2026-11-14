@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { byPopulation, DISTRICT_ZONES, municipalVideos, type DistrictZone, type Municipality, type TravelMunicipal, type TravelRoute } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
-import { BottomShade, TOWNHALL_ART } from '@/components/city-tiles';
+import { BottomShade } from '@/components/city-tiles';
 import { FilterChip, ListSurface, SectionTitle } from '@/components/inner';
 import { BLEED_STRIP, BLEED_STRIP_CONTENT, PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
@@ -18,6 +18,7 @@ import { useSettings } from '@/lib/settings';
 import { cityMunicipalities, useTravelMunicipal, useTravelRoutes } from '@/lib/travel';
 import { fonts, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import { useArt } from '@/lib/app-art';
 
 type Filter = 'all' | DistrictZone;
 type Item = Municipality & { intro?: TravelMunicipal; routes: TravelRoute[]; population?: number };
@@ -32,6 +33,7 @@ type Item = Municipality & { intro?: TravelMunicipal; routes: TravelRoute[]; pop
  */
 export default function TravelMayorsScreen() {
   const { t, i18n } = useTranslation();
+  const townhall = useArt()('cityTownhall');
   const router = useRouter();
   const c = useThemeColors();
   const { rtl } = useSettings();
@@ -97,7 +99,7 @@ export default function TravelMayorsScreen() {
         {intro?.cover ? (
           <ThumbImage photo={intro.cover} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityIgnoresInvertColors />
         ) : (
-          <Image source={TOWNHALL_ART} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
+          <Image source={townhall?.source} onError={townhall?.onError} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="right" accessible={false} />
         )}
         <BottomShade />
         <View style={styles.featuredFoot}>

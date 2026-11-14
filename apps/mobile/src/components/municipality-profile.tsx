@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { telUrl, type OfficialProfile } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
-import { BottomShade, GlassRow, SectionHeading, TOWNHALL_ART, type IconName } from '@/components/city-tiles';
+import { BottomShade, GlassRow, SectionHeading, type IconName } from '@/components/city-tiles';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
@@ -17,6 +17,7 @@ import { useOfficialFollow } from '@/lib/official-follows';
 import { useTravelMunicipal } from '@/lib/travel';
 import { fonts, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import { useArt } from '@/lib/app-art';
 
 const GOLD = '#E2B277';
 
@@ -55,6 +56,7 @@ export function MunicipalityProfile({
   mayorId: string | null;
 }) {
   const { t } = useTranslation();
+  const townhall = useArt()('cityTownhall');
   const router = useRouter();
   const c = useThemeColors();
   const bottom = usePageBottom();
@@ -96,7 +98,7 @@ export function MunicipalityProfile({
           {intro?.cover ? (
             <ThumbImage photo={intro.cover} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityIgnoresInvertColors />
           ) : (
-            <Image source={TOWNHALL_ART} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
+            <Image source={townhall?.source} onError={townhall?.onError} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
           )}
           <BottomShade top={0.2} bottom={0.95} />
           <View style={styles.heroFoot}>

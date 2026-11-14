@@ -20,7 +20,7 @@ import { Skyline } from '@/components/skyline';
 import { VideoModal } from '@/components/video-modal';
 import { VerifyEmailBanner } from '@/components/verify-email-banner';
 import { useAnnouncements } from '@/lib/announcements';
-import { HOME_ART } from '@/lib/app-art';
+import { useArt } from '@/lib/app-art';
 import { useAppConfig } from '@/lib/app-config';
 import { useIntroVideoUrl } from '@/lib/intro-video';
 import { locationRepository as repo } from '@/lib/locations';
@@ -30,15 +30,16 @@ import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
+import type { AppImage } from '@cityjoy/shared';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
 // Acil İhtiyaçlar panelden kapatılamaz (section yok).
-const MODULES: { key: keyof typeof HOME_ART; icon: IconName; scene: SceneKind; href?: Href; section?: 'myCity' | 'travel' | 'social' }[] = [
-  { key: 'myCity', icon: 'location-city', scene: 'city', href: '/city', section: 'myCity' },
-  { key: 'travel', icon: 'explore', scene: 'travel', href: '/travel' as Href, section: 'travel' },
-  { key: 'social', icon: 'groups', scene: 'social', href: '/social', section: 'social' },
-  { key: 'urgent', icon: 'emergency', scene: 'urgent', href: '/urgent' },
+const MODULES: { key: 'myCity' | 'travel' | 'social' | 'urgent'; art: AppImage; icon: IconName; scene: SceneKind; href?: Href; section?: 'myCity' | 'travel' | 'social' }[] = [
+  { key: 'myCity', art: 'homeMyCity', icon: 'location-city', scene: 'city', href: '/city', section: 'myCity' },
+  { key: 'travel', art: 'homeTravel', icon: 'explore', scene: 'travel', href: '/travel' as Href, section: 'travel' },
+  { key: 'social', art: 'homeSocial', icon: 'groups', scene: 'social', href: '/social', section: 'social' },
+  { key: 'urgent', art: 'homeUrgent', icon: 'emergency', scene: 'urgent', href: '/urgent' },
 ];
 
 function greetingKey(now = new Date()) {
@@ -58,6 +59,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const { language } = useSettings();
+  const art = useArt();
   const { location } = useUserLocation();
   const { user, profile } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -127,6 +129,7 @@ export default function HomeScreen() {
             // Panelden geçici olarak kapatılan bölüm: kart soluk, dokunulmaz, altında "Geçici olarak kapalı".
             const off = !!m.section && closed.includes(m.section);
             const href = off ? undefined : m.href;
+            const a = art(m.art);
             return (
             <Pressable
               key={m.key}
@@ -136,7 +139,7 @@ export default function HomeScreen() {
               onPress={href ? () => router.push(href) : undefined}
               style={({ pressed }) => [styles.module, { borderColor: sceneRim(m.scene), opacity: off ? 0.5 : pressed ? 0.88 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
               {/* Eren'in resimleri: Seyahat ve Acil'de konu sağ yarıda (8 Kasım); Şehrim ve Sosyal kare, ortalı (10 Kasım). */}
-              <Image source={HOME_ART[m.key]} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition={m.key === 'travel' ? 'right' : 'center'} accessible={false} />
+              {a ? <Image source={a.source} onError={a.onError} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition={m.key === 'travel' ? 'right' : 'center'} accessible={false} /> : null}
               <View style={styles.moduleIcon}>
                 <MaterialIcons name={m.icon} size={19} color="#FFFFFF" />
               </View>

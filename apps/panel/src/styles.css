@@ -473,3 +473,10 @@ section[aria-labelledby="suspended-title"] { margin-top: 28px; }
 @media (max-width: 720px) { .av-phone { width: min(390px, calc(100vw - 48px)); height: 680px; } }
 .av-tag { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font: 600 0.72rem var(--font-body); color: #b7cdcf; letter-spacing: 0.02em; white-space: nowrap; }
 .open-in-app { white-space: nowrap; }
+
+/* Uygulama ayarları > Görseller (gruplu) */
+.as-images-wrap { display: flex; flex-direction: column; gap: 0.9rem; width: 100%; }
+.as-image-group { display: flex; flex-direction: column; gap: 0.6rem; }
+.as-image-group h3 { margin: 0.4rem 0 0; }
+.as-images-wrap .as-image-frame { max-height: 260px; padding: 0; }
+.as-pill { padding: 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }

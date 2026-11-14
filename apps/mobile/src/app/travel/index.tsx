@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { AppText } from '@/components/app-text';
 import { RoundButton } from '@/components/hero-header';
 import { sceneSky } from '@/components/scene-art';
-import { TRAVEL_ART } from '@/lib/app-art';
+import { useArt } from '@/lib/app-art';
 import { locationRepository as repo } from '@/lib/locations';
 import { useUserLocation } from '@/lib/user-location';
 import { fonts, radius, spacing } from '@/theme/tokens';
@@ -24,6 +24,9 @@ const TEAL = '#25C6CF';
  */
 export default function TravelIntroScreen() {
   const { t } = useTranslation();
+  const art = useArt();
+  const journey = art('travelJourney');
+  const explore = art('travelExplore');
   const router = useRouter();
   const c = useThemeColors();
   const insets = useSafeAreaInsets();
@@ -42,7 +45,7 @@ export default function TravelIntroScreen() {
       <StatusBar style="light" />
       {/* Alt yarı: tüm ekran; üst yarı onun üstüne çapraz kesilerek konur. */}
       <View style={StyleSheet.absoluteFill}>
-        <Image source={TRAVEL_ART.journey} contentFit="cover" style={StyleSheet.absoluteFill} accessible={false} />
+        <Image source={journey?.source} onError={journey?.onError} contentFit="cover" style={StyleSheet.absoluteFill} accessible={false} />
         <View style={[StyleSheet.absoluteFill, styles.dim]} />
       </View>
       <View
@@ -58,7 +61,7 @@ export default function TravelIntroScreen() {
           transform: [{ rotate: `${-angle}rad` }],
         }}>
         <View style={{ position: 'absolute', width: W, height: H, left: S / 2 - W / 2, top: S - H / 2, transform: [{ rotate: `${angle}rad` }], backgroundColor: sceneSky('travel') }}>
-          <Image source={TRAVEL_ART.explore} contentFit="cover" style={StyleSheet.absoluteFill} accessible={false} />
+          <Image source={explore?.source} onError={explore?.onError} contentFit="cover" style={StyleSheet.absoluteFill} accessible={false} />
           <View style={[StyleSheet.absoluteFill, styles.dim]} />
         </View>
       </View>

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router';
 import {
-  APP_IMAGE_MIN,
+  APP_IMAGE_GROUPS,
+  APP_IMAGE_SPECS,
   APP_IMAGES,
   APP_SECTIONS,
   BANNER_TEMPLATES,
@@ -18,6 +19,7 @@ import {
 import { createAppConfigAdmin, PhotoTooLargeError, uploadMedia, type AppConfigHistoryEntry } from '@cityjoy/shared/firebase';
 
 import { firestore, storage } from '../lib/firebase';
+import { defaultImageUrl } from '../lib/app-images';
 import { prepareImage } from '../lib/image';
 import { locationRepository } from '../lib/locations';
 import { isAdminUser, useSession } from '../lib/session';
@@ -394,24 +396,35 @@ function ClosedForm({ closed, disabled, onChange }: { closed: AppConfig['closed'
   );
 }
 
+/**
+ * Görseller (Eren, 14 Kasım 2026: uygulamadaki bütün resimler panelden değişir). Resim depoya yüklenir, adresi bu ayara
+ * yazılır; uygulama açılışta okur, resmi bir kez indirip saklar. Boş bırakılan yerde uygulamadaki hazır resim kalır.
+ */
 function ImagesForm({ images, uid, disabled, onChange }: { images: AppConfig['images']; uid: string; disabled: boolean; onChange(i: AppConfig['images']): void }) {
   const [busy, setBusy] = useState<AppImage | null>(null);
   const [error, setError] = useState<{ key: AppImage; text: string }>();
+  const [warn, setWarn] = useState<{ key: AppImage; text: string }>();
+  const changed = APP_IMAGES.filter((k) => images[k]).length;
 
   const pick = async (key: AppImage, file: File | undefined) => {
     if (!file) return;
+    const spec = APP_IMAGE_SPECS[key];
     setError(undefined);
+    setWarn(undefined);
     setBusy(key);
     try {
       const bitmap = await createImageBitmap(file);
       const { width, height } = bitmap;
       bitmap.close();
-      if (width < APP_IMAGE_MIN.width || height < APP_IMAGE_MIN.height) {
-        setError({ key, text: t('appSettings.images.tooSmall', { w: width, h: height, minW: APP_IMAGE_MIN.width, minH: APP_IMAGE_MIN.height }) });
+      if (width < spec.minW || height < spec.minH) {
+        setError({ key, text: t('appSettings.images.tooSmall', { w: width, h: height, minW: spec.minW, minH: spec.minH }) });
         return;
       }
       const photo = await uploadMedia(storage, uid, 'uygulama', await prepareImage(file));
       onChange({ ...images, [key]: photo.url });
+      // En-boy oranı çok farklıysa resim kırpılır: engellemez, uyarır.
+      const ratio = width / height / (spec.w / spec.h);
+      if (ratio > 1.2 || ratio < 1 / 1.2) setWarn({ key, text: t('appSettings.images.ratio', { w: spec.w, h: spec.h }) });
     } catch (e) {
       setError({ key, text: e instanceof PhotoTooLargeError ? t('image.tooLarge') : t('image.error') });
     } finally {
@@ -420,24 +433,42 @@ function ImagesForm({ images, uid, disabled, onChange }: { images: AppConfig['im
   };
 
   return (
-    <div className="as-images">
-      {APP_IMAGES.map((k) => (
-        <div key={k} className="card as-image">
-          <strong>{t(`appSettings.images.${k}`)}</strong>
-          <div className="as-image-frame">
-            {images[k] ? <img src={images[k]} alt={t(`appSettings.images.${k}`)} /> : <span className="meta">{t('appSettings.images.default')}</span>}
+    <div className="as-images-wrap">
+      <p className="meta">{t('appSettings.images.hint')}</p>
+      <p className="meta">{t('appSettings.images.count', { n: changed, total: APP_IMAGES.length })}</p>
+      {APP_IMAGE_GROUPS.map((g) => (
+        <section key={g} className="as-image-group" aria-labelledby={`as-img-${g}`}>
+          <h3 id={`as-img-${g}`}>{t(`appSettings.images.groups.${g}`)}</h3>
+          <div className="as-images">
+            {APP_IMAGES.filter((k) => APP_IMAGE_SPECS[k].group === g).map((k) => {
+              const spec = APP_IMAGE_SPECS[k];
+              const name = t(`appSettings.images.names.${k}`);
+              const fallback = defaultImageUrl(k);
+              const shown = images[k] || fallback;
+              return (
+                <div key={k} className="card as-image">
+                  <strong>{name}</strong>
+                  <div className="as-image-frame" style={{ aspectRatio: `${spec.w} / ${spec.h}` }}>
+                    {shown ? <img src={shown} alt={name} loading="lazy" /> : <span className="meta">{t('appSettings.images.drawing')}</span>}
+                  </div>
+                  <span className={images[k] ? 'badge-pill as-pill' : 'meta'}>{t(images[k] ? 'appSettings.images.custom' : fallback ? 'appSettings.images.default' : 'appSettings.images.noDefault')}</span>
+                  <span className="meta">{t('appSettings.images.size', { w: spec.w, h: spec.h, minW: spec.minW, minH: spec.minH })}</span>
+                  <label className="btn secondary as-file">
+                    {busy === k ? t('image.uploading') : t('appSettings.images.choose')}
+                    <input type="file" accept="image/jpeg,image/png,image/webp" aria-label={`${name}: ${t('appSettings.images.choose')}`} disabled={disabled || !!busy} onChange={(e) => (pick(k, e.target.files?.[0]), (e.target.value = ''))} />
+                  </label>
+                  {images[k] ? (
+                    <button className="btn ghost" type="button" disabled={disabled} onClick={() => onChange({ ...images, [k]: '' })}>{t(fallback ? 'appSettings.images.reset' : 'appSettings.images.resetDrawing')}</button>
+                  ) : null}
+                  {error?.key === k ? <span className="error" role="alert">{error.text}</span> : null}
+                  {warn?.key === k ? <span className="note" role="status">{warn.text}</span> : null}
+                </div>
+              );
+            })}
           </div>
-          <label className="btn secondary as-file">
-            {busy === k ? t('image.uploading') : t('appSettings.images.choose')}
-            <input type="file" accept="image/jpeg,image/png,image/webp" disabled={disabled || !!busy} onChange={(e) => (pick(k, e.target.files?.[0]), (e.target.value = ''))} />
-          </label>
-          {images[k] ? (
-            <button className="btn ghost" type="button" disabled={disabled} onClick={() => onChange({ ...images, [k]: '' })}>{t('appSettings.images.reset')}</button>
-          ) : null}
-          {error?.key === k ? <span className="error" role="alert">{error.text}</span> : null}
-        </div>
+        </section>
       ))}
-      <p className="meta full-row">{t('appSettings.images.hint', { minW: APP_IMAGE_MIN.width, minH: APP_IMAGE_MIN.height })}</p>
+      <p className="meta">{t('appSettings.images.notHere')}</p>
     </div>
   );
 }
