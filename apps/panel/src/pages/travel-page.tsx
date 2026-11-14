@@ -291,9 +291,6 @@ function AdminTravelPage() {
                 <input type="file" accept=".xlsx" className="sr-only" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) importExcel(f); }} />
               </label>
             ) : null}
-            {canEdit ? <button className="btn secondary" disabled={busy} onClick={() => window.confirm(t('travel.seedConfirm')) && act(async () => t('travel.seeded', { count: await admin!.importSeed() }))}>
-              {t('travel.seed')}
-            </button> : null}
             {/* Ara > Yerler (Türkiye geneli, 13 Kasım 2026): eski yerlere arama anahtarı; yeni kayıtlarda kendiliğinden. */}
             {canEdit ? <button className="btn secondary" disabled={busy} onClick={() => act(async () => t('travel.searchIndexed', { count: await admin!.reindexPlaceSearch() }))}>
               {t('travel.searchIndex')}

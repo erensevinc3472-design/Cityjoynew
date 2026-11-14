@@ -1277,8 +1277,6 @@
     "intro": "Uygulamadaki Seyahat > Keşfet ve Öğren bölümünün içeriği: bölge ve şehir tanıtımları, gezilecek yerler, hazır rotalar, yöresel ve Başkanlarla Keşif. Uygulama yalnızca yayındaki içeriği gösterir.",
     "verifyNote": "Önce taslak kaydedin, bilgileri (özellikle saat, ücret, telefon) resmî kaynaktan kontrol edip yayına alın. Bu bölümde puan ve yorum yoktur; sayısal bilgileri kaynak ve yılıyla girin.",
     "readOnly": "Bu bölümü yalnızca admin düzenler.",
-    "seed": "Başlangıç içeriğini yükle",
-    "seedConfirm": "Marmara ve Bursa için hazırlanan başlangıç içeriği taslak olarak eklensin mi? Var olan kayıtlar değişmez.",
     "excel": {
       "template": "Excel şablonu",
       "upload": "Excel'den yükle",
@@ -1287,7 +1285,6 @@
       "confirm": "{{regions}} bölge, {{cities}} şehir, {{places}} gezilecek yer yüklenecek. Hatalı satır: {{errors}} (bunlar atlanır). Yeni kayıtlar taslak olarak girer, var olanlar güncellenir, hiçbir şey silinmez. Devam edilsin mi?",
       "done": "{{added}} yeni kayıt taslak olarak eklendi, {{updated}} kayıt güncellendi. Atlanan hatalı satır: {{errors}}. Kontrol edip yayına alın."
     },
-    "seeded": "{{count}} kayıt taslak olarak eklendi. Kontrol edip yayına alın.",
     "tabs": {
       "bolge": "Bölgeler",
       "sehir": "Şehirler",
