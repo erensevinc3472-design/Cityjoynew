@@ -108,6 +108,13 @@ export default function NewPostScreen() {
   const provinceName = (provinceCode && locationRepository.getProvince(provinceCode)?.name) || '';
   const districtId = biz ? biz.location.districtId : location?.districtId;
   const place = [districtId ? locationRepository.getDistrict(districtId)?.name : '', provinceName].filter(Boolean).join(', ');
+  // Kancalar (useEffect) erken dönüşlerden önce olmalı, yoksa ekran açılırken çöker.
+  // Gündem konuları (haber, ekonomi, spor...) yalnızca Genel seçiliyken; Genel kalkınca tür "Genel"e döner.
+  const toNews = news && publisher && !biz;
+  const withTopics = targets.includes('genel') || toNews;
+  useEffect(() => {
+    if (!withTopics && isPostTopic(category)) setCategory('genel');
+  }, [withTopics, category]);
   if (author !== 'me' && !biz) {
     return (
       <FormScreen title={t('explore.newPost')}>
@@ -131,12 +138,6 @@ export default function NewPostScreen() {
   const bizFull = !!biz && !isProBusiness(biz) && biz.postCount >= DEFAULT_LIMITS.isletmeGonderiToplam;
 
   const toggle = (x: PostTarget) => setTargets((cur) => (cur.includes(x) ? cur.filter((y) => y !== x) : [...cur, x]));
-  // Gündem konuları (haber, ekonomi, spor...) yalnızca Genel seçiliyken; Genel kalkınca tür "Genel"e döner.
-  const toNews = news && publisher && !biz;
-  const withTopics = targets.includes('genel') || toNews;
-  useEffect(() => {
-    if (!withTopics && isPostTopic(category)) setCategory('genel');
-  }, [withTopics, category]);
 
   const submit = async () => {
     if (bizNoHood || bizFull) return;
