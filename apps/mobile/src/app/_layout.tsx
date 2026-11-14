@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppGate } from '@/components/app-gate';
+import { PreviewBridge } from '@/components/preview-bridge';
 import { CrashScreen } from '@/components/crash-screen';
 import { OfflineBanner } from '@/components/offline-banner';
 import '@/lib/i18n';
@@ -66,6 +67,8 @@ function RootNavigator() {
           <OfflineBanner />
           <PushRegistrar />
           <ReturnToExplore />
+          {/* Panel > Uygulama görünümü: yalnızca panel önizleme derlemesinde çalışır. */}
+          <PreviewBridge />
         </IncomingSosProvider>
       </View>
     </LocaleProvider>

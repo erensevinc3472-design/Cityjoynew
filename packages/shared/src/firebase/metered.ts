@@ -27,6 +27,27 @@ function rootOfQuery(q: Query<DocumentData> | DocumentReference<DocumentData>): 
   return anyQ._query?.collectionGroup || anyQ._query?.path?.segments?.[0] || 'diger';
 }
 
+/**
+ * Yazma kapısı (Panel > Uygulama görünümü): panel önizlemesindeki uygulama gerçek veritabanına yazmasın diye kurulur.
+ * Kapı false dönerse yazma yapılmaz ve WriteBlockedError atılır. Telefondaki uygulamada kapı yoktur.
+ */
+export class WriteBlockedError extends Error {
+  constructor() {
+    super('preview-read-only');
+  }
+}
+let writeGuard: ((collection: string) => boolean) | null = null;
+export function setWriteGuard(fn: ((collection: string) => boolean) | null): void {
+  writeGuard = fn;
+}
+const guard = (path: string | undefined) => {
+  if (writeGuard && !writeGuard(rootOf(path))) throw new WriteBlockedError();
+};
+/** Depoya dosya yüklemeden önce de aynı kapı sorulur (önizlemede yetim dosya kalmasın). */
+export function assertWritable(area: string): void {
+  if (writeGuard && !writeGuard(area)) throw new WriteBlockedError();
+}
+
 /** Şimdiye kadarki sayımı verir ve sıfırlar. */
 export function takeFirestoreUsage(): { reads: Record<string, number>; writes: Record<string, number> } {
   const out = { reads: Object.fromEntries(reads), writes: Object.fromEntries(writes) };
@@ -91,21 +112,25 @@ export const onSnapshot: typeof fs.onSnapshot = ((ref: Query<DocumentData> | Doc
 }) as typeof fs.onSnapshot;
 
 export const setDoc: typeof fs.setDoc = ((ref: DocumentReference, ...rest: unknown[]) => {
+  guard(ref.path);
   add(writes, rootOf(ref.path), 1);
   return (fs.setDoc as (...a: unknown[]) => Promise<void>)(ref, ...rest);
 }) as typeof fs.setDoc;
 
 export const updateDoc: typeof fs.updateDoc = ((ref: DocumentReference, ...rest: unknown[]) => {
+  guard(ref.path);
   add(writes, rootOf(ref.path), 1);
   return (fs.updateDoc as (...a: unknown[]) => Promise<void>)(ref, ...rest);
 }) as typeof fs.updateDoc;
 
 export const deleteDoc: typeof fs.deleteDoc = ((ref: DocumentReference) => {
+  guard(ref.path);
   add(writes, rootOf(ref.path), 1);
   return fs.deleteDoc(ref);
 }) as typeof fs.deleteDoc;
 
 export const addDoc: typeof fs.addDoc = ((ref: fs.CollectionReference, data: unknown) => {
+  guard(ref.path);
   add(writes, rootOf(ref.path), 1);
   return (fs.addDoc as (...a: unknown[]) => Promise<DocumentReference>)(ref, data);
 }) as typeof fs.addDoc;
@@ -127,8 +152,15 @@ export const writeBatch: typeof fs.writeBatch = ((db: fs.Firestore) => {
   wrap('delete');
   const commit = batch.commit.bind(batch);
   batch.commit = async () => {
+    pending.forEach((k) => guard(k));
     await commit();
     pending.forEach((k) => add(writes, k, 1));
   };
   return batch;
 }) as typeof fs.writeBatch;
+
+/** İşlem (transaction): önizlemede yazma kapısından geçmeden başlamaz. */
+export const runTransaction: typeof fs.runTransaction = ((db: fs.Firestore, ...rest: unknown[]) => {
+  guard(undefined);
+  return (fs.runTransaction as (...a: unknown[]) => Promise<unknown>)(db, ...rest);
+}) as typeof fs.runTransaction;

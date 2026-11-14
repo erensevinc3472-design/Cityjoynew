@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useSearchParams } from 'react-router';
 import {
   APP_IMAGE_MIN,
   APP_IMAGES,
@@ -50,7 +51,9 @@ export function AppSettingsPage() {
   const [draft, setDraft] = useState<AppConfig | null>(null);
   const [history, setHistory] = useState<AppConfigHistoryEntry[]>([]);
   const [loadError, setLoadError] = useState(false);
-  const [tab, setTab] = useState<Tab>('banner');
+  // Uygulama görünümünden gelen bağlantı doğrudan ilgili sekmeyi açar (?sekme=banner).
+  const [params] = useSearchParams();
+  const [tab, setTab] = useState<Tab>(() => (TABS as readonly string[]).includes(params.get('sekme') ?? '') ? (params.get('sekme') as Tab) : 'banner');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [confirming, setConfirming] = useState<ReturnType<typeof riskyChanges> | null>(null);

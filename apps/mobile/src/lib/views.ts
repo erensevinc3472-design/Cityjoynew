@@ -2,6 +2,7 @@ import { httpsCallable } from 'firebase/functions';
 import { AppState } from 'react-native';
 
 import { functions } from '@/lib/firebase';
+import { IS_PANEL_PREVIEW } from '@/lib/preview-flag';
 
 /**
  * Video izlenmeleri (Eren, 13 Kasım 2026; maliyet ilkesi): en az 3 sn oynayan video burada birikir, 10 olunca ya da 30
@@ -28,6 +29,8 @@ async function flush() {
 }
 
 export function markViewed(postId: string) {
+  // Panel önizlemesinde izlenme sayılmaz (yöneticinin bakması sayıları şişirmesin).
+  if (IS_PANEL_PREVIEW) return;
   if (sent.has(postId) || pending.has(postId)) return;
   pending.add(postId);
   if (pending.size >= BATCH) flush();

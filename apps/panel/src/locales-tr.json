@@ -1812,7 +1812,8 @@
       "rozetler": "Rozetler",
       "veri-kaynaklari": "Veri kaynakları",
       "toplu-bildirim": "Toplu bildirim",
-      "uygulama-ayarlari": "Uygulama ayarları"
+      "uygulama-ayarlari": "Uygulama ayarları",
+      "uygulama-gorunumu": "Uygulama görünümü"
     },
     "audience": "Takipçiler",
     "open": "Menüyü aç",
@@ -2772,5 +2773,103 @@
       "search": "Ara",
       "profile": "Profil"
     }
+  },
+  "appView": {
+    "title": "Uygulama görünümü",
+    "intro": "Uygulamayı burada, telefon ekranındaki gibi gez. Hangi ekrandaysan o ekranla ilgili panel sayfaları, içerik durumu ve hızlı ayarlar sağda çıkar. \"Şu il gibi göster\" yalnızca bu önizlemeyi değiştirir; senin ya da başkasının konumu değişmez.\nÖnizlemedeki uygulama yalnızca gösterir, kayıt yapmaz: beğeni, yorum, gönderi, mesaj gibi işlemler burada kaydedilmez. Giriş, çıkış ve hesap işlemleri de kapalıdır (panel oturumun etkilenmesin diye).",
+    "adminOnly": "Bu sayfayı yalnızca yöneticiler görür.",
+    "viewAs": "Şu il gibi göster",
+    "district": "İlçe",
+    "allDistricts": "Tüm ilçeler",
+    "theme": "Tema",
+    "themes": {
+      "system": "Telefona göre",
+      "light": "Gündüz",
+      "dark": "Gece"
+    },
+    "language": "Dil",
+    "home": "Ana sayfaya dön",
+    "reload": "Yeniden yükle",
+    "frameTitle": "Uygulama önizlemesi",
+    "readOnly": "Önizleme: kayıt yapılmaz.",
+    "notReady": "Önizleme açılamadı. Bağlantını kontrol edip \"Yeniden yükle\"ye bas. Sorun sürerse önizleme derlemesi yüklenmemiş olabilir.",
+    "sectionOpen": "{{section}} bölümü uygulamada açık.",
+    "sectionClosed": "{{section}} bölümü şu an geçici olarak kapalı. Kullanıcılar \"Geçici olarak kapalı\" yazısı görüyor.",
+    "countsTitle": "{{province}} içeriği",
+    "kinds": {
+      "businesses": "Yayında işletme",
+      "events": "Yaklaşan etkinlik",
+      "announcements": "Yayında duyuru",
+      "deals": "Aktif fırsat",
+      "showcases": "Vitrin kartı"
+    },
+    "empty": "Boş: bu ilde uygulamada bu bölüm boş görünür.",
+    "recordTitle": "Bu kayıt",
+    "recordId": "Kayıt kimliği",
+    "recordOpen": "{{page}} sayfasında aç",
+    "related": "Bu ekranla ilgili",
+    "quick": "Hızlı ayarlar",
+    "closeSection": "{{section}} bölümünü geçici olarak kapat",
+    "openSection": "{{section}} bölümünü yeniden aç",
+    "confirmClose": "{{section}} bölümü bütün kullanıcılar için hemen kapanacak. Emin misin?",
+    "saved": "Kaydedildi. Önizleme yeni hâliyle yeniden açıldı.",
+    "saveError": "Kaydedilemedi. Bağlantını kontrol edip tekrar dene.",
+    "bannerNone": "Bu ilde şu an duyuru bandı yok.",
+    "bannerActive": "Bu ilde şu an bir {{kind}} bandı görünüyor.",
+    "bannerKinds": {
+      "duyuru": "duyuru",
+      "bakim": "bakım"
+    },
+    "bannerAdd": "Duyuru bandı ekle",
+    "bannerEdit": "Bandı düzenle",
+    "demoReadOnly": "Örnek hesapta ayarlar değiştirilemez.",
+    "limitsTitle": "Önizlemede çalışmayanlar",
+    "limits": {
+      "notifications": "Bildirimler gelmez; bildirim izni ve sesleri yalnızca telefonda denenir.",
+      "sos": "SOS ve 112 araması gerçek gönderim yapmaz; SOS ekranlarını yalnızca görebilirsin.",
+      "camera": "Kamera ve fotoğraf/video çekimi yok; galeriden seçim de kaydedilmez.",
+      "location": "Gerçek konum ve arka planda konum kullanılmaz; konum yukarıdaki seçimden gelir.",
+      "save": "Hiçbir şey kaydedilmez. Değişiklikleri panelden ya da telefondaki uygulamadan yap."
+    },
+    "links": {
+      "banner": "Duyuru bandı",
+      "sections": "Bölümleri aç/kapat",
+      "legal": "Yasal metin sürümü",
+      "contact": "İletişim bilgileri",
+      "images": "Giriş ekranı resimleri"
+    },
+    "screens": {
+      "home": "Ana sayfa",
+      "showcase": "Şehir Vitrini",
+      "food": "Cafe ve Restoran",
+      "myCity": "Benim Şehrim",
+      "business": "İşletme sayfası",
+      "myBusiness": "İşletmem",
+      "deals": "Fırsatlar",
+      "event": "Etkinlik",
+      "events": "Etkinlikler",
+      "announcement": "Duyuru",
+      "announcements": "Duyurular ve haberler",
+      "place": "Gezilecek yer",
+      "roadside": "Yoldayım",
+      "travel": "Seyahat",
+      "social": "Keşfet ve sosyal",
+      "profile": "Kullanıcı profili",
+      "official": "Kurum sayfası",
+      "carsi": "Çarşı",
+      "messages": "Mesajlar",
+      "services": "Hizmetler",
+      "urgent": "Acil İhtiyaçlar",
+      "notifications": "Bildirimler",
+      "polls": "Anketler",
+      "contests": "Yarışmalar",
+      "weather": "Hava durumu",
+      "legal": "Yasal metinler",
+      "account": "Hesap",
+      "entry": "Giriş ekranları",
+      "other": "Diğer ekran"
+    },
+    "openInApp": "Uygulamada gör",
+    "tag": "Panel önizlemesi"
   }
 }

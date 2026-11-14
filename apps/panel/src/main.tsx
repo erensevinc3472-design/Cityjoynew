@@ -30,6 +30,7 @@ import { ContestsPage, PollsPage } from './pages/community-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { LimitsPage } from './pages/limits-page';
 import { AppSettingsPage } from './pages/app-settings-page';
+import { AppViewPage } from './pages/app-view-page';
 import { BadgesPage } from './pages/badges-page';
 import { DataSourcesPage } from './pages/data-sources-page';
 import { BroadcastPage } from './pages/broadcast-page';
@@ -83,6 +84,7 @@ const router = createHashRouter([
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
       { path: 'sinirlar', element: <LimitsPage /> },
       { path: 'uygulama-ayarlari', element: <AppSettingsPage /> },
+      { path: 'uygulama-gorunumu', element: <AppViewPage /> },
       { path: 'harcama', element: <BillingPage /> },
       { path: 'uyelikler', element: <MembershipsPage /> },
       { path: 'bildirimler', element: <NotificationsPage /> },

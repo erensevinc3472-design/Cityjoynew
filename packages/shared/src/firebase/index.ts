@@ -69,7 +69,7 @@ export { createBillingAdmin } from './billing';
 export { createOwnerSuspensionReader, createSuspensionAdmin } from './suspensions';
 export { broadcastFromDoc, createBroadcastPanel, getBroadcast } from './broadcasts';
 export { countUsage, createLimitsAdmin, deleteUsageOf, vitrinLimit } from './limits';
-export { createAppConfigAdmin, getAppConfig, type AppConfigHistoryEntry } from './app-config';
+export { APP_CONTENT_KINDS, countAppContent, createAppConfigAdmin, getAppConfig, type AppConfigHistoryEntry, type AppContentKind } from './app-config';
 export { createFirestoreTravelRepository, createMunicipalTravel, createTravelAdmin, type TravelAdminKind } from './travel';
 export { createRoadsidePackAdmin, createRoadsidePackRepository, type RoadsidePackSummary } from './roadside';
 export { createTravelPrices } from './travel-prices';
@@ -77,4 +77,4 @@ export { createFirebaseStats, type FirebaseStats, type StatsRange } from './stat
 export { createTranslationClient } from './translate';
 export { createSponsorAdmin, createSponsorRepository } from './sponsors';
 export { createMembershipAdmin, createOwnerPayments, createPostVisibility, type ProBusinessRow } from './memberships';
-export { takeFirestoreUsage } from './metered';
+export { assertWritable, setWriteGuard, takeFirestoreUsage, WriteBlockedError } from './metered';

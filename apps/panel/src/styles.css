@@ -449,3 +449,27 @@ section[aria-labelledby="suspended-title"] { margin-top: 28px; }
 .as-phone-icon { font-size: 34px; }
 .as-phone-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 50px; border-top: 1px solid rgb(234 241 241 / 0.1); display: flex; justify-content: space-around; align-items: center; font-size: 9.5px; color: #a3b9bb; }
 .as-phone-nav .off { text-decoration: line-through; opacity: 0.5; }
+
+/* Uygulama görünümü */
+.av-toolbar { align-items: flex-end; margin-bottom: 1rem; }
+.av-toolbar label { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: var(--muted, inherit); }
+.av-layout { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
+.av-phone-wrap { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; flex: none; max-width: 414px; text-align: center; }
+.av-phone { width: 390px; height: 800px; max-height: calc(100vh - 220px); min-height: 560px; border-radius: 44px; background: #050f11; padding: 26px 12px 12px; position: relative; box-shadow: 0 10px 40px rgb(0 0 0 / 0.35); }
+.av-frame { width: 100%; height: 100%; border: 0; border-radius: 32px; background: #0b2328; display: block; }
+.av-side { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 0.9rem; }
+.av-side .card { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+.av-side h2, .av-side h3 { margin: 0; }
+.av-path { font-family: ui-monospace, monospace; word-break: break-all; }
+.av-counts, .av-links { list-style: none; margin: 0; padding: 0; width: 100%; }
+.av-counts li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 0.75rem; padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+.av-counts li:last-child, .av-links li:last-child { border-bottom: 0; }
+.av-counts li small { flex-basis: 100%; color: #fcd34d; }
+.av-counts li.warn strong { color: #fcd34d; }
+.av-links li { border-bottom: 1px solid var(--border); }
+.av-links a { display: flex; min-height: 44px; align-items: center; }
+.av-limits summary { cursor: pointer; font-weight: 600; min-height: 32px; }
+.av-limits ul { margin: 0.4rem 0 0; padding-inline-start: 1.2rem; }
+@media (max-width: 720px) { .av-phone { width: min(390px, calc(100vw - 48px)); height: 680px; } }
+.av-tag { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font: 600 0.72rem var(--font-body); color: #b7cdcf; letter-spacing: 0.02em; white-space: nowrap; }
+.open-in-app { white-space: nowrap; }

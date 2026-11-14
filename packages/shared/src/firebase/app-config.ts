@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, writeBatch, type Firestore } from './metered';
+import { collection, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, serverTimestamp, Timestamp, where, writeBatch, type Firestore } from './metered';
 
 import { changedParts, normalizeAppConfig, type AppConfig, type AppConfigPart } from '../app-config/app-config';
 import { addAudit, iso } from './grants';
@@ -72,4 +72,24 @@ export function createAppConfigAdmin(db: Firestore) {
       });
     },
   };
+}
+
+/** Panel > Uygulama görünümü: seçili ilde uygulamada görünen kayıt sayıları (uygulamanın kullandığı sorgularla). */
+export type AppContentKind = 'businesses' | 'events' | 'announcements' | 'deals' | 'showcases';
+export const APP_CONTENT_KINDS: AppContentKind[] = ['businesses', 'events', 'announcements', 'deals', 'showcases'];
+
+/** Her sayım tek okuma sayılır (1000 kayda kadar). Okunamayan sayım null döner ("—" gösterilir). */
+export async function countAppContent(db: Firestore, provinceCode: string): Promise<Record<AppContentKind, number | null>> {
+  const c = (name: string, ...w: ReturnType<typeof where>[]) =>
+    getCountFromServer(query(collection(db, name), ...w))
+      .then((s) => s.data().count)
+      .catch(() => null);
+  const [businesses, events, announcements, deals, showcases] = await Promise.all([
+    c('businesses', where('status', '==', 'yayinda'), where('location.provinceCode', '==', provinceCode)),
+    c('events', where('status', 'in', ['yayinda', 'iptal']), where('region.provinceCode', '==', provinceCode), where('endsAt', '>=', Timestamp.now())),
+    c('announcements', where('status', '==', 'yayinda'), where('region.provinceCode', '==', provinceCode)),
+    c('deals', where('provinceCode', '==', provinceCode), where('status', '==', 'aktif')),
+    c('cityShowcases', where('provinceCode', '==', provinceCode), where('status', '==', 'yayinda')),
+  ]);
+  return { businesses, events, announcements, deals, showcases };
 }

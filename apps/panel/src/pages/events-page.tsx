@@ -16,6 +16,7 @@ import { createEventPanel, createFirestoreEventRepository, type SaveMode } from 
 
 import { authorLabel, cleanRegion, dateTime, regionComplete, regionLabel, RegionFields, scopeRegion, toLocalInput, useNeighbourhoodNames } from '../components/content-common';
 import { ImageField } from '../components/image-field';
+import { OpenInApp } from '../components/open-in-app';
 import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
@@ -139,7 +140,7 @@ function Events({ user }: { user: PanelUser }) {
   const row = (e: CityEvent, actions: ReactNode) => (
     <tr key={e.id}>
       <td>
-        <strong>{e.title}</strong>
+        <strong>{e.title}</strong> <OpenInApp path={`/events/${e.id}`} />
         <div className="meta">{t(`events.categories.${e.category}`)} · {dateTime(e.startsAt)} - {dateTime(e.endsAt)}</div>
         <div className="meta">{e.venueName}{e.address ? `, ${e.address}` : ''}</div>
         <div className="meta">{e.free ? t('events.free') : e.priceNote}</div>

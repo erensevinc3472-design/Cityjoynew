@@ -1,5 +1,6 @@
 import { deleteObject, getDownloadURL, ref, uploadBytes, type FirebaseStorage } from 'firebase/storage';
 
+import { assertWritable } from './metered';
 import { mediaPath, PHOTO_UPLOAD, type MediaKind, type Photo } from '../media/photo';
 import { POST_LIMITS, POST_VIDEO_TYPES, postPhotoPath, postPosterPath, postVideoPath, type PostPhoto, type PostVideo, type PostVideoExt } from '../posts/posts';
 
@@ -22,6 +23,7 @@ async function put(storage: FirebaseStorage, path: string, p: PreparedPhoto): Pr
   const blob = p.blob ?? (await (await fetch(p.uri!)).blob());
   if (blob.size > PHOTO_UPLOAD.maxBytes) throw new PhotoTooLargeError();
   const r = ref(storage, path);
+  assertWritable('storage');
   await uploadBytes(r, blob, { contentType: 'image/jpeg' });
   return { path, url: await getDownloadURL(r), width: Math.round(p.width), height: Math.round(p.height) };
 }
@@ -49,6 +51,7 @@ export async function uploadPostVideo(storage: FirebaseStorage, uid: string, pos
   if (blob.size > POST_LIMITS.videoBytes) throw new VideoTooLargeError();
   const path = postVideoPath(uid, postId, v.ext);
   const r = ref(storage, path);
+  assertWritable('storage');
   await uploadBytes(r, blob, { contentType: POST_VIDEO_TYPES[v.ext] });
   const out: PostVideo = { path, url: await getDownloadURL(r), width: Math.round(v.width), height: Math.round(v.height), durationSec: Math.round(v.durationSec) };
   // Kapak yüklenemezse video kapaksız paylaşılır.

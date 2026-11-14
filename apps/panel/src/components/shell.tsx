@@ -44,6 +44,7 @@ export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
   {
     key: 'icerik',
     items: [
+      { key: 'uygulama-gorunumu', show: admin, path: '/uygulama-gorunumu', icon: 'smartphone' },
       { key: 'vitrin', show: (u) => isAdminUser(u) || canSeeModule(u.grants, 'sehir-rehberi'), path: '/sehir-vitrini', icon: 'screen' },
       { key: 'sehir-rehberi', module: 'sehir-rehberi', path: '/sehir-rehberi', icon: 'book' },
       { key: 'gonderiler', module: 'gonderiler', path: '/duyurular', icon: 'megaphone' },

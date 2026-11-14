@@ -19,6 +19,7 @@ import { useCity } from '../lib/city';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { Intro } from '../components/intro';
+import { OpenInApp } from '../components/open-in-app';
 import { SuspendForm, suspensionAdmin } from '../components/suspend-control';
 
 const TIERS = MEMBERSHIP_TIERS;
@@ -162,7 +163,7 @@ export function BusinessesPage() {
                 return (
                   <tr key={b.id}>
                     <td>
-                      <strong>{b.name}</strong>
+                      <strong>{b.name}</strong> <OpenInApp path={`/business/${b.id}`} />
                       <div className="meta">{t(`businesses.types.${b.type}`)} · {place(b)}</div>
                       <div className="meta">{b.categoryIds.map(categoryName).join(', ')}</div>
                       {b.roadside?.length ? (
