@@ -7,7 +7,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   isPostListed,
+  PIN_LIMIT,
   PROFILE_LIMITS,
+  TAG_POLICIES,
+  type TagPolicy,
   PROFILE_REPORT_REASONS,
   validateBio,
   type FollowStatus,
@@ -22,6 +25,7 @@ import { deletePhotos, type JoinedItem } from '@cityjoy/shared/firebase';
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
+import { StatBox } from '@/components/stat-box';
 import { BottomNav } from '@/components/bottom-nav';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { Chips } from '@/components/chips';
@@ -32,6 +36,7 @@ import { RoundButton } from '@/components/hero-header';
 import { StateMessage } from '@/components/state-message';
 import { TextField } from '@/components/text-field';
 import { TopBar } from '@/components/top-bar';
+import { BadgeChips, OfficialChip, OfficialSeal } from '@/components/user-badges';
 import { useBannedWordCheck } from '@/lib/banned-words';
 import { storage } from '@/lib/firebase';
 import { useChats } from '@/lib/messages';
@@ -40,13 +45,28 @@ import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { rememberProfile, rememberProfilePhoto } from '@/lib/profile-photos';
 import { refreshFollowing, setBlocked, setMyProfile, useSocial } from '@/lib/social';
+import { loadMutual } from '@/lib/mutual';
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
 import { errorText } from '@/lib/limits';
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
-type Tab = 'gonderiler' | 'kaydedilenler' | 'katildiklarim';
-const TAB_ICONS: Record<Tab, IconName> = { gonderiler: 'grid-on', kaydedilenler: 'bookmark-border', katildiklarim: 'event-available' };
+type Tab = 'gonderiler' | 'videolar' | 'etiketlendiklerim' | 'kaydedilenler' | 'katildiklarim';
+const TAB_ICONS: Record<Tab, IconName> = {
+  gonderiler: 'grid-on',
+  videolar: 'smart-display',
+  etiketlendiklerim: 'assignment-ind',
+  kaydedilenler: 'bookmark-border',
+  katildiklarim: 'event-available',
+};
+
+/** Sabitlenenler başta (en çok PIN_LIMIT), sonra kalanlar en yeni önce. */
+function withPinned(list: Post[] | null, pinned: Post[] | null): Post[] | null {
+  if (!list) return list;
+  const top = (pinned ?? list.filter((p) => p.pinned)).slice(0, PIN_LIMIT);
+  const ids = new Set(top.map((p) => p.id));
+  return [...top, ...list.filter((p) => !ids.has(p.id))];
+}
 
 /**
  * Profil (Instagram düzeni; 13. madde 31). Paylaşım yalnızca Keşfet'ten yapılır, profil paylaşılanları gösterir.
@@ -63,7 +83,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const { language } = useSettings();
   const lang = language ?? 'tr';
   const { user } = useSession();
-  const { blocked } = useSocial();
+  const { blocked, following } = useSocial();
   const own = !!user && user.uid === uid;
   const [profile, setProfile] = useState<PublicProfile | null | undefined>(undefined);
   const [counts, setCounts] = useState<{ followers: number; following: number } | null>(null);
@@ -72,6 +92,15 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [saved, setSaved] = useState<Post[] | null>(null);
   const [joined, setJoined] = useState<JoinedItem[] | null>(null);
+  const [videos, setVideos] = useState<Post[] | null>(null);
+  const [tagged, setTagged] = useState<Post[] | null>(null);
+  // Başkasının profilinde sabitlenenler ayrı okunur (kendi profilimde bütün gönderilerimden süzülür).
+  const [pinned, setPinned] = useState<Post[] | null>(null);
+  // Ortak takip: takip ettiklerimden bu kişiyi takip edenler (ilk üçünün adı ve fotoğrafı).
+  const [mutual, setMutual] = useState<{ uids: string[]; top: PublicProfile[] } | null>(null);
+  const [mutualOpen, setMutualOpen] = useState(false);
+  const [mutualList, setMutualList] = useState<PublicProfile[] | null>(null);
+  const [tagPolicy, setTagPolicy] = useState<TagPolicy>('herkes');
   const [requests, setRequests] = useState<{ uid: string; displayName: string }[]>([]);
   const [tab, setTab] = useState<Tab>('gonderiler');
   const [editing, setEditing] = useState(false);
@@ -97,6 +126,8 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     const p = await socialRepository.getProfile(uid).catch(() => null);
     setProfile(p);
     if (!p) return;
+    // Askıdaki hesabın profili ve gönderileri başkalarına gösterilmez.
+    if (p.suspended && !own) return setPosts([]);
     socialRepository.counts(uid).then(setCounts, () => setCounts(null));
     if (own) {
       socialRepository.requests(uid).then(setRequests, () => setRequests([]));
@@ -110,21 +141,44 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     socialRepository.hasReportedProfile(uid, user.uid).then(setReported);
     if (b || (p.isPrivate && f !== 'aktif')) return setPosts([]);
     postRepository.byAuthor(uid, f === 'aktif').then((l) => setPosts(l.filter((x) => isPostListed(x) && !x.business)), () => setPosts([]));
+    postRepository.pinnedByAuthor(uid, f === 'aktif').then((l) => setPinned(l.filter((x) => isPostListed(x) && !x.business)), () => setPinned([]));
   }, [uid, user, own]);
+
+  // Ortak takipçiler: oturumdaki takip listemle, sonuç telefonda bir gün saklanır (lib/mutual).
+  useEffect(() => {
+    if (own || !user || !following || blockedMe) return;
+    let alive = true;
+    loadMutual(user.uid, uid, following).then((m) => alive && setMutual(m), () => alive && setMutual(null));
+    return () => {
+      alive = false;
+    };
+  }, [uid, user, own, following, blockedMe]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  // Kaydedilenler ve Katıldıklarım yalnızca sekme açılınca okunur.
+  // Videolar, Etiketlendiklerim, Kaydedilenler ve Katıldıklarım yalnızca sekme açılınca okunur.
   useEffect(() => {
-    if (!own || !user) return;
+    if (!user || !profile) return;
+    if (tab === 'videolar' && videos === null) {
+      if (own) setVideos(posts ? posts.filter((x) => !!x.video) : null);
+      else postRepository.videosByAuthor(uid, follow === 'aktif').then((l) => setVideos(l.filter((x) => isPostListed(x) && !x.business)), () => setVideos([]));
+    }
+    if (tab === 'etiketlendiklerim' && tagged === null) postRepository.taggedIn(uid).then((l) => setTagged(l.filter(isPostListed)), () => setTagged([]));
+    if (!own) return;
     if (tab === 'kaydedilenler' && saved === null) postRepository.listSaved(user.uid).then((l) => setSaved(l.filter(isPostListed)), () => setSaved([]));
     if (tab === 'katildiklarim' && joined === null) eventRepository.listJoined(user.uid).then(setJoined, () => setJoined([]));
-  }, [tab, own, user, saved, joined]);
+  }, [tab, own, user, profile, uid, follow, posts, videos, tagged, saved, joined]);
+
+  const openMutual = () => {
+    setMutualOpen(true);
+    if (mutual && mutualList === null) socialRepository.profilesOf(mutual.uids).then(setMutualList, () => setMutualList([]));
+  };
 
   const back = () => (asTab ? router.dismissTo('/home') : router.canGoBack() ? router.back() : router.replace('/explore'));
-  const footer = asTab ? <BottomNav active="profile" /> : null;
+  // Alt menü başkasının profilinde de durur (Eren, 13 Kasım 2026).
+  const footer = <BottomNav active={asTab ? 'profile' : undefined} />;
   const top = (title: string, right?: ReactNode) => (
     <TopBar centered title={title} left={<RoundButton icon="arrow-back" label={t('common.back')} onPress={back} />} right={right} />
   );
@@ -135,6 +189,18 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
         {top(own ? t('explore.profile.mine') : t('explore.profile.title'))}
         <View style={styles.pad}>
           {!user ? <FormMessage kind="info" text={t('explore.signIn')} /> : profile === undefined ? <StateMessage kind="loading" /> : <StateMessage kind="empty" message={t('explore.profile.missing')} />}
+        </View>
+        {footer}
+      </View>
+    );
+  }
+
+  if (profile.suspended && !own) {
+    return (
+      <View style={[styles.root, { backgroundColor: c.background }]}>
+        {top(t('explore.profile.title'))}
+        <View style={styles.pad}>
+          <StateMessage kind="empty" message={`${t('explore.profile.suspended')} ${t('explore.profile.suspendedNote')}`} />
         </View>
         {footer}
       </View>
@@ -225,10 +291,27 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
     setDraft({ displayName: profile.displayName, bio: profile.bio, isPrivate: profile.isPrivate });
     setPhotoDraft(undefined);
     setEditing(true);
+    socialRepository.tagPolicy(uid).then(setTagPolicy, () => {});
+  };
+  const changeTagPolicy = (v: TagPolicy) => {
+    const before = tagPolicy;
+    setTagPolicy(v);
+    socialRepository.setTagPolicy(uid, v).catch(() => (setTagPolicy(before), setError(t('explore.saveError'))));
   };
 
+  const mutualText = mutual
+    ? mutual.uids.length === 1
+      ? t('explore.profile.mutual1', { a: mutual.top[0]?.displayName ?? '?' })
+      : mutual.uids.length === 2
+        ? t('explore.profile.mutual2', { a: mutual.top[0]?.displayName ?? '?', b: mutual.top[1]?.displayName ?? '?' })
+        : t('explore.profile.mutualMore', { a: mutual.top[0]?.displayName ?? '?', b: mutual.top[1]?.displayName ?? '?', n: mutual.uids.length - 2 })
+    : '';
+
   const hidden = !own && (blockedMe || iBlocked || (profile.isPrivate && follow !== 'aktif'));
-  const tabs: Tab[] = own ? ['gonderiler', 'kaydedilenler', 'katildiklarim'] : ['gonderiler'];
+  // Takipçi / Takip listesi: gizli hesabınkini yalnızca takipçileri açar; engel varsa kapalı (14 Kasım 2026).
+  const listsOpen = !hidden && !profile.suspended;
+  const openFollows = (side: 'takipci' | 'takip') => router.push({ pathname: '/follows', params: { uid, side, name: profile.displayName } });
+  const tabs: Tab[] = own ? ['gonderiler', 'videolar', 'etiketlendiklerim', 'kaydedilenler', 'katildiklarim'] : ['gonderiler', 'videolar', 'etiketlendiklerim'];
 
   const pill = (label: string, onPress: () => void, opts: { primary?: boolean; disabled?: boolean } = {}) => (
     <Pressable
@@ -300,7 +383,7 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
   return (
     <View style={[styles.root, { backgroundColor: c.background }]}>
       {top(profile.displayName, right)}
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.scroll}>
         <View style={styles.pad}>
           {/* Profil başı: halkalı harf, yanında gönderi / takipçi / takip sayıları. */}
           <View style={styles.head}>
@@ -328,21 +411,20 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                 </Pressable>
               </Modal>
             ) : null}
-            <View style={styles.stats}>
-              {[
-                { n: hidden || posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts') },
-                { n: counts ? String(counts.followers) : '–', label: t('explore.profile.statFollowers') },
-                { n: counts ? String(counts.following) : '–', label: t('explore.profile.statFollowing') },
-              ].map((x) => (
-                <View key={x.label} style={styles.stat} accessible accessibilityLabel={`${x.n} ${x.label}`}>
-                  <AppText style={[styles.statN, { color: c.textStrong }]}>{x.n}</AppText>
-                  <AppText style={[styles.statL, { color: c.textMuted }]}>{x.label}</AppText>
-                </View>
-              ))}
-            </View>
+            <StatBox
+              items={[
+                { n: hidden || posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts'), onPress: hidden ? undefined : () => setTab('gonderiler') },
+                { n: counts ? String(counts.followers) : '–', label: t('explore.profile.statFollowers'), onPress: listsOpen ? () => openFollows('takipci') : undefined, hint: t('follows.openHint') },
+                { n: counts ? String(counts.following) : '–', label: t('explore.profile.statFollowing'), onPress: listsOpen ? () => openFollows('takip') : undefined, hint: t('follows.openHint') },
+              ]}
+            />
           </View>
           <View style={styles.bio}>
-            <AppText style={[styles.name, { color: c.textStrong }]}>{profile.displayName}</AppText>
+            <View style={styles.nameRow}>
+              <AppText style={[styles.name, styles.nameShrink, { color: c.textStrong }]}>{profile.displayName}</AppText>
+              {profile.official ? <OfficialSeal size={18} /> : null}
+            </View>
+            {profile.official ? <OfficialChip /> : null}
             {profile.isPrivate ? (
               <View style={styles.privateRow}>
                 <MaterialIcons name="lock-outline" size={13} color={c.textMuted} />
@@ -355,7 +437,21 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                 <AppText variant="caption" style={{ color: c.accent }}>{t(`locationBadge.badge.${profile.locationVerified}`)}</AppText>
               </View>
             ) : null}
+            <BadgeChips ids={profile.badges} />
             {profile.bio ? <AppText selectable style={styles.bioText}>{profile.bio}</AppText> : null}
+            {!own && mutual ? (
+              <Pressable accessibilityRole="button" accessibilityHint={t('explore.profile.mutualTitle')} onPress={openMutual} style={({ pressed }) => [styles.mutual, { opacity: pressed ? 0.7 : 1 }]}>
+                <View style={styles.mutualFaces}>
+                  {mutual.top.slice(0, 3).map((m, i) => (
+                    <View key={m.uid} style={[styles.mutualFace, { backgroundColor: c.surfaceStrong, borderColor: c.background, marginStart: i ? -8 : 0 }]}>
+                      <AppText style={[styles.mutualInitial, { color: c.accent }]}>{(m.displayName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                      <AvatarPhoto photo={m.photo} size={22} />
+                    </View>
+                  ))}
+                </View>
+                <AppText variant="caption" numberOfLines={2} style={[styles.grow, { color: c.textMuted }]}>{mutualText}</AppText>
+              </Pressable>
+            ) : null}
           </View>
           {error ? <FormMessage kind="error" text={error} /> : null}
 
@@ -388,6 +484,8 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
                   <TextField label={t('explore.profile.bio')} hint={t('explore.profile.bioHint')} value={draft.bio} onChangeText={(v) => setDraft((d) => ({ ...d, bio: v }))} maxLength={PROFILE_LIMITS.bio} multiline />
                 )}
                 <CheckboxRow checked={draft.isPrivate} onToggle={() => setDraft((d) => ({ ...d, isPrivate: !d.isPrivate }))} label={t('explore.profile.privateToggle')} />
+                {/* Etiket izni hemen kaydedilir (Kaydet'i beklemez). */}
+                <Chips<TagPolicy> label={t('explore.profile.tagPolicy')} value={tagPolicy} onChange={changeTagPolicy} options={TAG_POLICIES.map((v) => ({ value: v, label: t(`explore.profile.tagPolicies.${v}`) }))} />
                 <AppButton title={t('explore.profile.save')} loading={busy} disabled={busy} onPress={saveProfile} />
                 <AppButton variant="ghost" title={t('account.cancel')} onPress={cancelEdit} />
               </View>
@@ -448,23 +546,57 @@ export function ProfileView({ uid, asTab }: { uid: string; asTab?: boolean }) {
           })}
         </View>
 
-        {tab === 'gonderiler' ? (
-          hidden ? (
-            <View style={styles.lockBox}>
-              <MaterialIcons name="lock-outline" size={36} color={c.textSoft} />
-              <AppText muted style={styles.center}>{iBlocked ? t('explore.profile.youBlocked') : blockedMe ? '' : t('explore.profile.privateNote')}</AppText>
-            </View>
-          ) : (
-            <PostGrid list={posts} empty={own ? t('explore.profile.noPostsOwn') : t('explore.profile.noPosts')} />
-          )
+        {hidden && (tab === 'gonderiler' || tab === 'videolar' || tab === 'etiketlendiklerim') ? (
+          <View style={styles.lockBox}>
+            <MaterialIcons name="lock-outline" size={36} color={c.textSoft} />
+            <AppText muted style={styles.center}>{iBlocked ? t('explore.profile.youBlocked') : blockedMe ? '' : t('explore.profile.privateNote')}</AppText>
+          </View>
+        ) : tab === 'gonderiler' ? (
+          <PostGrid list={withPinned(posts, own ? null : pinned)} empty={own ? t('explore.profile.noPostsOwn') : t('explore.profile.noPosts')} />
+        ) : tab === 'videolar' ? (
+          <PostGrid list={videos} views empty={own ? t('explore.profile.noVideosOwn') : t('explore.profile.noVideos')} />
+        ) : tab === 'etiketlendiklerim' ? (
+          <>
+            <PostGrid list={tagged} empty={own ? t('explore.profile.noTaggedOwn') : t('explore.profile.noTagged')} />
+            {tagged?.length ? <AppText variant="caption" muted style={styles.center}>{t('explore.profile.taggedNote')}</AppText> : null}
+          </>
         ) : tab === 'kaydedilenler' ? (
           <PostGrid list={saved} empty={t('explore.profile.noSaved')} />
         ) : (
           joinedList()
         )}
-        <View style={{ height: asTab ? spacing.lg : insets.bottom + spacing.lg }} />
+        <View style={{ height: spacing.lg }} />
       </ScrollView>
       {footer}
+
+      {/* Ortak takip listesi. */}
+      <Modal visible={mutualOpen} transparent animationType="fade" onRequestClose={() => setMutualOpen(false)}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={styles.backdrop} onPress={() => setMutualOpen(false)} />
+        <View style={[styles.sheet, { backgroundColor: c.background, paddingBottom: insets.bottom + spacing.md }]}>
+          <View style={[styles.handle, { backgroundColor: c.border }]} />
+          <AppText variant="label" accessibilityRole="header">{t('explore.profile.mutualTitle')}</AppText>
+          {mutualList === null ? (
+            <StateMessage kind="loading" />
+          ) : (
+            <ScrollView style={styles.mutualScroll}>
+              {mutualList.map((m) => (
+                <Pressable
+                  key={m.uid}
+                  accessibilityRole="button"
+                  onPress={() => (setMutualOpen(false), router.push({ pathname: '/u/[uid]', params: { uid: m.uid } }))}
+                  style={({ pressed }) => [styles.mutualRow, { opacity: pressed ? 0.7 : 1 }]}>
+                  <View style={[styles.mutualFace, styles.mutualFaceBig, { backgroundColor: c.surfaceStrong, borderColor: c.background }]}>
+                    <AppText style={[styles.mutualInitial, { color: c.accent }]}>{(m.displayName || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                    <AvatarPhoto photo={m.photo} size={36} />
+                  </View>
+                  <AppText style={styles.grow}>{m.displayName}</AppText>
+                  <MaterialIcons name="chevron-right" size={20} color={c.textSoft} />
+                </Pressable>
+              ))}
+            </ScrollView>
+          )}
+        </View>
+      </Modal>
 
       {/* Başkasının profili: engelle ve şikâyet et. */}
       <Modal visible={menu} transparent animationType="fade" onRequestClose={() => setMenu(false)}>
@@ -516,12 +648,10 @@ const styles = StyleSheet.create({
   avatar: { width: 76, height: 76, borderRadius: 38, alignItems: 'center', justifyContent: 'center' },
   zoomBack: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.85)', alignItems: 'center', justifyContent: 'center' },
   initial: { fontFamily: fonts.heading, fontSize: 32 },
-  stats: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
-  stat: { alignItems: 'center' },
-  statN: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23 },
-  statL: { fontSize: 12, lineHeight: 16 },
   bio: { gap: 2, marginTop: -spacing.xs },
   name: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  nameShrink: { flexShrink: 1 },
   privateRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   bioText: { fontSize: 14, lineHeight: 20 },
   buttons: { flexDirection: 'row', gap: 6 },
@@ -534,6 +664,13 @@ const styles = StyleSheet.create({
   shortcutTitle: { fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 17 },
   shortcutHint: { fontSize: 11, lineHeight: 15 },
   grow: { flex: 1 },
+  mutual: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: MIN_TOUCH, marginTop: 4 },
+  mutualFaces: { flexDirection: 'row' },
+  mutualFace: { width: 24, height: 24, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  mutualFaceBig: { width: 38, height: 38, borderRadius: 19 },
+  mutualInitial: { fontFamily: fonts.bodySemi, fontSize: 11, lineHeight: 14 },
+  mutualRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: MIN_TOUCH, paddingVertical: 4 },
+  mutualScroll: { maxHeight: 360 },
   block: { gap: spacing.sm },
   requests: { gap: spacing.sm, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   request: { flexDirection: 'row', alignItems: 'center', gap: 6 },

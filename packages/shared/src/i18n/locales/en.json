@@ -114,7 +114,8 @@
     "requiresRecentLogin": "For your security, please enter your password again.",
     "unknown": "Something went wrong. Please try again.",
     "notConfigured": "The app isn't connected to the server yet.",
-    "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Please choose another name."
+    "reservedName": "This name is reserved for official institutions (municipality, governorship, CityJoy, etc.). Please choose another name.",
+    "accountSuspended": "This account has been suspended. If you think this is a mistake, please contact us."
   },
   "reset": {
     "title": "Reset your password",
@@ -160,10 +161,18 @@
     "appearance": "Appearance",
     "appearanceSystem": "Match phone setting",
     "appearanceLight": "Light",
-    "appearanceDark": "Dark"
+    "appearanceDark": "Dark",
+    "autoplay": {
+      "title": "Autoplay videos",
+      "wifi": "Wi-Fi only",
+      "her-zaman": "Always",
+      "kapali": "Off",
+      "hint": "Saves your mobile data"
+    }
   },
   "legal": {
-    "draftNotice": "This text is being prepared and will be reviewed by a lawyer before launch."
+    "draftNotice": "This text is being prepared and will be reviewed by a lawyer before launch.",
+    "openFull": "Read the full text"
   },
   "urgent": {
     "title": "Urgent Needs",
@@ -300,7 +309,7 @@
     "deleteYes": "Yes, delete",
     "statusLive": "Published",
     "statusHidden": "Hidden",
-    "statusRemoved": "Removed by CityJoy",
+    "statusRemoved": "Suspended",
     "verifiedOn": "Documents verified ({{date}})",
     "verified": "Documents verified",
     "unverified": "Not verified",
@@ -326,7 +335,7 @@
     "addressLabel": "Address",
     "noProvince": "Choose your location to see businesses.",
     "chooseLocation": "Choose location",
-    "removedNote": "This business was removed by CityJoy. Contact CityJoy for details.",
+    "removedNote": "This business has been suspended by CityJoy and is not visible in the app. Contact CityJoy for details.",
     "priceListTitle": "Price list",
     "removeService": "Remove",
     "duplicatePhone": "A business with this phone number is already registered. If it's yours, contact CityJoy.",
@@ -452,6 +461,111 @@
       "unverifiedSection": "Unverified businesses",
       "requestSent": "Your request has been received. Our team will contact you as soon as possible.",
       "requestFailed": "The request could not be sent. Check your connection and try again."
+    },
+    "categoryBrowseHint": "Pick your group, then tick your services. Or search above.",
+    "categoryGroupsBack": "Groups",
+    "categoryNotFound": "No service matches this word. Try another word or tell us below.",
+    "categoryNotListed": "Your work isn't listed? Tick \"Other\" in your group and tell us, we'll add it.",
+    "categorySuggest": "Report a missing service",
+    "categorySelectedCount": "{{count}} selected",
+    "suspendedReason": "Reason: {{reason}}.",
+    "suspendedUntil": "It reopens automatically on {{date}}.",
+    "bannedNew": "You can't open a new business right now because a business linked to your account is suspended.",
+    "bannedUntil": "You can open one after {{date}}.",
+    "membership": {
+      "title": "Membership",
+      "pro": "Pro",
+      "free": "Free",
+      "freeIntro": "Pro unlocks more photos, video, reviews, deals and featured placement.",
+      "verifyFirst": "Your business needs to be verified before you can go Pro. This button turns on once it is verified.",
+      "goPro": "Go Pro",
+      "manage": "Membership & payments",
+      "screen": "Membership & payments",
+      "renewsOn": "Renews automatically on {{date}}.",
+      "endsOn": "Ends on {{date}} (renewal off).",
+      "noEnd": "No end date",
+      "tier": "Plan level",
+      "plan": "Plan",
+      "started": "Started",
+      "renews": "Renews",
+      "ends": "Ends",
+      "source": "Paid via",
+      "sources": {
+        "app-store": "App Store",
+        "google-play": "Google Play",
+        "web": "Website",
+        "manuel": "Granted by CityJoy",
+        "kurucu-donem": "Founding business period"
+      },
+      "cancelledNote": "You cancelled your subscription. Pro stays on until {{date}}, then you move to Free.",
+      "manageStore": "Manage subscription (cancel, change plan)",
+      "restored": "Your previous purchases were checked. If a subscription was found, it will appear here in a few seconds.",
+      "history": "Payment history",
+      "noPayments": "No payments yet.",
+      "kinds": {
+        "ilk": "Purchase",
+        "yenileme": "Renewal",
+        "plan-degisti": "Plan change",
+        "iade": "Refund"
+      },
+      "invoiceNote": "Payments are taken by Apple or Google; the store emails you the receipt."
+    },
+    "proPlan": {
+      "title": "Go Pro",
+      "lead": "Make your business stand out and show customers everything.",
+      "perks": {
+        "photos": "Up to 10 photos and a photo strip in lists",
+        "video": "Intro video",
+        "details": "Detailed description",
+        "prices": "Services and prices list",
+        "reviews": "Customer reviews and rating",
+        "map": "Address and directions",
+        "deals": "5 deals at the same time",
+        "featured": "\"Sponsored\" featured placement in lists",
+        "stats": "Page statistics"
+      },
+      "plans": {
+        "aylik": "Monthly",
+        "yillik": "Yearly"
+      },
+      "periods": {
+        "aylik": "month",
+        "yillik": "year"
+      },
+      "perMonth": "{{price}} per month",
+      "buy": "Start Pro subscription",
+      "terms": "The subscription fee ({{price}} / {{period}}) is charged to your Apple ID or Google account when you confirm the purchase. It renews automatically for the same period and price unless cancelled at least 24 hours before the period ends. You can manage and cancel it in your store account settings or on the \"Membership & payments\" screen.",
+      "restore": "Restore purchases",
+      "restoreError": "Purchases could not be restored. Check your connection and try again.",
+      "buyError": "The purchase could not be completed. You were not charged; you can try again.",
+      "activating": "Payment received, turning on your Pro membership…",
+      "done": "Your Pro membership is on. You can use Pro features on your business page.",
+      "late": "Payment received. Your Pro membership will turn on within a few minutes; if it does not, tap \"Restore purchases\".",
+      "restoreLate": "Your previous purchases were checked. No active Pro subscription was found.",
+      "soon": "The Pro subscription will be available here very soon.",
+      "noOffers": "Pro plans could not be loaded right now. Try again in a moment.",
+      "back": "Back to my business",
+      "trial": {
+        "DAY_one": "{{count}}-day free trial",
+        "DAY_other": "{{count}}-day free trial",
+        "WEEK_one": "{{count}}-week free trial",
+        "WEEK_other": "{{count}}-week free trial",
+        "MONTH_one": "{{count}}-month free trial",
+        "MONTH_other": "{{count}}-month free trial",
+        "YEAR_one": "{{count}}-year free trial",
+        "YEAR_other": "{{count}}-year free trial"
+      },
+      "buyTrial": "Start free trial",
+      "termsTrial": "When the free trial ({{trial}}) ends, the subscription starts automatically at {{price}} / {{period}}; cancel at least 24 hours before the trial ends and you will not be charged."
+    },
+    "hidden": {
+      "title": "Hidden posts ({{count}})",
+      "body": "These posts were hidden because Pro ended. They were not deleted. On the free plan your newest {{count}} posts are shown. Tap \"Show\" to swap one with your oldest visible post. Renew Pro and they all come back.",
+      "show": "Show",
+      "renew": "Renew Pro",
+      "error": "Could not change it. Try again in a moment.",
+      "gallery": "{{count}} gallery photos are hidden (Pro ended). They were not deleted; renew Pro to bring them back.",
+      "galleryEdit": "On the free plan only the first {{count}} photos are shown; the others are kept and come back with Pro. Reorder them to choose which one is shown."
     }
   },
   "reviews": {
@@ -945,7 +1059,30 @@
     "followHint": "When you follow, this account only sees your saved neighbourhood and age range as an anonymous total; your name is never shown.",
     "followError": "Could not complete, please try again.",
     "mayor": "Mayor",
-    "mayorTitle": "Mayor"
+    "mayorTitle": "Mayor",
+    "muni": {
+      "call": "Call",
+      "web": "Website",
+      "mail": "Email",
+      "map": "Directions",
+      "services": "e-Municipality services",
+      "servicesNote": "Services open on the municipality’s official website.",
+      "servicesNoSite": "The municipality has not added its website yet; services open a web search.",
+      "mayorActing": "Acting Mayor",
+      "discover": "Discover with Mayors page",
+      "discoverSub": "Photos, videos and routes of the district",
+      "about": "About the municipality",
+      "service": {
+        "pay": "Tax and payments",
+        "request": "Requests and complaints",
+        "zoning": "Zoning and permits",
+        "marriage": "Marriage services",
+        "social": "Social assistance",
+        "culture": "Culture and events",
+        "tenders": "Tenders",
+        "council": "Council decisions"
+      }
+    }
   },
   "neighbourhood": {
     "title": "Neighbourhood Square",
@@ -1117,13 +1254,15 @@
       "mahallem": "My Neighbourhood",
       "bolgesel": "Regional",
       "genel": "General",
-      "takip": "Following"
+      "takip": "Following",
+      "haberler": "News"
     },
     "tabHints": {
       "mahallem": "only people in your neighbourhood see it",
       "bolgesel": "everyone in your province sees it",
       "genel": "everyone on the app sees it",
-      "takip": "only your followers see it"
+      "takip": "only your followers see it",
+      "haberler": "shown on the {{place}} News page (publisher)"
     },
     "categories": {
       "genel": "General",
@@ -1132,7 +1271,13 @@
       "firsat": "Deal",
       "soru-yardim": "Question / Help",
       "kayip-buluntu": "Lost & Found",
-      "taziye": "Condolence"
+      "taziye": "Condolence",
+      "haber": "News",
+      "ekonomi": "Economy",
+      "spor": "Sports",
+      "teknoloji": "Technology",
+      "kultur-sanat": "Culture & Arts",
+      "saglik": "Health"
     },
     "reasons": {
       "nefret": "Hate speech",
@@ -1179,7 +1324,13 @@
       "write": "Write a comment",
       "send": "Send",
       "turnOff": "Turn off comments",
-      "turnOn": "Turn on comments"
+      "turnOn": "Turn on comments",
+      "sheetTitle": "Comments",
+      "add": "Add a comment...",
+      "deleteShort": "Delete",
+      "moreActions": "More actions",
+      "backToComments": "Back to comments",
+      "emoji": "Add {{emoji}}"
     },
     "followHint": "You aren't following anyone yet. Tap a person's name on a post to follow them from their profile.",
     "profile": {
@@ -1238,7 +1389,9 @@
       "tabs": {
         "gonderiler": "Posts",
         "kaydedilenler": "Saved",
-        "katildiklarim": "Joined"
+        "katildiklarim": "Joined",
+        "videolar": "Videos",
+        "etiketlendiklerim": "Tagged"
       },
       "noPostsOwn": "No posts yet. Use the + button in Explore to share your first post.",
       "noSaved": "Posts you save appear here. Only you can see them.",
@@ -1249,7 +1402,24 @@
       "photo": "Profile photo",
       "photoHint": "Visible to everyone. It is cropped square and resized; location data is removed.",
       "photoRemoved": "Your profile photo was removed after a report; you cannot add a new one.",
-      "photoZoom": "Enlarge profile photo"
+      "photoZoom": "Enlarge profile photo",
+      "suspended": "This profile has been suspended.",
+      "suspendedNote": "Its profile and posts are not visible right now.",
+      "noVideos": "No videos yet.",
+      "noVideosOwn": "Videos you share appear here with their view counts.",
+      "noTagged": "No tagged posts yet.",
+      "noTaggedOwn": "Posts where others tag you appear here.",
+      "taggedNote": "Only public (General) posts are listed.",
+      "mutual1": "Followed by {{a}}",
+      "mutual2": "Followed by {{a}} and {{b}}",
+      "mutualMore": "Followed by {{a}}, {{b}} and {{n}} others",
+      "mutualTitle": "People you follow who follow them",
+      "tagPolicy": "Who can tag me",
+      "tagPolicies": {
+        "herkes": "Everyone",
+        "takip": "Only people I follow",
+        "kimse": "No one"
+      }
     },
     "takipFeedHint": "posts shared only with followers by people you follow",
     "share": "Share",
@@ -1264,7 +1434,13 @@
       "firsat": "Deal",
       "soru-yardim": "Help",
       "kayip-buluntu": "LostFound",
-      "taziye": "Condolence"
+      "taziye": "Condolence",
+      "haber": "News",
+      "ekonomi": "Economy",
+      "spor": "Sports",
+      "teknoloji": "Technology",
+      "kultur-sanat": "Culture & Arts",
+      "saglik": "Health"
     },
     "businessTag": "Business",
     "business": {
@@ -1294,13 +1470,97 @@
       "selected": "Selected video, {{duration}}",
       "note": "Up to {{max}} seconds and 40 MB. Add a video or photos, not both.",
       "tooLong": "Videos can be up to {{max}} seconds. Trim it and choose again.",
-      "tooLarge": "The video is too large (max 40 MB). Choose a shorter or lower-resolution video."
+      "tooLarge": "The video is too large (max 40 MB). Choose a shorter or lower-resolution video.",
+      "open": "Open video full screen",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "pause": "Pause",
+      "resume": "Play",
+      "viewer": "Video viewer",
+      "progress": "Video progress",
+      "end": "No more videos for now",
+      "backToFeed": "Back to feed",
+      "swipeClose": "Swipe right to close",
+      "silent": "Silent video"
     },
     "verifiedBusiness": "Verified business",
     "seeComments": "View all {{count}} comments",
     "seen": "I saw it",
     "seenHint": "Write where you saw it in a comment",
-    "more": "more"
+    "more": "more",
+    "sort": {
+      "label": "Sort",
+      "choose": "Feed order",
+      "senin-icin": "For you",
+      "en-yeni": "Newest",
+      "seninDesc": "Fresh, liked and nearby posts first",
+      "yeniDesc": "By time only, newest on top",
+      "how": "How is it sorted?",
+      "rules": "The same open rules for everyone: new posts rise and fade over time. Likes and comments (comments count more) lift a post a little. People you follow, your own neighbourhood and official announcements come first. Posts from the same person never come back to back. Reported posts drop down. How long you look is not tracked, and there is no hidden paid boosting."
+    },
+    "badge": "Badge: {{name}}",
+    "folders": {
+      "all": "All",
+      "add": "New folder",
+      "title": "Add to folder",
+      "none": "No folder",
+      "newName": "New folder name",
+      "create": "Create",
+      "edit": "Edit",
+      "name": "Folder name",
+      "save": "Save",
+      "delete": "Delete folder",
+      "deleteConfirm": "Delete this folder? Its posts stay in your saved posts.",
+      "cancel": "Cancel",
+      "limit": "You can create up to {{count}} folders.",
+      "error": "Couldn't update the folder. Try again.",
+      "empty": "No posts in this folder. Long-press a post and pick this folder.",
+      "hint": "Long-press a post to put it in a folder.",
+      "in": "Folder: {{name}}"
+    },
+    "recent": {
+      "tab": "Recently viewed",
+      "info": "The last {{count}} posts you looked at. Kept only on this phone.",
+      "reset": "Reset",
+      "resetConfirm": "Clear your recently viewed list?",
+      "empty": "You haven't looked at any posts yet. Posts you view in Explore appear here."
+    },
+    "people": {
+      "add": "Tag people",
+      "title": "Tagged people",
+      "limit": "You can tag up to {{n}} people.",
+      "remove": "Remove tag {{name}}",
+      "hint": "People you tag get a notification. If their settings don’t allow it, the tag is not added.",
+      "with": "with {{name}}",
+      "withMore": "with {{name}} and {{n}} others",
+      "removeMe": "Remove from my profile",
+      "removeMeConfirm": "Remove your tag from this post? It will no longer appear on your profile.",
+      "removed": "Your tag was removed."
+    },
+    "pin": {
+      "pin": "Pin to profile",
+      "unpin": "Unpin",
+      "limit": "You can pin up to {{n}} posts. Unpin one first.",
+      "pinned": "Pinned"
+    },
+    "views": "{{n}} views",
+    "official": {
+      "seal": "Official CityJoy account",
+      "where": "Where should it appear?",
+      "reach": {
+        "turkiye": "All of Türkiye",
+        "il": "A province",
+        "ilce": "A district",
+        "mahalle": "A neighbourhood"
+      },
+      "needPlace": "Choose the place first.",
+      "note": {
+        "turkiye": "Everyone sees it in the General feed; it also reaches your followers.",
+        "il": "Everyone in the chosen province sees it in the Regional feed.",
+        "ilce": "Shown in the Regional feed of the chosen district's province.",
+        "mahalle": "Shown only in the chosen neighbourhood, in the My neighbourhood feed."
+      }
+    }
   },
   "news": {
     "title": "News",
@@ -1334,18 +1594,20 @@
     "official": "Official news",
     "sourceNote": "Every story shows its source. Publisher stories show only a headline and short summary; the full text is on the source's site. The app never adds a \"breaking\" label itself.",
     "publisherTitle": "Run a local news site?",
-    "publisherText": "Apply as a publisher and your stories will appear here."
+    "publisherText": "Apply as a publisher and your stories will appear here.",
+    "localTitle": "Local publishers",
+    "localHint": "Local news accounts verified with a CityJoy publisher badge. Posts belong to the account itself."
   },
   "search": {
     "title": "Search",
     "ask": "What are you looking for?",
-    "placeholder": "People, businesses, places, events or posts",
+    "placeholder": "People, businesses, services, places or posts",
     "tabs": {
       "tumu": "All",
       "kisiler": "People",
       "isletmeler": "Businesses",
+      "hizmetler": "Services",
       "yerler": "Places",
-      "etkinlikler": "Events",
       "gonderiler": "Posts"
     },
     "recent": "Recent searches",
@@ -1378,11 +1640,16 @@
     "privateAccount": "Private account",
     "heroLine1": "What are you",
     "heroLine2": "looking for?",
-    "heroSub": "People, businesses, places, events and posts in one place.",
+    "heroSub": "People, businesses, services, places and posts in one place.",
     "clear": "Clear search",
     "masters": "Tradespeople near you",
     "upcoming": "Upcoming events",
-    "seeAllShort": "See all"
+    "seeAllShort": "See all",
+    "scopeAll": "All of Türkiye",
+    "scoped": "{{title}} · {{place}}",
+    "otherProvince": "Province to search services in",
+    "noService": "No service called “{{q}}” was found. Looking for a business name? Try the Businesses tab.",
+    "cityPlaces": "Places in your city · {{place}}"
   },
   "messages": {
     "title": "Messages",
@@ -1502,7 +1769,11 @@
       "muhtar": "Neighbourhood office",
       "cityjoy": "CityJoy",
       "channel": "General notifications",
-      "quietChannel": "Silent notifications"
+      "quietChannel": "Silent notifications",
+      "proEndingTitle": "{{title}}: Pro ends in three days",
+      "proEndingBody": "If you do not renew, posts and photos over the free limit will be hidden (not deleted). They all come back when Pro returns.",
+      "taggedTitle": "{{title}} tagged you",
+      "taggedBody": "Tap to see the post."
     },
     "categories": {
       "acil": "Urgent announcements",
@@ -1644,7 +1915,8 @@
       "efficiency": "Journey mode",
       "efficiencyTitle": "Plan and\nNavigate",
       "efficiencyText": "Reach your destination the easiest and most efficient way.",
-      "start": "Start your journey"
+      "start": "Start your journey",
+      "myCityA11y": "Open the {{city}} page"
     },
     "directions": "Directions",
     "call": "Call",
@@ -1656,6 +1928,11 @@
     "address": "Address",
     "duration": "Suggested time",
     "checkNote": "Hours and fees can change; check an official source before you go.",
+    "practical": "Practical info",
+    "ageInfo": "Age and children",
+    "bring": "Bring along",
+    "rules": "Rules",
+    "goodToKnow": "Good to know",
     "howToGet": "How to get there",
     "modes": {
       "metro": "Metro",
@@ -1770,7 +2047,81 @@
       "next": "Next detail",
       "hint": "Tap a number to see the detail",
       "story": "The story"
-    }
+    },
+    "districtList": "Districts",
+    "routeCount_one": "{{count}} route",
+    "routeCount_other": "{{count}} routes",
+    "moreStops_one": "+{{count}} more stop",
+    "moreStops_other": "+{{count}} more stops",
+    "planTitle": "Plan my trip",
+    "planHint": "Day by day, hour by hour",
+    "nearbyTitle": "Near me",
+    "nearbyHint": "What is around you now",
+    "nearbyIntro": "Places closest to where you are.",
+    "nearbyCenter": "Could not get your location; sorted from the centre of {{name}}.",
+    "nearbyFar": "You are outside {{name}}; sorted from the city centre.",
+    "nearbyLocating": "Getting your location…",
+    "useMyLocation": "Use my location",
+    "nearbyWalk": "Within walking distance",
+    "nearbyFurther": "A bit further",
+    "nearbyAll": "Nearby places",
+    "nearbyNone": "Places will appear here once their locations are added.",
+    "walkMin": "{{min}} min walk",
+    "driveMin": "{{km}} km · {{min}} min by car",
+    "closedNow": "Closed now",
+    "closesAt": "Open until {{time}}",
+    "alwaysOpen": "Always open",
+    "approxNote": "Times are estimated from straight-line distance and are approximate.",
+    "planIntro": "Choose how many days you stay and what you like; we will build a timed plan for you.",
+    "planDays": "How many days?",
+    "dayCount_one": "{{count}} day",
+    "dayCount_other": "{{count}} days",
+    "planStart": "When do you start?",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "planInterests": "What do you like?",
+    "planInterestsHint": "Optional",
+    "planPace": "Pace",
+    "pace": {
+      "sakin": "Relaxed",
+      "sakinHint": "3-4 places a day, long breaks",
+      "dolu": "Packed",
+      "doluHint": "5-6 places a day, early start"
+    },
+    "planFromMe": "The plan starts from where you are.",
+    "planFromCenter": "The plan starts from the centre of {{name}}.",
+    "planBuild": "Build my plan",
+    "planRebuild": "Rebuild the plan",
+    "planSummary": "{{name}} · {{days}} days · {{count}} stops",
+    "planNone": "You can build a plan once locations and opening hours are added for this city.",
+    "readyPlans": "Ready-made plans",
+    "dayN": "Day {{n}}",
+    "planFriday": "Friday: we kept mosques out of the prayer time (12:00-14:00).",
+    "planNow": "Now",
+    "planNext": "Next",
+    "meal": {
+      "ogle": "Lunch",
+      "aksam": "Dinner"
+    },
+    "mealTry": "Try: {{name}}",
+    "planWarn": {
+      "kapali": "May be closed at that time",
+      "gec": "Runs past the end of the day"
+    },
+    "planDayEmpty": "No stops left for this day.",
+    "planApprox": "Times and travel times are approximate; check opening hours before you go.",
+    "planChange": "Change preferences",
+    "planClear": "Delete plan",
+    "planOpen": "Open place",
+    "planSwap": "Swap for another place",
+    "planSwapHint": "Nearby places not in your plan:",
+    "planTomorrow": "Move to tomorrow",
+    "planRemove": "Remove from plan",
+    "localGov": "Local governments",
+    "mayorTitle": "Mayor of {{name}}",
+    "mayorActingTitle": "Acting Mayor of {{name}}",
+    "videos": "Videos",
+    "videoN": "Promo video {{n}}"
   },
   "food": {
     "kinds": {
@@ -2151,7 +2502,9 @@
     "reached": "You have reached today’s limit. You can do this again from {{when}}."
   },
   "media": {
-    "count": "{{count}}/{{max}} photos"
+    "count": "{{count}}/{{max}} photos",
+    "locked": "Pro ended, hidden (not deleted)",
+    "makeFirst": "Move to first"
   },
   "locationBadge": {
     "title": "Location badge",
@@ -2307,6 +2660,7 @@
   },
   "needs": {
     "title": "Other needs",
+    "subtitle": "Ready-made lists for your situation: just moved, ill, on holiday…",
     "empty": "No services chosen for this situation yet.",
     "note": "These lists show the services most searched for in this situation. If you can't find yours, use the search in Urgent Needs.",
     "items": {
@@ -2510,5 +2864,178 @@
     "signIn": "Sign in to translate",
     "error": "Couldn’t translate right now, please try again later",
     "a11y": "Translate this text into {{lang}}"
+  },
+  "suspension": {
+    "reasons": {
+      "uygunsuz-icerik": "Inappropriate content",
+      "taciz": "Harassment or bullying",
+      "spam": "Spam or advertising",
+      "sahte-hesap": "Fake or impersonating account",
+      "yasa-disi": "Illegal content",
+      "diger": "Breaking the rules"
+    }
+  },
+  "weather": {
+    "title": "Weather",
+    "updated": "{{place}} · updated {{time}}",
+    "noLocation": "Choose your location to see the weather.",
+    "offline": "No internet; showing the last saved forecast.",
+    "now": "Now",
+    "today": "Today",
+    "high": "High {{v}}°",
+    "low": "Low {{v}}°",
+    "wind": "Wind",
+    "windValue": "{{v}} km/h",
+    "humidity": "Humidity",
+    "sunrise": "Sunrise",
+    "sunset": "Sunset",
+    "source": "Data: {{source}}",
+    "open": "Weather details",
+    "kinds": {
+      "clear": "Clear",
+      "partly": "Partly cloudy",
+      "cloudy": "Cloudy",
+      "fog": "Fog",
+      "rain": "Rain",
+      "showers": "Showers",
+      "sleet": "Sleet",
+      "snow": "Snow",
+      "thunder": "Thunderstorm"
+    }
+  },
+  "broadcast": {
+    "title": "Notification",
+    "muhtar": "Neighbourhood office",
+    "note": "This notification was sent to your chosen area. You can choose which notifications you get in My account > Notifications."
+  },
+  "editor": {
+    "done": "Done",
+    "next": "Next",
+    "edit": "Edit",
+    "close": "Close",
+    "cancel": "Cancel",
+    "back": "Back",
+    "add": "Add",
+    "undo": "Undo",
+    "discard": "Discard your edits?",
+    "discardYes": "Discard",
+    "duration": "Duration {{time}}",
+    "text": "Text",
+    "textPlaceholder": "Type something…",
+    "size": "Text size",
+    "colors": "Colours",
+    "align": "Alignment",
+    "textColor": "Text colour",
+    "background": "Background",
+    "backgroundColor": "Background colour",
+    "bg": {
+      "yok": "None",
+      "dolu": "Solid",
+      "yari": "Translucent"
+    },
+    "fonts": {
+      "modern": "Modern",
+      "klasik": "Classic",
+      "el": "Handwriting",
+      "kalin": "BOLD",
+      "daktilo": "Typewriter"
+    },
+    "tools": {
+      "text": "Text",
+      "sticker": "Sticker",
+      "draw": "Draw",
+      "trim": "Trim",
+      "crop": "Crop / Rotate",
+      "soundOn": "Sound on",
+      "soundOff": "Sound off",
+      "cover": "Cover"
+    },
+    "stickers": {
+      "search": "Search stickers…",
+      "emoji": "Emoji",
+      "konum": "Location",
+      "bahset": "Mention",
+      "saat": "Time",
+      "hava": "Weather",
+      "tarih": "Date",
+      "etiket": "Hashtag",
+      "tagPlaceholder": "hashtag",
+      "mentionPlaceholder": "Search people"
+    },
+    "drawArea": "Drawing area",
+    "draw": {
+      "kalem": "Pen",
+      "fosforlu": "Highlighter",
+      "silgi": "Eraser",
+      "width": "Width {{n}}"
+    },
+    "video": {
+      "trimTitle": "Trim · {{from}} – {{to}} ({{n}} s)",
+      "start": "Start",
+      "end": "End",
+      "sound": "Video sound",
+      "cover": "Cover frame",
+      "choose": "Choose",
+      "coverTitle": "Cover frame",
+      "coverAt": "Frame {{time}}",
+      "coverNote": "This frame shows in the feed before the video plays."
+    },
+    "crop": {
+      "title": "Crop / Rotate",
+      "move": "Move crop area",
+      "orijinal": "Original",
+      "kare": "Square",
+      "dikey": "4:5",
+      "yatay": "Landscape",
+      "rotate": "Rotate"
+    }
+  },
+  "follows": {
+    "title": "Follows",
+    "tabs": {
+      "takipci": "Followers",
+      "takip": "Following",
+      "isletmeler": "Businesses"
+    },
+    "search": "Search",
+    "openHint": "Opens the list",
+    "remove": "Remove",
+    "removeTitle": "Remove {{name}} from your followers?",
+    "removeBody": "They won’t be notified. They can follow you again if they want.",
+    "cancel": "Cancel",
+    "noFollowers": "No followers yet.",
+    "noFollowing": "Not following anyone yet.",
+    "noBusinesses": "You don’t follow any businesses.",
+    "businessPrivate": "Only the business owner and managers can see this list."
+  },
+  "appConfig": {
+    "updateTitle": "Update required",
+    "updateBody": "This version of CityJoy can no longer be used. Please update the app to continue.",
+    "update": "Update",
+    "maintTitle": "Under maintenance",
+    "maintEmergency": "If this is an emergency, call 112.",
+    "call112": "Call 112",
+    "reacceptTitle": "Our legal texts have changed",
+    "reacceptBody": "The terms of use and privacy notice have changed. Please read and accept them to continue.",
+    "accept": "I have read and accept",
+    "acceptError": "Could not save. Check your connection and try again.",
+    "closedTitle": "This section is temporarily closed",
+    "closedBody": "We are making improvements. It will be back soon.",
+    "closedTile": "Temporarily closed",
+    "goHome": "Back to home",
+    "newVersion": "A new version is available",
+    "newVersionBody": "Tap to update.",
+    "dismiss": "Close",
+    "contactTitle": "Contact",
+    "supportEmail": "Support email",
+    "kvkk": "Data protection (KVKK) address",
+    "links": {
+      "web": "Website",
+      "instagram": "Instagram",
+      "x": "X",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "tiktok": "TikTok"
+    }
   }
 }

@@ -43,3 +43,35 @@ describe('arama', () => {
     expect(cleanSuggestions([' Nöbetçi eczane ', 'nobetci ECZANE', 'x', 'Berber'])).toEqual(['Nöbetçi eczane', 'Berber']);
   });
 });
+
+describe('arama kapsamı (Eren, 13 Kasım 2026)', () => {
+  it('Türkiye geneli sonuçta önce ilçe, sonra il, sonra diğer iller; grup içi sıra korunur', async () => {
+    const { nearFirst } = await import('../index');
+    const list = [
+      { id: 'a', p: { provinceCode: '07', districtId: '07-alanya' } },
+      { id: 'b', p: { provinceCode: '16', districtId: '16-nilufer' } },
+      { id: 'c', p: { provinceCode: '16', districtId: '16-osmangazi' } },
+      { id: 'd', p: { provinceCode: '34' } },
+      { id: 'e', p: { provinceCode: '16', districtId: '16-osmangazi' } },
+    ];
+    const out = nearFirst(list, { provinceCode: '16', districtId: '16-osmangazi' }, (x) => x.p).map((x) => x.id);
+    expect(out).toEqual(['c', 'e', 'b', 'a', 'd']);
+    expect(nearFirst(list, {}, (x) => x.p).map((x) => x.id)).toEqual(['a', 'b', 'c', 'd', 'e']);
+  });
+
+  it('meslek yazılınca hizmet araması, işletme adı yazılınca değil; eş anlamlılar da sayılır', async () => {
+    const { isServiceQuery, uniqueById } = await import('../index');
+    const cats = [
+      { names: { tr: 'Hırdavat', en: 'Hardware store' }, keywords: 'hırdavatçı, nalbur' },
+      { names: { tr: 'Kuaför' }, keywords: 'berber, saç' },
+    ];
+    expect(isServiceQuery(cats, 'hırdavat')).toBe(true);
+    expect(isServiceQuery(cats, 'hirdavatci')).toBe(true);
+    expect(isServiceQuery(cats, 'nalbur')).toBe(true);
+    expect(isServiceQuery(cats, 'Berber')).toBe(true);
+    expect(isServiceQuery(cats, 'hardware')).toBe(true);
+    expect(isServiceQuery(cats, 'Emre Hırdavat')).toBe(false);
+    expect(isServiceQuery(cats, 'Ulu Cami')).toBe(false);
+    expect(uniqueById([{ id: '1' }, { id: '2' }, { id: '1' }]).map((x) => x.id)).toEqual(['1', '2']);
+  });
+});

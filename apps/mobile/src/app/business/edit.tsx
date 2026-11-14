@@ -23,13 +23,14 @@ import {
   type BusinessType,
   type DayHours,
 } from '@cityjoy/shared';
-import { vitrinLimit } from '@cityjoy/shared/firebase';
+import { createOwnerSuspensionReader, vitrinLimit } from '@cityjoy/shared/firebase';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { BusinessManagers } from '@/components/business-managers';
 import { FormMessage } from '@/components/form-message';
 import { FormScreen } from '@/components/form-screen';
+import { MembershipSection } from '@/components/membership-section';
 import { MediaPicker } from '@/components/media-picker';
 import { OptionRow } from '@/components/option-row';
 import { CategoryPicker, FoodKindPicker, IconChipPicker, RegionPicker } from '@/components/pickers';
@@ -104,6 +105,26 @@ export default function EditBusinessScreen() {
       .catch(() => setExisting(null));
   }, [id]);
 
+  // Askıdaki işletmede sebep ve bitiş tarihi (yalnızca sahibi okur); yeni işletmede sahibine yasak var mı.
+  const [suspendedText, setSuspendedText] = useState<string>();
+  const [banned, setBanned] = useState<{ until?: string } | null>(null);
+  const removedNow = existing?.status === 'kaldirildi';
+  useEffect(() => {
+    if (!removedNow || !existing) return setSuspendedText(undefined);
+    createOwnerSuspensionReader(firestore)
+      .business(existing.id)
+      .then((s) => {
+        if (!s) return setSuspendedText(undefined);
+        const parts = [t('business.suspendedReason', { reason: t(`suspension.reasons.${s.reason}`) })];
+        if (s.until) parts.push(t('business.suspendedUntil', { date: new Date(s.until).toLocaleDateString() }));
+        setSuspendedText(parts.join(' '));
+      }, () => setSuspendedText(undefined));
+  }, [removedNow, existing, t]);
+  useEffect(() => {
+    if (id || !user) return;
+    createOwnerSuspensionReader(firestore).banned(user.uid).then(setBanned, () => setBanned(null));
+  }, [id, user]);
+
   if (!user) {
     return (
       <FormScreen title={t('business.newTitle')}>
@@ -115,6 +136,16 @@ export default function EditBusinessScreen() {
     return (
       <FormScreen title={t('business.editTitle')}>
         <StateMessage kind="loading" />
+      </FormScreen>
+    );
+  }
+  if (!id && banned) {
+    return (
+      <FormScreen title={t('business.newTitle')}>
+        <FormMessage
+          kind="error"
+          text={`${t('business.bannedNew')}${banned.until ? ` ${t('business.bannedUntil', { date: new Date(banned.until).toLocaleDateString() })}` : ''}`}
+        />
       </FormScreen>
     );
   }
@@ -205,7 +236,7 @@ export default function EditBusinessScreen() {
 
   return (
     <FormScreen title={existing ? t('business.editTitle') : t('business.newTitle')}>
-      {removed ? <FormMessage kind="error" text={t('business.removedNote')} /> : null}
+      {removed ? <FormMessage kind="error" text={suspendedText ? `${t('business.removedNote')} ${suspendedText}` : t('business.removedNote')} /> : null}
       {existing && !isOwner ? <FormMessage kind="info" text={t('business.managers.editingAs', { name: existing.name })} /> : null}
       {message ? <FormMessage kind={message.kind} text={message.text} /> : null}
 
@@ -268,7 +299,7 @@ export default function EditBusinessScreen() {
       <TextField label={t('business.description')} value={form.description ?? ''} onChangeText={(description) => set({ description })} maxLength={BUSINESS_LIMITS.description} multiline error={err('description')} />
       <MediaPicker label={t('business.logo')} hint={t('business.logoHint')} kind="isletme-logo" uid={user.uid} photos={form.logo ? [form.logo] : []} max={1} onChange={(p) => set({ logo: p[0] })} disabled={busy || removed} round />
       {vitrinMax > 0 || form.gallery?.length ? (
-        <MediaPicker label={t('business.gallery')} hint={t('business.galleryHint')} kind="isletme-vitrin" uid={user.uid} photos={form.gallery ?? []} max={Math.max(vitrinMax, form.gallery?.length ?? 0)} onChange={(gallery) => set({ gallery })} disabled={busy || removed} />
+        <MediaPicker label={t('business.gallery')} hint={tier !== 'pro' && (form.gallery?.length ?? 0) > vitrinMax ? t('business.hidden.galleryEdit', { count: vitrinMax }) : t('business.galleryHint')} kind="isletme-vitrin" uid={user.uid} photos={form.gallery ?? []} max={Math.max(vitrinMax, form.gallery?.length ?? 0)} visibleCount={tier !== 'pro' && (form.gallery?.length ?? 0) > vitrinMax ? vitrinMax : undefined} onChange={(gallery) => set({ gallery })} disabled={busy || removed} />
       ) : null}
 
       <AppText variant="label" accessibilityRole="header">{t('business.page.payment')}</AppText>
@@ -334,6 +365,7 @@ export default function EditBusinessScreen() {
       {existing && isOwner && !removed ? <BusinessManagers business={existing} onSaved={(managers) => setExisting({ ...existing, managers })} /> : null}
       {existing && !isOwner ? <LeaveManaged businessId={existing.id} uid={user.uid} /> : null}
       {existing && isOwner && !removed ? <VerificationSection business={existing} uid={user.uid} /> : <AppText variant="caption" muted>{t('business.myVerifyNote')}</AppText>}
+      {existing && isOwner && !removed ? <MembershipSection business={existing} /> : null}
 
       {existing && isOwner && !removed ? (
         <AppButton

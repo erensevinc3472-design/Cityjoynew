@@ -81,7 +81,7 @@ export default function ContestScreen() {
 
   return (
     <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.tags}>
           {item.prize ? <Tag label={t('contests.prized')} /> : null}
           <Tag label={item.status === 'katilim' ? t('contests.joinOpen') : item.status === 'oylama' ? t('contests.voteOpen') : t('contests.results')} tone={item.status === 'sonuc' ? 'muted' : 'green'} />

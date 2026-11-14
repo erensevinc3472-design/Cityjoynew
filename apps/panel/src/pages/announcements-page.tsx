@@ -24,6 +24,8 @@ import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 import { limitText } from '../lib/limits';
+import { EmptyState } from '../components/empty-state';
+import { Intro } from '../components/intro';
 
 // `retry`: sınır dolunca "Onaya gönder" düğmesi.
 type Msg = { kind: 'ok' | 'error'; text: string; retry?: () => void } | undefined;
@@ -171,7 +173,7 @@ function Announcements({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h1>{t('announcements.title')}</h1>
-          <p className="meta">{t('announcements.intro')}</p>
+          <Intro text={t('announcements.intro')} />
         </div>
         {publisher && live && !draft ? <button className="btn" onClick={() => setDraft({ input: newDraft() })}>{t('announcements.new')}</button> : null}
       </header>
@@ -265,7 +267,7 @@ function Announcements({ user }: { user: PanelUser }) {
             <>
               <h2>{publisher.author.type === 'kurum' ? t('announcements.orgTitle') : t('announcements.mineTitle')}</h2>
               {mine.length === 0 ? (
-                <div className="state">{t('announcements.empty')}</div>
+                <EmptyState text={t('announcements.empty')} {...(live && !draft ? { actionLabel: t('announcements.new'), onAction: () => setDraft({ input: newDraft() }) } : {})} />
               ) : (
                 table(
                   mine.map((a) =>

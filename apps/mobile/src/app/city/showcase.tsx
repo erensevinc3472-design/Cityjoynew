@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import type { CityShowcase, ShowcaseItem, ShowcaseTheme } from '@cityjoy/shared';
 
 import { AppText } from '@/components/app-text';
-import { useProvinceCover } from '@/components/city-cover';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { SectionTitle, Tag } from '@/components/inner';
 import { SceneArt, sceneSky, type SceneKind } from '@/components/scene-art';
@@ -38,7 +37,6 @@ const PLACEHOLDER_THEMES: ShowcaseTheme[] = ['lezzet', 'tarih', 'doga'];
  */
 export default function CityShowcaseScreen() {
   const { t, i18n } = useTranslation();
-  const cover = useProvinceCover();
   const bottom = usePageBottom();
   const router = useRouter();
   const c = useThemeColors();
@@ -83,10 +81,10 @@ export default function CityShowcaseScreen() {
     </>
   );
 
-  const header = <PageHead cover={cover} title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
+  const header = <PageHead title={t('showcase.title', { city: province })} onBack={() => (router.canGoBack() ? router.back() : router.replace('/city'))} />;
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
         {header}
         {!provinceCode ? (

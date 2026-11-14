@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { BANNED_WORD_LIMITS, can, isGrantActive, LANGUAGES, SEARCH_LIMITS, type SearchSuggestions } from '@cityjoy/shared';
 import {
   createActivityModeration,
@@ -25,6 +25,31 @@ import { regionLabel } from '../components/content-common';
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
+import { MediaEdits } from '../components/media-edits';
+import { SuspendControl } from '../components/suspend-control';
+
+/** Sekmeler (Eren, 12 Kasım 2026 panel yenileme): alt alta uzun liste yerine türlere göre, yeni şikâyet sayısıyla. */
+const TABS = ['degerlendirmeler', 'gonderiler', 'yorumlar', 'aktiviteler', 'ilanlar', 'profiller', 'mesajlar', 'ayarlar'] as const;
+type TabKey = (typeof TABS)[number];
+const TAB_KEY = 'cityjoy-panel-moderasyon-sekme';
+
+function readTab(): TabKey {
+  try {
+    const v = localStorage.getItem(TAB_KEY);
+    return (TABS as readonly string[]).includes(v ?? '') ? (v as TabKey) : 'degerlendirmeler';
+  } catch {
+    return 'degerlendirmeler';
+  }
+}
+
+function TabPanel({ k, tab, children }: { k: TabKey; tab: TabKey; children: ReactNode }) {
+  return (
+    <div role="tabpanel" id={'mod-panel-' + k} aria-labelledby={'mod-tab-' + k} hidden={tab !== k} className="tab-panel">
+      {children}
+    </div>
+  );
+}
 
 /**
  * Moderasyon (PROJE.md 6.4, 15.1): şikâyet edilen işletme değerlendirmeleri. Gizlenen yorum işletme
@@ -40,6 +65,24 @@ export function ModerationPage() {
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
+  const [tab, setTab] = useState<TabKey>(readTab);
+  const [counts, setCounts] = useState<Partial<Record<TabKey, number>>>({});
+  // Her sekmenin sayaç bildirimi sabit kalsın diye bir kez kurulur.
+  const reporters = useMemo(
+    () => Object.fromEntries(TABS.map((k) => [k, (n: number) => setCounts((c) => (c[k] === n ? c : { ...c, [k]: n }))])) as Record<TabKey, (n: number) => void>,
+    [],
+  );
+  const choose = (k: TabKey) => {
+    setTab(k);
+    try {
+      localStorage.setItem(TAB_KEY, k);
+    } catch {
+      // Saklanamazsa yalnızca bu oturumda geçerli.
+    }
+  };
+  useEffect(() => {
+    if (list) reporters.degerlendirmeler(list.filter((r) => r.status === 'yeni').length);
+  }, [list, reporters]);
 
   const load = useCallback(async () => {
     setLoadError(false);
@@ -76,12 +119,22 @@ export function ModerationPage() {
       <header className="page-head">
         <div>
           <h1>{t('moderation.title')}</h1>
-          <p className="meta">{t('moderation.intro')}</p>
+          <Intro text={t('moderation.intro')} />
         </div>
       </header>
       {user?.isDemo ? <p className="note">{t('moderation.demoReadOnly')}</p> : !isAdmin ? <p className="note">{t('moderation.adminOnly')}</p> : !canEdit ? <p className="note">{t('moderation.readOnly')}</p> : null}
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
 
+      <div className="page-tabs" role="tablist" aria-label={t('moderation.title')}>
+        {TABS.filter((k) => k !== 'ayarlar' || (user && isAdminUser(user))).map((k) => (
+          <button key={k} type="button" role="tab" id={'mod-tab-' + k} aria-selected={tab === k} aria-controls={'mod-panel-' + k} onClick={() => choose(k)}>
+            {t('moderation.tabs.' + k)}
+            {counts[k] ? <b className="nav-badge">{counts[k]}</b> : null}
+          </button>
+        ))}
+      </div>
+
+      <div role="tabpanel" id="mod-panel-degerlendirmeler" aria-labelledby="mod-tab-degerlendirmeler" hidden={tab !== 'degerlendirmeler'}>
       {loadError ? (
         <div className="state" role="alert">
           <p>{t('moderation.loadError')}</p>
@@ -143,16 +196,48 @@ export function ModerationPage() {
           <p className="count">{t('moderation.note')}</p>
         </div>
       )}
-      {user ? <ActivityReports user={user} /> : null}
-      {user ? <PostReports user={user} /> : null}
-      {user ? <ListingReports user={user} /> : null}
-      {user ? <CommentReports user={user} /> : null}
-      {user ? <ProfileReports user={user} /> : null}
-      {user ? <MessageReports user={user} /> : null}
-      {user && isAdminUser(user) ? <BannedWords user={user} /> : null}
-      {user && isAdminUser(user) ? <SearchSuggestionsSection user={user} /> : null}
-      {user && isAdminUser(user) ? <IntroVideoSection user={user} /> : null}
+      </div>
+      {user ? (
+        <>
+          <TabPanel k="aktiviteler" tab={tab}><ActivityReports user={user} onCount={reporters.aktiviteler} /></TabPanel>
+          <TabPanel k="gonderiler" tab={tab}><PostReports user={user} onCount={reporters.gonderiler} /></TabPanel>
+          <TabPanel k="ilanlar" tab={tab}><ListingReports user={user} onCount={reporters.ilanlar} /></TabPanel>
+          <TabPanel k="yorumlar" tab={tab}><CommentReports user={user} onCount={reporters.yorumlar} /></TabPanel>
+          <TabPanel k="profiller" tab={tab}><ProfileReports user={user} onCount={reporters.profiller} /></TabPanel>
+          <TabPanel k="mesajlar" tab={tab}><MessageReports user={user} onCount={reporters.mesajlar} /></TabPanel>
+          {isAdminUser(user) ? (
+            <TabPanel k="ayarlar" tab={tab}>
+              <BannedWords user={user} />
+              <SearchSuggestionsSection user={user} />
+              <IntroVideoSection user={user} />
+            </TabPanel>
+          ) : null}
+        </>
+      ) : null}
     </section>
+  );
+}
+
+/** Yorumun yapıldığı gönderi: kim paylaştı, yazının başı ve fotoğrafları (tıklayınca büyük açılır). */
+function PostContext({ post }: { post: CommentReport['post'] }) {
+  if (!post) return <div className="post-context meta">{t('moderation.comments.postMissing')}</div>;
+  return (
+    <div className="post-context">
+      <span className="meta">{t('moderation.comments.onPost', { name: post.authorName })}</span>
+      {post.text ? <p dir="auto" className="post-context-text">{post.text}</p> : null}
+      {post.photos?.length ? (
+        <div className="photo-row">
+          {post.photos.map((p, i) => (
+            <a key={p.path} href={p.url} target="_blank" rel="noreferrer noopener" title={t('moderation.posts.photo', { n: i + 1 })}>
+              <img src={p.url} alt={t('moderation.posts.photo', { n: i + 1 })} loading="lazy" />
+            </a>
+          ))}
+        </div>
+      ) : null}
+      {post.video && !post.edits?.[0] ? <video className="mod-video" src={post.video.url} controls preload="metadata" aria-label={t('moderation.posts.video', { seconds: post.video.durationSec })} /> : null}
+      <MediaEdits post={post} />
+      {post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : null}
+    </div>
   );
 }
 
@@ -160,7 +245,7 @@ export function ModerationPage() {
  * Aktivite şikâyetleri (PROJE.md 5.3): admin hepsini, il yöneticisi ve il düzeyindeki gönüllü moderatör kendi ilini görür.
  * Üç şikâyet alan aktivite uygulamada listeden düşer; "Kaldır" tamamen kaldırır, "Yerinde kalsın" geri getirir.
  */
-function ActivityReports({ user }: { user: PanelUser }) {
+function ActivityReports({ user, onCount }: { user: PanelUser; onCount?: (n: number) => void }) {
   const isAdmin = isAdminUser(user);
   const provinces = useMemo(
     () => [...new Set(user.grants.filter((g) => g.scope.level === 'il' && isGrantActive(g, new Date()) && g.modules.moderasyon?.includes('goruntule')).map((g) => (g.scope.level === 'il' ? g.scope.provinceCode : '')))],
@@ -168,6 +253,9 @@ function ActivityReports({ user }: { user: PanelUser }) {
   );
   const canDecide = !user.isDemo && (isAdmin || user.grants.some((g) => g.scope.level === 'il' && g.modules.moderasyon?.includes('duzenle')));
   const [list, setList] = useState<ActivityReport[] | null>(null);
+  useEffect(() => {
+    if (list) onCount?.(list.filter((r) => r.status === 'yeni').length);
+  }, [list, onCount]);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -208,7 +296,7 @@ function ActivityReports({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h2>{t('moderation.activities.title')}</h2>
-          <p className="meta">{t('moderation.activities.intro')}</p>
+          <Intro text={t('moderation.activities.intro')} />
         </div>
       </header>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -289,7 +377,7 @@ function ActivityReports({ user }: { user: PanelUser }) {
  * Çarşı şikâyetleri (PROJE.md 5.11): admin hepsini, il yöneticisi ve il düzeyindeki gönüllü moderatör kendi ilini görür.
  * Üç şikâyet alan ilan uygulamada listeden düşer; "Kaldır" yayından çıkarır, "Yerinde kalsın" geri getirir.
  */
-function ListingReports({ user }: { user: PanelUser }) {
+function ListingReports({ user, onCount }: { user: PanelUser; onCount?: (n: number) => void }) {
   const isAdmin = isAdminUser(user);
   const provinces = useMemo(
     () => [...new Set(user.grants.filter((g) => g.scope.level === 'il' && isGrantActive(g, new Date()) && g.modules.moderasyon?.includes('goruntule')).map((g) => (g.scope.level === 'il' ? g.scope.provinceCode : '')))],
@@ -297,6 +385,9 @@ function ListingReports({ user }: { user: PanelUser }) {
   );
   const canDecide = !user.isDemo && (isAdmin || user.grants.some((g) => g.scope.level === 'il' && g.modules.moderasyon?.includes('duzenle')));
   const [list, setList] = useState<ListingReport[] | null>(null);
+  useEffect(() => {
+    if (list) onCount?.(list.filter((r) => r.status === 'yeni').length);
+  }, [list, onCount]);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -337,7 +428,7 @@ function ListingReports({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h2>{t('moderation.listings.title')}</h2>
-          <p className="meta">{t('moderation.listings.intro')}</p>
+          <Intro text={t('moderation.listings.intro')} />
         </div>
       </header>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -420,7 +511,7 @@ function ListingReports({ user }: { user: PanelUser }) {
  * Keşfet şikâyetleri (PROJE.md 5.5 madde 8): admin hepsini, il yöneticisi ve il düzeyindeki gönüllü moderatör kendi
  * ilini görür. Üç şikâyet alan gönderi uygulamada akıştan düşer; "Kaldır" tamamen kaldırır, "Yerinde kalsın" geri getirir.
  */
-function PostReports({ user }: { user: PanelUser }) {
+function PostReports({ user, onCount }: { user: PanelUser; onCount?: (n: number) => void }) {
   const isAdmin = isAdminUser(user);
   const provinces = useMemo(
     () => [...new Set(user.grants.filter((g) => g.scope.level === 'il' && isGrantActive(g, new Date()) && g.modules.moderasyon?.includes('goruntule')).map((g) => (g.scope.level === 'il' ? g.scope.provinceCode : '')))],
@@ -428,6 +519,9 @@ function PostReports({ user }: { user: PanelUser }) {
   );
   const canDecide = !user.isDemo && (isAdmin || user.grants.some((g) => g.scope.level === 'il' && g.modules.moderasyon?.includes('duzenle')));
   const [list, setList] = useState<PostReport[] | null>(null);
+  useEffect(() => {
+    if (list) onCount?.(list.filter((r) => r.status === 'yeni').length);
+  }, [list, onCount]);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -468,7 +562,7 @@ function PostReports({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h2>{t('moderation.posts.title')}</h2>
-          <p className="meta">{t('moderation.posts.intro')}</p>
+          <Intro text={t('moderation.posts.intro')} />
         </div>
       </header>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -498,11 +592,13 @@ function PostReports({ user }: { user: PanelUser }) {
                 <tr key={r.id}>
                   <td className="num">{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
                   <td>
-                    {r.post && (r.post.text || r.post.photos?.length) ? (
+                    {r.post && (r.post.text || r.post.photos?.length || r.post.video) ? (
                       <>
                         <strong>{r.post.authorName}</strong> <span className="meta">· {t(`moderation.posts.categories.${r.post.category}`)}</span>
                         <div className="meta">{regionLabel(r.post.region)} · {r.post.targets.map((x) => t(`moderation.posts.targets.${x}`)).join(', ')}</div>
                         <div className="meta">{t('moderation.posts.counts', { reports: r.post.reportCount, likes: r.post.likeCount })}</div>
+                        {r.post.viewCount ? <div className="meta">{t('moderation.posts.views', { n: r.post.viewCount.toLocaleString('tr-TR') })}</div> : null}
+                        {r.post.tags?.length ? <div className="meta">{t('moderation.posts.tags', { names: r.post.tags.map((u) => r.post?.tagNames?.[u] ?? '?').join(', ') })}</div> : null}
                         <details>
                           <summary>{t('announcements.showBody')}</summary>
                           <p dir="auto" style={{ whiteSpace: 'pre-wrap' }}>{r.post.text}</p>
@@ -516,9 +612,10 @@ function PostReports({ user }: { user: PanelUser }) {
                             ))}
                           </div>
                         ) : null}
-                        {r.post.video ? (
+                        {r.post.video && !r.post.edits?.[0] ? (
                           <video className="mod-video" src={r.post.video.url} controls preload="metadata" aria-label={t('moderation.posts.video', { seconds: r.post.video.durationSec })} />
                         ) : null}
+                        <MediaEdits post={r.post} />
                         {r.post.status === 'kaldirildi' ? <span className="pill warn">{t('moderation.posts.removed')}</span> : r.post.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
                       </>
                     ) : (
@@ -555,7 +652,7 @@ function PostReports({ user }: { user: PanelUser }) {
  * şikâyet alan yorum uygulamada gizlenir; "Yorumu sil" tamamen siler, "Yerinde kalsın" geri getirir. Yorum yazısının
  * şikâyet anındaki kopyası gösterilir (yorum sonradan silinmiş olsa da). Her işlem kayda geçer.
  */
-function CommentReports({ user }: { user: PanelUser }) {
+function CommentReports({ user, onCount }: { user: PanelUser; onCount?: (n: number) => void }) {
   const isAdmin = isAdminUser(user);
   const provinces = useMemo(
     () => [...new Set(user.grants.filter((g) => g.scope.level === 'il' && isGrantActive(g, new Date()) && g.modules.moderasyon?.includes('goruntule')).map((g) => (g.scope.level === 'il' ? g.scope.provinceCode : '')))],
@@ -563,6 +660,9 @@ function CommentReports({ user }: { user: PanelUser }) {
   );
   const canDecide = !user.isDemo && (isAdmin || user.grants.some((g) => g.scope.level === 'il' && g.modules.moderasyon?.includes('sil')));
   const [list, setList] = useState<CommentReport[] | null>(null);
+  useEffect(() => {
+    if (list) onCount?.(list.filter((r) => r.status === 'yeni').length);
+  }, [list, onCount]);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -603,7 +703,7 @@ function CommentReports({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h2>{t('moderation.comments.title')}</h2>
-          <p className="meta">{t('moderation.comments.intro')}</p>
+          <Intro text={t('moderation.comments.intro')} />
         </div>
       </header>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -641,6 +741,7 @@ function CommentReports({ user }: { user: PanelUser }) {
                       <span className="pill warn">{t('moderation.comments.deleted')}</span>
                     )}
                     {r.comment?.cleared ? <span className="pill ok">{t('moderation.posts.kept')}</span> : null}
+                    <PostContext post={r.post} />
                   </td>
                   <td>{t(`moderation.posts.reasons.${r.reason}`)}</td>
                   <td><span className={r.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`moderation.statuses.${r.status}`)}</span></td>
@@ -667,9 +768,12 @@ function CommentReports({ user }: { user: PanelUser }) {
  * Keşfet profil şikâyetleri (yalnızca admin; profilde bölge bilgisi tutulmaz). Şikâyet anındaki ad ve tanıtım
  * gösterilir. "Tanıtımı kaldır" tanıtımı boşaltır ve kişinin yeniden yazmasını kapatır. Her işlem kayda geçer.
  */
-function ProfileReports({ user }: { user: PanelUser }) {
+function ProfileReports({ user, onCount }: { user: PanelUser; onCount?: (n: number) => void }) {
   const isAdmin = isAdminUser(user);
   const [list, setList] = useState<ProfileReport[] | null>(null);
+  useEffect(() => {
+    if (list) onCount?.(list.filter((r) => r.status === 'yeni').length);
+  }, [list, onCount]);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -709,7 +813,7 @@ function ProfileReports({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h2>{t('moderation.profiles.title')}</h2>
-          <p className="meta">{t('moderation.profiles.intro')}</p>
+          <Intro text={t('moderation.profiles.intro')} />
         </div>
       </header>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -748,6 +852,7 @@ function ProfileReports({ user }: { user: PanelUser }) {
                     {r.bio ? <p dir="auto" style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{r.bio}</p> : null}
                     {!r.current ? <span className="pill warn">{t('moderation.profiles.deleted')}</span> : r.current.bioRemoved ? <span className="pill warn">{t('moderation.profiles.bioRemoved')}</span> : null}
                     {r.current?.photoRemoved ? <span className="pill warn">{t('moderation.profiles.photoRemoved')}</span> : null}
+                    {r.current?.suspended ? <span className="pill warn">{t('suspend.pill')}</span> : null}
                   </td>
                   <td>{t(`moderation.profiles.reasons.${r.reason}`)}</td>
                   <td><span className={r.status === 'yeni' ? 'pill warn' : 'pill'}>{t(`moderation.statuses.${r.status}`)}</span></td>
@@ -757,6 +862,9 @@ function ProfileReports({ user }: { user: PanelUser }) {
                         {r.current && !r.current.bioRemoved && r.current.bio ? <button className="link" disabled={busy} onClick={() => act(() => mod.removeBio(r))}>{t('moderation.profiles.removeBio')}</button> : null}
                         {r.current?.photo ? <button className="link" disabled={busy} onClick={() => act(() => mod.removePhoto(r))}>{t('moderation.profiles.removePhoto')}</button> : null}
                         {r.status === 'yeni' ? <button className="link" disabled={busy} onClick={() => act(() => mod.dismiss(r))}>{t('moderation.profiles.dismiss')}</button> : null}
+                        {r.current ? (
+                          <SuspendControl uid={r.targetUid} name={r.current.displayName} suspended={!!r.current.suspended} onDone={(ok) => { setMessage({ kind: ok ? 'ok' : 'error', text: t(ok ? 'suspend.saved' : 'suspend.error') }); if (ok) load(); }} />
+                        ) : null}
                       </div>
                     </td>
                   )}
@@ -775,9 +883,12 @@ function ProfileReports({ user }: { user: PanelUser }) {
  * Mesaj şikâyetleri (PROJE.md 5.11): yalnızca admin, yalnızca şikâyet edilen mesajın kopyası (sohbetin tamamı
  * görülmez, KVKK). "Mesajı kaldır" mesajı sohbette "kaldırıldı" yapar; her işlem işlem kaydına yazılır.
  */
-function MessageReports({ user }: { user: PanelUser }) {
+function MessageReports({ user, onCount }: { user: PanelUser; onCount?: (n: number) => void }) {
   const isAdmin = isAdminUser(user);
   const [list, setList] = useState<MessageReport[] | null>(null);
+  useEffect(() => {
+    if (list) onCount?.(list.length);
+  }, [list, onCount]);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -817,7 +928,7 @@ function MessageReports({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h2>{t('moderation.messages.title')}</h2>
-          <p className="meta">{t('moderation.messages.intro')}</p>
+          <Intro text={t('moderation.messages.intro')} />
         </div>
       </header>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -876,6 +987,7 @@ function MessageReports({ user }: { user: PanelUser }) {
  */
 function BannedWords({ user }: { user: PanelUser }) {
   const [text, setText] = useState<string | null>(null);
+  const [saved, setSaved] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
@@ -884,7 +996,9 @@ function BannedWords({ user }: { user: PanelUser }) {
   const load = useCallback(async () => {
     setLoadError(false);
     try {
-      setText((await store.get()).join('\n'));
+      const r = await store.load();
+      setText(r.words.join('\n'));
+      setSaved(r.saved);
     } catch {
       setLoadError(true);
     }
@@ -902,6 +1016,7 @@ function BannedWords({ user }: { user: PanelUser }) {
     try {
       const saved = await store.save(user.uid, text.split('\n'));
       setText(saved.join('\n'));
+      setSaved(true);
       setMessage({ kind: 'ok', text: t('moderation.words.saved', { count: saved.length }) });
     } catch {
       setMessage({ kind: 'error', text: t('moderation.error') });
@@ -928,9 +1043,10 @@ function BannedWords({ user }: { user: PanelUser }) {
         <div className="state" aria-live="polite">{t('moderation.loading')}</div>
       ) : (
         <form className="form panel-form" onSubmit={submit}>
-          <div className="field">
+          {!saved ? <p className="note full-row">{t('moderation.words.defaultNote')}</p> : null}
+          <div className="field full-row">
             <label htmlFor="banned-words">{t('moderation.words.label')}</label>
-            <textarea id="banned-words" rows={8} value={text} disabled={user.isDemo} onChange={(e) => setText(e.target.value)} />
+            <textarea id="banned-words" rows={14} value={text} disabled={user.isDemo} onChange={(e) => setText(e.target.value)} />
             <span className="meta">{t('moderation.words.hint')}</span>
           </div>
           {user.isDemo ? null : (
@@ -1073,7 +1189,7 @@ function IntroVideoSection({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h2>{t('moderation.introVideo.title')}</h2>
-          <p className="meta">{t('moderation.introVideo.intro')}</p>
+          <Intro text={t('moderation.introVideo.intro')} />
         </div>
       </header>
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}

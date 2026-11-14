@@ -1,4 +1,5 @@
 import {
+  arrayRemove,
   collection,
   collectionGroup,
   deleteField,
@@ -18,13 +19,15 @@ import {
   type DocumentData,
   type Firestore,
   type QueryConstraint,
-} from 'firebase/firestore';
+} from './metered';
 
 import {
   COMMENT_LIMITS,
   POST_LIMITS,
+  POST_REACHES,
   POST_TARGETS,
   type Post,
+  type PostReach,
   type PostBusiness,
   type PostComment,
   type PostInput,
@@ -33,8 +36,11 @@ import {
   type PostTarget,
   canShowInFrames,
   FRAMES_LIMITS,
+  PIN_LIMIT,
+  postTagRequest,
   type PostVideo,
 } from '../posts/posts';
+import { sanitizeMediaEdits, type MediaEdit } from '../posts/media-edit';
 import { PROFILE_LIMITS } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { isStoredPhoto, photoFrom } from '../media/photo';
@@ -54,8 +60,14 @@ function postVideoOf(d: DocumentData): { video?: PostVideo } {
   const v = d.video as Partial<PostVideo> | undefined;
   return v && typeof v.path === 'string' && typeof v.url === 'string' && isStoredPhoto({ path: v.path, url: v.url })
     && typeof v.durationSec === 'number' && v.durationSec > 0 && v.durationSec <= POST_LIMITS.videoSeconds
-    ? { video: { path: v.path, url: v.url, width: Math.round(v.width ?? 0), height: Math.round(v.height ?? 0), durationSec: Math.round(v.durationSec) } }
+    ? { video: { path: v.path, url: v.url, width: Math.round(v.width ?? 0), height: Math.round(v.height ?? 0), durationSec: Math.round(v.durationSec), ...posterOf(v) } }
     : {};
+}
+
+/** Kapak karesi yalnızca videonun klasöründeki `cover.jpg` ise. */
+function posterOf(v: Partial<PostVideo>): { poster?: string } {
+  const path = v.path!.replace(/video[.](mp4|mov)$/, 'cover.jpg');
+  return typeof v.poster === 'string' && path !== v.path && isStoredPhoto({ path, url: v.poster }) ? { poster: v.poster } : {};
 }
 
 /** Yalnızca kendi depomuzdaki, bu gönderinin klasöründeki geçerli fotoğraflar gösterilir (kurallar yolu denetler). */
@@ -64,12 +76,28 @@ function postPhotosOf(d: DocumentData): { photos?: PostPhoto[] } {
   return photos.length ? { photos } : {};
 }
 
+/** Yazılacak düzenleyici bilgisi (Firestore null'u liste içinde kabul eder). */
+function editsField(input: PostInput): { edits?: (MediaEdit | null)[] } {
+  const count = input.photos?.length ?? (input.video ? 1 : 0);
+  const edits = sanitizeMediaEdits(input.edits, count, input.photos?.length ? undefined : input.video?.durationSec);
+  return edits ? { edits } : {};
+}
+
+/** Düzenleyici bilgisi: temizlenmiş, medya sayısına göre (bozuksa yok sayılır). */
+function postEditsOf(d: DocumentData): { edits?: (MediaEdit | null)[] } {
+  const { photos } = postPhotosOf(d);
+  const { video } = postVideoOf(d);
+  const edits = sanitizeMediaEdits(d.edits, photos?.length ?? (video ? 1 : 0), photos?.length ? undefined : video?.durationSec);
+  return edits ? { edits } : {};
+}
+
 function fromDoc(id: string, d: DocumentData): Post {
   return {
     id,
     text: d.text,
     category: d.category,
     targets: targetsFromMap(d.targets),
+    ...(d.targets?.haberler === true ? { news: true } : {}),
     region: d.region,
     status: d.status,
     authorUid: d.authorUid,
@@ -82,10 +110,25 @@ function fromDoc(id: string, d: DocumentData): Post {
     cleared: d.cleared === true,
     ...postPhotosOf(d),
     ...postVideoOf(d),
+    ...postEditsOf(d),
     ...(d.frames === true ? { frames: true } : {}),
+    ...(POST_REACHES.includes(d.reach) ? { reach: d.reach as PostReach } : {}),
     ...(d.framesFeatured === true ? { framesFeatured: true } : {}),
+    ...(d.authorSuspended === true ? { authorSuspended: true } : {}),
+    ...(d.tierHidden === true ? { tierHidden: true } : {}),
+    ...tagsOf(d),
+    ...(d.pinned === true ? { pinned: true } : {}),
+    ...(typeof d.viewCount === 'number' && d.viewCount > 0 ? { viewCount: Math.floor(d.viewCount) } : {}),
     createdAt: iso(d.createdAt) ?? '',
   };
+}
+
+/** Sunucunun onayladığı etiketler ve adları (adı olmayan kimlik "?" görünür). */
+function tagsOf(d: DocumentData): { tags?: string[]; tagNames?: Record<string, string> } {
+  const tags = Array.isArray(d.tags) ? (d.tags as unknown[]).filter((x): x is string => typeof x === 'string').slice(0, POST_LIMITS.tags) : [];
+  if (!tags.length) return {};
+  const names = (d.tagNames ?? {}) as Record<string, unknown>;
+  return { tags, tagNames: Object.fromEntries(tags.map((u) => [u, typeof names[u] === 'string' ? (names[u] as string) : '?'])) };
 }
 
 const postRef = (db: Firestore, id: string) => doc(db, COLLECTION, id);
@@ -108,6 +151,20 @@ function commentFromDoc(postId: string, id: string, d: DocumentData): PostCommen
 }
 
 /** Akış süzgeci: Mahallem kendi mahallesi, Bölgesel kendi ili (istenirse bir ilçesi), Genel herkes. */
+/** Kaydettiklerim klasörü (users/{uid}/saveFolders). */
+export interface SaveFolder {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+/** Klasör adı en çok 40 harf, kişi başına en çok 20 klasör (sınır uygulamada). */
+export const SAVE_FOLDER_LIMITS = { name: 40, count: 20 } as const;
+/** Kaydedilen gönderi ve (varsa) klasörü. */
+export interface SavedEntry {
+  post: Post;
+  folder?: string;
+}
+
 export type FeedFilter =
   | { target: 'mahallem'; neighbourhoodId: string }
   | { target: 'bolgesel'; provinceCode: string; districtId?: string }
@@ -126,6 +183,29 @@ export interface FeedPage {
  * Mahallem gönderisini yalnızca o mahalledekine, Bölgesel'i yalnızca o ildekine okutur.
  */
 export function createFirestorePostRepository(db: Firestore) {
+  /** Kişinin profil gönderileri: Genel olanlar, takip ediyorsam Takip olanlar da (en yeni önce). */
+  async function authorPosts(uid: string, following: boolean, extra: QueryConstraint[], max: number): Promise<Post[]> {
+    const q = (target: 'genel' | 'takip') =>
+      getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where(`targets.${target}`, '==', true), ...extra, where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(max)))
+        .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())));
+    const lists = await Promise.all([q('genel'), following ? q('takip').catch(() => [] as Post[]) : Promise.resolve([] as Post[])]);
+    const seen = new Set<string>();
+    return lists.flat().filter((p) => !seen.has(p.id) && !!seen.add(p.id)).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, max);
+  }
+  /** Kaydedilenler klasörleriyle (Kaydettiklerim ekranı; yeniden eskiye, en çok 100). */
+  async function listSavedEntries(uid: string): Promise<SavedEntry[]> {
+    const snap = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), orderBy('createdAt', 'desc'), limit(100)));
+    const rows = await Promise.all(
+      snap.docs.map((d) =>
+        getDoc(postRef(db, d.id)).then(
+          (p): SavedEntry | null => (p.exists() ? { post: fromDoc(p.id, p.data()), ...(d.get('folder') ? { folder: d.get('folder') as string } : {}) } : null),
+          () => null,
+        ),
+      ),
+    );
+    return rows.filter((r): r is SavedEntry => !!r && r.post.status === 'aktif');
+  }
+
   return {
     /**
      * "{Şehir} kareleri": ildeki fotoğraflı, Genel'e açık ve Karelere işaretli gönderiler, yeniden eskiye, 30'ar.
@@ -182,6 +262,14 @@ export function createFirestorePostRepository(db: Firestore) {
       return { posts, cursor: posts.length === POST_LIMITS.pageSize ? posts[posts.length - 1].createdAt : null };
     },
 
+    /** Haberler > Bölgesel: ildeki yayıncıların Haberler'e paylaştıkları (en yeni 20). */
+    async news(provinceCode: string): Promise<Post[]> {
+      const snap = await getDocs(
+        query(collection(db, COLLECTION), where('targets.haberler', '==', true), where('status', '==', 'aktif'), where('region.provinceCode', '==', provinceCode), orderBy('createdAt', 'desc'), limit(POST_LIMITS.pageSize)),
+      );
+      return snap.docs.map((d) => fromDoc(d.id, d.data())).filter((p) => !p.authorSuspended && !p.tierHidden);
+    },
+
     /**
      * Ara > Gönderiler: kişinin görebileceği akışlarda (Genel, ilindeki Bölgesel, mahallesindeki Mahallem) anahtarı
      * taşıyan son gönderiler. Her akış ayrı sorgudur; kurallar her birini ayrı doğrular.
@@ -201,12 +289,42 @@ export function createFirestorePostRepository(db: Firestore) {
 
     /** Profil sayfası: kişinin Genel gönderileri, takip ediyorsam Takip gönderileri de (son 20). */
     async byAuthor(uid: string, following: boolean): Promise<Post[]> {
-      const q = (target: 'genel' | 'takip') =>
-        getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where(`targets.${target}`, '==', true), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(20)))
-          .then((s) => s.docs.map((d) => fromDoc(d.id, d.data())));
-      const lists = await Promise.all([q('genel'), following ? q('takip').catch(() => [] as Post[]) : Promise.resolve([] as Post[])]);
-      const seen = new Set<string>();
-      return lists.flat().filter((p) => !seen.has(p.id) && !!seen.add(p.id)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      return authorPosts(uid, following, [], 20);
+    },
+
+    /** Profil > Videolar: kişinin videolu gönderileri (izlenme sayısıyla). */
+    async videosByAuthor(uid: string, following: boolean): Promise<Post[]> {
+      return authorPosts(uid, following, [where('hasVideo', '==', true)], 30);
+    },
+
+    /** Profilin en üstüne sabitlenenler (en çok PIN_LIMIT). */
+    async pinnedByAuthor(uid: string, following: boolean): Promise<Post[]> {
+      return authorPosts(uid, following, [where('pinned', '==', true)], PIN_LIMIT);
+    },
+
+    /** Kendi sabitlediğim gönderi sayısı (sınır denetimi; en çok PIN_LIMIT + 1 okunur). */
+    async myPinnedCount(uid: string): Promise<number> {
+      const snap = await getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), where('pinned', '==', true), limit(PIN_LIMIT + 1)));
+      return snap.docs.filter((d) => d.get('status') === 'aktif').length;
+    },
+
+    /** Sahibi sabitler ya da sabitlemeyi kaldırır (sınırı uygulama denetler). */
+    async setPinned(id: string, pinned: boolean): Promise<void> {
+      await updateDoc(postRef(db, id), { pinned: pinned ? true : deleteField(), updatedAt: serverTimestamp() });
+    },
+
+    /**
+     * Profil > Etiketlendiklerim: kişinin etiketlendiği herkese açık (Genel) gönderiler. Takipçilere özel gönderiler
+     * burada listelenmez (her paylaşanın takipçisi olup olmadığı tek sorguda denetlenemez).
+     */
+    async taggedIn(uid: string): Promise<Post[]> {
+      const snap = await getDocs(query(collection(db, COLLECTION), where('tags', 'array-contains', uid), where('targets.genel', '==', true), where('status', '==', 'aktif'), orderBy('createdAt', 'desc'), limit(30)));
+      return snap.docs.map((d) => fromDoc(d.id, d.data()));
+    },
+
+    /** Etiketlenen kişi kendini gönderiden çıkarır (profilinde de görünmez olur). */
+    async removeMyTag(id: string, uid: string): Promise<void> {
+      await updateDoc(postRef(db, id), { tags: arrayRemove(uid), [`tagNames.${uid}`]: deleteField() });
     },
 
     /**
@@ -256,12 +374,14 @@ export function createFirestorePostRepository(db: Firestore) {
     async create(uid: string, authorName: string, input: PostInput, as?: { business: PostBusiness; pending: boolean }, id?: string): Promise<string> {
       const ref = id ? postRef(db, id) : doc(collection(db, COLLECTION));
       const r = input.region;
+      const tagReq = postTagRequest(uid, input.tagRequest, input.edits);
       const batch = writeBatch(db);
       await countUsage(db, batch, as ? { type: 'b', id: as.business.id } : { type: 'u', id: uid }, as ? 'isletme-gonderi' : 'gonderi', uid);
       batch.set(ref, {
         text: input.text.trim(),
         category: input.category,
-        targets: targetsToMap(input.targets),
+        // Haberler yalnızca kişisel paylaşımda (yayıncı rozeti; işletme adına olmaz).
+        targets: { ...targetsToMap(input.targets), ...(input.news && !as ? { haberler: true } : {}) },
         region: { provinceCode: r.provinceCode, districtId: r.districtId, neighbourhoodId: r.neighbourhoodId },
         status: as?.pending ? 'onay-bekliyor' : 'aktif',
         authorUid: uid,
@@ -274,10 +394,14 @@ export function createFirestorePostRepository(db: Firestore) {
           ? { photos: input.photos.map((p) => ({ path: p.path, url: p.url, width: Math.round(p.width), height: Math.round(p.height) })) }
           : {}),
         ...(input.video && !input.photos?.length
-          ? { video: { path: input.video.path, url: input.video.url, width: Math.round(input.video.width), height: Math.round(input.video.height), durationSec: Math.round(input.video.durationSec) } }
+          ? { video: { path: input.video.path, url: input.video.url, width: Math.round(input.video.width), height: Math.round(input.video.height), durationSec: Math.round(input.video.durationSec), ...(input.video.poster ? { poster: input.video.poster } : {}) } }
           : {}),
         searchKeys: searchKeys(input.text, SEARCH_LIMITS.postKeys, SEARCH_LIMITS.minPost),
         ...(input.frames && canShowInFrames(input) ? { frames: true } : {}),
+        ...(input.reach && !as ? { reach: input.reach } : {}),
+        ...editsField(input),
+        ...(input.video && !input.photos?.length ? { hasVideo: true } : {}),
+        ...(tagReq.length ? { tagReq } : {}),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
@@ -291,7 +415,7 @@ export function createFirestorePostRepository(db: Firestore) {
      */
     async remove(id: string): Promise<void> {
       const batch = writeBatch(db);
-      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), updatedAt: serverTimestamp() });
+      batch.update(postRef(db, id), { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), edits: deleteField(), updatedAt: serverTimestamp() });
       await batch.commit();
     },
 
@@ -391,9 +515,48 @@ export function createFirestorePostRepository(db: Firestore) {
       return getDoc(savedRef(db, uid, postId)).then((s) => s.exists(), () => false);
     },
 
-    async save(uid: string, postId: string): Promise<void> {
+    async save(uid: string, postId: string, folder?: string): Promise<void> {
       const batch = writeBatch(db);
-      batch.set(savedRef(db, uid, postId), { createdAt: serverTimestamp() });
+      batch.set(savedRef(db, uid, postId), folder ? { createdAt: serverTimestamp(), folder } : { createdAt: serverTimestamp() });
+      await batch.commit();
+    },
+
+    /** Kaydedilen gönderiyi klasöre taşır; null: klasörden çıkarır ("Tümü"de kalır). */
+    async setSavedFolder(uid: string, postId: string, folder: string | null): Promise<void> {
+      await updateDoc(savedRef(db, uid, postId), { folder: folder ?? deleteField() });
+    },
+
+    /** Gönderinin klasörü (kaydedilmemişse undefined, klasörsüzse null). */
+    async savedFolder(uid: string, postId: string): Promise<string | null | undefined> {
+      const s = await getDoc(savedRef(db, uid, postId));
+      return s.exists() ? (s.get('folder') ?? null) : undefined;
+    },
+
+    async listFolders(uid: string): Promise<SaveFolder[]> {
+      const snap = await getDocs(query(collection(db, 'users', uid, 'saveFolders'), orderBy('createdAt', 'asc'), limit(SAVE_FOLDER_LIMITS.count)));
+      return snap.docs.map((d) => ({ id: d.id, name: d.get('name') ?? '', createdAt: iso(d.get('createdAt')) ?? '' }));
+    },
+
+    async createFolder(uid: string, name: string): Promise<SaveFolder> {
+      const ref = doc(collection(db, 'users', uid, 'saveFolders'));
+      const at = Timestamp.now();
+      const clean = name.trim().slice(0, SAVE_FOLDER_LIMITS.name);
+      const batch = writeBatch(db);
+      batch.set(ref, { name: clean, createdAt: at });
+      await batch.commit();
+      return { id: ref.id, name: clean, createdAt: at.toDate().toISOString() };
+    },
+
+    async renameFolder(uid: string, id: string, name: string): Promise<void> {
+      await updateDoc(doc(db, 'users', uid, 'saveFolders', id), { name: name.trim().slice(0, SAVE_FOLDER_LIMITS.name) });
+    },
+
+    /** Klasörü siler; içindeki gönderiler kaydedilmiş kalır ("Tümü"ye döner). */
+    async deleteFolder(uid: string, id: string): Promise<void> {
+      const inside = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), where('folder', '==', id), limit(400)));
+      const batch = writeBatch(db);
+      inside.docs.forEach((d) => batch.update(d.ref, { folder: deleteField() }));
+      batch.delete(doc(db, 'users', uid, 'saveFolders', id));
       await batch.commit();
     },
 
@@ -411,10 +574,10 @@ export function createFirestorePostRepository(db: Firestore) {
 
     /** Kaydedilenler (yeniden eskiye, en çok 50). Kaldırılan ya da artık görülemeyen gönderi listede yer almaz. */
     async listSaved(uid: string): Promise<Post[]> {
-      const snap = await getDocs(query(collection(db, 'users', uid, 'savedPosts'), orderBy('createdAt', 'desc'), limit(50)));
-      const posts = await Promise.all(snap.docs.map((d) => getDoc(postRef(db, d.id)).then((p) => (p.exists() ? fromDoc(p.id, p.data()) : null), () => null)));
-      return posts.filter((p): p is Post => !!p && p.status === 'aktif');
+      return (await listSavedEntries(uid)).map((e) => e.post);
     },
+
+    listSavedEntries,
 
     /** Hesap silmede (KVKK): kişinin gönderileri boşaltılır, beğenileri ve yorumları geri alınır, kaydettikleri silinir. */
     async deleteAllOf(uid: string): Promise<void> {
@@ -431,11 +594,17 @@ export function createFirestorePostRepository(db: Firestore) {
         batch.delete(s.ref);
         await batch.commit();
       }
+      const folders = await getDocs(query(collection(db, 'users', uid, 'saveFolders'), limit(100)));
+      for (const f of folders.docs) {
+        const batch = writeBatch(db);
+        batch.delete(f.ref);
+        await batch.commit();
+      }
       const mine = await getDocs(query(collection(db, COLLECTION), where('authorUid', '==', uid), limit(500)));
       for (const d of mine.docs) {
         if (d.get('status') === 'kaldirildi' && !d.get('text') && !d.get('photos') && !d.get('video')) continue;
         const batch = writeBatch(db);
-        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), updatedAt: serverTimestamp() });
+        batch.update(d.ref, { status: 'kaldirildi', text: '', authorName: '', searchKeys: deleteField(), photos: deleteField(), video: deleteField(), edits: deleteField(), updatedAt: serverTimestamp() });
         await batch.commit();
       }
       const likes = await getDocs(query(collectionGroup(db, 'likes'), where('uid', '==', uid), limit(500)));
@@ -518,7 +687,11 @@ export function createPostModeration(db: Firestore, actorUid: string) {
       return Promise.all(
         snap.docs.map(async (d) => {
           const data = d.data();
-          const c = await getDoc(commentRef(db, data.postId, data.commentId)).catch(() => null);
+          // Aynı gönderiye birden çok şikâyet olsa da her biri ayrı okunur; liste en çok 100 olduğu için yeterli.
+          const [c, p] = await Promise.all([
+            getDoc(commentRef(db, data.postId, data.commentId)).catch(() => null),
+            getDoc(postRef(db, data.postId)).catch(() => null),
+          ]);
           return {
             id: d.id,
             postId: data.postId,
@@ -530,6 +703,7 @@ export function createPostModeration(db: Firestore, actorUid: string) {
             status: data.status,
             createdAt: iso(data.createdAt) ?? '',
             comment: c?.exists() ? commentFromDoc(data.postId, c.id, c.data()) : null,
+            post: p?.exists() ? fromDoc(p.id, p.data()) : null,
           };
         }),
       );
@@ -583,6 +757,8 @@ export interface CommentReport {
   status: 'yeni' | 'incelendi';
   createdAt: string;
   comment: PostComment | null;
+  /** Yorumun yapıldığı gönderi (moderatör yorumu bağlamıyla görsün diye); silinmişse null. */
+  post: Post | null;
 }
 
 /**

@@ -117,6 +117,25 @@ export interface TourScene {
 
 export const TOUR_LIMITS = { scenes: 6, points: 8, label: 24, title: 50, text: 300, story: 2000 } as const;
 
+/** Konum (enlem, boylam). Yakınımda ve Gezimi planla kullanır (Karar, Eren, 12 Kasım 2026). */
+export interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+/**
+ * Hesaplanabilir açılış saatleri (Gezimi planla). Düz yazı `visitingHours` kullanıcıya gösterilmeye devam eder.
+ * `allDay`: her zaman açık (köprü, köy, park); değilse `open`–`close` ("09:00", "18:30"). `closedDays`: kapalı günler
+ * (0 = pazar … 6 = cumartesi). `prayer`: namaz vakitlerinde ziyaret kısıtlı (cami); planlayıcı cuma öğlesine koymaz.
+ */
+export interface PlaceHours {
+  allDay: boolean;
+  open?: string;
+  close?: string;
+  closedDays: number[];
+  prayer: boolean;
+}
+
 /** Gezilecek yer (deneyim). */
 export interface TravelPlace {
   id: string;
@@ -135,10 +154,20 @@ export interface TravelPlace {
   visitingHours?: string;
   entranceFee?: string;
   suggestedDuration?: string;
+  /** Planlayıcı için önerilen kalış (dakika); yoksa kategoriye göre tahmin edilir. */
+  durationMinutes?: number;
+  hours?: PlaceHours;
+  location?: LatLng;
   address?: string;
   howToGet: TravelStep[];
   nearby: TravelNearby[];
   tips: string[];
+  /** Yanına alınacaklar (kalın giysi, su gibi); her öğe kısa. */
+  bring?: string[];
+  /** Uyulması gereken kurallar (kıyafet, fotoğraf, ateş yakma gibi). */
+  rules?: string[];
+  /** Yaş sınırı, çocuklar ve bebek arabası için uygunluk. */
+  ageInfo?: string;
   accessibility?: string;
   phone?: string;
   website?: string;
@@ -171,7 +200,7 @@ export const TRAVEL_LIMITS = {
 
 export type TravelPlaceInput = Omit<TravelPlace, 'id' | 'updatedAt'>;
 
-export type TravelError = 'name' | 'kind' | 'summary' | 'about' | 'tagline' | 'description' | 'lists' | 'website' | 'video' | 'tour';
+export type TravelError = 'name' | 'kind' | 'summary' | 'about' | 'tagline' | 'description' | 'lists' | 'website' | 'video' | 'tour' | 'location' | 'hours' | 'duration';
 
 /** Sahne sayısı, adlar, nokta yerleri (0-1) ve yazı uzunlukları. */
 export function validateTour(tour: TourScene[] | undefined): boolean {
@@ -200,7 +229,7 @@ export function validateTravelPlace(p: TravelPlaceInput): TravelError[] {
   if (len(p.kind) < 2 || len(p.kind) > L.kind) e.push('kind');
   if (len(p.summary) < 10 || len(p.summary) > L.summary) e.push('summary');
   if (len(p.about) < 10 || len(p.about) > L.longText) e.push('about');
-  const short = [p.visitingHours, p.entranceFee, p.suggestedDuration, p.address, p.accessibility, p.phone];
+  const short = [p.visitingHours, p.entranceFee, p.suggestedDuration, p.address, p.accessibility, p.phone, p.ageInfo];
   const long = [p.history, p.architecture];
   if (
     short.some((s) => len(s) > L.shortText) ||
@@ -208,6 +237,9 @@ export function validateTravelPlace(p: TravelPlaceInput): TravelError[] {
     p.howToGet.length > L.listItems ||
     p.nearby.length > L.listItems ||
     p.tips.length > L.listItems ||
+    (p.bring ?? []).length > L.listItems ||
+    (p.rules ?? []).length > L.listItems ||
+    [...(p.bring ?? []), ...(p.rules ?? [])].some((x) => !len(x) || len(x) > L.shortText) ||
     [...p.howToGet, ...p.nearby].some((x) => !len(x.text) || len(x.text) > L.shortText) ||
     p.tips.some((x) => !len(x) || len(x) > L.shortText)
   )
@@ -215,7 +247,49 @@ export function validateTravelPlace(p: TravelPlaceInput): TravelError[] {
   if (!httpsOk(p.website)) e.push('website');
   if (!httpsOk(p.videoUrl)) e.push('video');
   if (!validateTour(p.tour)) e.push('tour');
+  if (p.location && !validGeo(p.location)) e.push('location');
+  if (p.hours && !validHours(p.hours)) e.push('hours');
+  if (p.durationMinutes !== undefined && !(Number.isInteger(p.durationMinutes) && p.durationMinutes >= 10 && p.durationMinutes <= 720)) e.push('duration');
   return e;
+}
+
+export const validGeo = (g: LatLng) =>
+  Number.isFinite(g.lat) && Number.isFinite(g.lng) && Math.abs(g.lat) <= 90 && Math.abs(g.lng) <= 180 && !(g.lat === 0 && g.lng === 0);
+
+const HHMM = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+
+/** "09:30" → 570 (gün içindeki dakika). */
+export const minutesOf = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
+
+export function validHours(h: PlaceHours): boolean {
+  const days = h.closedDays ?? [];
+  const daysOk = days.length <= 6 && days.every((d) => Number.isInteger(d) && d >= 0 && d <= 6) && new Set(days).size === days.length;
+  if (!daysOk || typeof h.prayer !== 'boolean') return false;
+  if (h.allDay) return !h.open && !h.close;
+  return !!h.open && !!h.close && HHMM.test(h.open) && HHMM.test(h.close) && minutesOf(h.open) < minutesOf(h.close);
+}
+
+/**
+ * Panelde yapıştırılan Google Haritalar bağlantısından ya da "40.18, 29.06" yazısından konum çıkarır. Kısa bağlantılar
+ * (maps.app.goo.gl) açılmadan çözülemez; o zaman `null` döner, panel koordinatın yapıştırılmasını ister.
+ */
+export function parseGeo(text: string): LatLng | null {
+  const t = text.trim();
+  const num = '(-?\\d+(?:\\.\\d+)?)';
+  const pats = [
+    new RegExp(`!3d${num}!4d${num}`),
+    new RegExp(`@${num},\\s*${num}`),
+    new RegExp(`[?&](?:q|query|ll|destination)=${num}(?:,|%2C)\\s*${num}`, 'i'),
+    new RegExp(`^${num}\\s*,\\s*${num}$`),
+  ];
+  for (const re of pats) {
+    const m = t.match(re);
+    if (m) {
+      const g = { lat: Number(m[1]), lng: Number(m[2]) };
+      if (validGeo(g)) return { lat: Math.round(g.lat * 1e6) / 1e6, lng: Math.round(g.lng * 1e6) / 1e6 };
+    }
+  }
+  return null;
 }
 
 export function validateTravelText(c: { tagline: string; description: string; videoUrl?: string }): TravelError[] {
@@ -345,10 +419,17 @@ export interface TravelMunicipal {
   districtId?: string;
   slogan: string;
   description: string;
+  /** Eski tek video alanı (okunur; yeni kayıtlar `videos` yazar). */
   videoUrl?: string;
+  /** Tanıtım videoları (Eren, 12 Kasım 2026: başkan birden fazla video yükleyebilsin), en çok MUNICIPAL_VIDEO_LIMITS.count. */
+  videos?: MunicipalVideo[];
   /** Kapak fotoğrafı (`media/{yükleyen}/seyahat/...`); yoksa çizim gösterilir. */
   cover?: Photo;
   mayorName?: string;
+  /** Başkanın fotoğrafı (Başkanlarla Keşif'te sinematik kartta ve ilçe satırında; Eren, 12 Kasım 2026). */
+  mayorPhoto?: Photo;
+  /** Başkan vekili (görevden alma, vefat vb.): kartta "Başkan Vekili" yazar. */
+  mayorActing?: boolean;
   /** Admin: seçim döneminde false (yalnızca "Belediye" görünür). */
   showMayor: boolean;
   zone?: DistrictZone;
@@ -359,8 +440,21 @@ export interface TravelMunicipal {
   updatedAt: string;
 }
 
+export interface MunicipalVideo {
+  url: string;
+  /** İsteğe bağlı kısa başlık ("Tarihi çarşımız", "Festival 2026"). */
+  title?: string;
+}
+export const MUNICIPAL_VIDEO_LIMITS = { count: 5, title: 60 } as const;
+
+/** Tanıtımın videoları: yeni liste, yoksa eski tek video. Bozuk adresler atlanır. */
+export function municipalVideos(m: Pick<TravelMunicipal, 'videos' | 'videoUrl'>): MunicipalVideo[] {
+  const list = m.videos?.length ? m.videos : m.videoUrl ? [{ url: m.videoUrl }] : [];
+  return list.filter((v) => typeof v?.url === 'string' && /^https:\/\/\S+$/.test(v.url)).slice(0, MUNICIPAL_VIDEO_LIMITS.count);
+}
+
 /** Belediyenin değiştirebildiği alanlar. */
-export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'mayorName' | 'cover'>;
+export type TravelMunicipalText = Pick<TravelMunicipal, 'slogan' | 'description' | 'videoUrl' | 'videos' | 'mayorName' | 'cover' | 'mayorPhoto' | 'mayorActing'>;
 
 export const ROUTE_LIMITS = { title: 60, summary: 300, stops: 12, note: 300, tips: 6 } as const;
 
@@ -391,10 +485,14 @@ export function validateTravelLocal(x: TravelLocalInput): TravelError[] {
 
 export function validateTravelMunicipal(m: TravelMunicipalText): TravelError[] {
   const e: TravelError[] = [];
-  if (len(m.slogan) < 2 || len(m.slogan) > TRAVEL_LIMITS.tagline) e.push('tagline');
-  if (len(m.description) < 10 || len(m.description) > TRAVEL_LIMITS.description) e.push('description');
+  // Tanıtım yazısı henüz yokken yalnızca başkan bilgisi girilebilir (ikisi de boş).
+  const onlyMayor = !len(m.slogan) && !len(m.description);
+  if (!onlyMayor && (len(m.slogan) < 2 || len(m.slogan) > TRAVEL_LIMITS.tagline)) e.push('tagline');
+  if (!onlyMayor && (len(m.description) < 10 || len(m.description) > TRAVEL_LIMITS.description)) e.push('description');
   if (len(m.mayorName) > TRAVEL_LIMITS.name) e.push('name');
   if (!httpsOk(m.videoUrl)) e.push('video');
+  const v = m.videos ?? [];
+  if (v.length > MUNICIPAL_VIDEO_LIMITS.count || v.some((x) => !len(x.url) || !httpsOk(x.url) || len(x.title) > MUNICIPAL_VIDEO_LIMITS.title)) e.push('video');
   return e;
 }
 
@@ -410,3 +508,6 @@ export function byPopulation<T extends { name: string; population?: number }>(a:
   if (b.population != null) return 1;
   return a.name.localeCompare(b.name, 'tr');
 }
+
+/** Kartta gösterilecek resim: kapak yoksa "İçini gez"in ilk sahnesi (genelde dış görünüm). */
+export const placeImage = (p: Pick<TravelPlace, 'cover' | 'tour'>): Photo | undefined => p.cover ?? p.tour?.[0]?.image;

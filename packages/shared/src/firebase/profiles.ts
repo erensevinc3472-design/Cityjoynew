@@ -11,7 +11,7 @@ import {
   updateDoc,
   writeBatch,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { ageGroup, type UserProfile } from '../models/user';
 import { DEFAULT_OCCUPATIONS } from '../services/occupations';
@@ -77,6 +77,10 @@ export function createFirestoreProfileRepository(db: Firestore): ProfileReposito
       }
       if (patch.targeting) data['consents.targeting'] = patch.targeting;
       if (patch.commercialMessages) data['consents.commercialMessages'] = patch.commercialMessages;
+      if (patch.legal) {
+        data['consents.terms'] = patch.legal;
+        data['consents.privacyNotice'] = patch.legal;
+      }
       await updateDoc(ref(uid), data);
     },
 

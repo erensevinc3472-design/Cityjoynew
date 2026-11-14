@@ -1,6 +1,6 @@
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import type { ComponentProps, PropsWithChildren, ReactNode } from 'react';
+import { useEffect, useState, type ComponentProps, type PropsWithChildren, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,9 +8,10 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { fonts, GUTTER, MIN_TOUCH, radius, spacing } from '@/theme/tokens';
 import { SurfaceContext } from '@/theme/use-theme';
-import { AUTH_ART } from '@/lib/app-art';
+import { useArt } from '@/lib/app-art';
 import { AppText } from './app-text';
 import { SceneArt, sceneSky, type SceneKind } from './scene-art';
+import type { AppImage } from '@cityjoy/shared';
 
 const GOLD = '#E2B277';
 
@@ -18,23 +19,24 @@ const GOLD = '#E2B277';
  * Giriş akışının ortak zemini (13. madde 35, giriş akışı): arkada tam ekran sahne çizimi ve karartma, üstte CityJoy
  * yazısı, altta içerik. Renk şeması her zaman koyudur; resimler Panel > Uygulama görselleri'nden değişecek (Blaze ile).
  */
-export function AuthScene({ kind = 'cover', image = AUTH_ART.welcome, shade = true, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; image?: number | null; shade?: boolean; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
+export function AuthScene({ kind = 'cover', art = 'signIn', shade = true, glass, logo = true, top, children }: PropsWithChildren<{ kind?: SceneKind; art?: AppImage; shade?: boolean; glass?: boolean; logo?: boolean; top?: ReactNode }>) {
   const insets = useSafeAreaInsets();
+  const source = useArt()(art);
   const { width } = useWindowDimensions();
   return (
     <SurfaceContext.Provider value={{ scheme: 'dark', glass }}>
       <View style={[styles.root, { backgroundColor: sceneSky(kind) }]}>
         <StatusBar style="light" />
-        {image ? (
+        {source ? (
           // Dikey resim (Eren, 8 Kasım 2026): üstü boş gökyüzü, konu altta; ekranı tam kaplar.
-          <Image source={image} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
+          <Image source={source.source} onError={source.onError} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" accessible={false} />
         ) : (
           <View pointerEvents="none" style={[styles.scene, { height: Math.round(width * 1.35) }]}>
             <SceneArt kind={kind} />
           </View>
         )}
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, image ? styles.dimPhoto : styles.dim]} />
-        {image && shade ? <BottomShade /> : null}
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, source ? styles.dimPhoto : styles.dim]} />
+        {source && shade ? <BottomShade /> : null}
         <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView
             contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md, paddingBottom: insets.bottom + spacing.lg }]}

@@ -8,7 +8,7 @@ import { businessRepository, socialRepository } from './services';
  * listelerinde aynı kişi tekrar okunmaz. Böylece ad değişikliği eski gönderilerde de görünür (gönderide yazılı ad
  * yalnızca profil okunamazsa kullanılır).
  */
-type Author = { photo?: Photo; displayName?: string; locationVerified?: LocationBadge };
+type Author = { photo?: Photo; displayName?: string; locationVerified?: LocationBadge; badges?: string[]; official?: boolean };
 const cache = new Map<string, Promise<Author>>();
 const listeners = new Set<() => void>();
 
@@ -17,7 +17,7 @@ function load(uid: string): Promise<Author> {
     cache.set(
       uid,
       socialRepository.getProfile(uid).then(
-        (p) => (p ? { photo: p.photo, displayName: p.displayName, locationVerified: p.locationVerified } : {}),
+        (p) => (p ? { photo: p.photo, displayName: p.displayName, locationVerified: p.locationVerified, badges: p.badges, official: p.official } : {}),
         () => ({}),
       ),
     );

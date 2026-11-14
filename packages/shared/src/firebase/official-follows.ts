@@ -12,7 +12,7 @@ import {
   type DocumentData,
   type Firestore,
   type WriteBatch,
-} from 'firebase/firestore';
+} from './metered';
 
 import type { UserProfile } from '../models/user';
 import {

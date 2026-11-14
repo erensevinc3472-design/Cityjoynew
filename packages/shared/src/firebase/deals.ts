@@ -13,7 +13,7 @@ import {
   type DocumentData,
   type Firestore,
   type WriteBatch,
-} from 'firebase/firestore';
+} from './metered';
 
 import type { Business } from '../business/business';
 import { sortDeals, type Deal, type DealInput, type DealReportReason, type DealStatus } from '../deals/deals';

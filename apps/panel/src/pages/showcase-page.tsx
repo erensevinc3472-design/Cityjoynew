@@ -19,6 +19,7 @@ import { locationRepository as repo } from '../lib/locations';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
 type ItemDraft = ShowcaseItem & { key: string };
@@ -135,7 +136,7 @@ export function ShowcasePage() {
       <header className="page-head">
         <div>
           <h1>{t('showcase.title')}</h1>
-          <p className="meta">{t('showcase.intro')}</p>
+          <Intro text={t('showcase.intro')} />
         </div>
         {canEdit && !draft ? (
           <div className="actions">

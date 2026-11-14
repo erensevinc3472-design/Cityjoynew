@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import {
   can,
+  CATEGORY_KEYWORDS_MAX,
   DEFAULT_SERVICE_CATEGORIES,
+  foldForSearch,
   isGrantActive,
   LANGUAGES,
   SERVICE_ICONS,
@@ -16,6 +18,7 @@ import { locationRepository } from '../lib/locations';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
+import { Intro } from '../components/intro';
 
 type Draft = {
   id?: string;
@@ -25,6 +28,7 @@ type Draft = {
   order: number;
   active: boolean;
   urgent: boolean;
+  keywords: string;
 };
 
 /**
@@ -49,6 +53,16 @@ export function ServiceCategoriesPage() {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string }>();
   const [busy, setBusy] = useState(false);
+  // Uzun liste (22 grup, 240+ hizmet): gruplar başta kapalı, aramada eşleşenler açılır (Eren, 12 Kasım 2026 panel yenileme).
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
+  const [query, setQuery] = useState('');
+  const toggleGroup = (id: string) =>
+    setOpenGroups((o) => {
+      const n = new Set(o);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
 
   const load = useCallback(async () => {
     setLoadError(false);
@@ -83,6 +97,7 @@ export function ServiceCategoriesPage() {
   const mains = all.filter((c) => c.parentId === null).sort(byOrder);
   const childrenOf = (id: string) => all.filter((c) => c.parentId === id).sort(byOrder);
   const showActions = canEdit && !usingDefaults;
+  const missingDefaults = usingDefaults || list === null ? [] : DEFAULT_SERVICE_CATEGORIES.filter((d) => !list.some((c) => c.id === d.id));
   const anyReview = canReview() || suggestionProvinces.some((p) => canReview(p));
 
   const act = async (fn: () => Promise<string>) => {
@@ -101,7 +116,7 @@ export function ServiceCategoriesPage() {
   const nextOrder = (parentId: string | null) =>
     all.filter((c) => c.parentId === parentId).reduce((m, c) => Math.max(m, c.order), 0) + 1;
 
-  const newDraft = (parentId: string | null): Draft => ({ parentId, names: {}, icon: 'category', order: nextOrder(parentId), active: true, urgent: false });
+  const newDraft = (parentId: string | null): Draft => ({ parentId, names: {}, icon: 'category', order: nextOrder(parentId), active: true, urgent: false, keywords: '' });
 
   const submitDraft = (e: FormEvent) => {
     e.preventDefault();
@@ -121,6 +136,7 @@ export function ServiceCategoriesPage() {
           order: draft.order,
           active: draft.active,
           ...(draft.parentId && draft.urgent ? { urgent: true } : {}),
+          ...(draft.parentId && draft.keywords.trim() ? { keywords: draft.keywords.trim() } : {}),
         },
         isNew,
       );
@@ -130,7 +146,17 @@ export function ServiceCategoriesPage() {
   };
 
   const edit = (c: ServiceCategory) =>
-    setDraft({ id: c.id, parentId: c.parentId, names: { ...c.names }, icon: c.icon, order: c.order, active: c.active, urgent: !!c.urgent });
+    setDraft({ id: c.id, parentId: c.parentId, names: { ...c.names }, icon: c.icon, order: c.order, active: c.active, urgent: !!c.urgent, keywords: c.keywords ?? '' });
+
+  const q = foldForSearch(query.trim());
+  const searching = q.length > 0;
+  const hit = (c: ServiceCategory) => [c.names.tr, c.keywords, ...Object.values(c.names)].some((v) => !!v && foldForSearch(v).includes(q));
+  const visibleTree = mains.flatMap((main) => {
+    const kids = childrenOf(main.id);
+    if (!searching) return [{ main, children: kids, open: openGroups.has(main.id) }];
+    const matched = hit(main) ? kids : kids.filter(hit);
+    return hit(main) || matched.length ? [{ main, children: matched, open: true }] : [];
+  });
 
   const row = (c: ServiceCategory, isChild: boolean) => {
     const missing = LANGUAGES.filter((l) => !c.names[l.code]).length;
@@ -139,7 +165,13 @@ export function ServiceCategoriesPage() {
         <td className="num">{c.order}</td>
         <td>
           {isChild ? <span className="tree-indent" aria-hidden="true">└</span> : null}
-          {isChild ? c.names.tr : <strong>{c.names.tr}</strong>}
+          {isChild ? c.names.tr : (
+            <button type="button" className="group-toggle" aria-expanded={searching || openGroups.has(c.id)} onClick={() => toggleGroup(c.id)} disabled={searching}>
+              <span aria-hidden="true">{searching || openGroups.has(c.id) ? '▾' : '▸'}</span>
+              <strong>{c.names.tr}</strong>
+              <span className="meta">{t('services.childCount', { count: childrenOf(c.id).length })}</span>
+            </button>
+          )}
           {c.urgent ? <> <span className="pill warn">{t('services.urgent')}</span></> : null}
           <div className="meta">
             {c.icon} · {missing ? t('services.missingTranslations', { count: missing }) : t('services.allTranslations')}
@@ -171,7 +203,7 @@ export function ServiceCategoriesPage() {
       <header className="page-head">
         <div>
           <h1>{t('services.title')}</h1>
-          <p className="meta">{t('services.intro')}</p>
+          <Intro text={t('services.intro')} />
         </div>
         {showActions ? (
           <div className="actions">
@@ -189,6 +221,14 @@ export function ServiceCategoriesPage() {
               {t('services.seed')}
             </button>
           ) : null}
+        </div>
+      ) : null}
+      {showActions && missingDefaults.length ? (
+        <div className="note">
+          <p>{t('services.missingDefaults', { count: missingDefaults.length })}</p>
+          <button className="btn" disabled={busy} onClick={() => act(async () => t('services.seeded', { count: await admin!.seedDefaults(new Set(list!.map((c) => c.id))) }))}>
+            {t('services.addMissing')}
+          </button>
         </div>
       ) : null}
       {message ? <p className={message.kind === 'error' ? 'error' : 'note'} role={message.kind === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -275,6 +315,13 @@ export function ServiceCategoriesPage() {
               <span className="meta">{t('services.urgentHint')}</span>
             </div>
           ) : null}
+          {draft.parentId ? (
+            <div className="field">
+              <label htmlFor="sc-keywords">{t('services.keywords')}</label>
+              <input id="sc-keywords" maxLength={CATEGORY_KEYWORDS_MAX} value={draft.keywords} onChange={(e) => setDraft({ ...draft, keywords: e.target.value })} />
+              <span className="meta">{t('services.keywordsHint')}</span>
+            </div>
+          ) : null}
           <h2 className="form-section">{t('services.names')}</h2>
           {LANGUAGES.map((l) => (
             <div key={l.code} className="field">
@@ -318,6 +365,14 @@ export function ServiceCategoriesPage() {
               onSave={(list) => act(async () => t('sort.saved', { count: await admin!.reorder(list) }))}
             />
           ) : null}
+          <div className="table-tools">
+            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('services.searchPlaceholder')} aria-label={t('services.searchPlaceholder')} />
+            {!searching ? (
+              <button type="button" className="link" onClick={() => setOpenGroups(openGroups.size === mains.length ? new Set() : new Set(mains.map((m) => m.id)))}>
+                {openGroups.size === mains.length ? t('services.collapseAll') : t('services.expandAll')}
+              </button>
+            ) : null}
+          </div>
           <table>
             <thead>
               <tr>
@@ -328,7 +383,10 @@ export function ServiceCategoriesPage() {
               </tr>
             </thead>
             <tbody>
-              {mains.flatMap((m) => [row(m, false), ...childrenOf(m.id).map((c) => row(c, true))])}
+              {visibleTree.flatMap(({ main, children, open }) => [row(main, false), ...(open ? children.map((c) => row(c, true)) : [])])}
+              {searching && !visibleTree.length ? (
+                <tr><td colSpan={showActions ? 4 : 3} className="state">{t('services.noMatch')}</td></tr>
+              ) : null}
             </tbody>
           </table>
           <p className="count">{t('services.count', { main: mains.length, sub: all.length - mains.length })} {t('services.noDelete')}</p>

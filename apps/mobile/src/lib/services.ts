@@ -12,9 +12,12 @@ import {
   createFirestoreCommunityRepository,
   createHolidayRepository,
   createSponsorRepository,
+  createOwnerPayments,
+  createPostVisibility,
   createFirestoreTravelRepository,
   createFirestorePostRepository,
   createFirestoreSocialRepository,
+  createBadgeReader,
   createFirestoreMessageRepository,
   createFirestoreListingRepository,
   createFirestoreCityGuideRepository,
@@ -35,7 +38,7 @@ import { Platform } from 'react-native';
 
 export { DuplicateBusinessError, SosSendTimeoutError } from '@cityjoy/shared/firebase';
 
-import { firebaseAuth, firestore } from './firebase';
+import { firebaseAuth, firestore, functions } from './firebase';
 import i18n from './i18n';
 import { deviceStorage } from './storage';
 
@@ -66,6 +69,8 @@ export const activityRepository = createFirestoreActivityRepository(firestore);
 export const postRepository = createFirestorePostRepository(firestore);
 /** Keşfet profili, takip ve engelleme. */
 export const socialRepository = createFirestoreSocialRepository(firestore);
+/** Keşfet rozetleri listesi (oturumda bir kez okunur). */
+export const badgeReader = createBadgeReader(firestore);
 /** Birebir mesajlar (yalnızca iki taraf okur). */
 export const messageRepository = createFirestoreMessageRepository(firestore);
 /** Çarşı ilanları (ikinci el eşya). */
@@ -84,6 +89,8 @@ export const communityRepository = createFirestoreCommunityRepository(firestore)
 /** Seyahat > Planla: tatil fikirlerinin konaklama tesisleri ve ekip düzenlemesi. */
 export const holidayRepository = createHolidayRepository(firestore);
 export const sponsorRepository = createSponsorRepository(firestore);
+export const ownerPayments = createOwnerPayments(firestore);
+export const postVisibility = createPostVisibility(functions);
 export const pushTokenRepository = createFirestorePushTokenRepository(firestore);
 /** Benim Şehrim sabit bilgileri: il başına özet tek okuma, bölüm yalnızca değişince indirilir. */
 export const cityGuide = createCityGuideStore(createFirestoreCityGuideRepository(firestore), deviceStorage);

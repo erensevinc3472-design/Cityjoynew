@@ -16,6 +16,7 @@ import { firestore } from '../lib/firebase';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
 import { GripIcon, SortBar, useSortableList } from '../components/sortable';
+import { Intro } from '../components/intro';
 
 type Texts = Partial<Record<LanguageCode, string>>;
 type Draft = { id?: string; number: string; names: Texts; notes: Texts; icon: EmergencyIcon; order: number; active: boolean };
@@ -114,7 +115,7 @@ export function EmergencyNumbersPage() {
       <header className="page-head">
         <div>
           <h1>{t('emergency.title')}</h1>
-          <p className="meta">{t('emergency.intro')}</p>
+          <Intro text={t('emergency.intro')} />
         </div>
         {canEdit && !usingDefaults ? (
           <div className="actions">

@@ -7,7 +7,12 @@ import { foldForSearch } from '../locations/search';
  * ("berber" > "be", "ber", "berb"...), Türkçe karakter ve büyük/küçük harf farkı olmadan. Sorgu bu anahtarlardan
  * biriyle eşleşen belgeleri getirir, kalan kelimeler telefonda süzülür.
  */
-export const SEARCH_TABS = ['tumu', 'kisiler', 'isletmeler', 'yerler', 'etkinlikler', 'gonderiler'] as const;
+/**
+ * Arama kapsamı (Karar Eren, 13 Kasım 2026): kişiler, işletme adları ve yerler Türkiye geneli (yakındakiler önce);
+ * hizmetler (meslek) bölgesel: önce ilçe, sonra il, istenirse başka il. Gönderiler Genel + il + mahalle. Etkinlikler
+ * aramada yok (Etkinlik bölümünde).
+ */
+export const SEARCH_TABS = ['tumu', 'kisiler', 'isletmeler', 'hizmetler', 'yerler', 'gonderiler'] as const;
 export type SearchTab = (typeof SEARCH_TABS)[number];
 
 export const SEARCH_LIMITS = {
@@ -18,6 +23,8 @@ export const SEARCH_LIMITS = {
   minPost: 3,
   profileKeys: 40,
   businessKeys: 60,
+  /** Gezilecek yer adı (Ulu Cami, Alanya Kalesi). */
+  placeKeys: 40,
   postKeys: 300,
   /** Son aramalar telefonda saklanır. */
   recent: 10,
@@ -125,4 +132,50 @@ export function cleanSuggestions(lines: readonly string[]): string[] {
     if (out.length >= SEARCH_LIMITS.suggestions) break;
   }
   return out;
+}
+
+/** Bir kaydın yeri (il plaka kodu ve ilçe kimliği). */
+export interface SearchPlace {
+  provinceCode?: string;
+  districtId?: string;
+}
+
+/**
+ * Türkiye geneli sonuçlarda yakındakiler önce: aynı ilçe, sonra aynı il, sonra diğer iller. Her grubun içindeki sıra
+ * korunur (önce gelen sıralama, ör. doğrulanmış işletmeler önce, bozulmaz).
+ */
+export function nearFirst<T>(items: readonly T[], at: SearchPlace, placeOf: (item: T) => SearchPlace): T[] {
+  const tier = (x: T) => {
+    const p = placeOf(x);
+    if (at.districtId && p.districtId === at.districtId) return 0;
+    if (at.provinceCode && p.provinceCode === at.provinceCode) return 1;
+    return 2;
+  };
+  return items
+    .map((item, i) => ({ item, i, t: tier(item) }))
+    .sort((a, b) => a.t - b.t || a.i - b.i)
+    .map((x) => x.item);
+}
+
+/** Aynı kimlikli kayıtlar bir kez (ilk görülen kalır). */
+export function uniqueById<T extends { id: string }>(items: readonly T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((x) => !seen.has(x.id) && (seen.add(x.id), true));
+}
+
+/**
+ * Hizmet kategorisinin aramadaki metni: beş dildeki adı ve paneldeki eş anlamlı kelimeler ("kuaför" için "berber,
+ * saç"; "hırdavat" için "hırdavatçı, nalbur").
+ */
+export function categorySearchText(c: { names: Partial<Record<string, string>>; keywords?: string }): string {
+  return [...Object.values(c.names), (c.keywords ?? '').replace(/,/g, ' ')].filter(Boolean).join(' ');
+}
+
+/**
+ * Yazılan bir meslek mi: sorgudaki her kelime bir kategorinin adında ya da eş anlamlılarında kesin geçiyor ("hırdavat"
+ * evet, "Emre Hırdavat" hayır: "Emre" bir meslek değil, işletme adıdır). Tümü sekmesinde Hizmetler bölümü o zaman
+ * en üste çıkar.
+ */
+export function isServiceQuery(categories: readonly { names: Partial<Record<string, string>>; keywords?: string }[], query: string): boolean {
+  return categories.some((c) => matchesSearch(categorySearchText(c), query, false));
 }

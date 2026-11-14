@@ -1,9 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { NEWS_CATEGORIES, readingMinutes, type Announcement } from '@cityjoy/shared';
+import { NEWS_CATEGORIES, readingMinutes, type Announcement, type Post } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
@@ -13,6 +13,7 @@ import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useAnnouncements, useAuthorLabel } from '@/lib/announcements';
 import { locationRepository as repo } from '@/lib/locations';
+import { postRepository } from '@/lib/services';
 import { useSettings } from '@/lib/settings';
 import { useUserLocation } from '@/lib/user-location';
 import { radius, spacing } from '@/theme/tokens';
@@ -31,7 +32,12 @@ export default function NewsScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const { location } = useUserLocation();
-  const { list, failed, reload } = useAnnouncements(location, 'haberler');
+  const { list, failed, reload: reloadOfficial } = useAnnouncements(location, 'haberler');
+  const local = useLocalPublishers(location?.provinceCode);
+  const reload = () => {
+    reloadOfficial();
+    local.reload();
+  };
   const [scope, setScope] = useState<Scope>('bolgesel');
   const [category, setCategory] = useState<string | null>(null);
   const province = location ? repo.getProvince(location.provinceCode)?.name : undefined;
@@ -86,6 +92,17 @@ export default function NewsScreen() {
             )}
           </>
         )}
+        {scope === 'bolgesel' && local.posts?.length ? (
+          <>
+            <AppText variant="label" accessibilityRole="header" style={{ color: c.textStrong }}>{t('news.localTitle')}</AppText>
+            <ListSurface>
+              {local.posts.map((p, n) => (
+                <PublisherRow key={p.id} post={p} first={n === 0} onPress={() => router.push({ pathname: '/explore/[id]', params: { id: p.id } })} />
+              ))}
+            </ListSurface>
+            <AppText variant="caption" muted>{t('news.localHint')}</AppText>
+          </>
+        ) : null}
         <AppText variant="caption" muted>{t('news.sourceNote')}</AppText>
         <View style={[styles.publisher, { borderColor: c.accentBorder }]}>
           <MaterialIcons name="rss-feed" size={20} color={c.accent} />
@@ -98,6 +115,25 @@ export default function NewsScreen() {
       </ScrollView>
     </Screen>
   );
+}
+
+/** Yayıncı rozetli hesapların Haberler'e paylaştıkları (ildeki en yeni 20; tek sorgu). Hata olursa bölüm görünmez. */
+function useLocalPublishers(provinceCode: string | undefined) {
+  const [posts, setPosts] = useState<Post[] | null>(null);
+  const reload = useCallback(() => {
+    if (!provinceCode) return setPosts(null);
+    postRepository.news(provinceCode).then(setPosts).catch(() => setPosts([]));
+  }, [provinceCode]);
+  useEffect(reload, [reload]);
+  return { posts, reload };
+}
+
+function PublisherRow({ post, first, onPress }: { post: Post; first: boolean; onPress(): void }) {
+  const c = useThemeColors();
+  const { language } = useSettings();
+  const date = post.createdAt ? new Date(post.createdAt).toLocaleDateString(language ?? 'tr', { day: 'numeric', month: 'short' }) : '';
+  const line = post.text.split(/\r?\n/)[0]!.slice(0, 120) || post.authorName;
+  return <ListRow first={first} leading={<RowIcon icon="campaign" tint={c.accent} />} title={line} subtitle={[post.authorName, date].filter(Boolean).join(' · ')} onPress={onPress} />;
 }
 
 function useMeta(item: Announcement) {

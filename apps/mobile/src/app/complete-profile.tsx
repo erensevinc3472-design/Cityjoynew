@@ -7,7 +7,6 @@ import { ageGroup, birthYearError, LEGAL_TEXT_VERSION, type Gender } from '@city
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { AuthScene, onboardingStyles, StepDots } from '@/components/auth-scene';
-import { AUTH_ART } from '@/lib/app-art';
 import { Chips } from '@/components/chips';
 import { CheckboxRow } from '@/components/checkbox-row';
 import { FormMessage } from '@/components/form-message';
@@ -116,7 +115,7 @@ export default function CompleteProfileScreen() {
   const occupationLabel = occupations?.find((o) => o.id === occupationId)?.name;
 
   return (
-    <AuthScene kind="news" image={AUTH_ART.permission} logo={false}>
+    <AuthScene kind="news" art="permission" logo={false}>
       <StepDots total={3} current={2} label={t('onboarding.step', { n: 3, total: 3 })} />
       <View style={onboardingStyles.texts}>
         <AppText accessibilityRole="header" style={onboardingStyles.title}>{t('onboarding.notifyTitle')}</AppText>

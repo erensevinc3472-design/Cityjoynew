@@ -29,6 +29,8 @@ import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { EmptyState } from '../components/empty-state';
+import { Intro } from '../components/intro';
 
 type Caps = Partial<Record<Module, Action[]>>;
 type Level = RegionScope['level'];
@@ -275,7 +277,7 @@ function ManageGrants({ user, granter }: { user: PanelUser; granter: Granter }) 
       <header className="page-head">
         <div>
           <h1>{t('grants.title')}</h1>
-          <p className="meta">{granter.isAdmin ? t('grants.introAdmin') : t('grants.introProvince')}</p>
+          <Intro text={granter.isAdmin ? t('grants.introAdmin') : t('grants.introProvince')} />
         </div>
         {!draft && !user.isDemo ? (
           <div className="actions">
@@ -320,7 +322,7 @@ function ManageGrants({ user, granter }: { user: PanelUser; granter: Granter }) 
       ) : grants === null ? (
         <div className="state" aria-live="polite">{t('grants.loading')}</div>
       ) : visible.length === 0 ? (
-        <div className="state">{t('grants.empty')}</div>
+        <EmptyState text={t('grants.empty')} {...(!draft && !user.isDemo ? { actionLabel: t('grants.new'), onAction: () => setDraft(newDraft(granter)) } : {})} />
       ) : (
         <div className="table-wrap">
           <table>

@@ -1,5 +1,5 @@
 import { cleanPhoto, type Photo } from '../media/photo';
-import type { MembershipTier } from '../models/membership';
+import type { BusinessMembership, MembershipTier } from '../models/membership';
 import { isReservedName } from '../organizations/municipalities';
 import { cleanLodging, validateLodging, type LodgingInfo } from '../travel/holiday';
 
@@ -222,7 +222,7 @@ export interface Business extends BusinessInput {
   ownerUid: string;
   status: BusinessStatus;
   verification: { status: VerificationStatus; verifiedAt?: string };
-  membership: { tier: MembershipTier; endsAt?: string };
+  membership: BusinessMembership;
   /** Ücretli öne çıkma bitişi (ISO); kartta "Reklam" etiketi çıkar. */
   featuredUntil?: string;
   /** Yayındaki değerlendirmelerin yıldız toplamı ve sayısı; ortalama hesaplanır (kurallar toplamı denetler). */
@@ -447,6 +447,8 @@ export interface BusinessRepository {
   listInProvince(provinceCode: string): Promise<Business[]>;
   /** Ara > İşletmeler: ildeki yayındaki işletmelerden adının bir kelimesi anahtarla başlayanlar (en çok 30). */
   searchByName(provinceCode: string, key: string): Promise<Business[]>;
+  /** Ara > İşletmeler (Türkiye geneli, Eren 13 Kasım 2026): adının bir kelimesi anahtarla başlayan yayındaki işletmeler (en çok 30). */
+  searchByNameAll(key: string): Promise<Business[]>;
   get(id: string): Promise<Business | null>;
   listMine(uid: string): Promise<Business[]>;
   /** Kişinin yetkili olduğu (sahibi olmadığı) işletmeler. */
@@ -459,6 +461,11 @@ export interface BusinessRepository {
   unfollow(id: string, uid: string): Promise<void>;
   /** Takip ettiğim işletmelerin kimlikleri (en çok 200). */
   followedIds(uid: string): Promise<string[]>;
+  /**
+   * İşletmenin takipçileri (yalnızca sahibi ve yetkilileri okur; kurallarda). Kişi kimlikleri en yeni önce, 30'ar;
+   * imleç son takibin tarihi (14 Kasım 2026).
+   */
+  followerPage(id: string, cursor?: string | null): Promise<{ uids: string[]; next: string | null }>;
   /** Hesap silinirken işletme takipleri ve yetkililikler bırakılır. */
   leaveAllOf(uid: string): Promise<void>;
   create(uid: string, input: BusinessInput): Promise<string>;

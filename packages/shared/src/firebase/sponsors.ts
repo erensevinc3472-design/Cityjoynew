@@ -1,4 +1,4 @@
-import { collection, deleteField, doc, getDocs, limit, query, serverTimestamp, where, writeBatch, type DocumentData, type Firestore } from 'firebase/firestore';
+import { collection, deleteField, doc, getDocs, limit, query, serverTimestamp, where, writeBatch, type DocumentData, type Firestore } from './metered';
 
 import { cleanPhoto, photoFrom } from '../media/photo';
 import { SPONSOR_NATIONWIDE, SPONSOR_PLACES, type Sponsor, type SponsorInput, type SponsorPlace } from '../sponsors/sponsors';

@@ -5,17 +5,16 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { GUTTER, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
-
-/** Eren'in şehir silüeti resmi (8 Kasım 2026, her ilde aynı; kaynak CityJoy-gorseller/siluet.png). */
-const SKYLINE_ART = require('../../assets/city/siluet.jpg') as number;
+import { useArt } from '@/lib/app-art';
 
 /** Sayfanın en altında kenardan kenara şehir silüeti; üst kenarı sayfa rengine erir. ScrollView içeriğinin sonuna konur. */
 export function Skyline({ style }: { style?: StyleProp<ViewStyle> }) {
   const c = useThemeColors();
+  const art = useArt()('citySkyline');
   const id = 'skyfade' + useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
     <View pointerEvents="none" style={[styles.skyline, style]}>
-      <Image source={SKYLINE_ART} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
+      <Image source={art?.source} onError={art?.onError} style={StyleSheet.absoluteFill} contentFit="cover" accessible={false} />
       <Svg width="100%" height="100%" preserveAspectRatio="none" style={StyleSheet.absoluteFill}>
         <Defs>
           <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">

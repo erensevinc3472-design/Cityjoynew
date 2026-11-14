@@ -6,7 +6,7 @@ import {
   serverTimestamp,
   writeBatch,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import type { Action, Module } from '../permissions/types';
 import { DEFAULT_OCCUPATIONS } from '../services/occupations';

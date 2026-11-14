@@ -118,6 +118,15 @@ describe('users', () => {
     });
     await assertSucceeds(updateDoc(ref, { location: second, locationChangedAt: serverTimestamp(), updatedAt: serverTimestamp() }));
   });
+
+  it('CityJoy yöneticisi deneme için mahallesini bekleme olmadan değiştirir', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    const ref = doc(db('eren'), 'users/eren');
+    await assertSucceeds(setDoc(ref, profile('eren')));
+    const first = { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-ataevler' };
+    await assertSucceeds(updateDoc(ref, { location: first, locationChangedAt: serverTimestamp(), updatedAt: serverTimestamp() }));
+    await assertSucceeds(updateDoc(ref, { location: { ...first, neighbourhoodId: '16-nilufer-beşevler' }, locationChangedAt: serverTimestamp(), updatedAt: serverTimestamp() }));
+  });
 });
 
 describe('occupations, admins, auditLog', () => {
@@ -155,6 +164,9 @@ describe('occupations, admins, auditLog', () => {
     await assertFails(setDoc(doc(db('ali'), 'serviceCategories/ev'), c('ali', null)));
     await assertSucceeds(setDoc(doc(db('eren'), 'serviceCategories/ev'), c('eren', null)));
     await assertSucceeds(setDoc(doc(db('eren'), 'serviceCategories/cilingir'), c('eren', 'ev', { urgent: true })));
+    // Arama kelimeleri (en çok 300 harf).
+    await assertSucceeds(setDoc(doc(db('eren'), 'serviceCategories/berber'), c('eren', 'ev', { keywords: 'tıraş, sakal' })));
+    await assertFails(setDoc(doc(db('eren'), 'serviceCategories/berber'), c('eren', 'ev', { keywords: 'x'.repeat(301) })));
     // Üstü olmayan ya da üçüncü seviye kategori kurulamaz.
     await assertFails(setDoc(doc(db('eren'), 'serviceCategories/x'), c('eren', 'yok')));
     await assertFails(setDoc(doc(db('eren'), 'serviceCategories/y'), c('eren', 'cilingir')));
@@ -212,6 +224,13 @@ describe('occupations, admins, auditLog', () => {
       b.set(doc(f, 'businessPhones/05321234567'), { businessId: id, ownerUid: uid });
       return b.commit();
     };
+    // Askıdaki işletmenin sahibi (yasak kaydı varsa) yeni işletme açamaz.
+    await seed('businessBans/ali', { uid: 'ali', businessId: 'eski' });
+    await assertFails(create('ali', 'b1'));
+    await assertSucceeds(getDoc(doc(db('ali'), 'businessBans/ali')));
+    await assertFails(getDoc(doc(db('veli'), 'businessBans/ali')));
+    await assertFails(deleteDoc(doc(db('ali'), 'businessBans/ali')));
+    await env.withSecurityRulesDisabled((c) => deleteDoc(doc(c.firestore(), 'businessBans/ali')));
     await assertSucceeds(create('ali', 'b1'));
     await assertFails(create('veli', 'b2'));
 
@@ -418,5 +437,33 @@ describe('günlük sınırlar', () => {
     // Panel > Sınırlar bütün sayıları (vitrin dahil) birlikte yazar.
     await assertSucceeds(setDoc(doc(db('eren'), 'config/limits'), { ...DEFAULT_LIMITS, oneriYeni: 3, updatedBy: 'eren', updatedAt: serverTimestamp() }));
     await assertSucceeds(bump(db('ali'), 3, 'serviceSuggestions/a'));
+  });
+});
+
+describe('hesap askıları', () => {
+  it('askı kaydını admin ve kişinin kendisi okur, başkası okuyamaz, kimse yazamaz', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    await seed('suspensions/ali', { uid: 'ali', active: true, reason: 'spam' });
+    await assertSucceeds(getDoc(doc(db('eren'), 'suspensions/ali')));
+    await assertSucceeds(getDoc(doc(db('ali'), 'suspensions/ali')));
+    await assertFails(getDoc(doc(db('veli'), 'suspensions/ali')));
+    await assertFails(setDoc(doc(db('eren'), 'suspensions/veli'), { uid: 'veli', active: true }));
+    await assertFails(setDoc(doc(db('ali'), 'suspensions/ali'), { uid: 'ali', active: false }));
+  });
+
+  it('işletme askı kaydını admin ve işletmenin sahibi okur, başkası okuyamaz, kimse yazamaz', async () => {
+    await seed('admins/eren', { addedAt: 'konsol' });
+    await seed('businessSuspensions/b9', { businessId: 'b9', ownerUid: 'ali', active: true, reason: 'spam' });
+    await assertSucceeds(getDoc(doc(db('eren'), 'businessSuspensions/b9')));
+    await assertSucceeds(getDoc(doc(db('ali'), 'businessSuspensions/b9')));
+    await assertFails(getDoc(doc(db('veli'), 'businessSuspensions/b9')));
+    await assertFails(setDoc(doc(db('ali'), 'businessSuspensions/b9'), { businessId: 'b9', ownerUid: 'ali', active: false }));
+  });
+
+  it('kişi profiline askı işareti koyamaz ya da silemez; askıdaki profili düzenleyemez', async () => {
+    await seed('publicProfiles/ali', { displayName: 'Ali', bio: '', isPrivate: false, searchKeys: ['ali'], updatedAt: serverTimestamp() });
+    await assertFails(updateDoc(doc(db('ali'), 'publicProfiles/ali'), { suspended: true, updatedAt: serverTimestamp() }));
+    await seed('publicProfiles/veli', { displayName: 'Veli', bio: '', isPrivate: false, searchKeys: ['veli'], suspended: true, updatedAt: serverTimestamp() });
+    await assertFails(updateDoc(doc(db('veli'), 'publicProfiles/veli'), { bio: 'merhaba', updatedAt: serverTimestamp() }));
   });
 });

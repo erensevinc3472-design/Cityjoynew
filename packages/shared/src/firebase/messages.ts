@@ -14,7 +14,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { MESSAGE_LIMITS, quotaAfter, threadId, unreadKey, type Chat, type ChatContext, type ChatMessage, type MessageReportReason } from '../messages/messages';
 import { addAudit, iso } from './grants';

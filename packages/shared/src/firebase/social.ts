@@ -9,15 +9,19 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
+  startAfter,
+  Timestamp,
   updateDoc,
   where,
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
-import { blockId, followId, PROFILE_LIMITS, type FollowStatus, type ProfileReportReason, type PublicProfile } from '../posts/social';
+import { TAG_POLICIES, type TagPolicy } from '../posts/posts';
+import { blockId, followId, PROFILE_LIMITS, type FollowPage, type FollowStatus, type ProfileReportReason, type PublicProfile } from '../posts/social';
 import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { addAudit, iso } from './grants';
 import { countUsage } from './limits';
@@ -27,9 +31,12 @@ const FOLLOWS = 'follows';
 const BLOCKS = 'blocks';
 const REPORTS = 'profileReports';
 
+/** Ortak takip için okunan en çok takip (maliyet sınırı; 7 küçük sorgu). */
+const MUTUAL_SCAN = 200;
+
 const nameKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.profileKeys);
 
-function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
+export function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
   const photo = photoFrom(d.photo);
   return {
     uid,
@@ -40,6 +47,10 @@ function profileFromDoc(uid: string, d: DocumentData): PublicProfile {
     ...(photo ? { photo } : {}),
     photoRemoved: d.photoRemoved === true,
     ...(d.locationVerified === 'mahalle' || d.locationVerified === 'ilce' ? { locationVerified: d.locationVerified } : {}),
+    ...(d.suspended === true ? { suspended: true } : {}),
+    ...(d.publisher === true ? { publisher: true } : {}),
+    ...(d.official === true ? { official: true } : {}),
+    ...(Array.isArray(d.badges) && d.badges.length ? { badges: d.badges.filter((b: unknown): b is string => typeof b === 'string').slice(0, 3) } : {}),
   };
 }
 
@@ -172,12 +183,84 @@ export function createFirestoreSocialRepository(db: Firestore) {
       return { followers: a.data().count, following: b.data().count };
     },
 
+    /**
+     * Takipçi / Takip listesi (14 Kasım 2026): onaylı takipler en yeni önce, 30'ar kişi. İmleç son takibin tarihidir.
+     * Gizli hesabın listesini uygulama yalnızca takipçilerine açar (sayılar herkese açık olduğu için kayıtlar da okunur).
+     */
+    async followPage(uid: string, side: 'takipci' | 'takip', cursor?: string | null): Promise<FollowPage<PublicProfile>> {
+      const field = side === 'takipci' ? 'followeeUid' : 'followerUid';
+      const other = side === 'takipci' ? 'followerUid' : 'followeeUid';
+      const snap = await getDocs(
+        query(
+          collection(db, FOLLOWS),
+          where(field, '==', uid),
+          where('status', '==', 'aktif'),
+          orderBy('createdAt', 'desc'),
+          ...(cursor ? [startAfter(Timestamp.fromDate(new Date(cursor)))] : []),
+          limit(PROFILE_LIMITS.followPage),
+        ),
+      );
+      const uids = snap.docs.map((d) => d.get(other) as string);
+      const found = new Map((await this.profilesOf(uids)).map((p) => [p.uid, p]));
+      const last = snap.docs[snap.docs.length - 1];
+      return {
+        items: uids.flatMap((u) => (found.has(u) ? [found.get(u)!] : [])),
+        next: snap.docs.length === PROFILE_LIMITS.followPage && last ? (iso(last.get('createdAt')) ?? null) : null,
+      };
+    },
+
+    /** Listedeki kişilerle benim takip durumum (tek sorgu, en çok 30 kişi): kimlik > aktif / istek. */
+    async followStatesOf(me: string, uids: readonly string[]): Promise<Map<string, FollowStatus>> {
+      const part = uids.filter((u) => u !== me).slice(0, 30);
+      if (!part.length) return new Map();
+      const snap = await getDocs(query(collection(db, FOLLOWS), where('followerUid', '==', me), where('followeeUid', 'in', part)));
+      return new Map(snap.docs.map((d) => [d.get('followeeUid') as string, d.get('status') as FollowStatus]));
+    },
+
     /** Takip ettiklerim (Takip akışı için, en çok 30). */
     async followingUids(me: string): Promise<string[]> {
       const snap = await getDocs(
         query(collection(db, FOLLOWS), where('followerUid', '==', me), where('status', '==', 'aktif'), limit(PROFILE_LIMITS.feedAuthors)),
       );
       return snap.docs.map((d) => d.get('followeeUid') as string);
+    },
+
+    /**
+     * Ortak takip (profilde "Ahmet K., Ayşe Y. ve 3 kişi daha takip ediyor"): benim takip ettiklerimden bu kişiyi takip
+     * edenler. Takip listem en çok MUTUAL_SCAN kişi okunur, 30'luk parçalarla sorulur (yalnızca eşleşenler okunur).
+     */
+    /**
+     * Ortak takipçiler: takip ettiklerimden kimler bu kişiyi takip ediyor. Takip listem oturumda zaten okunduğu için
+     * buraya verilir (her profil açılışında yeniden okunmaz); en çok MUTUAL_SCAN kişi, 30'arlı sorgularla.
+     */
+    async mutualFollowers(myFollowing: readonly string[], other: string): Promise<string[]> {
+      const uids = myFollowing.filter((u) => u !== other).slice(0, MUTUAL_SCAN);
+      const parts: string[][] = [];
+      for (let i = 0; i < uids.length; i += 30) parts.push(uids.slice(i, i + 30));
+      const found = await Promise.all(
+        parts.map((part) =>
+          getDocs(query(collection(db, FOLLOWS), where('followeeUid', '==', other), where('status', '==', 'aktif'), where('followerUid', 'in', part)))
+            .then((snap) => snap.docs.map((d) => d.get('followerUid') as string))
+            .catch(() => [] as string[]),
+        ),
+      );
+      return found.flat();
+    },
+
+    /** Profiller (ortak takip satırı ve listesi için; en çok 30). */
+    async profilesOf(uids: readonly string[]): Promise<PublicProfile[]> {
+      const snaps = await Promise.all(uids.slice(0, 30).map((u) => getDoc(profileRef(u)).catch(() => null)));
+      return snaps.flatMap((x) => (x?.exists() && x.get('suspended') !== true ? [profileFromDoc(x.id, x.data())] : []));
+    },
+
+    /** "Beni kim etiketleyebilir" (kişinin kendi ayarı; varsayılan herkes). */
+    async tagPolicy(me: string): Promise<TagPolicy> {
+      const v = (await getDoc(doc(db, 'users', me, 'settings', 'privacy')).catch(() => null))?.get('tagPolicy');
+      return (TAG_POLICIES as readonly string[]).includes(v) ? (v as TagPolicy) : 'herkes';
+    },
+
+    async setTagPolicy(me: string, policy: TagPolicy): Promise<void> {
+      await setDoc(doc(db, 'users', me, 'settings', 'privacy'), { tagPolicy: policy, updatedAt: serverTimestamp() });
     },
 
     /** Engelle: iki yöndeki takip de biter. */

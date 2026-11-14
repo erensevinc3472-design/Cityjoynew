@@ -9,7 +9,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { byIssueDesc, type CityShowcase, type CityShowcaseInput, type ShowcaseStatus } from '../city-guide/showcase';
 import { addAudit, iso } from './grants';

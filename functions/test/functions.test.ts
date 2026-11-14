@@ -5,13 +5,21 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { handleAnnouncementWrite } from '../src/announcements';
 import { handleBusinessPostWrite } from '../src/business-posts';
+import { handleBroadcastEstimate, handleBroadcastReview, handleBroadcastSend } from '../src/broadcasts';
 import { handleBudgetNotice, handleManualStop } from '../src/budget';
 import { handleActivityChange, handleEventChange } from '../src/cancellations';
-import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from '../src/cleanup';
+import { deleteExpiredPushLog, deleteExpiredSos, deleteExpiredViewLog, deleteUserLeftovers } from '../src/cleanup';
+import { handleCostReport, handleReportUsage, UsageError, type MonitoringFetch } from '../src/cost-report';
+import { isCostSampled } from '@cityjoy/shared';
+import { handlePostTags, handleRecordViews, removeTagsOf, ViewError, VIEW_LIMITS } from '../src/post-tags';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS } from '../src/photos';
 import type { NotifyDeps } from '../src/push';
 import { handleFollowWrite, handleMessageCreate } from '../src/social';
+import { handleLift, handleSuspend, liftExpiredSuspensions } from '../src/suspensions';
+import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensions } from '../src/business-suspensions';
 import { handleThumb, type ThumbStore } from '../src/thumbs';
+import { expireMemberships, handleStoreEvent, type ProState } from '../src/memberships';
+import { applyTierVisibility, handleBusinessTierChange, handleTierVisibilityChoice, remindProEnding } from '../src/tier-visibility';
 import sharp from 'sharp';
 import { deleteOldTranslations, handleTranslate, translationId, type Translator } from '../src/translate';
 
@@ -590,5 +598,410 @@ describe('küçük kopya', () => {
     expect(await handleThumb('posts/u1/p1/video.mp4', 'video/mp4', 't', store)).toBeNull();
     expect(await handleThumb('baska/x.jpg', 'image/jpeg', 't', store)).toBeNull();
     expect(written).toHaveLength(0);
+  });
+});
+
+describe('hesap askıya alma', () => {
+  const fake = () => {
+    const off = new Set<string>();
+    return { off, accounts: { disable: async (u: string) => void off.add(u), enable: async (u: string) => void off.delete(u) } };
+  };
+  beforeEach(async () => {
+    await db.doc('admins/A').set({ at: Timestamp.now() });
+    await db.doc('publicProfiles/U').set({ displayName: 'Ali V.', bio: '', isPrivate: false });
+    await db.doc('users/U').set({ uid: 'U' });
+  });
+
+  it('admin askıya alır: giriş kapanır, profil işaretlenir, kayıt ve işlem kaydı yazılır', async () => {
+    const { off, accounts } = fake();
+    await handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'taciz', days: 7, note: 'üç şikâyet' }, NOW);
+    expect(off.has('U')).toBe(true);
+    expect((await db.doc('publicProfiles/U').get()).get('suspended')).toBe(true);
+    const s = await db.doc('suspensions/U').get();
+    expect(s.get('active')).toBe(true);
+    expect(s.get('displayName')).toBe('Ali V.');
+    expect((s.get('until') as Timestamp).toMillis()).toBe(NOW.getTime() + 7 * 86_400_000);
+    expect((await db.collection('auditLog').where('targetId', '==', 'U').get()).size).toBe(1);
+  });
+
+  it('admin olmayan, admini ya da kendini askıya alamaz; geçersiz istek reddedilir', async () => {
+    const { off, accounts } = fake();
+    await expect(handleSuspend(db, accounts, 'U', { uid: 'A', reason: 'spam', days: null }, NOW)).rejects.toThrow('yetki');
+    await db.doc('admins/B').set({ at: Timestamp.now() });
+    await expect(handleSuspend(db, accounts, 'A', { uid: 'B', reason: 'spam', days: null }, NOW)).rejects.toThrow('admin');
+    await expect(handleSuspend(db, accounts, 'A', { uid: 'A', reason: 'spam', days: null }, NOW)).rejects.toThrow('admin');
+    await expect(handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'kotu', days: 7 }, NOW)).rejects.toThrow('gecersiz');
+    await expect(handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'spam', days: 5 }, NOW)).rejects.toThrow('gecersiz');
+    expect(off.size).toBe(0);
+  });
+
+  it('askı kaldırılınca giriş açılır ve profil işareti silinir', async () => {
+    const { off, accounts } = fake();
+    await handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'spam', days: null }, NOW);
+    await handleLift(db, accounts, 'A', 'U', NOW);
+    expect(off.has('U')).toBe(false);
+    expect((await db.doc('publicProfiles/U').get()).get('suspended')).toBeUndefined();
+    expect((await db.doc('suspensions/U').get()).get('active')).toBe(false);
+    await expect(handleLift(db, accounts, 'A', 'U', NOW)).rejects.toThrow('yok');
+  });
+
+  it('askıda kişinin kendi gönderileri akıştan gizlenir, işletme adına olanlar kalır; askı kalkınca geri açılır', async () => {
+    const { accounts } = fake();
+    await db.doc('posts/p1').set({ authorUid: 'U', status: 'aktif' });
+    await db.doc('posts/p2').set({ authorUid: 'U', status: 'aktif', business: { id: 'b1', name: 'Kafe' } });
+    await db.doc('posts/p3').set({ authorUid: 'X', status: 'aktif' });
+    await handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'spam', days: null }, NOW);
+    expect((await db.doc('posts/p1').get()).get('authorSuspended')).toBe(true);
+    expect((await db.doc('posts/p2').get()).get('authorSuspended')).toBeUndefined();
+    expect((await db.doc('posts/p3').get()).get('authorSuspended')).toBeUndefined();
+    await handleLift(db, accounts, 'A', 'U', NOW);
+    expect((await db.doc('posts/p1').get()).get('authorSuspended')).toBeUndefined();
+  });
+
+  it('süresi dolan askı kendiliğinden kalkar, süresiz olan kalır', async () => {
+    const { off, accounts } = fake();
+    await db.doc('publicProfiles/V').set({ displayName: 'Veli', bio: '', isPrivate: false });
+    await handleSuspend(db, accounts, 'A', { uid: 'U', reason: 'spam', days: 1 }, NOW);
+    await handleSuspend(db, accounts, 'A', { uid: 'V', reason: 'spam', days: null }, NOW);
+    expect(await liftExpiredSuspensions(db, accounts, new Date(NOW.getTime() + 3_600_000))).toBe(0);
+    expect(await liftExpiredSuspensions(db, accounts, new Date(NOW.getTime() + 2 * 86_400_000))).toBe(1);
+    expect(off.has('U')).toBe(false);
+    expect(off.has('V')).toBe(true);
+    expect(await liftExpiredSuspensions(db, accounts, new Date(NOW.getTime() + 3 * 86_400_000))).toBe(0);
+  });
+});
+
+describe('işletme askıya alma', () => {
+  beforeEach(async () => {
+    await db.doc('admins/A').set({ at: Timestamp.now() });
+    await db.doc('businesses/b1').set({ name: 'Ali Tesisat', ownerUid: 'U', status: 'gizli', location: { provinceCode: '16', districtId: '16-nilufer' } });
+  });
+
+  it('admin askıya alır: işletme kaldırılır, sahibine yasak konur; kaldırınca eski durumuna döner, yasak kalkar', async () => {
+    await handleBusinessSuspend(db, 'A', { businessId: 'b1', reason: 'spam', days: 30, banOwner: true, note: 'sahte yorumlar' }, NOW);
+    expect((await db.doc('businesses/b1').get()).get('status')).toBe('kaldirildi');
+    const s = await db.doc('businessSuspensions/b1').get();
+    expect(s.get('ownerUid')).toBe('U');
+    expect(s.get('prevStatus')).toBe('gizli');
+    expect((await db.doc('businessBans/U').get()).exists).toBe(true);
+    await handleBusinessLift(db, 'A', 'b1', NOW);
+    expect((await db.doc('businesses/b1').get()).get('status')).toBe('gizli');
+    expect((await db.doc('businessBans/U').get()).exists).toBe(false);
+    expect((await db.doc('businessSuspensions/b1').get()).get('active')).toBe(false);
+    expect((await db.collection('auditLog').where('targetId', '==', 'b1').get()).size).toBe(2);
+  });
+
+  it('yasak istenmezse sahibi yeni işletme açabilir; admin olmayan askıya alamaz', async () => {
+    await expect(handleBusinessSuspend(db, 'U', { businessId: 'b1', reason: 'spam', days: 7, banOwner: true }, NOW)).rejects.toThrow('yetki');
+    await expect(handleBusinessSuspend(db, 'A', { businessId: 'b1', reason: 'spam', days: 7 }, NOW)).rejects.toThrow('gecersiz');
+    await expect(handleBusinessSuspend(db, 'A', { businessId: 'yok', reason: 'spam', days: 7, banOwner: false }, NOW)).rejects.toThrow('yok');
+    await handleBusinessSuspend(db, 'A', { businessId: 'b1', reason: 'spam', days: 7, banOwner: false }, NOW);
+    expect((await db.doc('businessBans/U').get()).exists).toBe(false);
+  });
+
+  it('süresi dolunca kendiliğinden açılır; eski yolla kaldırılmış işletme de açılabilir', async () => {
+    await handleBusinessSuspend(db, 'A', { businessId: 'b1', reason: 'spam', days: 1, banOwner: true }, NOW);
+    expect(await liftExpiredBusinessSuspensions(db, new Date(NOW.getTime() + 3_600_000))).toBe(0);
+    expect(await liftExpiredBusinessSuspensions(db, new Date(NOW.getTime() + 2 * 86_400_000))).toBe(1);
+    expect((await db.doc('businesses/b1').get()).get('status')).toBe('gizli');
+    await db.doc('businesses/b2').set({ name: 'Eski', ownerUid: 'V', status: 'kaldirildi', location: { provinceCode: '16', districtId: 'x' } });
+    await handleBusinessLift(db, 'A', 'b2', NOW);
+    expect((await db.doc('businesses/b2').get()).get('status')).toBe('yayinda');
+  });
+});
+
+describe('Pro abonelik', () => {
+  const biz = { name: 'Usta Fırın', ownerUid: 'sahip', location: { provinceCode: '16', districtId: 'nilufer' }, verification: { status: 'dogrulandi' }, membership: { tier: 'ucretsiz' } };
+  const pro: ProState = { expiresAt: new Date('2026-12-01T09:00:00Z'), startedAt: NOW, productId: 'cityjoy_pro_aylik', store: 'app-store', autoRenew: true };
+  const event = (over: Record<string, unknown> = {}) => ({
+    event: { id: 'olay-1', type: 'INITIAL_PURCHASE', app_user_id: 'biz_b1', product_id: 'cityjoy_pro_aylik', store: 'APP_STORE', environment: 'PRODUCTION', purchased_at_ms: NOW.getTime(), price: 9.99, price_in_purchased_currency: 349.99, currency: 'TRY', takehome_percentage: 0.85, ...over },
+  });
+
+  it('satın alınca işletme Pro olur, ödeme bir kez kaydedilir, işlem kaydı düşer', async () => {
+    await db.doc('businesses/b1').set(biz);
+    const deps = { fetchState: async () => pro, now: NOW };
+    expect(await handleStoreEvent(db, event(), deps)).toEqual({ synced: 1, payment: true });
+    await handleStoreEvent(db, event(), deps); // aynı bildirim ikinci kez
+    const m = (await db.doc('businesses/b1').get()).get('membership');
+    expect(m.tier).toBe('pro');
+    expect(m.plan).toBe('aylik');
+    expect(m.autoRenew).toBe(true);
+    expect(m.endsAt.toDate()).toEqual(pro.expiresAt);
+    const pays = await db.collection('payments').get();
+    expect(pays.size).toBe(1);
+    expect(pays.docs[0].data()).toMatchObject({ businessId: 'b1', ownerUid: 'sahip', amount: 349.99, currency: 'TRY', kind: 'ilk', plan: 'aylik', sandbox: false, provinceCode: '16' });
+    expect((await db.collection('auditLog').get()).size).toBe(1);
+  });
+
+  it('iptal edince süre sonuna kadar Pro sürer, yenileme kapanır; süre bitince Ücretsiz', async () => {
+    await db.doc('businesses/b1').set(biz);
+    await handleStoreEvent(db, event({ type: 'CANCELLATION', cancel_reason: 'UNSUBSCRIBE' }), { fetchState: async () => ({ ...pro, autoRenew: false }), now: NOW });
+    let m = (await db.doc('businesses/b1').get()).get('membership');
+    expect(m).toMatchObject({ tier: 'pro', autoRenew: false });
+    expect((await db.collection('payments').get()).size).toBe(0);
+    await handleStoreEvent(db, event({ id: 'olay-2', type: 'EXPIRATION' }), { fetchState: async () => ({ ...pro, expiresAt: new Date('2026-10-01T00:00:00Z') }), now: NOW });
+    m = (await db.doc('businesses/b1').get()).get('membership');
+    expect(m.tier).toBe('ucretsiz');
+  });
+
+  it('başka ürün, test bildirimi ve işletme olmayan kimlik yok sayılır; elle verilen Pro korunur', async () => {
+    await db.doc('businesses/b1').set({ ...biz, membership: { tier: 'pro', source: 'manuel', endsAt: Timestamp.fromDate(new Date('2026-12-01')) } });
+    const none = { fetchState: async () => null, now: NOW };
+    expect(await handleStoreEvent(db, event({ product_id: 'baska_urun' }), none)).toEqual({ synced: 0, payment: false });
+    expect(await handleStoreEvent(db, { event: { type: 'TEST' } }, none)).toEqual({ synced: 0, payment: false });
+    expect(await handleStoreEvent(db, event({ app_user_id: 'kisi-123' }), none)).toEqual({ synced: 0, payment: false });
+    await handleStoreEvent(db, event({ type: 'EXPIRATION' }), none);
+    expect((await db.doc('businesses/b1').get()).get('membership.tier')).toBe('pro');
+  });
+
+  it('günlük denetim süresi bir günden fazla geçen Pro üyeliği indirir', async () => {
+    await db.doc('businesses/eski').set({ ...biz, membership: { tier: 'pro', endsAt: Timestamp.fromDate(new Date('2026-10-30T00:00:00Z')) } });
+    await db.doc('businesses/yeni').set({ ...biz, membership: { tier: 'pro', endsAt: Timestamp.fromDate(new Date('2026-10-31T20:00:00Z')) } });
+    expect(await expireMemberships(db, NOW)).toBe(1);
+    expect((await db.doc('businesses/eski').get()).get('membership.tier')).toBe('ucretsiz');
+    expect((await db.doc('businesses/yeni').get()).get('membership.tier')).toBe('pro');
+  });
+});
+
+describe('Pro bitince fazla gönderiler', () => {
+  const free = { name: 'Usta Fırın', ownerUid: 'sahip', managers: { yrd: { edit: true } }, verification: { status: 'dogrulandi' }, membership: { tier: 'ucretsiz' } };
+  const proBiz = { ...free, membership: { tier: 'pro' } };
+  async function seed(n: number) {
+    await db.doc('businesses/b1').set(proBiz);
+    for (let i = 0; i < n; i++) {
+      await db.doc(`posts/p${String(i).padStart(2, '0')}`).set({ business: { id: 'b1', name: 'Usta Fırın' }, status: 'aktif', createdAt: Timestamp.fromMillis(NOW.getTime() - (n - i) * 60_000) });
+    }
+  }
+  const hiddenIds = async () => (await db.collection('posts').where('tierHidden', '==', true).get()).docs.map((d) => d.id).sort();
+
+  it('Pro kapanınca en yeni 9 görünür, gerisi gizlenir (silinmez); Pro açılınca hepsi geri gelir', async () => {
+    await seed(12);
+    expect(await handleBusinessTierChange(db, 'b1', proBiz, free)).toBe(3);
+    expect(await hiddenIds()).toEqual(['p00', 'p01', 'p02']);
+    expect((await db.collection('posts').get()).size).toBe(12);
+    // Sayaç yalnızca görünenleri sayar (yeni gönderi sınırı).
+    await handleBusinessPostWrite(db, { business: { id: 'b1' }, status: 'aktif' }, { business: { id: 'b1' }, status: 'aktif', tierHidden: true });
+    expect((await db.doc('businesses/b1').get()).get('postCount')).toBe(9);
+    // Kademe değişmeden yapılan düzenleme dokunmaz; Pro dönünce hepsi açılır.
+    expect(await handleBusinessTierChange(db, 'b1', free, { ...free, name: 'Yeni ad' })).toBe(0);
+    expect(await handleBusinessTierChange(db, 'b1', free, proBiz)).toBe(3);
+    expect(await hiddenIds()).toEqual([]);
+  });
+
+  it('panelden sınır değişince ona göre; doğrulama kalkınca da Pro sayılmaz', async () => {
+    await seed(5);
+    await db.doc('config/limits').set({ isletmeGonderiToplam: 2 });
+    await handleBusinessTierChange(db, 'b1', proBiz, { ...proBiz, verification: { status: 'dogrulanmadi' } });
+    expect(await hiddenIds()).toEqual(['p00', 'p01', 'p02']);
+  });
+
+  it('sahibi gizli gönderiyi gösterince en eski görünen gizlenir; yabancı ve Pro işletme seçemez', async () => {
+    await seed(11);
+    await db.doc('businesses/b1').set(free);
+    await applyTierVisibility(db, 'b1', false);
+    expect(await hiddenIds()).toEqual(['p00', 'p01']);
+    await handleTierVisibilityChoice(db, 'sahip', { postId: 'p00', visible: true });
+    expect(await hiddenIds()).toEqual(['p01', 'p02']);
+    await handleTierVisibilityChoice(db, 'yrd', { postId: 'p05', visible: false });
+    await handleTierVisibilityChoice(db, 'yrd', { postId: 'p01', visible: true });
+    expect(await hiddenIds()).toEqual(['p02', 'p05']);
+    await expect(handleTierVisibilityChoice(db, 'yabanci', { postId: 'p02', visible: true })).rejects.toThrow('yetki');
+    await expect(handleTierVisibilityChoice(db, 'sahip', { postId: '../x', visible: true })).rejects.toThrow('gecersiz');
+    await db.doc('businesses/b1').set(proBiz);
+    await expect(handleTierVisibilityChoice(db, 'sahip', { postId: 'p02', visible: true })).rejects.toThrow('pro');
+  });
+
+  it('yenilenmeyecek Pro bitmeden 3 gün önce sahibine bildirim; kendiliğinden yenilenene gitmez', async () => {
+    const ends = (days: number) => Timestamp.fromMillis(NOW.getTime() + days * 86_400_000);
+    await db.doc('businesses/b1').set({ ...free, membership: { tier: 'pro', endsAt: ends(2.5), autoRenew: false } });
+    await db.doc('businesses/b2').set({ ...free, ownerUid: 'sahip2', membership: { tier: 'pro', endsAt: ends(2.5), autoRenew: true } });
+    await db.doc('businesses/b3').set({ ...free, ownerUid: 'sahip3', membership: { tier: 'pro', endsAt: ends(10), source: 'manuel' } });
+    for (const uid of ['sahip', 'sahip2', 'sahip3']) await db.doc(`pushTokens/${uid}`).set({ tokens: [`T-${uid}`], language: 'tr', updatedAt: Timestamp.now() });
+    const { sent, deps } = fakeSender();
+    expect(await remindProEnding(db, deps)).toBe(1);
+    expect(sent[0]).toMatchObject({ to: 'T-sahip', title: 'Usta Fırın: Pro üç gün içinde bitiyor' });
+    expect(sent[0].data.href).toEqual({ pathname: '/business/membership', params: { id: 'b1' } });
+  });
+});
+
+describe('bölgeye toplu bildirim', () => {
+  const kurum = { uid: 'k1', email: 'personel@nilufer.bel.tr', emailVerified: true };
+  const muhtar = { uid: 'mu1', email: 'muhtar@ornek.com', emailVerified: true };
+  const il = { uid: 'iy1', email: 'il@ornek.com', emailVerified: true };
+  const msg = (over: Record<string, unknown> = {}) => ({
+    publisherKey: 'bld-16-nilufer', kind: 'duyuru', title: 'Su kesintisi', body: 'Yarın 09.00-17.00 arası su kesilecek.',
+    region: { provinceCode: '16', districtId: '16-nilufer' }, ...over,
+  });
+
+  beforeEach(async () => {
+    const live = (uid: string, location: Record<string, string>) =>
+      Promise.all([db.doc(`users/${uid}`).set({ uid, location }), phone(uid)]);
+    await live('n1', { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-m1' });
+    await live('n2', { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-m2' });
+    await live('o1', { provinceCode: '16', districtId: '16-osmangazi' });
+    await live('i1', { provinceCode: '34', districtId: '34-kadikoy' });
+    await db.doc('organizations/bld-16-nilufer').set({ name: 'Nilüfer Belediyesi', status: 'aktif', modules: ['gonderiler', 'bildirimler'], scope: { level: 'ilce', provinceCode: '16', districtId: '16-nilufer' } });
+    await db.doc('orgMembers/bld-16-nilufer__personel@nilufer.bel.tr').set({ assignments: { bildirimler: ['goruntule', 'bildirim-gonder'] } });
+    await db.doc('grants/muhtar@ornek.com__mahalle-16-nilufer-m1').set({ role: 'muhtar', scope: { level: 'mahalle', provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-m1' }, modules: { bildirimler: ['goruntule', 'bildirim-gonder'] } });
+    await db.doc('grants/il@ornek.com__il-16').set({ role: 'il-yoneticisi', scope: { level: 'il', provinceCode: '16' }, modules: { bildirimler: ['goruntule', 'bildirim-gonder'] } });
+    await db.doc('admins/adm').set({ at: Timestamp.now() });
+  });
+
+  it('kurum kendi ilçesine gönderir: yalnızca ilçedekilere gider, kayıt ve işlem kaydı yazılır', async () => {
+    const { sent, deps } = fakeSender();
+    const res = await handleBroadcastSend(db, kurum, msg(), deps);
+    expect(res.status).toBe('gonderildi');
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-n1', 'T-n2']);
+    expect(sent[0]).toMatchObject({ title: 'Duyuru · Nilüfer Belediyesi', body: 'Su kesintisi: Yarın 09.00-17.00 arası su kesilecek.' });
+    expect(sent[0].data.href).toEqual({ pathname: '/broadcast/[id]', params: { id: res.id } });
+    const rec = (await db.doc(`broadcasts/${res.id}`).get()).data()!;
+    expect(rec).toMatchObject({ status: 'gonderildi', sentCount: 2, author: { type: 'kurum', orgId: 'bld-16-nilufer' }, preparedBy: 'k1' });
+    expect((await db.collection('auditLog').where('targetId', '==', res.id).get()).size).toBe(1);
+  });
+
+  it('bölge dışına, görevi olmayana, doğrulanmamış e-postaya izin yok', async () => {
+    const { sent, deps } = fakeSender();
+    await expect(handleBroadcastSend(db, kurum, msg({ region: { provinceCode: '16', districtId: '16-osmangazi' } }), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, { ...kurum, emailVerified: false }, msg(), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, { uid: 'x', email: 'baska@ornek.com', emailVerified: true }, msg(), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, muhtar, msg({ publisherKey: 'mahalle-16-nilufer-m1' }), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, kurum, msg({ publisherKey: 'cityjoy' }), deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastSend(db, kurum, msg({ title: 'x' }), deps)).rejects.toThrow('gecersiz');
+    expect(sent).toEqual([]);
+  });
+
+  it('muhtar yalnızca mahallesine; günlük sınır 3', async () => {
+    const { sent, deps } = fakeSender();
+    const m = msg({ publisherKey: 'mahalle-16-nilufer-m1', region: { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '16-nilufer-m1' } });
+    for (let i = 0; i < 3; i++) await handleBroadcastSend(db, muhtar, m, deps);
+    expect(sent.map((x) => x.to)).toEqual(['T-n1', 'T-n1', 'T-n1']);
+    expect(sent[0].title).toBe('Duyuru · Muhtarlık');
+    await expect(handleBroadcastSend(db, muhtar, m, deps)).rejects.toThrow('sinir');
+  });
+
+  it('il geneli il yöneticisinden onaya düşer; admin onaylayınca ildekilere gider, ret gerekçe ister', async () => {
+    const { sent, deps } = fakeSender();
+    const est = await handleBroadcastEstimate(db, il, { publisherKey: 'il-16', region: { provinceCode: '16' } }, NOW);
+    expect(est).toEqual({ reach: null, needsApproval: true });
+    const res = await handleBroadcastSend(db, il, msg({ publisherKey: 'il-16', kind: 'acil', region: { provinceCode: '16' } }), deps);
+    expect(res.status).toBe('onay-bekliyor');
+    expect(sent).toEqual([]);
+    await expect(handleBroadcastReview(db, 'iy1', { id: res.id, approve: true }, deps)).rejects.toThrow('yetki');
+    await expect(handleBroadcastReview(db, 'adm', { id: res.id, approve: false, note: 'x' }, deps)).rejects.toThrow('gecersiz');
+    await handleBroadcastReview(db, 'adm', { id: res.id, approve: true }, deps);
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-n1', 'T-n2', 'T-o1']);
+    expect(sent[0].priority).toBe('high');
+    await expect(handleBroadcastReview(db, 'adm', { id: res.id, approve: true }, deps)).rejects.toThrow('yok');
+  });
+
+  it('admin (CityJoy) her yere doğrudan gönderir, sınırsız', async () => {
+    const { sent, deps } = fakeSender();
+    const res = await handleBroadcastSend(db, { uid: 'adm' }, msg({ publisherKey: 'cityjoy', region: { provinceCode: '34' } }), deps);
+    expect(res.status).toBe('gonderildi');
+    expect(sent.map((m) => [m.to, m.title])).toEqual([['T-i1', 'Duyuru · CityJoy']]);
+  });
+});
+
+describe('gönderide etiket ve izlenme', () => {
+  const person = async (uid: string, extra: Record<string, unknown> = {}) => {
+    await db.doc(`publicProfiles/${uid}`).set({ uid, displayName: uid.toUpperCase(), ...extra });
+    await db.doc(`pushTokens/${uid}`).set({ tokens: [`T-${uid}`], language: 'tr', updatedAt: Timestamp.now() });
+  };
+
+  it('ayara, engele ve askıya göre süzer; uygunları yazar, isteği siler, yalnızca onlara bildirim gider', async () => {
+    for (const u of ['acik', 'takipci', 'takipsiz', 'kapali', 'engelli', 'askida']) await person(u, u === 'askida' ? { suspended: true } : {});
+    await db.doc('users/takipci/settings/privacy').set({ tagPolicy: 'takip' });
+    await db.doc('users/takipsiz/settings/privacy').set({ tagPolicy: 'takip' });
+    await db.doc('users/kapali/settings/privacy').set({ tagPolicy: 'kimse' });
+    await db.doc('follows/takipci_ayse').set({ status: 'aktif' });
+    await db.doc('blocks/engelli_ayse').set({ at: Timestamp.now() });
+    const post = { authorUid: 'ayse', authorName: 'Ayşe K.', status: 'aktif', tagReq: ['acik', 'takipci', 'takipsiz', 'kapali', 'engelli', 'askida', 'yok', 'ayse'] };
+    await db.doc('posts/p1').set(post);
+    const { sent, deps } = fakeSender();
+    expect(await handlePostTags(db, 'p1', post, deps)).toBe(2);
+    const after = (await db.doc('posts/p1').get()).data();
+    expect(after?.tags).toEqual(['acik', 'takipci']);
+    expect(after?.tagNames).toEqual({ acik: 'ACIK', takipci: 'TAKIPCI' });
+    expect(after?.tagReq).toBeUndefined();
+    expect(sent.map((m) => m.to).sort()).toEqual(['T-acik', 'T-takipci']);
+    expect(sent[0].data.href).toEqual({ pathname: '/explore/[id]', params: { id: 'p1' } });
+
+    // Onay bekleyen (işletme) gönderide etiket yazılır ama bildirim gitmez; hesap silinince etiketten çıkar.
+    const pending = { ...post, status: 'onay-bekliyor', tagReq: ['acik'] };
+    await db.doc('posts/p2').set(pending);
+    const quiet = fakeSender();
+    expect(await handlePostTags(db, 'p2', pending, quiet.deps)).toBe(1);
+    expect(quiet.sent).toEqual([]);
+    expect(await removeTagsOf(db, 'acik')).toBe(2);
+    expect((await db.doc('posts/p1').get()).data()).toMatchObject({ tags: ['takipci'], tagNames: { takipci: 'TAKIPCI' } });
+    // İsteği olmayan gönderiye dokunulmaz.
+    expect(await handlePostTags(db, 'p3', { authorUid: 'ayse' }, fakeSender().deps)).toBe(0);
+  });
+
+  it('izlenme: kişi başına günde bir; kendi, kaldırılmış ve videosuz gönderi sayılmaz; kayıt iki gün sonra silinir', async () => {
+    const video = { path: 'v', url: 'https://x', width: 1, height: 1, durationSec: 10 };
+    await db.doc('posts/v1').set({ authorUid: 'ayse', status: 'aktif', video });
+    await db.doc('posts/v2').set({ authorUid: 'ali', status: 'aktif', video });
+    await db.doc('posts/v3').set({ authorUid: 'ayse', status: 'kaldirildi', video });
+    await db.doc('posts/f1').set({ authorUid: 'ayse', status: 'aktif' });
+    expect(await handleRecordViews(db, 'ali', { ids: ['v1', 'v2', 'v3', 'f1', 'yok', 'v1'] }, NOW)).toBe(1);
+    expect((await db.doc('posts/v1').get()).get('viewCount')).toBe(1);
+    expect((await db.doc('posts/v2').get()).get('viewCount')).toBeUndefined();
+    // Aynı gün tekrar sayılmaz; ertesi gün sayılır; başka kişi ayrıca sayılır.
+    expect(await handleRecordViews(db, 'ali', { ids: ['v1'] }, NOW)).toBe(0);
+    expect(await handleRecordViews(db, 'veli', { ids: ['v1'] }, NOW)).toBe(1);
+    const tomorrow = new Date(NOW.getTime() + 86_400_000);
+    expect(await handleRecordViews(db, 'ali', { ids: ['v1'] }, tomorrow)).toBe(1);
+    expect((await db.doc('posts/v1').get()).get('viewCount')).toBe(3);
+    // Geçersiz istek.
+    await expect(handleRecordViews(db, 'ali', { ids: Array.from({ length: VIEW_LIMITS.perCall + 1 }, (_, i) => `p${i}`) }, NOW)).rejects.toBeInstanceOf(ViewError);
+    await expect(handleRecordViews(db, 'ali', null, NOW)).rejects.toBeInstanceOf(ViewError);
+    // Günlük temizlik: süresi geçen kayıtlar.
+    expect(await deleteExpiredViewLog(db, new Date(NOW.getTime() + 2.5 * 86_400_000))).toBe(2);
+    expect(await deleteExpiredViewLog(db, new Date(NOW.getTime() + 4 * 86_400_000))).toBe(1);
+  });
+});
+
+describe('özelliklere göre harcama', () => {
+  const sampled = Array.from({ length: 500 }, (_, i) => `u${i}`).find((u) => isCostSampled(u))!;
+  const outside = Array.from({ length: 500 }, (_, i) => `u${i}`).find((u) => !isCostSampled(u))!;
+
+  it('örneklemdeki uygulamanın sayımı o günün kaydına eklenir; örneklem dışı ve bozuk rapor reddedilir', async () => {
+    await handleReportUsage(db, sampled, { reads: { posts: 10, follows: 3 }, writes: { posts: 1 } }, NOW);
+    await handleReportUsage(db, sampled, { reads: { posts: 5 } }, NOW);
+    const d = (await db.doc('billing/cost-20261101').get()).data();
+    expect(d?.client).toEqual({ reporters: 2, samplePct: 5, reads: { posts: 15, follows: 3 }, writes: { posts: 1 } });
+    await expect(handleReportUsage(db, outside, { reads: { posts: 1 } }, NOW)).rejects.toBeInstanceOf(UsageError);
+    await expect(handleReportUsage(db, sampled, { reads: { posts: -4 } }, NOW)).rejects.toBeInstanceOf(UsageError);
+  });
+
+  it('gece raporu: dünün sunucu kullanımı yazılır; Google okunamazsa hata not edilir, uygulama sayımı kalır', async () => {
+    const seen: string[] = [];
+    const monitor: MonitoringFetch = async (filter, _a, _g, start, end) => {
+      seen.push(`${start.toISOString()}|${end.toISOString()}`);
+      if (filter.includes('run.googleapis.com/request_count')) return [{ labels: { service_name: 'recordviews' }, value: 40 }];
+      if (filter.includes('billable_instance_time')) return [{ labels: { service_name: 'recordviews' }, value: 12.5 }];
+      if (filter.includes('execution_count')) return [{ labels: { function_name: 'userDeleted' }, value: 2 }];
+      if (filter.includes('read_ops')) return [{ labels: {}, value: 1000 }, { labels: {}, value: 500 }];
+      if (filter.includes('write_ops')) return [{ labels: {}, value: 80 }];
+      if (filter.includes('sent_bytes')) return [{ labels: {}, value: 2048 }];
+      if (filter.includes('total_bytes')) return [{ labels: {}, value: 4096 }];
+      return [];
+    };
+    // NOW = 1 Kasım 12.00 (Türkiye): dün = 31 Ekim.
+    await db.doc('billing/cost-20261031').set({ day: '20261031', client: { reporters: 1, samplePct: 5, reads: { posts: 1 }, writes: {} } });
+    expect(await handleCostReport(db, monitor, NOW)).toBe('20261031');
+    expect(seen[0]).toBe('2026-10-30T21:00:00.000Z|2026-10-31T21:00:00.000Z');
+    const d = (await db.doc('billing/cost-20261031').get()).data();
+    expect(d?.server).toEqual({
+      functions: { recordviews: { calls: 40, seconds: 12.5 }, userDeleted: { calls: 2, seconds: 2 } },
+      firestore: { reads: 1500, writes: 80, deletes: 0 },
+      storage: { egressBytes: 2048, storedBytes: 4096 },
+    });
+    expect(d?.client.reads.posts).toBe(1);
+    await handleCostReport(db, async () => { throw new Error('monitoring 403: izin yok'); }, NOW);
+    const e = (await db.doc('billing/cost-20261031').get()).data();
+    expect(e?.serverError).toContain('403');
+    expect(e?.server).toBeDefined();
   });
 });

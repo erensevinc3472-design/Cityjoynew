@@ -1,4 +1,4 @@
-import { doc, getDoc, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, writeBatch, type Firestore } from './metered';
 
 import { LANGUAGES } from '../i18n/languages';
 import { cleanSuggestions, type SearchSuggestions } from '../search/search';

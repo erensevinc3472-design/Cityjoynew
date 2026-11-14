@@ -1,5 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState, type PropsWithChildren } from 'react';
-import type { AuthUser, UserProfile } from '@cityjoy/shared';
+import { Alert, AppState } from 'react-native';
+import { AuthError, type AuthUser, type UserProfile } from '@cityjoy/shared';
+
+import i18n from './i18n';
 
 import { isFirebaseConfigured } from './firebase-config';
 import { reconcileOfficialFollows } from './official-follow-sync';
@@ -20,6 +23,16 @@ interface SessionValue {
 }
 
 const SessionContext = createContext<SessionValue | null>(null);
+
+// Açılış sayfası (Eren, 12 Kasım 2026): kayıt ya da girişten hemen sonra ana sayfa açılır; uygulama sonraki açılışlarda
+// (oturum telefonda zaten açıkken) Keşfet'le başlar. null: ilk oturum bilgisi henüz gelmedi.
+let restoredStart: boolean | null = null;
+/** Uygulama açık bir oturumla başladıysa ve açılış yönlendirmesi henüz yapılmadıysa true. */
+export const startsWithRestoredSession = () => restoredStart === true;
+/** Açılış yönlendirmesi yapıldı; aynı çalışmada sonraki yönlendirmeler ana sayfaya gider. */
+export const consumeRestoredStart = () => {
+  restoredStart = false;
+};
 
 export function SessionProvider({ children }: PropsWithChildren) {
   const [ready, setReady] = useState(!isFirebaseConfigured);
@@ -54,10 +67,28 @@ export function SessionProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!isFirebaseConfigured) return;
     return authService.onChange(async (u) => {
+      if (restoredStart === null) restoredStart = !!u;
+      else if (!u) restoredStart = false;
       await adopt(u);
       setReady(true);
     });
   }, [adopt]);
+
+  // Hesap askıya alındıysa açık oturum da kapanır: açılışta ve uygulamaya her dönüşte hesap yeniden denetlenir.
+  const uid = user?.uid;
+  useEffect(() => {
+    if (!isFirebaseConfigured || !uid) return;
+    const check = () =>
+      authService.reload().catch(async (e) => {
+        if (!(e instanceof AuthError) || e.code !== 'account-suspended') return;
+        await authService.signOut().catch(() => {});
+        await adopt(null);
+        Alert.alert(i18n.t('errors.accountSuspended'));
+      });
+    check();
+    const sub = AppState.addEventListener('change', (s) => s === 'active' && check());
+    return () => sub.remove();
+  }, [uid, adopt]);
 
   const refreshProfile = useCallback(async () => (user ? loadProfile(user.uid) : null), [user, loadProfile]);
   const refreshUser = useCallback(async () => {

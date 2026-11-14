@@ -16,11 +16,14 @@ import { createEventPanel, createFirestoreEventRepository, type SaveMode } from 
 
 import { authorLabel, cleanRegion, dateTime, regionComplete, regionLabel, RegionFields, scopeRegion, toLocalInput, useNeighbourhoodNames } from '../components/content-common';
 import { ImageField } from '../components/image-field';
+import { OpenInApp } from '../components/open-in-app';
 import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
 import { limitText } from '../lib/limits';
+import { EmptyState } from '../components/empty-state';
+import { Intro } from '../components/intro';
 
 // `retry`: sınır dolunca "Onaya gönder" düğmesi.
 type Msg = { kind: 'ok' | 'error'; text: string; retry?: () => void } | undefined;
@@ -137,7 +140,7 @@ function Events({ user }: { user: PanelUser }) {
   const row = (e: CityEvent, actions: ReactNode) => (
     <tr key={e.id}>
       <td>
-        <strong>{e.title}</strong>
+        <strong>{e.title}</strong> <OpenInApp path={`/events/${e.id}`} />
         <div className="meta">{t(`events.categories.${e.category}`)} · {dateTime(e.startsAt)} - {dateTime(e.endsAt)}</div>
         <div className="meta">{e.venueName}{e.address ? `, ${e.address}` : ''}</div>
         <div className="meta">{e.free ? t('events.free') : e.priceNote}</div>
@@ -209,7 +212,7 @@ function Events({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h1>{t('events.title')}</h1>
-          <p className="meta">{t('events.intro')}</p>
+          <Intro text={t('events.intro')} />
         </div>
         {publisher && live && !draft ? <button className="btn" onClick={() => setDraft({ input: newDraft() })}>{t('events.new')}</button> : null}
       </header>
@@ -304,7 +307,7 @@ function Events({ user }: { user: PanelUser }) {
           {publisher ? (
             <>
               <h2>{publisher.author.type === 'kurum' ? t('events.orgTitle') : t('events.mineTitle')}</h2>
-              {mine.length === 0 ? <div className="state">{t('events.empty')}</div> : table(mine.map((e) => row(e, manageActions(e))))}
+              {mine.length === 0 ? <EmptyState text={t('events.empty')} {...(live && !draft ? { actionLabel: t('events.new'), onAction: () => setDraft({ input: newDraft() }) } : {})} /> : table(mine.map((e) => row(e, manageActions(e))))}
             </>
           ) : null}
 

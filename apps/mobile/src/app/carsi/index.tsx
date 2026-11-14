@@ -18,7 +18,6 @@ import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { Chips } from '@/components/chips';
 import { PillButton } from '@/components/city-hub';
-import { useProvinceCover } from '@/components/city-cover';
 import { PageHead, PAGE_CONTENT, usePageBottom } from '@/components/page-head';
 import { ListingArt, ListingCard } from '@/components/listing-card';
 import { OptionRow } from '@/components/option-row';
@@ -43,7 +42,6 @@ type KindFilter = ListingKind | 'hepsi';
 export default function CarsiScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const cover = useProvinceCover();
   const bottom = usePageBottom();
   const c = useThemeColors();
   const { user } = useSession();
@@ -119,7 +117,7 @@ export default function CarsiScreen() {
   const back = () => (router.canGoBack() ? router.back() : router.replace('/city'));
   // Mahalle Meydanı gibi üstte il görseli (Eren, 10 Kasım 2026); İlanlarım ve İlan ver başlığın altında.
   const header = (
-    <PageHead cover={cover} title={t('carsi.title')} subtitle={[province, t('carsi.slogan')].filter(Boolean).join(' · ')} onBack={back}>
+    <PageHead title={t('carsi.title')} subtitle={[province, t('carsi.slogan')].filter(Boolean).join(' · ')} onBack={back}>
       {user ? (
         <View style={styles.actions}>
           <PillButton small icon="inventory-2" label={t('carsi.mine')} onPress={() => router.push('/carsi/mine')} />
@@ -131,7 +129,7 @@ export default function CarsiScreen() {
 
   if (!location) {
     return (
-      <Screen bleed cover={cover}>
+      <Screen bleed>
         <View style={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]}>
           {header}
           <StateMessage kind="empty" message={t('carsi.needLocation')} />
@@ -142,8 +140,8 @@ export default function CarsiScreen() {
   }
 
   return (
-    <Screen bleed cover={cover}>
-      <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
+    <Screen bleed>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} refreshControl={<RefreshControl refreshing={false} onRefresh={load} />} keyboardShouldPersistTaps="handled">
         {header}
         <SearchField value={query} onChangeText={(v) => (setQuery(v), v.trim() ? null : setSearched(''))} placeholder={t('carsi.searchPlaceholder')} onSubmitEditing={() => setSearched(query.trim())} />
         <Chips<KindFilter>

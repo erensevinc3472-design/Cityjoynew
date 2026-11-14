@@ -14,7 +14,6 @@ import {
 import { AnnouncementCard } from '@/components/announcement-card';
 import { AppText } from '@/components/app-text';
 import { frost, PillButton } from '@/components/city-hub';
-import { useProvinceCover } from '@/components/city-cover';
 import { EventCard } from '@/components/event-card';
 import { FrostFill } from '@/components/glass';
 import { OfficialProfileCard } from '@/components/official-profile-card';
@@ -61,7 +60,6 @@ export default function NeighbourhoodScreen() {
   const router = useRouter();
   const c = useThemeColors();
   const dark = useResolvedScheme() === 'dark';
-  const cover = useProvinceCover();
   const bottom = usePageBottom();
   const { rtl } = useSettings();
   const { location } = useUserLocation();
@@ -97,9 +95,9 @@ export default function NeighbourhoodScreen() {
 
   if (!nb) {
     return (
-      <Screen bleed cover={cover}>
+      <Screen bleed>
         <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]}>
-          <PageHead cover={cover} extend={40} title={t('neighbourhood.title')} subtitle={place || undefined} onBack={back} />
+          <PageHead extend={40} title={t('neighbourhood.title')} subtitle={place || undefined} onBack={back} />
           <StateMessage kind="empty" message={t('neighbourhood.needNeighbourhood')} />
           <PillButton gold icon="edit-location-alt" label={t('home.changeLocation')} onPress={changePlace} />
         </ScrollView>
@@ -223,9 +221,9 @@ export default function NeighbourhoodScreen() {
   );
 
   return (
-    <Screen bleed cover={cover}>
+    <Screen bleed>
       <ScrollView contentContainerStyle={[PAGE_CONTENT, styles.content, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
-        <PageHead cover={cover} extend={60} title={t('neighbourhood.title')} subtitle={subtitle} onBack={back} />
+        <PageHead extend={60} title={t('neighbourhood.title')} subtitle={subtitle} onBack={back} />
 
         <View style={styles.tiles}>
           {tile('muhtar', 'person-outline', t('neighbourhood.muhtarlik'), () => toggle('muhtar'), open === 'muhtar')}
@@ -257,21 +255,6 @@ export default function NeighbourhoodScreen() {
           </Pressable>
         </View>
 
-        <View style={[styles.placeCard, card]}>
-          <FrostFill />
-          <View style={[styles.pin, { backgroundColor: dark ? 'rgba(226, 178, 119, 0.12)' : c.accentSoft }]}>
-            <MaterialIcons name="place" size={20} color={gold} />
-          </View>
-          <View style={styles.flex}>
-            <AppText style={[styles.rowTitle, { color: c.textStrong }]} numberOfLines={1}>{name ?? t('neighbourhood.title')}</AppText>
-            <AppText style={[styles.rowHint, { color: c.textMuted }]} numberOfLines={1}>{place}</AppText>
-          </View>
-          <Pressable accessibilityRole="button" onPress={changePlace} hitSlop={6} style={({ pressed }) => [styles.change, { borderColor: dark ? 'rgba(226, 178, 119, 0.6)' : c.primary, opacity: pressed ? 0.75 : 1 }]}>
-            <MaterialIcons name="edit-location-alt" size={16} color={gold} />
-            <AppText style={[styles.changeText, { color: gold }]}>{t('neighbourhood.change')}</AppText>
-          </Pressable>
-        </View>
-
         <AppText variant="caption" muted style={styles.center}>{t('neighbourhood.feedSoon')}</AppText>
       </ScrollView>
     </Screen>
@@ -295,9 +278,5 @@ const styles = StyleSheet.create({
   badgeText: { fontFamily: fonts.bodySemi, fontSize: 11.5 },
   area: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderTopWidth: 1, paddingTop: spacing.sm },
   areaTitle: { fontFamily: fonts.bodySemi, fontSize: 13, lineHeight: 18 },
-  placeCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 2, padding: spacing.md - 2, borderRadius: radius.lg + 2, borderWidth: 1, overflow: 'hidden', marginTop: spacing.xs },
-  pin: { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
-  change: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 36, paddingHorizontal: 12, borderRadius: radius.pill, borderWidth: 1 },
-  changeText: { fontFamily: fonts.bodySemi, fontSize: 12.5 },
   center: { textAlign: 'center' },
 });

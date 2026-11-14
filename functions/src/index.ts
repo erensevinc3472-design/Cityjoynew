@@ -3,6 +3,7 @@
  * tetikleyiciler var; testler mantığı emülatördeki veritabanıyla doğrudan çağırır.
  */
 import { initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import * as functionsV1 from 'firebase-functions/v1';
@@ -14,15 +15,23 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { onObjectFinalized } from 'firebase-functions/v2/storage';
 
 import { handleAnnouncementWrite } from './announcements';
+import { BroadcastError, handleBroadcastEstimate, handleBroadcastReview, handleBroadcastSend, type Actor } from './broadcasts';
 import { handleBusinessPostWrite } from './business-posts';
+import { cloudMonitoring, handleCostReport, handleReportUsage, UsageError } from './cost-report';
 import { cloudBillingDisabler, handleBudgetNotice, handleManualStop, type BudgetNotice } from './budget';
 import { handleActivityChange, handleEventChange } from './cancellations';
-import { deleteExpiredPushLog, deleteExpiredSos, deleteUserLeftovers } from './cleanup';
+import { deleteExpiredPushLog, deleteExpiredSos, deleteExpiredViewLog, deleteUserLeftovers } from './cleanup';
 import { handleActivityCover, handleListingPhotos, handleMediaChange, handlePostPhotos, MEDIA_FIELDS, type DeleteFiles } from './photos';
 import { expoSender } from './push';
+import { handlePostTags, handleRecordViews, removeTagsOf, ViewError } from './post-tags';
+import { expireMemberships } from './memberships';
 import { handleFollowWrite, handleMessageCreate } from './social';
+import { handleLift, handleSuspend, liftExpiredSuspensions, SuspensionError, type AccountSwitch } from './suspensions';
+import { handleBusinessLift, handleBusinessSuspend, liftExpiredBusinessSuspensions } from './business-suspensions';
 import { handleThumb } from './thumbs';
+import { handleBusinessTierChange, handleTierVisibilityChoice, remindProEnding, TierVisibilityError } from './tier-visibility';
 import { deleteOldTranslations, googleTranslator, handleTranslate, TranslateError } from './translate';
+import { metFetchJson, refreshWeather, saveWeatherStatus } from './weather';
 
 initializeApp();
 const db = getFirestore();
@@ -56,6 +65,22 @@ export const messageSent = onDocumentCreated('chats/{chatId}/messages/{mid}', as
 
 export const followChanged = onDocumentWritten('follows/{fid}', async (e) => {
   await handleFollowWrite(db, e.params.fid, e.data?.before.data(), e.data?.after.data(), deps());
+});
+
+// Etiket isteği denetlenir, uygunlar yazılır ve bildirim gider (post-tags.ts).
+export const postTagged = onDocumentCreated('posts/{id}', async (e) => {
+  await handlePostTags(db, e.params.id, e.data?.data(), deps());
+});
+
+// Video izlenmeleri: telefon toplu gönderir, kişi başına günde bir sayılır.
+export const recordViews = onCall({ maxInstances: 5 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  try {
+    return { counted: await handleRecordViews(db, req.auth.uid, req.data, new Date()) };
+  } catch (e) {
+    if (e instanceof ViewError) throw new HttpsError('invalid-argument', e.code);
+    throw new HttpsError('internal', 'yapilamadi');
+  }
 });
 
 // İşletme adına yayındaki gönderi sayısı (Ücretsiz kademede toplam sınır).
@@ -96,6 +121,20 @@ export const profilePhotoChanged = onDocumentWritten('publicProfiles/{uid}', asy
 });
 export const businessMediaChanged = onDocumentWritten('businesses/{id}', async (e) => {
   await handleMediaChange(MEDIA_FIELDS.businesses, e.data?.before.data(), e.data?.after.data(), deleteFiles);
+  // Pro açılınca ya da kapanınca fazla gönderiler gizlenir / geri gelir (hiçbiri silinmez).
+  await handleBusinessTierChange(db, e.params.id, e.data?.before.data(), e.data?.after.data());
+});
+
+// Ücretsiz kademede hangi gönderinin görüneceğini işletme sahibi seçer.
+export const choosePostVisibility = onCall({ maxInstances: 3 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  try {
+    await handleTierVisibilityChoice(db, req.auth.uid, req.data);
+    return { ok: true };
+  } catch (e) {
+    if (!(e instanceof TierVisibilityError)) throw new HttpsError('internal', 'yapilamadi');
+    throw new HttpsError(e.code === 'yetki' ? 'permission-denied' : e.code === 'yok' ? 'not-found' : e.code === 'pro' ? 'failed-precondition' : 'invalid-argument', e.code);
+  }
 });
 
 // Çarşı ilanından çıkan ya da ilan kaldırılınca fotoğraf dosyaları silinir.
@@ -127,7 +166,96 @@ export const dailyCleanup = onSchedule({ schedule: 'every day 04:00', timeZone: 
   const now = new Date();
   await deleteExpiredSos(db, now);
   await deleteExpiredPushLog(db, now);
+  await deleteExpiredViewLog(db, now);
   await deleteOldTranslations(db, now);
+  await expireMemberships(db, now);
+  await remindProEnding(db, { send: expoSender, now });
+});
+
+// Hava durumu (Eren, 13 Kasım 2026): 3 saatte bir 81 il merkezi MET Norway'den bir kez çekilir, il başına küçük
+// dosya yazılır; telefon yalnızca dosyayı okur (kullanıcı sayısı dış isteği artırmaz). Dosya 30 dakika önbellekte kalır.
+export const weatherRefresh = onSchedule({ schedule: 'every 3 hours', timeZone: 'Europe/Istanbul', maxInstances: 1, timeoutSeconds: 300 }, async () => {
+  const now = new Date();
+  const bucket = getStorage().bucket();
+  const run = await refreshWeather({
+    now,
+    fetchJson: metFetchJson,
+    write: (path, file) =>
+      bucket.file(path).save(JSON.stringify(file), { resumable: false, contentType: 'application/json', metadata: { cacheControl: 'public, max-age=1800' } }),
+  });
+  await saveWeatherStatus(db, run, now);
+});
+
+// Hesap askıya alma (yalnızca admin, panelden): giriş kapanır, açık oturumlar düşer.
+const accounts: AccountSwitch = {
+  disable: async (uid) => {
+    await getAuth().updateUser(uid, { disabled: true });
+    await getAuth().revokeRefreshTokens(uid);
+  },
+  enable: async (uid) => {
+    await getAuth().updateUser(uid, { disabled: false });
+  },
+};
+const suspensionCall = async (fn: () => Promise<void>) => {
+  try {
+    await fn();
+    return { ok: true };
+  } catch (e) {
+    if (!(e instanceof SuspensionError)) throw new HttpsError('internal', 'yapilamadi');
+    const code = e.code === 'yetki' ? 'permission-denied' : e.code === 'yok' ? 'not-found' : e.code === 'admin' ? 'failed-precondition' : 'invalid-argument';
+    throw new HttpsError(code, e.code);
+  }
+};
+export const suspendAccount = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return suspensionCall(() => handleSuspend(db, accounts, req.auth!.uid, req.data, new Date()));
+});
+export const liftSuspension = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return suspensionCall(() => handleLift(db, accounts, req.auth!.uid, (req.data as { uid?: unknown } | null)?.uid, new Date()));
+});
+// Bölgeye toplu bildirim (panel): ulaşılacak kişi sayısı, gönderme, il geneli için admin onayı.
+const broadcastCall = async <T>(fn: () => Promise<T>) => {
+  try {
+    return await fn();
+  } catch (e) {
+    if (!(e instanceof BroadcastError)) throw new HttpsError('internal', 'yapilamadi');
+    const code = e.code === 'yetki' ? 'permission-denied' : e.code === 'yok' ? 'not-found' : e.code === 'sinir' ? 'resource-exhausted' : 'invalid-argument';
+    throw new HttpsError(code, e.code);
+  }
+};
+const actorOf = (auth: { uid: string; token: { email?: string; email_verified?: boolean } }): Actor => ({
+  uid: auth.uid,
+  email: auth.token.email,
+  emailVerified: auth.token.email_verified === true,
+});
+export const broadcastEstimate = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return broadcastCall(() => handleBroadcastEstimate(db, actorOf(req.auth!), req.data, new Date()));
+});
+export const broadcastSend = onCall({ maxInstances: 2, timeoutSeconds: 300 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return broadcastCall(() => handleBroadcastSend(db, actorOf(req.auth!), req.data, deps()));
+});
+export const broadcastReview = onCall({ maxInstances: 2, timeoutSeconds: 300 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return broadcastCall(async () => {
+    await handleBroadcastReview(db, req.auth!.uid, req.data, deps());
+    return { ok: true };
+  });
+});
+// Süreli askılar saatte bir denetlenir (askı yoksa tek okuma).
+export const suspensionExpiry = onSchedule({ schedule: 'every 1 hours', maxInstances: 1 }, async () => {
+  await liftExpiredSuspensions(db, accounts, new Date());
+  await liftExpiredBusinessSuspensions(db, new Date());
+});
+export const suspendBusiness = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return suspensionCall(() => handleBusinessSuspend(db, req.auth!.uid, req.data, new Date()));
+});
+export const liftBusinessSuspension = onCall({ maxInstances: 2 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  return suspensionCall(() => handleBusinessLift(db, req.auth!.uid, (req.data as { businessId?: unknown } | null)?.businessId, new Date()));
 });
 
 // "Çevir" düğmesi: yalnızca giriş yapmış kişi; sınır ve önbellek translate.ts'de.
@@ -166,4 +294,29 @@ export const billingStop = onCall({ maxInstances: 1 }, async (req) => {
 export const userDeleted = functionsV1
   .region(REGION)
   .auth.user()
-  .onDelete((user) => deleteUserLeftovers(db, user.uid, deleteFiles));
+  .onDelete(async (user) => {
+    await deleteUserLeftovers(db, user.uid, deleteFiles);
+    await removeTagsOf(db, user.uid);
+  });
+
+// Pro abonelik mağaza bildirimi (RevenueCat): store-webhook.ts. Ödeme ilk sürümde yok (PROJE.md 15.2); gizli
+// bilgiler (REVENUECAT_WEBHOOK_AUTH, REVENUECAT_API_KEY) Secret Manager'a girilince aşağıdaki satır açılır. Kapalıyken
+// Firebase yükleme sırasında bu gizli bilgileri istemez.
+// export { storeEvents } from './store-webhook';
+
+// Özelliklere göre harcama (Panel > Harcama; cost-report.ts): örneklemdeki uygulamalar sayım yollar, her gece sunucu
+// kullanımı Google Cloud Monitoring'den okunur.
+export const reportUsage = onCall({ maxInstances: 3 }, async (req) => {
+  if (!req.auth) throw new HttpsError('unauthenticated', 'giris');
+  try {
+    await handleReportUsage(db, req.auth.uid, req.data, new Date());
+    return { ok: true };
+  } catch (e) {
+    if (e instanceof UsageError) throw new HttpsError('invalid-argument', e.code);
+    throw new HttpsError('internal', 'yapilamadi');
+  }
+});
+
+export const costReport = onSchedule({ schedule: 'every day 03:30', timeZone: 'Europe/Istanbul', maxInstances: 1, timeoutSeconds: 120 }, async () => {
+  await handleCostReport(db, cloudMonitoring(PROJECT), new Date());
+});

@@ -1,8 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { Stack } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing, I18nManager, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { AccessibilityInfo, Animated, Easing, I18nManager, PanResponder, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { TourPoint, TourScene } from '@cityjoy/shared';
 
@@ -68,6 +69,34 @@ export function PlaceTour({ tour }: { tour: TourScene[] }) {
     setPoint(pointAfter);
     progress.setValue(0);
   };
+
+  // Resmi parmakla sağa/sola kaydırınca önceki/sonraki sahneye geçilir (Eren, 11 Kasım 2026). Yalnızca belirgin yatay
+  // harekette devreye girer; noktalara dokunma ve sayfayı aşağı kaydırma eskisi gibi çalışır. Arapçada yön ters çevrilir.
+  const swipeTo = useRef((_dx: number) => {});
+  swipeTo.current = (dx: number) => {
+    const step = (dx < 0 ? 1 : -1) * (I18nManager.isRTL ? -1 : 1);
+    const next = scene + step;
+    if (next >= 0 && next < tour.length) go(next);
+  };
+  // Başlangıç noktası ayrıca tutulur: web'de art arda kaydırmalarda hareket bilgisi (gestureState) önceki kaydırmadan kalabiliyor.
+  const startX = useRef(0);
+  const swipe = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponderCapture: (e) => {
+        startX.current = e.nativeEvent.pageX;
+        return false;
+      },
+      onMoveShouldSetPanResponder: (e, g) => {
+        const dx = e.nativeEvent.pageX - startX.current;
+        return Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(g.dy) * 1.5;
+      },
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderRelease: (e) => {
+        const dx = e.nativeEvent.pageX - startX.current;
+        if (Math.abs(dx) > 40) swipeTo.current(dx);
+      },
+    }),
+  ).current;
 
   // Geçiş, iki katman ekrana çizildikten sonra başlar (aksi hâlde web'de yeni katmanlar hareketi kaçırıyor).
   useEffect(() => {
@@ -139,6 +168,9 @@ export function PlaceTour({ tour }: { tour: TourScene[] }) {
 
   return (
     <View>
+      {/* iOS 26 ekranın her yerinden sağa kaydırmayı "geri" sayıyor; resmi sağa kaydırınca sayfa kapanmasın diye geri
+          hareketi bu sayfada sol kenardaki ince şeritle sınırlanır (eski iPhone davranışı). */}
+      <Stack.Screen options={{ gestureResponseDistance: { start: -1, end: 30, top: -1, bottom: -1 } }} />
       {/* Sahneler */}
       {tour.length > 1 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips} accessibilityRole="tablist">
@@ -159,7 +191,7 @@ export function PlaceTour({ tour }: { tour: TourScene[] }) {
       ) : null}
 
       {/* Sahne */}
-      <View style={[styles.stage, { height: stageH }]}>
+      <View style={[styles.stage, { height: stageH }]} {...(tour.length > 1 ? swipe.panHandlers : {})}>
         {prev !== null && tour[prev] ? layer(tour[prev], prev, { opacity: outOpacity, transform: [{ scale: outScale }] }, false) : null}
         {layer(current, scene, prev !== null ? { opacity: inOpacity, transform: [{ scale: inScale }] } : {}, true)}
         <AppText style={styles.note}>{t('travel.tour.illustrative')}</AppText>

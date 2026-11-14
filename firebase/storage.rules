@@ -16,24 +16,35 @@ service firebase.storage {
             // Gönderi videosu (en çok 60 sn, 40 MB): video.mp4 ya da iPhone'da video.mov.
             || (file.matches('video[.](mp4|mov)')
               && request.resource.contentType in ['video/mp4', 'video/quicktime']
-              && request.resource.size > 0 && request.resource.size <= 40000000));
+              && request.resource.size > 0 && request.resource.size <= 40000000)
+            // Videonun kapak karesi (paylaşım düzenleyicisinde seçilir): küçük JPEG.
+            || (file == 'cover.jpg'
+              && request.resource.contentType == 'image/jpeg'
+              && request.resource.size > 0 && request.resource.size <= 400000));
       allow update: if false;
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
 
     // Diğer görseller: media/{uid}/{tür}/{rastgele}.jpg (etkinlik kapağı, kurum logosu, işletme logosu ve vitrini,
-    // profil fotoğrafı, Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat kapakları).
+    // profil fotoğrafı, Çarşı ilan fotoğrafları, aktivite kapağı, Seyahat kapakları, uygulama giriş resimleri).
     // Yükleyen kendi klasörüne yükler; görseli bir kayda (etkinlik, kurum, işletme) bağlamaya kimin yetkisi olduğunu
     // Firestore kuralı denetler. Kayıttan çıkan dosyayı sunucu siler.
     match /media/{uid}/{kind}/{file} {
       allow read: if request.auth != null;
       allow create: if request.auth != null && request.auth.uid == uid
-        && kind in ['etkinlik', 'kurum', 'isletme-logo', 'isletme-vitrin', 'profil', 'ilan', 'aktivite', 'seyahat']
+        && kind in ['etkinlik', 'kurum', 'isletme-logo', 'isletme-vitrin', 'profil', 'ilan', 'aktivite', 'seyahat', 'uygulama']
         && file.matches('[A-Za-z0-9]{10,40}[.]jpg')
         && request.resource.contentType == 'image/jpeg'
         && request.resource.size > 0 && request.resource.size <= 1500000;
       allow update: if false;
       allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Hava durumu ve nöbetçi eczane gibi herkese açık veri dosyaları (Eren, 13 Kasım 2026): yalnızca sunucu yazar,
+    // herkes okur (giriş yapmadan da; karşılama ekranında da gösterilebilir).
+    match /public/{kind}/{file} {
+      allow read: if kind in ['weather', 'pharmacy'] && file.matches('[0-9]{2}[.]json');
+      allow write: if false;
     }
 
     // Listelerde gösterilen küçük kopyalar (640 piksel): thumbs/{asıl yol}. Yalnızca sunucu yazar ve siler.

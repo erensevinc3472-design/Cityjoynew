@@ -11,12 +11,16 @@ const STORAGE_KEY = 'settings:v1';
 /** Görünüm: telefonun ayarına uy ya da açık/koyu sabitle. */
 export type ThemeMode = 'system' | 'light' | 'dark';
 
+/** Keşfet videoları kendiliğinden oynasın mı (Eren, 12 Kasım 2026: varsayılan yalnızca Wi-Fi'de; mobil veri harcanmasın). */
+export type AutoplayMode = 'her-zaman' | 'wifi' | 'kapali';
+
 interface StoredSettings {
   language: LanguageCode | null;
   themeMode: ThemeMode;
   location: UserLocation | null;
   /** Kullanıcı konum adımını tamamladı ya da atladı. */
   locationStepDone: boolean;
+  autoplay: AutoplayMode;
 }
 
 interface SettingsContextValue extends StoredSettings {
@@ -26,11 +30,12 @@ interface SettingsContextValue extends StoredSettings {
   setLanguage(code: LanguageCode): Promise<void>;
   setLocation(location: UserLocation | null): Promise<void>;
   setThemeMode(mode: ThemeMode): Promise<void>;
+  setAutoplay(mode: AutoplayMode): Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
-const EMPTY: StoredSettings = { language: null, themeMode: 'system', location: null, locationStepDone: false };
+const EMPTY: StoredSettings = { language: null, themeMode: 'system', location: null, locationStepDone: false, autoplay: 'wifi' };
 
 function applyDirection(code: LanguageCode) {
   const rtl = isRtl(code);
@@ -92,6 +97,8 @@ export function SettingsProvider({ children }: PropsWithChildren) {
 
   const setThemeMode = useCallback((themeMode: ThemeMode) => persist({ ...settings, themeMode }), [persist, settings]);
 
+  const setAutoplay = useCallback((autoplay: AutoplayMode) => persist({ ...settings, autoplay }), [persist, settings]);
+
   const activeLanguage = settings.language ?? suggestedLanguage;
   const value: SettingsContextValue = {
     ...settings,
@@ -101,6 +108,7 @@ export function SettingsProvider({ children }: PropsWithChildren) {
     setLanguage,
     setLocation,
     setThemeMode,
+    setAutoplay,
   };
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

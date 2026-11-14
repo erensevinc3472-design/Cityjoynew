@@ -15,6 +15,7 @@ import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 type Message = { kind: 'ok' | 'error'; text: string };
 
@@ -99,7 +100,7 @@ export function HolidayPage() {
       <header className="page-head">
         <div>
           <h1>{t('holiday.title')}</h1>
-          <p className="meta">{t('holiday.intro')}</p>
+          <Intro text={t('holiday.intro')} />
         </div>
       </header>
 

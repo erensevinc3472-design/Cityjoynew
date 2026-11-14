@@ -57,6 +57,11 @@ describe('işletme sayfası', () => {
     const b = (await biz('x').get(id))!;
     expect(b.gallery).toHaveLength(4);
     expect(b.logo).toBeUndefined();
+    // Sınır düşünce (Pro bitti) fazla fotoğraflar silinmez: çıkarma ve sıra değiştirme olur, yeni fotoğraf eklenemez.
+    await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'config/limits'), { vitrinUcretsiz: 1 }));
+    await biz('cengiz').update(id, { ...input, gallery: [vitrin(4)[3], vitrin(4)[1], vitrin(4)[0]] });
+    expect((await biz('x').get(id))!.gallery?.map((p) => p.path.slice(-7))).toEqual(['003.jpg', '001.jpg', '000.jpg']);
+    await expect(biz('cengiz').update(id, { ...input, gallery: [vitrin(4)[3], media('cengiz', 'isletme-vitrin', 'yeniFoto0000001')] })).rejects.toThrow();
     // Sınır ne olursa olsun en çok 30.
     await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), 'config/limits'), { vitrinUcretsiz: 100 }));
     await expect(biz('cengiz').update(id, { ...input, gallery: vitrin(31) })).rejects.toThrow();
@@ -99,6 +104,19 @@ describe('işletme sayfası', () => {
     expect((await biz('x').get(id))!.managers).toEqual([]);
     const log = await getDocs(collection(fs('eren'), 'auditLog'));
     expect(log.docs.map((d) => d.data().summary)).toContain('Yetkili çıkarıldı (Ayşe K.): Cengiz Kebap');
+  }, 30000);
+
+  it('takipçi listesi: yalnızca sahibi ve yetkilileri görür; takipçi kendi kaydını görür', async () => {
+    const id = await biz('cengiz').create('cengiz', input);
+    await verify(id);
+    await biz('cengiz').setManagers(id, [{ uid: 'ayse', name: 'Ayşe K.', post: 'kapali', edit: false, reply: false, messages: false }]);
+    await biz('ali').follow(id, 'ali');
+    await biz('veli').follow(id, 'veli');
+    expect((await biz('cengiz').followerPage(id)).uids.sort()).toEqual(['ali', 'veli']);
+    expect((await biz('ayse').followerPage(id)).uids.sort()).toEqual(['ali', 'veli']);
+    await expect(biz('ali').followerPage(id)).rejects.toThrow();
+    await expect(biz('yabanci').followerPage(id)).rejects.toThrow();
+    expect(await biz('ali').followedIds('ali')).toEqual([id]);
   }, 30000);
 
   it('takip: sayaç tam bir değişir, iki kez takip edilemez; takip akışına işletmenin Takip gönderileri düşer', async () => {

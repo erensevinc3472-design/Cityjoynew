@@ -25,6 +25,9 @@ describe('Keşfet gönderileri', () => {
     expect(validatePost(input({ targets: [] }))).toEqual(['targets']);
     expect(validatePost(input({ targets: ['mahallem', 'mahallem'] }))).toEqual(['targets']);
     expect(validatePost(input({ category: 'reklam' as never }))).toEqual(['category']);
+    // Gündem konusu (spor, ekonomi...) yalnızca Genel akışında.
+    expect(validatePost(input({ category: 'spor', targets: ['genel'] }))).toEqual([]);
+    expect(validatePost(input({ category: 'spor', targets: ['mahallem'] }))).toEqual(['category']);
     expect(validatePost(input({ region: { provinceCode: '16', districtId: '16-nilufer', neighbourhoodId: '34-kadikoy-moda' } }))).toEqual(['region']);
   });
 

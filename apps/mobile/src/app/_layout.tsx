@@ -1,6 +1,9 @@
+import { Anton_400Regular } from '@expo-google-fonts/anton';
+import { Caveat_600SemiBold } from '@expo-google-fonts/caveat';
 import { Fraunces_500Medium, Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold } from '@expo-google-fonts/plus-jakarta-sans';
+import { SpaceMono_700Bold } from '@expo-google-fonts/space-mono';
 import { useFonts } from 'expo-font';
 import { LocaleProvider, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -9,12 +12,16 @@ import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppGate } from '@/components/app-gate';
+import { PreviewBridge } from '@/components/preview-bridge';
 import { CrashScreen } from '@/components/crash-screen';
 import { OfflineBanner } from '@/components/offline-banner';
 import '@/lib/i18n';
 import { IncomingSosBanner, IncomingSosProvider, PushRegistrar } from '@/lib/incoming-sos';
 // SOS arka plan konum görevi, uygulama kapalıyken de çalışabilmesi için en başta tanımlanır.
 import '@/lib/sos-background';
+import '@/lib/usage-meter';
+import { ReturnToExplore } from '@/lib/return-to-explore';
 import { SessionProvider, useSession } from '@/lib/session';
 import { SettingsProvider, useSettings } from '@/lib/settings';
 import { useThemeColors } from '@/theme/use-theme';
@@ -34,6 +41,10 @@ function RootNavigator() {
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
     PlusJakartaSans_800ExtraBold,
+    // Paylaşım düzenleyicisinin yazı tipleri (El yazısı, Kalın, Daktilo).
+    Caveat_600SemiBold,
+    Anton_400Regular,
+    SpaceMono_700Bold,
   });
   // Yazı tipi yüklenemezse sistem yazı tipiyle devam edilir.
   const loaded = ready && session.ready && (fontsLoaded || !!fontError);
@@ -50,9 +61,14 @@ function RootNavigator() {
       <View style={{ flex: 1, ...(Platform.OS === 'web' ? {} : { direction: rtl ? ('rtl' as const) : ('ltr' as const) }), backgroundColor: c.background }}>
         <IncomingSosProvider>
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.background } }} />
+          {/* Panel > Uygulama ayarları: zorunlu güncelleme, bakım, yeniden onay, kapalı bölüm. */}
+          <AppGate />
           <IncomingSosBanner />
           <OfflineBanner />
           <PushRegistrar />
+          <ReturnToExplore />
+          {/* Panel > Uygulama görünümü: yalnızca panel önizleme derlemesinde çalışır. */}
+          <PreviewBridge />
         </IncomingSosProvider>
       </View>
     </LocaleProvider>

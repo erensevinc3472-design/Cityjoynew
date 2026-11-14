@@ -11,10 +11,12 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
+import { SEARCH_LIMITS, searchKeys } from '../search/search';
 import { SEED_CITIES, SEED_LOCAL, SEED_PLACES, SEED_REGIONS, SEED_ROUTES } from '../travel/seed';
 import { travelPlaceId, type TravelImport } from '../travel/sheet';
+import { municipalVideos, type MunicipalVideo } from '../travel/travel';
 import type {
   TravelCityContent,
   TravelLocalInput,
@@ -27,6 +29,7 @@ import type {
   TravelReviewStatus,
   TravelRoute,
   TravelRouteInput,
+  PlaceHours,
   TourScene,
 } from '../travel/travel';
 import { cleanPhoto, photoFrom, type Photo } from '../media/photo';
@@ -40,10 +43,14 @@ const LOCAL = 'travelLocal';
 const MUNICIPAL = 'travelMunicipal';
 
 /** Boş isteğe bağlı alanlar belgeye yazılmaz (güncellemede silinir). Kapak yalnızca dört alanıyla yazılır. */
+/** Yazılacak video listesi: boş satırlar atılır, yazılar kırpılır; liste boşsa alan silinir. */
+const cleanVideos = (m: { videos?: MunicipalVideo[]; videoUrl?: string }) =>
+  (m.videos?.length ? m.videos : m.videoUrl ? [{ url: m.videoUrl }] : []).map((x) => ({ url: x.url.trim(), ...(x.title?.trim() ? { title: x.title.trim() } : {}) })).filter((x) => x.url);
+
 const clean = <T extends Record<string, unknown>>(o: T) =>
   Object.fromEntries(
     Object.entries(o)
-      .map(([k, v]) => [k, k === 'cover' && v ? cleanPhoto(v as Photo) : typeof v === 'string' ? v.trim() : v])
+      .map(([k, v]) => [k, (k === 'cover' || k === 'mayorPhoto') && v ? cleanPhoto(v as Photo) : typeof v === 'string' ? v.trim() : v])
       .filter(([, v]) => v !== undefined && v !== ''),
   ) as T;
 
@@ -102,6 +109,10 @@ const tourOf = (d: DocumentData): { tour?: TourScene[] } => {
   return tour.length ? { tour } : {};
 };
 
+/** Açılış saatleri: her zaman açıkta saat alanı yazılmaz (Firestore boş değer kabul etmez). */
+const cleanHours = (h: PlaceHours | undefined) =>
+  h ? { allDay: h.allDay, ...(h.allDay ? {} : { open: h.open, close: h.close }), closedDays: [...h.closedDays].sort((a, b) => a - b), prayer: h.prayer } : undefined;
+
 /** Yazılacak sahneler: resim dört alanıyla, yazılar kırpılmış. Boşsa alan yazılmaz. */
 const cleanTour = (tour: TourScene[] | undefined) =>
   tour?.length
@@ -146,13 +157,22 @@ const localOf = (id: string, d: DocumentData): TravelLocalItem => ({
   order: d.order ?? 0,
   updatedAt: iso(d.updatedAt) ?? '',
 });
-const municipalOf = (id: string, d: DocumentData): TravelMunicipal => ({
-  ...(withoutCover(d) as TravelMunicipal),
+const municipalOf = (id: string, d: DocumentData): TravelMunicipal => {
+  const { mayorPhoto: raw, ...rest } = withoutCover(d);
+  const mayorPhoto = photoFrom(raw);
+  return {
+  ...(rest as TravelMunicipal),
   id,
   ...coverOf(d),
+  ...(mayorPhoto ? { mayorPhoto } : {}),
+  videos: municipalVideos(d),
   showMayor: d.showMayor !== false,
   updatedAt: iso(d.updatedAt) ?? '',
-});
+  };
+};
+/** Ara > Yerler (Türkiye geneli): gezilecek yerin adından arama anahtarları. */
+export const placeSearchKeys = (name: string) => searchKeys(name, SEARCH_LIMITS.placeKeys);
+
 const ordered = <T extends { order: number; title: string }>(a: T, b: T) => a.order - b.order || a.title.localeCompare(b.title, 'tr');
 
 /** Durakların boş isteğe bağlı alanları yazılmaz. */
@@ -177,6 +197,11 @@ export function createFirestoreTravelRepository(db: Firestore) {
     },
     async listPlaces(cityId: string): Promise<TravelPlace[]> {
       return (await published(PLACES, where('cityId', '==', cityId))).docs.map((d) => placeOf(d.id, d.data())).sort(byOrder);
+    },
+    /** Ara > Yerler: Türkiye genelinde, adının bir kelimesi anahtarla başlayan yayındaki yerler (en çok 30). */
+    async searchPlaces(key: string): Promise<TravelPlace[]> {
+      const snap = await getDocs(query(collection(db, PLACES), where('status', '==', 'yayinda'), where('searchKeys', 'array-contains', key), limit(30)));
+      return snap.docs.map((d) => placeOf(d.id, d.data()));
     },
     async getPlace(id: string): Promise<TravelPlace | null> {
       const s = await getDoc(doc(db, PLACES, id));
@@ -251,7 +276,7 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
     async savePlace(id: string | null, p: TravelPlaceInput): Promise<string> {
       const ref = id ? doc(db, PLACES, id) : doc(collection(db, PLACES));
       const batch = writeBatch(db);
-      batch.set(ref, { ...clean({ ...p, tour: cleanTour(p.tour) } as unknown as Record<string, unknown>), updatedAt: serverTimestamp() });
+      batch.set(ref, { ...clean({ ...p, tour: cleanTour(p.tour), hours: cleanHours(p.hours) } as unknown as Record<string, unknown>), searchKeys: placeSearchKeys(p.name), updatedAt: serverTimestamp() });
       audit(batch, ref.id, id ? 'duzenle' : 'ekle', `Gezilecek yer: ${p.name}`);
       await batch.commit();
       return ref.id;
@@ -279,7 +304,14 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
     async saveMunicipal(m: Omit<TravelMunicipal, 'updatedAt'>, label: string) {
       const batch = writeBatch(db);
       const { id, ...rest } = m;
-      batch.set(doc(db, MUNICIPAL, id), { ...clean(rest as unknown as Record<string, unknown>), updatedAt: serverTimestamp() });
+      // Slogan ve tanıtım boş olabilir (yalnızca başkan bilgisi); boş metin de yazılır.
+      batch.set(doc(db, MUNICIPAL, id), {
+        ...clean({ ...rest, videoUrl: undefined, videos: undefined } as unknown as Record<string, unknown>),
+        ...(cleanVideos(rest).length ? { videos: cleanVideos(rest) } : {}),
+        slogan: rest.slogan.trim(),
+        description: rest.description.trim(),
+        updatedAt: serverTimestamp(),
+      });
       audit(batch, id, 'duzenle', `Belediye tanıtımı: ${label}`);
       await batch.commit();
     },
@@ -343,7 +375,8 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
           byCity.set(p.data.cityId, names);
         }
         const existing = names.get(p.id);
-        writes.push({ col: PLACES, id: existing ?? p.id, data: p.data as unknown as Record<string, unknown>, isNew: !existing && !(await exists(PLACES, p.id)) });
+        const data = { ...p.data, hours: cleanHours(p.data.hours), searchKeys: placeSearchKeys(p.data.name) };
+        writes.push({ col: PLACES, id: existing ?? p.id, data: data as unknown as Record<string, unknown>, isNew: !existing && !(await exists(PLACES, p.id)) });
       }
       for (let i = 0; i < writes.length; i += 400) {
         const part = writes.slice(i, i + 400);
@@ -361,6 +394,26 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
       return { added, updated };
     },
 
+    /**
+     * Ara > Yerler için eski yerlere arama anahtarı yazar (13 Kasım 2026 öncesi kaydedilenler; yeni kayıtlarda kendiliğinden).
+     * Yalnızca anahtarı eksik ya da adı değişmiş yerler yazılır. Döner: güncellenen sayısı.
+     */
+    async reindexPlaceSearch(): Promise<number> {
+      const snap = await getDocs(query(collection(db, PLACES), limit(5000)));
+      const todo = snap.docs.filter((d) => {
+        const want = placeSearchKeys(String(d.data().name ?? ''));
+        const have = (d.data().searchKeys ?? []) as string[];
+        return want.length !== have.length || want.some((k, i) => k !== have[i]);
+      });
+      for (let i = 0; i < todo.length; i += 400) {
+        const batch = writeBatch(db);
+        for (const d of todo.slice(i, i + 400)) batch.update(d.ref, { searchKeys: placeSearchKeys(String(d.data().name ?? '')), updatedAt: serverTimestamp() });
+        audit(batch, `seyahat-arama-${i / 400 + 1}`, 'duzenle', `Gezilecek yerler aramaya eklendi (${Math.min(400, todo.length - i)} yer)`);
+        await batch.commit();
+      }
+      return todo.length;
+    },
+
     /** Başlangıç içeriği (Marmara, Bursa): yalnızca olmayanlar taslak olarak eklenir. Döner: eklenen sayısı. */
     async importSeed(): Promise<number> {
       const batch = writeBatch(db);
@@ -375,7 +428,7 @@ export function createTravelAdmin(db: Firestore, actorUid: string) {
         const { id, ...rest } = c;
         await add(CITIES, id, rest);
       }
-      for (const p of SEED_PLACES) await add(PLACES, p.id, p.data as unknown as Record<string, unknown>);
+      for (const p of SEED_PLACES) await add(PLACES, p.id, { ...p.data, searchKeys: placeSearchKeys(p.data.name) } as unknown as Record<string, unknown>);
       for (const r of SEED_ROUTES) await add(ROUTES, r.id, cleanRoute({ ...r.data, status: 'taslak' }));
       for (const x of SEED_LOCAL) await add(LOCAL, x.id, x.data as unknown as Record<string, unknown>);
       if (n) audit(batch, 'seyahat-baslangic', 'ekle', `Seyahat başlangıç içeriği taslak olarak yüklendi (${n} kayıt)`);
@@ -411,9 +464,13 @@ export function createMunicipalTravel(db: Firestore, actorUid: string, org: { id
           ...(org.districtId ? { districtId: org.districtId } : {}),
           slogan: text.slogan.trim(),
           description: text.description.trim(),
-          videoUrl: text.videoUrl?.trim() ? text.videoUrl.trim() : deleteField(),
+          // Eski tek video alanı listeye taşınır.
+          videoUrl: deleteField(),
+          videos: cleanVideos(text).length ? cleanVideos(text) : deleteField(),
           mayorName: text.mayorName?.trim() ? text.mayorName.trim() : deleteField(),
           cover: text.cover ? cleanPhoto(text.cover) : deleteField(),
+          mayorPhoto: text.mayorPhoto ? cleanPhoto(text.mayorPhoto) : deleteField(),
+          mayorActing: text.mayorActing ? true : deleteField(),
           status: submit ? 'onay-bekliyor' : 'taslak',
           updatedAt: serverTimestamp(),
         },

@@ -1,7 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import {
   chatTitle,
@@ -29,6 +30,7 @@ import { HeroHeader } from '@/components/hero-header';
 import { Screen } from '@/components/screen';
 import { StateMessage } from '@/components/state-message';
 import { useBannedWordCheck } from '@/lib/banned-words';
+import { useKeyboardHeight } from '@/lib/keyboard';
 import { useReadReceipts } from '@/lib/messages';
 import { setOpenChat } from '@/lib/push';
 import { businessRepository, listingRepository, messageRepository, socialRepository } from '@/lib/services';
@@ -53,6 +55,8 @@ export default function ChatScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const keyboard = useKeyboardHeight();
   const { language, rtl } = useSettings();
   const lang = language ?? 'tr';
   const { uid: other, business, listing, thread } = useLocalSearchParams<{ uid: string; business?: string; listing?: string; thread?: string }>();
@@ -77,6 +81,10 @@ export default function ChatScreen() {
   // İşletme ya da ilan sayfasından açılan yeni sohbetin konusu (yayında olmalı ve karşı taraf sahibi).
   const [biz, setBiz] = useState<ChatContext | null | undefined>(business || listing ? undefined : null);
   const scroll = useRef<ScrollViewInstance>(null);
+  // Klavye açılınca son mesajlar görünür kalsın.
+  useEffect(() => {
+    if (keyboard) scroll.current?.scrollToEnd({ animated: true });
+  }, [keyboard]);
   const topic: Pick<ChatContext, 'type' | 'id'> | null = business ? { type: 'isletme', id: business } : listing ? { type: 'ilan', id: listing } : null;
   const id = thread ?? (me && other ? threadId(me, other, topic) : '');
   const iBlocked = blocked.has(other ?? '');
@@ -202,7 +210,8 @@ export default function ChatScreen() {
 
   return (
     <Screen header={header}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      {/* Klavye açılınca yazı kutusu klavyenin hemen üstüne çıkar (alt güvenli boşluk zaten ekranda). */}
+      <View style={[styles.flex, keyboard ? { paddingBottom: Math.max(0, keyboard - insets.bottom) } : null]}>
         <ScrollView
           ref={scroll}
           style={styles.flex}
@@ -339,7 +348,7 @@ export default function ChatScreen() {
         ) : (
           <AppText variant="caption" muted style={styles.center}>{iBlocked ? t('messages.youBlocked') : t('messages.cannotWrite')}</AppText>
         )}
-      </KeyboardAvoidingView>
+      </View>
     </Screen>
   );
 }

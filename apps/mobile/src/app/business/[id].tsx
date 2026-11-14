@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useState, type ComponentProps, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ComponentProps, type ReactNode } from 'react';
 import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,7 @@ import {
 
 import { ThumbImage } from '@/components/thumb-image';
 import { AppText } from '@/components/app-text';
+import { StatBox } from '@/components/stat-box';
 import { TranslatableText } from '@/components/translatable-text';
 import { BusinessCard, ProTag, verificationText } from '@/components/business-card';
 import { useToast } from '@/components/toast';
@@ -35,6 +36,9 @@ import { DealBox } from '@/components/deal-box';
 import { Tag } from '@/components/inner';
 import { RoundButton } from '@/components/hero-header';
 import { PostGrid } from '@/components/post-grid';
+import { HiddenPosts } from '@/components/hidden-posts';
+import { vitrinLimit } from '@cityjoy/shared/firebase';
+import { firestore } from '@/lib/firebase';
 import { ReviewsSection } from '@/components/reviews-section';
 import { StateMessage } from '@/components/state-message';
 import { TopBar } from '@/components/top-bar';
@@ -78,6 +82,13 @@ export default function BusinessScreen() {
   const [error, setError] = useState(false);
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [pending, setPending] = useState<Post[]>([]);
+  /** Pro bitince gizlenen gönderiler (yalnızca ekip görür). */
+  const [hidden, setHidden] = useState<Post[]>([]);
+  /** Ücretsiz kademede herkese görünen vitrin fotoğrafı sayısı (Panel > Sınırlar). */
+  const [freeGallery, setFreeGallery] = useState<number>(DEFAULT_LIMITS.vitrinUcretsiz);
+  useEffect(() => {
+    vitrinLimit(firestore, 'ucretsiz').then(setFreeGallery, () => {});
+  }, []);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [tab, setTab] = useState<Tab>('gonderiler');
   const [busy, setBusy] = useState(false);
@@ -91,8 +102,15 @@ export default function BusinessScreen() {
         setB(biz);
         if (biz) dealRepository.listForBusiness(biz.id).then((l) => setDeals(l.filter((d) => dealLive(d))), () => setDeals([]));
         if (!biz || !user) return setPosts([]);
-        postRepository.byBusiness(id, { provinceCode: location?.provinceCode, following }).then((l) => setPosts(l.filter(isPostListed)), () => setPosts([]));
-        if (biz.ownerUid === user.uid || biz.managers.some((m) => m.uid === user.uid)) postRepository.pendingOf(id).then(setPending, () => setPending([]));
+        const isTeam = biz.ownerUid === user.uid || biz.managers.some((m) => m.uid === user.uid);
+        postRepository.byBusiness(id, { provinceCode: location?.provinceCode, following }).then(
+          (l) => {
+            setPosts(l.filter(isPostListed));
+            setHidden(isTeam ? l.filter((p) => p.tierHidden && p.status === 'aktif' && !p.authorSuspended) : []);
+          },
+          () => setPosts([]),
+        );
+        if (isTeam) postRepository.pendingOf(id).then(setPending, () => setPending([]));
       },
       () => setError(true),
     );
@@ -128,6 +146,10 @@ export default function BusinessScreen() {
   // Ücretsiz (doğrulanmış) işletme adına toplam gönderi sınırı; asıl denetim sunucuda, sayı panelden değişebilir.
   const postLimit = DEFAULT_LIMITS.isletmeGonderiToplam;
   const postsFull = verified && !pro && b.postCount >= postLimit;
+  // Pro bitince vitrin fotoğrafları silinmez; herkese Ücretsiz sınır kadarı görünür, gerisi Pro dönünce geri gelir.
+  const allGallery = b.gallery ?? [];
+  const gallery = pro ? allGallery : allGallery.slice(0, freeGallery);
+  const galleryHidden = team && !pro ? allGallery.length - gallery.length : 0;
   const district = locationRepository.getDistrict(b.location.districtId)?.name;
   const province = locationRepository.getProvince(b.location.provinceCode)?.name;
   const services = [
@@ -230,18 +252,14 @@ export default function BusinessScreen() {
                 )}
               </View>
             </View>
-            <View style={styles.stats}>
-              {[
-                { n: posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts') },
-                { n: String(b.followerCount), label: t('explore.profile.statFollowers') },
-                { n: b.rating.count ? `★ ${avg.toLocaleString(i18n.language)}` : '–', label: t('business.page.statRating', { count: b.rating.count }) },
-              ].map((x) => (
-                <View key={x.label} style={styles.stat} accessible accessibilityLabel={`${x.n} ${x.label}`}>
-                  <AppText style={[styles.statN, { color: c.textStrong }]}>{x.n}</AppText>
-                  <AppText style={[styles.statL, { color: c.textMuted }]} numberOfLines={1}>{x.label}</AppText>
-                </View>
-              ))}
-            </View>
+            <StatBox
+              items={[
+                { n: posts === null ? '–' : String(posts.length), label: t('explore.profile.statPosts'), onPress: () => setTab('gonderiler') },
+                // Takipçi listesini yalnızca sahibi ve yetkilileri açar (14 Kasım 2026; kurallarda da öyle).
+                { n: String(b.followerCount), label: t('explore.profile.statFollowers'), onPress: team ? () => router.push({ pathname: '/follows', params: { business: b.id, name: b.name } }) : undefined, hint: t('follows.openHint') },
+                { n: b.rating.count ? `★ ${avg.toLocaleString(i18n.language)}` : '–', label: t('business.page.statRating', { count: b.rating.count }), onPress: () => setTab('yorumlar') },
+              ]}
+            />
           </View>
 
           <View style={styles.bio}>
@@ -267,19 +285,20 @@ export default function BusinessScreen() {
           {/* Fırsat kutusu kapağın altında (13. madde 35). */}
           {deals.map((d) => <DealBox key={d.id} deal={d} own={team} />)}
 
-          {b.gallery?.length ? (
+          {gallery.length ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery} accessibilityLabel={t('business.page.gallery')}>
-              {b.gallery.map((p, i) => (
+              {gallery.map((p, i) => (
                 <ThumbImage
                   key={p.path}
                   photo={p}
                   style={[styles.galleryItem, { aspectRatio: Math.min(1.5, Math.max(0.8, p.width / p.height)), backgroundColor: c.surfaceStrong }]}
                   contentFit="cover"
-                  accessibilityLabel={t('explore.photos.label', { n: i + 1, total: b.gallery!.length })}
+                  accessibilityLabel={t('explore.photos.label', { n: i + 1, total: gallery.length })}
                 />
               ))}
             </ScrollView>
           ) : null}
+          {galleryHidden > 0 ? <AppText variant="caption" muted>{t('business.hidden.gallery', { count: galleryHidden })}</AppText> : null}
 
           <View style={styles.buttons}>
             {team ? null : pill(following ? t('business.page.following') : t('business.page.follow'), following ? 'check' : 'add', toggleFollow, !following)}
@@ -374,7 +393,10 @@ export default function BusinessScreen() {
         </View>
 
         {tab === 'gonderiler' ? (
-          <PostGrid list={posts} empty={t('business.page.noPosts')} />
+          <>
+            {team && !pro ? <HiddenPosts businessId={b.id} list={hidden} limit={postLimit} isOwner={isOwner} onChanged={load} /> : null}
+            <PostGrid list={posts} empty={t('business.page.noPosts')} />
+          </>
         ) : tab === 'menu' ? (
           <View style={styles.section}>
             {b.priceList.length ? (
@@ -455,10 +477,6 @@ const styles = StyleSheet.create({
   gallery: { gap: spacing.sm },
   galleryItem: { height: 140, borderRadius: radius.md },
   initial: { fontFamily: fonts.heading, fontSize: 26, lineHeight: 30 },
-  stats: { flex: 1, flexDirection: 'row', justifyContent: 'space-around' },
-  stat: { alignItems: 'center', flexShrink: 1 },
-  statN: { fontFamily: fonts.heading, fontSize: 18, lineHeight: 23 },
-  statL: { fontSize: 12, lineHeight: 16 },
   bio: { gap: 2, marginTop: -spacing.xs },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   name: { fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 20, flexShrink: 1 },

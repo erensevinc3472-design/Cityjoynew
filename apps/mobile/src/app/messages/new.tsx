@@ -63,7 +63,7 @@ export default function NewMessageScreen() {
   return (
     <Screen header={header}>
       <SearchField value={input} onChangeText={setInput} placeholder={t('messages.searchPeople')} autoFocus />
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {!searching ? <AppText variant="label" accessibilityRole="header">{t('messages.followingTitle')}</AppText> : null}
         {list === null ? (
           <StateMessage kind="loading" />

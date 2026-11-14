@@ -12,3 +12,7 @@ veri-denemesi/
 # Panelin yayına kopyası (npm run panel:deploy)
 firebase/panel-dist/
 firebase/.firebase/
+
+# Panel > Uygulama görünümü derlemesi (npm run panel:preview-app)
+apps/panel/public/uygulama/
+apps/mobile/dist-panel-preview/

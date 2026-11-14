@@ -5,6 +5,8 @@ import { createBillingAdmin } from '@cityjoy/shared/firebase';
 import { firestore, functions } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
+import { CostBreakdown } from '../components/cost-breakdown';
 
 const tl = (n: number) => `${n.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} TL`;
 const when = (s?: string) => (s ? new Date(s).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }) : '');
@@ -77,7 +79,7 @@ export function BillingPage() {
       <header className="page-head">
         <div>
           <h1>{t('billing.title')}</h1>
-          <p className="meta">{t('billing.intro')}</p>
+          <Intro text={t('billing.intro')} />
         </div>
       </header>
       {!canEdit ? (
@@ -104,7 +106,7 @@ export function BillingPage() {
                     {!status.enabled && status.stoppedAt ? <span className="meta">{when(status.stoppedAt)}</span> : null}
                   </div>
                   <div className="card stat">
-                    <span className="stat-label">{t('billing.cost')}</span>
+                    <span className="stat-label">{t('billing.costMonth')}</span>
                     <strong className="stat-value">{tl(status.costAmount)}</strong>
                     {status.updatedAt ? <span className="meta">{t('billing.updated', { at: when(status.updatedAt) })}</span> : null}
                   </div>
@@ -118,6 +120,8 @@ export function BillingPage() {
                   </div>
                 </div>
               )}
+
+              <CostBreakdown />
 
               <form className="form panel-form" onSubmit={saveCap}>
                 <fieldset className="form-section">

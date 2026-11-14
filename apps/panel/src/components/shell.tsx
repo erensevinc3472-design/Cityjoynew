@@ -1,13 +1,18 @@
-import { useState, type ReactNode } from 'react';
-import { NavLink, Outlet } from 'react-router';
+import { useEffect, useState, type ReactNode } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router';
 import { canSeeModule, type Module } from '@cityjoy/shared';
 
 import { ScopeLabel } from './scope-label';
+import { PanelSearch } from './panel-search';
 import { hasProfileAccess } from '../pages/profile-page';
+import { canBroadcast } from '../pages/broadcast-page';
 import { canSeeAudience } from '../lib/audience';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { useTheme } from '../lib/theme';
+import { firestore } from '../lib/firebase';
+import { createFirebaseStats } from '@cityjoy/shared/firebase';
 
 /** Menü öğesi: ya bir bölüm yetkisine (module) ya da özel bir koşula (show) bağlı. Yolu olmayan "yakında" gösterilir. */
 interface MenuItem {
@@ -16,71 +21,78 @@ interface MenuItem {
   module?: Module;
   show?: (user: PanelUser) => boolean;
   icon: keyof typeof ICONS;
+  /** Yanında bekleyen iş sayısı gösterilir. */
+  badge?: 'approvals' | 'reports';
 }
 
 const admin = (u: PanelUser) => isAdminUser(u);
 
 /**
- * Menü uygulamanın bölümleriyle aynı gruplanır (Karar, Eren, 3 Kasım 2026): Benim Şehrim, Seyahat, Sosyal, Acil,
- * İşletmeler ve profiller, Yönetim. Her kişi yalnızca yetkili olduğu öğeleri görür; boş grup gizlenir.
+ * Menü işe göre gruplanır (Karar, Eren, 12 Kasım 2026; 3 Kasım'daki uygulama bölümleri düzeninin yerine):
+ * Günlük işler (bekleyen sayılarıyla), İçerik, İşletme ve sosyal, Raporlar, Ayarlar (başta kapalı).
+ * Her kişi yalnızca yetkili olduğu öğeleri görür; boş grup gizlenir. Henüz yapılmamış öğe menüde gösterilmez.
  */
 export const MENU_GROUPS: { key: string; items: MenuItem[] }[] = [
   {
-    key: 'sehrim',
+    key: 'gunluk',
     items: [
-      { key: 'konumlar', module: 'konumlar', path: '/konumlar', icon: 'pin' },
-      { key: 'sehir-rehberi', module: 'sehir-rehberi', path: '/sehir-rehberi', icon: 'book' },
-      { key: 'gonderiler', module: 'gonderiler', path: '/duyurular', icon: 'megaphone' },
-      { key: 'etkinlikler', module: 'etkinlikler', path: '/etkinlikler', icon: 'calendar' },
-      { key: 'hizmetler', module: 'hizmetler', icon: 'tool' },
+      { key: 'today', path: '/', icon: 'home', show: () => true },
+      { key: 'onaylar', module: 'onaylar', path: '/onaylar', icon: 'check', badge: 'approvals' },
+      { key: 'moderasyon', module: 'moderasyon', path: '/moderasyon', icon: 'shield', badge: 'reports' },
     ],
   },
   {
-    key: 'seyahat',
+    key: 'icerik',
     items: [
+      { key: 'uygulama-gorunumu', show: admin, path: '/uygulama-gorunumu', icon: 'smartphone' },
+      { key: 'vitrin', show: (u) => isAdminUser(u) || canSeeModule(u.grants, 'sehir-rehberi'), path: '/sehir-vitrini', icon: 'screen' },
+      { key: 'sehir-rehberi', module: 'sehir-rehberi', path: '/sehir-rehberi', icon: 'book' },
+      { key: 'gonderiler', module: 'gonderiler', path: '/duyurular', icon: 'megaphone' },
+      { key: 'toplu-bildirim', show: canBroadcast, path: '/toplu-bildirim', icon: 'bell' },
+      { key: 'etkinlikler', module: 'etkinlikler', path: '/etkinlikler', icon: 'calendar' },
       { key: 'seyahat', module: 'seyahat', path: '/seyahat', icon: 'globe' },
       { key: 'yol-ustu', show: admin, path: '/yol-ustu-verisi', icon: 'road' },
       { key: 'tatil-fikirleri', show: admin, path: '/tatil-fikirleri', icon: 'sun' },
+      { key: 'acil-numaralar', module: 'acil-numaralar', path: '/acil-numaralar', icon: 'phone' },
+      { key: 'konumlar', module: 'konumlar', path: '/konumlar', icon: 'pin' },
     ],
   },
   {
-    key: 'sosyal',
+    key: 'isletme-sosyal',
     items: [
-      { key: 'moderasyon', module: 'moderasyon', path: '/moderasyon', icon: 'shield' },
+      { key: 'isletme-dogrulama', module: 'isletme-dogrulama', path: '/isletmeler', icon: 'store' },
+      { key: 'firsatlar', module: 'moderasyon', path: '/firsatlar', icon: 'ticket' },
+      { key: 'profiller', show: admin, path: '/profiller', icon: 'users' },
+      { key: 'rozetler', show: admin, path: '/rozetler', icon: 'star' },
       { key: 'bildirimler', module: 'bildirimler', path: '/bildirimler', icon: 'bell' },
       { key: 'anketler', show: admin, path: '/anketler', icon: 'check' },
       { key: 'yarismalar', show: admin, path: '/yarismalar', icon: 'badge' },
       { key: 'sponsorlar', show: admin, path: '/sponsorlar', icon: 'megaphone' },
-    ],
-  },
-  {
-    key: 'acil',
-    items: [
-      { key: 'acil-numaralar', module: 'acil-numaralar', path: '/acil-numaralar', icon: 'phone' },
-      { key: 'sos', module: 'sos', path: '/sos-ayarlari', icon: 'alert' },
-    ],
-  },
-  {
-    key: 'isletmeler',
-    items: [
-      { key: 'isletme-dogrulama', module: 'isletme-dogrulama', path: '/isletmeler', icon: 'store' },
-      { key: 'onaylar', module: 'onaylar', path: '/onaylar', icon: 'check' },
-      { key: 'firsatlar', module: 'moderasyon', path: '/firsatlar', icon: 'ticket' },
-      { key: 'profiller', show: admin, path: '/profiller', icon: 'users' },
       { key: 'hizmet-kategorileri', module: 'hizmet-kategorileri', path: '/hizmet-kategorileri', icon: 'grid' },
       { key: 'diger-ihtiyaclar', show: admin, path: '/diger-ihtiyaclar', icon: 'grid' },
       { key: 'meslekler', module: 'meslekler', path: '/meslekler', icon: 'briefcase' },
     ],
   },
   {
-    key: 'yonetim',
+    key: 'raporlar',
+    items: [
+      { key: 'istatistikler', show: (u) => canSeeStats(u), path: '/istatistikler', icon: 'chart' },
+      { key: 'kitle', show: (u) => canSeeAudience(u, isAdminUser(u)), path: '/takipciler', icon: 'users' },
+      { key: 'uyelikler', show: admin, path: '/uyelikler', icon: 'badge' },
+      { key: 'harcama', show: admin, path: '/harcama', icon: 'gauge' },
+      { key: 'veri-kaynaklari', show: admin, path: '/veri-kaynaklari', icon: 'sun' },
+      { key: 'islem-kayitlari', module: 'islem-kayitlari', path: '/islem-kayitlari', icon: 'file' },
+    ],
+  },
+  {
+    key: 'ayarlar',
     items: [
       { key: 'profile', show: hasProfileAccess, path: '/profil', icon: 'badge' },
       { key: 'kurumlar', module: 'kurumlar', path: '/kurumlar', icon: 'building' },
       { key: 'yetkiler', module: 'yetkiler', path: '/yetkiler', icon: 'key' },
-      { key: 'islem-kayitlari', module: 'islem-kayitlari', path: '/islem-kayitlari', icon: 'file' },
+      { key: 'sos', module: 'sos', path: '/sos-ayarlari', icon: 'alert' },
+      { key: 'uygulama-ayarlari', show: admin, path: '/uygulama-ayarlari', icon: 'settings' },
       { key: 'sinirlar', show: admin, path: '/sinirlar', icon: 'gauge' },
-      { key: 'harcama', show: admin, path: '/harcama', icon: 'gauge' },
     ],
   },
 ];
@@ -94,21 +106,63 @@ export function canSeeStats(user: PanelUser): boolean {
   return canSeeModule(user.grants, 'moderasyon') || canSeeModule(user.grants, 'isletme-dogrulama');
 }
 
-const COLLAPSED_KEY = 'cityjoy-panel-kapali-gruplar';
+// Yeni menü düzeniyle anahtar değişti; Ayarlar başta kapalı.
+const COLLAPSED_KEY = 'cityjoy-panel-kapali-gruplar-2';
 
 function readCollapsed(): string[] {
   try {
-    return JSON.parse(localStorage.getItem(COLLAPSED_KEY) ?? '[]');
+    return JSON.parse(localStorage.getItem(COLLAPSED_KEY) ?? '["ayarlar"]');
   } catch {
-    return [];
+    return ['ayarlar'];
   }
 }
+
+type Badges = Partial<Record<NonNullable<MenuItem['badge']>, number | null>>;
 
 export function Shell() {
   const { user, signOut } = useSession();
   const city = useCity();
   const [collapsed, setCollapsed] = useState<string[]>(readCollapsed);
+  const [theme, toggleTheme] = useTheme();
+  // Telefonda menü soldan açılan çekmecedir; sayfa değişince ya da Esc ile kapanır.
+  const [drawer, setDrawer] = useState(false);
+  const location = useLocation();
+  useEffect(() => setDrawer(false), [location.pathname]);
+  useEffect(() => {
+    if (!drawer) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDrawer(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [drawer]);
+  // Bekleyen onay ve şikâyet sayıları (sayım sorgusu, belge okumaz): il değişince ve en çok dakikada bir yenilenir.
+  const [badges, setBadges] = useState<Badges>({});
+  const [badgeTick, setBadgeTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setBadgeTick((n) => n + 1), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  useEffect(() => {
+    if (!user || user.isDemo) return;
+    let live = true;
+    const s = createFirebaseStats(firestore);
+    Promise.all([
+      canSeeModule(user.grants, 'onaylar') ? s.pendingApprovals(city.provinceCode) : Promise.resolve(null),
+      canSeeModule(user.grants, 'moderasyon') ? s.openReports(city.provinceCode) : Promise.resolve(null),
+    ]).then(([approvals, reports]) => live && setBadges({ approvals, reports }));
+    return () => {
+      live = false;
+    };
+  }, [user, city.provinceCode, badgeTick]);
   if (!user) return null;
+
+  const themeLabel = t(theme === 'dark' ? 'menu.themeLight' : 'menu.themeDark');
+  const themeButton = (
+    <button type="button" className="theme-toggle" onClick={toggleTheme} aria-label={themeLabel} title={themeLabel}>
+      <span aria-hidden="true">◐</span>
+    </button>
+  );
 
   const toggle = (key: string) => {
     const next = collapsed.includes(key) ? collapsed.filter((k) => k !== key) : [...collapsed, key];
@@ -124,7 +178,10 @@ export function Shell() {
     item.path ? (
       <NavLink key={item.key} to={item.path} end={item.path === '/'}>
         <Icon name={item.icon} />
-        <span>{label}</span>
+        <span className="grow">{label}</span>
+        {item.badge && badges[item.badge] ? (
+          <b className="nav-badge" aria-label={t('menu.waiting', { count: badges[item.badge]! })}>{badges[item.badge]! > 99 ? '99+' : badges[item.badge]}</b>
+        ) : null}
       </NavLink>
     ) : (
       <span key={item.key} className="nav-disabled" aria-disabled="true">
@@ -134,17 +191,27 @@ export function Shell() {
     );
 
   const showCity = city.national || city.provinces.length > 1;
-  const showcase = isAdminUser(user) || canSeeModule(user.grants, 'sehir-rehberi');
 
   return (
-    <div className="shell">
-      <aside className="sidebar">
+    <div className={drawer ? 'shell drawer-open' : 'shell'}>
+      <header className="topbar">
+        <button type="button" className="menu-button" aria-expanded={drawer} aria-controls="panel-menu" onClick={() => setDrawer(!drawer)}>
+          <span aria-hidden="true">☰</span>
+          <span className="sr-only">{t('menu.open')}</span>
+        </button>
+        <span className="brand-mark" aria-hidden="true">C</span>
+        <p className="brand grow">CityJoy</p>
+        {themeButton}
+      </header>
+      {drawer ? <div className="drawer-backdrop" onClick={() => setDrawer(false)} aria-hidden="true" /> : null}
+      <aside className="sidebar" id="panel-menu">
         <div className="brand-row">
           <span className="brand-mark" aria-hidden="true">C</span>
-          <div>
+          <div className="grow">
             <p className="brand">CityJoy</p>
             <span className="brand-sub">{t('menu.panel')}</span>
           </div>
+          {themeButton}
         </div>
 
         {showCity ? (
@@ -159,12 +226,9 @@ export function Shell() {
           </label>
         ) : null}
 
-        <nav aria-label={t('menu.label')}>
-          {link({ key: 'today', path: '/', icon: 'home' }, t('menu.today'))}
-          {canSeeStats(user) ? link({ key: 'stats', path: '/istatistikler', icon: 'chart' }, t('menu.stats')) : null}
-          {canSeeAudience(user, isAdminUser(user)) ? link({ key: 'kitle', path: '/takipciler', icon: 'users' }, t('menu.audience')) : null}
-          {showcase ? link({ key: 'vitrin', path: '/sehir-vitrini', icon: 'screen' }, t('menu.showcase')) : null}
+        <PanelSearch user={user} />
 
+        <nav aria-label={t('menu.label')}>
           {MENU_GROUPS.map((g) => {
             const items = visibleItems(user, g.items);
             if (!items.length) return null;
@@ -219,6 +283,7 @@ const ICONS = {
   alert: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 7v6M12 16v.5',
   store: 'M4 9l1.5-5h13L20 9M4 9h16v11H4zM9 20v-6h6v6',
   check: 'M5 12l4 4 10-10',
+  star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9Z',
   users: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3 20c0-3 3-5 6-5s6 2 6 5M16 5a3 3 0 0 1 0 6M18 15c2 .6 3 2.4 3 5',
   grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
   briefcase: 'M4 7h16v12H4zM9 7V4h6v3M4 12h16',
@@ -227,6 +292,8 @@ const ICONS = {
   key: 'M14 10a4 4 0 1 0-1 2.7L20 20M17 17l2-2',
   file: 'M7 3h7l5 5v13H7ZM14 3v5h5M10 13h6M10 17h4',
   gauge: 'M4 16a8 8 0 1 1 16 0M12 16l4-5',
+  settings: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M14 4v4M8 10v4M16 16v4',
+  smartphone: 'M7 2h10a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1ZM11 18h2',
 } as const;
 
 function Icon({ name }: { name: keyof typeof ICONS }) {

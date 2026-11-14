@@ -14,7 +14,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 
 import { rankEntries, sortContests, type Contest, type ContestEntry, type ContestInput, type ContestStatus, type EntryStatus } from '../polls/contests';
 import { type Poll, type PollInput, type PollStatus } from '../polls/polls';

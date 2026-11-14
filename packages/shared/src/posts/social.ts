@@ -22,17 +22,36 @@ export interface PublicProfile {
   photoRemoved: boolean;
   /** Konum rozeti (madde 5): mahallesi ya da ilçesi telefonun konumuyla doğrulandı; mahallenin adı görünmez. */
   locationVerified?: LocationBadge;
+  /** Hesap askıya alındı (yalnızca sunucu koyar): profil ve gönderiler başkalarına gösterilmez. */
+  suspended?: boolean;
+  /** Admin'in verdiği rozetlerin kimlikleri (posts/badges.ts); kişi kendisi değiştiremez. */
+  badges?: string[];
+  /** Yayıncı rozeti var: Haberler'e paylaşabilir (yalnızca admin rozet verirken yazılır). */
+  publisher?: boolean;
+  /**
+   * Resmî CityJoy hesabı (Eren, 14 Kasım 2026): adın yanında altın onay rozeti; istediği yere (tüm Türkiye, il, ilçe,
+   * mahalle) paylaşır, Haberler'e de paylaşabilir. Yalnızca admin panelden verir; kişi kendisi yazamaz (kurallar).
+   */
+  official?: boolean;
 }
 
 export const PROFILE_LIMITS = {
   bio: 160,
   /** Takip akışında en çok bu kadar hesabın gönderisi okunur (hesap başına bir sorgu). */
   feedAuthors: 30,
-  /** Takip akışında hesap başına okunan gönderi. */
-  perAuthor: 10,
+  /** Takip akışında hesap başına okunan gönderi (maliyet: 13 Kasım 2026'da 10'dan 5'e; akış zaten en yenileri gösterir). */
+  perAuthor: 5,
   /** Ara > Kişiler: tek sorguda en çok. */
   searchResults: 30,
+  /** Takipçi / Takip listesi: sayfa başına kişi (aşağı kaydırdıkça devamı; 14 Kasım 2026). */
+  followPage: 30,
 } as const;
+
+/** Takipçi / Takip listesinde bir sayfa: kişiler ve devamı için imleç (null: bitti). */
+export interface FollowPage<T> {
+  items: T[];
+  next: string | null;
+}
 
 export type FollowStatus = 'aktif' | 'istek';
 

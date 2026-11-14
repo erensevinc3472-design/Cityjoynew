@@ -16,6 +16,7 @@ import { ImageField } from '../components/image-field';
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession, type PanelUser } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 type Form = OfficialProfileInput & { name: string };
 const EMPTY: Form = { name: '', about: '', phone: '', email: '', website: '', address: '', hours: '' };
@@ -117,7 +118,7 @@ function Profiles({ user }: { user: PanelUser }) {
       <header className="page-head">
         <div>
           <h1>{t('profile.title')}</h1>
-          <p className="meta">{t('profile.intro')}</p>
+          <Intro text={t('profile.intro')} />
         </div>
       </header>
       {user.isDemo ? <p className="note">{t('profile.demoReadOnly')}</p> : null}

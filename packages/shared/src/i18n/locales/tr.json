@@ -114,7 +114,8 @@
     "requiresRecentLogin": "Güvenliğin için şifreni tekrar girmen gerekiyor.",
     "unknown": "Bir sorun oluştu. Lütfen tekrar dene.",
     "notConfigured": "Uygulama henüz sunucuya bağlı değil.",
-    "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Başka bir ad yazın."
+    "reservedName": "Bu ad resmî kurumlara ayrılmış (belediye, valilik, muhtarlık, CityJoy vb.). Başka bir ad yazın.",
+    "accountSuspended": "Bu hesap askıya alındı. Bir yanlışlık olduğunu düşünüyorsan bizimle iletişime geç."
   },
   "reset": {
     "title": "Şifreni sıfırla",
@@ -160,10 +161,18 @@
     "appearance": "Görünüm",
     "appearanceSystem": "Telefonun ayarına göre",
     "appearanceLight": "Açık",
-    "appearanceDark": "Koyu"
+    "appearanceDark": "Koyu",
+    "autoplay": {
+      "title": "Videoları otomatik oynat",
+      "wifi": "Yalnızca Wi-Fi'de",
+      "her-zaman": "Her zaman",
+      "kapali": "Kapalı",
+      "hint": "Mobil verin harcanmaz"
+    }
   },
   "legal": {
-    "draftNotice": "Bu metin hazırlanıyor. Yayından önce avukat tarafından kontrol edilecek."
+    "draftNotice": "Bu metin hazırlanıyor. Yayından önce avukat tarafından kontrol edilecek.",
+    "openFull": "Tam metni oku"
   },
   "urgent": {
     "title": "Acil İhtiyaçlar",
@@ -300,7 +309,7 @@
     "deleteYes": "Evet, sil",
     "statusLive": "Yayında",
     "statusHidden": "Gizli",
-    "statusRemoved": "Yönetim tarafından kaldırıldı",
+    "statusRemoved": "Askıya alındı",
     "verifiedOn": "Belgeleri doğrulandı ({{date}})",
     "verified": "Belgeleri doğrulandı",
     "unverified": "Doğrulanmadı",
@@ -326,7 +335,7 @@
     "addressLabel": "Adres",
     "noProvince": "İşletmeleri görmek için konumunuzu seçin.",
     "chooseLocation": "Konum seç",
-    "removedNote": "Bu işletme yönetim tarafından yayından kaldırıldı. Bilgi için CityJoy ile iletişime geçin.",
+    "removedNote": "Bu işletme yönetim tarafından askıya alındı; uygulamada görünmüyor. Bilgi için CityJoy ile iletişime geç.",
     "priceListTitle": "Fiyat listesi",
     "removeService": "Kaldır",
     "duplicatePhone": "Bu telefon numarasıyla kayıtlı bir işletme zaten var. İşletme sizinse CityJoy ile iletişime geçin.",
@@ -452,6 +461,111 @@
       "unverifiedSection": "Doğrulanmamış işletmeler",
       "requestSent": "Talebiniz alındı. En kısa sürede ekibimiz sizinle iletişime geçecek.",
       "requestFailed": "Talep gönderilemedi. Bağlantını kontrol edip tekrar dene."
+    },
+    "categoryBrowseHint": "Grubunu seç, sonra hizmetlerini işaretle. Ya da yukarıdan ara.",
+    "categoryGroupsBack": "Gruplar",
+    "categoryNotFound": "Bu kelimeyle hizmet bulunamadı. Başka bir kelime dene ya da aşağıdan bize yaz.",
+    "categoryNotListed": "İşin listede yok mu? Grubunun \"Diğer\" seçeneğini işaretle ve bize yaz, ekleyelim.",
+    "categorySuggest": "Eksik hizmeti bildir",
+    "categorySelectedCount": "{{count}} seçili",
+    "suspendedReason": "Sebep: {{reason}}.",
+    "suspendedUntil": "{{date}} tarihinde kendiliğinden açılır.",
+    "bannedNew": "Hesabına bağlı bir işletme askıda olduğu için şu an yeni işletme açamazsın.",
+    "bannedUntil": "{{date}} tarihinden sonra açabilirsin.",
+    "membership": {
+      "title": "Üyelik",
+      "pro": "Pro",
+      "free": "Ücretsiz",
+      "freeIntro": "Pro ile daha çok fotoğraf, video, yorumlar, fırsatlar ve öne çıkma hakkı açılır.",
+      "verifyFirst": "Pro'ya geçmek için önce işletmeni doğrulatman gerekiyor. Doğrulanınca bu düğme açılır.",
+      "goPro": "Pro'ya geç",
+      "manage": "Üyelik ve Ödemeler",
+      "screen": "Üyelik ve Ödemeler",
+      "renewsOn": "{{date}} tarihinde kendiliğinden yenilenir.",
+      "endsOn": "{{date}} tarihinde biter (yenileme kapalı).",
+      "noEnd": "Süresiz",
+      "tier": "Kademe",
+      "plan": "Plan",
+      "started": "Başlangıç",
+      "renews": "Yenilenme",
+      "ends": "Bitiş",
+      "source": "Ödeme yeri",
+      "sources": {
+        "app-store": "App Store",
+        "google-play": "Google Play",
+        "web": "İnternet sitesi",
+        "manuel": "CityJoy tarafından verildi",
+        "kurucu-donem": "Kurucu işletme dönemi"
+      },
+      "cancelledNote": "Aboneliğini iptal ettin. Pro {{date}} tarihine kadar sürer, sonra Ücretsiz üyeliğe geçersin.",
+      "manageStore": "Aboneliği yönet (iptal, plan değiştir)",
+      "restored": "Önceki satın almaların kontrol edildi. Bir abonelik bulunduysa birkaç saniye içinde burada görünür.",
+      "history": "Ödeme geçmişi",
+      "noPayments": "Henüz ödeme yok.",
+      "kinds": {
+        "ilk": "Satın alma",
+        "yenileme": "Yenileme",
+        "plan-degisti": "Plan değişikliği",
+        "iade": "İade"
+      },
+      "invoiceNote": "Ödeme Apple ya da Google üzerinden alınır; makbuzu mağaza e-postayla gönderir."
+    },
+    "proPlan": {
+      "title": "Pro'ya geç",
+      "lead": "İşletmeni öne çıkar, müşterilerine her şeyi göster.",
+      "perks": {
+        "photos": "En çok 10 fotoğraf ve listede fotoğraf şeridi",
+        "video": "Tanıtım videosu",
+        "details": "Detaylı tanıtım yazısı",
+        "prices": "Hizmetler ve ücretler listesi",
+        "reviews": "Müşteri yorumları ve puan",
+        "map": "Adres ve yol tarifi",
+        "deals": "Aynı anda 5 fırsat",
+        "featured": "Listelerde \"Sponsorlu\" öne çıkma hakkı",
+        "stats": "Sayfa istatistikleri"
+      },
+      "plans": {
+        "aylik": "Aylık",
+        "yillik": "Yıllık"
+      },
+      "periods": {
+        "aylik": "ay",
+        "yillik": "yıl"
+      },
+      "perMonth": "Aylık {{price}}",
+      "buy": "Pro aboneliği başlat",
+      "terms": "Abonelik ücreti ({{price}} / {{period}}) satın almayı onaylayınca Apple Kimliğine ya da Google hesabına yansır. Dönem bitmeden en az 24 saat önce iptal edilmezse aynı süre ve ücretle kendiliğinden yenilenir. Aboneliğini mağaza hesap ayarlarından ya da \"Üyelik ve Ödemeler\" ekranından yönetebilir ve iptal edebilirsin.",
+      "restore": "Satın almayı geri yükle",
+      "restoreError": "Satın almalar geri yüklenemedi. Bağlantını kontrol edip tekrar dene.",
+      "buyError": "Satın alma tamamlanamadı. Ücret alınmadı; tekrar deneyebilirsin.",
+      "activating": "Ödemen alındı, Pro üyeliğin açılıyor…",
+      "done": "Pro üyeliğin açık. Pro özellikleri işletme sayfanda kullanabilirsin.",
+      "late": "Ödemen alındı. Pro üyeliğin birkaç dakika içinde açılır; açılmazsa \"Satın almayı geri yükle\"ye dokun.",
+      "restoreLate": "Önceki satın almaların kontrol edildi. Etkin bir Pro aboneliği bulunmadı.",
+      "soon": "Pro aboneliği çok yakında burada satın alınabilecek.",
+      "noOffers": "Pro planları şu an yüklenemedi. Biraz sonra tekrar dene.",
+      "back": "İşletmeme dön",
+      "trial": {
+        "DAY_one": "{{count}} gün ücretsiz",
+        "DAY_other": "{{count}} gün ücretsiz",
+        "WEEK_one": "{{count}} hafta ücretsiz",
+        "WEEK_other": "{{count}} hafta ücretsiz",
+        "MONTH_one": "{{count}} ay ücretsiz",
+        "MONTH_other": "{{count}} ay ücretsiz",
+        "YEAR_one": "{{count}} yıl ücretsiz",
+        "YEAR_other": "{{count}} yıl ücretsiz"
+      },
+      "buyTrial": "Ücretsiz denemeyi başlat",
+      "termsTrial": "Ücretsiz deneme ({{trial}}) bitince abonelik {{price}} / {{period}} ücretle kendiliğinden başlar; deneme bitmeden en az 24 saat önce iptal edersen ücret alınmaz."
+    },
+    "hidden": {
+      "title": "Gizlenen gönderiler ({{count}})",
+      "body": "Pro bittiği için bu gönderiler gizlendi, silinmedi. Ücretsizde en yeni {{count}} gönderi görünür. \"Göster\"e dokunursan en eski görünen gönderinle yer değiştirir. Pro'yu yenilersen hepsi geri gelir.",
+      "show": "Göster",
+      "renew": "Pro'yu yenile",
+      "error": "Değiştirilemedi. Biraz sonra tekrar dene.",
+      "gallery": "{{count}} vitrin fotoğrafı gizli (Pro bitti). Silinmedi; Pro'yu yenilersen geri gelir.",
+      "galleryEdit": "Ücretsizde yalnızca ilk {{count}} fotoğraf görünür, diğerleri saklı kalır ve Pro'da geri gelir. Sırayı değiştirerek hangisinin görüneceğini seçebilirsin."
     }
   },
   "reviews": {
@@ -945,7 +1059,30 @@
     "followHint": "Takip ettiğinde bu hesaba yalnızca kayıtlı mahallen ve yaş aralığın isimsiz, toplu sayı olarak yansır; adın görünmez.",
     "followError": "İşlem yapılamadı, tekrar dene.",
     "mayor": "Belediye Başkanı",
-    "mayorTitle": "Belediye başkanı"
+    "mayorTitle": "Belediye başkanı",
+    "muni": {
+      "call": "Ara",
+      "web": "İnternet sitesi",
+      "mail": "E-posta",
+      "map": "Yol tarifi",
+      "services": "e-Belediye işlemleri",
+      "servicesNote": "İşlemler belediyenin resmî internet sitesinde açılır.",
+      "servicesNoSite": "Belediye internet sitesini henüz eklemedi; işlemler web aramasıyla açılır.",
+      "mayorActing": "Belediye Başkan Vekili",
+      "discover": "Başkanlarla Keşif tanıtımı",
+      "discoverSub": "İlçenin fotoğrafları, videoları ve rotaları",
+      "about": "Belediye hakkında",
+      "service": {
+        "pay": "Vergi ve borç ödeme",
+        "request": "İstek ve şikâyet",
+        "zoning": "İmar ve ruhsat",
+        "marriage": "Nikâh işlemleri",
+        "social": "Sosyal yardımlar",
+        "culture": "Kültür ve etkinlik",
+        "tenders": "İhaleler",
+        "council": "Meclis kararları"
+      }
+    }
   },
   "neighbourhood": {
     "title": "Mahalle Meydanı",
@@ -1117,13 +1254,15 @@
       "mahallem": "Mahallem",
       "bolgesel": "Bölgesel",
       "genel": "Genel",
-      "takip": "Takip"
+      "takip": "Takip",
+      "haberler": "Haberler"
     },
     "tabHints": {
       "mahallem": "yalnızca mahallendekiler görür",
       "bolgesel": "ilindeki herkes görür",
       "genel": "uygulamadaki herkes görür",
-      "takip": "yalnızca takipçilerin görür"
+      "takip": "yalnızca takipçilerin görür",
+      "haberler": "{{place}} Haberler sayfasında görünür (yayıncı)"
     },
     "categories": {
       "genel": "Genel",
@@ -1132,7 +1271,13 @@
       "firsat": "Fırsat",
       "soru-yardim": "Soru / Yardım",
       "kayip-buluntu": "Kayıp - Buluntu",
-      "taziye": "Taziye"
+      "taziye": "Taziye",
+      "haber": "Haber",
+      "ekonomi": "Ekonomi",
+      "spor": "Spor",
+      "teknoloji": "Teknoloji",
+      "kultur-sanat": "Kültür-Sanat",
+      "saglik": "Sağlık"
     },
     "reasons": {
       "nefret": "Nefret söylemi",
@@ -1179,7 +1324,13 @@
       "write": "Yorum yaz",
       "send": "Gönder",
       "turnOff": "Yorumları kapat",
-      "turnOn": "Yorumları aç"
+      "turnOn": "Yorumları aç",
+      "sheetTitle": "Yorumlar",
+      "add": "Yorum ekle...",
+      "deleteShort": "Sil",
+      "moreActions": "Diğer işlemler",
+      "backToComments": "Yorumlara dön",
+      "emoji": "{{emoji}} ekle"
     },
     "followHint": "Henüz kimseyi takip etmiyorsun. Bir gönderide paylaşanın adına dokunup profilinden takip edebilirsin.",
     "profile": {
@@ -1238,7 +1389,9 @@
       "tabs": {
         "gonderiler": "Gönderiler",
         "kaydedilenler": "Kaydedilenler",
-        "katildiklarim": "Katıldıklarım"
+        "katildiklarim": "Katıldıklarım",
+        "videolar": "Videolar",
+        "etiketlendiklerim": "Etiketlendiklerim"
       },
       "noPostsOwn": "Henüz paylaşımın yok. Keşfet'teki + düğmesiyle ilk gönderini paylaşabilirsin.",
       "noSaved": "Kaydettiğin gönderiler burada görünür. Yalnızca sen görürsün.",
@@ -1249,7 +1402,24 @@
       "photo": "Profil fotoğrafı",
       "photoHint": "Herkese açık görünür. Kare kırpılır, küçültülür; konum bilgisi silinir.",
       "photoRemoved": "Profil fotoğrafın şikâyet üzerine kaldırıldı; yeni fotoğraf koyamazsın.",
-      "photoZoom": "Profil fotoğrafını büyüt"
+      "photoZoom": "Profil fotoğrafını büyüt",
+      "suspended": "Bu profil askıya alındı.",
+      "suspendedNote": "Profili ve gönderileri şu an görünmüyor.",
+      "noVideos": "Henüz video yok.",
+      "noVideosOwn": "Paylaştığın videolar izlenme sayılarıyla burada görünür.",
+      "noTagged": "Henüz etiketlendiği gönderi yok.",
+      "noTaggedOwn": "Başkalarının seni etiketlediği gönderiler burada görünür.",
+      "taggedNote": "Yalnızca herkese açık (Genel) gönderiler listelenir.",
+      "mutual1": "{{a}} takip ediyor",
+      "mutual2": "{{a}} ve {{b}} takip ediyor",
+      "mutualMore": "{{a}}, {{b}} ve {{n}} kişi daha takip ediyor",
+      "mutualTitle": "Takip ettiğin kişilerden takip edenler",
+      "tagPolicy": "Beni kim etiketleyebilir",
+      "tagPolicies": {
+        "herkes": "Herkes",
+        "takip": "Yalnızca takip ettiğim kişiler",
+        "kimse": "Kimse"
+      }
     },
     "takipFeedHint": "takip ettiklerinin yalnızca takipçilerine açtığı gönderiler",
     "share": "Paylaş",
@@ -1264,7 +1434,13 @@
       "firsat": "Fırsat",
       "soru-yardim": "Yardım",
       "kayip-buluntu": "Kayıp",
-      "taziye": "Taziye"
+      "taziye": "Taziye",
+      "haber": "Haber",
+      "ekonomi": "Ekonomi",
+      "spor": "Spor",
+      "teknoloji": "Teknoloji",
+      "kultur-sanat": "Kültür-Sanat",
+      "saglik": "Sağlık"
     },
     "businessTag": "İşletme",
     "business": {
@@ -1294,13 +1470,97 @@
       "selected": "Seçilen video, {{duration}}",
       "note": "En çok {{max}} saniye ve 40 MB. Video ya da fotoğraf eklenir, ikisi birlikte olmaz.",
       "tooLong": "Video en çok {{max}} saniye olabilir. Kırpıp yeniden seç.",
-      "tooLarge": "Video çok büyük (en çok 40 MB). Daha kısa ya da düşük çözünürlüklü bir video seç."
+      "tooLarge": "Video çok büyük (en çok 40 MB). Daha kısa ya da düşük çözünürlüklü bir video seç.",
+      "open": "Videoyu tam ekran aç",
+      "mute": "Sesi kapat",
+      "unmute": "Sesi aç",
+      "pause": "Durdur",
+      "resume": "Oynat",
+      "viewer": "Video izleyici",
+      "progress": "Video ilerlemesi",
+      "end": "Şimdilik başka video yok",
+      "backToFeed": "Akışa dön",
+      "swipeClose": "Kapatmak için sağa kaydır",
+      "silent": "Sessiz video"
     },
     "verifiedBusiness": "Doğrulanmış işletme",
     "seeComments": "{{count}} yorumun tümünü gör",
     "seen": "Gördüm",
     "seenHint": "Nerede gördüğünü yorumla yaz",
-    "more": "devamı"
+    "more": "devamı",
+    "sort": {
+      "label": "Sıralama",
+      "choose": "Akış sırası",
+      "senin-icin": "Senin için",
+      "en-yeni": "En yeni",
+      "seninDesc": "Taze, beğenilen ve yakınındaki paylaşımlar önce",
+      "yeniDesc": "Yalnızca zamana göre, en yeni üstte",
+      "how": "Nasıl sıralanıyor?",
+      "rules": "Herkes için aynı açık kurallar: yeni paylaşımlar öne çıkar ve zamanla geriler. Beğeni ve yorum (yorum daha değerli) biraz öne alır. Takip ettiğin kişiler, kendi mahallen ve resmî duyurular öne gelir. Aynı kişinin paylaşımları arka arkaya gelmez. Şikâyet alan paylaşım geri düşer. Ne kadar baktığın izlenmez, parayla gizli öne çıkma yoktur."
+    },
+    "badge": "Rozet: {{name}}",
+    "folders": {
+      "all": "Tümü",
+      "add": "Yeni klasör",
+      "title": "Klasöre ekle",
+      "none": "Klasörsüz",
+      "newName": "Yeni klasör adı",
+      "create": "Oluştur",
+      "edit": "Düzenle",
+      "name": "Klasör adı",
+      "save": "Kaydet",
+      "delete": "Klasörü sil",
+      "deleteConfirm": "Klasör silinsin mi? İçindeki gönderiler Kaydettiklerim'de kalır.",
+      "cancel": "Vazgeç",
+      "limit": "En çok {{count}} klasör açabilirsin.",
+      "error": "Klasör işlemi yapılamadı. Tekrar dene.",
+      "empty": "Bu klasörde gönderi yok. Bir gönderiye uzun basıp bu klasörü seç.",
+      "hint": "Klasöre koymak için gönderiye uzun bas.",
+      "in": "Klasör: {{name}}"
+    },
+    "recent": {
+      "tab": "Son gördüklerin",
+      "info": "Son baktığın {{count}} gönderi. Yalnızca bu telefonda tutulur.",
+      "reset": "Sıfırla",
+      "resetConfirm": "Son gördüklerin listesi silinsin mi?",
+      "empty": "Henüz bir gönderiye bakmadın. Keşfet'te baktığın gönderiler burada görünür."
+    },
+    "people": {
+      "add": "Kişileri etiketle",
+      "title": "Etiketlenenler",
+      "limit": "En çok {{n}} kişi etiketleyebilirsin.",
+      "remove": "{{name}} etiketini kaldır",
+      "hint": "Etiketlediğin kişiler bildirim alır. Kişinin ayarı izin vermiyorsa etiket eklenmez.",
+      "with": "{{name}} ile",
+      "withMore": "{{name}} ve {{n}} kişi ile",
+      "removeMe": "Profilimden kaldır",
+      "removeMeConfirm": "Bu gönderideki etiketin kaldırılsın mı? Gönderi profilinde görünmez olur.",
+      "removed": "Etiketin kaldırıldı."
+    },
+    "pin": {
+      "pin": "Profilde sabitle",
+      "unpin": "Sabitlemeyi kaldır",
+      "limit": "En çok {{n}} gönderi sabitleyebilirsin. Önce birini kaldır.",
+      "pinned": "Sabitlendi"
+    },
+    "views": "{{n}} izlenme",
+    "official": {
+      "seal": "Resmî CityJoy hesabı",
+      "where": "Nerede görünsün?",
+      "reach": {
+        "turkiye": "Tüm Türkiye",
+        "il": "Bir il",
+        "ilce": "Bir ilçe",
+        "mahalle": "Bir mahalle"
+      },
+      "needPlace": "Önce yeri seç.",
+      "note": {
+        "turkiye": "Genel akışta herkes görür; takipçilerin akışına da düşer.",
+        "il": "Seçtiğin ildeki herkes Bölgesel akışta görür.",
+        "ilce": "Seçtiğin ilçenin ilindeki Bölgesel akışta görünür.",
+        "mahalle": "Yalnızca seçtiğin mahallede, Mahallem akışında görünür."
+      }
+    }
   },
   "news": {
     "title": "Haberler",
@@ -1334,18 +1594,20 @@
     "official": "Kurum haberi",
     "sourceNote": "Her haberde kaynağın adı yazar. Yayıncı haberlerinde yalnızca başlık ve kısa özet olur, tamamı kaynağın sitesindedir. \"Son dakika\" etiketini uygulama kendisi koymaz.",
     "publisherTitle": "Yerel haber siten mi var?",
-    "publisherText": "Yayıncı olarak başvur, haberlerin burada çıksın."
+    "publisherText": "Yayıncı olarak başvur, haberlerin burada çıksın.",
+    "localTitle": "Yerel yayıncılar",
+    "localHint": "CityJoy’un yayıncı rozeti verdiği yerel haber hesapları. Paylaşımlar hesabın kendisine aittir."
   },
   "search": {
     "title": "Ara",
     "ask": "Ne arıyorsun?",
-    "placeholder": "Kişi, işletme, yer, etkinlik ya da gönderi",
+    "placeholder": "Kişi, işletme, hizmet, yer ya da gönderi",
     "tabs": {
       "tumu": "Tümü",
       "kisiler": "Kişiler",
       "isletmeler": "İşletmeler",
+      "hizmetler": "Hizmetler",
       "yerler": "Yerler",
-      "etkinlikler": "Etkinlikler",
       "gonderiler": "Gönderiler"
     },
     "recent": "Son aramalar",
@@ -1378,11 +1640,16 @@
     "privateAccount": "Gizli hesap",
     "heroLine1": "Ne aramak",
     "heroLine2": "istersin?",
-    "heroSub": "Kişiler, işletmeler, yerler, etkinlikler ve gönderiler tek yerde.",
+    "heroSub": "Kişiler, işletmeler, hizmetler, yerler ve gönderiler tek yerde.",
     "clear": "Aramayı temizle",
     "masters": "Bölgendeki ustalar",
     "upcoming": "Yaklaşan etkinlikler",
-    "seeAllShort": "Tümünü gör"
+    "seeAllShort": "Tümünü gör",
+    "scopeAll": "Türkiye geneli",
+    "scoped": "{{title}} · {{place}}",
+    "otherProvince": "Hizmet aranan il",
+    "noService": "“{{q}}” adında bir hizmet bulunamadı. İşletme adı arıyorsan İşletmeler sekmesine bak.",
+    "cityPlaces": "Şehrindeki yerler · {{place}}"
   },
   "messages": {
     "title": "Mesajlar",
@@ -1502,7 +1769,11 @@
       "muhtar": "Muhtarlık",
       "cityjoy": "CityJoy",
       "channel": "Genel bildirimler",
-      "quietChannel": "Sessiz bildirimler"
+      "quietChannel": "Sessiz bildirimler",
+      "proEndingTitle": "{{title}}: Pro üç gün içinde bitiyor",
+      "proEndingBody": "Yenilemezsen ücretsiz sınırdan fazla gönderilerin ve fotoğrafların gizlenir (silinmez). Pro dönünce hepsi geri gelir.",
+      "taggedTitle": "{{title}} seni etiketledi",
+      "taggedBody": "Gönderiyi görmek için dokun."
     },
     "categories": {
       "acil": "Acil duyurular",
@@ -1644,7 +1915,8 @@
       "efficiency": "Yolculuk modu",
       "efficiencyTitle": "Planla ve\nNavigasyon",
       "efficiencyText": "Gideceğin yere en rahat ve en verimli yoldan ulaş.",
-      "start": "Yolculuğa başla"
+      "start": "Yolculuğa başla",
+      "myCityA11y": "{{city}} sayfasını aç"
     },
     "directions": "Yol tarifi",
     "call": "Ara",
@@ -1656,6 +1928,11 @@
     "address": "Adres",
     "duration": "Önerilen süre",
     "checkNote": "Saat ve ücretler değişebilir; gitmeden resmî kaynaktan kontrol et.",
+    "practical": "Pratik bilgiler",
+    "ageInfo": "Yaş ve çocuklar",
+    "bring": "Yanına al",
+    "rules": "Kurallar",
+    "goodToKnow": "Bilmekte fayda var",
     "howToGet": "Nasıl gidilir?",
     "modes": {
       "metro": "Metro",
@@ -1770,7 +2047,81 @@
       "next": "Sonraki ayrıntı",
       "hint": "Numaralara dokun, ayrıntıyı gör",
       "story": "Hikâyesi"
-    }
+    },
+    "districtList": "İlçeler",
+    "routeCount_one": "{{count}} rota",
+    "routeCount_other": "{{count}} rota",
+    "moreStops_one": "+{{count}} durak daha",
+    "moreStops_other": "+{{count}} durak daha",
+    "planTitle": "Gezimi planla",
+    "planHint": "Gün gün, saat saat program",
+    "nearbyTitle": "Yakınımda",
+    "nearbyHint": "Şu an çevrende neler var",
+    "nearbyIntro": "Bulunduğun yere en yakın yerler.",
+    "nearbyCenter": "Konumun alınamadı; {{name}} merkezine göre sıraladık.",
+    "nearbyFar": "{{name}} dışındasın; şehir merkezine göre sıraladık.",
+    "nearbyLocating": "Konumun alınıyor…",
+    "useMyLocation": "Konumumu kullan",
+    "nearbyWalk": "Yürüme mesafesinde",
+    "nearbyFurther": "Biraz daha uzakta",
+    "nearbyAll": "Yakındaki yerler",
+    "nearbyNone": "Bu şehrin yerlerine konum eklenince burada görünecek.",
+    "walkMin": "{{min}} dk yürüme",
+    "driveMin": "{{km}} km · arabayla {{min}} dk",
+    "closedNow": "Şu an kapalı",
+    "closesAt": "{{time}}’e kadar açık",
+    "alwaysOpen": "Her zaman açık",
+    "approxNote": "Süreler kuş uçuşu mesafeden tahmin edilir, yaklaşıktır.",
+    "planIntro": "Kaç gün kalacağını ve neleri sevdiğini seç; sana saatli bir program kuralım.",
+    "planDays": "Kaç gün?",
+    "dayCount_one": "{{count}} gün",
+    "dayCount_other": "{{count}} gün",
+    "planStart": "Ne zaman başlıyorsun?",
+    "today": "Bugün",
+    "tomorrow": "Yarın",
+    "planInterests": "Neleri seversin?",
+    "planInterestsHint": "İstersen boş bırak",
+    "planPace": "Tempo",
+    "pace": {
+      "sakin": "Sakin",
+      "sakinHint": "Günde 3-4 yer, uzun molalar",
+      "dolu": "Dolu dolu",
+      "doluHint": "Günde 5-6 yer, erken başla"
+    },
+    "planFromMe": "Program bulunduğun yerden başlar.",
+    "planFromCenter": "Program {{name}} merkezinden başlar.",
+    "planBuild": "Programımı kur",
+    "planRebuild": "Programı yeniden kur",
+    "planSummary": "{{name}} · {{days}} gün · {{count}} durak",
+    "planNone": "Bu şehrin yerlerine konum ve saat bilgisi eklenince program kurabileceksin.",
+    "readyPlans": "Hazır planlar",
+    "dayN": "{{n}}. gün",
+    "planFriday": "Cuma: namaz saatinde (12:00-14:00) camilere program koymadık.",
+    "planNow": "Şu an",
+    "planNext": "Sıradaki",
+    "meal": {
+      "ogle": "Öğle yemeği",
+      "aksam": "Akşam yemeği"
+    },
+    "mealTry": "Öneri: {{name}}",
+    "planWarn": {
+      "kapali": "O saatte kapalı olabilir",
+      "gec": "Gün sonuna sarkıyor"
+    },
+    "planDayEmpty": "Bu güne durak kalmadı.",
+    "planApprox": "Saatler ve yol süreleri yaklaşıktır; gitmeden açılış saatlerini kontrol et.",
+    "planChange": "Tercihleri değiştir",
+    "planClear": "Programı sil",
+    "planOpen": "Yeri aç",
+    "planSwap": "Başka bir yerle değiştir",
+    "planSwapHint": "Programında olmayan, yakındaki yerler:",
+    "planTomorrow": "Yarına taşı",
+    "planRemove": "Programdan çıkar",
+    "localGov": "Yerel Yönetimler",
+    "mayorTitle": "{{name}} Belediye Başkanı",
+    "mayorActingTitle": "{{name}} Belediye Başkan Vekili",
+    "videos": "Videolar",
+    "videoN": "{{n}}. tanıtım videosu"
   },
   "food": {
     "kinds": {
@@ -2151,7 +2502,9 @@
     "reached": "Bugünlük hakkın doldu. {{when}} itibarıyla yeniden yapabilirsin."
   },
   "media": {
-    "count": "{{count}}/{{max}} fotoğraf"
+    "count": "{{count}}/{{max}} fotoğraf",
+    "locked": "Pro bitti, gizli (silinmedi)",
+    "makeFirst": "Başa al"
   },
   "locationBadge": {
     "title": "Konum rozeti",
@@ -2307,6 +2660,7 @@
   },
   "needs": {
     "title": "Diğer ihtiyaçlar",
+    "subtitle": "Durumuna göre hazır listeler: yeni taşındım, hastayım, tatildeyim…",
     "empty": "Bu durum için henüz hizmet seçilmedi.",
     "note": "Listeler bu durumda en çok aranan hizmetlerden oluşur. Aradığını bulamazsan Acil İhtiyaçlar'daki aramayı kullan.",
     "items": {
@@ -2510,5 +2864,178 @@
     "signIn": "Çeviri için giriş yap",
     "error": "Şu an çevrilemedi, biraz sonra tekrar dene",
     "a11y": "Bu metni çevir ({{lang}})"
+  },
+  "suspension": {
+    "reasons": {
+      "uygunsuz-icerik": "Uygunsuz içerik",
+      "taciz": "Taciz ya da zorbalık",
+      "spam": "Spam ya da reklam",
+      "sahte-hesap": "Sahte ya da taklit hesap",
+      "yasa-disi": "Yasa dışı içerik",
+      "diger": "Kurallara aykırı kullanım"
+    }
+  },
+  "weather": {
+    "title": "Hava durumu",
+    "updated": "{{place}} · güncelleme {{time}}",
+    "noLocation": "Hava durumunu görmek için konumunu seç.",
+    "offline": "İnternet yok; son kaydedilen tahmin gösteriliyor.",
+    "now": "Şimdi",
+    "today": "Bugün",
+    "high": "En yüksek {{v}}°",
+    "low": "En düşük {{v}}°",
+    "wind": "Rüzgâr",
+    "windValue": "{{v}} km/sa",
+    "humidity": "Nem",
+    "sunrise": "Gün doğumu",
+    "sunset": "Gün batımı",
+    "source": "Veri: {{source}}",
+    "open": "Hava durumu ayrıntısı",
+    "kinds": {
+      "clear": "Açık",
+      "partly": "Parçalı bulutlu",
+      "cloudy": "Bulutlu",
+      "fog": "Sisli",
+      "rain": "Yağmurlu",
+      "showers": "Sağanak",
+      "sleet": "Karla karışık yağmur",
+      "snow": "Karlı",
+      "thunder": "Gök gürültülü"
+    }
+  },
+  "broadcast": {
+    "title": "Bildirim",
+    "muhtar": "Muhtarlık",
+    "note": "Bu bildirim seçtiğin bölgeye gönderildi. Hangi bildirimleri alacağını Hesabım > Bildirimler'den seçebilirsin."
+  },
+  "editor": {
+    "done": "Bitti",
+    "next": "İleri",
+    "edit": "Düzenle",
+    "close": "Kapat",
+    "cancel": "Vazgeç",
+    "back": "Geri",
+    "add": "Ekle",
+    "undo": "Geri al",
+    "discard": "Yaptığın düzenlemeler silinsin mi?",
+    "discardYes": "Sil",
+    "duration": "Süre {{time}}",
+    "text": "Yazı",
+    "textPlaceholder": "Bir şey yaz…",
+    "size": "Yazı boyutu",
+    "colors": "Renkler",
+    "align": "Hizalama",
+    "textColor": "Yazı rengi",
+    "background": "Alt zemin",
+    "backgroundColor": "Zemin rengi",
+    "bg": {
+      "yok": "Yok",
+      "dolu": "Dolu",
+      "yari": "Yarı saydam"
+    },
+    "fonts": {
+      "modern": "Modern",
+      "klasik": "Klasik",
+      "el": "El yazısı",
+      "kalin": "KALIN",
+      "daktilo": "Daktilo"
+    },
+    "tools": {
+      "text": "Yazı",
+      "sticker": "Çıkartma",
+      "draw": "Çizim",
+      "trim": "Kırp",
+      "crop": "Kırp / Döndür",
+      "soundOn": "Ses açık",
+      "soundOff": "Ses kapalı",
+      "cover": "Kapak"
+    },
+    "stickers": {
+      "search": "Çıkartma ara…",
+      "emoji": "Emoji",
+      "konum": "Konum",
+      "bahset": "Bahset",
+      "saat": "Saat",
+      "hava": "Hava",
+      "tarih": "Tarih",
+      "etiket": "Etiket",
+      "tagPlaceholder": "etiket",
+      "mentionPlaceholder": "Kişi ara"
+    },
+    "drawArea": "Çizim alanı",
+    "draw": {
+      "kalem": "Kalem",
+      "fosforlu": "Fosforlu kalem",
+      "silgi": "Silgi",
+      "width": "Kalınlık {{n}}"
+    },
+    "video": {
+      "trimTitle": "Kırp · {{from}} – {{to}} ({{n}} sn)",
+      "start": "Başlangıç",
+      "end": "Bitiş",
+      "sound": "Videonun sesi",
+      "cover": "Kapak karesi",
+      "choose": "Seç",
+      "coverTitle": "Kapak karesi",
+      "coverAt": "Kare {{time}}",
+      "coverNote": "Akışta video oynamadan önce bu kare görünür."
+    },
+    "crop": {
+      "title": "Kırp / Döndür",
+      "move": "Kırpma alanını kaydır",
+      "orijinal": "Orijinal",
+      "kare": "Kare",
+      "dikey": "4:5",
+      "yatay": "Yatay",
+      "rotate": "Döndür"
+    }
+  },
+  "follows": {
+    "title": "Takip",
+    "tabs": {
+      "takipci": "Takipçi",
+      "takip": "Takip",
+      "isletmeler": "İşletmeler"
+    },
+    "search": "Ara",
+    "openHint": "Listeyi açar",
+    "remove": "Çıkar",
+    "removeTitle": "{{name}} takipçilerinden çıkarılsın mı?",
+    "removeBody": "Kişiye bildirim gitmez. İstersen seni yeniden takip edebilir.",
+    "cancel": "Vazgeç",
+    "noFollowers": "Henüz takipçi yok.",
+    "noFollowing": "Henüz kimse takip edilmiyor.",
+    "noBusinesses": "Takip ettiğin işletme yok.",
+    "businessPrivate": "Bu listeyi yalnızca işletmenin sahibi ve yetkilileri görür."
+  },
+  "appConfig": {
+    "updateTitle": "Güncelleme gerekiyor",
+    "updateBody": "CityJoy'un bu sürümü artık kullanılamıyor. Devam etmek için uygulamayı güncelle.",
+    "update": "Güncelle",
+    "maintTitle": "Bakımdayız",
+    "maintEmergency": "Acil bir durumdaysan 112'yi ara.",
+    "call112": "112'yi ara",
+    "reacceptTitle": "Yasal metinler güncellendi",
+    "reacceptBody": "Kullanım şartları ve aydınlatma metni değişti. Devam etmek için okuyup onaylaman gerekiyor.",
+    "accept": "Okudum, onaylıyorum",
+    "acceptError": "Kaydedilemedi. Bağlantını kontrol edip tekrar dene.",
+    "closedTitle": "Bu bölüm geçici olarak kapalı",
+    "closedBody": "Bir iyileştirme yapıyoruz. Kısa süre sonra tekrar açılacak.",
+    "closedTile": "Geçici olarak kapalı",
+    "goHome": "Ana sayfaya dön",
+    "newVersion": "Yeni sürüm var",
+    "newVersionBody": "Güncellemek için dokun.",
+    "dismiss": "Kapat",
+    "contactTitle": "İletişim",
+    "supportEmail": "Destek e-postası",
+    "kvkk": "KVKK başvuru adresi",
+    "links": {
+      "web": "Web sitesi",
+      "instagram": "Instagram",
+      "x": "X",
+      "facebook": "Facebook",
+      "youtube": "YouTube",
+      "tiktok": "TikTok"
+    }
   }
 }

@@ -11,12 +11,16 @@ import {
   type VerificationStatus,
 } from '@cityjoy/shared';
 import { createApprovalAdmin, createBusinessAdmin } from '@cityjoy/shared/firebase';
+import type { BusinessSuspension } from '@cityjoy/shared';
 
 import { firestore } from '../lib/firebase';
 import { locationRepository } from '../lib/locations';
 import { useCity } from '../lib/city';
 import { useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
+import { OpenInApp } from '../components/open-in-app';
+import { SuspendForm, suspensionAdmin } from '../components/suspend-control';
 
 const TIERS = MEMBERSHIP_TIERS;
 const DAY = 86400000;
@@ -52,6 +56,20 @@ export function BusinessesPage() {
   const [busy, setBusy] = useState(false);
   // "Yol üstü" süzgeci: türü yol-ustu olanlar ve kendini yol üstü tesis işaretleyen diğer işletmeler.
   const [typeFilter, setTypeFilter] = useState<'' | 'yol-ustu'>('');
+  // Etkin işletme askıları (yalnızca admin okur): sebep, bitiş, sahibine yasak.
+  const [suspensions, setSuspensions] = useState<Map<string, BusinessSuspension>>(new Map());
+  const loadSuspensions = useCallback(() => {
+    if (!canEdit) return;
+    suspensionAdmin().listActiveBusinesses().then(setSuspensions, () => setSuspensions(new Map()));
+  }, [canEdit]);
+  useEffect(loadSuspensions, [loadSuspensions]);
+  const suspendDone = (ok: boolean) => {
+    setMessage(ok ? { kind: 'ok', text: t('suspend.saved') } : { kind: 'error', text: t('suspend.error') });
+    if (ok) {
+      load();
+      loadSuspensions();
+    }
+  };
 
   const load = useCallback(async () => {
     setLoadError(false);
@@ -96,7 +114,7 @@ export function BusinessesPage() {
       <header className="page-head">
         <div>
           <h1>{t('businesses.title')}</h1>
-          <p className="meta">{t('businesses.intro')}</p>
+          <Intro text={t('businesses.intro')} />
         </div>
       </header>
       {user?.isDemo ? <p className="note">{t('businesses.demoReadOnly')}</p> : !canEdit ? <p className="note">{t('businesses.readOnly')}</p> : null}
@@ -145,7 +163,7 @@ export function BusinessesPage() {
                 return (
                   <tr key={b.id}>
                     <td>
-                      <strong>{b.name}</strong>
+                      <strong>{b.name}</strong> <OpenInApp path={`/business/${b.id}`} />
                       <div className="meta">{t(`businesses.types.${b.type}`)} · {place(b)}</div>
                       <div className="meta">{b.categoryIds.map(categoryName).join(', ')}</div>
                       {b.roadside?.length ? (
@@ -175,11 +193,26 @@ export function BusinessesPage() {
                     </td>
                     <td>
                       <span className={b.status === 'yayinda' ? 'pill ok' : b.status === 'kaldirildi' ? 'pill warn' : 'pill'}>{t(`businesses.statuses.${b.status}`)}</span>
-                      {canEdit && b.status !== 'gizli' ? (
+                      {suspensions.get(b.id) ? (
+                        <div className="meta">
+                          {t('suspend.businessInfo', {
+                            reason: t(`suspend.reasons.${suspensions.get(b.id)!.reason}`),
+                            until: suspensions.get(b.id)!.until ? new Date(suspensions.get(b.id)!.until!).toLocaleDateString('tr-TR') : t('suspend.days.forever'),
+                          })}
+                          {suspensions.get(b.id)!.banOwner ? <div>{t('suspend.bannedOwner')}</div> : null}
+                          {suspensions.get(b.id)!.note ? <div dir="auto">{suspensions.get(b.id)!.note}</div> : null}
+                        </div>
+                      ) : null}
+                      {canEdit ? (
                         <div className="row-actions">
-                          <button className="link" disabled={busy} onClick={() => act(() => admin!.setRemoved(b, b.status !== 'kaldirildi'))}>
-                            {b.status === 'kaldirildi' ? t('businesses.restore') : t('businesses.remove')}
-                          </button>
+                          <SuspendForm
+                            business
+                            name={b.name}
+                            suspended={b.status === 'kaldirildi'}
+                            onDone={suspendDone}
+                            suspend={(c) => suspensionAdmin().suspendBusiness({ businessId: b.id, ...c })}
+                            lift={() => suspensionAdmin().liftBusiness(b.id)}
+                          />
                         </div>
                       ) : null}
                     </td>

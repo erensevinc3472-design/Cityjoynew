@@ -29,14 +29,23 @@ import { NeedsPage } from './pages/needs-page';
 import { ContestsPage, PollsPage } from './pages/community-page';
 import { SosSettingsPage } from './pages/sos-settings-page';
 import { LimitsPage } from './pages/limits-page';
+import { AppSettingsPage } from './pages/app-settings-page';
+import { AppViewPage } from './pages/app-view-page';
+import { BadgesPage } from './pages/badges-page';
+import { DataSourcesPage } from './pages/data-sources-page';
+import { BroadcastPage } from './pages/broadcast-page';
 import { BillingPage } from './pages/billing-page';
+import { MembershipsPage } from './pages/memberships-page';
 import { NotificationsPage } from './pages/notifications-page';
 import { TodayPage } from './pages/today-page';
 import { StatsPage } from './pages/stats-page';
 import { ProfilesPage } from './pages/profiles-page';
 import { AudiencePage } from './pages/audience-page';
 import { CityProvider } from './lib/city';
+import { applyStoredTheme } from './lib/theme';
 import './styles.css';
+
+applyStoredTheme();
 
 function RequireUser({ children }: { children: React.ReactNode }) {
   const { ready, user } = useSession();
@@ -58,6 +67,9 @@ const router = createHashRouter([
       { index: true, element: <TodayPage /> },
       { path: 'istatistikler', element: <StatsPage /> },
       { path: 'profiller', element: <ProfilesPage /> },
+      { path: 'rozetler', element: <BadgesPage /> },
+      { path: 'veri-kaynaklari', element: <DataSourcesPage /> },
+      { path: 'toplu-bildirim', element: <BroadcastPage /> },
       { path: 'takipciler', element: <AudiencePage /> },
       { path: 'konumlar', element: <LocationsPage /> },
       { path: 'meslekler', element: <OccupationsPage /> },
@@ -71,7 +83,10 @@ const router = createHashRouter([
       { path: 'moderasyon', element: <ModerationPage /> },
       { path: 'sos-ayarlari', element: <SosSettingsPage /> },
       { path: 'sinirlar', element: <LimitsPage /> },
+      { path: 'uygulama-ayarlari', element: <AppSettingsPage /> },
+      { path: 'uygulama-gorunumu', element: <AppViewPage /> },
       { path: 'harcama', element: <BillingPage /> },
+      { path: 'uyelikler', element: <MembershipsPage /> },
       { path: 'bildirimler', element: <NotificationsPage /> },
       { path: 'onaylar', element: <ApprovalsPage /> },
       { path: 'duyurular', element: <AnnouncementsPage /> },

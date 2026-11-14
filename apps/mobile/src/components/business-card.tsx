@@ -48,7 +48,8 @@ export function ProTag() {
  * Kademeler (Karar Eren, 7 Kasım 2026): doğrulanmış işletmenin kartı sayfasına götürür (sağda ok); doğrulanmamış
  * işletmenin sayfası dışarıya kapalı, kart dokununca yerinde açılır: bilgiler, uyarı, yorumlar, Ara ve WhatsApp.
  */
-export function BusinessCard({ business: b, featured, initiallyOpen }: { business: Business; featured?: boolean; initiallyOpen?: boolean }) {
+/** showProvince: Türkiye geneli aramada ilçenin yanında il de yazar (aynı adlı işletmeler karışmasın). */
+export function BusinessCard({ business: b, featured, initiallyOpen, showProvince }: { business: Business; featured?: boolean; initiallyOpen?: boolean; showProvince?: boolean }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
@@ -59,7 +60,8 @@ export function BusinessCard({ business: b, featured, initiallyOpen }: { busines
   const page = hasPublicPage(b) || team;
   const [open, setOpen] = useState(!!initiallyOpen);
   const [reviews, setReviews] = useState(false);
-  const district = locationRepository.getDistrict(b.location.districtId)?.name;
+  const districtName = locationRepository.getDistrict(b.location.districtId)?.name;
+  const district = showProvince ? [districtName, locationRepository.getProvince(b.location.provinceCode)?.name].filter(Boolean).join(', ') : districtName;
   const place = [district, b.is24h ? t('business.open24') : b.hoursNote].filter(Boolean).join(' · ');
   const label = [featured ? t('business.ad') : null, pro ? t('business.pro') : null, b.name, verificationText(b, t, i18n.language), ratingText(b, t, i18n.language), district]
     .filter(Boolean)

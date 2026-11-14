@@ -22,6 +22,8 @@ import { locationRepository } from '../lib/locations';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { EmptyState } from '../components/empty-state';
+import { Intro } from '../components/intro';
 
 type View = 'bekleyen' | ApprovalStatus | 'sonuclanan';
 
@@ -132,7 +134,7 @@ export function ApprovalsPage() {
       <header className="page-head">
         <div>
           <h1>{t('approvals.title')}</h1>
-          <p className="meta">{isAdmin ? t('approvals.introAdmin') : t('approvals.introProvince')}</p>
+          <Intro text={isAdmin ? t('approvals.introAdmin') : t('approvals.introProvince')} />
         </div>
       </header>
       {user?.isDemo ? <p className="note">{t('approvals.demoReadOnly')}</p> : null}
@@ -315,7 +317,7 @@ function TrustedApprovers(props: {
       <header className="page-head">
         <div>
           <h2 id="trusted-title">{t('approvals.trusted.title')}</h2>
-          <p className="meta">{t('approvals.trusted.intro')}</p>
+          <Intro text={t('approvals.trusted.intro')} />
         </div>
         {props.live && !draft ? <button className="btn" onClick={() => setDraft(empty)}>{t('approvals.trusted.add')}</button> : null}
       </header>
@@ -374,7 +376,7 @@ function TrustedApprovers(props: {
       ) : null}
 
       {active.length === 0 ? (
-        <div className="state">{t('approvals.trusted.empty')}</div>
+        <EmptyState text={t('approvals.trusted.empty')} {...(props.live && !draft ? { actionLabel: t('approvals.trusted.add'), onAction: () => setDraft(empty) } : {})} />
       ) : (
         <div className="table-wrap">
           <table>

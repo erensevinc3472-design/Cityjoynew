@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, serverTimestamp, writeBatch, type Firestore } from './metered';
 
 import { packByCell, unpackPlace, type PackedPlace, type RoadsidePlace } from '../business/roadside';
 import { addAudit, iso } from './grants';

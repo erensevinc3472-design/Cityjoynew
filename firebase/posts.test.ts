@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 
 import { assertFails, assertSucceeds, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import type { PostInput } from '@cityjoy/shared';
-import { createFirestorePostRepository, createFramesAdmin, createPostModeration } from '@cityjoy/shared/firebase';
-import { doc, getDoc, increment, serverTimestamp, setDoc, Timestamp, updateDoc, type Firestore } from 'firebase/firestore';
+import { countUsage, takeFirestoreUsage, createFirestorePostRepository, createFirestoreSocialRepository, createFramesAdmin, createPostModeration } from '@cityjoy/shared/firebase';
+import { deleteField, doc, getDoc, increment, serverTimestamp, setDoc, Timestamp, updateDoc, writeBatch, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -166,6 +166,24 @@ describe('Keşfet gönderileri', () => {
     x = r.newId();
     const photo = { path: `posts/ayse/${x}/0.jpg`, url: `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${x}%2F0.jpg?alt=media&token=t`, width: 10, height: 10 };
     await assertFails(raw(x, { video: video(x), photos: [photo] }));
+    // Paylaşım düzenleyicisi: kapak karesi ve düzenlemeler (en çok 10) yazılır; uygulama kapağı yalnızca aynı klasördeyse gösterir.
+    const ed = r.newId();
+    const poster = `https://firebasestorage.googleapis.com/v0/b/cityjoy.appspot.com/o/posts%2Fayse%2F${ed}%2Fcover.jpg?alt=media&token=t`;
+    await assertSucceeds(r.create('ayse', 'Ayşe K.', input({ text: '', video: { ...video(ed), poster }, edits: [{ items: [{ kind: 'yazi', x: 0.5, y: 0.4, scale: 1, rotation: 0, text: 'Akşam', font: 'modern', color: '#FFFFFF', bg: 'yok', bgColor: '#111111', align: 'center', size: 0.08 }], muted: true, trimStart: 2, trimEnd: 20 }] }), undefined, ed));
+    const got = await r.get(ed);
+    expect(got?.video?.poster).toBe(poster);
+    expect(got?.edits?.[0]).toMatchObject({ muted: true, trimStart: 2, trimEnd: 20 });
+    x = r.newId();
+    await assertFails(raw(x, { video: { ...video(x), poster: 5 } }));
+    x = r.newId();
+    await assertFails(raw(x, { video: video(x), edits: Array.from({ length: 11 }, () => null) }));
+    x = r.newId();
+    await assertFails(raw(x, { video: video(x), edits: 'x' }));
+    await assertSucceeds(r.remove(ed));
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const d = (await getDoc(doc(ctx.firestore(), 'posts', ed))).data() ?? {};
+      expect('edits' in d || 'video' in d).toBe(false);
+    });
     await assertSucceeds(r.remove(ok));
     await env.withSecurityRulesDisabled(async (ctx) => {
       expect('video' in ((await getDoc(doc(ctx.firestore(), 'posts', ok))).data() ?? {})).toBe(false);
@@ -281,6 +299,31 @@ describe('Keşfet gönderileri', () => {
     expect(await repo('ali').listSaved('ali')).toEqual([]);
   });
 
+  it('kaydedilenler klasörleri: yalnızca kişinin kendisi, silinince gönderiler kalır', async () => {
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
+    const f = await repo('ali').createFolder('ali', '  Gidilecek yerler  ');
+    expect(f.name).toBe('Gidilecek yerler');
+    await assertFails(repo('veli').createFolder('ali', 'Benim'));
+    await assertFails(repo('veli').listFolders('ali'));
+    await assertSucceeds(repo('ali').save('ali', id, f.id));
+    expect(await repo('ali').savedFolder('ali', id)).toBe(f.id);
+    expect((await repo('ali').listSavedEntries('ali')).map((e) => e.folder)).toEqual([f.id]);
+    await assertSucceeds(repo('ali').setSavedFolder('ali', id, null));
+    expect(await repo('ali').savedFolder('ali', id)).toBeNull();
+    await assertSucceeds(repo('ali').setSavedFolder('ali', id, f.id));
+    await assertFails(repo('veli').setSavedFolder('ali', id, null));
+    // Kayıt tarihi ya da başka alan değiştirilemez; çok uzun ad olmaz.
+    await assertFails(updateDoc(doc(fs('ali'), 'users', 'ali', 'savedPosts', id), { createdAt: Timestamp.fromDate(new Date('2020-01-01')) }));
+    await assertFails(updateDoc(doc(fs('ali'), 'users', 'ali', 'savedPosts', id), { note: 'x' }));
+    await assertFails(setDoc(doc(fs('ali'), 'users', 'ali', 'saveFolders', 'uzun'), { name: 'x'.repeat(41), createdAt: Timestamp.now() }));
+    await assertSucceeds(repo('ali').renameFolder('ali', f.id, 'Hafta sonu'));
+    expect((await repo('ali').listFolders('ali')).map((x) => x.name)).toEqual(['Hafta sonu']);
+    await assertSucceeds(repo('ali').deleteFolder('ali', f.id));
+    expect(await repo('ali').listFolders('ali')).toEqual([]);
+    expect(await repo('ali').savedFolder('ali', id)).toBeNull();
+    expect(await repo('ali').isSaved('ali', id)).toBe(true);
+  });
+
   it('hesap silme: gönderiler boşaltılır, beğeniler geri alınır', async () => {
     const mine = await repo('ali').create('ali', 'Ali', input({ targets: ['genel'] }));
     const other = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
@@ -291,5 +334,71 @@ describe('Keşfet gönderileri', () => {
     expect(await repo('ali').get(mine)).toMatchObject({ status: 'kaldirildi', text: '' });
     expect(await repo('ayse').get(other)).toMatchObject({ likeCount: 0, commentCount: 0 });
     expect(await repo('ali').listSaved('ali')).toEqual([]);
+  });
+
+  it('etiket, sabitleme, izlenme: istemci etiketi yalnızca istek olarak yazar, sabitlemeyi sahibi yapar, etiketlenen kendini çıkarır', async () => {
+    const r = repo('ayse');
+    // İstek: en çok 20 kişi, kendisi olmaz; etiket, sabit ve izlenme alanlarını istemci yazamaz.
+    const id = await r.create('ayse', 'Ayşe K.', input({ targets: ['genel'], tagRequest: ['ali', 'veli'] }));
+    expect((await getDoc(doc(fs('ayse'), 'posts', id))).get('tagReq')).toEqual(['ali', 'veli']);
+    // Uygulamanın yazdığı gibi (kullanım sayacıyla birlikte) doğrudan yazım.
+    const raw = async (extra: Record<string, unknown>) => {
+      const db = fs('ayse');
+      const b = writeBatch(db);
+      await countUsage(db, b, { type: 'u', id: 'ayse' }, 'gonderi', 'ayse');
+      b.set(doc(db, 'posts', r.newId()), {
+        text: 'Yazı', category: 'genel', targets: { mahallem: false, bolgesel: false, genel: true }, region: ataevler, status: 'aktif', authorUid: 'ayse',
+        authorName: 'Ayşe K.', likeCount: 0, commentCount: 0, reportCount: 0, searchKeys: [], createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...extra,
+      });
+      return b.commit();
+    };
+    await assertSucceeds(raw({ tagReq: ['ali'] }));
+    await assertFails(raw({ tagReq: ['ayse'] }));
+    await assertFails(raw({ tagReq: Array.from({ length: 21 }, (_, i) => `u${i}`) }));
+    await assertFails(raw({ tags: ['ali'] }));
+    await assertFails(raw({ pinned: true }));
+    await assertFails(raw({ viewCount: 5 }));
+    await assertFails(raw({ hasVideo: true }));
+
+    // Sahibi sabitler ve kaldırır; başkası sabitleyemez; sabitlerken başka alan değişmez.
+    await assertFails(repo('ali').setPinned(id, true));
+    await assertSucceeds(r.setPinned(id, true));
+    expect(await r.myPinnedCount('ayse')).toBe(1);
+    expect((await repo('ali').pinnedByAuthor('ayse', false)).map((p) => p.id)).toEqual([id]);
+    await assertFails(updateDoc(doc(fs('ayse'), 'posts', id), { pinned: true, viewCount: 99, updatedAt: serverTimestamp() }));
+    await assertSucceeds(r.setPinned(id, false));
+    expect(await r.myPinnedCount('ayse')).toBe(0);
+
+    // Sunucunun yazdığı etiket: etiketlenen yalnızca kendini çıkarır, başkasını çıkaramaz; yabancı hiç dokunamaz.
+    await env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), 'posts', id), { tags: ['ali', 'veli'], tagNames: { ali: 'Ali', veli: 'Veli' }, tagReq: deleteField() }));
+    expect((await repo('veli').taggedIn('ali')).map((p) => p.id)).toEqual([id]);
+    await assertFails(updateDoc(doc(fs('ali'), 'posts', id), { tags: ['ali'], ['tagNames.veli']: deleteField() }));
+    await assertFails(updateDoc(doc(fs('istanbul'), 'posts', id), { tags: ['ali'], ['tagNames.veli']: deleteField() }));
+    await assertSucceeds(repo('ali').removeMyTag(id, 'ali'));
+    expect(await r.get(id)).toMatchObject({ tags: ['veli'], tagNames: { veli: 'Veli' } });
+    expect(await repo('ali').taggedIn('ali')).toEqual([]);
+  });
+
+  it('"Beni kim etiketleyebilir" ayarı yalnızca kişinin kendisine, yalnızca geçerli değerle', async () => {
+    const social = (uid: string) => createFirestoreSocialRepository(fs(uid));
+    expect(await social('ali').tagPolicy('ali')).toBe('herkes');
+    await assertSucceeds(social('ali').setTagPolicy('ali', 'takip'));
+    expect(await social('ali').tagPolicy('ali')).toBe('takip');
+    await assertFails(setDoc(doc(fs('ali'), 'users/ali/settings/privacy'), { tagPolicy: 'herkesler', updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(fs('ali'), 'users/ali/settings/privacy'), { tagPolicy: 'kimse', other: 1, updatedAt: serverTimestamp() }));
+    await assertFails(setDoc(doc(fs('ayse'), 'users/ali/settings/privacy'), { tagPolicy: 'kimse', updatedAt: serverTimestamp() }));
+    await assertFails(getDoc(doc(fs('ayse'), 'users/ali/settings/privacy')));
+  });
+
+  it('harcama ölçümü: depolardaki okuma ve yazmalar koleksiyona göre sayılır', async () => {
+    takeFirestoreUsage();
+    const id = await repo('ayse').create('ayse', 'Ayşe K.', input({ targets: ['genel'] }));
+    await repo('ali').get(id);
+    await repo('ali').byAuthor('ayse', false);
+    const u = takeFirestoreUsage();
+    expect(u.writes.posts).toBe(1);
+    expect(u.writes.usage).toBe(1);
+    expect(u.reads.posts).toBeGreaterThanOrEqual(2);
+    expect(takeFirestoreUsage()).toEqual({ reads: {}, writes: {} });
   });
 });

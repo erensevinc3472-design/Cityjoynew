@@ -20,6 +20,7 @@ import { useCity } from '../lib/city';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 /**
  * Panel > Anketler, Yarışmalar, Şehir Kulüpleri (13. madde 35). Anket ve yarışma admin'in (kurum talepleri ekip
@@ -122,7 +123,7 @@ export function PollsPage() {
       <header className="page-head">
         <div>
           <h1>{t('community.polls.title')}</h1>
-          <p className="meta">{t('community.polls.intro')}</p>
+          <Intro text={t('community.polls.intro')} />
         </div>
       </header>
       <Message message={message} />
@@ -276,7 +277,7 @@ export function ContestsPage() {
       <header className="page-head">
         <div>
           <h1>{t('community.contests.title')}</h1>
-          <p className="meta">{t('community.contests.intro')}</p>
+          <Intro text={t('community.contests.intro')} />
         </div>
       </header>
       <Message message={message} />

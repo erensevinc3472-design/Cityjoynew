@@ -7,6 +7,7 @@ import { firestore } from '../lib/firebase';
 import { locationRepository as repo } from '../lib/locations';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 /**
  * Panel > Sponsorlar (Eren, 11 Kasım 2026). Sosyal Harmoni ve Fırsatlar sayfalarının altındaki "Sponsorlu" bant.
@@ -96,7 +97,7 @@ export function SponsorsPage() {
       <header className="page-head">
         <div>
           <h1>{t('sponsors.title')}</h1>
-          <p className="meta">{t('sponsors.intro')}</p>
+          <Intro text={t('sponsors.intro')} />
         </div>
       </header>
       <p className="note">{t('sponsors.rules')}</p>

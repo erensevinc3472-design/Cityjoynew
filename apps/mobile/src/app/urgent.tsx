@@ -163,7 +163,7 @@ export default function UrgentScreen() {
 
   return (
     <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {/* SOS: ince ama ekranın en belirgin öğesi; düğmenin çevresinde yavaş nabız. */}
         <Pressable
           accessibilityRole="button"
@@ -270,24 +270,36 @@ export default function UrgentScreen() {
               {quick.map((x) => tile(x.id, iconOf(x), localized(x.names, lang) ?? x.names.tr, () => openService(x)))}
             </View>
 
-            {/* Diğer İhtiyaçlar: durum kartları (13. madde 35); eşleşmeyi admin panelden belirler. */}
-            <AppText variant="subtitle" accessibilityRole="header">{t('needs.title')}</AppText>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.needs}>
-              {NEED_SITUATIONS.filter((s) => needs[s].length > 0).map((s) => (
-                <Pressable
-                  key={s}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${t(`needs.items.${s}.title`)}. ${t(`needs.items.${s}.hint`)}`}
-                  onPress={() => router.push({ pathname: '/services/need', params: { id: s } })}
-                  style={({ pressed }) => [styles.need, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.75 : 1 }]}>
-                  <View style={[styles.tileIcon, { backgroundColor: c.accentSoft }]}>
-                    <MaterialIcons name={NEED_ICONS[s]} size={22} color={c.icon} />
+            {/* Diğer İhtiyaçlar: durum kartları (13. madde 35); eşleşmeyi admin panelden belirler. Eren (13 Kasım 2026):
+                "çok belli olmuyor, o bölüm çok iyi, görünür yapalım": yana kayan şerit yerine çerçeveli bölümde ikili
+                ızgara, hepsi bir bakışta görünür. */}
+            {NEED_SITUATIONS.some((s) => needs[s].length > 0) ? (
+              <View style={[styles.needsPanel, { backgroundColor: c.accentSoft, borderColor: c.accentBorder }]}>
+                <View style={styles.needsHead}>
+                  <MaterialIcons name="volunteer-activism" size={22} color={c.accent} />
+                  <View style={styles.flex}>
+                    <AppText variant="subtitle" accessibilityRole="header" style={{ color: c.textStrong }}>{t('needs.title')}</AppText>
+                    <AppText style={[styles.needHint, { color: c.textMuted }]}>{t('needs.subtitle')}</AppText>
                   </View>
-                  <AppText style={[styles.tileText, { color: c.text }]} numberOfLines={2}>{t(`needs.items.${s}.title`)}</AppText>
-                  <AppText style={[styles.needHint, { color: c.textMuted }]} numberOfLines={2}>{t(`needs.items.${s}.hint`)}</AppText>
-                </Pressable>
-              ))}
-            </ScrollView>
+                </View>
+                <View style={styles.needs}>
+                  {NEED_SITUATIONS.filter((s) => needs[s].length > 0).map((s) => (
+                    <Pressable
+                      key={s}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t(`needs.items.${s}.title`)}. ${t(`needs.items.${s}.hint`)}`}
+                      onPress={() => router.push({ pathname: '/services/need', params: { id: s } })}
+                      style={({ pressed }) => [styles.need, { backgroundColor: c.surface, borderColor: c.border, opacity: pressed ? 0.75 : 1 }]}>
+                      <View style={[styles.needIcon, { backgroundColor: c.accent }]}>
+                        <MaterialIcons name={NEED_ICONS[s]} size={20} color={c.onPrimary} />
+                      </View>
+                      <AppText style={[styles.needTitle, { color: c.textStrong }]} numberOfLines={2}>{t(`needs.items.${s}.title`)}</AppText>
+                      <AppText style={[styles.needHint, { color: c.textMuted }]} numberOfLines={2}>{t(`needs.items.${s}.hint`)}</AppText>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            ) : null}
 
             {/* Tüm hizmetler: açılır kategoriler, içinde simgeli alt hizmetler */}
             <AppText variant="subtitle" accessibilityRole="header">{t('urgent.allTitle')}</AppText>
@@ -398,8 +410,12 @@ const styles = StyleSheet.create({
   childText: { fontSize: 11, lineHeight: 14, textAlign: 'center' },
   dot: { width: 8, height: 8, borderRadius: 4 },
   childDot: { position: 'absolute', top: 8, end: 8 },
-  needs: { gap: spacing.sm, paddingEnd: spacing.md },
-  need: { width: 148, gap: 6, padding: spacing.md, borderRadius: radius.lg, borderWidth: 1 },
+  needsPanel: { gap: spacing.md, padding: spacing.md, borderRadius: radius.lg, borderWidth: 1 },
+  needsHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  needs: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  need: { flexBasis: '46%', flexGrow: 1, minHeight: 112, gap: 6, padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
+  needIcon: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  needTitle: { fontFamily: fonts.bodySemi, fontSize: 14, lineHeight: 18 },
   needHint: { fontSize: 12, lineHeight: 16 },
   missing: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: MIN_TOUCH, borderRadius: radius.pill, borderWidth: 1, borderStyle: 'dashed' },
   missingText: { fontFamily: fonts.bodySemi, fontSize: 13 },

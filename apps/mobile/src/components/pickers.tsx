@@ -1,6 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { I18nManager, Pressable, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
   buildCategoryTree,
@@ -179,54 +180,113 @@ export function CategoryPicker({
     return cat ? localized(cat.names, lang)! : id;
   };
   const results = useMemo(
-    () => (query.trim() ? searchCategoryTree(tree, query, lang).flatMap((n) => n.children.map((child) => ({ child, parent: n.category }))).slice(0, 30) : []),
+    () => (query.trim() ? searchCategoryTree(tree, query, lang).flatMap((n) => n.children.map((child) => ({ child, parent: n.category }))).slice(0, 40) : []),
     [tree, query, lang],
   );
+  // Gezinme (Eren, 12 Kasım 2026: "insanlar kendi alanını bulmakta zorlanır"): yazmadan da gruplar görünür, gruba dokununca hizmetleri açılır.
+  const [openId, setOpenId] = useState<string | null>(null);
+  const openNode = openId ? tree.find((n) => n.category.id === openId) : undefined;
+  const searching = !!query.trim();
   const toggle = (id: string) =>
     onChange(selected.includes(id) ? selected.filter((x) => x !== id) : selected.length < max ? [...selected, id] : selected);
 
+  const choice = (child: ServiceCategory, parent?: ServiceCategory) => {
+    const isOn = selected.includes(child.id);
+    const disabled = !isOn && selected.length >= max;
+    return (
+      <Pressable
+        key={child.id}
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: isOn, disabled }}
+        disabled={disabled}
+        onPress={() => toggle(child.id)}
+        style={({ pressed }) => [styles.choice, { opacity: disabled ? 0.5 : pressed ? 0.7 : 1 }]}>
+        <MaterialIcons name={iconOf(child.icon)} size={20} color={isOn ? c.primary : c.icon} />
+        <View style={styles.flex}>
+          <AppText>{localized(child.names, lang)}</AppText>
+          {parent ? <AppText variant="caption" muted>{localized(parent.names, lang)}</AppText> : null}
+        </View>
+        <MaterialIcons name={isOn ? 'check-box' : 'check-box-outline-blank'} size={22} color={isOn ? c.primary : c.textSoft} />
+      </Pressable>
+    );
+  };
+
   return (
     <View style={styles.group}>
-      <View style={styles.chips}>
-        {selected.map((id) => (
-          <Pressable
-            key={id}
-            accessibilityRole="button"
-            accessibilityLabel={`${nameOf(id)}, ${t('business.removeService')}`}
-            onPress={() => toggle(id)}
-            style={[styles.chip, { backgroundColor: c.accentSoft, borderColor: c.accentBorder }]}>
-            <AppText variant="caption" style={{ color: c.textStrong }}>{nameOf(id)}</AppText>
-            <MaterialIcons name="close" size={16} color={c.textMuted} />
-          </Pressable>
-        ))}
-      </View>
-      <SearchField value={query} onChangeText={setQuery} placeholder={t('business.categorySearch')} />
-      {results.length ? (
-        <View style={[styles.list, { borderColor: c.border, backgroundColor: c.surface }]}>
-          {results.map(({ child, parent }) => {
-            const isOn = selected.includes(child.id);
-            const disabled = !isOn && selected.length >= max;
-            return (
-              <Pressable
-                key={child.id}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: isOn, disabled }}
-                disabled={disabled}
-                onPress={() => toggle(child.id)}
-                style={({ pressed }) => [styles.choice, { opacity: disabled ? 0.5 : pressed ? 0.7 : 1 }]}>
-                <View style={styles.flex}>
-                  <AppText>{localized(child.names, lang)}</AppText>
-                  <AppText variant="caption" muted>{localized(parent.names, lang)}</AppText>
-                </View>
-                <MaterialIcons name={isOn ? 'check-box' : 'check-box-outline-blank'} size={22} color={isOn ? c.primary : c.textSoft} />
-              </Pressable>
-            );
-          })}
+      {selected.length ? (
+        <View style={styles.chips}>
+          {selected.map((id) => (
+            <Pressable
+              key={id}
+              accessibilityRole="button"
+              accessibilityLabel={`${nameOf(id)}, ${t('business.removeService')}`}
+              onPress={() => toggle(id)}
+              style={[styles.chip, { backgroundColor: c.accentSoft, borderColor: c.accentBorder }]}>
+              <AppText variant="caption" style={{ color: c.textStrong }}>{nameOf(id)}</AppText>
+              <MaterialIcons name="close" size={16} color={c.textMuted} />
+            </Pressable>
+          ))}
         </View>
       ) : null}
+      <SearchField value={query} onChangeText={setQuery} placeholder={t('business.categorySearch')} />
+      {searching ? (
+        results.length ? (
+          <View style={[styles.list, { borderColor: c.border, backgroundColor: c.surface }]}>{results.map(({ child, parent }) => choice(child, parent))}</View>
+        ) : (
+          <AppText variant="caption" muted>{t('business.categoryNotFound')}</AppText>
+        )
+      ) : openNode ? (
+        <View style={[styles.list, { borderColor: c.border, backgroundColor: c.surface }]}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('business.categoryGroupsBack')}
+            onPress={() => setOpenId(null)}
+            style={({ pressed }) => [styles.choice, { opacity: pressed ? 0.7 : 1 }]}>
+            <MaterialIcons name={I18nManager.isRTL ? 'chevron-right' : 'chevron-left'} size={24} color={c.primary} />
+            <AppText variant="label" style={[styles.flex, { color: c.textStrong }]}>{localized(openNode.category.names, lang)}</AppText>
+            <AppText variant="caption" style={{ color: c.primary }}>{t('business.categoryGroupsBack')}</AppText>
+          </Pressable>
+          <View style={[styles.divider, { backgroundColor: c.border }]} />
+          {openNode.children.map((child) => choice(child))}
+        </View>
+      ) : (
+        <>
+          <AppText variant="caption" muted>{t('business.categoryBrowseHint')}</AppText>
+          <View style={styles.groupGrid}>
+            {tree.map((n) => {
+              const count = n.children.filter((x) => selected.includes(x.id)).length;
+              return (
+                <Pressable
+                  key={n.category.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={localized(n.category.names, lang)}
+                  accessibilityHint={count ? t('business.categorySelectedCount', { count }) : undefined}
+                  onPress={() => setOpenId(n.category.id)}
+                  style={({ pressed }) => [
+                    styles.groupTile,
+                    { backgroundColor: count ? c.accentSoft : c.surface, borderColor: count ? c.accentBorder : c.border, opacity: pressed ? 0.8 : 1 },
+                  ]}>
+                  <MaterialIcons name={iconOf(n.category.icon)} size={20} color={c.primary} />
+                  <AppText variant="caption" numberOfLines={2} style={[styles.flex, { color: c.textStrong }]}>{localized(n.category.names, lang)}</AppText>
+                  {count ? <AppText variant="caption" style={{ color: c.primary }}>{count}</AppText> : null}
+                </Pressable>
+              );
+            })}
+          </View>
+        </>
+      )}
+      {/* Listede yoksa: grubun "Diğer" seçeneği + eksik hizmeti bildir (panelde "Eksik hizmet önerileri"ne düşer). */}
+      <View style={[styles.notListed, { borderColor: c.border }]}>
+        <AppText variant="caption" muted style={styles.flex}>{t('business.categoryNotListed')}</AppText>
+        <Pressable accessibilityRole="link" onPress={() => router.push('/services/suggest')} hitSlop={8}>
+          <AppText variant="caption" style={{ color: c.primary, fontWeight: '600' }}>{t('business.categorySuggest')}</AppText>
+        </Pressable>
+      </View>
     </View>
   );
 }
+
+const iconOf = (name: string) => (name in MaterialIcons.glyphMap ? name : 'category') as never;
 
 /** Yeme-içme işletmesinin türleri (kafe, restoran, kebap…): hizmet kategorileri yerine seçilir. */
 export function FoodKindPicker({ selected, max, onChange }: { selected: string[]; max: number; onChange(ids: string[]): void }) {
@@ -274,4 +334,8 @@ const styles = StyleSheet.create({
   choice: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: MIN_TOUCH, paddingHorizontal: spacing.sm },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.sm, minHeight: 32 },
+  groupGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+  groupTile: { flexBasis: '48%', flexGrow: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.xs, minHeight: MIN_TOUCH + 4, paddingHorizontal: spacing.sm, borderRadius: radius.md, borderWidth: 1 },
+  divider: { height: StyleSheet.hairlineWidth, marginVertical: 2 },
+  notListed: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingTop: spacing.sm, borderTopWidth: StyleSheet.hairlineWidth },
 });

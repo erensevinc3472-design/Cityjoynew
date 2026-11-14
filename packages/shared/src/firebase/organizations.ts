@@ -12,7 +12,7 @@ import {
   writeBatch,
   type DocumentData,
   type Firestore,
-} from 'firebase/firestore';
+} from './metered';
 import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,

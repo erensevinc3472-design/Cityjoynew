@@ -16,7 +16,7 @@ import {
   type DocumentData,
   type Firestore,
   type QueryConstraint,
-} from 'firebase/firestore';
+} from './metered';
 
 import type { AnnouncementRegion, Publisher } from '../announcements/announcements';
 import { EVENT_LIMITS, type CityEvent, type EventInput } from '../events/events';

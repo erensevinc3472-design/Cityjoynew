@@ -5,6 +5,7 @@ import { createRoadsidePackAdmin, type RoadsidePackSummary } from '@cityjoy/shar
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
 type Loaded = { name: string; createdAt?: string; places: PackedPlace[]; skipped: number };
@@ -99,7 +100,7 @@ export function RoadsidePage() {
       <header className="page-head">
         <div>
           <h1>{t('roadside.title')}</h1>
-          <p className="meta">{t('roadside.intro')}</p>
+          <Intro text={t('roadside.intro')} />
         </div>
       </header>
       {!admin ? <p className="note">{t('roadside.adminOnly')}</p> : user?.isDemo ? <p className="note">{t('roadside.demo')}</p> : null}

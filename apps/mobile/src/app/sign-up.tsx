@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LEGAL_TEXT_VERSION, MIN_PASSWORD_LENGTH, validateSignUp, type SignUpErrors, type SignUpInput } from '@cityjoy/shared';
+import { MIN_PASSWORD_LENGTH, validateSignUp, type SignUpErrors, type SignUpInput } from '@cityjoy/shared';
 
 import { AppButton } from '@/components/app-button';
 import { CheckboxRow } from '@/components/checkbox-row';
@@ -10,6 +10,7 @@ import { AuthLink, AuthScene, GlassCard } from '@/components/auth-scene';
 import { TextField } from '@/components/text-field';
 import { errorKey } from '@/lib/auth-errors';
 import { authService, profileRepository } from '@/lib/services';
+import { useAppConfig } from '@/lib/app-config';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
 import { restartFlow } from '@/lib/navigation';
@@ -17,6 +18,7 @@ import { restartFlow } from '@/lib/navigation';
 /** Kayıt (G-Kayit): giriş ekranıyla aynı cam kart; doğum yılı ve iki zorunlu onay kalır. */
 export default function SignUpScreen() {
   const { t } = useTranslation();
+  const { legal } = useAppConfig();
   const router = useRouter();
   const { language, suggestedLanguage } = useSettings();
   const { adopt } = useSession();
@@ -50,7 +52,7 @@ export default function SignUpScreen() {
     try {
       const user = await authService.signUp(form.email, form.password, form.fullName);
       const now = new Date().toISOString();
-      const consent = { granted: true, at: now, textVersion: LEGAL_TEXT_VERSION };
+      const consent = { granted: true, at: now, textVersion: legal.version };
       await profileRepository.create({
         uid: user.uid,
         displayName: form.fullName,

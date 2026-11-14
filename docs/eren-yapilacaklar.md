@@ -3,6 +3,16 @@
 Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterli; Claude bu listeyi günceller.
 Şifre, kart bilgisi, anahtar gibi şeyleri sohbete yazma; gerekiyorsa Claude nereye gireceğini söyler.
 
+## Pro abonelik için (yayından önce, acele yok; 12 Kasım 2026)
+
+Uygulama ve panel hazır; satın almanın gerçekten çalışması için bu hesap işleri gerekiyor. Sırası geldiğinde Claude her adımı tek tek anlatır.
+
+- [x] **Pro fiyatı (karar verildi, 12 Kasım):** aylık 999,99 TL, yıllık 9.999,99 TL, ilk ay ücretsiz deneme. Ürünleri açarken mağaza panelinde bu fiyatları ve 1 aylık ücretsiz denemeyi sen girersin; sonra istediğin zaman oradan değiştirirsin.
+- [ ] **Ücretli uygulama sözleşmesi:** Apple Developer (App Store Connect > İş) ve Google Play Console (Ödemeler profili). Şirket/vergi ve banka bilgisi gerekir; mali müşavire danış.
+- [ ] **İki mağazada abonelik ürünü:** `cityjoy_pro_aylik` ve `cityjoy_pro_yillik` (Claude ekran ekran anlatır).
+- [ ] **RevenueCat hesabı** (revenuecat.com, ücretsiz başlangıç) ve iki mağazanın bağlanması. Anahtarları sohbete yazma; Claude nereye gireceğini söyler.
+- [ ] **Avukat:** abonelik, otomatik yenileme, iptal ve iade metinleri (mesafeli satış). **Mali müşavir:** mağaza gelirinin faturası ve kaydı.
+
 ## 1. Hemen (bugün yarın, kısa işler)
 
 - [x] **claude/blaze-kurulum birleştirme ve yüklemeler (yapıldı, 11 Kasım; Eren izin verdi, Claude yaptı):** https://github.com/erensevinc3472-design/Cityjoynew/compare/main...claude/blaze-kurulum?expand=1
@@ -72,6 +82,8 @@ Hazırlanma: 31 Ekim 2026. Bir maddeyi bitirince Claude'a "X tamam" demen yeterl
   hazır olunca bilgisayarda `eas login` komutunu açar, şifreyi sen yazarsın.
 
 ## 3. Hukuk ve metinler
+
+- [ ] **Yasal sayfalardaki boşluklar (13 Kasım 2026):** taslak sayfalar hazır (gizlilik, kullanım şartları, hesap silme; panel yüklenince https://cityjoynew.web.app/gizlilik.html, /kullanim-sartlari.html, /hesap-silme.html). Doldurulacak 3 şey: veri sorumlusunun adı/unvanı ve adresi (şahıs mı şirket mi kararına bağlı), bir iletişim e-postası (ör. destek@cityjoy.com.tr; alan adında e-posta açılabilir, Claude anlatır), avukatın netleştireceği yerler (yurt dışı aktarım dayanağı, sorumluluk sınırı, yetkili mahkeme). Bu adresleri mağaza kayıtlarına yazacağız.
 
 - [ ] **Avukat:** gizlilik politikası, kullanım şartları, KVKK aydınlatma metni, açık rıza metinleri, topluluk kuralları.
   Uygulamada konum (SOS ve arka plan konumu), aile listesi, yorumlar, mesajlaşma, arama kaydı ve yaş sınırı (13) var;

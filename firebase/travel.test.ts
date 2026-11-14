@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { assertFails, initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { SEED_LOCAL, SEED_PLACES, SEED_ROUTES } from '@cityjoy/shared';
 import { createFirestoreTravelRepository, createTravelAdmin } from '@cityjoy/shared/firebase';
-import { collection, doc, getDocs, setDoc, type Firestore } from 'firebase/firestore';
+import { collection, deleteField, doc, getDocs, setDoc, updateDoc, type Firestore } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -60,6 +60,26 @@ describe('seyahat', () => {
     await admin.savePlace(id, { ...input, name: 'Irgandı Köprüsü', status: 'yayinda', order: 10, tour });
     expect((await app.getPlace(id))?.tour?.[0]?.points[0]?.title).toBe('Şadırvan');
     await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, tour: Array.from({ length: 7 }, () => tour[0]), updatedAt: new Date() }));
+    // Gezimi planla: konum, açılış saatleri ve kalış süresi yazılır; bozuk saat ve konum reddedilir.
+    const plan = { location: { lat: 40.184, lng: 29.062 }, hours: { allDay: false, open: '09:00', close: '18:00', closedDays: [1], prayer: true }, durationMinutes: 45 };
+    await admin.savePlace(id, { ...input, name: 'Irgandı Köprüsü', status: 'yayinda', order: 10, ...plan });
+    const read = await app.getPlace(id);
+    expect([read?.location, read?.hours, read?.durationMinutes]).toEqual([plan.location, plan.hours, 45]);
+    await admin.savePlace(id, { ...input, name: 'Irgandı Köprüsü', status: 'yayinda', order: 10, hours: { allDay: true, closedDays: [], prayer: false } });
+    expect((await app.getPlace(id))?.hours).toEqual({ allDay: true, closedDays: [], prayer: false });
+    await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, hours: { ...plan.hours, open: '19:00' }, updatedAt: new Date() }));
+    await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, location: { lat: 140, lng: 29 }, updatedAt: new Date() }));
+    await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, durationMinutes: 5, updatedAt: new Date() }));
+    // Ara > Yerler (Türkiye geneli): kaydedilen yerin adı aranır; eski yerler panelden aramaya eklenir; çok anahtar reddedilir.
+    expect((await app.searchPlaces('irgan')).map((p) => p.id)).toContain(id);
+    // Eski kayıt: anahtarsız yer (13 Kasım öncesi kaydedilmiş gibi).
+    const eski = await admin.savePlace(null, { ...input, name: 'Alanya Kalesi', cityId: '07', status: 'yayinda', order: 1 });
+    await env.withSecurityRulesDisabled((ctx) => updateDoc(doc(ctx.firestore(), 'travelPlaces', eski), { searchKeys: deleteField() }));
+    expect(await app.searchPlaces('alanya')).toEqual([]);
+    expect(await admin.reindexPlaceSearch()).toBeGreaterThanOrEqual(1);
+    expect((await app.searchPlaces('kale')).map((p) => p.name)).toEqual(['Alanya Kalesi']);
+    expect(await admin.reindexPlaceSearch()).toBe(0);
+    await assertFails(setDoc(doc(fs('eren'), 'travelPlaces', id), { ...input, searchKeys: Array.from({ length: 41 }, (_, i) => `k${i}`), updatedAt: new Date() }));
     await admin.deletePlace({ ...base, id });
     expect((await app.listPlaces('16')).map((p) => p.id)).not.toContain(id);
 

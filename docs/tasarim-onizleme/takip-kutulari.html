@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Takip kutuları önizleme</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL@24,500,1&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0B2328; --s:#123238; --s2:#163C43; --line:rgba(234,241,241,.10); --t:#EAF1F1; --m:#A3B9BB; --g:#E2B277; --gs:rgba(226,178,119,.14); --chip:rgba(234,241,241,.10); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#E9ECE6; font-family:Inter, sans-serif; color:var(--t); padding:20px 12px; }
+  h1 { font-family:'Plus Jakarta Sans'; color:#14262B; font-size:20px; margin:0 0 4px 6px; }
+  .sub { color:#56696D; font-size:13px; margin:0 0 16px 6px; max-width:1000px; }
+  .grid { display:flex; flex-wrap:wrap; gap:22px; justify-content:center; }
+  .cap { color:#14262B; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; text-align:center; margin:10px 0 0; }
+  .capsub { color:#56696D; font-size:12px; text-align:center; margin:2px auto 0; max-width:290px; }
+  .ic { font-family:'Material Symbols Rounded'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; }
+  .phone { width:300px; height:600px; border-radius:42px; background:var(--bg); overflow:hidden; position:relative; box-shadow:0 0 0 7px #10181a, 0 10px 30px rgba(0,0,0,.25); }
+  .status { height:40px; display:flex; justify-content:space-between; align-items:center; padding:0 26px; font-weight:600; font-size:13px; }
+  .top { display:flex; align-items:center; gap:8px; height:44px; padding:0 12px; }
+  .round { width:36px; height:36px; border-radius:50%; background:var(--chip); display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .title { flex:1; text-align:center; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; }
+  .pad { padding:6px 14px; }
+  .head { display:flex; align-items:center; gap:12px; }
+  .av { width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg,#2E7A82,#E2B277); flex:none; display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:24px; color:#0B2328; }
+  .av.sq { border-radius:18px; }
+  .name { font-family:'Plus Jakarta Sans'; font-weight:700; font-size:17px; margin:12px 0 2px; }
+  .m { color:var(--m); font-size:12.5px; }
+  /* Önerilen kutular */
+  .boxes { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px; }
+  .box { background:var(--s); border:1px solid var(--line); border-radius:14px; padding:9px 4px 8px; text-align:center; }
+  .box b { display:block; font-family:'Plus Jakarta Sans'; font-size:18px; line-height:22px; }
+  .box span { color:var(--m); font-size:11.5px; }
+  .box.tap { position:relative; }
+  .box.tap::after { content:'›'; position:absolute; right:7px; top:6px; color:var(--g); font-size:14px; }
+  .btns { display:flex; gap:8px; margin-top:12px; }
+  .pill { flex:1; height:36px; border-radius:999px; background:var(--s2); display:flex; align-items:center; justify-content:center; gap:5px; font-size:13px; font-weight:600; }
+  .pill.p { background:var(--g); color:#0B2328; }
+  .tabs { display:flex; margin:12px 0 0; border-bottom:1px solid var(--line); }
+  .tab { flex:1; text-align:center; padding:9px 0; font-size:13px; color:var(--m); font-weight:600; }
+  .tab.on { color:var(--t); box-shadow:inset 0 -2px 0 var(--g); }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:2px; }
+  .grid3 div { aspect-ratio:1; background:linear-gradient(160deg,#1C4950,#0F2E33); }
+  .search { height:38px; border-radius:12px; background:var(--s); display:flex; align-items:center; gap:8px; padding:0 12px; color:var(--m); font-size:13px; margin:10px 0 6px; }
+  .row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); }
+  .ra { width:40px; height:40px; border-radius:50%; flex:none; }
+  .rn { flex:1; min-width:0; }
+  .rn b { display:block; font-size:13.5px; font-weight:600; }
+  .rn span { color:var(--m); font-size:12px; }
+  .sm { height:30px; padding:0 12px; border-radius:999px; font-size:12px; font-weight:600; display:flex; align-items:center; border:1.5px solid var(--g); color:var(--g); }
+  .sm.on { background:var(--g); color:#0B2328; }
+  .sm.gray { border-color:var(--line); color:var(--m); }
+  .note { background:var(--gs); color:var(--g); border-radius:10px; padding:8px 10px; font-size:11.5px; margin-top:8px; display:flex; gap:6px; }
+</style>
+</head>
+<body>
+<h1>Takip kutuları ve listeler: öneri</h1>
+<p class="sub">Sayılar kare kutulara alınıyor, kutuya dokununca liste açılıyor. Renkler, yazı tipi ve yerleşim aynı kalıyor. Gece görünümü gösteriliyor, gündüz görünümünde kutular beyaz olur.</p>
+<div class="grid">
+
+  <!-- 1. Kişi profili -->
+  <div>
+    <div class="phone">
+      <div class="status"><span>10:50</span><span class="ic">signal_cellular_alt</span></div>
+      <div class="top"><div class="round ic">arrow_back</div><div class="title">eren.s</div><div class="round ic">more_horiz</div></div>
+      <div class="pad">
+        <div class="head"><div class="av">E</div>
+          <div><div class="name" style="margin:0">Eren S.</div><div class="m">Osmangazi, Bursa</div></div>
+        </div>
+        <div class="boxes">
+          <div class="box"><b>24</b><span>Gönderi</span></div>
+          <div class="box tap"><b>318</b><span>Takipçi</span></div>
+          <div class="box tap"><b>152</b><span>Takip</span></div>
+        </div>
+        <div class="m" style="margin-top:10px">Bursa'yı seven biri. Kahve, tarih, yürüyüş.</div>
+        <div class="btns"><div class="pill p"><span class="ic" style="font-size:17px">add</span>Takip et</div><div class="pill">Mesaj</div></div>
+        <div class="tabs"><div class="tab on">Izgara</div><div class="tab">Videolar</div><div class="tab">Etiket</div></div>
+        <div class="grid3"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <p class="cap">1. Kişi profili</p>
+    <p class="capsub">Gönderi, Takipçi, Takip kutuları. Takipçi ve Takip kutusuna dokununca liste açılır.</p>
+  </div>
+
+  <!-- 2. İşletme sayfası -->
+  <div>
+    <div class="phone">
+      <div class="status"><span>10:50</span><span class="ic">signal_cellular_alt</span></div>
+      <div class="top"><div class="round ic">arrow_back</div><div class="title">Kahve Durağı</div><div class="round ic">ios_share</div></div>
+      <div class="pad">
+        <div class="head"><div class="av sq">K</div>
+          <div><div class="name" style="margin:0">Kahve Durağı</div><div class="m">Kafe · Nilüfer, Bursa</div><div class="m" style="color:#7FD1A5">Şu an açık · 23:00'e kadar</div></div>
+        </div>
+        <div class="boxes">
+          <div class="box"><b>41</b><span>Gönderi</span></div>
+          <div class="box tap"><b>1.204</b><span>Takipçi</span></div>
+          <div class="box tap"><b>★ 4,7</b><span>86 yorum</span></div>
+        </div>
+        <div class="btns"><div class="pill p"><span class="ic" style="font-size:17px">add</span>Takip et</div><div class="pill"><span class="ic" style="font-size:17px">call</span>Ara</div><div class="pill"><span class="ic" style="font-size:17px">directions</span>Yol</div></div>
+        <div class="tabs"><div class="tab on">Gönderiler</div><div class="tab">Menü</div><div class="tab">Bilgiler</div></div>
+        <div class="grid3"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <p class="cap">2. İşletme sayfası</p>
+    <p class="capsub">Aynı kutular. Takipçi listesini sahibi ve yetkilileri açar, Yorum kutusu yorumlara götürür.</p>
+  </div>
+
+  <!-- 3. Liste -->
+  <div>
+    <div class="phone">
+      <div class="status"><span>10:50</span><span class="ic">signal_cellular_alt</span></div>
+      <div class="top"><div class="round ic">arrow_back</div><div class="title">eren.s</div><div style="width:36px"></div></div>
+      <div class="pad" style="padding-top:0">
+        <div class="tabs" style="margin-top:0"><div class="tab on">318 Takipçi</div><div class="tab">152 Takip</div></div>
+        <div class="search"><span class="ic" style="font-size:18px">search</span>Ara</div>
+        <div class="row"><div class="ra" style="background:#2E7A82"></div><div class="rn"><b>Ayşe Yılmaz</b><span>ayse.y</span></div><div class="sm on">Takiptesin</div></div>
+        <div class="row"><div class="ra" style="background:#8A6A3E"></div><div class="rn"><b>Mehmet K.</b><span>mehmetk</span></div><div class="sm">Takip et</div></div>
+        <div class="row"><div class="ra" style="background:#4D5F8C"></div><div class="rn"><b>Zeynep A.</b><span>zeynep.a</span></div><div class="sm on">Takiptesin</div></div>
+        <div class="row"><div class="ra" style="background:#6B4D7A"></div><div class="rn"><b>Can D.</b><span>cand</span></div><div class="sm gray">Çıkar</div></div>
+        <div class="row"><div class="ra" style="background:#3E7A5A"></div><div class="rn"><b>Elif T.</b><span>elif.t</span></div><div class="sm">Takip et</div></div>
+        <div class="note"><span class="ic" style="font-size:15px">info</span>Kendi listende takipçiyi "Çıkar" diyebilirsin. Takip sekmesinde takip ettiğin işletmeler de ayrı başlıkla görünür.</div>
+      </div>
+    </div>
+    <p class="cap">3. Takipçi / Takip listesi</p>
+    <p class="capsub">İki sekme, arama, her satırda Takip et / Takiptesin. Gizli hesabın listesini yalnızca takipçileri görür.</p>
+  </div>
+
+</div>
+</body>
+</html>

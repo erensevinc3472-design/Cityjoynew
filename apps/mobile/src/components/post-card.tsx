@@ -1,18 +1,22 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
-import { Animated, Pressable, Share, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Animated, Modal, Pressable, Share, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import type { Post } from '@cityjoy/shared';
 
 import { AvatarPhoto } from '@/components/avatar-photo';
 import { AppText } from '@/components/app-text';
 import { TranslatableText } from '@/components/translatable-text';
+import { BadgeIcons, OfficialSeal } from '@/components/user-badges';
 import { PostPhotos } from '@/components/post-photos';
 import { PostSheet } from '@/components/post-sheet';
 import { PostVideoView } from '@/components/post-video';
 import { useReduceMotion } from '@/components/scene-art';
 import { locationRepository as repo } from '@/lib/locations';
 import { useAuthor, useBusinessInfo } from '@/lib/profile-photos';
+import { useRelativeTime } from '@/lib/relative-time';
 import { useSettings } from '@/lib/settings';
 import { fonts, GUTTER, radius, spacing } from '@/theme/tokens';
 import { useThemeColors } from '@/theme/use-theme';
@@ -31,26 +35,16 @@ interface Props {
   /** Kaydet işareti; onSave yoksa görünmez. */
   saved?: boolean;
   onSave?(): void;
+  /** Akışta ekranda en çok görünen video: sessiz ve döngüde kendiliğinden oynar. */
+  videoActive?: boolean;
+  /** Videoya dokununca tam ekran (verilmezse video kartın içinde oynat düğmesiyle açılır). */
+  onOpenVideo?(): void;
 }
 
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 const DOUBLE_TAP_MS = 260;
 
-/** "şimdi", "5 dk", "3 sa", "2 g"; bir haftadan eskiyse tarih. */
-export function useRelativeTime() {
-  const { t } = useTranslation();
-  const { language } = useSettings();
-  return (iso: string) => {
-    if (!iso) return '';
-    const at = new Date(iso);
-    const min = Math.floor((Date.now() - at.getTime()) / 60000);
-    if (min < 1) return t('time.now');
-    if (min < 60) return t('time.minutes', { count: min });
-    if (min < 60 * 24) return t('time.hours', { count: Math.floor(min / 60) });
-    if (min < 60 * 24 * 7) return t('time.days', { count: Math.floor(min / 1440) });
-    return at.toLocaleDateString(language ?? 'tr', { day: 'numeric', month: 'short' });
-  };
-}
+export { useRelativeTime };
 
 /**
  * Keşfet gönderisi (Instagram hissi; Eren'in örnek ekranı, 13. madde 30): çerçevesiz, ekran genişliğinde. Üstte halkalı
@@ -58,13 +52,16 @@ export function useRelativeTime() {
  * en altta kategori etiketi. Fotoğraf varsa ekran genişliğinde üstte durur, yazı altında. Yazıya ya da fotoğrafa iki kez dokunmak beğenir (kalp belirir); bir kez dokunmak uzun yazıyı açar. Yorumlar ayrı sayfada
  * değil, alttan açılan panelde (Eren, 7 Kasım).
  */
-export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, onFollow, saved, onSave }: Props) {
+export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, onFollow, saved, onSave, videoActive, onOpenVideo }: Props) {
   // Yorum panelinde yapılan değişiklikler (yorum sayısı, yorumları kapatma) kartta hemen görünür.
   const [changed, setChanged] = useState<Post | null>(null);
   const item = changed && changed.id === given.id ? changed : given;
   const [sheet, setSheet] = useState(false);
   const [removed, setRemoved] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(false);
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
   // Ad ve rozet güncel profilden (oturumda kişi başına bir okuma): ad değişikliği eski gönderilerde de görünür.
   const author = useAuthor(item.business ? undefined : item.authorUid);
   const biz = useBusinessInfo(item.business?.id);
@@ -75,7 +72,15 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
   const lang = language ?? 'tr';
   const reduce = useReduceMotion();
   const ago = useRelativeTime();
-  const district = repo.getDistrict(item.region.districtId)?.name;
+  // Resmî hesabın seçtiği yer: "Tüm Türkiye", il, "ilçe, il"; diğerlerinde ilçe.
+  const district =
+    item.reach === 'turkiye'
+      ? t('explore.official.reach.turkiye')
+      : item.reach === 'il'
+        ? repo.getProvince(item.region.provinceCode)?.name
+        : item.reach === 'ilce'
+          ? [repo.getDistrict(item.region.districtId)?.name, repo.getProvince(item.region.provinceCode)?.name].filter(Boolean).join(', ')
+          : repo.getDistrict(item.region.districtId)?.name;
   const heart = useRef(new Animated.Value(0)).current;
   const bump = useRef(new Animated.Value(1)).current;
   const lastTap = useRef(0);
@@ -155,6 +160,8 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
               {!item.business && author.locationVerified ? (
                 <MaterialIcons name="where-to-vote" size={14} color={c.accent} accessibilityLabel={t(`locationBadge.badge.${author.locationVerified}`)} />
               ) : null}
+              {!item.business && author.official ? <OfficialSeal /> : null}
+              {!item.business ? <BadgeIcons ids={author.badges} /> : null}
               {item.business && biz.verified ? (
                 <MaterialIcons name="verified" size={15} color={c.accent} accessibilityLabel={t('explore.verifiedBusiness')} />
               ) : null}
@@ -187,7 +194,7 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
       <View style={styles.body}>
         {photos.length ? (
           <View style={styles.photos}>
-            <PostPhotos photos={photos} maxWidth={640} onTap={tapBody} />
+            <PostPhotos photos={photos} maxWidth={640} onTap={tapBody} edits={item.edits} />
             {/* Kategori etiketi fotoğrafın üstünde (13. madde 35, Keşfet önizlemesi). */}
             <View pointerEvents="none" style={styles.photoTag}>
               <AppText style={styles.photoTagText}>{t(`explore.categories.${item.category}`)}</AppText>
@@ -195,7 +202,7 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
           </View>
         ) : item.video ? (
           <View style={styles.photos}>
-            <PostVideoView video={item.video} maxWidth={640} />
+            <PostVideoView video={item.video} maxWidth={640} active={videoActive} onOpen={onOpenVideo} edit={item.edits?.[0]} viewId={item.id} />
           </View>
         ) : null}
         {item.text ? (
@@ -211,6 +218,40 @@ export function PostCard({ item: given, liked, full, onLike, onAuthor, follow, o
           <MaterialIcons name="favorite" size={76} color={c.danger} />
         </Animated.View>
       </View>
+
+      {item.tags?.length ? (
+        // Etiketlenenler: "Ayşe K. ile" / "Ayşe K. ve 2 kişi ile"; dokununca liste, kişiye dokununca profili.
+        <Pressable accessibilityRole="button" accessibilityHint={t('explore.people.title')} onPress={() => setTagsOpen(true)} hitSlop={4} style={({ pressed }) => [styles.tagged, { opacity: pressed ? 0.7 : 1 }]}>
+          <MaterialIcons name="person-outline" size={16} color={c.textMuted} />
+          <AppText numberOfLines={1} style={[styles.taggedText, { color: c.textMuted }]}>
+            {item.tags.length === 1
+              ? t('explore.people.with', { name: item.tagNames?.[item.tags[0]] ?? '?' })
+              : t('explore.people.withMore', { name: item.tagNames?.[item.tags[0]] ?? '?', n: item.tags.length - 1 })}
+          </AppText>
+        </Pressable>
+      ) : null}
+      {item.tags?.length ? (
+        <Modal visible={tagsOpen} transparent animationType="fade" onRequestClose={() => setTagsOpen(false)}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={styles.backdrop} onPress={() => setTagsOpen(false)} />
+          <View style={[styles.sheet, { backgroundColor: c.background, paddingBottom: insets.bottom + spacing.md }]}>
+            <AppText variant="label" accessibilityRole="header">{t('explore.people.title')}</AppText>
+            {item.tags.map((u) => (
+              <Pressable
+                key={u}
+                accessibilityRole="link"
+                onPress={() => (setTagsOpen(false), router.push({ pathname: '/u/[uid]', params: { uid: u } }))}
+                style={({ pressed }) => [styles.tagRow, { opacity: pressed ? 0.7 : 1 }]}>
+                <View style={[styles.avatar, { backgroundColor: c.surfaceStrong }]}>
+                  <AppText style={[styles.initial, { color: c.accent }]}>{(item.tagNames?.[u] || '?').slice(0, 1).toLocaleUpperCase(lang)}</AppText>
+                  <AvatarPhoto uid={u} size={36} />
+                </View>
+                <AppText style={styles.flex} numberOfLines={1}>{item.tagNames?.[u] ?? '?'}</AppText>
+                <MaterialIcons name="chevron-right" size={20} color={c.textSoft} />
+              </Pressable>
+            ))}
+          </View>
+        </Modal>
+      ) : null}
 
       <View style={styles.actions}>
         <Animated.View style={{ transform: [{ scale: bump }] }}>
@@ -292,6 +333,11 @@ const styles = StyleSheet.create({
   lostText: { fontFamily: fonts.bodySemi, fontSize: 14 },
   seeComments: { fontSize: 13, paddingBottom: 4 },
   foot: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  tagged: { flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 32, alignSelf: 'flex-start' },
+  taggedText: { fontFamily: fonts.bodyMedium, fontSize: 13 },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
+  sheet: { paddingHorizontal: GUTTER, paddingTop: spacing.md, gap: spacing.xs, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, maxHeight: '70%' },
+  tagRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 48 },
   tag: { fontFamily: fonts.bodySemi, fontSize: 12 },
   targets: { flex: 1, fontSize: 11 },
 });

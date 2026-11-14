@@ -1,7 +1,8 @@
 import { deleteObject, getDownloadURL, ref, uploadBytes, type FirebaseStorage } from 'firebase/storage';
 
+import { assertWritable } from './metered';
 import { mediaPath, PHOTO_UPLOAD, type MediaKind, type Photo } from '../media/photo';
-import { POST_LIMITS, POST_VIDEO_TYPES, postPhotoPath, postVideoPath, type PostPhoto, type PostVideo, type PostVideoExt } from '../posts/posts';
+import { POST_LIMITS, POST_VIDEO_TYPES, postPhotoPath, postPosterPath, postVideoPath, type PostPhoto, type PostVideo, type PostVideoExt } from '../posts/posts';
 
 /** Küçültülmüş JPEG: telefonda yerel dosya adresi (`uri`), panelde tarayıcıdaki veri (`blob`). */
 export interface PreparedPhoto {
@@ -22,6 +23,7 @@ async function put(storage: FirebaseStorage, path: string, p: PreparedPhoto): Pr
   const blob = p.blob ?? (await (await fetch(p.uri!)).blob());
   if (blob.size > PHOTO_UPLOAD.maxBytes) throw new PhotoTooLargeError();
   const r = ref(storage, path);
+  assertWritable('storage');
   await uploadBytes(r, blob, { contentType: 'image/jpeg' });
   return { path, url: await getDownloadURL(r), width: Math.round(p.width), height: Math.round(p.height) };
 }
@@ -33,6 +35,8 @@ export interface PreparedVideo {
   width: number;
   height: number;
   durationSec: number;
+  /** Düzenleyicide seçilen kapak karesi (yerel JPEG). */
+  coverUri?: string;
 }
 
 export class VideoTooLargeError extends Error {
@@ -47,8 +51,23 @@ export async function uploadPostVideo(storage: FirebaseStorage, uid: string, pos
   if (blob.size > POST_LIMITS.videoBytes) throw new VideoTooLargeError();
   const path = postVideoPath(uid, postId, v.ext);
   const r = ref(storage, path);
+  assertWritable('storage');
   await uploadBytes(r, blob, { contentType: POST_VIDEO_TYPES[v.ext] });
-  return { path, url: await getDownloadURL(r), width: Math.round(v.width), height: Math.round(v.height), durationSec: Math.round(v.durationSec) };
+  const out: PostVideo = { path, url: await getDownloadURL(r), width: Math.round(v.width), height: Math.round(v.height), durationSec: Math.round(v.durationSec) };
+  // Kapak yüklenemezse video kapaksız paylaşılır.
+  if (v.coverUri) {
+    try {
+      const c = await (await fetch(v.coverUri)).blob();
+      const cr = ref(storage, postPosterPath(uid, postId));
+      if (c.size <= 400_000) {
+        await uploadBytes(cr, c, { contentType: 'image/jpeg' });
+        out.poster = await getDownloadURL(cr);
+      }
+    } catch {
+      /* kapaksız devam */
+    }
+  }
+  return out;
 }
 
 /** Gönderi fotoğraflarını sırayla yükler (`posts/{uid}/{postId}/{sıra}.jpg`). */

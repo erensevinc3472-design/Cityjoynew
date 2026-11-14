@@ -27,6 +27,7 @@ export function MediaPicker({
   disabled,
   round,
   pick,
+  visibleCount,
 }: {
   label: string;
   hint?: string;
@@ -39,6 +40,11 @@ export function MediaPicker({
   round?: boolean;
   /** Galeriden kare kırpma (profil fotoğrafı) ve en uzun kenar. */
   pick?: { square?: boolean; maxEdge?: number };
+  /**
+   * Pro bitince vitrin: ilk bu kadarı herkese görünür, gerisi kilitli (silinmez). Verilirse her fotoğrafta "Başa al"
+   * düğmesi çıkar; sahibi hangisinin görüneceğini sırayla seçer.
+   */
+  visibleCount?: number;
 }) {
   const { t } = useTranslation();
   const c = useThemeColors();
@@ -69,6 +75,22 @@ export function MediaPicker({
         {photos.map((p, i) => (
           <View key={p.path} style={[styles.thumb, shape, { backgroundColor: c.surfaceStrong }]}>
             <Image source={{ uri: p.url }} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityLabel={t('explore.photos.label', { n: i + 1, total: photos.length })} />
+            {visibleCount !== undefined && i >= visibleCount ? (
+              <View style={styles.locked} accessibilityLabel={t('media.locked')}>
+                <MaterialIcons name="lock-outline" size={20} color="#FFFFFF" />
+              </View>
+            ) : null}
+            {visibleCount !== undefined && i > 0 ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${t('media.makeFirst')} (${i + 1})`}
+                disabled={disabled || busy}
+                onPress={() => onChange([p, ...photos.filter((_, k) => k !== i)])}
+                hitSlop={10}
+                style={styles.first}>
+                <MaterialIcons name="first-page" size={16} color="#FFFFFF" />
+              </Pressable>
+            ) : null}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={`${t('explore.photos.remove')} (${i + 1})`}
@@ -108,6 +130,8 @@ const styles = StyleSheet.create({
   thumb: { width: 76, height: 76, borderRadius: radius.md, overflow: 'hidden' },
   round: { borderRadius: 38 },
   remove: { position: 'absolute', top: 4, end: 4, width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' },
+  locked: { position: 'absolute', top: 0, bottom: 0, start: 0, end: 0, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center' },
+  first: { position: 'absolute', bottom: 4, start: 4, width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' },
   add: { borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', gap: 2, padding: 4 },
   addText: { fontSize: 11, lineHeight: 14, textAlign: 'center' },
 });

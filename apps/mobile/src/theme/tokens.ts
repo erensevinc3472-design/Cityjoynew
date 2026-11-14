@@ -100,6 +100,10 @@ export const fonts = {
   /** Benim Şehrim alt sayfalarında yumuşak tırnaklı başlık (cam taslağı, 7 Kasım 2026). */
   serif: 'Fraunces_500Medium',
   serifSemi: 'Fraunces_600SemiBold',
+  /** Paylaşım düzenleyicisi yazı tipleri. */
+  hand: 'Caveat_600SemiBold',
+  poster: 'Anton_400Regular',
+  mono: 'SpaceMono_700Bold',
 } as const;
 
 /** Dokunma alanı en az 44 nokta (erişilebilirlik). */

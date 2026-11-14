@@ -13,6 +13,7 @@ import { createNotificationTriggers } from '@cityjoy/shared/firebase';
 import { firestore } from '../lib/firebase';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 /**
  * Bildirimler (PROJE.md 5.12, 7). Şimdilik tetikleyiciler: hangi olayların kullanıcının bildirim merkezine düştüğü
@@ -61,7 +62,7 @@ export function NotificationsPage() {
       <header className="page-head">
         <div>
           <h1>{t('notifications.title')}</h1>
-          <p className="meta">{t('notifications.intro')}</p>
+          <Intro text={t('notifications.intro')} />
         </div>
       </header>
       <p className="note">{t('notifications.sendingSoon')}</p>

@@ -6,6 +6,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Belge yolu (kural boyutu sınırı için kısa yazım).
+    function dp(c, i) {
+      return /databases/$(database)/documents/$(c)/$(i);
+    }
+    function dp2(c, i, s, j) {
+      return /databases/$(database)/documents/$(c)/$(i)/$(s)/$(j);
+    }
+    function me() {
+      return request.auth.uid;
+    }
+
     function signedIn() {
       return request.auth != null;
     }
@@ -16,7 +27,7 @@ service cloud.firestore {
 
     // Admin listesi yalnızca Firebase konsolundan (ya da sunucudan) yazılır.
     function isAdmin() {
-      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return signedIn() && exists(dp('admins', request.auth.uid));
     }
 
     // ---- Kişi yetkileri (PROJE.md 6.7): grants/{e-posta}__{bölge}. Kişi doğrulanmış e-postasıyla tanınır;
@@ -29,7 +40,7 @@ service cloud.firestore {
       return request.auth.token.email;
     }
     function grantPath(key) {
-      return /databases/$(database)/documents/grants/$(myEmail() + '__' + key);
+      return dp('grants', myEmail() + '__' + key);
     }
     function grantOk(g, module, action) {
       return g.get('revokedAt', null) == null
@@ -61,6 +72,12 @@ service cloud.firestore {
       return c is map
         && c.keys().hasOnly(['granted', 'at', 'textVersion'])
         && c.granted is bool && c.at is string && c.textVersion is string;
+    }
+
+    // Resmî CityJoy hesabı (Eren, 14 Kasım 2026): işareti yalnızca admin koyar (publicProfiles.official).
+    function isOfficialAccount() {
+      return signedIn() && exists(dp('publicProfiles', me()))
+        && get(dp('publicProfiles', me())).data.get('official', false) == true;
     }
 
     function validLocation(loc) {
@@ -114,12 +131,13 @@ service cloud.firestore {
         : after.locationChangedAt == request.time
           && (neighbourhoodOf(before) == null
               || before.get('locationChangedAt', null) == null
-              || request.time > before.locationChangedAt + duration.value(30, 'd'));
+              || request.time > before.locationChangedAt + duration.value(30, 'd')
+              || isAdmin());
     }
 
     // Konum rozeti: kişinin kaydındaki doğrulama ile herkese açık profildeki rozet aynı yazımda birlikte değişir.
     function publicProfilePath(uid) {
-      return /databases/$(database)/documents/publicProfiles/$(uid);
+      return dp('publicProfiles', uid);
     }
     function locationCheckPaired(uid) {
       return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['locationCheck'])
@@ -157,11 +175,21 @@ service cloud.firestore {
       // Keşfet'te kaydedilen gönderiler: yalnızca kişinin kendisi.
       match /savedPosts/{postId} {
         allow read, delete: if isSelf(uid);
-        function _k3(nw) {
-          return isSelf(uid) && nw.keys().hasOnly(['createdAt'])
-          && nw.createdAt == request.time;
+        // folder: kişinin klasörü (saveFolders), yoksa "Tümü"; güncellemede yalnız klasör değişir.
+        function _k3(nw, t) {
+          return isSelf(uid) && nw.keys().hasOnly(['createdAt', 'folder'])
+          && nw.createdAt == t && (!('folder' in nw) || (nw.folder is string && nw.folder.size() <= 40));
         }
-        allow create: if _k3(request.resource.data);
+        allow create: if _k3(request.resource.data, request.time);
+        allow update: if _k3(request.resource.data, resource.data.createdAt);
+      }
+      match /saveFolders/{f} {
+        allow read, delete: if isSelf(uid);
+        function _kf(nw) {
+          return isSelf(uid) && nw.keys().hasOnly(['name', 'createdAt']) && nw.name is string
+          && nw.name.size() > 0 && nw.name.size() <= 40 && nw.createdAt is timestamp;
+        }
+        allow create, update: if _kf(request.resource.data);
       }
 
       // Çarşı favorileri: yalnızca kişinin kendisi.
@@ -189,6 +217,11 @@ service cloud.firestore {
           && nw.updatedAt == request.time;
         }
         allow create, update: if _k5(request.resource.data);
+        // "Beni kim etiketleyebilir" (sunucu etiketlerken okur).
+        allow create, update: if isSelf(uid) && id == 'privacy'
+          && request.resource.data.keys().hasOnly(['tagPolicy', 'updatedAt'])
+          && request.resource.data.tagPolicy in ['herkes', 'takip', 'kimse']
+          && request.resource.data.updatedAt == request.time;
       }
     }
 
@@ -235,15 +268,16 @@ service cloud.firestore {
       allow read: if true;
       function _k8(nw) {
         return isAdmin()
-        && nw.keys().hasOnly(['parentId', 'names', 'icon', 'order', 'active', 'urgent', 'updatedAt', 'updatedBy'])
+        && nw.keys().hasOnly(['parentId', 'names', 'icon', 'order', 'active', 'urgent', 'keywords', 'updatedAt', 'updatedBy'])
         && validLocalized(nw.names)
         && nw.icon is string && nw.icon.size() <= 40
         && nw.order is int && nw.active is bool
         && (!('urgent' in nw) || nw.urgent is bool)
+        && (!('keywords' in nw) || (nw.keywords is string && nw.keywords.size() <= 300))
         && (nw.parentId == null
             || (nw.parentId is string && nw.parentId != id
-                && existsAfter(/databases/$(database)/documents/serviceCategories/$(nw.parentId))
-                && getAfter(/databases/$(database)/documents/serviceCategories/$(nw.parentId)).data.parentId == null))
+                && existsAfter(dp('serviceCategories', nw.parentId))
+                && getAfter(dp('serviceCategories', nw.parentId)).data.parentId == null))
         && stamped(nw);
       }
       allow create, update: if _k8(request.resource.data);
@@ -286,7 +320,7 @@ service cloud.firestore {
                 && provinceAllows('hizmet-kategorileri', 'onayla', od.provinceCode)))
         && nw.diff(od).affectedKeys().hasOnly(['status', 'reviewedBy', 'reviewedAt'])
         && nw.status == 'incelendi'
-        && nw.reviewedBy == request.auth.uid
+        && nw.reviewedBy == me()
         && nw.reviewedAt == request.time;
       }
       allow update: if _k10(request.resource.data, resource.data);
@@ -370,13 +404,13 @@ service cloud.firestore {
         && (u.size() < 3 || validManager(m[u[2]]));
     }
     function isManagerOf(b) {
-      return signedIn() && request.auth.uid in b.get('managerUids', []);
+      return signedIn() && me() in b.get('managerUids', []);
     }
     function managerCan(b, perm) {
-      return isManagerOf(b) && b.managers[request.auth.uid][perm] == true;
+      return isManagerOf(b) && b.managers[me()][perm] == true;
     }
     function businessFollowPath(bid, uid) {
-      return /databases/$(database)/documents/businessFollows/$(bid + '_' + uid);
+      return dp('businessFollows', bid + '_' + uid);
     }
 
     // Ara (PROJE.md 5.10): addan / yazıdan üretilen arama anahtarları (kelime başları), yalnızca sayısı sınırlanır.
@@ -391,16 +425,16 @@ service cloud.firestore {
     }
 
     function businessPath(id) {
-      return /databases/$(database)/documents/businesses/$(id);
+      return dp('businesses', id);
     }
 
     function phoneClaimedBy(phone, id) {
-      return existsAfter(/databases/$(database)/documents/businessPhones/$(phone))
-        && getAfter(/databases/$(database)/documents/businessPhones/$(phone)).data.businessId == id;
+      return existsAfter(dp('businessPhones', phone))
+        && getAfter(dp('businessPhones', phone)).data.businessId == id;
     }
 
     function myReviewPath(bid) {
-      return /databases/$(database)/documents/businesses/$(bid)/reviews/$(request.auth.uid);
+      return dp2('businesses', bid, 'reviews', me());
     }
 
     // Yayındaki değerlendirmenin yıldızı ve sayısı (gizlenen sayılmaz), yazımdan önce ve sonra.
@@ -434,7 +468,9 @@ service cloud.firestore {
         && nw.keys().hasOnly(businessContentKeys().concat(
              ['ownerUid', 'status', 'verification', 'membership', 'rating', 'createdAt', 'updatedAt']))
         && validBusinessContent(nw)
-        && nw.ownerUid == request.auth.uid
+        && nw.ownerUid == me()
+        // Askıdaki işletmenin sahibi askı süresince yeni işletme açamaz.
+        && !exists(dp('businessBans', me()))
         && nw.status == 'yayinda'
         && nw.verification == {'status': 'dogrulanmadi'}
         && nw.membership == {'tier': 'ucretsiz'}
@@ -471,9 +507,9 @@ service cloud.firestore {
       function _k14(nw, od) {
         return isManagerOf(od)
         && nw.diff(od).affectedKeys().hasOnly(['managers', 'managerUids', 'updatedAt'])
-        && !(request.auth.uid in nw.managerUids)
+        && !(me() in nw.managerUids)
         && nw.managerUids.size() == od.managerUids.size() - 1
-        && nw.managers.diff(od.managers).affectedKeys().hasOnly([request.auth.uid])
+        && nw.managers.diff(od.managers).affectedKeys().hasOnly([me()])
         && validManagers(nw);
       }
       allow update: if _k14(request.resource.data, resource.data);
@@ -482,9 +518,9 @@ service cloud.firestore {
         return signedIn()
         && nw.diff(od).affectedKeys().hasOnly(['followerCount'])
         && ((nw.followerCount == od.get('followerCount', 0) + 1
-              && !exists(businessFollowPath(id, request.auth.uid)) && existsAfter(businessFollowPath(id, request.auth.uid)))
+              && !exists(businessFollowPath(id, me())) && existsAfter(businessFollowPath(id, me())))
             || (nw.followerCount == od.get('followerCount', 0) - 1
-              && exists(businessFollowPath(id, request.auth.uid)) && !existsAfter(businessFollowPath(id, request.auth.uid))));
+              && exists(businessFollowPath(id, me())) && !existsAfter(businessFollowPath(id, me()))));
       }
       allow update: if _k15(request.resource.data, resource.data);
       // Değerlendirme yazan kişi: yalnızca yıldız toplamı, tam olarak kendi değerlendirmesi kadar değişir.
@@ -514,14 +550,19 @@ service cloud.firestore {
       allow delete: if isSelf(resource.data.ownerUid);
     }
 
-    // İşletme takibi (belge kimliği = işletme_kişi). Kişi yalnızca kendi takiplerini görür; sayaç aynı yazımda değişir.
+    // İşletme takibi (belge kimliği = işletme_kişi). Kişi kendi takiplerini görür; takipçi listesini yalnızca işletmenin
+    // sahibi ve yetkilileri görür (14 Kasım 2026; sayı herkese açık, kim takip ediyor değil). Sayaç aynı yazımda değişir.
+    function businessTeamOf(bid) {
+      let b = get(businessPath(bid)).data;
+      return b.ownerUid == me() || me() in b.get('managerUids', []);
+    }
     match /businessFollows/{fid} {
-      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow read: if signedIn() && (resource == null || resource.data.uid == me() || businessTeamOf(resource.data.businessId));
       function _k18(nw) {
         return signedIn()
         && nw.keys().hasOnly(['uid', 'businessId', 'createdAt'])
-        && nw.uid == request.auth.uid
-        && fid == nw.businessId + '_' + request.auth.uid
+        && nw.uid == me()
+        && fid == nw.businessId + '_' + me()
         && nw.createdAt == request.time
         && get(businessPath(nw.businessId)).data.status == 'yayinda'
         && getAfter(businessPath(nw.businessId)).data.followerCount
@@ -529,7 +570,7 @@ service cloud.firestore {
       }
       allow create: if _k18(request.resource.data);
       // İşletme silinmişse (ya da sayaç birlikte azalıyorsa) takip kaydı silinir.
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid
+      allow delete: if signedIn() && resource.data.uid == me()
         && (!existsAfter(businessPath(resource.data.businessId))
             || getAfter(businessPath(resource.data.businessId)).data.followerCount
                  == get(businessPath(resource.data.businessId)).data.get('followerCount', 0) - 1);
@@ -542,13 +583,13 @@ service cloud.firestore {
       function _k19(nw) {
         return signedIn()
         && nw.keys().hasOnly(['businessId', 'ownerUid'])
-        && nw.ownerUid == request.auth.uid
+        && nw.ownerUid == me()
         && existsAfter(businessPath(nw.businessId))
-        && getAfter(businessPath(nw.businessId)).data.ownerUid == request.auth.uid
+        && getAfter(businessPath(nw.businessId)).data.ownerUid == me()
         && getAfter(businessPath(nw.businessId)).data.phone == phone;
       }
       allow create: if _k19(request.resource.data);
-      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid
+      allow delete: if signedIn() && resource.data.ownerUid == me()
         && (!existsAfter(businessPath(resource.data.businessId))
             || getAfter(businessPath(resource.data.businessId)).data.phone != phone);
       allow update: if false;
@@ -556,13 +597,13 @@ service cloud.firestore {
 
     // Uygulamadan arama / WhatsApp kaydı: değerlendirme yazabilmenin şartı. Yalnızca sahibi görür.
     match /contacts/{id} {
-      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      allow read: if signedIn() && (resource == null || resource.data.uid == me());
+      allow delete: if signedIn() && resource.data.uid == me();
       function _k20(nw) {
         return signedIn()
         && nw.keys().hasOnly(['uid', 'businessId', 'at'])
-        && nw.uid == request.auth.uid
-        && id == nw.businessId + '_' + request.auth.uid
+        && nw.uid == me()
+        && id == nw.businessId + '_' + me()
         && nw.at == request.time;
       }
       allow create: if _k20(request.resource.data);
@@ -599,7 +640,7 @@ service cloud.firestore {
       return get(businessPath(d.businessId)).data;
     }
     function dealBizOk(d) {
-      return dealBiz(d).ownerUid == request.auth.uid
+      return dealBiz(d).ownerUid == me()
         && dealBiz(d).status == 'yayinda'
         && dealBiz(d).verification.status == 'dogrulandi'
         // Fırsat yalnızca Pro'da (Karar Eren, 7 Kasım 2026); eski 'premium' Pro sayılır.
@@ -613,7 +654,7 @@ service cloud.firestore {
         return signedIn()
         && nw.keys().hasOnly(dealContentKeys().concat(['businessName', 'provinceCode', 'districtId', 'ownerUid', 'status', 'stats', 'reportCount', 'createdAt', 'updatedAt']))
         && validDeal(nw)
-        && nw.ownerUid == request.auth.uid
+        && nw.ownerUid == me()
         && dealBizOk(nw)
         && nw.provinceCode == dealBiz(nw).location.provinceCode
         && nw.districtId == dealBiz(nw).location.districtId
@@ -653,8 +694,8 @@ service cloud.firestore {
         return signedIn()
         && nw.diff(od).affectedKeys().hasOnly(['reportCount'])
         && nw.reportCount == od.reportCount + 1
-        && !exists(/databases/$(database)/documents/dealReports/$(id + '_' + request.auth.uid))
-        && existsAfter(/databases/$(database)/documents/dealReports/$(id + '_' + request.auth.uid));
+        && !exists(dp('dealReports', id + '_' + me()))
+        && existsAfter(dp('dealReports', id + '_' + me()));
       }
       allow update: if _k24(request.resource.data, resource.data);
       // İl yöneticisi / moderatör gizler ya da geri açar (geri açılan fırsatı işletme yeniden başlatır).
@@ -662,7 +703,7 @@ service cloud.firestore {
         return provinceAllows('moderasyon', 'duzenle', od.provinceCode)
         && nw.diff(od).affectedKeys().hasOnly(['status', 'moderatedBy', 'updatedAt'])
         && nw.status in ['gizlendi', 'durduruldu']
-        && nw.moderatedBy == request.auth.uid
+        && nw.moderatedBy == me()
         && nw.updatedAt == request.time;
       }
       allow update: if _k25(request.resource.data, resource.data);
@@ -679,12 +720,12 @@ service cloud.firestore {
       allow read: if isSelf(resource.data.uid) || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
       function _k27(nw) {
         return signedIn()
-        && rid == nw.dealId + '_' + request.auth.uid
+        && rid == nw.dealId + '_' + me()
         && nw.keys().hasOnly(['dealId', 'uid', 'reason', 'provinceCode', 'createdAt'])
-        && nw.uid == request.auth.uid
+        && nw.uid == me()
         && nw.reason in ['yaniltici', 'gecersiz', 'uygunsuz', 'diger']
-        && exists(/databases/$(database)/documents/deals/$(nw.dealId))
-        && nw.provinceCode == get(/databases/$(database)/documents/deals/$(nw.dealId)).data.provinceCode
+        && exists(dp('deals', nw.dealId))
+        && nw.provinceCode == get(dp('deals', nw.dealId)).data.provinceCode
         && nw.createdAt == request.time;
       }
       allow create: if _k27(request.resource.data);
@@ -694,22 +735,22 @@ service cloud.firestore {
     // ---- Sosyal Harmoni: Anketler, Yarışmalar, Şehir Kulüpleri (13. madde 35). Oy: giriş + doğrulanmış e-posta
     // (telefon doğrulaması Blaze ile), seçenek / yarışmacı başına tek oy, günlük oy sınırı (yeni hesaba düşük). ----
     function pollPath(id) {
-      return /databases/$(database)/documents/polls/$(id);
+      return dp('polls', id);
     }
     function pollVotePath(id) {
-      return /databases/$(database)/documents/pollVotes/$(id);
+      return dp('pollVotes', id);
     }
     function contestPath(id) {
-      return /databases/$(database)/documents/contests/$(id);
+      return dp('contests', id);
     }
     function entryPath(cid, eid) {
-      return /databases/$(database)/documents/contests/$(cid)/entries/$(eid);
+      return dp2('contests', cid, 'entries', eid);
     }
     function contestVotePath(id) {
-      return /databases/$(database)/documents/contestVotes/$(id);
+      return dp('contestVotes', id);
     }
     function oyOk() {
-      return usageOk('u-' + request.auth.uid, 'oy', userLimit('oy', 30, 5));
+      return usageOk('u-' + me(), 'oy', userLimit('oy', 30, 5));
     }
     function validPoll(d) {
       return d.question is string && d.question.size() >= 5 && d.question.size() <= 140
@@ -728,12 +769,12 @@ service cloud.firestore {
         return verified() && od.status == 'yayinda' && request.time < od.endsAt
         && nw.diff(od).affectedKeys().hasOnly(['counts', 'voteCount'])
         && nw.voteCount == od.voteCount + 1
-        && !exists(pollVotePath(id + '_' + request.auth.uid))
-        && existsAfter(pollVotePath(id + '_' + request.auth.uid))
+        && !exists(pollVotePath(id + '_' + me()))
+        && existsAfter(pollVotePath(id + '_' + me()))
         && nw.counts.diff(od.counts).affectedKeys()
-             == [getAfter(pollVotePath(id + '_' + request.auth.uid)).data.optionId].toSet()
-        && nw.counts[getAfter(pollVotePath(id + '_' + request.auth.uid)).data.optionId]
-             == od.counts[getAfter(pollVotePath(id + '_' + request.auth.uid)).data.optionId] + 1;
+             == [getAfter(pollVotePath(id + '_' + me())).data.optionId].toSet()
+        && nw.counts[getAfter(pollVotePath(id + '_' + me())).data.optionId]
+             == od.counts[getAfter(pollVotePath(id + '_' + me())).data.optionId] + 1;
       }
       allow update: if _k28(request.resource.data, resource.data);
       allow delete: if isAdmin();
@@ -741,12 +782,12 @@ service cloud.firestore {
 
     // Oy gizli: yalnızca oy veren okur; değiştirilemez, silinemez.
     match /pollVotes/{vid} {
-      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow read: if signedIn() && (resource == null || resource.data.uid == me());
       function _k29(nw) {
         return verified()
-        && vid == nw.pollId + '_' + request.auth.uid
+        && vid == nw.pollId + '_' + me()
         && nw.keys().hasOnly(['pollId', 'uid', 'optionId', 'createdAt'])
-        && nw.uid == request.auth.uid
+        && nw.uid == me()
         && nw.createdAt == request.time
         && get(pollPath(nw.pollId)).data.status == 'yayinda'
         && request.time < get(pollPath(nw.pollId)).data.endsAt
@@ -798,24 +839,24 @@ service cloud.firestore {
         allow update: if _k32(request.resource.data);
         // Oy veren: sayı bir artar; oy belgesi aynı işlemde ilk kez yazılır. Kendine oy yok.
         function _k33(nw, od) {
-          return verified() && request.auth.uid != eid
+          return verified() && me() != eid
           && nw.diff(od).affectedKeys().hasOnly(['voteCount'])
           && nw.voteCount == od.voteCount + 1
-          && !exists(contestVotePath(cid + '_' + eid + '_' + request.auth.uid))
-          && existsAfter(contestVotePath(cid + '_' + eid + '_' + request.auth.uid));
+          && !exists(contestVotePath(cid + '_' + eid + '_' + me()))
+          && existsAfter(contestVotePath(cid + '_' + eid + '_' + me()));
         }
         allow update: if _k33(request.resource.data, resource.data);
       }
     }
 
     match /contestVotes/{vid} {
-      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow read: if signedIn() && (resource == null || resource.data.uid == me());
       function _k34(nw) {
         return verified()
         && nw.keys().hasOnly(['contestId', 'entryId', 'uid', 'createdAt'])
-        && vid == nw.contestId + '_' + nw.entryId + '_' + request.auth.uid
-        && nw.uid == request.auth.uid
-        && nw.entryId != request.auth.uid
+        && vid == nw.contestId + '_' + nw.entryId + '_' + me()
+        && nw.uid == me()
+        && nw.entryId != me()
         && nw.createdAt == request.time
         && get(contestPath(nw.contestId)).data.status == 'oylama'
         && request.time < get(contestPath(nw.contestId)).data.voteEndsAt
@@ -871,11 +912,11 @@ service cloud.firestore {
       }
 
       allow read: if resource == null || resource.data.status == 'yayinda' || isSelf(uid) || isAdmin()
-        || (signedIn() && biz().ownerUid == request.auth.uid);
+        || (signedIn() && biz().ownerUid == me());
       function _k35(nw) {
         return isSelf(uid)
         && biz().status == 'yayinda' && biz().ownerUid != uid
-        && exists(/databases/$(database)/documents/contacts/$(bid + '_' + uid))
+        && exists(dp('contacts', bid + '_' + uid))
         && nw.keys().hasOnly(['uid', 'stars', 'text', 'authorName', 'status', 'createdAt', 'updatedAt'])
         && nw.uid == uid
         && validReview(nw)
@@ -896,7 +937,7 @@ service cloud.firestore {
       allow update: if _k36(request.resource.data, resource.data);
       // İşletme sahibinin (ya da cevap izni olan yetkilinin) cevabı.
       function _k37(nw) {
-        return signedIn() && (biz().ownerUid == request.auth.uid || managerCan(biz(), 'reply'))
+        return signedIn() && (biz().ownerUid == me() || managerCan(biz(), 'reply'))
         && nw.diff(resource.data).affectedKeys().hasOnly(['reply'])
         && nw.reply.keys().hasOnly(['text', 'at'])
         && nw.reply.text is string
@@ -915,12 +956,12 @@ service cloud.firestore {
       allow delete: if (isSelf(uid)
             && (!exists(businessPath(bid)) || resource.data.status != 'yayinda' || !existsAfter(businessPath(bid))
                 || getAfter(businessPath(bid)).data.rating.count == biz().rating.count - 1))
-        || (signedIn() && exists(businessPath(bid)) && biz().ownerUid == request.auth.uid && !existsAfter(businessPath(bid)));
+        || (signedIn() && exists(businessPath(bid)) && biz().ownerUid == me() && !existsAfter(businessPath(bid)));
     }
 
     // Hesap silmede kullanıcının tüm değerlendirmelerini bulmak için (yalnızca kendi yorumları).
     match /{path=**}/reviews/{rid} {
-      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow read: if signedIn() && resource.data.uid == me();
     }
 
     // Değerlendirme şikâyetleri: kişi başına yorum başına bir şikâyet; admin inceler.
@@ -928,10 +969,10 @@ service cloud.firestore {
       function _k39(nw) {
         return signedIn()
         && nw.keys().hasOnly(['businessId', 'reviewUid', 'reporterUid', 'reason', 'status', 'createdAt'])
-        && nw.reporterUid == request.auth.uid
-        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
-        && nw.reviewUid != request.auth.uid
-        && id == nw.businessId + '_' + nw.reviewUid + '_' + request.auth.uid
+        && nw.reporterUid == me()
+        && usageOk('u-' + me(), 'sikayet', limitOf('sikayet', 20))
+        && nw.reviewUid != me()
+        && id == nw.businessId + '_' + nw.reviewUid + '_' + me()
         && nw.reason in ['hakaret', 'sahte', 'kisisel-veri', 'alakasiz', 'diger']
         && nw.status == 'yeni'
         && nw.createdAt == request.time;
@@ -949,14 +990,14 @@ service cloud.firestore {
 
     // ---- SOS - Aileme haber ver (PROJE.md 5.4) ----
     function familyLinkPath(a, b) {
-      return /databases/$(database)/documents/familyLinks/$(a < b ? a + '_' + b : b + '_' + a);
+      return dp('familyLinks', a < b ? a + '_' + b : b + '_' + a);
     }
     function isFamily(other) {
-      return exists(familyLinkPath(request.auth.uid, other));
+      return exists(familyLinkPath(me(), other));
     }
     // Alıcıların hepsi gönderenin aile listesinde olmalı (en çok 10 kişi; kurallar döngü kuramadığı için tek tek).
     function recipientOk(r, i) {
-      return r.size() <= i || (r[i] is string && r[i] != request.auth.uid && isFamily(r[i]));
+      return r.size() <= i || (r[i] is string && r[i] != me() && isFamily(r[i]));
     }
     function recipientsAreFamily(r) {
       return r is list && r.size() >= 1 && r.size() <= 10
@@ -973,12 +1014,12 @@ service cloud.firestore {
     // Davet kodu: tek kullanımlık, 24 saat. Kod gizli anahtar gibidir; tekil okunur, listelenmez (yalnızca sahibi).
     match /familyInvites/{code} {
       allow get: if signedIn();
-      allow list: if signedIn() && resource.data.fromUid == request.auth.uid;
+      allow list: if signedIn() && resource.data.fromUid == me();
       function _k41(nw) {
         return signedIn()
         && code.matches('^[A-HJKMNP-Z2-9]{8}$')
         && nw.keys().hasOnly(['fromUid', 'fromName', 'createdAt', 'expiresAt'])
-        && nw.fromUid == request.auth.uid
+        && nw.fromUid == me()
         && nw.fromName is string && nw.fromName.size() <= 60
         && nw.createdAt == request.time
         && nw.expiresAt is timestamp
@@ -989,32 +1030,32 @@ service cloud.firestore {
       // Kabul: başkası, süresi dolmadan, bir kez; aile bağı aynı toplu yazımda kurulur.
       function _k42(nw, od) {
         return signedIn()
-        && request.auth.uid != od.fromUid
+        && me() != od.fromUid
         && !('usedBy' in od)
         && request.time < od.expiresAt
         && nw.diff(od).affectedKeys().hasOnly(['usedBy', 'usedAt'])
-        && nw.usedBy == request.auth.uid
+        && nw.usedBy == me()
         && nw.usedAt == request.time
-        && existsAfter(familyLinkPath(request.auth.uid, od.fromUid));
+        && existsAfter(familyLinkPath(me(), od.fromUid));
       }
       allow update: if _k42(request.resource.data, resource.data);
-      allow delete: if signedIn() && resource.data.fromUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.fromUid == me();
     }
 
     // Aile bağı (iki kişi, karşılıklı). Yalnızca iki taraf görür; her biri istediği an siler (ayrılır).
     match /familyLinks/{id} {
       function inviteAfter() {
-        return getAfter(/databases/$(database)/documents/familyInvites/$(request.resource.data.inviteCode)).data;
+        return getAfter(dp('familyInvites', request.resource.data.inviteCode)).data;
       }
       function inviteBefore() {
-        return get(/databases/$(database)/documents/familyInvites/$(request.resource.data.inviteCode)).data;
+        return get(dp('familyInvites', request.resource.data.inviteCode)).data;
       }
-      allow read: if signedIn() && (resource == null || request.auth.uid in resource.data.members);
+      allow read: if signedIn() && (resource == null || me() in resource.data.members);
       function _k43(nw) {
         return signedIn()
         && nw.keys().hasOnly(['members', 'names', 'inviteCode', 'createdAt'])
         && nw.members is list && nw.members.size() == 2
-        && request.auth.uid in nw.members
+        && me() in nw.members
         && nw.members[0] < nw.members[1]
         && id == nw.members[0] + '_' + nw.members[1]
         && nw.names is map && nw.names.keys().hasOnly(nw.members)
@@ -1023,23 +1064,23 @@ service cloud.firestore {
         && !('usedBy' in inviteBefore())
         && request.time < inviteBefore().expiresAt
         && inviteBefore().fromUid in nw.members
-        && inviteBefore().fromUid != request.auth.uid
-        && inviteAfter().usedBy == request.auth.uid;
+        && inviteBefore().fromUid != me()
+        && inviteAfter().usedBy == me();
       }
       allow create: if _k43(request.resource.data);
       allow update: if false;
-      allow delete: if signedIn() && request.auth.uid in resource.data.members;
+      allow delete: if signedIn() && me() in resource.data.members;
     }
 
     // SOS kaydı: yalnızca gönderen ve alıcılar görür; panel/admin göremez (gizlilik).
     match /sosAlerts/{id} {
-      allow read: if signedIn() && (resource == null || resource.data.fromUid == request.auth.uid
-        || request.auth.uid in resource.data.recipients);
+      allow read: if signedIn() && (resource == null || resource.data.fromUid == me()
+        || me() in resource.data.recipients);
       function _k44(nw) {
         return signedIn()
         && nw.keys().hasOnly(['fromUid', 'fromName', 'recipients', 'test', 'status', 'location',
              'createdAt', 'liveUntil', 'deleteAt', 'deliveredTo', 'seenBy'])
-        && nw.fromUid == request.auth.uid
+        && nw.fromUid == me()
         && nw.fromName is string && nw.fromName.size() <= 60
         && recipientsAreFamily(nw.recipients)
         && nw.test is bool
@@ -1054,7 +1095,7 @@ service cloud.firestore {
       allow create: if _k44(request.resource.data);
       // Gönderen: canlı konum ve durum (Güvendeyim / Yardım gerek / bitir).
       function _k45(nw, od) {
-        return signedIn() && od.fromUid == request.auth.uid
+        return signedIn() && od.fromUid == me()
         && nw.diff(od).affectedKeys().hasOnly(['location', 'status'])
         && nw.status in ['aktif', 'guvende', 'bitti']
         && (!('location' in nw.diff(od).affectedKeys()) || validSosLocation(nw.location));
@@ -1062,13 +1103,13 @@ service cloud.firestore {
       allow update: if _k45(request.resource.data, resource.data);
       // Alıcı: yalnızca kendi "teslim edildi" ve "görüldü" işareti.
       function _k46(nw, od) {
-        return signedIn() && request.auth.uid in od.recipients
+        return signedIn() && me() in od.recipients
         && nw.diff(od).affectedKeys().hasOnly(['deliveredTo', 'seenBy'])
-        && nw.deliveredTo.diff(od.deliveredTo).affectedKeys().hasOnly([request.auth.uid])
-        && nw.seenBy.diff(od.seenBy).affectedKeys().hasOnly([request.auth.uid]);
+        && nw.deliveredTo.diff(od.deliveredTo).affectedKeys().hasOnly([me()])
+        && nw.seenBy.diff(od.seenBy).affectedKeys().hasOnly([me()]);
       }
       allow update: if _k46(request.resource.data, resource.data);
-      allow delete: if signedIn() && resource.data.fromUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.fromUid == me();
     }
 
     // Bildirim adresleri (telefon başına, en çok 5): SOS bildirimini aile üyesinin telefonu gönderir.
@@ -1130,7 +1171,7 @@ service cloud.firestore {
       return created != null && created > request.time - duration.value(7, 'd') ? limitOf(key + 'Yeni', defNew) : limitOf(key, def);
     }
     function usagePath(subject, kind) {
-      return /databases/$(database)/documents/usage/$(subject + '~' + kind);
+      return dp('usage', subject + '~' + kind);
     }
     // Sayaç bu yazımda değişti (kendi kuralı yalnızca +1 ya da süresi dolunca 1'den başlatmaya izin verir) ve sınırı aşmadı.
     function usageOk(subject, kind, limit) {
@@ -1138,7 +1179,7 @@ service cloud.firestore {
         && (!exists(usagePath(subject, kind)) || getAfter(usagePath(subject, kind)).data != get(usagePath(subject, kind)).data);
     }
     function ownsUsage(type, sid) {
-      return (type == 'u' && sid == request.auth.uid)
+      return (type == 'u' && sid == me())
         || (type == 'b' && isBusinessTeam(sid))
         || (type == 'k' && isMemberOf(sid))
         || (type == 'g' && exists(grantPath(sid)));
@@ -1163,7 +1204,7 @@ service cloud.firestore {
 
     match /usage/{id} {
       // Kişi kendi sayaçlarını hesabını silerken siler.
-      allow delete: if signedIn() && id.split('~')[0] == 'u-' + request.auth.uid;
+      allow delete: if signedIn() && id.split('~')[0] == 'u-' + me();
       allow read: if signedIn() && (resource == null || ownsUsage(resource.data.type, resource.data.sid));
       function _k48(nw) {
         return signedIn()
@@ -1184,6 +1225,27 @@ service cloud.firestore {
             || (nw.windowStart == od.windowStart && nw.count == od.count + 1));
       }
       allow update: if _k49(request.resource.data, resource.data);
+    }
+
+    // İşletme askıları: admin ve işletmenin sahibi okur (sebep ve bitiş tarihini görür); yazma yalnızca sunucu işlevi.
+    match /businessSuspensions/{bid} {
+      allow read: if isAdmin() || (resource != null && isSelf(resource.data.ownerUid));
+      allow write: if false;
+    }
+    // Yeni işletme açma yasağı (askıdaki işletmenin sahibi): admin ve kişinin kendisi okur.
+    match /businessBans/{uid} {
+      allow read: if isAdmin() || isSelf(uid);
+      allow write: if false;
+    }
+    // Dış veri kaynaklarının son çekim özeti (hava durumu, nöbetçi eczane): yalnızca sunucu yazar, admin okur.
+    match /dataSources/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    // Hesap askıları (Eren, 12 Kasım 2026): yalnızca sunucu işlevi yazar; admin hepsini, kişi kendi kaydını okur.
+    match /suspensions/{uid} {
+      allow read: if isAdmin() || isSelf(uid);
+      allow write: if false;
     }
 
     match /config/{id} {
@@ -1251,6 +1313,13 @@ service cloud.firestore {
         && stamped(nw);
       }
       allow write: if isAdmin() && id == 'bannedWords' && _c_bannedWords(request.resource.data);
+      // Keşfet rozetleri (Eren, 13 Kasım 2026): admin rozet listesini yönetir, uygulama okur.
+      function _c_badges(nw) {
+        return nw.keys().hasOnly(['items', 'updatedBy', 'updatedAt'])
+        && nw.items is list && nw.items.size() <= 30
+        && stamped(nw);
+      }
+      allow write: if isAdmin() && id == 'badges' && _c_badges(request.resource.data);
       // Ara: önerilen aramalar (PROJE.md 5.10), dil başına en çok 12; admin yönetir, uygulama okur.
       function _c_searchSuggestions(nw) {
         return nw.keys().hasOnly(['terms', 'updatedBy', 'updatedAt'])
@@ -1299,6 +1368,31 @@ service cloud.firestore {
         && stamped(nw);
       }
       allow write: if isAdmin() && id == 'notificationTriggers' && _c_notificationTriggers(request.resource.data);
+      // Uygulama ayarları (Panel > Ayarlar > Uygulama ayarları, 14 Kasım 2026): admin yazar, uygulama açılışta okur.
+      // Acil İhtiyaçlar ve SOS kapatılamaz (closed listesinde yer alamaz).
+      function _c_app(d) {
+        return d.keys().hasOnly(['minVersion', 'suggestVersion', 'storeUrl', 'banner', 'closed', 'legal', 'contact', 'images', 'updatedBy', 'updatedAt'])
+        && d.minVersion is map && d.suggestVersion is map && d.storeUrl is map
+        && d.contact is map && d.images is map
+        && (d.banner == null || (d.banner is map && d.banner.kind in ['duyuru', 'bakim']
+            && d.banner.text is map && d.banner.text.tr is string
+            && d.banner.text.tr.size() > 0 && d.banner.text.tr.size() <= 300
+            && d.banner.provinces is list && d.banner.provinces.size() <= 81))
+        && d.closed is list && d.closed.hasOnly(['myCity', 'travel', 'social', 'explore', 'carsi', 'messages'])
+        && d.legal is map && d.legal.version is string && d.legal.version.size() <= 40 && d.legal.reaccept is bool
+        && stamped(d);
+      }
+      allow write: if isAdmin() && id == 'app' && _c_app(request.resource.data);
+    }
+    // Uygulama ayarı geçmişi: her değişiklikte önceki hâl yazılır ("Geri al"). Yalnızca admin; değiştirilemez, silinemez.
+    match /appConfigHistory/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['actorUid', 'at', 'parts', 'before', 'rollback'])
+        && request.resource.data.actorUid == me() && request.resource.data.at == request.time
+        && request.resource.data.parts is list && request.resource.data.before is map
+        && request.resource.data.rollback is bool;
+      allow update, delete: if false;
     }
 
     match /admins/{uid} {
@@ -1312,6 +1406,13 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['cap', 'updatedBy', 'updatedAt'])
         && request.resource.data.cap is int && request.resource.data.cap >= 100 && request.resource.data.cap <= 100000
         && stamped(request.resource.data);
+    }
+
+    // Pro abonelik ödemeleri (Karar Eren, 12 Kasım 2026; PROJE.md 15.2): mağaza bildirimiyle yalnızca sunucu yazar.
+    // Admin hepsini (Panel > Üyelikler ve Gelir), işletme sahibi yalnızca kendi işletmesininkileri okur.
+    match /payments/{id} {
+      allow read: if isAdmin() || (signedIn() && resource.data.ownerUid == me());
+      allow write: if false;
     }
 
     // ---- Yetkiler (PROJE.md 6.7): admin il yöneticisi, muhtar ve moderatör verir; il yöneticisi kendi ilinde muhtar
@@ -1450,10 +1551,10 @@ service cloud.firestore {
     // ---- Kurumlar (PROJE.md 6.6-6.7): yalnızca admin açar. Kurum yöneticisi kendi personeline, kurumun bölgesi ve
     // bölümleri içinde görev verir; yeni kurum yöneticisini admin atar. Pasif ya da sözleşmesi biten kurumda kimse çalışamaz.
     function orgPath(orgId) {
-      return /databases/$(database)/documents/organizations/$(orgId);
+      return dp('organizations', orgId);
     }
     function memberPath(orgId) {
-      return /databases/$(database)/documents/orgMembers/$(orgId + '__' + myEmail());
+      return dp('orgMembers', orgId + '__' + myEmail());
     }
     function memberActive(m) {
       return m.get('removedAt', null) == null && (m.get('expiresAt', null) == null || m.expiresAt > request.time);
@@ -1492,7 +1593,7 @@ service cloud.firestore {
       function _k52(nw) {
         return isAdmin() && validOrg(id, nw)
         && nw.status == 'aktif'
-        && nw.createdBy == request.auth.uid
+        && nw.createdBy == me()
         && nw.createdAt == request.time;
       }
       allow create: if _k52(request.resource.data);
@@ -1525,7 +1626,7 @@ service cloud.firestore {
         && validAssignment(d.assignments, 'seyahat') && validAssignment(d.assignments, 'istatistik')
         && validAssignment(d.assignments, 'baskan')
         && (!('expiresAt' in d) || d.expiresAt is timestamp)
-        && d.addedBy == request.auth.uid
+        && d.addedBy == me()
         && d.updatedAt == request.time;
     }
 
@@ -1551,7 +1652,7 @@ service cloud.firestore {
         && od.get('removedAt', null) == null
         && nw.diff(od).affectedKeys().hasOnly(['removedAt', 'removedBy', 'updatedAt'])
         && nw.removedAt == request.time
-        && nw.removedBy == request.auth.uid
+        && nw.removedBy == me()
         && nw.updatedAt == request.time;
       }
       allow update: if _k55(request.resource.data, resource.data);
@@ -1652,32 +1753,32 @@ service cloud.firestore {
         && get(businessPath(d.targetId)).data.verification.status != 'dogrulandi';
     }
     function isBusinessOwner(bid) {
-      return signedIn() && exists(businessPath(bid)) && get(businessPath(bid)).data.ownerUid == request.auth.uid;
+      return signedIn() && exists(businessPath(bid)) && get(businessPath(bid)).data.ownerUid == me();
     }
     // İlk aşama onayı: onaylayan kendisi, e-postası (güvenilir yönetici listesiyle eşleşir) ve şimdiki zaman.
     function myStep(f) {
       return f is map && f.keys().hasOnly(['uid', 'email', 'name', 'at'])
-        && f.uid == request.auth.uid && f.email == request.auth.token.get('email', '')
+        && f.uid == me() && f.email == request.auth.token.get('email', '')
         && f.name is string && f.name.size() >= 1 && f.name.size() <= 80
         && f.at == request.time;
     }
     function myDecision(dec, stage, rejected) {
       return dec is map && dec.keys().hasOnly(['uid', 'at', 'stage', 'reason'])
-        && dec.uid == request.auth.uid && dec.at == request.time && dec.stage == stage
+        && dec.uid == me() && dec.at == request.time && dec.stage == stage
         && (rejected ? (dec.reason is string && dec.reason.size() >= 5 && dec.reason.size() <= 300) : !('reason' in dec));
     }
 
     match /approvals/{id} {
       // İsteyen ve işletme sahibi kendi isteğini; onay yetkisi olan il yöneticisi kendi ilindekileri; admin hepsini görür.
       allow read: if resource == null || isAdmin()
-        || (signedIn() && resource.data.requestedBy == request.auth.uid)
+        || (signedIn() && resource.data.requestedBy == me())
         || provinceAllows('onaylar', 'goruntule', resource.data.region.provinceCode)
         || (resource.data.kind == 'isletme-dogrulama' && isBusinessOwner(resource.data.targetId));
       // İşletme sahibi doğrulama ister; reddedilen ya da sonradan doğrulaması kaldırılan istek yeniden gönderilir.
       // (Ucuz denetimler önce: kuralların hesap sınırı aşılmasın.)
       function _k60(nw) {
         return nw.status == 'il-onayi-bekliyor'
-        && nw.requestedBy == request.auth.uid
+        && nw.requestedBy == me()
         && !('firstApproval' in nw) && !('decision' in nw)
         && (resource == null || !(resource.data.status in ['il-onayi-bekliyor', 'admin-onayi-bekliyor']))
         && validApproval(id, nw)
@@ -1688,7 +1789,7 @@ service cloud.firestore {
       // İl yöneticisi istek gelmemiş bir işletmeyi kendisi önerir: 1. aşama onaylı olarak admin'e gider. Kendi işletmesini öneremez.
       function _k61(nw) {
         return nw.status == 'admin-onayi-bekliyor'
-        && nw.requestedBy == request.auth.uid
+        && nw.requestedBy == me()
         && !('decision' in nw)
         && (resource == null || !(resource.data.status in ['il-onayi-bekliyor', 'admin-onayi-bekliyor']))
         && myStep(nw.firstApproval)
@@ -1702,7 +1803,7 @@ service cloud.firestore {
       function _k62(nw, od) {
         return od.status == 'il-onayi-bekliyor'
         && nw.status in ['admin-onayi-bekliyor', 'reddedildi']
-        && od.requestedBy != request.auth.uid
+        && od.requestedBy != me()
         && nw.updatedAt == request.time
         && ((nw.status == 'admin-onayi-bekliyor'
               && nw.diff(od).affectedKeys().hasOnly(['status', 'firstApproval', 'updatedAt'])
@@ -1724,7 +1825,7 @@ service cloud.firestore {
       }
       allow update: if _k63(request.resource.data, resource.data);
       // İsteyen geri çeker; işletme silinince istek de silinir (hesap silmede de). Kararlar işlem kaydında kalır.
-      allow delete: if signedIn() && (resource.data.requestedBy == request.auth.uid
+      allow delete: if signedIn() && (resource.data.requestedBy == me()
         || (resource.data.kind == 'isletme-dogrulama' && isBusinessOwner(resource.data.targetId)));
     }
 
@@ -1745,7 +1846,7 @@ service cloud.firestore {
             ? 'ilce-' + nw.districtId : 'il-' + nw.provinceCode)
         && nw.modules is list
         && nw.modules.hasOnly(['isletme-dogrulama', 'bildirimler', 'etkinlikler', 'kurumlar', 'moderasyon'])
-        && nw.addedBy == request.auth.uid
+        && nw.addedBy == me()
         && nw.addedAt == request.time
         && nw.updatedAt == request.time;
       }
@@ -1754,7 +1855,7 @@ service cloud.firestore {
         return isAdmin() && od.get('removedAt', null) == null
         && nw.diff(od).affectedKeys().hasOnly(['removedAt', 'removedBy', 'updatedAt'])
         && nw.removedAt == request.time
-        && nw.removedBy == request.auth.uid
+        && nw.removedBy == me()
         && nw.updatedAt == request.time;
       }
       allow update: if _k65(request.resource.data, resource.data);
@@ -1831,21 +1932,30 @@ service cloud.firestore {
         // Acil duyuru bitiş tarihiyle, en çok 7 gün (sürekli en üstte kalmasın).
         && (d.kind != 'acil' || ('endsAt' in d && d.endsAt <= request.time + duration.value(7, 'd') + duration.value(1, 'h')))
         && d.author is map
-        && d.preparedBy == request.auth.uid
+        && d.preparedBy == me()
         && d.preparedByName is string && d.preparedByName.size() <= 80
         && d.updatedAt == request.time;
     }
     // Hazırlayanın seçebileceği durum: taslak, onaya gönder ya da (yetkisi varsa) doğrudan yayınla.
 
+    // Bölgeye toplu bildirim (PROJE.md 7): yalnızca sunucu işlevi yazar (yetki, günlük sınır, il geneli onayı orada).
+    // Gönderilen bildirimin tam metni uygulamada açılır; onay bekleyeni / reddedileni hazırlayan ve admin görür.
+    match /broadcasts/{id} {
+      allow read: if (signedIn() && resource.data.status == 'gonderildi')
+        || (signedIn() && resource.data.preparedBy == me())
+        || isAdmin();
+      allow write: if false;
+    }
+
     match /announcements/{id} {
       allow read: if resource.data.status == 'yayinda'
-        || (signedIn() && resource.data.preparedBy == request.auth.uid)
+        || (signedIn() && resource.data.preparedBy == me())
         || isAdmin()
         || (resource.data.author.type == 'kurum' && isMemberOf(resource.data.author.orgId))
         || (resource.data.author.type == 'kisi' && grantAllows('il-' + resource.data.region.provinceCode, 'gonderiler', 'onayla'));
       // (Ucuz denetimler önce: kuralların hesap sınırı aşılmasın.)
       function _k66(nw) {
-        return nw.preparedBy == request.auth.uid
+        return nw.preparedBy == me()
         && !('reviewedBy' in nw) && !('reviewNote' in nw)
         && nw.createdAt == request.time
         && validAnnouncement(nw)
@@ -1855,7 +1965,7 @@ service cloud.firestore {
       allow create: if _k66(request.resource.data);
       // Hazırlayan: yayında olmayanı düzenler / yeniden gönderir. Yayınlayan hesap ve oluşturma tarihi değişmez.
       function _k67(nw, od) {
-        return od.preparedBy == request.auth.uid
+        return od.preparedBy == me()
         && od.status in ['taslak', 'onay-bekliyor', 'reddedildi']
         && nw.author == od.author
         && nw.createdAt == od.createdAt
@@ -1868,7 +1978,7 @@ service cloud.firestore {
       // Onay ya da gerekçeli ret (yalnızca durum ve inceleme bilgisi değişir).
       function _k68(nw, od) {
         return od.status == 'onay-bekliyor'
-        && nw.reviewedBy == request.auth.uid
+        && nw.reviewedBy == me()
         && nw.updatedAt == request.time
         && ((nw.status == 'yayinda' && nw.publishedAt == request.time
               && nw.diff(od).affectedKeys().hasOnly(['status', 'publishedAt', 'reviewedBy', 'updatedAt', 'ringAlways'])
@@ -1879,7 +1989,7 @@ service cloud.firestore {
               && nw.reviewNote.size() <= 300
               && nw.diff(od).affectedKeys().hasOnly(['status', 'reviewNote', 'reviewedBy', 'updatedAt'])))
         // Kendi hazırladığını onaylayamaz (günlük yayın sınırını aşmanın yolu olmasın); admin hariç.
-        && (od.preparedBy != request.auth.uid || isAdmin())
+        && (od.preparedBy != me() || isAdmin())
         && canReview(od, 'gonderiler');
       }
       allow update: if _k68(request.resource.data, resource.data);
@@ -1887,11 +1997,11 @@ service cloud.firestore {
       function _k69(nw, od) {
         return od.status == 'yayinda'
         && nw.status == 'kaldirildi'
-        && nw.reviewedBy == request.auth.uid
+        && nw.reviewedBy == me()
         && nw.updatedAt == request.time
         && nw.diff(od).affectedKeys().hasOnly(['status', 'reviewedBy', 'updatedAt'])
         && (canReview(od, 'gonderiler')
-            || (od.preparedBy == request.auth.uid && authorCan(od, 'gonderiler', 'sil')));
+            || (od.preparedBy == me() && authorCan(od, 'gonderiler', 'sil')));
       }
       allow update: if _k69(request.resource.data, resource.data);
       // Silinmez: kayıt için kalır.
@@ -1921,19 +2031,19 @@ service cloud.firestore {
         && (!('cover' in d) || validMediaBy(d.cover, 'etkinlik', d.preparedBy))
         && d.attendeeCount is int
         && d.author is map
-        && d.preparedBy == request.auth.uid
+        && d.preparedBy == me()
         && d.preparedByName is string && d.preparedByName.size() <= 80
         && d.updatedAt == request.time;
     }
     function eventPath(id) {
-      return /databases/$(database)/documents/events/$(id);
+      return dp('events', id);
     }
     function myAttendancePath(id) {
-      return /databases/$(database)/documents/events/$(id)/attendees/$(request.auth.uid);
+      return dp2('events', id, 'attendees', me());
     }
     // Organizatör tarafı: hazırlayan, kurumda etkinlik bölümünü gören personel, kişi yetkisinin sahibi, onaylayan, admin.
     function managesEvent(e) {
-      return isAdmin() || (signedIn() && e.preparedBy == request.auth.uid)
+      return isAdmin() || (signedIn() && e.preparedBy == me())
         || (e.author.type == 'kurum' ? staffCan(e.author.orgId, 'etkinlikler', 'goruntule')
             : grantAllows(e.author.grantKey, 'etkinlikler', 'goruntule'))
         || canReview(e, 'etkinlikler');
@@ -1941,12 +2051,12 @@ service cloud.firestore {
 
     match /events/{id} {
       allow read: if resource.data.status in ['yayinda', 'iptal']
-        || (signedIn() && resource.data.preparedBy == request.auth.uid)
+        || (signedIn() && resource.data.preparedBy == me())
         || isAdmin()
         || (resource.data.author.type == 'kurum' && isMemberOf(resource.data.author.orgId))
         || (resource.data.author.type == 'kisi' && grantAllows('il-' + resource.data.region.provinceCode, 'etkinlikler', 'onayla'));
       function _k70(nw) {
-        return nw.preparedBy == request.auth.uid
+        return nw.preparedBy == me()
         && nw.attendeeCount == 0
         && !('reviewedBy' in nw) && !('reviewNote' in nw)
         && nw.createdAt == request.time
@@ -1957,7 +2067,7 @@ service cloud.firestore {
       allow create: if _k70(request.resource.data);
       // Hazırlayan: yayında olmayanı düzenler / yeniden gönderir.
       function _k71(nw, od) {
-        return od.preparedBy == request.auth.uid
+        return od.preparedBy == me()
         && od.status in ['taslak', 'onay-bekliyor', 'reddedildi']
         && nw.author == od.author
         && nw.createdAt == od.createdAt
@@ -1971,7 +2081,7 @@ service cloud.firestore {
       // Onay ya da gerekçeli ret.
       function _k72(nw, od) {
         return od.status == 'onay-bekliyor'
-        && nw.reviewedBy == request.auth.uid
+        && nw.reviewedBy == me()
         && nw.updatedAt == request.time
         && ((nw.status == 'yayinda' && nw.publishedAt == request.time
               && nw.diff(od).affectedKeys().hasOnly(['status', 'publishedAt', 'reviewedBy', 'updatedAt']))
@@ -1980,21 +2090,21 @@ service cloud.firestore {
               && nw.reviewNote.size() <= 300
               && nw.diff(od).affectedKeys().hasOnly(['status', 'reviewNote', 'reviewedBy', 'updatedAt'])))
         // Kendi hazırladığını onaylayamaz (günlük yayın sınırını aşmanın yolu olmasın); admin hariç.
-        && (od.preparedBy != request.auth.uid || isAdmin())
+        && (od.preparedBy != me() || isAdmin())
         && canReview(od, 'etkinlikler');
       }
       allow update: if _k72(request.resource.data, resource.data);
       // İptal (görünür kalır) ve yayından kaldırma: onaylayan, admin ya da hazırlayan (iptal için "Ekle", kaldırma için "Sil").
       function _k73(nw, od) {
-        return nw.reviewedBy == request.auth.uid
+        return nw.reviewedBy == me()
         && nw.updatedAt == request.time
         && nw.diff(od).affectedKeys().hasOnly(['status', 'reviewedBy', 'updatedAt'])
         && ((od.status == 'yayinda' && nw.status == 'iptal'
               && (canReview(od, 'etkinlikler')
-                  || (od.preparedBy == request.auth.uid && authorCan(od, 'etkinlikler', 'ekle'))))
+                  || (od.preparedBy == me() && authorCan(od, 'etkinlikler', 'ekle'))))
             || (od.status in ['yayinda', 'iptal'] && nw.status == 'kaldirildi'
               && (canReview(od, 'etkinlikler')
-                  || (od.preparedBy == request.auth.uid && authorCan(od, 'etkinlikler', 'sil')))));
+                  || (od.preparedBy == me() && authorCan(od, 'etkinlikler', 'sil')))));
       }
       allow update: if _k73(request.resource.data, resource.data);
       // "Katılıyorum" sayacı: yalnızca kendi katılım kaydıyla birlikte tam bir artar (yayındaki, bitmemiş etkinlikte,
@@ -2035,7 +2145,7 @@ service cloud.firestore {
     }
     // Hesap silmede kişinin bütün katılımları bulunur.
     match /{path=**}/attendees/{uid} {
-      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow read: if signedIn() && resource.data.uid == me();
     }
 
     // ---- Kullanıcı aktiviteleri (PROJE.md 5.3): her yetişkin kullanıcı kendi ilinde açar. Herkes (giriş yapmış) mahalleyi
@@ -2043,19 +2153,19 @@ service cloud.firestore {
     // Tarih ve yer sonradan değişmez (değişiklik bildirimi yok), yalnızca iptal edilir. Sayaçlar yalnızca kendi katılım ya
     // da şikâyet kaydıyla birlikte tam bir değişir. Moderatör (admin, ildeki moderasyon yetkisi) kaldırır ya da bırakır.
     function myUserPath() {
-      return /databases/$(database)/documents/users/$(request.auth.uid);
+      return dp('users', me());
     }
     function isAdultUser() {
       return signedIn() && exists(myUserPath()) && ageOf(get(myUserPath()).data.birthYear) >= 18;
     }
     function activityPath(id) {
-      return /databases/$(database)/documents/activities/$(id);
+      return dp('activities', id);
     }
     function myActivityAttendance(id) {
-      return /databases/$(database)/documents/activities/$(id)/attendees/$(request.auth.uid);
+      return dp2('activities', id, 'attendees', me());
     }
     function myActivityReport(id) {
-      return /databases/$(database)/documents/activityReports/$(id + '_' + request.auth.uid);
+      return dp('activityReports', id + '_' + me());
     }
     function validActivity(d) {
       return d.keys().hasOnly(['title', 'description', 'category', 'startsAt', 'endsAt', 'region', 'capacity', 'status',
@@ -2074,14 +2184,14 @@ service cloud.firestore {
 
     match /activities/{id} {
       allow read: if signedIn()
-        && (resource.data.status in ['aktif', 'iptal'] || resource.data.organizerUid == request.auth.uid
+        && (resource.data.status in ['aktif', 'iptal'] || resource.data.organizerUid == me()
             || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
       // Açma: yetişkin, kendi adına, kendi ilinde, en çok 30 gün sonrası için; tam adres aynı yazımda. Kapak fotoğrafı
       // isteğe bağlı ve açanın kendi `aktivite` dosyası; sonradan değişmez.
       function _k76(nw) {
-        return nw.organizerUid == request.auth.uid
-        && (!('cover' in nw) || validMediaBy(nw.cover, 'aktivite', request.auth.uid))
-        && usageOk('u-' + request.auth.uid, 'aktivite', userLimit('aktivite', 3, 1))
+        return nw.organizerUid == me()
+        && (!('cover' in nw) || validMediaBy(nw.cover, 'aktivite', me()))
+        && usageOk('u-' + me(), 'aktivite', userLimit('aktivite', 3, 1))
         && nw.status == 'aktif'
         && nw.attendeeCount == 0 && nw.reportCount == 0
         && !('cleared' in nw) && !('moderatedBy' in nw)
@@ -2096,7 +2206,7 @@ service cloud.firestore {
       allow create: if _k76(request.resource.data);
       // Düzenleyen: iptal eder ya da (hesap silmede) kaldırır, kapak da silinir; başka bir şey değişmez.
       function _k77(nw, od) {
-        return od.organizerUid == request.auth.uid
+        return od.organizerUid == me()
         && nw.updatedAt == request.time
         && ((od.status == 'aktif' && nw.status == 'iptal'
               && nw.diff(od).affectedKeys().hasOnly(['status', 'updatedAt']))
@@ -2113,7 +2223,7 @@ service cloud.firestore {
         && ((nw.attendeeCount == od.attendeeCount + 1
               && !exists(myActivityAttendance(id)) && existsAfter(myActivityAttendance(id))
               && od.status == 'aktif' && od.startsAt > request.time
-              && od.organizerUid != request.auth.uid
+              && od.organizerUid != me()
               && nw.attendeeCount <= od.capacity
               && isAdultUser())
             || (nw.attendeeCount == od.attendeeCount - 1
@@ -2130,7 +2240,7 @@ service cloud.firestore {
       allow update: if _k79(request.resource.data, resource.data);
       // Moderasyon: kaldır ya da "yerinde kalsın".
       function _k80(nw, od) {
-        return nw.moderatedBy == request.auth.uid
+        return nw.moderatedBy == me()
         && nw.updatedAt == request.time
         && nw.diff(od).affectedKeys().hasOnly(['status', 'cleared', 'moderatedBy', 'updatedAt'])
         && (nw.status == 'kaldirildi'
@@ -2143,22 +2253,22 @@ service cloud.firestore {
       // Tam buluşma yeri: düzenleyen, katılanlar ve admin okur. Aktiviteyle birlikte yazılır; hesap silmede düzenleyen siler.
       match /private/{doc} {
         allow read: if signedIn()
-          && (get(activityPath(id)).data.organizerUid == request.auth.uid || exists(myActivityAttendance(id)) || isAdmin());
+          && (get(activityPath(id)).data.organizerUid == me() || exists(myActivityAttendance(id)) || isAdmin());
         function _k81(nw) {
           return doc == 'details' && !exists(activityPath(id))
-          && getAfter(activityPath(id)).data.organizerUid == request.auth.uid
+          && getAfter(activityPath(id)).data.organizerUid == me()
           && nw.keys().hasOnly(['address'])
           && nw.address is string
           && nw.address.size() >= 5 && nw.address.size() <= 200;
         }
         allow create: if _k81(request.resource.data);
-        allow delete: if signedIn() && get(activityPath(id)).data.organizerUid == request.auth.uid;
+        allow delete: if signedIn() && get(activityPath(id)).data.organizerUid == me();
         allow update: if false;
       }
 
       // Katılım: kişi kendisi ekler ve siler. Ad yalnızca izinle yazılır; düzenleyen yalnızca adını paylaşanları görür.
       match /attendees/{uid} {
-        allow read: if isSelf(uid) || (resource.data.shareName == true && get(activityPath(id)).data.organizerUid == request.auth.uid);
+        allow read: if isSelf(uid) || (resource.data.shareName == true && get(activityPath(id)).data.organizerUid == me());
         function _k82(nw) {
           return isSelf(uid)
           && nw.keys().hasOnly(['uid', 'shareName', 'displayName', 'createdAt'])
@@ -2184,20 +2294,20 @@ service cloud.firestore {
       function _k83(nw) {
         return signedIn()
         && nw.keys().hasOnly(['activityId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
-        && nw.reporterUid == request.auth.uid
-        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
-        && rid == nw.activityId + '_' + request.auth.uid
+        && nw.reporterUid == me()
+        && usageOk('u-' + me(), 'sikayet', limitOf('sikayet', 20))
+        && rid == nw.activityId + '_' + me()
         && nw.reason in ['tehlikeli', 'uygunsuz', 'ticari', 'sahte', 'diger']
         && nw.status == 'yeni'
         && nw.createdAt == request.time
-        && get(activityPath(nw.activityId)).data.organizerUid != request.auth.uid
+        && get(activityPath(nw.activityId)).data.organizerUid != me()
         && nw.provinceCode == get(activityPath(nw.activityId)).data.region.provinceCode
         && getAfter(activityPath(nw.activityId)).data.reportCount
            == get(activityPath(nw.activityId)).data.reportCount + 1;
       }
       allow create: if _k83(request.resource.data);
       // Kişi kendi şikâyetini görür ("şikâyet ettiniz" bilgisi için).
-      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == me()))
         || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
       function _k84(nw, od) {
         return provinceAllows('moderasyon', 'duzenle', od.provinceCode)
@@ -2213,7 +2323,7 @@ service cloud.firestore {
     // Genel'i her giriş yapmış kişi okur. Sayaçlar yalnızca kendi beğeni ya da şikâyet kaydıyla tam bir değişir. Sahibi
     // gönderisini boşaltarak kaldırır; moderatör (admin, ildeki moderasyon yetkisi) kaldırır ya da bırakır.
     function postPath(id) {
-      return /databases/$(database)/documents/posts/$(id);
+      return dp('posts', id);
     }
     function myLocation() {
       return get(myUserPath()).data.get('location', {});
@@ -2221,18 +2331,21 @@ service cloud.firestore {
     function validPost(d) {
       return d.keys().hasOnly(['text', 'category', 'targets', 'region', 'status', 'authorUid', 'authorName', 'business', 'likeCount',
              'commentCount', 'commentsOff', 'lastComment', 'reportCount', 'cleared', 'moderatedBy', 'searchKeys', 'photos', 'video', 'frames',
-             'framesFeatured', 'createdAt', 'updatedAt'])
+             'framesFeatured', 'edits', 'tagReq', 'hasVideo', 'tags', 'tagNames', 'pinned', 'viewCount', 'reach', 'createdAt', 'updatedAt'])
+        && (!('reach' in d) || d.reach in ['turkiye', 'il', 'ilce', 'mahalle'])
         && d.text is string && d.text.size() <= 2000
+        // Düzenleyici (yazı/çıkartma/çizim; içeriği uygulama temizler): medya başına bir öğe.
+        && (!('edits' in d) || (d.edits is list && d.edits.size() <= 10))
         // Kareler: yalnızca fotoğraflı ve Genel'e açık gönderi (Seyahat > "{Şehir} kareleri").
         && (!('frames' in d) || (d.frames is bool && (d.frames == false || ('photos' in d && d.targets.genel == true))))
         && (!('framesFeatured' in d) || d.framesFeatured is bool)
         && validSearchKeys(d, 300)
-        && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye']
-        && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip'])
+        && d.category in ['genel', 'duyuru', 'etkinlik', 'firsat', 'soru-yardim', 'kayip-buluntu', 'taziye', 'haber', 'ekonomi', 'spor', 'teknoloji', 'kultur-sanat', 'saglik']
+        && d.targets is map && d.targets.keys().hasOnly(['mahallem', 'bolgesel', 'genel', 'takip', 'haberler'])
         && d.targets.keys().hasAll(['mahallem', 'bolgesel', 'genel'])
         && d.targets.mahallem is bool && d.targets.bolgesel is bool && d.targets.genel is bool
-        && d.targets.get('takip', false) is bool
-        && (d.targets.mahallem || d.targets.bolgesel || d.targets.genel || d.targets.get('takip', false))
+        && d.targets.get('takip', false) is bool && d.targets.get('haberler', false) is bool
+        && (d.targets.mahallem || d.targets.bolgesel || d.targets.genel || d.targets.get('takip', false) || d.targets.get('haberler', false))
         && validLocation(d.region) && 'neighbourhoodId' in d.region
         && d.authorName is string && d.authorName.size() <= 40
         && d.likeCount is int && d.reportCount is int
@@ -2255,12 +2368,12 @@ service cloud.firestore {
     }
     // Yazanın kendisi ve sunucu saati (yönetici ayarlarında).
     function stamped(d) {
-      return d.updatedBy == request.auth.uid && d.updatedAt == request.time;
+      return d.updatedBy == me() && d.updatedAt == request.time;
     }
     function mediaKeptOrOwn(d, key, kind) {
       return !(key in d)
         || (resource != null && resource.data.get(key, null) == d[key])
-        || validMediaBy(d[key], kind, request.auth.uid);
+        || validMediaBy(d[key], kind, me());
     }
     // İşletme vitrini: kademeye göre en çok fotoğraf (panel > Sınırlar; kesin üst sınır 30). Kural motorunun işlem
     // sınırı (1000) yüzünden tek tek fotoğraf burada denetlenmez: uygulama yalnızca kendi depomuzdaki adresleri gösterir,
@@ -2271,6 +2384,8 @@ service cloud.firestore {
       let pro = d.get('membership', {}).get('tier', '') in ['pro', 'premium'];
       return l is list && (l.size() == 0
         || (resource != null && resource.data.get('gallery', []) == l)
+        // Pro bitince fazla fotoğraflar silinmez: eskilerden çıkarma ya da sıra değiştirme (yeni fotoğraf yok) her kademede olur.
+        || (resource != null && resource.data.get('gallery', []).hasAll(l))
         || (l.size() <= 30 && l.size() <= limitOf(pro ? 'vitrinPro' : 'vitrinUcretsiz', pro ? 10 : 1)));
     }
     // Gönderi fotoğrafları (en çok 10, albüm): dosya paylaşanın klasöründe, bu gönderinin kimliğiyle ve sırayla
@@ -2298,7 +2413,8 @@ service cloud.firestore {
       let v = d.get('video', null);
       let b = 'posts/' + d.authorUid + '/' + id + '/video.';
       return !('video' in d)
-        || (!('photos' in d) && v is map && v.keys().hasOnly(['path', 'url', 'width', 'height', 'durationSec'])
+        || (!('photos' in d) && v is map && v.keys().hasOnly(['path', 'url', 'width', 'height', 'durationSec', 'poster'])
+            && (!('poster' in v) || (v.poster is string && v.poster.size() <= 600))
             && (v.path == b + 'mp4' || v.path == b + 'mov')
             && v.url is string && v.url.size() <= 600
             && v.width is int && v.height is int
@@ -2308,10 +2424,12 @@ service cloud.firestore {
       // Hedefler sabit anahtarlı bir haritada durur ({mahallem, bolgesel, genel}: true/false): akış sorguları bunlarla
       // süzülür ve kurallar sorguyu doğrulayabilir.
       return d.targets.get('genel', false) == true
+        // Haberler (yayıncı paylaşımı): giriş yapan herkes okur; liste ile süzülür.
+        || d.targets.get('haberler', false) == true
         || (d.targets.get('bolgesel', false) == true && myLocation().get('provinceCode', '') == d.region.provinceCode)
         || (d.targets.get('mahallem', false) == true && myLocation().get('neighbourhoodId', '') == d.region.neighbourhoodId)
         || (d.targets.get('takip', false) == true
-            && ('business' in d ? exists(businessFollowPath(d.business.id, request.auth.uid)) : isFollowerOf(d.authorUid)));
+            && ('business' in d ? exists(businessFollowPath(d.business.id, me())) : isFollowerOf(d.authorUid)));
     }
     // İşletme adına paylaşım: sahibi doğrudan; yetkili izni "doğrudan" ise yayında, "onayla" ise onay bekler.
     // Bölge işletmenin konumudur (mahallesi seçilmiş olmalı).
@@ -2323,56 +2441,70 @@ service cloud.firestore {
         && b.verification.status == 'dogrulandi'
         && (b.get('membership', {}).get('tier', '') in ['pro', 'premium']
             || b.get('postCount', 0) < limitOf('isletmeGonderiToplam', 9))
-        && ((b.ownerUid == request.auth.uid && d.status == 'aktif')
-            || (isManagerOf(b) && b.managers[request.auth.uid].post == 'dogrudan' && d.status == 'aktif')
-            || (isManagerOf(b) && b.managers[request.auth.uid].post == 'onayla' && d.status == 'onay-bekliyor'))
+        && ((b.ownerUid == me() && d.status == 'aktif')
+            || (isManagerOf(b) && b.managers[me()].post == 'dogrudan' && d.status == 'aktif')
+            || (isManagerOf(b) && b.managers[me()].post == 'onayla' && d.status == 'onay-bekliyor'))
         && d.region.provinceCode == b.location.provinceCode
         && d.region.districtId == b.location.districtId
         && d.region.neighbourhoodId == b.location.get('neighbourhoodId', '');
     }
     function isBusinessTeam(bid) {
       let b = get(businessPath(bid)).data;
-      return b.ownerUid == request.auth.uid || isManagerOf(b);
+      return b.ownerUid == me() || isManagerOf(b);
     }
     function followPath(follower, followee) {
-      return /databases/$(database)/documents/follows/$(follower + '_' + followee);
+      return dp('follows', follower + '_' + followee);
     }
     // Takip onaylanmış (gizli hesapta istek kabul edilmiş) mi.
     function isFollowerOf(uid) {
-      return exists(followPath(request.auth.uid, uid)) && get(followPath(request.auth.uid, uid)).data.status == 'aktif';
+      return exists(followPath(me(), uid)) && get(followPath(me(), uid)).data.status == 'aktif';
     }
     function blockPath(blocker, blocked) {
-      return /databases/$(database)/documents/blocks/$(blocker + '_' + blocked);
+      return dp('blocks', blocker + '_' + blocked);
     }
 
     match /posts/{id} {
       allow read: if signedIn()
         && ((resource.data.status == 'aktif' && canSeePost(resource.data))
-            || resource.data.authorUid == request.auth.uid
+            || resource.data.authorUid == me()
             || ('business' in resource.data && isBusinessTeam(resource.data.business.id))
             || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
       // Paylaşma: kendi adına kendi kayıtlı mahallesiyle, ya da işletme adına işletmenin konumuyla.
       function _k85(nw) {
-        return signedIn() && nw.authorUid == request.auth.uid
+        // Resmî CityJoy hesabı mı (bir kez okunur; yalnızca kişisel gönderide).
+        let off = !('business' in nw) && isOfficialAccount();
+        return signedIn() && nw.authorUid == me()
         && nw.likeCount == 0 && nw.reportCount == 0
         && nw.get('commentCount', 0) == 0
         && !('cleared' in nw) && !('moderatedBy' in nw)
         && !('commentsOff' in nw) && !('lastComment' in nw)
         && !('framesFeatured' in nw)
+        && !('tags' in nw) && !('tagNames' in nw) && !('pinned' in nw) && !('viewCount' in nw)
+        && (!('tagReq' in nw) || (nw.tagReq is list && nw.tagReq.size() <= 20 && !(me() in nw.tagReq)))
+        && (!('hasVideo' in nw) || (nw.hasVideo == true && 'video' in nw))
         && nw.createdAt == request.time
         && validPost(nw)
         && (nw.text.size() >= 1 || 'photos' in nw || 'video' in nw)
         && validPostPhotos(nw, id)
         && validPostVideo(nw, id)
+        // Haberler'e yalnızca yayıncı rozetli kişi ya da resmî CityJoy hesabı, kendi adına paylaşır (Eren, 13-14 Kasım 2026).
+        && (nw.targets.get('haberler', false) == false
+            || (!('business' in nw)
+                && (off || get(dp('publicProfiles', me())).data.get('publisher', false) == true)))
+        // Erişim seçimi (reach) yalnızca resmî hesapta.
+        && (!('reach' in nw) || off)
         && ('business' in nw
             ? (validBusinessPost(nw)
                 && usageOk('b-' + nw.business.id, 'isletme-gonderi', limitOf('isletmeGonderi', 5)))
             : (nw.status == 'aktif'
                 && exists(myUserPath())
-                && usageOk('u-' + request.auth.uid, 'gonderi', userLimit('gonderi', 10, 3))
-                && myLocation().get('neighbourhoodId', '') == nw.region.neighbourhoodId
-                && myLocation().get('districtId', '') == nw.region.districtId
-                && myLocation().get('provinceCode', '') == nw.region.provinceCode));
+                // Resmî CityJoy hesabı istediği yere paylaşır (Eren, 14 Kasım 2026); günlük sınırı yüksek.
+                && (off
+                    ? usageOk('u-' + me(), 'gonderi', 100)
+                    : (usageOk('u-' + me(), 'gonderi', userLimit('gonderi', 10, 3))
+                        && myLocation().get('neighbourhoodId', '') == nw.region.neighbourhoodId
+                        && myLocation().get('districtId', '') == nw.region.districtId
+                        && myLocation().get('provinceCode', '') == nw.region.provinceCode))));
       }
       allow create: if _k85(request.resource.data);
       // Kareler (admin): öne çıkar / kaldır. Karelere girmeyi yalnızca paylaşan seçer; admin geri açamaz.
@@ -2395,22 +2527,33 @@ service cloud.firestore {
       // Sahibi (işletme paylaşımında işletme sahibi de) kaldırır: yazı, ad, arama anahtarları, fotoğraflar ve video boşaltılır
       // (dosyaları sunucu siler).
       function _k88(nw, od) {
-        return (od.authorUid == request.auth.uid
+        return (od.authorUid == me()
             || ('business' in od && isBusinessOwner(od.business.id)))
         && nw.updatedAt == request.time
         && nw.status == 'kaldirildi' && nw.text == '' && nw.authorName == ''
-        && !('searchKeys' in nw) && !('photos' in nw) && !('video' in nw)
-        && nw.diff(od).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'video', 'updatedAt']);
+        && !('searchKeys' in nw) && !('photos' in nw) && !('video' in nw) && !('edits' in nw)
+        && nw.diff(od).affectedKeys().hasOnly(['status', 'text', 'authorName', 'searchKeys', 'photos', 'video', 'edits', 'updatedAt']);
       }
       allow update: if _k88(request.resource.data, resource.data);
       // Sahibi yorumları kapatır ya da açar.
       function _k89(nw, od) {
-        return od.authorUid == request.auth.uid
+        return od.authorUid == me()
         && nw.updatedAt == request.time
         && nw.commentsOff is bool
         && nw.diff(od).affectedKeys().hasOnly(['commentsOff', 'updatedAt']);
       }
       allow update: if _k89(request.resource.data, resource.data);
+      // Sahibi profilinde sabitler / kaldırır (en çok 3'ü uygulama denetler).
+      allow update: if resource.data.authorUid == me()
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.get('pinned', true) == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pinned', 'updatedAt']);
+      // Etiketlenen kişi yalnızca kendini çıkarır (etiketleri sunucu yazar).
+      allow update: if signedIn() && me() in resource.data.get('tags', [])
+        && request.resource.data.tags == resource.data.tags.removeAll([me()])
+        && !(me() in request.resource.data.get('tagNames', {}))
+        && request.resource.data.get('tagNames', {}).diff(resource.data.get('tagNames', {})).affectedKeys().hasOnly([me()])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tags', 'tagNames']);
       // Yorum sayacı: yalnızca adı geçen yorum (lastComment) aynı yazımda eklenirken tam bir artar, silinirken azalır.
       // Kimin silebileceğini yorum kuralı denetler.
       function _k90(nw, od) {
@@ -2418,11 +2561,11 @@ service cloud.firestore {
         && nw.diff(od).affectedKeys().hasOnly(['commentCount', 'lastComment'])
         && nw.lastComment is string
         && ((nw.commentCount == od.get('commentCount', 0) + 1
-              && !exists(/databases/$(database)/documents/posts/$(id)/comments/$(nw.lastComment))
-              && existsAfter(/databases/$(database)/documents/posts/$(id)/comments/$(nw.lastComment)))
+              && !exists(dp2('posts', id, 'comments', nw.lastComment))
+              && existsAfter(dp2('posts', id, 'comments', nw.lastComment)))
             || (nw.commentCount == od.get('commentCount', 0) - 1
-              && exists(/databases/$(database)/documents/posts/$(id)/comments/$(nw.lastComment))
-              && !existsAfter(/databases/$(database)/documents/posts/$(id)/comments/$(nw.lastComment))));
+              && exists(dp2('posts', id, 'comments', nw.lastComment))
+              && !existsAfter(dp2('posts', id, 'comments', nw.lastComment))));
       }
       allow update: if _k90(request.resource.data, resource.data);
       // Beğeni sayacı: yalnızca kendi beğeni kaydıyla tam bir artar (görebildiği, kaldırılmamış gönderide) ya da azalır.
@@ -2430,12 +2573,12 @@ service cloud.firestore {
         return signedIn()
         && nw.diff(od).affectedKeys().hasOnly(['likeCount'])
         && ((nw.likeCount == od.likeCount + 1
-              && !exists(/databases/$(database)/documents/posts/$(id)/likes/$(request.auth.uid))
-              && existsAfter(/databases/$(database)/documents/posts/$(id)/likes/$(request.auth.uid))
+              && !exists(dp2('posts', id, 'likes', me()))
+              && existsAfter(dp2('posts', id, 'likes', me()))
               && od.status == 'aktif' && canSeePost(od))
             || (nw.likeCount == od.likeCount - 1
-              && exists(/databases/$(database)/documents/posts/$(id)/likes/$(request.auth.uid))
-              && !existsAfter(/databases/$(database)/documents/posts/$(id)/likes/$(request.auth.uid))));
+              && exists(dp2('posts', id, 'likes', me()))
+              && !existsAfter(dp2('posts', id, 'likes', me()))));
       }
       allow update: if _k91(request.resource.data, resource.data);
       // Şikâyet sayacı: yalnızca kendi şikâyet kaydıyla tam bir artar.
@@ -2443,13 +2586,13 @@ service cloud.firestore {
         return signedIn()
         && nw.diff(od).affectedKeys().hasOnly(['reportCount'])
         && nw.reportCount == od.reportCount + 1
-        && !exists(/databases/$(database)/documents/postReports/$(id + '_' + request.auth.uid))
-        && existsAfter(/databases/$(database)/documents/postReports/$(id + '_' + request.auth.uid));
+        && !exists(dp('postReports', id + '_' + me()))
+        && existsAfter(dp('postReports', id + '_' + me()));
       }
       allow update: if _k92(request.resource.data, resource.data);
       // Moderasyon: kaldır ya da "yerinde kalsın".
       function _k93(nw, od) {
-        return nw.moderatedBy == request.auth.uid
+        return nw.moderatedBy == me()
         && nw.updatedAt == request.time
         && nw.diff(od).affectedKeys().hasOnly(['status', 'cleared', 'moderatedBy', 'updatedAt'])
         && (nw.status == 'kaldirildi'
@@ -2480,13 +2623,13 @@ service cloud.firestore {
       match /comments/{cid} {
         allow read: if signedIn()
           && ((get(postPath(id)).data.status == 'aktif' && canSeePost(get(postPath(id)).data))
-              || get(postPath(id)).data.authorUid == request.auth.uid
+              || get(postPath(id)).data.authorUid == me()
               || provinceAllows('moderasyon', 'goruntule', get(postPath(id)).data.region.provinceCode));
         function _k95(nw) {
           return signedIn()
           && nw.keys().hasOnly(['authorUid', 'authorName', 'text', 'reportCount', 'createdAt'])
-          && nw.authorUid == request.auth.uid
-          && usageOk('u-' + request.auth.uid, 'yorum', userLimit('yorum', 100, 30))
+          && nw.authorUid == me()
+          && usageOk('u-' + me(), 'yorum', userLimit('yorum', 100, 30))
           && nw.authorName is string && nw.authorName.size() <= 40
           && nw.text is string && nw.text.size() >= 1 && nw.text.size() <= 500
           && nw.reportCount == 0
@@ -2494,25 +2637,25 @@ service cloud.firestore {
           && get(postPath(id)).data.status == 'aktif' && canSeePost(get(postPath(id)).data)
           && get(postPath(id)).data.get('commentsOff', false) != true
           // Gönderi sahibi beni engellediyse yorum yazamam.
-          && !exists(blockPath(get(postPath(id)).data.authorUid, request.auth.uid))
+          && !exists(blockPath(get(postPath(id)).data.authorUid, me()))
           && getAfter(postPath(id)).data.commentCount == get(postPath(id)).data.get('commentCount', 0) + 1;
         }
         allow create: if _k95(request.resource.data);
         allow delete: if signedIn()
-          && (resource.data.authorUid == request.auth.uid
-              || get(postPath(id)).data.authorUid == request.auth.uid
+          && (resource.data.authorUid == me()
+              || get(postPath(id)).data.authorUid == me()
               || isAdmin() || provinceAllows('moderasyon', 'sil', get(postPath(id)).data.region.provinceCode))
           && getAfter(postPath(id)).data.commentCount == get(postPath(id)).data.get('commentCount', 0) - 1;
         function _k96(nw, od) {
           return signedIn()
           && nw.diff(od).affectedKeys().hasOnly(['reportCount'])
           && nw.reportCount == od.reportCount + 1
-          && !exists(/databases/$(database)/documents/commentReports/$(id + '_' + cid + '_' + request.auth.uid))
-          && existsAfter(/databases/$(database)/documents/commentReports/$(id + '_' + cid + '_' + request.auth.uid));
+          && !exists(dp('commentReports', id + '_' + cid + '_' + me()))
+          && existsAfter(dp('commentReports', id + '_' + cid + '_' + me()));
         }
         allow update: if _k96(request.resource.data, resource.data);
         function _k97(nw) {
-          return nw.moderatedBy == request.auth.uid
+          return nw.moderatedBy == me()
           && nw.cleared == true
           && nw.diff(resource.data).affectedKeys().hasOnly(['cleared', 'moderatedBy'])
           && (isAdmin() || provinceAllows('moderasyon', 'duzenle', get(postPath(id)).data.region.provinceCode));
@@ -2522,7 +2665,7 @@ service cloud.firestore {
     }
     // Kişinin bütün yorumları (hesap silme için).
     match /{path=**}/comments/{cid} {
-      allow read: if signedIn() && resource.data.authorUid == request.auth.uid;
+      allow read: if signedIn() && resource.data.authorUid == me();
     }
 
     // Yorum şikâyetleri: kişi başına yorum başına bir; yorumun yazısı kopyalanır (silinse de moderatör görür).
@@ -2530,18 +2673,18 @@ service cloud.firestore {
       function _k98(nw) {
         return signedIn()
         && nw.keys().hasOnly(['postId', 'commentId', 'reporterUid', 'reason', 'text', 'provinceCode', 'status', 'createdAt'])
-        && nw.reporterUid == request.auth.uid
-        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
-        && rid == nw.postId + '_' + nw.commentId + '_' + request.auth.uid
+        && nw.reporterUid == me()
+        && usageOk('u-' + me(), 'sikayet', limitOf('sikayet', 20))
+        && rid == nw.postId + '_' + nw.commentId + '_' + me()
         && nw.reason in ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger']
         && nw.text is string && nw.text.size() <= 500
         && nw.status == 'yeni'
         && nw.createdAt == request.time
         && nw.provinceCode == get(postPath(nw.postId)).data.region.provinceCode
-        && get(/databases/$(database)/documents/posts/$(nw.postId)/comments/$(nw.commentId)).data.authorUid != request.auth.uid;
+        && get(dp2('posts', nw.postId, 'comments', nw.commentId)).data.authorUid != me();
       }
       allow create: if _k98(request.resource.data);
-      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == me()))
         || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
       function _k99(nw, od) {
         return provinceAllows('moderasyon', 'duzenle', od.provinceCode)
@@ -2556,16 +2699,16 @@ service cloud.firestore {
     // ile 13-17 yaş arası kişi arasında sohbet açılamaz; engel iki yönde de yazışmayı durdurur. Yeni sohbet sayısı 24 saatte
     // sınırlı (yeni hesapta 10, sonra 30). Mesajları yalnızca iki taraf okur; admin yalnızca şikâyet edilen mesajın kopyasını.
     function chatPath(id) {
-      return /databases/$(database)/documents/chats/$(id);
+      return dp('chats', id);
     }
     function chatMessagePath(id, mid) {
-      return /databases/$(database)/documents/chats/$(id)/messages/$(mid);
+      return dp2('chats', id, 'messages', mid);
     }
     function quotaPath() {
-      return /databases/$(database)/documents/chatQuota/$(request.auth.uid);
+      return dp('chatQuota', me());
     }
     function isMinor(uid) {
-      return ageOf(get(/databases/$(database)/documents/users/$(uid)).data.birthYear) < 18;
+      return ageOf(get(dp('users', uid)).data.birthYear) < 18;
     }
     function notBlockedPair(a, b) {
       return !exists(blockPath(a, b)) && !exists(blockPath(b, a));
@@ -2576,10 +2719,10 @@ service cloud.firestore {
       return get(followPath(a, b)).data.status == 'aktif';
     }
     function otherOf(members) {
-      return members[0] == request.auth.uid ? members[1] : members[0];
+      return members[0] == me() ? members[1] : members[0];
     }
     function profileName(uid) {
-      return get(/databases/$(database)/documents/publicProfiles/$(uid)).data.displayName;
+      return get(dp('publicProfiles', uid)).data.displayName;
     }
     function chatLimit() {
       return userLimit('sohbet', 30, 10);
@@ -2587,9 +2730,9 @@ service cloud.firestore {
     // Son mesaj özeti: aynı yazımda eklenen, benim yazdığım mesajı gösterir.
     function validLast(id, last) {
       return last.keys().hasOnly(['id', 'text', 'from', 'at'])
-        && last.from == request.auth.uid && last.at == request.time
+        && last.from == me() && last.at == request.time
         && last.text is string && last.text.size() <= 80
-        && getAfter(chatMessagePath(id, last.id)).data.from == request.auth.uid;
+        && getAfter(chatMessagePath(id, last.id)).data.from == me();
     }
     // Yeni sohbet sayacı bu yazımda değişti (sayacın kendi kuralı yalnızca +1 ya da süresi dolunca sıfırlamaya izin verir).
     function quotaCounted() {
@@ -2600,16 +2743,16 @@ service cloud.firestore {
     function businessChat(id, d, other) {
       return d.context.keys().hasOnly(['type', 'id', 'title']) && d.context.type == 'isletme'
         && id == d.members[0] + '_' + d.members[1] + '__b_' + d.context.id
-        && get(/databases/$(database)/documents/businesses/$(d.context.id)).data.ownerUid == other
-        && get(/databases/$(database)/documents/businesses/$(d.context.id)).data.status == 'yayinda'
-        && d.context.title == get(/databases/$(database)/documents/businesses/$(d.context.id)).data.name
+        && get(dp('businesses', d.context.id)).data.ownerUid == other
+        && get(dp('businesses', d.context.id)).data.status == 'yayinda'
+        && d.context.title == get(dp('businesses', d.context.id)).data.name
         && d.names[other] == d.context.title
         && d.accepted == true;
     }
     // Çarşı ilanı için açılan sohbet: kimliğin sonunda ilan, karşı taraf ilanın sahibi, ilan yayında ve süresi dolmamış;
     // baştan açık (ilan herkese açık verildi), ad kişinin Keşfet adı.
     function listingChat(id, d, other) {
-      let l = get(/databases/$(database)/documents/listings/$(d.context.id)).data;
+      let l = get(dp('listings', d.context.id)).data;
       return d.context.keys().hasOnly(['type', 'id', 'title']) && d.context.type == 'ilan'
         && id == d.members[0] + '_' + d.members[1] + '__l_' + d.context.id
         && l.ownerUid == other && l.status == 'yayinda'
@@ -2621,20 +2764,20 @@ service cloud.firestore {
     function personChat(id, d, other) {
       return id == d.members[0] + '_' + d.members[1]
         && d.names[other] == profileName(other)
-        && (d.accepted == false || (d.accepted == true && followsActive(request.auth.uid, other) && followsActive(other, request.auth.uid)));
+        && (d.accepted == false || (d.accepted == true && followsActive(me(), other) && followsActive(other, me())));
     }
     function validNewChat(id, d, other) {
       return d.keys().hasOnly(['members', 'names', 'startedBy', 'accepted', 'last', 'unread', 'seen', 'context', 'createdAt', 'updatedAt'])
-        && d.names.keys().hasOnly([request.auth.uid, other])
-        && d.names[request.auth.uid] == profileName(request.auth.uid)
-        && d.startedBy == request.auth.uid
+        && d.names.keys().hasOnly([me(), other])
+        && d.names[me()] == profileName(me())
+        && d.startedBy == me()
         && ('context' in d ? (d.context.type == 'ilan' ? listingChat(id, d, other) : businessChat(id, d, other)) : personChat(id, d, other))
-        && d.unread.keys().hasOnly([request.auth.uid, other]) && d.unread[request.auth.uid] == 0 && d.unread[other] == 1
+        && d.unread.keys().hasOnly([me(), other]) && d.unread[me()] == 0 && d.unread[other] == 1
         && d.seen == {}
         && validLast(id, d.last)
         && d.createdAt == request.time && d.updatedAt == request.time
-        && notBlockedPair(request.auth.uid, other)
-        && isMinor(request.auth.uid) == isMinor(other)
+        && notBlockedPair(me(), other)
+        && isMinor(me()) == isMinor(other)
         && quotaCounted();
     }
     function chatSending(id, before, after, other) {
@@ -2642,26 +2785,26 @@ service cloud.firestore {
         && validLast(id, after.last)
         && after.unread.keys().hasOnly(before.members)
         && after.unread[other] == before.unread.get(other, 0) + 1
-        && after.unread.get(request.auth.uid, 0) == before.unread.get(request.auth.uid, 0)
+        && after.unread.get(me(), 0) == before.unread.get(me(), 0)
         && after.updatedAt == request.time
         && (after.accepted == before.accepted
-            || (before.accepted == false && after.accepted == true && before.startedBy != request.auth.uid));
+            || (before.accepted == false && after.accepted == true && before.startedBy != me()));
     }
     function chatReading(before, after, other) {
       return after.diff(before).affectedKeys().hasOnly(['unread', 'seen'])
         && after.unread.keys().hasOnly(before.members)
-        && after.unread[request.auth.uid] == 0
+        && after.unread[me()] == 0
         && after.unread.get(other, 0) == before.unread.get(other, 0)
-        && after.seen.diff(before.seen).affectedKeys().hasOnly([request.auth.uid])
-        && (!(request.auth.uid in after.seen.diff(before.seen).affectedKeys()) || after.seen[request.auth.uid] == request.time);
+        && after.seen.diff(before.seen).affectedKeys().hasOnly([me()])
+        && (!(me() in after.seen.diff(before.seen).affectedKeys()) || after.seen[me()] == request.time);
     }
     // "Sohbeti sil": kişi yalnızca kendi silme zamanını yazar (ve kendi okunmamışını sıfırlar); karşı tarafa dokunulmaz.
     function chatHiding(before, after, other) {
       return after.diff(before).affectedKeys().hasOnly(['hidden', 'unread'])
-        && after.hidden.diff(before.get('hidden', {})).affectedKeys().hasOnly([request.auth.uid])
-        && after.hidden[request.auth.uid] == request.time
+        && after.hidden.diff(before.get('hidden', {})).affectedKeys().hasOnly([me()])
+        && after.hidden[me()] == request.time
         && after.unread.keys().hasOnly(before.members)
-        && after.unread[request.auth.uid] == 0
+        && after.unread[me()] == 0
         && after.unread.get(other, 0) == before.unread.get(other, 0);
     }
 
@@ -2669,8 +2812,8 @@ service cloud.firestore {
     // değildir; işletme tarafının okunmamış sayacı sahibininkidir (sahip ve yetkililer için ortak).
     function isBusinessStaff(chat) {
       return signedIn() && chat.get('context', null) != null
-        && request.auth.uid in get(/databases/$(database)/documents/businesses/$(chat.context.id)).data.get('managerUids', [])
-        && get(/databases/$(database)/documents/businesses/$(chat.context.id)).data.managers[request.auth.uid].get('messages', false) == true;
+        && me() in get(dp('businesses', chat.context.id)).data.get('managerUids', [])
+        && get(dp('businesses', chat.context.id)).data.managers[me()].get('messages', false) == true;
     }
     function ownerOfChat(chat) {
       return chat.members[0] == chat.startedBy ? chat.members[1] : chat.members[0];
@@ -2693,33 +2836,33 @@ service cloud.firestore {
     // Mesaj, aynı yazımdaki sohbet özetinin son mesajıdır; iki taraf arasında engel yoktur.
     function messageFits(chat, mid) {
       return chat.last.id == mid
-        && ((request.auth.uid in chat.members && notBlockedPair(request.auth.uid, otherOf(chat.members)))
-            || (isBusinessStaff(chat) && notBlockedPair(request.auth.uid, chat.startedBy) && notBlockedPair(ownerOfChat(chat), chat.startedBy)));
+        && ((me() in chat.members && notBlockedPair(me(), otherOf(chat.members)))
+            || (isBusinessStaff(chat) && notBlockedPair(me(), chat.startedBy) && notBlockedPair(ownerOfChat(chat), chat.startedBy)));
     }
 
     match /chats/{id} {
-      allow read: if signedIn() && (resource == null || request.auth.uid in resource.data.members || isBusinessStaff(resource.data));
+      allow read: if signedIn() && (resource == null || me() in resource.data.members || isBusinessStaff(resource.data));
       function _k100(nw) {
         return signedIn()
         && nw.members is list && nw.members.size() == 2
         && nw.members[0] < nw.members[1]
-        && request.auth.uid in nw.members
+        && me() in nw.members
         && validNewChat(id, nw, otherOf(nw.members));
       }
       allow create: if _k100(request.resource.data);
       function _k101(nw, od) {
-        return signedIn() && request.auth.uid in od.members
+        return signedIn() && me() in od.members
         && nw.members == od.members
         && (chatSending(id, od, nw, otherOf(od.members))
             || chatReading(od, nw, otherOf(od.members))
             || chatHiding(od, nw, otherOf(od.members))
             // İsteği alan kişi kabul eder.
             || (nw.diff(od).affectedKeys().hasOnly(['accepted'])
-                && nw.accepted == true && od.startedBy != request.auth.uid)
+                && nw.accepted == true && od.startedBy != me())
             // Kendi son mesajını silen kişi önizlemeyi boşaltır.
             || (nw.diff(od).affectedKeys().hasOnly(['last'])
                 && nw.last.diff(od.last).affectedKeys().hasOnly(['text'])
-                && nw.last.text == '' && od.last.from == request.auth.uid));
+                && nw.last.text == '' && od.last.from == me()));
       }
       allow update: if _k101(request.resource.data, resource.data);
       // İşletme ekibi: işletme adına cevap, okundu, kendi son mesajını silince önizleme.
@@ -2730,18 +2873,18 @@ service cloud.firestore {
             || staffReading(od, nw)
             || (nw.diff(od).affectedKeys().hasOnly(['last'])
                 && nw.last.diff(od.last).affectedKeys().hasOnly(['text'])
-                && nw.last.text == '' && od.last.from == request.auth.uid));
+                && nw.last.text == '' && od.last.from == me()));
       }
       allow update: if _k102(request.resource.data, resource.data);
       // Hesap silinirken.
-      allow delete: if signedIn() && request.auth.uid in resource.data.members;
+      allow delete: if signedIn() && me() in resource.data.members;
 
       match /messages/{mid} {
-        allow read: if signedIn() && (request.auth.uid in get(chatPath(id)).data.members || isBusinessStaff(get(chatPath(id)).data));
+        allow read: if signedIn() && (me() in get(chatPath(id)).data.members || isBusinessStaff(get(chatPath(id)).data));
         function _k103(nw) {
           return signedIn()
           && nw.keys().hasOnly(['from', 'text', 'status', 'createdAt'])
-          && nw.from == request.auth.uid
+          && nw.from == me()
           && nw.status == 'aktif'
           && nw.text is string && nw.text.size() >= 1 && nw.text.size() <= 1000
           && nw.createdAt == request.time
@@ -2750,7 +2893,7 @@ service cloud.firestore {
         allow create: if _k103(request.resource.data);
         // Gönderen siler (yazı boşalır); admin şikâyet üzerine kaldırır.
         function _k104(nw, od) {
-          return signedIn() && od.from == request.auth.uid
+          return signedIn() && od.from == me()
           && nw.diff(od).affectedKeys().hasOnly(['status', 'text'])
           && nw.status == 'silindi' && nw.text == '';
         }
@@ -2761,7 +2904,7 @@ service cloud.firestore {
           && nw.status == 'kaldirildi' && nw.text == '';
         }
         allow update: if _k105(request.resource.data);
-        allow delete: if signedIn() && resource.data.from == request.auth.uid;
+        allow delete: if signedIn() && resource.data.from == me();
       }
     }
 
@@ -2786,20 +2929,20 @@ service cloud.firestore {
 
     // Mesaj şikâyeti: kişi başına mesaj başına bir, mesajın o anki kopyasıyla; yalnızca admin görür ve karar verir.
     match /messageReports/{rid} {
-      allow read: if isAdmin() || (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid));
+      allow read: if isAdmin() || (signedIn() && (resource == null || resource.data.reporterUid == me()));
       function _k108(nw) {
         return signedIn()
         && nw.keys().hasOnly(['chatId', 'messageId', 'reporterUid', 'reportedUid', 'text', 'reason', 'status', 'createdAt'])
-        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
-        && rid == request.auth.uid + '_' + nw.messageId
-        && nw.reporterUid == request.auth.uid
+        && usageOk('u-' + me(), 'sikayet', limitOf('sikayet', 20))
+        && rid == me() + '_' + nw.messageId
+        && nw.reporterUid == me()
         && nw.reason in ['taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'diger']
         && nw.status == 'acik'
         && nw.createdAt == request.time
-        && (request.auth.uid in get(chatPath(nw.chatId)).data.members
+        && (me() in get(chatPath(nw.chatId)).data.members
             || isBusinessStaff(get(chatPath(nw.chatId)).data))
         && get(chatMessagePath(nw.chatId, nw.messageId)).data.from == nw.reportedUid
-        && nw.reportedUid != request.auth.uid
+        && nw.reportedUid != me()
         && get(chatMessagePath(nw.chatId, nw.messageId)).data.text == nw.text;
       }
       allow create: if _k108(request.resource.data);
@@ -2816,10 +2959,10 @@ service cloud.firestore {
     // ilanı giriş yapmış herkes okur; liste sorguları yalnızca yayındakileri ister. Fotoğraf alanı Storage gelene kadar
     // boş. Sahibi düzenler, satıldı işaretler, son günlerde yeniler, boşaltarak kaldırır; moderatör kaldırır ya da bırakır.
     function listingPath(id) {
-      return /databases/$(database)/documents/listings/$(id);
+      return dp('listings', id);
     }
     function listingQuotaPath() {
-      return /databases/$(database)/documents/listingQuota/$(request.auth.uid);
+      return dp('listingQuota', me());
     }
     function listingLimit() {
       return userLimit('ilan', 5, 2);
@@ -2871,10 +3014,10 @@ service cloud.firestore {
     match /listings/{id} {
       allow read: if signedIn()
         && (resource.data.status in ['yayinda', 'satildi']
-            || resource.data.ownerUid == request.auth.uid
+            || resource.data.ownerUid == me()
             || regionAllows('moderasyon', 'goruntule', resource.data.region.provinceCode, resource.data.region.districtId));
       function _k110(nw) {
-        return verified() && nw.ownerUid == request.auth.uid
+        return verified() && nw.ownerUid == me()
         && validListing(nw)
         // Yeni ilanda en az bir fotoğraf (Karar Eren, 3 Kasım).
         && nw.photos.size() >= 1
@@ -2882,7 +3025,7 @@ service cloud.firestore {
         && nw.reportCount == 0
         && !('cleared' in nw) && !('moderatedBy' in nw)
         && nw.createdAt == request.time && nw.listedAt == request.time
-        && nw.ownerName == profileName(request.auth.uid)
+        && nw.ownerName == profileName(me())
         && isAdultUser()
         && myLocation().get('neighbourhoodId', '') == nw.region.neighbourhoodId
         && myLocation().get('districtId', '') == nw.region.districtId
@@ -2892,7 +3035,7 @@ service cloud.firestore {
       allow create: if _k110(request.resource.data);
       // Sahibi düzenler (yayındayken; bölge, ad ve tarihler değişmez).
       function _k111(nw, od) {
-        return od.ownerUid == request.auth.uid && od.status == 'yayinda'
+        return od.ownerUid == me() && od.status == 'yayinda'
         && nw.diff(od).affectedKeys().hasOnly(listingContentKeys())
         && validListing(nw)
         // Fotoğraflar sıfıra indirilemez (kuraldan önce fotoğrafsız verilmiş eski ilan dışında).
@@ -2901,7 +3044,7 @@ service cloud.firestore {
       allow update: if _k111(request.resource.data, resource.data);
       // Satıldı / yeniden yayında.
       function _k112(nw, od) {
-        return od.ownerUid == request.auth.uid
+        return od.ownerUid == me()
         && od.status in ['yayinda', 'satildi'] && nw.status in ['yayinda', 'satildi']
         && nw.updatedAt == request.time
         && nw.diff(od).affectedKeys().hasOnly(['status', 'updatedAt']);
@@ -2909,7 +3052,7 @@ service cloud.firestore {
       allow update: if _k112(request.resource.data, resource.data);
       // Yenile: son üç günde ya da süresi dolunca, 30 gün daha.
       function _k113(nw, od) {
-        return od.ownerUid == request.auth.uid && od.status == 'yayinda'
+        return od.ownerUid == me() && od.status == 'yayinda'
         && od.listedAt <= request.time - duration.value(27, 'd')
         && nw.listedAt == request.time && nw.updatedAt == request.time
         && nw.diff(od).affectedKeys().hasOnly(['listedAt', 'updatedAt']);
@@ -2917,7 +3060,7 @@ service cloud.firestore {
       allow update: if _k113(request.resource.data, resource.data);
       // Sahibi kaldırır: yazılar, ad, fotoğraflar ve arama anahtarları boşaltılır (dosyaları sunucu siler).
       function _k114(nw, od) {
-        return od.ownerUid == request.auth.uid
+        return od.ownerUid == me()
         && nw.updatedAt == request.time
         && nw.status == 'kaldirildi' && nw.title == ''
         && nw.description == '' && nw.swapFor == '' && nw.ownerName == ''
@@ -2931,13 +3074,13 @@ service cloud.firestore {
         return signedIn()
         && nw.diff(od).affectedKeys().hasOnly(['reportCount'])
         && nw.reportCount == od.reportCount + 1
-        && !exists(/databases/$(database)/documents/listingReports/$(id + '_' + request.auth.uid))
-        && existsAfter(/databases/$(database)/documents/listingReports/$(id + '_' + request.auth.uid));
+        && !exists(dp('listingReports', id + '_' + me()))
+        && existsAfter(dp('listingReports', id + '_' + me()));
       }
       allow update: if _k115(request.resource.data, resource.data);
       // Moderasyon: kaldır ya da "yerinde kalsın".
       function _k116(nw, od) {
-        return nw.moderatedBy == request.auth.uid
+        return nw.moderatedBy == me()
         && nw.updatedAt == request.time
         && nw.diff(od).affectedKeys().hasOnly(['status', 'cleared', 'moderatedBy', 'updatedAt'])
         && (nw.status == 'kaldirildi'
@@ -2972,19 +3115,19 @@ service cloud.firestore {
       function _k119(nw) {
         return signedIn()
         && nw.keys().hasOnly(['listingId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
-        && nw.reporterUid == request.auth.uid
-        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
-        && rid == nw.listingId + '_' + request.auth.uid
+        && nw.reporterUid == me()
+        && usageOk('u-' + me(), 'sikayet', limitOf('sikayet', 20))
+        && rid == nw.listingId + '_' + me()
         && nw.reason in ['dolandiricilik', 'yasakli', 'sahte', 'emlak-arac', 'uygunsuz', 'spam', 'diger']
         && nw.status == 'yeni'
         && nw.createdAt == request.time
-        && get(listingPath(nw.listingId)).data.ownerUid != request.auth.uid
+        && get(listingPath(nw.listingId)).data.ownerUid != me()
         && nw.provinceCode == get(listingPath(nw.listingId)).data.region.provinceCode
         && getAfter(listingPath(nw.listingId)).data.reportCount
            == get(listingPath(nw.listingId)).data.reportCount + 1;
       }
       allow create: if _k119(request.resource.data);
-      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == me()))
         || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
       function _k120(nw, od) {
         return provinceAllows('moderasyon', 'duzenle', od.provinceCode)
@@ -3015,12 +3158,12 @@ service cloud.firestore {
       // fotoğrafı kaldırıldıysa yenisini koyamaz. Fotoğraf kendi yüklediği dosya olmalı.
       function _k122(nw, od) {
         return isSelf(uid)
-        && nw.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'searchKeys', 'updatedAt'])
+        && nw.keys().hasOnly(['displayName', 'bio', 'isPrivate', 'bioRemoved', 'photo', 'photoRemoved', 'locationVerified', 'badges', 'publisher', 'official', 'searchKeys', 'updatedAt'])
         && nw.diff(od).affectedKeys().hasOnly(['displayName', 'bio', 'isPrivate', 'photo', 'locationVerified', 'searchKeys', 'updatedAt'])
         // Konum rozeti yalnızca kişinin kaydındaki doğrulamayla aynı yazımda ve aynı düzeyde.
         && (!nw.diff(od).affectedKeys().hasAny(['locationVerified'])
             || nw.get('locationVerified', null)
-               == getAfter(/databases/$(database)/documents/users/$(uid)).data.get('locationCheck', {}).get('level', null))
+               == getAfter(dp('users', uid)).data.get('locationCheck', {}).get('level', null))
         && mediaKeptOrOwn(nw, 'photo', 'profil')
         && (od.get('photoRemoved', false) != true || !('photo' in nw))
         && validSearchKeys(nw, 40)
@@ -3048,53 +3191,63 @@ service cloud.firestore {
         && nw.updatedAt == request.time;
       }
       allow update: if _k124(request.resource.data);
+      // Rozet (Eren, 13 Kasım 2026): yalnızca admin verir ya da geri alır; kişi isteyemez, kendisi değiştiremez.
+      function _k125(nw) {
+        return isAdmin()
+        && nw.diff(resource.data).affectedKeys().hasOnly(['badges', 'publisher', 'official', 'updatedAt'])
+        && nw.get('badges', []) is list && nw.get('badges', []).size() <= 3
+        && nw.get('publisher', false) is bool
+        && nw.get('official', false) is bool
+        && nw.updatedAt == request.time;
+      }
+      allow update: if _k125(request.resource.data);
       allow delete: if isSelf(uid);
     }
 
     match /follows/{fid} {
       // Onaylı takipler herkese açık (takipçi sayısı); istekleri yalnızca iki taraf görür.
       allow read: if signedIn()
-        && (resource.data.status == 'aktif' || resource.data.followerUid == request.auth.uid
-            || resource.data.followeeUid == request.auth.uid);
+        && (resource.data.status == 'aktif' || resource.data.followerUid == me()
+            || resource.data.followeeUid == me());
       function _k125(nw) {
         return signedIn()
         && nw.keys().hasOnly(['followerUid', 'followeeUid', 'status', 'createdAt'])
-        && nw.followerUid == request.auth.uid
-        && nw.followeeUid is string && nw.followeeUid != request.auth.uid
-        && fid == request.auth.uid + '_' + nw.followeeUid
-        && usageOk('u-' + request.auth.uid, 'takip', userLimit('takip', 200, 50))
+        && nw.followerUid == me()
+        && nw.followeeUid is string && nw.followeeUid != me()
+        && fid == me() + '_' + nw.followeeUid
+        && usageOk('u-' + me(), 'takip', userLimit('takip', 200, 50))
         && nw.createdAt == request.time
-        && exists(/databases/$(database)/documents/publicProfiles/$(nw.followeeUid))
-        && nw.status == (get(/databases/$(database)/documents/publicProfiles/$(nw.followeeUid)).data.isPrivate ? 'istek' : 'aktif')
-        && !exists(blockPath(nw.followeeUid, request.auth.uid))
-        && !exists(blockPath(request.auth.uid, nw.followeeUid));
+        && exists(dp('publicProfiles', nw.followeeUid))
+        && nw.status == (get(dp('publicProfiles', nw.followeeUid)).data.isPrivate ? 'istek' : 'aktif')
+        && !exists(blockPath(nw.followeeUid, me()))
+        && !exists(blockPath(me(), nw.followeeUid));
       }
       allow create: if _k125(request.resource.data);
       // Hesap sahibi isteği kabul eder.
       function _k126(nw, od) {
-        return signedIn() && od.followeeUid == request.auth.uid
+        return signedIn() && od.followeeUid == me()
         && od.status == 'istek' && nw.status == 'aktif'
         && nw.diff(od).affectedKeys().hasOnly(['status']);
       }
       allow update: if _k126(request.resource.data, resource.data);
       // Takibi bırakma, isteği reddetme, takipçiyi çıkarma (engellerken yoksa da silinebilir).
       allow delete: if signedIn()
-        && (resource == null || resource.data.followerUid == request.auth.uid || resource.data.followeeUid == request.auth.uid);
+        && (resource == null || resource.data.followerUid == me() || resource.data.followeeUid == me());
     }
 
     match /blocks/{bid} {
-      allow read: if signedIn() && (resource == null || resource.data.blockerUid == request.auth.uid
-        || resource.data.blockedUid == request.auth.uid);
+      allow read: if signedIn() && (resource == null || resource.data.blockerUid == me()
+        || resource.data.blockedUid == me());
       function _k127(nw) {
         return signedIn()
         && nw.keys().hasOnly(['blockerUid', 'blockedUid', 'createdAt'])
-        && nw.blockerUid == request.auth.uid
-        && nw.blockedUid is string && nw.blockedUid != request.auth.uid
-        && bid == request.auth.uid + '_' + nw.blockedUid
+        && nw.blockerUid == me()
+        && nw.blockedUid is string && nw.blockedUid != me()
+        && bid == me() + '_' + nw.blockedUid
         && nw.createdAt == request.time;
       }
       allow create: if _k127(request.resource.data);
-      allow delete: if signedIn() && resource.data.blockerUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.blockerUid == me();
       allow update: if false;
     }
 
@@ -3104,10 +3257,10 @@ service cloud.firestore {
       function _k128(nw) {
         return signedIn()
         && nw.keys().hasOnly(['targetUid', 'reporterUid', 'reason', 'displayName', 'bio', 'status', 'createdAt'])
-        && nw.reporterUid == request.auth.uid
-        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
-        && nw.targetUid is string && nw.targetUid != request.auth.uid
-        && rid == nw.targetUid + '_' + request.auth.uid
+        && nw.reporterUid == me()
+        && usageOk('u-' + me(), 'sikayet', limitOf('sikayet', 20))
+        && nw.targetUid is string && nw.targetUid != me()
+        && rid == nw.targetUid + '_' + me()
         && nw.reason in ['taklit', 'nefret', 'taciz', 'spam', 'uygunsuz', 'diger']
         && nw.displayName is string && nw.displayName.size() <= 40
         && nw.bio is string && nw.bio.size() <= 160
@@ -3115,7 +3268,7 @@ service cloud.firestore {
         && nw.createdAt == request.time;
       }
       allow create: if _k128(request.resource.data);
-      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid)) || isAdmin();
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == me())) || isAdmin();
       function _k129(nw) {
         return isAdmin()
         && nw.diff(resource.data).affectedKeys().hasOnly(['status'])
@@ -3127,7 +3280,7 @@ service cloud.firestore {
 
     // Kişinin bütün beğenileri (akıştaki kalpler ve hesap silme için).
     match /{path=**}/likes/{uid} {
-      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow read: if signedIn() && resource.data.uid == me();
     }
 
     // Gönderi şikâyetleri: kişi başına gönderi başına bir; kendi gönderisini şikâyet edemez. Admin hepsini, ildeki
@@ -3136,19 +3289,19 @@ service cloud.firestore {
       function _k130(nw) {
         return signedIn()
         && nw.keys().hasOnly(['postId', 'reporterUid', 'reason', 'provinceCode', 'status', 'createdAt'])
-        && nw.reporterUid == request.auth.uid
-        && usageOk('u-' + request.auth.uid, 'sikayet', limitOf('sikayet', 20))
-        && rid == nw.postId + '_' + request.auth.uid
+        && nw.reporterUid == me()
+        && usageOk('u-' + me(), 'sikayet', limitOf('sikayet', 20))
+        && rid == nw.postId + '_' + me()
         && nw.reason in ['nefret', 'taciz', 'dolandiricilik', 'spam', 'uygunsuz', 'emlak', 'diger']
         && nw.status == 'yeni'
         && nw.createdAt == request.time
-        && get(postPath(nw.postId)).data.authorUid != request.auth.uid
+        && get(postPath(nw.postId)).data.authorUid != me()
         && nw.provinceCode == get(postPath(nw.postId)).data.region.provinceCode
         && getAfter(postPath(nw.postId)).data.reportCount
            == get(postPath(nw.postId)).data.reportCount + 1;
       }
       allow create: if _k130(request.resource.data);
-      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == request.auth.uid))
+      allow read: if (signedIn() && (resource == null || resource.data.reporterUid == me()))
         || provinceAllows('moderasyon', 'goruntule', resource.data.provinceCode);
       function _k131(nw, od) {
         return provinceAllows('moderasyon', 'duzenle', od.provinceCode)
@@ -3226,17 +3379,17 @@ service cloud.firestore {
     // muhtarlık ya da başkan profilini takip eder. Takip kaydı kişinin kayıtlı konumunu (GPS değil) ve doğum yılından
     // yaş aralığını taşır; kayıt ile sayaç aynı toplu yazımda değişir. Sayaçlar isimsizdir, kayıtları yalnızca kişi görür.
     function officialStatsPath(pid) {
-      return /databases/$(database)/documents/officialStats/$(pid);
+      return dp('officialStats', pid);
     }
     function officialFollowPath(pid) {
-      return /databases/$(database)/documents/officialFollows/$(request.auth.uid + '__' + pid);
+      return dp('officialFollows', me() + '__' + pid);
     }
     function ageBandFor(by) {
       let age = request.time.year() - by;
       return age < 18 ? 'u18' : age < 25 ? '18-24' : age < 35 ? '25-34' : age < 45 ? '35-44' : age < 55 ? '45-54' : '55+';
     }
     function followMatchesUser(f) {
-      let u = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      let u = get(dp('users', me())).data;
       let loc = u.get('location', {});
       return f.provinceCode == loc.get('provinceCode', null)
         && f.districtId == loc.get('districtId', null)
@@ -3249,14 +3402,14 @@ service cloud.firestore {
     }
 
     match /officialFollows/{fid} {
-      allow read: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
+      allow read: if signedIn() && (resource == null || resource.data.uid == me());
       function _k133(nw) {
         return signedIn()
         && nw.keys().hasOnly(['uid', 'profileId', 'provinceCode', 'districtId', 'neighbourhoodId', 'ageBand', 'createdAt'])
-        && nw.uid == request.auth.uid
+        && nw.uid == me()
         && nw.profileId is string
-        && fid == request.auth.uid + '__' + nw.profileId
-        && exists(/databases/$(database)/documents/officialProfiles/$(nw.profileId))
+        && fid == me() + '__' + nw.profileId
+        && exists(dp('officialProfiles', nw.profileId))
         && followMatchesUser(nw)
         && nw.createdAt == request.time
         && statsTouched(nw.profileId);
@@ -3264,13 +3417,13 @@ service cloud.firestore {
       allow create: if _k133(request.resource.data);
       // Mahalle değişince (ya da yaş aralığı geçince) sayılar eski yerden yeniye taşınır.
       function _k134(nw, od) {
-        return signedIn() && od.uid == request.auth.uid
+        return signedIn() && od.uid == me()
         && nw.diff(od).affectedKeys().hasOnly(['provinceCode', 'districtId', 'neighbourhoodId', 'ageBand'])
         && followMatchesUser(nw)
         && statsTouched(od.profileId);
       }
       allow update: if _k134(request.resource.data, resource.data);
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid && statsTouched(resource.data.profileId);
+      allow delete: if signedIn() && resource.data.uid == me() && statsTouched(resource.data.profileId);
     }
 
     // Haritada tek bir sayaç tam bir azalır (o) ve / veya tam bir artar (n); başka hiçbir anahtar değişmez.
@@ -3362,21 +3515,40 @@ service cloud.firestore {
       allow create, update: if _k136(request.resource.data);
       allow delete: if isAdmin();
     }
+    // Gezimi planla ve Yakınımda (Karar, Eren, 12 Kasım 2026): konum ve hesaplanabilir açılış saatleri.
+    function placeGeoOk(d) {
+      return !('location' in d) || (d.location is map && d.location.keys().hasOnly(['lat', 'lng'])
+        && d.location.lat is number && d.location.lng is number
+        && d.location.lat >= -90 && d.location.lat <= 90 && d.location.lng >= -180 && d.location.lng <= 180);
+    }
+    function placeHoursOk(d) {
+      return !('hours' in d) || (d.hours is map && d.hours.keys().hasOnly(['allDay', 'open', 'close', 'closedDays', 'prayer'])
+        && d.hours.allDay is bool && d.hours.prayer is bool
+        && d.hours.closedDays is list && d.hours.closedDays.size() <= 6
+        && (d.hours.allDay
+          ? !('open' in d.hours) && !('close' in d.hours)
+          : (d.hours.open is string && d.hours.open.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+            && d.hours.close is string && d.hours.close.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+            && d.hours.open < d.hours.close)));
+    }
     match /travelPlaces/{id} {
       allow read: if resource == null || resource.data.status == 'yayinda' || isAdmin();
       function _k137(nw) {
         return isAdmin() && validTravelStatus(nw)
         && nw.keys().hasOnly(['cityId', 'districtId', 'name', 'kind', 'category', 'summary', 'about', 'history',
              'architecture', 'visitingHours', 'entranceFee', 'suggestedDuration', 'address', 'howToGet', 'nearby', 'tips',
-             'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'tour', 'mustSee', 'source', 'order', 'status', 'updatedAt'])
+             'bring', 'rules', 'ageInfo', 'accessibility', 'phone', 'website', 'videoUrl', 'cover', 'tour', 'mustSee', 'source', 'order', 'status', 'updatedAt',
+             'durationMinutes', 'hours', 'location', 'searchKeys'])
         && mediaKeptOrOwn(nw, 'cover', 'seyahat') && (!('tour' in nw) || (nw.tour is list && nw.tour.size() <= 6))
+        && placeGeoOk(nw) && placeHoursOk(nw)
+        && (!('durationMinutes' in nw) || (nw.durationMinutes is int && nw.durationMinutes >= 10 && nw.durationMinutes <= 720))
         && nw.cityId is string && nw.cityId.matches('^[0-8][0-9]$')
         && nw.name is string && nw.name.size() >= 2 && nw.name.size() <= 80
         && nw.category in ['tarih', 'doga', 'deniz', 'lezzet', 'kultur', 'alisveris']
         && nw.about is string && nw.about.size() <= 2000
         && nw.get('howToGet', []).size() <= 10 && nw.get('nearby', []).size() <= 10
         && nw.get('tips', []).size() <= 10
-        && travelUrlOk(nw, 'website') && travelUrlOk(nw, 'videoUrl');
+        && travelUrlOk(nw, 'website') && travelUrlOk(nw, 'videoUrl') && validSearchKeys(nw, 40);
       }
       allow create, update: if _k137(request.resource.data);
       allow delete: if isAdmin();
@@ -3445,10 +3617,12 @@ service cloud.firestore {
     function validMunicipal(id, d) {
       return id.matches('^bld-[0-9]{2}(-[a-z0-9-]+)?$')
         && d.keys().hasOnly(['cityId', 'districtId', 'slogan', 'description', 'videoUrl', 'mayorName', 'cover', 'showMayor', 'zone',
-             'population', 'populationYear', 'status', 'updatedAt'])
+             'population', 'populationYear', 'status', 'updatedAt', 'mayorPhoto', 'mayorActing', 'videos'])
         && mediaKeptOrOwn(d, 'cover', 'seyahat')
+        && mediaKeptOrOwn(d, 'mayorPhoto', 'seyahat')
+        && (!('mayorActing' in d) || d.mayorActing is bool)
         && d.cityId is string && d.cityId.matches('^[0-8][0-9]$')
-        && d.slogan is string && d.slogan.size() >= 2 && d.slogan.size() <= 60
+        && d.slogan is string && (d.slogan.size() == 0 || d.slogan.size() >= 2) && d.slogan.size() <= 60
         && d.description is string && d.description.size() <= 600
         && (!('mayorName' in d) || (d.mayorName is string && d.mayorName.size() <= 80))
         && (!('showMayor' in d) || d.showMayor is bool)
@@ -3456,6 +3630,7 @@ service cloud.firestore {
         && (!('population' in d) || (d.population is int && d.population >= 0))
         && (!('populationYear' in d) || (d.populationYear is string && d.populationYear.size() <= 10))
         && travelUrlOk(d, 'videoUrl')
+        && (!('videos' in d) || (d.videos is list && d.videos.size() <= 5))
         && d.status in ['taslak', 'onay-bekliyor', 'yayinda']
         && d.updatedAt == request.time;
     }
@@ -3476,10 +3651,10 @@ service cloud.firestore {
     }
 
     match /auditLog/{id} {
-      allow read: if isAdmin() || (signedIn() && resource.data.actorUid == request.auth.uid);
+      allow read: if isAdmin() || (signedIn() && resource.data.actorUid == me());
       function _k141(nw) {
         return signedIn()
-        && nw.actorUid == request.auth.uid
+        && nw.actorUid == me()
         && nw.at == request.time
         && (isAdmin()
             || (nw.get('region', null) is map

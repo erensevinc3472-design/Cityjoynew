@@ -9,6 +9,7 @@ const KEYS: Record<AuthErrorCode, string> = {
   network: 'errors.network',
   'requires-recent-login': 'errors.requiresRecentLogin',
   'popup-closed': 'errors.unknown',
+  'account-suspended': 'errors.accountSuspended',
   unknown: 'errors.unknown',
 };
 

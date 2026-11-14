@@ -22,6 +22,7 @@ import { locationRepository as repo } from '../lib/locations';
 import { useCity } from '../lib/city';
 import { isAdminUser, useSession } from '../lib/session';
 import { t } from '../lib/t';
+import { Intro } from '../components/intro';
 
 type Msg = { kind: 'ok' | 'error'; text: string } | undefined;
 
@@ -153,7 +154,7 @@ export function CityGuidePage() {
       <header className="page-head">
         <div>
           <h1>{t('guide.title')}</h1>
-          <p className="meta">{t('guide.intro')}</p>
+          <Intro text={t('guide.intro')} />
         </div>
         <div className="actions">
           {admin && !user?.isDemo ? <button className="btn secondary" onClick={() => setShowAll(true)}>{t('guide.readiness')}</button> : null}

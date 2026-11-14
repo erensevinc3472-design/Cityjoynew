@@ -14,6 +14,8 @@ import { FormMessage } from '@/components/form-message';
 import { HeroHeader } from '@/components/hero-header';
 import { StateMessage } from '@/components/state-message';
 import { locationRepository as repo } from '@/lib/locations';
+import { isAdminAccount } from '@cityjoy/shared/firebase';
+import { firestore } from '@/lib/firebase';
 import { profileRepository } from '@/lib/services';
 import { useSession } from '@/lib/session';
 import { useSettings } from '@/lib/settings';
@@ -85,7 +87,8 @@ export default function LocationScreen() {
       const neighbourhoodChanged = (next?.neighbourhoodId ?? null) !== (profile.location?.neighbourhoodId ?? null);
       const nextAllowed = nextNeighbourhoodChange(profile);
       // Mahalle ayda bir kez değişir; aynı kural veritabanında da denetlenir.
-      if (neighbourhoodChanged && nextAllowed && nextAllowed > new Date()) {
+      // CityJoy yöneticisi (deneme için konum değiştirir) bu sınıra takılmaz; kurallar da aynı (Eren, 12 Kasım 2026).
+      if (neighbourhoodChanged && nextAllowed && nextAllowed > new Date() && !(await isAdminAccount(firestore, user.uid).catch(() => false))) {
         setSaveError(t('account.neighbourhoodLocked', { date: nextAllowed.toLocaleDateString(i18n.language) }));
         return;
       }
@@ -166,7 +169,7 @@ export default function LocationScreen() {
 
       <SearchField value={query} onChangeText={setQuery} placeholder={t(`location.${searchKey[step]}`)} />
 
-      <FlatList
+      <FlatList automaticallyAdjustKeyboardInsets
         data={visible ?? []}
         keyExtractor={(r) => r.id}
         keyboardShouldPersistTaps="handled"

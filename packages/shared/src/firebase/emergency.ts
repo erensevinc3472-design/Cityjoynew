@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore';
+import { collection, doc, getDocs, serverTimestamp, writeBatch, type Firestore } from './metered';
 
 import {
   DEFAULT_EMERGENCY_NUMBERS,

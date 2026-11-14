@@ -8,7 +8,7 @@ import { useSession } from './session';
  * Oturum başına bir kez okunan Keşfet bilgileri: kendi herkese açık profilim (yoksa açılır), engellediklerim ve takip
  * ettiklerim. Değişince yerelde güncellenir; akışlar bunlara göre süzülür.
  */
-let state: { uid: string; profile: PublicProfile | null; blocked: Set<string>; following: string[] | null; businesses: string[] | null } | null = null;
+let state: { uid: string; profile: PublicProfile | null; blocked: Set<string>; following: string[] | null; businesses: string[] | null; team: string[] } | null = null;
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((f) => f());
 
@@ -27,7 +27,7 @@ export function useSocial() {
 
   useEffect(() => {
     if (!uid || !profile || state?.uid === uid) return;
-    state = { uid, profile: null, blocked: new Set(), following: null, businesses: null };
+    state = { uid, profile: null, blocked: new Set(), following: null, businesses: null, team: [] };
     socialRepository.ensureProfile(uid, authorNameOf(profile.displayName), profile.isPrivate).then((p) => {
       if (state?.uid === uid) state.profile = p;
       notify();
@@ -37,6 +37,11 @@ export function useSocial() {
       notify();
     }, () => {});
     refreshFollowing(uid);
+    // Sahibi ya da yetkilisi olduğum işletmeler: akışta kendi işletmesine "Takip et" görünmesin (14 Kasım 2026).
+    Promise.all([businessRepository.listMine(uid).catch(() => []), businessRepository.listManaged(uid).catch(() => [])]).then(([own, managed]) => {
+      if (state?.uid === uid) state.team = [...own, ...managed].map((b) => b.id);
+      notify();
+    });
     businessRepository.followedIds(uid).then((b) => {
       if (state?.uid === uid) state.businesses = b;
       notify();
@@ -54,6 +59,8 @@ export function useSocial() {
     following: mine?.following ?? null,
     /** Takip ettiğim işletmeler; null: henüz okunmadı. */
     followingBusinesses: mine?.businesses ?? null,
+    /** Sahibi ya da yetkilisi olduğum işletmelerin kimlikleri. */
+    teamBusinesses: mine?.team ?? [],
   };
 }
 

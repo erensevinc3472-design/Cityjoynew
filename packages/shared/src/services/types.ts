@@ -24,6 +24,8 @@ export type AuthErrorCode =
   | 'network'
   | 'requires-recent-login'
   | 'popup-closed'
+  /** Hesap askıya alındı (giriş kapalı). */
+  | 'account-suspended'
   | 'unknown';
 
 export class AuthError extends Error {
@@ -71,6 +73,8 @@ export interface ProfilePatch {
   isPrivate?: boolean;
   targeting?: ConsentRecord;
   commercialMessages?: ConsentRecord;
+  /** Yasal metinler yeniden onaylanınca: kullanım şartları ve aydınlatma metni birlikte yeni sürümle yazılır. */
+  legal?: ConsentRecord;
 }
 
 export interface ProfileRepository {

@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, limit, query, serverTimestamp, where, writeBatch, type Firestore } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, query, serverTimestamp, where, writeBatch, type Firestore } from './metered';
 
 import type { Business } from '../business/business';
 import type { HolidayCuration, HolidayTheme } from '../travel/holiday';

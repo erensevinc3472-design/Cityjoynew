@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { AppButton } from '@/components/app-button';
 import { AppText } from '@/components/app-text';
 import { AuthScene, onboardingStyles as styles, StepDots, WhyRow } from '@/components/auth-scene';
-import { AUTH_ART } from '@/lib/app-art';
 import { locationRepository as repo } from '@/lib/locations';
 
 const norm = (s?: string | null) => (s ?? '').toLocaleLowerCase('tr').replace(/\s+(ili|ilçesi|province|district)$/u, '').trim();
@@ -51,7 +50,7 @@ export default function PermissionLocationScreen() {
   };
 
   return (
-    <AuthScene kind="neighbourhood" image={AUTH_ART.permission} logo={false}>
+    <AuthScene kind="neighbourhood" art="permission" logo={false}>
       <StepDots total={3} current={0} label={t('onboarding.step', { n: 1, total: 3 })} />
       <View style={styles.texts}>
         <AppText accessibilityRole="header" style={styles.title}>{t('onboarding.locationTitle')}</AppText>

@@ -1,4 +1,4 @@
-import { doc, getDoc, serverTimestamp, writeBatch, type Firestore, type WriteBatch } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, writeBatch, type Firestore, type WriteBatch } from './metered';
 
 import {
   DEFAULT_LIMITS,

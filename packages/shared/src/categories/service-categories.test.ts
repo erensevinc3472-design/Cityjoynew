@@ -19,9 +19,9 @@ const memoryCache = () => {
 };
 
 describe('hizmet kategorileri', () => {
-  it('başlangıç listesi: 14 ana kategori, beş dil, benzersiz kimlik, acil kategoriler işaretli', () => {
+  it('başlangıç listesi: 22 ana kategori, beş dil, benzersiz kimlik, acil kategoriler işaretli', () => {
     const tree = buildCategoryTree([]);
-    expect(tree).toHaveLength(14);
+    expect(tree).toHaveLength(22);
     const ids = DEFAULT_SERVICE_CATEGORIES.map((c) => c.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const c of DEFAULT_SERVICE_CATEGORIES) expect(Object.keys(c.names).sort()).toEqual(['ar', 'de', 'en', 'ru', 'tr']);
@@ -47,7 +47,11 @@ describe('hizmet kategorileri', () => {
     expect(ids('çilingir', 'en')).toEqual(['cilingir']);
     // Ana kategori eşleşirse tüm alt kategorileri gelir.
     expect(ids('evcil hayvan').length).toBeGreaterThanOrEqual(5);
-    expect(ids('')).toHaveLength(88);
+    expect(ids('')).toHaveLength(242);
+    // Arama kelimeleri: kişi işini kendi deyişiyle bulur; her grubun sonunda "Diğer" var.
+    expect(ids('sakal')).toContain('berber');
+    expect(ids('muhasebe')).toContain('mali-musavir');
+    expect(tree.every((n) => n.children.at(-1)!.id === `${n.category.id}-diger`)).toBe(true);
   });
 
   it('liste yalnızca sürüm damgası değişince indirilir', async () => {

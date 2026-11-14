@@ -53,14 +53,16 @@ export default function ServiceCategoryScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const c = useThemeColors();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // Ara > Hizmetler > "Başka ilde ara": il parametresiyle başka ilin listesi açılır (Eren, 13 Kasım 2026).
+  const { id, province: otherProvince } = useLocalSearchParams<{ id: string; province?: string }>();
   const { language } = useSettings();
   const lang = language ?? 'tr';
   const { location } = useUserLocation();
   const { all } = useServiceCategories();
   const category = findCategory(all, id);
   const parent = category?.parentId ? findCategory(all, category.parentId) : undefined;
-  const province = location ? locationRepository.getProvince(location.provinceCode)?.name : undefined;
+  const provinceCode = otherProvince && locationRepository.getProvince(otherProvince) ? otherProvince : location?.provinceCode;
+  const province = provinceCode ? locationRepository.getProvince(provinceCode)?.name : undefined;
   const subtitle = [parent && localized(parent.names, lang), province].filter(Boolean).join(' · ');
   const name = category ? localized(category.names, lang) : t('services.title');
   const profile = PROFILES[id] ?? (category?.parentId ? PROFILES[category.parentId] : undefined);
@@ -73,8 +75,7 @@ export default function ServiceCategoryScreen() {
   const [openNow, setOpenNow] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
 
-  const provinceCode = location?.provinceCode;
-  const districtId = location?.districtId;
+  const districtId = provinceCode === location?.provinceCode ? location?.districtId : undefined;
   const load = useCallback(() => {
     if (!provinceCode) return;
     setError(false);
@@ -113,7 +114,7 @@ export default function ServiceCategoryScreen() {
 
   return (
     <Screen header={header}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      <ScrollView automaticallyAdjustKeyboardInsets contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         {category?.urgent || profile ? (
           <View style={[styles.warning, category?.urgent ? { backgroundColor: c.dangerSoft, borderColor: c.danger } : { backgroundColor: c.accentSoft, borderColor: c.accentBorder }]}>
             <MaterialIcons name={(category?.urgent ? 'warning-amber' : 'info-outline') as IconName} size={22} color={category?.urgent ? c.danger : c.primary} />
@@ -128,7 +129,7 @@ export default function ServiceCategoryScreen() {
           </View>
         ) : null}
         {category?.urgent ? <AppButton variant="secondary" title={t('services.emergencyNumbers')} onPress={() => router.push('/urgent')} /> : null}
-        {id === 'taksi' && location ? <TaxiStands provinceCode={location.provinceCode} districtId={location.districtId} /> : null}
+        {id === 'taksi' && location && provinceCode === location.provinceCode ? <TaxiStands provinceCode={location.provinceCode} districtId={location.districtId} /> : null}
 
         {total > 0 ? (
           <>
@@ -147,7 +148,7 @@ export default function ServiceCategoryScreen() {
           </>
         ) : null}
 
-        {!location ? (
+        {!provinceCode ? (
           <>
             <StateMessage kind="empty" message={t('business.noProvince')} />
             <AppButton title={t('business.chooseLocation')} onPress={() => router.push('/location?edit=1')} />
