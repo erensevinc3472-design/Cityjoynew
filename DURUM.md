@@ -4,10 +4,10 @@
 > baştan sona okuma, yalnızca üzerinde çalışılan konunun bölümünü oku (bölüm listesi en altta).
 > Bir iş bitince bu dosyayı güncelle: "Yapılanlar", "Açık işler" ve "Sıradaki adım" bölümleri.
 
-Son güncelleme: 14 Kasım 2026 (Resmî CityJoy hesabı 1. parça: altın rozet, istediği yere paylaşım, panelde "Resmî hesap yap"; kurallar ve panel henüz canlıya yüklenmedi).
+Son güncelleme: 14 Kasım 2026 (Resmî CityJoy hesabı 1. parça: altın rozet, istediği yere paylaşım, panelde "Resmî hesap yap"; kurallar ve panel canlıda, Eren izin verdi).
 
 > **Resmî CityJoy hesabı, 1. parça (14 Kasım 2026, Karar Eren: rozet seçenek A, altın; telefonda denenmedi; kurallar ve
-> panel canlıya yüklenmedi).** Eren uygulamada normal bir hesap açar; admin Panel > Profiller'de "Resmî hesap yap" der
+> panel canlıda: 14 Kasım, Eren izin verdi, kural servisi 503/409 verdi, 6. denemede geçti).** Eren uygulamada normal bir hesap açar; admin Panel > Profiller'de "Resmî hesap yap" der
 > (Panel > Rozetler'de "Resmî CityJoy hesabı" listesi ve geri alma; en çok 10; işlem kaydı). Alan: `publicProfiles.official`
 > (yalnızca admin yazar, `_k125`). Uygulama: adın yanında altın onay (`OfficialSeal`, `components/user-badges.tsx`),
 > profilde "Resmî CityJoy hesabı" etiketi; paylaşım ekranında hedef kutuları yerine "Nerede görünsün?" (Tüm Türkiye / Bir
